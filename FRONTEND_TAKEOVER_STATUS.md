@@ -1,5 +1,7 @@
 # Coursistant Frontend Takeover Status
 
+> Historical USC LMS handoff record only. Its 8084 deployment remains reserved for USC. The independent IELTS frontend uses Dev 8085; do not use this file as its live deployment guide.
+
 Updated: 2026-08-24
 
 This repository is a continuation of the existing React + TypeScript LMS frontend. The takeover work preserves the original application and incrementally replaces incomplete or legacy flows with the current LMS v2 contracts on backend port 8081.

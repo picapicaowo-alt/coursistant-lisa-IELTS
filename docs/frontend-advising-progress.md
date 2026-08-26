@@ -2,7 +2,7 @@
 
 仓库：`coursistant-lisa-IELTS`。对照后端当前说明：Counselor 招生交接、Advisor 建档与学习计划、Advisor 课程编排。
 
-**当前准确口径：本地 Vite `/api` 和 Dev review build 已配置为 Dev advising LMS `https://dev.xlearnedu.com:8083`。Counselor / Advisor Core 已用 Dev fixture 账号走通；Tenant 只读与改派连续性也已验证。公开 8084 的外部 `/api` 反向代理仍指向 8081，需基础设施所有者切到 8083 后才能在公网复跑这些角色。课程编排前端未接线。**
+**当前准确口径：本地 Vite `/api` 和 IELTS Dev 8085 均连接 Dev advising LMS `https://dev.xlearnedu.com:8083`。Counselor / Advisor Core 已用 Dev fixture 账号走通；Tenant 只读与改派连续性也已验证。8084 保留给 USC LMS，不能部署本仓库。课程编排前端未接线。**
 
 当前仍不能对外说「全部联调完成」：A/B 和 Tenant 主流程已点通，但新学生本人读取同一 aggregate 仍待验证码，Promotion C 也尚未授权接线。
 
@@ -31,7 +31,7 @@
 
 前端本地 Vite `/api` **已改打 8083**（`.env.development` 的 `VITE_BASE_PORT=8083`）。8083 原先也是 AI Workflow 占位；现在以 advising LMS 为准，Workflow 需另给端口。
 
-公开 `https://dev.xlearnedu.com:8084/api/v3/api-docs` 在本次前端发布后仍返回 150 paths，且不含 `/v2/counsellor/student-intakes`，说明 8084 的外部 `/api` upstream 仍是 8081。静态前端仓库不拥有该反向代理配置；需由基础设施所有者切换 upstream，并确保不向 8083 转发 8084 的 `Origin` 请求头。
+公开 `https://dev.xlearnedu.com:8085/api/v3/api-docs` 返回 183 paths，并包含 `/v2/counsellor/student-intakes`。8085 使用独立 PM2 静态服务，`/api` upstream 是 8083，代理边界不转发浏览器的 `Origin` 请求头。
 
 ### Dev 实测（2026-08-26）
 
@@ -170,7 +170,7 @@ Advisor Course 业务流前端 **尚未开始**。
 
 | 项 | 值 |
 |---|---|
-| 前端 | 本地 Vite `http://localhost:13005` 已代理 8083；公开 8084 静态页面已发布，外部 `/api` upstream 待切换 |
+| 前端 | 本地 Vite `http://localhost:13005` 已代理 8083；公开 Dev 为 `https://dev.xlearnedu.com:8085` |
 | 登录 | `POST /v1/auth/login`；Counselor / Advisor 的 `role=USER` |
 | 账号 | Dev fixture 已收到；不要把密码写进仓库 |
 

@@ -174,7 +174,7 @@ Historical normalized-store designs in `STATE_MANAGEMENT.md` / `ARCHITECTURE.md`
 ### 7.2 Client behavior
 
 - Use the shared `ApiClient` (token attach, refresh coalescing, session-expired callback).
-- Prefer relative `/api` in Dev so 8084 same-origin proxy works; do not hardcode secrets or long-lived tokens into the bundle.
+- Prefer relative `/api` in Dev so the IELTS 8085 same-origin proxy works; do not hardcode secrets or long-lived tokens into the bundle.
 - Never log access tokens, refresh material, passwords, or full auth payloads.
 - Binary download/preview: use authenticated blob helpers — do not put Bearer tokens in URLs.
 
@@ -256,19 +256,19 @@ Historical normalized-store designs in `STATE_MANAGEMENT.md` / `ARCHITECTURE.md`
 - `main` is the latest production-ready frontend source; do not merge a branch
   that cannot pass the complete frontend quality baseline and production build.
 - Prefer small, imperative commit subjects: `feat:`, `fix:`, `test:`, `chore:`.
-- Do not commit local QA screenshots (`local-*.png`, `dev-8084-*.png`) unless explicitly requested.
+- Do not commit local QA screenshots (`local-*.png`, `dev-8085-*.png`) unless explicitly requested.
 - CI uses `npm ci`, so `package-lock.json` is canonical. Keep the retained
   `yarn.lock` compatible with the same `package.json`; review and verify either
   lockfile whenever it changes.
 
 ---
 
-## 14. Dev 8084
+## 14. IELTS Dev 8085
 
-- Review UI is built with `npm run build:dev` and deployed as static assets to the Dev host’s `coursistant-review-8084` release layout.
-- 8084 is **not** auto-deployed from GitHub. After merge-worthy work, build from this repo and deploy deliberately.
-- `/api` on 8084 proxies to the Dev LMS API. Training advising Dev is **8083**;
-  university LMS remains 8081. Keep the frontend pointed at same-origin `/api`.
+- Review UI is built with `npm run build:dev` and deployed as static assets to the Dev host’s `coursistant-ielts-8085` release layout.
+- 8085 is **not** auto-deployed from GitHub. After merge-worthy work, build from this repo and deploy deliberately.
+- `/api` on 8085 proxies to the training advising Dev LMS on **8083**. Keep the frontend pointed at same-origin `/api`.
+- **8084 is reserved for the USC LMS frontend and must never receive this repository's releases.**
 
 ---
 

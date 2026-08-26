@@ -23,7 +23,7 @@ npm ci
 npm run dev
 ```
 
-Useful scripts: `npm run test:run`, `npm run build`, `npm run build:dev` (8084 review build).
+Useful scripts: `npm run test:run`, `npm run build`, `npm run build:dev` (IELTS 8085 review build).
 
 For production, deploy the output of a clean `main` checkout after `npm ci` and
 `npm run build`. Environment and demo-account values are existing integration
