@@ -9,7 +9,30 @@
 export type LoginAccountType = 'USER' | 'TENANT_ADMIN' | 'SYSTEM_ADMIN' | 'ADMIN';
 
 /** Platform standing. Course TAs are not represented here — TA is per-course. */
-export type UserLevel = 'STUDENT' | 'INSTRUCTOR' | 'NOT_APPLICABLE';
+export type UserLevel =
+  | 'STUDENT'
+  | 'INSTRUCTOR'
+  | 'COUNSELLOR'
+  | 'ADVISOR'
+  | 'INSTRUCTOR_ADVISOR'
+  | 'NOT_APPLICABLE';
+
+export const USER_LEVELS: UserLevel[] = [
+  'STUDENT',
+  'INSTRUCTOR',
+  'COUNSELLOR',
+  'ADVISOR',
+  'INSTRUCTOR_ADVISOR',
+  'NOT_APPLICABLE',
+];
+
+export const MANAGED_USER_LEVELS: Exclude<UserLevel, 'NOT_APPLICABLE'>[] = [
+  'STUDENT',
+  'INSTRUCTOR',
+  'COUNSELLOR',
+  'ADVISOR',
+  'INSTRUCTOR_ADVISOR',
+];
 
 export interface LoginRequest {
   email: string;

@@ -1,0 +1,321 @@
+openapi: 3.0.1
+info:
+  title: LMS Counsellor Intake API
+  version: 1.0.0
+  description: >-
+    Standalone Counsellor Intake contract. Same operations also live in
+    advising.openapi.yaml. Paths use Counsellor spelling: /v2/counsellor/**.
+servers:
+- url: /api
+  description: Servlet context-path
+security:
+- bearerAuth: []
+tags:
+- name: CounsellorIntakes
+paths:
+  /v2/counsellor/student-intakes:
+    post:
+      operationId: counsellorCreateStudentIntake
+      tags: [CounsellorIntakes]
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          maxLength: 128
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentIntakeRequest"
+      responses:
+        "201":
+          description: "HTTP 201. ApiResponse.status=201. ApiResponse.code=SUCCESS. Created USER/STUDENT plus OPEN UNASSIGNED intake."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentIntakeApiResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409":
+          description: "USER_ALREADY_EXISTS, ADVISING_FEATURE_DISABLED, IDEMPOTENCY_KEY_MISMATCH"
+    get:
+      operationId: counsellorListStudentIntakes
+      tags: [CounsellorIntakes]
+      parameters:
+      - $ref: "#/components/parameters/Page"
+      - $ref: "#/components/parameters/Size"
+      responses:
+        "200":
+          description: "HTTP 200. ApiResponse.status=200. ApiResponse.code=SUCCESS. Caller-owned unassigned OPEN intakes."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentIntakePageApiResponse"
+        "400":
+          description: PARAM_MISSING or BAD_REQUEST
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /v2/counsellor/student-intakes/{intakeId}:
+    get:
+      operationId: counsellorGetStudentIntake
+      tags: [CounsellorIntakes]
+      parameters:
+      - $ref: "#/components/parameters/IntakeId"
+      responses:
+        "200":
+          description: "HTTP 200. ApiResponse.status=200. ApiResponse.code=SUCCESS. Caller-owned unassigned OPEN intake."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentIntakeApiResponse"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: STUDENT_INTAKE_NOT_FOUND
+    patch:
+      operationId: counsellorPatchStudentIntake
+      tags: [CounsellorIntakes]
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          maxLength: 128
+      - $ref: "#/components/parameters/IntakeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchStudentIntakeRequest"
+      responses:
+        "200":
+          description: "HTTP 200. ApiResponse.status=200. ApiResponse.code=SUCCESS. Updated unassigned intake."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentIntakeApiResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: STUDENT_INTAKE_NOT_FOUND
+        "409":
+          description: "STUDENT_INTAKE_VERSION_CONFLICT, ADVISING_FEATURE_DISABLED, IDEMPOTENCY_KEY_MISMATCH"
+  /v2/counsellor/advisors:
+    get:
+      operationId: counsellorListAdvisors
+      tags: [CounsellorIntakes]
+      parameters:
+      - $ref: "#/components/parameters/Page"
+      - $ref: "#/components/parameters/Size"
+      responses:
+        "200":
+          description: "HTTP 200. ApiResponse.status=200. ApiResponse.code=SUCCESS. Same-tenant ACTIVE ADVISOR or INSTRUCTOR_ADVISOR candidates."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AdvisorCandidatePageApiResponse"
+        "400":
+          description: PARAM_MISSING or BAD_REQUEST
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /v2/counsellor/student-intakes/{intakeId}/advisor:
+    put:
+      operationId: counsellorAssignAdvisor
+      tags: [CounsellorIntakes]
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          maxLength: 128
+      - $ref: "#/components/parameters/IntakeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignAdvisorRequest"
+      responses:
+        "200":
+          description: "HTTP 200. ApiResponse.status=200. ApiResponse.code=SUCCESS. First assignment; assignmentVersion=0."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentIntakeApiResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: STUDENT_INTAKE_NOT_FOUND
+        "409":
+          description: "ADVISOR_NOT_ELIGIBLE, STUDENT_ALREADY_ASSIGNED, STUDENT_INTAKE_VERSION_CONFLICT, ADVISING_FEATURE_DISABLED, IDEMPOTENCY_KEY_MISMATCH"
+  /v2/counsellor/dashboard:
+    get:
+      operationId: counsellorGetDashboard
+      tags: [CounsellorIntakes]
+      description: Read-only counsellor aggregates. Available even when intake-assignment-writes-enabled is false.
+      responses:
+        "200":
+          description: "HTTP 200. ApiResponse.status=200. ApiResponse.code=SUCCESS."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CounsellorDashboardApiResponse"
+        "401":
+          description: UNAUTHORIZED
+        "403": { $ref: "#/components/responses/Forbidden" }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    IntakeId:
+      name: intakeId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, default: 0, minimum: 0 }
+    Size:
+      name: size
+      in: query
+      schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
+  responses:
+    BadRequest:
+      description: PARAM_MISSING or BAD_REQUEST
+    Unauthorized:
+      description: UNAUTHORIZED
+    Forbidden:
+      description: FORBIDDEN
+  schemas:
+    CreateStudentIntakeRequest:
+      type: object
+      required: [name, email, studentType, courseRequest]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 255 }
+        email: { type: string, maxLength: 255 }
+        studentType: { type: string, enum: [VIP, STANDARD] }
+        courseRequest: { type: string, minLength: 1, maxLength: 2000 }
+        contactPhone: { type: string, minLength: 7, maxLength: 64 }
+        basicBackground: { type: string, maxLength: 4000 }
+    PatchStudentIntakeRequest:
+      type: object
+      required: [expectedIntakeVersion]
+      description: email, role, level and tenantId are not accepted. At least one mutable field besides expectedIntakeVersion is required.
+      properties:
+        expectedIntakeVersion: { type: integer }
+        name: { type: string, minLength: 1, maxLength: 255 }
+        studentType: { type: string, enum: [VIP, STANDARD] }
+        courseRequest: { type: string, maxLength: 2000 }
+        contactPhone: { type: string, minLength: 7, maxLength: 64 }
+        basicBackground: { type: string, maxLength: 4000 }
+    AssignAdvisorRequest:
+      type: object
+      required: [advisorUserId, expectedIntakeVersion]
+      properties:
+        advisorUserId: { type: integer }
+        expectedIntakeVersion: { type: integer }
+    StudentIntakeResponse:
+      type: object
+      required: [intakeId, studentUserId, lifecycleStatus, assignmentStatus, intakeVersion]
+      properties:
+        intakeId: { type: integer, format: int64 }
+        studentUserId: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        studentType: { type: string, enum: [VIP, STANDARD] }
+        courseRequest: { type: string }
+        contactPhone: { type: string }
+        basicBackground: { type: string }
+        lifecycleStatus: { type: string, enum: [OPEN, CANCELLED] }
+        assignmentStatus: { type: string, enum: [UNASSIGNED, ASSIGNED] }
+        intakeVersion: { type: integer }
+        activationMethod: { type: string, enum: [PASSWORD_RESET] }
+        advisorUserId: { type: integer }
+        assignmentVersion: { type: integer }
+        createdAt: { type: string, format: date-time }
+        updatedAt: { type: string, format: date-time }
+    AdvisorCandidateResponse:
+      type: object
+      required: [advisorUserId, name, email, level]
+      properties:
+        advisorUserId: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        level: { type: string, enum: [ADVISOR, INSTRUCTOR_ADVISOR] }
+    CounsellorDashboardResponse:
+      type: object
+      required: [createdCount, assignedCount, unassignedCount]
+      properties:
+        createdCount: { type: integer, format: int64 }
+        assignedCount: { type: integer, format: int64 }
+        unassignedCount: { type: integer, format: int64 }
+    AdvisingPageStudentIntake:
+      type: object
+      required: [page, size, total, items]
+      properties:
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer, format: int64 }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/StudentIntakeResponse" }
+    AdvisingPageAdvisorCandidate:
+      type: object
+      required: [page, size, total, items]
+      properties:
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer, format: int64 }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/AdvisorCandidateResponse" }
+    StudentIntakeApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/StudentIntakeResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    CounsellorDashboardApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/CounsellorDashboardResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    StudentIntakePageApiResponse:
+      type: object
+      properties:
+        status: { type: integer }
+        code: { type: string }
+        data: { $ref: "#/components/schemas/AdvisingPageStudentIntake" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    AdvisorCandidatePageApiResponse:
+      type: object
+      properties:
+        status: { type: integer }
+        code: { type: string }
+        data: { $ref: "#/components/schemas/AdvisingPageAdvisorCandidate" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }

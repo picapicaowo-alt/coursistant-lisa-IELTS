@@ -8,7 +8,7 @@ architecture.
 |------|----------------|
 | `main.tsx` | Application boot and top-level providers |
 | `App.tsx` | Lazy route composition and authenticated/public shells |
-| `pages/` | Product verticals; page-only components, hooks, stores, and tests stay with the page |
+| `pages/CounsellorDashboardPage` and advising verticals | Counsellor / Advisor / Student / Tenant intake and profile-plan surfaces (Gates A/B) |
 | `components/` | Reusable UI with more than one real consumer |
 | `apis/services/` | Browser request functions grouped by product domain |
 | `apis/types/` | Typed request/response contracts consumed by the frontend |

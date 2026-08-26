@@ -1,7 +1,12 @@
-# Coursistant Core Frontend Rules
+# Coursistant Training Frontend Rules
 
 These rules apply to the entire repository and to humans, coding agents, and
 automation working in it.
+
+This is the **independent training-institution product** (IELTS / GRE / TOEFL
+operations). It was forked from the university LMS frontend and keeps the same
+stack and ownership boundary. It is not a drop-in replacement for
+`picapicaowo-alt/coursistant-lisa`.
 
 ## Rule 1: this repository owns the frontend only
 
@@ -16,20 +21,19 @@ automation working in it.
   scope. They are integration inputs, not opportunistic cleanup targets.
 - When a frontend change exposes an external contract problem, record the
   expected/observed behavior for handoff. Do not repair the external system.
+- Do not invent endpoints, fields, or error codes that are not in the consumed
+  OpenAPI. Gate C course orchestration stays unwired until Promotion C is
+  authorized.
+- Never commit credentials, fixture passwords, or Dev account values.
 
-## Repository ownership and transition
+## Repository ownership
 
-- Planned organization home: `Coursistant-Inc/lms-frontend`.
-- Current authorized working repository during the handoff:
-  `picapicaowo-alt/coursistant-lisa`.
-- Until organization access and migration are explicitly confirmed, the
-  current working repository's `main` is the production-ready frontend source.
-  It must remain understandable, tested, and directly buildable.
-- Treat repository migration as a deliberate handoff: update remotes, branch
-  protections, CI, and these references together. Do not infer that access has
-  been granted or switch remotes opportunistically.
-- Follow `lms/PROJECT_STANDARDS.md`. Historical documents never override the
-  live code and that standard.
+- Authorized working repository: `picapicaowo-alt/coursistant-lisa-IELTS`.
+- App root: `lms/`.
+- Follow `lms/PROJECT_STANDARDS.md`. Historical university LMS documents never
+  override the live code and that standard.
+- Frontend-consumed contracts live in `docs/`. `docs/api/advising.openapi.yaml`
+  is the unique advising contract.
 
 ## Implementation rules
 
@@ -41,21 +45,12 @@ automation working in it.
   requests. TanStack Query owns server state; Zustand owns complex client/page
   state; `useState` owns local transient state.
 - SCSS Modules and the existing design tokens are the default styling path.
-  MUI or another UI kit is not permanently prohibited, but adding one requires
-  an explicit frontend architecture decision covering token/theme mapping,
-  shared component ownership, accessibility, bundle cost, and migration scope.
-  Approved kit components must enter through the shared UI layer rather than
-  ad-hoc imports in feature pages.
+  Figma is not ready: ship functional pages that can be restyled later. MUI or
+  another UI kit requires an explicit frontend architecture decision.
 - Do not add deploy-specific URLs, credentials, demo values, duplicated route
-  strings, role/status strings, or design colors directly in feature code. Use
-  the existing environment key, config module, typed domain constant, route
-  helper, or design token that owns the value. Do not move or rename existing
-  integration values as drive-by cleanup.
+  strings, role/status strings, or design colors directly in feature code.
 - Comments explain constraints, invariants, compatibility decisions, and the
-  reason behind non-obvious code. Do not narrate syntax or leave stale history
-  in source comments. Add concise TSDoc/JSDoc at tricky API, permission,
-  lifecycle, concurrency, cache, and state-transition boundaries; there is no
-  comment quota, and self-evident code should remain self-evident.
+  reason behind non-obvious code.
 - Never add `any`, `as any`, `@ts-nocheck`, ignored lint errors, secrets, or
   production `console.log` calls to avoid doing the real work.
 

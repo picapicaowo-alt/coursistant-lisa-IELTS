@@ -1,32 +1,35 @@
 ---
-description: Coursistant LMS frontend — repository transition, stack, and scope rules
+description: Coursistant training frontend — repository, stack, and scope rules
 alwaysApply: true
 ---
 
-# Coursistant LMS Frontend (Subfolder Rules)
+# Coursistant Training Frontend
 
-- **Planned organization home:** `https://github.com/Coursistant-Inc/lms-frontend`
-- **Current authorized working repository:** `https://github.com/picapicaowo-alt/coursistant-lisa`
+- **Authorized working repository:** `https://github.com/picapicaowo-alt/coursistant-lisa-IELTS`
+- **Upstream university LMS (read-only fork source):** `https://github.com/picapicaowo-alt/coursistant-lisa`
 - **App root:** `lms/`
 - **Standards doc:** `lms/PROJECT_STANDARDS.md` — read before editing frontend code.
+- **Consumed advising contract:** `docs/api/advising.openapi.yaml`
+
+This is an independent training-institution product. Do not treat
+`coursistant-lisa`, `bink44/lms-frontend`, or other forks as the place to land
+IELTS work.
 
 ## 1. Stack & Development Rules
 - **Language:** React 18 + TypeScript (`.ts` / `.tsx`) for all **new** code.
 - **Server State:** TanStack Query (`@tanstack/react-query`) + API services in `src/apis/services/*`.
 - **Client State:** Zustand only for complex page/workspace UI state.
-- **Styles:** SCSS modules with design tokens (`src/styles/_tokens.scss`).
+- **Styles:** SCSS modules with design tokens (`src/styles/_tokens.scss`). Figma is not ready — ship functional pages that can be restyled later.
 - **Tests:** Colocate `*.test.ts(x)` with unit under test using Vitest + Testing Library.
 - **Verification:** Run `npm run typecheck` and `npm run lint` in `lms/` before committing.
 - **自测要求**：每次有任何改动，你都要先自测（类型检查、单元测试等），自测完全没问题之后，再告诉用户。
 
 ## 2. Strict Prohibitions
 - Do NOT add new `.jsx` / `.js` source files.
-- Keep the configured authorized origin until the organization migration is
-  explicitly approved; do not point remotes at `bink44/lms-frontend` or
-  unrelated forks.
-- Keep SCSS Modules and existing design tokens as the default. MUI or another
-  UI kit requires an explicit frontend architecture decision and a shared UI
-  integration boundary; do not add ad-hoc kit imports in feature pages.
+- Do NOT invent OpenAPI paths, fields, or error codes. Implement only what `docs/api/` already contains.
+- Do NOT wire Milestone C course-orchestration mutations until Promotion C is authorized.
+- Do NOT commit passwords, fixture credentials, or Dev account values.
+- Keep SCSS Modules and existing design tokens as the default.
 - Do NOT commit QA screenshots (`local-*.png`, `dev-8084-*.png`) unless asked.
 - Do NOT rewrite legacy chat/profile JSX unless explicitly scoped for migration.
 

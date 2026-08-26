@@ -1,8 +1,10 @@
 # Project Standards
 
-Living coding standards for **coursistant-lisa** (Coursistant LMS frontend).
+Living coding standards for **coursistant-lisa-IELTS** (training-institution frontend).
 
-These rules started from the LmsHomePage / CourseWorkspacePage refactor guidelines and are extended for the current LMS v2 work (assignments, quiz, roster, notifications, AI workplace, Dev 8084).
+These rules started from the university LMS refactor guidelines and apply to
+the independent IELTS / training product. Keep the same stack; do not invent
+advising APIs that are not in `docs/api/advising.openapi.yaml`.
 
 **Coursistant rule number one:** this repository owns the frontend only. Read
 [`../AGENTS.md`](../AGENTS.md) before making changes. A frontend task must not
@@ -11,12 +13,7 @@ service implementations, databases, or infrastructure. Existing environment,
 proxy, and designated demo-account values remain unchanged unless the task
 explicitly requests that exact frontend configuration change.
 
-**Planned organization home:** `https://github.com/Coursistant-Inc/lms-frontend`
-
-**Current authorized working repository:** `https://github.com/picapicaowo-alt/coursistant-lisa`
-
-Until organization access and migration are explicitly confirmed, the current
-working repository's `main` remains the production-ready frontend source.
+**Authorized working repository:** `https://github.com/picapicaowo-alt/coursistant-lisa-IELTS`
 
 **Related:** `ARCHITECTURE.md`, `STATE_MANAGEMENT.md`, and `API_STANDARDS.md` are historical design notes — prefer this file when they conflict with current code.
 

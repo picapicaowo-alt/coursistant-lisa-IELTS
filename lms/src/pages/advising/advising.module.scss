@@ -1,0 +1,292 @@
+.page {
+  min-height: 100%;
+  padding: 2rem clamp(1rem, 4vw, 3.5rem) 4rem;
+  background: t.$page-bg;
+  color: t.$text;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 82rem;
+  margin: 0 auto 1.25rem;
+}
+
+.header h1 {
+  margin: .2rem 0;
+  font-size: clamp(2rem, 4vw, t.$fs-h1);
+  font-weight: t.$fw-extrabold;
+}
+
+.eyebrow {
+  color: t.$brand;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lede,
+.muted {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.5;
+}
+
+.grid {
+  display: grid;
+  max-width: 82rem;
+  margin: 0 auto;
+  gap: 1.25rem;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 82rem;
+  margin: 0 auto 1.25rem;
+}
+
+.stat,
+.card {
+  padding: 1.35rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+}
+
+.stat strong {
+  display: block;
+  font-size: t.$fs-doc-title;
+  font-weight: t.$fw-extrabold;
+}
+
+.stat span,
+.row span,
+.row small {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+}
+
+.list {
+  display: grid;
+  gap: .65rem;
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .85rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+}
+
+.identity {
+  display: grid;
+  gap: .15rem;
+  min-width: 0;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+
+.form {
+  display: grid;
+  gap: .8rem;
+  max-width: 44rem;
+}
+
+.form label {
+  display: grid;
+  gap: .35rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  min-height: 2.65rem;
+  padding: .55rem .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.form textarea {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.form input:focus-visible,
+.form select:focus-visible,
+.form textarea:focus-visible,
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid t.$brand-subtle;
+  outline-offset: 2px;
+}
+
+.primary,
+.secondary,
+.danger {
+  min-height: 2.5rem;
+  padding: 0 .9rem;
+  border-radius: t.$radius-control-sm;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+
+.primary {
+  border: 1px solid t.$brand;
+  background: t.$brand;
+  color: #fff;
+}
+
+.secondary {
+  border: 1px solid t.$border;
+  background: t.$card-bg;
+  color: t.$text;
+}
+
+.danger {
+  border: 1px solid t.$danger;
+  background: t.$danger;
+  color: #fff;
+}
+
+.primary:disabled,
+.secondary:disabled,
+.danger:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+.link {
+  color: t.$brand;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+  text-decoration: none;
+}
+
+.status,
+.error {
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+  padding: .75rem 1rem;
+  border-radius: t.$radius-control;
+  color: t.$text-muted;
+}
+
+.error {
+  background: rgba(t.$danger, .1);
+  color: t.$danger;
+}
+
+.success {
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+  padding: .75rem 1rem;
+  border-radius: t.$radius-control;
+  background: t.$success-subtle;
+  color: t.$success;
+}
+
+.tabs {
+  display: flex;
+  gap: .35rem;
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+  padding: .35rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  background: t.$card-bg;
+}
+
+.tabs a {
+  min-height: 2.5rem;
+  padding: .55rem 1rem;
+  border-radius: t.$radius-control-sm;
+  color: t.$text-muted;
+  font-weight: t.$fw-semibold;
+  text-decoration: none;
+}
+
+.tabActive {
+  background: t.$brand;
+  color: #fff;
+}
+
+.badge {
+  display: inline-block;
+  padding: .14rem .55rem;
+  border-radius: t.$radius-pill;
+  background: t.$brand-subtle;
+  color: t.$brand;
+  font-size: t.$fs-logo;
+  font-weight: t.$fw-bold;
+}
+
+.warn {
+  padding: .75rem 1rem;
+  border-radius: t.$radius-control;
+  background: rgba(t.$warning, .12);
+  color: t.$warning;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  margin-top: 1rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.nested {
+  display: grid;
+  gap: .75rem;
+  padding: .85rem;
+  border: 1px dashed t.$border;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.readonly dt {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.readonly dd {
+  margin: 0 0 .75rem;
+}
+
+@media (max-width: 800px) {
+  .stats { grid-template-columns: 1fr; }
+  .header, .row, .toolbar { flex-direction: column; }
+  .tabs { flex-wrap: wrap; }
+}

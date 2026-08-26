@@ -1,5 +1,5 @@
 ---
-description: TypeScript and React coding standards for maintained LMS modules
+description: TypeScript and React coding standards for maintained training frontend modules
 globs: lms/src/**/*.{ts,tsx}
 alwaysApply: false
 ---

@@ -1,8 +1,10 @@
 import {Suspense, lazy} from "react";
-import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
+import {BrowserRouter as Router, Navigate, Routes, Route} from "react-router-dom";
 import {AuthProvider} from "./contexts/AuthContext";
 import AuthLayout from "./layouts/AuthLayout";
-import {RequiredAuthProvider} from "@/contexts/RequiredAuthContext";
+import {RequiredAuthProvider, useRequiredAuth} from "@/contexts/RequiredAuthContext";
+import {RequireAdvisingAccess} from "@/pages/advising/RequireAdvisingAccess";
+import {getSignedInHomePath} from "@/utils/signedInHomePath";
 
 const Layout = lazy(() => import("./layouts/Layout"));
 const LMSHome = lazy(() => import("./pages/LmsHomePage"));
@@ -35,7 +37,26 @@ const Login = lazy(() => import("@/pages/LoginPage"));
 const Signup = lazy(() => import("./pages/signup/SignUpView"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPasswordPage"));
 const AdminConsolePage = lazy(() => import('./pages/AdminConsolePage'));
+const CounsellorDashboardPage = lazy(() => import('./pages/CounsellorDashboardPage'));
+const CounsellorIntakesPage = lazy(() => import('./pages/CounsellorIntakesPage'));
+const CounsellorIntakeFormPage = lazy(() => import('./pages/CounsellorIntakeFormPage'));
+const CounsellorAssignAdvisorPage = lazy(() => import('./pages/CounsellorAssignAdvisorPage'));
+const AdvisorStudentsPage = lazy(() => import('./pages/AdvisorStudentsPage'));
+const AdvisorStudentLayout = lazy(() => import('./pages/AdvisorStudentWorkspacePage'));
+const AdvisorStudentIntakePage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/IntakePage'));
+const AdvisorStudentProfilePage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/ProfilePage'));
+const AdvisorStudentStudyPlanPage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/StudyPlanPage'));
+const StudentAdvisingPage = lazy(() => import('./pages/StudentAdvisingPage'));
+const TenantIntakesPage = lazy(() => import('./pages/TenantIntakesPage'));
+const TenantStudentRecordPage = lazy(() => import('./pages/TenantStudentRecordPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+
+const SignedInHome = () => {
+  const {user} = useRequiredAuth();
+  const home = getSignedInHomePath(user);
+  if (home !== '/') return <Navigate to={home} replace/>;
+  return <LMSHome/>;
+};
 
 const App = () => {
   return (
@@ -68,7 +89,7 @@ const App = () => {
             />
 
             <Route path="/" element={<RequiredAuthProvider><Layout/></RequiredAuthProvider>}>
-              <Route index element={<LMSHome/>}/>
+              <Route index element={<SignedInHome/>}/>
               <Route path="course" element={<CourseCataloguePage/>}/>
               <Route path="course/:courseId" element={<CourseWorkspacePage/>}/>
               <Route path="course/:courseId/assignments/:assignmentId" element={<AssignmentDetailPage/>}/>
@@ -100,6 +121,21 @@ const App = () => {
               <Route path="aibot" element={<AIBot/>}/>
               <Route path="settings" element={<Settings/>}/>
               <Route path="admin" element={<AdminConsolePage/>}/>
+              <Route path="counsellor" element={<RequireAdvisingAccess gate="counsellor"><CounsellorDashboardPage/></RequireAdvisingAccess>}/>
+              <Route path="counsellor/intakes" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakesPage/></RequireAdvisingAccess>}/>
+              <Route path="counsellor/intakes/new" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>
+              <Route path="counsellor/intakes/:intakeId" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>
+              <Route path="counsellor/intakes/:intakeId/assign" element={<RequireAdvisingAccess gate="counsellor"><CounsellorAssignAdvisorPage/></RequireAdvisingAccess>}/>
+              <Route path="advisor/students" element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentsPage/></RequireAdvisingAccess>}/>
+              <Route path="advisor/students/:studentUserId" element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentLayout/></RequireAdvisingAccess>}>
+                <Route index element={<Navigate to="intake" replace/>}/>
+                <Route path="intake" element={<AdvisorStudentIntakePage/>}/>
+                <Route path="profile" element={<AdvisorStudentProfilePage/>}/>
+                <Route path="study-plan" element={<AdvisorStudentStudyPlanPage/>}/>
+              </Route>
+              <Route path="my-plan" element={<RequireAdvisingAccess gate="student"><StudentAdvisingPage/></RequireAdvisingAccess>}/>
+              <Route path="admin/intakes" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantIntakesPage/></RequireAdvisingAccess>}/>
+              <Route path="admin/students/:studentUserId" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantStudentRecordPage/></RequireAdvisingAccess>}/>
               <Route path="*" element={<NotFoundPage/>}/>
             </Route>
             <Route

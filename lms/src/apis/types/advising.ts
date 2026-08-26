@@ -1,0 +1,289 @@
+/**
+ * Advising contracts from docs/api/advising.openapi.yaml (Gates A and B).
+ * Gate C course orchestration types stay out until Promotion C is authorized.
+ */
+
+export type StudentType = 'VIP' | 'STANDARD';
+export type IntakeLifecycleStatus = 'OPEN' | 'CANCELLED';
+export type IntakeAssignmentStatus = 'UNASSIGNED' | 'ASSIGNED';
+export type AdvisorCandidateLevel = 'ADVISOR' | 'INSTRUCTOR_ADVISOR';
+export type StudyPlanRevisionAction = 'STUDY_PLAN_CREATED' | 'STUDY_PLAN_UPDATED';
+
+export interface AdvisingPage<T> {
+  page: number;
+  size: number;
+  total: number;
+  items: T[];
+}
+
+export interface CreateStudentIntakeRequest {
+  name: string;
+  email: string;
+  studentType: StudentType;
+  courseRequest: string;
+  contactPhone?: string;
+  basicBackground?: string;
+}
+
+export interface PatchStudentIntakeRequest {
+  expectedIntakeVersion: number;
+  name?: string;
+  studentType?: StudentType;
+  courseRequest?: string;
+  contactPhone?: string;
+  basicBackground?: string;
+}
+
+export interface AssignAdvisorRequest {
+  advisorUserId: number;
+  expectedIntakeVersion: number;
+}
+
+export interface ReassignAdvisorRequest {
+  advisorUserId: number;
+  expectedAssignmentVersion: number;
+  reason?: string;
+}
+
+export interface CancelStudentIntakeRequest {
+  expectedIntakeVersion: number;
+  reason: string;
+}
+
+export interface StudentIntakeResponse {
+  intakeId: number;
+  studentUserId: number;
+  name?: string;
+  email?: string;
+  studentType?: StudentType;
+  courseRequest?: string;
+  contactPhone?: string;
+  basicBackground?: string;
+  lifecycleStatus: IntakeLifecycleStatus;
+  assignmentStatus: IntakeAssignmentStatus;
+  intakeVersion: number;
+  activationMethod?: 'PASSWORD_RESET';
+  advisorUserId?: number;
+  assignmentVersion?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface AdvisorCandidateResponse {
+  advisorUserId: number;
+  name: string;
+  email: string;
+  level: AdvisorCandidateLevel;
+}
+
+export interface CounsellorDashboardResponse {
+  createdCount: number;
+  assignedCount: number;
+  unassignedCount: number;
+}
+
+export interface AdvisorStudentSummaryResponse {
+  studentUserId: number;
+  name: string;
+  email: string;
+  studentType: StudentType;
+  assignmentVersion: number;
+}
+
+export interface TenantIntakeListParams {
+  page?: number;
+  size?: number;
+  lifecycleStatus?: IntakeLifecycleStatus;
+  assignmentStatus?: IntakeAssignmentStatus;
+  advisorUserId?: number;
+}
+
+export interface ProfileSkillRequest {
+  skillCode: string;
+  displayName: string;
+  scale: string;
+  currentValue?: string;
+  targetValue?: string;
+  gapSummary?: string;
+  position: number;
+}
+
+export interface ProfileSkillResponse {
+  skillCode?: string;
+  displayName?: string;
+  scale?: string;
+  currentValue?: string;
+  targetValue?: string;
+  gapSummary?: string;
+  position?: number;
+}
+
+export interface CreateStudentProfileRequest {
+  contactPhone?: string;
+  academicBackground?: string;
+  priorTestExperience?: string;
+  baselineAssessment?: string;
+  targetGoal?: string;
+  targetMetric?: string;
+  targetValue?: string;
+  targetDate?: string;
+  advisorInterpretation?: string;
+  advisorPrivateNotes?: string;
+  skills?: ProfileSkillRequest[];
+}
+
+export interface UpdateStudentProfileRequest extends CreateStudentProfileRequest {
+  expectedProfileVersion: number;
+  skills: ProfileSkillRequest[];
+}
+
+export interface AdvisorStudentProfileResponse {
+  profileId: number;
+  studentUserId: number;
+  name?: string;
+  email?: string;
+  studentType?: StudentType;
+  advisorUserId?: number;
+  contactPhone?: string;
+  academicBackground?: string;
+  priorTestExperience?: string;
+  baselineAssessment?: string;
+  targetGoal?: string;
+  targetMetric?: string;
+  targetValue?: string;
+  targetDate?: string;
+  advisorInterpretation?: string;
+  advisorPrivateNotes?: string;
+  skills?: ProfileSkillResponse[];
+  profileVersion: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/** Student and tenant reads omit advisorPrivateNotes. */
+export interface StudentFacingProfileResponse {
+  profileId: number;
+  studentUserId: number;
+  name?: string;
+  email?: string;
+  studentType?: StudentType;
+  contactPhone?: string;
+  academicBackground?: string;
+  priorTestExperience?: string;
+  baselineAssessment?: string;
+  targetGoal?: string;
+  targetMetric?: string;
+  targetValue?: string;
+  targetDate?: string;
+  advisorInterpretation?: string;
+  skills?: ProfileSkillResponse[];
+  profileVersion: number;
+}
+
+export interface TenantStudentProfileResponse extends StudentFacingProfileResponse {
+  advisorUserId?: number;
+}
+
+export interface AdvisorTaskRequest {
+  id?: number;
+  title: string;
+  description?: string;
+  dueDate?: string;
+  submissionRequirement?: string;
+  position: number;
+}
+
+export interface CheckpointRequest {
+  id?: number;
+  description: string;
+  goal: string;
+  dueDate: string;
+  position: number;
+  tasks?: AdvisorTaskRequest[];
+}
+
+export interface CreateStudyPlanRequest {
+  expectedProfileVersion: number;
+  strategySummary: string;
+  startDate: string;
+  planEndDate: string;
+  checkpoints: CheckpointRequest[];
+}
+
+export interface UpdateStudyPlanRequest extends CreateStudyPlanRequest {
+  expectedStudyPlanVersion: number;
+}
+
+export interface AdvisorTaskResponse {
+  id?: number;
+  title?: string;
+  description?: string;
+  dueDate?: string;
+  submissionRequirement?: string;
+  position?: number;
+}
+
+export interface CheckpointResponse {
+  id?: number;
+  description?: string;
+  goal?: string;
+  dueDate?: string;
+  position?: number;
+  tasks?: AdvisorTaskResponse[];
+}
+
+export interface StudyPlanProfileContext {
+  targetGoal?: string;
+  skills?: ProfileSkillResponse[];
+  currentProfileVersion?: number;
+}
+
+export interface StudyPlanAggregate {
+  studyPlanId?: number;
+  strategySummary?: string;
+  startDate?: string;
+  planEndDate?: string;
+  checkpoints?: CheckpointResponse[];
+  studyPlanVersion?: number;
+  basedOnProfileVersion?: number;
+  profileChangedSincePlanUpdate?: boolean;
+}
+
+export interface AdvisorStudyPlanResponse {
+  studentUserId: number;
+  profileContext: StudyPlanProfileContext;
+  plan: StudyPlanAggregate;
+}
+
+export type StudentFacingStudyPlanResponse = AdvisorStudyPlanResponse;
+export type TenantStudyPlanResponse = AdvisorStudyPlanResponse;
+
+export interface StudyPlanRevisionResponse {
+  entityVersion?: number;
+  action?: StudyPlanRevisionAction;
+  snapshot?: Record<string, unknown>;
+  createdAt?: string;
+  actorId?: number;
+}
+
+export const ADVISING_ERROR_CODES = {
+  featureDisabled: 'ADVISING_FEATURE_DISABLED',
+  idempotencyMismatch: 'IDEMPOTENCY_KEY_MISMATCH',
+  userAlreadyExists: 'USER_ALREADY_EXISTS',
+  intakeNotFound: 'STUDENT_INTAKE_NOT_FOUND',
+  intakeVersionConflict: 'STUDENT_INTAKE_VERSION_CONFLICT',
+  alreadyAssigned: 'STUDENT_ALREADY_ASSIGNED',
+  advisorNotEligible: 'ADVISOR_NOT_ELIGIBLE',
+  intakeNotCancellable: 'STUDENT_INTAKE_NOT_CANCELLABLE',
+  assignmentVersionConflict: 'ADVISOR_ASSIGNMENT_VERSION_CONFLICT',
+  profileAlreadyExists: 'STUDENT_PROFILE_ALREADY_EXISTS',
+  profileRequired: 'STUDENT_PROFILE_REQUIRED',
+  profileNotFound: 'STUDENT_PROFILE_NOT_FOUND',
+  profileVersionConflict: 'STUDENT_PROFILE_VERSION_CONFLICT',
+  intakeRequired: 'STUDENT_INTAKE_REQUIRED',
+  studyPlanAlreadyExists: 'STUDY_PLAN_ALREADY_EXISTS',
+  studyPlanNotFound: 'STUDY_PLAN_NOT_FOUND',
+  studyPlanVersionConflict: 'STUDY_PLAN_VERSION_CONFLICT',
+  studyPlanInvalidTimeline: 'STUDY_PLAN_INVALID_TIMELINE',
+  studyPlanChildInvalid: 'STUDY_PLAN_CHILD_INVALID',
+} as const;

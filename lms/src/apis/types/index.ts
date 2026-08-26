@@ -7,3 +7,4 @@ export * from "./notification";
 export * from "./quiz";
 export * from "./profile";
 export * from "./admin";
+export * from "./advising";

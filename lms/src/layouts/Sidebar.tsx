@@ -4,6 +4,7 @@ import styles from './Sidebar.module.scss';
 import {useTranslation} from 'react-i18next';
 import {getSidebarIndex, SIDEBAR_CONFIGS} from "@/configs/routes.config";
 import {useRequiredAuth} from "@/contexts/RequiredAuthContext";
+import {getSignedInHomePath, isAdvisorLevel, isCounsellorLevel, isStudentLevel, isTenantAdminRole} from '@/utils/signedInHomePath';
 
 const Sidebar: React.FC = () => {
   const {t} = useTranslation();
@@ -11,11 +12,18 @@ const Sidebar: React.FC = () => {
   const {pathname} = useLocation();
   const selectedSidebarIndex = getSidebarIndex(pathname);
   const isUserAccount = user.role === 'USER';
+  const counsellor = isCounsellorLevel(user.level);
+  const advisor = isAdvisorLevel(user.level);
+  const student = isStudentLevel(user.level);
   const canUseAdminConsole = user.role === 'SYSTEM_ADMIN' || user.role === 'TENANT_ADMIN';
-  const homePath = isUserAccount ? '/' : '/course';
+  const homePath = getSignedInHomePath(user);
+  const showLmsNav = isUserAccount && !counsellor && !advisor;
   const sidebarItems = SIDEBAR_CONFIGS
     .map((item, originalIndex) => ({item, originalIndex}))
-    .filter(({item}) => isUserAccount || item.path === '/course');
+    .filter(({item}) => {
+      if (counsellor || advisor) return false;
+      return showLmsNav || item.path === '/course';
+    });
   
   return (
     <div className={styles.sidebar}>
@@ -28,6 +36,46 @@ const Sidebar: React.FC = () => {
       </Link>
       <nav>
         <ul>
+          {counsellor ? (
+            <>
+              <li>
+                <Link to="/counsellor">
+                  <div className={`${styles.itemContent} ${pathname === '/counsellor' ? styles.active : ''}`}>
+                    <img src="/icons/home_fill.png" alt="" className={styles.responsiveImage}/>
+                    <span>Dashboard</span>
+                  </div>
+                </Link>
+              </li>
+              <li>
+                <Link to="/counsellor/intakes">
+                  <div className={`${styles.itemContent} ${pathname.startsWith('/counsellor/intakes') ? styles.active : ''}`}>
+                    <img src="/icons/course_unfill.png" alt="" className={styles.responsiveImage}/>
+                    <span>Unassigned intakes</span>
+                  </div>
+                </Link>
+              </li>
+            </>
+          ) : null}
+          {advisor ? (
+            <li>
+              <Link to="/advisor/students">
+                <div className={`${styles.itemContent} ${pathname.startsWith('/advisor') ? styles.active : ''}`}>
+                  <img src="/icons/home_fill.png" alt="" className={styles.responsiveImage}/>
+                  <span>Students</span>
+                </div>
+              </Link>
+            </li>
+          ) : null}
+          {student ? (
+            <li>
+              <Link to="/my-plan">
+                <div className={`${styles.itemContent} ${pathname === '/my-plan' ? styles.active : ''}`}>
+                  <img src="/icons/course_unfill.png" alt="" className={styles.responsiveImage}/>
+                  <span>My plan</span>
+                </div>
+              </Link>
+            </li>
+          ) : null}
           {
             sidebarItems.map(({item, originalIndex}) => (
               <li key={item.path}>
@@ -44,10 +92,20 @@ const Sidebar: React.FC = () => {
               </li>
             ))
           }
+          {isTenantAdminRole(user.role) ? (
+            <li>
+              <Link to="/admin/intakes">
+                <div className={`${styles.itemContent} ${pathname.startsWith('/admin/intakes') || pathname.startsWith('/admin/students') ? styles.active : ''}`}>
+                  <img src="/icons/course_unfill.png" alt="" className={styles.responsiveImage}/>
+                  <span>Intakes</span>
+                </div>
+              </Link>
+            </li>
+          ) : null}
           {canUseAdminConsole ? (
             <li>
               <Link to="/admin">
-                <div className={`${styles.itemContent} ${pathname === '/admin' || pathname.startsWith('/admin/') ? styles.active : ''}`}>
+                <div className={`${styles.itemContent} ${pathname === '/admin' || (pathname.startsWith('/admin/') && !pathname.startsWith('/admin/intakes') && !pathname.startsWith('/admin/students')) ? styles.active : ''}`}>
                   <img src="/icons/profile-menu/setting.png" alt="Admin Console" className={styles.responsiveImage}/>
                   <span>Admin Console</span>
                 </div>

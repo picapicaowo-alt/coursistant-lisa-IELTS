@@ -17,7 +17,18 @@ import {CourseMembershipPanel} from './components/CourseMembershipPanel';
 import styles from './index.module.scss';
 
 type ManagedRole = CreateManagedUserRequest['role'];
-type ManagedLevel = 'STUDENT' | 'INSTRUCTOR';
+type ManagedLevel = 'STUDENT' | 'INSTRUCTOR' | 'COUNSELLOR' | 'ADVISOR' | 'INSTRUCTOR_ADVISOR';
+const MANAGED_LEVEL_OPTIONS: ManagedLevel[] = ['STUDENT', 'INSTRUCTOR', 'COUNSELLOR', 'ADVISOR', 'INSTRUCTOR_ADVISOR'];
+const asManagedLevel = (level: string): ManagedLevel =>
+  MANAGED_LEVEL_OPTIONS.includes(level as ManagedLevel) ? level as ManagedLevel : 'STUDENT';
+const levelSelect = (value: ManagedLevel, onChange: (level: ManagedLevel) => void) => (
+  <label>
+    <span>Level</span>
+    <select value={value} onChange={event => onChange(event.target.value as ManagedLevel)}>
+      {MANAGED_LEVEL_OPTIONS.map(option => <option key={option} value={option}>{option}</option>)}
+    </select>
+  </label>
+);
 type PageFeedback = {tone: 'success' | 'error'; text: string};
 
 const TenantRow = ({tenant, busy, onSave, onDelete}: {
@@ -58,7 +69,7 @@ const ManagedUserRow = ({account, tenants, busy, onUpdate, onDisable, onMoveTena
   onMoveTenant: (id: number, tenantId: number) => void;
 }) => {
   const [role, setRole] = useState<ManagedRole>(account.role === 'TENANT_ADMIN' ? 'TENANT_ADMIN' : 'USER');
-  const [level, setLevel] = useState<ManagedLevel>(account.level === 'INSTRUCTOR' ? 'INSTRUCTOR' : 'STUDENT');
+  const [level, setLevel] = useState<ManagedLevel>(asManagedLevel(account.level));
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [targetTenantId, setTargetTenantId] = useState(String(account.tenantId));
   const [confirmMove, setConfirmMove] = useState(false);
@@ -74,7 +85,7 @@ const ManagedUserRow = ({account, tenants, busy, onUpdate, onDisable, onMoveTena
         <summary>Manage</summary>
         <div className={styles.inlineForm}>
           <label><span>Account role</span><select value={role} onChange={event => setRole(event.target.value as ManagedRole)}><option value="USER">User</option><option value="TENANT_ADMIN">Tenant admin</option></select></label>
-          {role === 'USER' ? <label><span>Level</span><select value={level} onChange={event => setLevel(event.target.value as ManagedLevel)}><option value="STUDENT">Student</option><option value="INSTRUCTOR">Instructor</option></select></label> : null}
+          {role === 'USER' ? levelSelect(level, setLevel) : null}
           <button type="button" className={styles.primaryButton} disabled={busy} onClick={() => onUpdate(account.id, {role, level: role === 'USER' ? level : 'NOT_APPLICABLE'})}>Update role</button>
           <div className={styles.operationDivider}/>
           <label><span>Tenant</span><select value={targetTenantId} onChange={event => { setTargetTenantId(event.target.value); setConfirmMove(false); }}>{tenants.map(tenant => <option key={tenant.id} value={tenant.id}>{tenant.name} (#{tenant.id})</option>)}</select></label>
@@ -276,7 +287,7 @@ const AdminConsolePage: React.FC = () => {
               <label><span>Email</span><input required type="email" value={email} onChange={event => setEmail(event.target.value)}/></label>
               {isSystemAdmin ? <label><span>Tenant</span><select required value={tenantId || tenantsQuery.data?.[0]?.id || ''} onChange={event => setTenantId(event.target.value)}>{tenantsQuery.data?.map(tenant => <option key={tenant.id} value={tenant.id}>{tenant.name} (#{tenant.id})</option>)}</select></label> : null}
               <label><span>Account role</span><select value={role} onChange={event => setRole(event.target.value as ManagedRole)}><option value="USER">User</option><option value="TENANT_ADMIN">Tenant admin</option></select></label>
-              {role === 'USER' ? <label><span>Level</span><select value={level} onChange={event => setLevel(event.target.value as ManagedLevel)}><option value="STUDENT">Student</option><option value="INSTRUCTOR">Instructor</option></select></label> : null}
+              {role === 'USER' ? levelSelect(level, setLevel) : null}
               <button className={styles.primaryButton} disabled={createUser.isPending || !name.trim() || !email.trim() || (isSystemAdmin && !Number(tenantId || tenantsQuery.data?.[0]?.id))}>{createUser.isPending ? 'Creating…' : 'Create user'}</button>
             </form>
             <p className={styles.hint}>New accounts must establish their password through Forgot Password before signing in.</p>
@@ -297,7 +308,7 @@ const AdminConsolePage: React.FC = () => {
               <div className={styles.form}>
                 <label><span>User ID</span><input type="number" min="1" value={managedUserId} onChange={event => setManagedUserId(event.target.value)}/></label>
                 <label><span>Account role</span><select value={manualRole} onChange={event => setManualRole(event.target.value as ManagedRole)}><option value="USER">User</option><option value="TENANT_ADMIN">Tenant admin</option></select></label>
-                {manualRole === 'USER' ? <label><span>Level</span><select value={manualLevel} onChange={event => setManualLevel(event.target.value as ManagedLevel)}><option value="STUDENT">Student</option><option value="INSTRUCTOR">Instructor</option></select></label> : null}
+                {manualRole === 'USER' ? levelSelect(manualLevel, setManualLevel) : null}
                 <button type="button" className={styles.primaryButton} disabled={busy || !Number.isInteger(manualId) || manualId < 1} onClick={() => changeRole.mutate({id: manualId, request: {role: manualRole, level: manualRole === 'USER' ? manualLevel : 'NOT_APPLICABLE'}})}>Update role</button>
                 {confirmManualDisable ? <div className={styles.confirmRow}><button type="button" className={styles.dangerButton} disabled={busy} onClick={() => disableUser.mutate(manualId)}>Confirm disable</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmManualDisable(false)}>Cancel</button></div> : <button type="button" className={styles.dangerLink} disabled={!Number.isInteger(manualId) || manualId < 1} onClick={() => setConfirmManualDisable(true)}>Disable user</button>}
               </div>

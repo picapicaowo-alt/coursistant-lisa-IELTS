@@ -1,4 +1,4 @@
-# Contributing to the Coursistant Frontend
+# Contributing to the Coursistant Training Frontend
 
 Read [`AGENTS.md`](./AGENTS.md) and
 [`lms/PROJECT_STANDARDS.md`](./lms/PROJECT_STANDARDS.md) before changing code.

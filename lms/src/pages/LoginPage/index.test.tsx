@@ -74,6 +74,9 @@ const renderLogin = () => render(
       <Route path="/login" element={<LoginPage/>}/>
       <Route path="/" element={<div>User dashboard</div>}/>
       <Route path="/course" element={<div>Course administration</div>}/>
+      <Route path="/counsellor" element={<div>Counsellor dashboard</div>}/>
+      <Route path="/advisor/students" element={<div>Advisor queue</div>}/>
+      <Route path="/admin/intakes" element={<div>Tenant intakes</div>}/>
     </Routes>
   </MemoryRouter>
 );
@@ -130,6 +133,24 @@ describe('LoginPage account routing', () => {
       role: 'USER',
     });
     expect(await screen.findByText('User dashboard')).toBeInTheDocument();
+  });
+
+  it('sends counsellor accounts to the intake dashboard', async () => {
+    mocks.loginApi.mockResolvedValue(response({
+      userId: 11,
+      email: 'counsellor1@example.com',
+      name: 'Counsellor',
+      username: 'counsellor1',
+      role: 'USER',
+      level: 'COUNSELLOR',
+      avatar: null,
+      accessToken: 'token',
+      mustChangePassword: false,
+    }));
+    renderLogin();
+    const user = await fillCredentials('counsellor1@example.com');
+    await user.click(screen.getByRole('button', {name: 'Log in'}));
+    expect(await screen.findByText('Counsellor dashboard')).toBeInTheDocument();
   });
 
   it('resolves a platform admin without exposing account type in the UI', async () => {
