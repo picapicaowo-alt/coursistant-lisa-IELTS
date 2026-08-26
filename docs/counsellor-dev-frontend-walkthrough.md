@@ -6,7 +6,7 @@ Dev 上 Intake / Profile / 课程编排写开关都已打开。本文只带前�
 
 | 项 | 值 |
 |---|---|
-| Base | `https://dev.xlearnedu.com:8081/api` |
+| Base | `https://dev.xlearnedu.com:8083/api` |
 | 健康检查 | `GET {base}/v1` → 200 |
 | 登录 | `POST {base}/v1/auth/login` |
 | Counselor / Advisor 登录 role | 一律 `USER` |

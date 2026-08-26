@@ -14,4 +14,6 @@ export const advisingQueryKeys = {
   tenantIntakes: (params: object) => ['tenant', 'intakes', params] as const,
   tenantProfile: (studentUserId: number) => ['tenant', 'profile', studentUserId] as const,
   tenantStudyPlan: (studentUserId: number) => ['tenant', 'study-plan', studentUserId] as const,
+  tenantRevisions: (studentUserId: number, page: number) =>
+    ['tenant', 'study-plan-revisions', studentUserId, page] as const,
 };

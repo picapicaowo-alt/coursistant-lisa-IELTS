@@ -14,6 +14,9 @@ const AdvisorStudentIntakePage: React.FC = () => {
     queryKey: advisingQueryKeys.advisorIntake(id),
     queryFn: async () => unwrapData(await advisorApiService.getStudentIntake(id), 'advisorIntake'),
     enabled: Number.isInteger(id),
+    // A hidden 404 is the final authorization result for a non-current
+    // advisor. Retrying only delays the protected not-assigned state.
+    retry: false,
   });
 
   if (query.isPending) return <p className={styles.status}>Loading intake…</p>;

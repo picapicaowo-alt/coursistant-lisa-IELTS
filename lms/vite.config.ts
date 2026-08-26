@@ -5,6 +5,18 @@ import tailwindcss from '@tailwindcss/vite'
 
 const tokensPath = resolve(__dirname, './src/styles/_tokens.scss').replace(/\\/g, '/')
 
+type ProxyRequest = {removeHeader: (name: string) => void}
+type ProxyServer = {on: (event: string, handler: (request: ProxyRequest) => void) => void}
+
+// The Dev backend only allows its public origin. Browser requests are
+// same-origin from the frontend's perspective, so the proxy must not forward
+// localhost/LAN Origin values and accidentally turn them into CORS requests.
+const stripForwardedOrigin = (proxy: ProxyServer): void => {
+  proxy.on('proxyReq', proxyRequest => {
+    proxyRequest.removeHeader('origin')
+  })
+}
+
 // https://vite.dev/config/
 export default defineConfig(({mode}) => {
   // auto load .env.development / .env.production
@@ -16,6 +28,7 @@ export default defineConfig(({mode}) => {
     `${env.VITE_BASE_PROTOCOL}://${env.VITE_BASE_DOMAIN}:${env.VITE_BASE_PORT}`
   const apiPath = env.VITE_BASE_PATH || '/api'
   const aiAgentPath = env.VITE_AI_AGENT_API_DOMAIN_NAME || '/ai-agent'
+  // Fallback only. Dev advising LMS is 8083; do not assume Workflow still lives there.
   const aiAgentTarget = env.VITE_AI_AGENT_TARGET || 'https://dev.xlearnedu.com:8083'
   const studySupportPath = env.VITE_STUDY_SUPPORT_API_DOMAIN_NAME || '/study-support'
   const studySupportTarget = env.VITE_STUDY_SUPPORT_TARGET || 'https://dev.xlearnedu.com:8090'
@@ -25,12 +38,7 @@ export default defineConfig(({mode}) => {
     changeOrigin: true,
     secure: false,
     rewrite: (path: string) => path.replace(new RegExp(`^${pathPrefix}`), ''),
-    configure: (proxy: {on: (event: string, handler: (request: {removeHeader: (name: string) => void}) => void) => void}) => {
-      proxy.on('proxyReq', proxyRequest => {
-        // Duplicate CORS filters reject the forwarded Origin. See ADR 0001.
-        proxyRequest.removeHeader('origin')
-      })
-    },
+    configure: stripForwardedOrigin,
   })
 
   return {
@@ -79,6 +87,7 @@ export default defineConfig(({mode}) => {
           // Drop the cookie's Domain attribute so it binds to localhost
           // instead of being rejected as a foreign-domain cookie.
           cookieDomainRewrite: '',
+          configure: stripForwardedOrigin,
         },
         [aiAgentPath]: agentProxy(aiAgentPath, aiAgentTarget),
         [studySupportPath]: agentProxy(studySupportPath, studySupportTarget),

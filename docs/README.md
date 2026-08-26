@@ -10,6 +10,7 @@ the expected/observed behavior here and hand it off. Do not invent endpoints.
 | [`api/counsellor.openapi.yaml`](./api/counsellor.openapi.yaml) | Standalone Counsellor Intake copy of the A-gate paths |
 | [`counsellor-dev-frontend-walkthrough.md`](./counsellor-dev-frontend-walkthrough.md) | Counselor Dev walkthrough |
 | [`advisor-frontend-handoff.md`](./advisor-frontend-handoff.md) | Advisor Milestone B handoff |
+| [`frontend-advising-progress.md`](./frontend-advising-progress.md) | Frontend A/B completeness, local test results, remaining gaps |
 
 ## Current frontend scope
 

@@ -33,7 +33,7 @@ inputs and are not rewritten as part of normal frontend feature work.
 
 - Planned organization home: https://github.com/Coursistant-Inc/lms-frontend
 - Current authorized working repository:
-  https://github.com/picapicaowo-alt/coursistant-lisa
+  https://github.com/picapicaowo-alt/coursistant-lisa-IELTS
 
 The current repository's `main` remains deployable during the handoff. Remotes,
 CI, and repository references must be migrated together after organization

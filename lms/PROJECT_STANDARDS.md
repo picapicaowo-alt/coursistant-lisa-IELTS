@@ -267,7 +267,8 @@ Historical normalized-store designs in `STATE_MANAGEMENT.md` / `ARCHITECTURE.md`
 
 - Review UI is built with `npm run build:dev` and deployed as static assets to the Dev host’s `coursistant-review-8084` release layout.
 - 8084 is **not** auto-deployed from GitHub. After merge-worthy work, build from this repo and deploy deliberately.
-- `/api` on 8084 proxies to the Dev LMS API (8081). Keep the frontend pointed at same-origin `/api` for review builds.
+- `/api` on 8084 proxies to the Dev LMS API. Training advising Dev is **8083**;
+  university LMS remains 8081. Keep the frontend pointed at same-origin `/api`.
 
 ---
 
