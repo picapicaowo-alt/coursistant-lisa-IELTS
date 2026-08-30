@@ -107,11 +107,29 @@ paths:
                 $ref: '#/components/schemas/StudySessionResponse'
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/NotFound'}
+  /v1/vocabulary/sessions/{sessionId}/reveal:
+    post:
+      tags: [Vocabulary sessions]
+      operationId: revealVocabularyCard
+      summary: Reveal the current Test answer before self-rating
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Current card with its complete answer revealed and no rating recorded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySessionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Conflict'}
   /v1/vocabulary/sessions/{sessionId}/ratings:
     post:
       tags: [Vocabulary sessions]
       operationId: rateVocabularyCard
-      summary: Persist the one allowed pre-reveal rating for the current card
+      summary: Persist the one allowed rating after the current answer is revealed
       parameters:
         - $ref: '#/components/parameters/SessionId'
         - $ref: '#/components/parameters/IdempotencyKey'
@@ -123,7 +141,7 @@ paths:
               $ref: '#/components/schemas/RateCardRequest'
       responses:
         '200':
-          description: The same card with its complete answer revealed
+          description: The revealed card with its immutable rating saved
           content:
             application/json:
               schema:
@@ -384,7 +402,7 @@ components:
       enum: [ACTIVE, PAUSED, COMPLETED, ENDED]
     StudySessionResponse:
       type: object
-      required: [id, unitId, mode, status, position, totalScheduled, revealed, canGoPrevious]
+      required: [id, unitId, mode, status, position, totalScheduled, revealed, rated, canGoPrevious]
       properties:
         id: {type: string, format: uuid}
         unitId: {type: string, format: uuid}
@@ -393,6 +411,9 @@ components:
         position: {type: integer, minimum: 0}
         totalScheduled: {type: integer, minimum: 0}
         revealed: {type: boolean}
+        rated:
+          type: boolean
+          description: Whether the current Test encounter already has its immutable rating.
         canGoPrevious: {type: boolean}
         currentCard:
           oneOf:

@@ -1,6 +1,6 @@
 import {useEffect} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {ArrowRight, Check, CheckCircle2, ChevronLeft, Headphones, HelpCircle, X} from 'lucide-react';
+import {ArrowRight, Check, CheckCircle2, ChevronLeft, Headphones, HelpCircle, RefreshCcw, X} from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import type {RecallRating, StudySessionResponse} from '@/apis/types/vocabulary';
 import {vocabularyApi} from '@/apis/services/vocabulary-api';
@@ -36,6 +36,10 @@ const VocabularySessionPage = () => {
     vocabularyQueryKeys.session(studentId, sessionId),
     session,
   );
+  const revealMutation = useMutation({
+    mutationFn: () => vocabularyApi.revealCard(studentId, sessionId, crypto.randomUUID()),
+    onSuccess: setSession,
+  });
   const rateMutation = useMutation({
     mutationFn: ({wordId, rating}: {wordId: string; rating: RecallRating}) => vocabularyApi.rateCard(
       studentId,
@@ -68,7 +72,7 @@ const VocabularySessionPage = () => {
 
   const session = sessionQuery.data;
   useEffect(() => {
-    if (!session || session.mode !== 'TEST' || session.revealed || session.status !== 'ACTIVE' || rateMutation.isPending) return;
+    if (!session || session.mode !== 'TEST' || !session.revealed || session.rated || session.status !== 'ACTIVE' || rateMutation.isPending) return;
     const handleKey = (event: KeyboardEvent): void => {
       const option = RATING_OPTIONS[Number(event.key) - 1];
       if (!option || !session.currentCard) return;
@@ -83,8 +87,8 @@ const VocabularySessionPage = () => {
   if (sessionQuery.isError || unitQuery.isError || !session || !unitQuery.data) return <main className={styles.page}><PageState kind="error" title="This session is unavailable" detail="Your last saved position has not been changed. Return to the library or retry." onRetry={() => {void sessionQuery.refetch(); void unitQuery.refetch();}}/></main>;
 
   const unit = unitQuery.data;
-  const isBusy = rateMutation.isPending || advanceMutation.isPending || exitMutation.isPending;
-  const mutationError = rateMutation.isError || advanceMutation.isError || exitMutation.isError;
+  const isBusy = revealMutation.isPending || rateMutation.isPending || advanceMutation.isPending || exitMutation.isPending;
+  const mutationError = revealMutation.isError || rateMutation.isError || advanceMutation.isError || exitMutation.isError;
 
   if (session.status === 'COMPLETED' || session.status === 'ENDED') {
     const wasEnded = session.status === 'ENDED';
@@ -119,6 +123,8 @@ const VocabularySessionPage = () => {
   const card = session.currentCard;
   if (!card) return <main className={styles.page}><PageState kind="error" title="No card is available" detail="Exit this session and start the unit again."/></main>;
   const progress = session.totalScheduled > 0 ? Math.round(((session.position + 1) / session.totalScheduled) * 100) : 0;
+  const canReveal = session.mode === 'TEST' && !session.revealed;
+  const isAwaitingRating = session.mode === 'TEST' && !session.rated;
 
   return (
     <main className={styles.page}>
@@ -135,17 +141,36 @@ const VocabularySessionPage = () => {
 
       <p className={styles.modeGuidance}>
         {session.mode === 'TEST'
-          ? session.revealed
-            ? 'Rating saved · answer revealed'
-            : "Word first · choose a rating, including Don't remember, to reveal the answer"
+          ? session.rated
+            ? 'Rating saved · continue when you are ready'
+            : session.revealed
+              ? 'Answer revealed · now rate how well you remembered'
+              : 'Word first · recall the meaning, then flip the card'
           : 'Full-card browsing · no recall rating or completion change'}
       </p>
 
-      <section className={`${styles.studyCard} ${session.revealed ? styles.revealed : ''}`} aria-live="polite">
+      <section
+        className={`${styles.studyCard} ${session.revealed ? styles.revealed : ''}`}
+        aria-live="polite"
+        aria-label={canReveal ? `Show answer for ${card.word}` : undefined}
+        role={canReveal ? 'button' : undefined}
+        tabIndex={canReveal ? 0 : undefined}
+        onClick={canReveal && !isBusy ? () => revealMutation.mutate() : undefined}
+        onKeyDown={canReveal && !isBusy ? event => {
+          if (event.key !== 'Enter' && event.key !== ' ') return;
+          event.preventDefault();
+          revealMutation.mutate();
+        } : undefined}
+      >
         <div className={styles.cardPrompt}>
           <span className={styles.partOfSpeech}>{card.partOfSpeech}</span>
           <h1>{card.word}</h1>
-          {session.mode === 'TEST' && !session.revealed ? <p>Recall the meaning before you choose.</p> : null}
+          {canReveal ? (
+            <>
+              <p>Recall the meaning, then check your answer.</p>
+              <span className={styles.flipPrompt}><RefreshCcw size={17}/> Show answer</span>
+            </>
+          ) : null}
         </div>
 
         {card.answer ? (
@@ -170,19 +195,24 @@ const VocabularySessionPage = () => {
       {mutationError ? <p className={styles.inlineError} role="alert">That action was not saved. Please try it again.</p> : null}
 
       <footer className={styles.controls}>
-        {session.mode === 'TEST' && !session.revealed ? (
-          <div className={styles.ratingGroup} aria-label="Rate your recall">
-            {RATING_OPTIONS.map(({rating, label, hint, icon: Icon}, index) => (
-              <button key={rating} type="button" className={styles[rating.toLowerCase()]} disabled={isBusy} onClick={() => rateMutation.mutate({wordId: card.wordId, rating})}>
-                <span className={styles.key}>{index + 1}</span><Icon size={19}/><span><strong>{label}</strong><small>{hint}</small></span>
-              </button>
-            ))}
+        {isAwaitingRating ? (
+          <div className={styles.ratingPanel}>
+            <p id="rating-instruction" className={styles.ratingInstruction}>
+              {session.revealed ? 'Compare your recall with the answer, then choose one rating.' : 'Flip the card first. The rating buttons will unlock after the answer appears.'}
+            </p>
+            <div className={styles.ratingGroup} aria-label="Rate your recall" aria-describedby="rating-instruction">
+              {RATING_OPTIONS.map(({rating, label, hint, icon: Icon}, index) => (
+                <button key={rating} type="button" className={styles[rating.toLowerCase()]} disabled={!session.revealed || isBusy} onClick={() => rateMutation.mutate({wordId: card.wordId, rating})}>
+                  <span className={styles.key}>{index + 1}</span><Icon size={19}/><span><strong>{label}</strong><small>{hint}</small></span>
+                </button>
+              ))}
+            </div>
           </div>
         ) : (
           <div className={styles.navigationControls}>
             {session.mode === 'REMEMBER' ? (
               <button type="button" onClick={() => advanceMutation.mutate('PREVIOUS')} disabled={!session.canGoPrevious || isBusy}><ChevronLeft size={18}/> Previous</button>
-            ) : <span className={styles.lockedRating}><Check size={16}/> Rating saved · answer revealed</span>}
+            ) : <span className={styles.lockedRating}><Check size={16}/> Rating saved</span>}
             <button type="button" className={styles.nextButton} onClick={() => advanceMutation.mutate('NEXT')} disabled={isBusy}>
               {session.position + 1 >= session.totalScheduled ? 'Finish session' : 'Next card'} <ArrowRight size={18}/>
             </button>

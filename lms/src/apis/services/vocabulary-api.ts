@@ -69,6 +69,15 @@ export const vocabularyApi = {
     return response.data;
   },
 
+  async revealCard(studentId: string, sessionId: string, idempotencyKey: string): Promise<StudySessionResponse> {
+    const response = await client.getClient().post<StudySessionResponse>(
+      `/v1/vocabulary/sessions/${sessionId}/reveal`,
+      undefined,
+      {headers: requestHeaders(studentId, idempotencyKey)},
+    );
+    return response.data;
+  },
+
   async rateCard(studentId: string, sessionId: string, request: RateCardRequest, idempotencyKey: string): Promise<StudySessionResponse> {
     const response = await client.getClient().post<StudySessionResponse>(
       `/v1/vocabulary/sessions/${sessionId}/ratings`,

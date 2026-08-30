@@ -78,7 +78,7 @@ const VocabularyListPage = () => {
         <div className={styles.modeControls}>
           <div className={styles.segmented} aria-label="Study mode">
             <button type="button" className={mode === 'TEST' ? styles.selected : ''} onClick={() => setMode('TEST')}>
-              <Check size={17}/><span><strong>Test</strong><small>Word first · rate to reveal</small></span>
+              <Check size={17}/><span><strong>Test</strong><small>Word first · flip, then rate</small></span>
             </button>
             <button type="button" className={mode === 'REMEMBER' ? styles.selected : ''} onClick={() => setMode('REMEMBER')}>
               <BookOpenCheck size={17}/><span><strong>Remember</strong><small>Full card · browse only</small></span>
@@ -86,7 +86,7 @@ const VocabularyListPage = () => {
           </div>
           <p className={styles.modeDescription}>
             {mode === 'TEST'
-              ? "See the word first. Choose a recall rating—including Don't remember—to reveal the answer."
+              ? "See the word first. Recall the meaning, flip to check, then choose a rating—including Don't remember."
               : 'See the complete card from the start. Browsing does not record a rating or change completion.'}
           </p>
           <div className={styles.modeOption}>

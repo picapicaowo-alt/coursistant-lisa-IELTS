@@ -30,8 +30,9 @@ Cambridge licence. Production content must be supplied and approved separately.
   review count.
 - Remember mode shows the complete card, allows previous/next and optional
   shuffle, and never writes ratings or completion.
-- Test mode always shuffles, accepts one immutable pre-reveal rating, reveals
-  every answer, and requires deliberate advance.
+- Test mode always shuffles. Rating controls remain visible on the word side,
+  but unlock only after the student deliberately flips the card to check the
+  complete answer. One immutable rating is then accepted before advance.
 - `Kind of know` requires one later unaided `Know well`; `Don't remember`
   requires two later, separated `Know well` recalls.
 - Weak words never repeat immediately. Same-session retry loops are bounded;

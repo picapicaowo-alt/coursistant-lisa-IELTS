@@ -108,6 +108,7 @@ export interface StudySessionResponse {
   position: number;
   totalScheduled: number;
   revealed: boolean;
+  rated: boolean;
   canGoPrevious: boolean;
   currentCard: StudyCard | null;
   summary: SessionSummary | null;

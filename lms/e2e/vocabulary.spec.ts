@@ -83,6 +83,7 @@ const hiddenCard = {
   position: 0,
   totalScheduled: 20,
   revealed: false,
+  rated: false,
   canGoPrevious: false,
   currentCard: {wordId: WORD_ID, word: 'analyse', partOfSpeech: 'verb', answer: null},
   summary: null,
@@ -90,7 +91,6 @@ const hiddenCard = {
 
 const revealedCard = {
   ...hiddenCard,
-  totalScheduled: 21,
   revealed: true,
   currentCard: {
     ...hiddenCard.currentCard,
@@ -106,6 +106,12 @@ const revealedCard = {
   },
 };
 
+const ratedCard = {
+  ...revealedCard,
+  totalScheduled: 21,
+  rated: true,
+};
+
 test('library remains usable without horizontal overflow on mobile', async ({page}) => {
   await page.setViewportSize({width: 390, height: 844});
   await installSession(page);
@@ -119,22 +125,25 @@ test('library remains usable without horizontal overflow on mobile', async ({pag
   expect(overflow).toBe(false);
 });
 
-test('test mode requires a rating, reveals once, and hides the LMS shell', async ({page}) => {
+test('test mode requires reveal before rating and hides the LMS shell', async ({page}) => {
   await installSession(page);
   await page.route(`**/vocabulary-api/v1/vocabulary/units/${UNIT_ID}`, route => route.fulfill({json: unit}));
   await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}`, route => {
     if (route.request().method() === 'GET') return route.fulfill({json: hiddenCard});
-    if (route.request().url().endsWith('/ratings')) return route.fulfill({json: revealedCard});
     return route.fallback();
   });
-  await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}/ratings`, route => route.fulfill({json: revealedCard}));
+  await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}/reveal`, route => route.fulfill({json: revealedCard}));
+  await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}/ratings`, route => route.fulfill({json: ratedCard}));
   await page.goto(`/vocabulary/units/${UNIT_ID}/sessions/${SESSION_ID}`);
 
   await expect(page.getByRole('navigation')).toHaveCount(0);
   await expect(page.getByRole('heading', {name: 'analyse'})).toBeVisible();
   await expect(page.getByText('分析', {exact: true})).toHaveCount(0);
-  await page.getByRole('button', {name: /Don't remember/}).click();
+  await expect(page.getByRole('button', {name: /Don't remember/})).toBeDisabled();
+  await page.getByRole('button', {name: 'Show answer for analyse'}).click();
   await expect(page.getByText('分析', {exact: true})).toBeVisible();
+  await expect(page.getByRole('button', {name: /Don't remember/})).toBeEnabled();
+  await page.getByRole('button', {name: /Don't remember/}).click();
   await expect(page.getByRole('button', {name: 'Next card'})).toBeVisible();
   await expect(page.getByRole('button', {name: /Know well/})).toHaveCount(0);
 });
