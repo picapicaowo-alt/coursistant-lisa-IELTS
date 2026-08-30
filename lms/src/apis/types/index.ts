@@ -11,3 +11,4 @@ export * from "./advising";
 export * from "./parent";
 export * from "./mockExam";
 export * from "./courseOperations";
+export * from "./vocabulary";

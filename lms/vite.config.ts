@@ -32,6 +32,8 @@ export default defineConfig(({mode}) => {
   const aiAgentTarget = env.VITE_AI_AGENT_TARGET || 'https://dev.xlearnedu.com:8083'
   const studySupportPath = env.VITE_STUDY_SUPPORT_API_DOMAIN_NAME || '/study-support'
   const studySupportTarget = env.VITE_STUDY_SUPPORT_TARGET || 'https://dev.xlearnedu.com:8090'
+  const vocabularyPath = env.VITE_VOCABULARY_API_DOMAIN_NAME || '/vocabulary-api'
+  const vocabularyTarget = env.VITE_VOCABULARY_API_TARGET
 
   const agentProxy = (pathPrefix: string, target: string) => ({
     target,
@@ -91,6 +93,9 @@ export default defineConfig(({mode}) => {
         },
         [aiAgentPath]: agentProxy(aiAgentPath, aiAgentTarget),
         [studySupportPath]: agentProxy(studySupportPath, studySupportTarget),
+        ...(vocabularyTarget
+          ? {[vocabularyPath]: agentProxy(vocabularyPath, vocabularyTarget)}
+          : {}),
       },
     },
     test: {

@@ -1,0 +1,181 @@
+.page {
+  min-height: 100%;
+  padding: 2rem clamp(1rem, 3vw, 3.5rem) 3.5rem;
+  background: t.$page-bg;
+  color: t.$text;
+}
+
+.hero {
+  min-height: 15rem;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
+  border-radius: t.$radius-card-lg;
+  background: t.$text;
+  color: t.$card-bg;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  overflow: hidden;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 22rem;
+    height: 22rem;
+    right: -8rem;
+    bottom: -13rem;
+    border: 1px solid rgba(t.$card-bg, 0.18);
+    border-radius: 50%;
+    box-shadow: 0 0 0 4rem rgba(t.$card-bg, 0.04), 0 0 0 8rem rgba(t.$card-bg, 0.03);
+  }
+
+  h1 {
+    margin: 0.65rem 0 0.75rem;
+    font-size: clamp(2.4rem, 6vw, 4.8rem);
+    line-height: 0.95;
+    letter-spacing: -0.055em;
+  }
+
+  p {
+    max-width: 42rem;
+    margin: 0;
+    color: rgba(t.$card-bg, 0.72);
+    font-size: 1.02rem;
+    line-height: 1.65;
+  }
+}
+
+.eyebrow,
+.kicker {
+  color: t.$brand-subtle;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-bold;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.heroMark {
+  z-index: 1;
+  width: 9.5rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba(t.$card-bg, 0.18);
+  border-radius: 50%;
+  background: rgba(t.$card-bg, 0.06);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  flex: 0 0 auto;
+
+  svg {width: 2.4rem; height: 2.4rem; color: t.$brand-subtle;}
+  span {margin-top: 0.5rem; text-align: center; font-size: 0.72rem; font-weight: t.$fw-bold; letter-spacing: 0.12em; text-transform: uppercase;}
+}
+
+.continueCard {
+  margin: -1.25rem clamp(1rem, 3vw, 2.5rem) 0;
+  padding: 1.3rem 1.5rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  z-index: 2;
+
+  .kicker {color: t.$brand;}
+  h2 {margin: 0.2rem 0; font-size: t.$fs-item-title;}
+  p {margin: 0; color: t.$text-muted; font-size: t.$fs-caption;}
+  a {
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border-radius: t.$radius-control;
+    background: t.$brand;
+    color: t.$card-bg;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: t.$fw-semibold;
+    text-decoration: none;
+  }
+}
+
+.continueIcon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: t.$brand-subtle;
+  color: t.$brand;
+  display: grid;
+  place-content: center;
+}
+
+.librarySection {margin-top: 2.75rem;}
+.sectionHeading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  h2 {margin: 0.25rem 0 0; font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -0.035em;}
+  .kicker {color: t.$brand;}
+}
+
+.listCount {display: inline-flex; align-items: center; gap: 0.4rem; color: t.$text-muted; font-size: t.$fs-caption; font-weight: t.$fw-semibold;}
+
+.filters {
+  margin: 1.35rem 0;
+  padding: 0.85rem 1rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card;
+  background: t.$card-bg;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.85rem;
+
+  > svg {align-self: center; color: t.$text-muted;}
+  label {min-width: 0; flex: 1; display: grid; gap: 0.35rem; color: t.$text-muted; font-size: 0.7rem; font-weight: t.$fw-semibold; text-transform: uppercase; letter-spacing: 0.06em;}
+  select {min-height: 2.7rem; width: 100%; padding: 0 0.75rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$subcard-bg; color: t.$text; font: inherit; text-transform: none; letter-spacing: 0;}
+  button {min-height: 2.7rem; padding: 0 0.85rem; border: 0; background: transparent; color: t.$brand; font-weight: t.$fw-semibold;}
+}
+
+.listGrid {display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr)); gap: 1rem;}
+.listCard {
+  min-height: 20rem;
+  padding: 1.4rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  background: t.$card-bg;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+
+  &:hover {transform: translateY(-3px); border-color: t.$brand; box-shadow: t.$shadow-card;}
+  &:focus-visible {outline: 3px solid t.$brand; outline-offset: 3px;}
+  h3 {margin: 1rem 0 0.5rem; font-size: t.$fs-card-title; letter-spacing: -0.025em;}
+  > p {margin: 0; color: t.$text-muted; line-height: 1.6;}
+}
+
+.cardTop {display: flex; justify-content: space-between; align-items: flex-start;}
+.ordinal {font-size: 2.6rem; color: t.$neutral-fill; font-weight: t.$fw-extrabold; line-height: 1; letter-spacing: -0.06em;}
+.tags {display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 1rem; span {padding: 0.35rem 0.6rem; border-radius: t.$radius-pill; background: t.$brand-subtle; color: t.$brand; font-size: 0.7rem; font-weight: t.$fw-bold;}}
+.cardFooter {margin-top: auto; padding-top: 1rem; border-top: 1px solid t.$border; display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; color: t.$text-muted; font-size: t.$fs-caption; svg {color: t.$brand;}}
+
+@media (max-width: 700px) {
+  .page {padding: 1rem 0.75rem 2rem;}
+  .hero {min-height: 16rem; padding: 1.5rem; align-items: flex-end;}
+  .heroMark {display: none;}
+  .continueCard {margin: 0.75rem 0 0; grid-template-columns: auto 1fr; a {grid-column: 1 / -1; justify-content: center;}}
+  .sectionHeading {align-items: flex-start;}
+  .filters {align-items: stretch; flex-direction: column; > svg {display: none;} label {width: 100%;}}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .listCard {transition: none;}
+}
