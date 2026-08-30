@@ -8,3 +8,4 @@ export * from "./quiz";
 export * from "./profile";
 export * from "./admin";
 export * from "./advising";
+export * from "./vocabulary";

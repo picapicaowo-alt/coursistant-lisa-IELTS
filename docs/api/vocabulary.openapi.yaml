@@ -1,0 +1,402 @@
+openapi: 3.1.0
+info:
+  title: Coursistant Vocabulary API
+  version: 1.0.0
+  description: >-
+    Student-owned vocabulary library, study sessions, and durable review history.
+    This contract is independent of courses, assignments, reporting, and advising.
+servers:
+  - url: /vocabulary-api
+    description: Same-origin frontend route (localhost proxy or future gateway)
+tags:
+  - name: Vocabulary library
+  - name: Vocabulary sessions
+paths:
+  /v1/vocabulary/lists:
+    get:
+      tags: [Vocabulary library]
+      operationId: listVocabularyLists
+      summary: Browse the read-only vocabulary library
+      parameters:
+        - $ref: '#/components/parameters/Theme'
+        - $ref: '#/components/parameters/SkillFocus'
+        - $ref: '#/components/parameters/Difficulty'
+      responses:
+        '200':
+          description: Available lists with student progress
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VocabularyListCollectionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+  /v1/vocabulary/lists/{listId}:
+    get:
+      tags: [Vocabulary library]
+      operationId: getVocabularyList
+      summary: Read one list and its units
+      parameters:
+        - $ref: '#/components/parameters/ListId'
+      responses:
+        '200':
+          description: List detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VocabularyListDetailResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /v1/vocabulary/units/{unitId}:
+    get:
+      tags: [Vocabulary library]
+      operationId: getVocabularyUnit
+      summary: Read one unit, its progress, and resumable session
+      parameters:
+        - $ref: '#/components/parameters/UnitId'
+      responses:
+        '200':
+          description: Unit detail
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VocabularyUnitResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /v1/vocabulary/units/{unitId}/sessions:
+    post:
+      tags: [Vocabulary sessions]
+      operationId: startVocabularySession
+      summary: Start or resume a study session for a unit
+      parameters:
+        - $ref: '#/components/parameters/UnitId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StartSessionRequest'
+      responses:
+        '200':
+          description: Existing resumable session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySessionResponse'
+        '201':
+          description: New session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySessionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /v1/vocabulary/sessions/{sessionId}:
+    get:
+      tags: [Vocabulary sessions]
+      operationId: getVocabularySession
+      summary: Resume a session at its persisted position
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+      responses:
+        '200':
+          description: Session state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySessionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+  /v1/vocabulary/sessions/{sessionId}/ratings:
+    post:
+      tags: [Vocabulary sessions]
+      operationId: rateVocabularyCard
+      summary: Persist the one allowed pre-reveal rating for the current card
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RateCardRequest'
+      responses:
+        '200':
+          description: The same card with its complete answer revealed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySessionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /v1/vocabulary/sessions/{sessionId}/advance:
+    post:
+      tags: [Vocabulary sessions]
+      operationId: advanceVocabularySession
+      summary: Deliberately advance after reveal, or navigate Remember mode
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdvanceSessionRequest'
+      responses:
+        '200':
+          description: Updated session or final summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySessionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+        '409': {$ref: '#/components/responses/Conflict'}
+  /v1/vocabulary/sessions/{sessionId}/exit:
+    post:
+      tags: [Vocabulary sessions]
+      operationId: exitVocabularySession
+      summary: Persist position and leave the session
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Paused session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySessionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
+components:
+  parameters:
+    ListId:
+      name: listId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    UnitId:
+      name: unitId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    SessionId:
+      name: sessionId
+      in: path
+      required: true
+      schema: {type: string, format: uuid}
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      schema: {type: string, minLength: 8, maxLength: 128}
+    Theme:
+      name: theme
+      in: query
+      schema: {type: string}
+    SkillFocus:
+      name: skillFocus
+      in: query
+      schema: {type: string}
+    Difficulty:
+      name: difficulty
+      in: query
+      schema: {type: string}
+  responses:
+    Unauthorized:
+      description: Student identity is missing or invalid
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
+    NotFound:
+      description: The requested resource does not exist for this student
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
+    Conflict:
+      description: The request conflicts with the persisted session state
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
+  schemas:
+    ApiError:
+      type: object
+      required: [code, message]
+      properties:
+        code: {type: string}
+        message: {type: string}
+    VocabularyListCollectionResponse:
+      type: object
+      required: [items, filters]
+      properties:
+        items:
+          type: array
+          items: {$ref: '#/components/schemas/VocabularyListSummary'}
+        filters:
+          $ref: '#/components/schemas/VocabularyFilters'
+        continue:
+          oneOf:
+            - {$ref: '#/components/schemas/ContinueStudy'}
+            - {type: 'null'}
+    VocabularyListSummary:
+      type: object
+      required: [id, name, description, totalWords, theme, skillFocus, difficulty, progress]
+      properties:
+        id: {type: string, format: uuid}
+        name: {type: string}
+        description: {type: string}
+        totalWords: {type: integer, minimum: 1}
+        theme: {type: string}
+        skillFocus: {type: string}
+        difficulty: {type: string}
+        progress: {$ref: '#/components/schemas/ListProgress'}
+    VocabularyListDetailResponse:
+      allOf:
+        - $ref: '#/components/schemas/VocabularyListSummary'
+        - type: object
+          required: [units]
+          properties:
+            units:
+              type: array
+              items: {$ref: '#/components/schemas/VocabularyUnitSummary'}
+    VocabularyUnitSummary:
+      type: object
+      required: [id, number, name, wordCount, progress]
+      properties:
+        id: {type: string, format: uuid}
+        number: {type: integer, minimum: 1}
+        name: {type: string}
+        wordCount: {type: integer, minimum: 20, maximum: 30}
+        progress: {$ref: '#/components/schemas/UnitProgress'}
+        activeSessionId:
+          type: [string, 'null']
+          format: uuid
+    VocabularyUnitResponse:
+      allOf:
+        - $ref: '#/components/schemas/VocabularyUnitSummary'
+        - type: object
+          required: [listId, listName]
+          properties:
+            listId: {type: string, format: uuid}
+            listName: {type: string}
+    VocabularyFilters:
+      type: object
+      required: [themes, skillFocuses, difficulties]
+      properties:
+        themes: {type: array, items: {type: string}}
+        skillFocuses: {type: array, items: {type: string}}
+        difficulties: {type: array, items: {type: string}}
+    ListProgress:
+      type: object
+      required: [clearedWords, totalWords, completionCount]
+      properties:
+        clearedWords: {type: integer, minimum: 0}
+        totalWords: {type: integer, minimum: 1}
+        completionCount: {type: integer, minimum: 0}
+    UnitProgress:
+      type: object
+      required: [clearedWords, totalWords, completionCount, readyForReview]
+      properties:
+        clearedWords: {type: integer, minimum: 0}
+        totalWords: {type: integer, minimum: 1}
+        completionCount: {type: integer, minimum: 0}
+        readyForReview: {type: integer, minimum: 0}
+    ContinueStudy:
+      type: object
+      required: [listId, listName, unitId, unitName, sessionId, mode]
+      properties:
+        listId: {type: string, format: uuid}
+        listName: {type: string}
+        unitId: {type: string, format: uuid}
+        unitName: {type: string}
+        sessionId: {type: string, format: uuid}
+        mode: {$ref: '#/components/schemas/StudyMode'}
+    StartSessionRequest:
+      type: object
+      required: [mode]
+      properties:
+        mode: {$ref: '#/components/schemas/StudyMode'}
+        shuffle:
+          type: boolean
+          description: Remember mode option. Test mode is always shuffled.
+    RateCardRequest:
+      type: object
+      required: [wordId, rating]
+      properties:
+        wordId: {type: string, format: uuid}
+        rating: {$ref: '#/components/schemas/RecallRating'}
+    AdvanceSessionRequest:
+      type: object
+      required: [direction]
+      properties:
+        direction:
+          type: string
+          enum: [NEXT, PREVIOUS]
+    StudyMode:
+      type: string
+      enum: [REMEMBER, TEST]
+    RecallRating:
+      type: string
+      enum: [KNOW_WELL, KIND_OF_KNOW, DONT_REMEMBER]
+    SessionStatus:
+      type: string
+      enum: [ACTIVE, PAUSED, COMPLETED]
+    StudySessionResponse:
+      type: object
+      required: [id, unitId, mode, status, position, totalScheduled, revealed, canGoPrevious]
+      properties:
+        id: {type: string, format: uuid}
+        unitId: {type: string, format: uuid}
+        mode: {$ref: '#/components/schemas/StudyMode'}
+        status: {$ref: '#/components/schemas/SessionStatus'}
+        position: {type: integer, minimum: 0}
+        totalScheduled: {type: integer, minimum: 0}
+        revealed: {type: boolean}
+        canGoPrevious: {type: boolean}
+        currentCard:
+          oneOf:
+            - {$ref: '#/components/schemas/StudyCard'}
+            - {type: 'null'}
+        summary:
+          oneOf:
+            - {$ref: '#/components/schemas/SessionSummary'}
+            - {type: 'null'}
+    StudyCard:
+      type: object
+      required: [wordId, word, partOfSpeech]
+      properties:
+        wordId: {type: string, format: uuid}
+        word: {type: string}
+        partOfSpeech: {type: string}
+        answer:
+          oneOf:
+            - {$ref: '#/components/schemas/WordAnswer'}
+            - {type: 'null'}
+    WordAnswer:
+      type: object
+      required: [ukPhonetic, primaryMeaningZh, secondaryMeaningsZh, exampleEn, exampleZh]
+      properties:
+        ukPhonetic: {type: string}
+        usPhonetic: {type: [string, 'null']}
+        audioUrl: {type: [string, 'null'], format: uri-reference}
+        primaryMeaningZh: {type: string}
+        secondaryMeaningsZh:
+          type: array
+          maxItems: 2
+          items: {type: string}
+        exampleEn: {type: string}
+        exampleZh: {type: string}
+    SessionSummary:
+      type: object
+      required: [clearedThisSession, currentPassCleared, currentPassTotal, carriedForward, unitCompletionOccurred, unitCompletionCount]
+      properties:
+        clearedThisSession: {type: integer, minimum: 0}
+        currentPassCleared: {type: integer, minimum: 0}
+        currentPassTotal: {type: integer, minimum: 1}
+        carriedForward: {type: integer, minimum: 0}
+        unitCompletionOccurred: {type: boolean}
+        unitCompletionCount: {type: integer, minimum: 0}

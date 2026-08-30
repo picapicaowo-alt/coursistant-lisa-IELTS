@@ -13,7 +13,8 @@
     "calendar": "日历",
     "chat": "聊天",
     "aiChatbot": "AI 助手",
-    "aiWorkplace": "AI 工作区"
+    "aiWorkplace": "AI 工作区",
+    "vocabulary": "单词卡"
   },
   "actions": {
     "save": "保存",

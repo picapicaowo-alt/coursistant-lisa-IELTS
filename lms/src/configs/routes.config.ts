@@ -1,9 +1,12 @@
+import {VOCABULARY_PATHS, isVocabularySessionPath} from '@/pages/vocabulary/routes';
+
 export interface SidebarConfig {
   name: string;
   path: string;
   sidebarItem: {
-    filledIcon: string;
-    unfilledIcon: string;
+    filledIcon?: string;
+    unfilledIcon?: string;
+    icon?: 'vocabulary';
     translationLabel: string;
   };
 }
@@ -37,6 +40,14 @@ export const SIDEBAR_CONFIGS: SidebarConfig[] = [
     },
   },
   {
+    name: "Vocabulary",
+    path: VOCABULARY_PATHS.root,
+    sidebarItem: {
+      icon: "vocabulary",
+      translationLabel: "sidebar.vocabulary",
+    },
+  },
+  {
     name: "AI Workplace",
     path: "/aibot",
     sidebarItem: {
@@ -63,6 +74,7 @@ const APP_SHELL_BASE_PATHS = [
   '/counsellor',
   '/advisor',
   '/my-plan',
+  VOCABULARY_PATHS.root,
   '/settings',
   '/profile',
   '/post',
@@ -71,6 +83,7 @@ const APP_SHELL_BASE_PATHS = [
 ];
 
 export const shouldShowAppShell = (pathname: string): boolean => {
+  if (isVocabularySessionPath(pathname)) return false;
   if (pathname === '/') return true;
   return APP_SHELL_BASE_PATHS.some(
     base => base !== '/' && (pathname === base || pathname.startsWith(`${base}/`)),

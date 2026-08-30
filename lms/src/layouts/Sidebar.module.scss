@@ -45,6 +45,12 @@
             height: auto;
             margin-bottom: 10px;
         }
+
+        .responsiveIcon {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 10px;
+        }
         
         span {
             margin: 0 1rem;
@@ -111,6 +117,12 @@
 
             .responsiveImage {
                 width: 20px;
+                margin-bottom: 0.25rem;
+            }
+
+            .responsiveIcon {
+                width: 20px;
+                height: 20px;
                 margin-bottom: 0.25rem;
             }
 

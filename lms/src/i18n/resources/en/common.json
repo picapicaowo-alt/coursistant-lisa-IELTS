@@ -13,7 +13,8 @@
     "calendar": "Calendar",
     "chat": "Chat",
     "aiChatbot": "AI Chatbot",
-    "aiWorkplace": "AI Workplace"
+    "aiWorkplace": "AI Workplace",
+    "vocabulary": "Vocabulary"
   },
   "actions": {
     "save": "Save",

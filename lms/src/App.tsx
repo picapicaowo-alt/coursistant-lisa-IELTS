@@ -5,6 +5,8 @@ import AuthLayout from "./layouts/AuthLayout";
 import {RequiredAuthProvider, useRequiredAuth} from "@/contexts/RequiredAuthContext";
 import {RequireAdvisingAccess} from "@/pages/advising/RequireAdvisingAccess";
 import {getSignedInHomePath} from "@/utils/signedInHomePath";
+import {RequireVocabularyStudent} from '@/pages/vocabulary/RequireVocabularyStudent';
+import {VOCABULARY_ROUTE_PATTERNS} from '@/pages/vocabulary/routes';
 
 const Layout = lazy(() => import("./layouts/Layout"));
 const LMSHome = lazy(() => import("./pages/LmsHomePage"));
@@ -50,6 +52,9 @@ const StudentAdvisingPage = lazy(() => import('./pages/StudentAdvisingPage'));
 const TenantIntakesPage = lazy(() => import('./pages/TenantIntakesPage'));
 const TenantStudentRecordPage = lazy(() => import('./pages/TenantStudentRecordPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const VocabularyPage = lazy(() => import('./pages/VocabularyPage'));
+const VocabularyListPage = lazy(() => import('./pages/VocabularyListPage'));
+const VocabularySessionPage = lazy(() => import('./pages/VocabularySessionPage'));
 
 const SignedInHome = () => {
   const {user} = useRequiredAuth();
@@ -134,6 +139,9 @@ const App = () => {
                 <Route path="study-plan" element={<AdvisorStudentStudyPlanPage/>}/>
               </Route>
               <Route path="my-plan" element={<RequireAdvisingAccess gate="student"><StudentAdvisingPage/></RequireAdvisingAccess>}/>
+              <Route path={VOCABULARY_ROUTE_PATTERNS.root} element={<RequireVocabularyStudent><VocabularyPage/></RequireVocabularyStudent>}/>
+              <Route path={VOCABULARY_ROUTE_PATTERNS.list} element={<RequireVocabularyStudent><VocabularyListPage/></RequireVocabularyStudent>}/>
+              <Route path={VOCABULARY_ROUTE_PATTERNS.session} element={<RequireVocabularyStudent><VocabularySessionPage/></RequireVocabularyStudent>}/>
               <Route path="admin/intakes" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantIntakesPage/></RequireAdvisingAccess>}/>
               <Route path="admin/students/:studentUserId" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantStudentRecordPage/></RequireAdvisingAccess>}/>
               <Route path="*" element={<NotFoundPage/>}/>

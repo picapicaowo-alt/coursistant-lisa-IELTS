@@ -1,0 +1,48 @@
+.state {
+  min-height: 22rem;
+  padding: 3rem 1.5rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  background: t.$card-bg;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  text-align: center;
+
+  h2 {
+    margin: 1rem 0 0.35rem;
+    font-size: t.$fs-card-title;
+    color: t.$text;
+  }
+
+  p {
+    max-width: 32rem;
+    margin: 0;
+    color: t.$text-muted;
+    line-height: 1.6;
+  }
+
+  button {
+    min-height: 2.75rem;
+    margin-top: 1.25rem;
+    padding: 0 1rem;
+    border: 0;
+    border-radius: t.$radius-control;
+    background: t.$brand;
+    color: t.$card-bg;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: t.$fw-semibold;
+  }
+}
+
+.icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: t.$brand-subtle;
+  color: t.$brand;
+  display: grid;
+  place-content: center;
+}

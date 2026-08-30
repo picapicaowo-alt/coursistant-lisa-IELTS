@@ -1,0 +1,141 @@
+import {useState} from 'react';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {ArrowLeft, ArrowRight, BookOpenCheck, Check, Clock3, Layers3, RefreshCcw, Shuffle} from 'lucide-react';
+import {Link, useNavigate, useParams} from 'react-router-dom';
+import type {StudyMode, VocabularyUnitSummary} from '@/apis/types/vocabulary';
+import {vocabularyApi} from '@/apis/services/vocabulary-api';
+import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
+import {PageState} from '@/pages/vocabulary/components/PageState';
+import {ProgressRing} from '@/pages/vocabulary/components/ProgressRing';
+import {vocabularyQueryKeys} from '@/pages/vocabulary/queryKeys';
+import {VOCABULARY_PATHS} from '@/pages/vocabulary/routes';
+import styles from './index.module.scss';
+
+const VocabularyListPage = () => {
+  const {listId = ''} = useParams();
+  const {user} = useRequiredAuth();
+  const studentId = String(user.userId);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [mode, setMode] = useState<StudyMode>('TEST');
+  const [shuffle, setShuffle] = useState(false);
+  const [startingUnitId, setStartingUnitId] = useState<string | null>(null);
+  const query = useQuery({
+    queryKey: vocabularyQueryKeys.list(studentId, listId),
+    queryFn: () => vocabularyApi.getList(studentId, listId),
+    enabled: Boolean(listId),
+  });
+  const startMutation = useMutation({
+    mutationFn: (unitId: string) => vocabularyApi.startSession(
+      studentId,
+      unitId,
+      {mode, ...(mode === 'REMEMBER' ? {shuffle} : {})},
+      crypto.randomUUID(),
+    ),
+    onMutate: unitId => setStartingUnitId(unitId),
+    onSuccess: session => {
+      void queryClient.invalidateQueries({queryKey: vocabularyQueryKeys.all});
+      navigate(VOCABULARY_PATHS.session(session.unitId, session.id));
+    },
+    onSettled: () => setStartingUnitId(null),
+  });
+
+  if (query.isPending) return <main className={styles.page}><PageState kind="loading" title="Loading units" detail="Preparing this list and your current pass…"/></main>;
+  if (query.isError || !query.data) return <main className={styles.page}><PageState kind="error" title="This list is unavailable" detail="The list may have moved, or the localhost API may be offline." onRetry={() => void query.refetch()}/></main>;
+
+  const list = query.data;
+  return (
+    <main className={styles.page}>
+      <Link className={styles.backLink} to={VOCABULARY_PATHS.root}><ArrowLeft size={17}/> Vocabulary library</Link>
+      <section className={styles.overview}>
+        <div className={styles.overviewCopy}>
+          <div className={styles.tags}><span>{list.theme}</span><span>{list.skillFocus}</span><span>{list.difficulty}</span></div>
+          <h1>{list.name}</h1>
+          <p>{list.description}</p>
+          <div className={styles.facts}>
+            <span><Layers3 size={17}/>{list.units.length} {list.units.length === 1 ? 'unit' : 'units'}</span>
+            <span><BookOpenCheck size={17}/>{list.totalWords} words</span>
+            <span><RefreshCcw size={17}/>{list.progress.completionCount} complete passes</span>
+          </div>
+        </div>
+        <ProgressRing value={list.progress.clearedWords} max={list.progress.totalWords} label="current pass" size="large"/>
+      </section>
+
+      <section className={styles.modeSection} aria-labelledby="mode-heading">
+        <div>
+          <span className={styles.kicker}>Study setup</span>
+          <h2 id="mode-heading">Choose a mode, then a unit</h2>
+        </div>
+        <div className={styles.modeControls}>
+          <div className={styles.segmented} aria-label="Study mode">
+            <button type="button" className={mode === 'TEST' ? styles.selected : ''} onClick={() => setMode('TEST')}>
+              <Check size={17}/><span><strong>Test</strong><small>Recall, rate, reveal</small></span>
+            </button>
+            <button type="button" className={mode === 'REMEMBER' ? styles.selected : ''} onClick={() => setMode('REMEMBER')}>
+              <BookOpenCheck size={17}/><span><strong>Remember</strong><small>Browse complete cards</small></span>
+            </button>
+          </div>
+          {mode === 'REMEMBER' ? (
+            <label className={styles.shuffle}>
+              <input type="checkbox" checked={shuffle} onChange={event => setShuffle(event.target.checked)}/>
+              <Shuffle size={16}/> Shuffle this session
+            </label>
+          ) : (
+            <span className={styles.testNote}><Shuffle size={16}/> Test mode always shuffles</span>
+          )}
+        </div>
+      </section>
+
+      {startMutation.isError ? (
+        <div className={styles.inlineError} role="alert">The session could not start. If another mode is paused, resume or finish it first.</div>
+      ) : null}
+
+      <section className={styles.units} aria-label="Units">
+        {list.units.map(unit => (
+          <UnitCard
+            key={unit.id}
+            unit={unit}
+            mode={mode}
+            pending={startingUnitId === unit.id}
+            onStart={() => startMutation.mutate(unit.id)}
+          />
+        ))}
+      </section>
+    </main>
+  );
+};
+
+interface UnitCardProps {
+  unit: VocabularyUnitSummary;
+  mode: StudyMode;
+  pending: boolean;
+  onStart: () => void;
+}
+
+const UnitCard = ({unit, mode, pending, onStart}: UnitCardProps) => {
+  const percent = Math.round((unit.progress.clearedWords / unit.progress.totalWords) * 100);
+  const buttonLabel = unit.activeSessionId ? 'Resume session' : `Start ${mode === 'TEST' ? 'test' : 'remembering'}`;
+  return (
+    <article className={styles.unitCard}>
+      <div className={styles.unitNumber}>{String(unit.number).padStart(2, '0')}</div>
+      <div className={styles.unitMain}>
+        <span className={styles.kicker}>Unit {unit.number}</span>
+        <h3>{unit.name}</h3>
+        <div className={styles.progressTrack} aria-label={`${percent}% of current pass cleared`}>
+          <span style={{width: `${percent}%`}}/>
+        </div>
+        <p>{unit.progress.clearedWords} of {unit.progress.totalWords} words cleared in this pass</p>
+      </div>
+      <dl className={styles.unitStats}>
+        <div><dt>Words</dt><dd>{unit.wordCount}</dd></div>
+        <div><dt>Completions</dt><dd>{unit.progress.completionCount}</dd></div>
+        <div><dt>Ready to review</dt><dd>{unit.progress.readyForReview}</dd></div>
+      </dl>
+      <button type="button" onClick={onStart} disabled={pending}>
+        {pending ? <Clock3 size={17}/> : null}{pending ? 'Starting…' : buttonLabel}<ArrowRight size={18}/>
+      </button>
+    </article>
+  );
+};
+
+export default VocabularyListPage;

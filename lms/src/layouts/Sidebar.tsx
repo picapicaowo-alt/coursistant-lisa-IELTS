@@ -5,6 +5,8 @@ import {useTranslation} from 'react-i18next';
 import {getSidebarIndex, SIDEBAR_CONFIGS} from "@/configs/routes.config";
 import {useRequiredAuth} from "@/contexts/RequiredAuthContext";
 import {getSignedInHomePath, isAdvisorLevel, isCounsellorLevel, isStudentLevel, isTenantAdminRole} from '@/utils/signedInHomePath';
+import {BookOpen} from 'lucide-react';
+import {VOCABULARY_PATHS} from '@/pages/vocabulary/routes';
 
 const Sidebar: React.FC = () => {
   const {t} = useTranslation();
@@ -22,6 +24,7 @@ const Sidebar: React.FC = () => {
     .map((item, originalIndex) => ({item, originalIndex}))
     .filter(({item}) => {
       if (counsellor || advisor) return false;
+      if (item.path === VOCABULARY_PATHS.root) return student;
       return showLmsNav || item.path === '/course';
     });
   
@@ -81,11 +84,15 @@ const Sidebar: React.FC = () => {
               <li key={item.path}>
                 <Link to={item.path}>
                   <div className={`${styles.itemContent} ${selectedSidebarIndex === originalIndex ? styles.active : ''}`}>
-                    <img
-                      src={selectedSidebarIndex === originalIndex ? item.sidebarItem.filledIcon : item.sidebarItem.unfilledIcon}
-                      alt={item.name}
-                      className={styles.responsiveImage}
-                    />
+                    {item.sidebarItem.icon === 'vocabulary' ? (
+                      <BookOpen className={styles.responsiveIcon} aria-hidden="true"/>
+                    ) : (
+                      <img
+                        src={selectedSidebarIndex === originalIndex ? item.sidebarItem.filledIcon : item.sidebarItem.unfilledIcon}
+                        alt={item.name}
+                        className={styles.responsiveImage}
+                      />
+                    )}
                     <span>{!isUserAccount && item.path === '/course' ? 'Courses' : t(item.sidebarItem.translationLabel)}</span>
                   </div>
                 </Link>
