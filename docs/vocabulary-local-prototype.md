@@ -3,8 +3,8 @@
 ## Scope and isolation
 
 - Frontend branch: `codex/vocabulary-local-prototype`
-- Frontend worktree: `/Users/lisa/Documents/ChatGPT/Coursistant IELTS Vocabulary Prototype`
-- Standalone API: `/Users/lisa/Documents/ChatGPT/Coursistant Vocabulary API Prototype`
+- Frontend worktree: an isolated worktree of the authorized frontend repository
+- Standalone API: an independent sibling Git repository with no 8083 remote
 - Frontend URL: `http://127.0.0.1:13005/vocabulary`
 - API URL: `http://127.0.0.1:18083`
 
@@ -50,18 +50,18 @@ Prisma schema, backup/import behavior, and authentication were not copied.
 In three terminals:
 
 ```bash
-cd "/Users/lisa/Documents/ChatGPT/Coursistant Vocabulary API Prototype"
+cd <vocabulary-api-worktree>
 npm install
 npm run dev
 ```
 
 ```bash
-cd "/Users/lisa/Documents/ChatGPT/Coursistant IELTS Vocabulary Prototype/lms"
+cd <frontend-worktree>/lms
 npm run dev:mock-api
 ```
 
 ```bash
-cd "/Users/lisa/Documents/ChatGPT/Coursistant IELTS Vocabulary Prototype/lms"
+cd <frontend-worktree>/lms
 VITE_BASE_PROTOCOL=http VITE_BASE_DOMAIN=127.0.0.1 VITE_BASE_PORT=18081 npm run dev -- --host 127.0.0.1
 ```
 
