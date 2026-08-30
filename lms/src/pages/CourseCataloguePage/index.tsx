@@ -9,6 +9,7 @@ import {dashboardApiService} from "@/apis/services/dashboard-api";
 import {CourseState, unwrapData} from "@/apis";
 import {useRequiredAuth} from "@/contexts/RequiredAuthContext";
 import {courseApiService} from "@/apis/services/course-api";
+import {canAccessCourseOperations} from '@/utils/roleCapabilities';
 
 const CourseCataloguePage: React.FC = () => {
   const {t} = useTranslation("course");
@@ -127,6 +128,8 @@ const CoursesList: React.FC<{state: CourseState}> = ({state}) => {
             // matter which permission flags it holds, so this checks the
             // enrolment role rather than any of them.
             canManage={!isUserAccount || ('courseRole' in course && (course.courseRole ?? course.role) === 'Instructor')}
+            showOperations={canAccessCourseOperations(user, 'courseRole' in course ? course.courseRole ?? course.role : null)}
+            showDelivery={user.role === 'TENANT_ADMIN'}
           />
         ))}
       </div>

@@ -180,7 +180,7 @@ const LoginPage: React.FC = () => {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? t("login.hidePassword") : t("login.showPassword")}
-                    className="text-gray-500 hover:text-gray-700 cursor-pointer"
+                    className="flex h-11 w-11 items-center justify-center rounded text-gray-500 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-[#566FE8] cursor-pointer"
                   >
                     <Icon icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} width={20} height={20}/>
                   </button>

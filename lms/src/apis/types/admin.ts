@@ -55,3 +55,18 @@ export interface AssignmentGradeCorrectionRequest {
   score: number;
   reason: string;
 }
+
+/** Query object accepted by GET /v2/admins. Every field is optional. */
+export interface AdminDirectoryQuery {
+  avatar?: string;
+  email?: string;
+  id?: number;
+  name?: string;
+  phone?: string;
+  role?: string;
+  status?: string;
+  username?: string;
+}
+
+/** The supplied auth OpenAPI wraps admin reads in an untyped ApiResponse. */
+export type AdminDirectoryRead = unknown;

@@ -4,6 +4,7 @@ import {AuthProvider} from "./contexts/AuthContext";
 import AuthLayout from "./layouts/AuthLayout";
 import {RequiredAuthProvider, useRequiredAuth} from "@/contexts/RequiredAuthContext";
 import {RequireAdvisingAccess} from "@/pages/advising/RequireAdvisingAccess";
+import {RequireRoleAccess} from "@/components/RequireRoleAccess";
 import {getSignedInHomePath} from "@/utils/signedInHomePath";
 
 const Layout = lazy(() => import("./layouts/Layout"));
@@ -42,13 +43,22 @@ const CounsellorIntakesPage = lazy(() => import('./pages/CounsellorIntakesPage')
 const CounsellorIntakeFormPage = lazy(() => import('./pages/CounsellorIntakeFormPage'));
 const CounsellorAssignAdvisorPage = lazy(() => import('./pages/CounsellorAssignAdvisorPage'));
 const AdvisorStudentsPage = lazy(() => import('./pages/AdvisorStudentsPage'));
+const AdvisorOperationsPage = lazy(() => import('./pages/AdvisorOperationsPage'));
 const AdvisorStudentLayout = lazy(() => import('./pages/AdvisorStudentWorkspacePage'));
 const AdvisorStudentIntakePage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/IntakePage'));
 const AdvisorStudentProfilePage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/ProfilePage'));
 const AdvisorStudentStudyPlanPage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/StudyPlanPage'));
+const AdvisorStudentCoursesPage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/CoursesPage'));
+const AdvisorStudentSupportPage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/SupportPage'));
 const StudentAdvisingPage = lazy(() => import('./pages/StudentAdvisingPage'));
+const ParentPortalPage = lazy(() => import('./pages/ParentPortalPage'));
+const MockExamsPage = lazy(() => import('./pages/MockExamsPage'));
+const MockExamSessionPage = lazy(() => import('./pages/MockExamSessionPage'));
 const TenantIntakesPage = lazy(() => import('./pages/TenantIntakesPage'));
 const TenantStudentRecordPage = lazy(() => import('./pages/TenantStudentRecordPage'));
+const TenantCourseDeliveryPage = lazy(() => import('./pages/TenantCourseDeliveryPage'));
+const CourseOperationsPage = lazy(() => import('./pages/CourseOperationsPage'));
+const MyOperationsPage = lazy(() => import('./pages/MyOperationsPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
 const SignedInHome = () => {
@@ -88,35 +98,50 @@ const App = () => {
                    }
             />
 
+            <Route
+              path="/mock-exams/:studentMockExamId/:section"
+              element={
+                <RequiredAuthProvider>
+                  <RequireRoleAccess capability="mockExamSession">
+                    <MockExamSessionPage/>
+                  </RequireRoleAccess>
+                </RequiredAuthProvider>
+              }
+            />
+
             <Route path="/" element={<RequiredAuthProvider><Layout/></RequiredAuthProvider>}>
               <Route index element={<SignedInHome/>}/>
-              <Route path="course" element={<CourseCataloguePage/>}/>
-              <Route path="course/:courseId" element={<CourseWorkspacePage/>}/>
-              <Route path="course/:courseId/assignments/:assignmentId" element={<AssignmentDetailPage/>}/>
-              <Route path="course/:courseId/assignments/new" element={<AssignmentEditorPage/>}/>
-              <Route path="course/:courseId/assignments/:assignmentId/edit" element={<AssignmentEditorPage/>}/>
-              <Route path="course/:courseId/assignments/:assignmentId/grading" element={<AssignmentGradingPage/>}/>
-              <Route path="course/:courseId/assignments/:assignmentId/submissions/:submissionId" element={<AssignmentSubmissionPage/>}/>
-              <Route path="course/:courseId/announcements/:subjectId" element={<NotificationSubjectPage kind="announcement"/>}/>
-              <Route path="course/:courseId/announcements" element={<CourseAnnouncementsPage/>}/>
-              <Route path="course/:courseId/events" element={<CourseEventsPage/>}/>
-              <Route path="course/:courseId/events/:eventId" element={<CourseEventsPage/>}/>
-              <Route path="course/:courseId/schedule" element={<CourseSchedulePage/>}/>
-              <Route path="course/:courseId/groups" element={<CourseGroupsPage/>}/>
-              <Route path="course/:courseId/group-sets/:groupSetId" element={<GroupSetDetailPage/>}/>
-              <Route path="course/:courseId/weeks/:subjectId" element={<NotificationSubjectPage kind="week"/>}/>
-              <Route path="course/:courseId/quizzes/new" element={<QuizEditorPage/>}/>
-              <Route path="course/:courseId/quizzes/:quizId" element={<QuizPage/>}/>
-              <Route path="course/:courseId/quizzes/:quizId/edit" element={<QuizEditorPage/>}/>
-              <Route path="course/:courseId/quizzes/:quizId/grading" element={<QuizGradingPage/>}/>
-              <Route path="course/:courseId/grades" element={<CourseGradesPage/>}/>
+              <Route element={<RequireRoleAccess capability="courses"/>}>
+                <Route path="course" element={<CourseCataloguePage/>}/>
+                <Route path="course/:courseId" element={<CourseWorkspacePage/>}/>
+                <Route path="course/:courseId/operations" element={<CourseOperationsPage/>}/>
+                <Route path="course/:courseId/assignments/:assignmentId" element={<AssignmentDetailPage/>}/>
+                <Route path="course/:courseId/assignments/new" element={<AssignmentEditorPage/>}/>
+                <Route path="course/:courseId/assignments/:assignmentId/edit" element={<AssignmentEditorPage/>}/>
+                <Route path="course/:courseId/assignments/:assignmentId/grading" element={<AssignmentGradingPage/>}/>
+                <Route path="course/:courseId/assignments/:assignmentId/submissions/:submissionId" element={<AssignmentSubmissionPage/>}/>
+                <Route path="course/:courseId/announcements/:subjectId" element={<NotificationSubjectPage kind="announcement"/>}/>
+                <Route path="course/:courseId/announcements" element={<CourseAnnouncementsPage/>}/>
+                <Route path="course/:courseId/events" element={<CourseEventsPage/>}/>
+                <Route path="course/:courseId/events/:eventId" element={<CourseEventsPage/>}/>
+                <Route path="course/:courseId/schedule" element={<CourseSchedulePage/>}/>
+                <Route path="course/:courseId/groups" element={<CourseGroupsPage/>}/>
+                <Route path="course/:courseId/group-sets/:groupSetId" element={<GroupSetDetailPage/>}/>
+                <Route path="course/:courseId/weeks/:subjectId" element={<NotificationSubjectPage kind="week"/>}/>
+                <Route path="course/:courseId/quizzes/new" element={<QuizEditorPage/>}/>
+                <Route path="course/:courseId/quizzes/:quizId" element={<QuizPage/>}/>
+                <Route path="course/:courseId/quizzes/:quizId/edit" element={<QuizEditorPage/>}/>
+                <Route path="course/:courseId/quizzes/:quizId/grading" element={<QuizGradingPage/>}/>
+                <Route path="course/:courseId/grades" element={<CourseGradesPage/>}/>
+                <Route path="course/add-content" element={<CourseCreatePage/>}/>
+              </Route>
               <Route path="calendar" element={<CalendarPage/>}/>
+              <Route path="my-operations" element={<RequireRoleAccess capability="myOperations"><MyOperationsPage/></RequireRoleAccess>}/>
               <Route path="post" element={<Post/>}/>
               <Route path="post/:postId" element={<PostDetail/>}/>
               <Route path="roster" element={<Roster/>}/>
               <Route path="roster/:courseId" element={<Roster/>}/>
               <Route path="profile" element={<Profile/>}/>
-              <Route path="course/add-content" element={<CourseCreatePage/>}/>
               <Route path="create/:contentType" element={<CreateContent/>}/>
               <Route path="aibot" element={<AIBot/>}/>
               <Route path="settings" element={<Settings/>}/>
@@ -127,15 +152,21 @@ const App = () => {
               <Route path="counsellor/intakes/:intakeId" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>
               <Route path="counsellor/intakes/:intakeId/assign" element={<RequireAdvisingAccess gate="counsellor"><CounsellorAssignAdvisorPage/></RequireAdvisingAccess>}/>
               <Route path="advisor/students" element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentsPage/></RequireAdvisingAccess>}/>
+              <Route path="advisor/operations" element={<RequireAdvisingAccess gate="advisor"><AdvisorOperationsPage/></RequireAdvisingAccess>}/>
               <Route path="advisor/students/:studentUserId" element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentLayout/></RequireAdvisingAccess>}>
                 <Route index element={<Navigate to="intake" replace/>}/>
                 <Route path="intake" element={<AdvisorStudentIntakePage/>}/>
                 <Route path="profile" element={<AdvisorStudentProfilePage/>}/>
                 <Route path="study-plan" element={<AdvisorStudentStudyPlanPage/>}/>
+                <Route path="courses" element={<AdvisorStudentCoursesPage/>}/>
+                <Route path="support" element={<AdvisorStudentSupportPage/>}/>
               </Route>
               <Route path="my-plan" element={<RequireAdvisingAccess gate="student"><StudentAdvisingPage/></RequireAdvisingAccess>}/>
+              <Route path="parent" element={<RequireAdvisingAccess gate="parent"><ParentPortalPage/></RequireAdvisingAccess>}/>
+              <Route path="mock-exams" element={<RequireRoleAccess capability="mockExams"><MockExamsPage/></RequireRoleAccess>}/>
               <Route path="admin/intakes" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantIntakesPage/></RequireAdvisingAccess>}/>
               <Route path="admin/students/:studentUserId" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantStudentRecordPage/></RequireAdvisingAccess>}/>
+              <Route path="admin/courses/:courseId/delivery" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantCourseDeliveryPage/></RequireAdvisingAccess>}/>
               <Route path="*" element={<NotFoundPage/>}/>
             </Route>
             <Route

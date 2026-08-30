@@ -7,6 +7,7 @@ import {isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {ParentLinksPanel} from '@/components/ParentLinksPanel';
 
 const AdvisorStudentLayout: React.FC = () => {
   const {studentUserId} = useParams();
@@ -40,7 +41,10 @@ const AdvisorStudentLayout: React.FC = () => {
         <NavLink to={`/advisor/students/${id}/intake`} className={({isActive}) => isActive ? styles.tabActive : ''}>Intake</NavLink>
         <NavLink to={`/advisor/students/${id}/profile`} className={({isActive}) => isActive ? styles.tabActive : ''}>Profile</NavLink>
         <NavLink to={`/advisor/students/${id}/study-plan`} className={({isActive}) => isActive ? styles.tabActive : ''}>Study plan</NavLink>
+        <NavLink to={`/advisor/students/${id}/courses`} className={({isActive}) => isActive ? styles.tabActive : ''}>Courses</NavLink>
+        <NavLink to={`/advisor/students/${id}/support`} className={({isActive}) => isActive ? styles.tabActive : ''}>Support &amp; reports</NavLink>
       </nav>
+      <ParentLinksPanel scope="advisor" subjectId={id}/>
       <Outlet/>
     </main>
   );

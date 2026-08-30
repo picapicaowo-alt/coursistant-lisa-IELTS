@@ -6,16 +6,18 @@ import {
   getSignedInHomePath,
   isAdvisorLevel,
   isCounsellorLevel,
+  isParentLevel,
   isStudentLevel,
   isTenantAdminRole,
 } from '@/utils/signedInHomePath';
 
-type Gate = 'counsellor' | 'advisor' | 'student' | 'tenantAdmin';
+type Gate = 'counsellor' | 'advisor' | 'student' | 'parent' | 'tenantAdmin';
 
 const allowed: Record<Gate, (user: Pick<LoginResponse, 'role' | 'level'>) => boolean> = {
   counsellor: user => isCounsellorLevel(user.level),
   advisor: user => isAdvisorLevel(user.level),
   student: user => isStudentLevel(user.level),
+  parent: user => isParentLevel(user.level),
   tenantAdmin: user => isTenantAdminRole(user.role),
 };
 

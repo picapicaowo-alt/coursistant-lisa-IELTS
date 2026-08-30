@@ -141,6 +141,19 @@ export interface AssignmentAttachment {
   createdAt: string;
 }
 
+export interface AssignmentAttachmentManifestItem {
+  assignmentId?: number;
+  assignmentState?: string;
+  attachmentId?: number;
+  contentType?: string;
+  createdAt?: string;
+  originalName?: string;
+  sizeBytes?: number;
+}
+
+/** The full role-shaped assignment list has no data schema in the supplied YAML. */
+export type AssignmentListRead = unknown;
+
 export interface AssignmentDetail {
   id: number;
   courseId: number;

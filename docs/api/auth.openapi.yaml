@@ -1,0 +1,967 @@
+openapi: 3.0.1
+info:
+  description: Coursistant LMS REST API contract (OpenAPI 3).
+  title: LMS API
+  version: 1.0.0
+servers:
+- description: Servlet context-path
+  url: /api
+security:
+- bearerAuth: []
+tags:
+- description: System-admin managed user lifecycle
+  name: System Managed Users
+- description: "Session login, register, token refresh, password flows"
+  name: Auth
+- description: Tenant-admin managed user lifecycle
+  name: Tenant Managed Users
+- description: System admin read APIs; write APIs disabled until Phase 2
+  name: Admins
+paths:
+  /v1:
+    get:
+      operationId: authHello
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      security: []
+      summary: Health / hello probe
+      tags:
+      - Auth
+  /v1/auth/email-verifications/register:
+    post:
+      operationId: authSendRegisterEmailVerification
+      parameters:
+      - description: Email to verify
+        example: student@example.com
+        in: query
+        name: email
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      security: []
+      summary: Send registration email verification code
+      tags:
+      - Auth
+  /v1/auth/email-verifications/reset:
+    post:
+      operationId: authSendResetEmailVerification
+      parameters:
+      - description: Email to verify
+        example: student@example.com
+        in: query
+        name: email
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      security: []
+      summary: Send password-reset email verification code
+      tags:
+      - Auth
+  /v1/auth/login:
+    post:
+      operationId: authLogin
+      requestBody:
+        content:
+          application/json:
+            examples:
+              studentLogin:
+                description: studentLogin
+                value:
+                  email: student@example.com
+                  password: Passw0rd1
+                  role: USER
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Login succeeded; refresh token is only in Set-Cookie
+          headers:
+            Set-Cookie:
+              description: "Sets refreshToken HttpOnly cookie: refreshToken=<token>;\
+                \ Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax"
+              schema:
+                type: string
+              style: simple
+      security: []
+      summary: Login and issue access token + refresh cookie
+      tags:
+      - Auth
+  /v1/auth/logout:
+    post:
+      operationId: authLogout
+      parameters:
+      - description: HttpOnly refresh token cookie (name=refreshToken). Secure; Path=/;
+          SameSite=Lax; Max-Age=1209600 (14 days) when set.
+        in: cookie
+        name: refreshToken
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Logged out; refresh cookie cleared
+          headers:
+            Set-Cookie:
+              description: "Clears refreshToken cookie: refreshToken=; Path=/; Max-Age=0;\
+                \ HttpOnly; Secure; SameSite=Lax"
+              schema:
+                type: string
+              style: simple
+      security: []
+      summary: Revoke refresh token and clear cookie
+      tags:
+      - Auth
+  /v1/auth/password:
+    put:
+      operationId: authUpdatePassword
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            examples:
+              changePassword:
+                description: changePassword
+                value:
+                  currentPassword: OldPassw0rd
+                  newPassword: NewPassw0rd1
+            schema:
+              $ref: "#/components/schemas/ChangePasswordRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Change password for the authenticated principal
+      tags:
+      - Auth
+  /v1/auth/password-resets:
+    post:
+      operationId: authResetPassword
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            examples:
+              resetPassword:
+                description: resetPassword
+                value:
+                  email: student@example.com
+                  verificationCode: "123456"
+                  newPassword: NewPassw0rd1
+            schema:
+              $ref: "#/components/schemas/PasswordResetRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      security: []
+      summary: Reset password with email verification code
+      tags:
+      - Auth
+  /v1/auth/refresh-token:
+    post:
+      operationId: authRefreshToken
+      parameters:
+      - description: HttpOnly refresh token cookie (name=refreshToken). Secure; Path=/;
+          SameSite=Lax; Max-Age=1209600 (14 days) when set.
+        in: cookie
+        name: refreshToken
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: New access token in body; rotated refresh token only in Set-Cookie
+          headers:
+            Set-Cookie:
+              description: "Sets refreshToken HttpOnly cookie: refreshToken=<token>;\
+                \ Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax"
+              schema:
+                type: string
+              style: simple
+      security: []
+      summary: Rotate refresh cookie and return new access token
+      tags:
+      - Auth
+  /v1/auth/register:
+    post:
+      operationId: authRegister
+      requestBody:
+        content:
+          application/json:
+            examples:
+              register:
+                description: register
+                value:
+                  email: student@example.com
+                  verificationCode: "123456"
+                  password: Passw0rd1
+                  name: Student One
+                  username: student1
+                  tenantId: 1
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Registration succeeded; refresh token is only in Set-Cookie
+          headers:
+            Set-Cookie:
+              description: "Sets refreshToken HttpOnly cookie: refreshToken=<token>;\
+                \ Path=/; Max-Age=1209600; HttpOnly; Secure; SameSite=Lax"
+              schema:
+                type: string
+              style: simple
+      security: []
+      summary: Register and issue access token + refresh cookie
+      tags:
+      - Auth
+  /v2/admins:
+    get:
+      operationId: adminList
+      parameters:
+      - in: query
+        name: query
+        required: true
+        schema:
+          $ref: "#/components/schemas/AdminQuery"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List admins with optional filters
+      tags:
+      - Admins
+    post:
+      deprecated: true
+      description: Phase 2 disabled. Always returns 403 FORBIDDEN until secure management
+        APIs ship.
+      operationId: adminAddDisabled
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Create admin (disabled)
+      tags:
+      - Admins
+      x-availability: disabled
+  /v2/admins/batch:
+    delete:
+      deprecated: true
+      description: Phase 2 disabled. Always returns 403 FORBIDDEN until secure management
+        APIs ship.
+      operationId: adminDeleteBatchDisabled
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Batch delete admins (disabled)
+      tags:
+      - Admins
+      x-availability: disabled
+  /v2/admins/{id}:
+    delete:
+      deprecated: true
+      description: Phase 2 disabled. Always returns 403 FORBIDDEN until secure management
+        APIs ship.
+      operationId: adminDeleteDisabled
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Delete admin (disabled)
+      tags:
+      - Admins
+      x-availability: disabled
+    get:
+      operationId: adminGetById
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get admin by id
+      tags:
+      - Admins
+    put:
+      deprecated: true
+      description: Phase 2 disabled. Always returns 403 FORBIDDEN until secure management
+        APIs ship.
+      operationId: adminUpdateDisabled
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Update admin (disabled)
+      tags:
+      - Admins
+      x-availability: disabled
+  /v2/system/managed-users:
+    post:
+      operationId: systemManagedUserCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            examples:
+              createTenantAdmin:
+                description: createTenantAdmin
+                value:
+                  email: admin@example.com
+                  name: Tenant Admin
+                  role: TENANT_ADMIN
+                  level: NOT_APPLICABLE
+                  tenantId: 1
+            schema:
+              $ref: "#/components/schemas/SystemManagedUserCreateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a managed user in a tenant
+      tags:
+      - System Managed Users
+  /v2/system/managed-users/{id}/disable:
+    post:
+      operationId: systemManagedUserDisable
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Disable a system-managed user
+      tags:
+      - System Managed Users
+  /v2/system/managed-users/{id}/role:
+    put:
+      description: Target level is required. Same role+level is idempotent. Student
+        and Parent identities are immutable and cannot be transition targets (409
+        IDENTITY_LEVEL_TRANSITION_FORBIDDEN). Enrollment/last-admin blockers remain
+        409 CONFLICT.
+      operationId: systemManagedUserChangeRole
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            examples:
+              changeRole:
+                description: changeRole
+                value:
+                  role: USER
+                  level: INSTRUCTOR_ADVISOR
+            schema:
+              $ref: "#/components/schemas/SystemManagedUserChangeRoleRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SUCCESS – including same-tuple idempotent
+        "400":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: PARAM_MISSING or BAD_REQUEST
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: FORBIDDEN
+        "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: USER_NOT_FOUND
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: IDENTITY_LEVEL_TRANSITION_FORBIDDEN or CONFLICT
+      summary: Change role/level of a system-managed user
+      tags:
+      - System Managed Users
+  /v2/tenant/managed-users:
+    post:
+      description: "USER without level defaults to STUDENT. USER may be STUDENT, INSTRUCTOR,\
+        \ ADVISOR, COUNSELLOR, PARENT, or INSTRUCTOR_ADVISOR. TENANT_ADMIN requires\
+        \ NOT_APPLICABLE."
+      operationId: tenantManagedUserCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            examples:
+              createAdvisor:
+                description: createAdvisor
+                value:
+                  email: advisor@example.com
+                  name: Advisor One
+                  role: USER
+                  level: ADVISOR
+            schema:
+              $ref: "#/components/schemas/TenantManagedUserCreateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a managed user in the caller tenant
+      tags:
+      - Tenant Managed Users
+  /v2/tenant/managed-users/{id}/disable:
+    post:
+      operationId: tenantManagedUserDisable
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Disable a tenant-managed user
+      tags:
+      - Tenant Managed Users
+  /v2/tenant/managed-users/{id}/role:
+    put:
+      description: Target level is required. Same role+level is idempotent. Student
+        and Parent identities are immutable and cannot be transition targets (409
+        IDENTITY_LEVEL_TRANSITION_FORBIDDEN). Enrollment/last-admin blockers remain
+        409 CONFLICT.
+      operationId: tenantManagedUserChangeRole
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            examples:
+              changeRole:
+                description: changeRole
+                value:
+                  role: USER
+                  level: INSTRUCTOR_ADVISOR
+            schema:
+              $ref: "#/components/schemas/TenantManagedUserChangeRoleRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SUCCESS – including same-tuple idempotent
+        "400":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: PARAM_MISSING or BAD_REQUEST
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: FORBIDDEN
+        "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: NOT_FOUND
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: IDENTITY_LEVEL_TRANSITION_FORBIDDEN or CONFLICT
+      summary: Change role/level of a tenant-managed user
+      tags:
+      - Tenant Managed Users
+components:
+  schemas:
+    AdminQuery:
+      type: object
+      properties:
+        avatar:
+          type: string
+        email:
+          type: string
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        phone:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+        username:
+          type: string
+    ApiErrorResponse:
+      type: object
+      description: Error envelope rendered by ApiExceptionHandler (data is explicitly
+        null unless structured error details are supplied).
+      properties:
+        code:
+          type: string
+          description: Stable ErrorType.name()
+          example: USER_NOT_FOUND
+        data:
+          type: object
+          nullable: true
+        message:
+          type: string
+          example: User Does Not Exist
+        status:
+          type: integer
+          format: int32
+          example: 404
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-07-23T10:00:00Z
+      required:
+      - code
+      - data
+      - message
+      - status
+      - timestamp
+    ApiResponse:
+      type: object
+      description: Unified JSON envelope for LMS APIs
+      properties:
+        code:
+          type: string
+          description: Stable machine code (ErrorType.name() or SUCCESS)
+          example: SUCCESS
+        data:
+          type: object
+          description: Payload; explicitly null when no payload is available
+          nullable: true
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-07-23T10:00:00Z
+    ChangePasswordRequest:
+      type: object
+      description: Change password for the authenticated principal
+      properties:
+        currentPassword:
+          type: string
+          format: password
+          description: Current password
+          example: OldPassw0rd
+        newPassword:
+          type: string
+          format: password
+          description: New password
+          example: NewPassw0rd1
+      required:
+      - currentPassword
+      - newPassword
+    LoginRequest:
+      type: object
+      description: Credentials for POST /v1/auth/login
+      properties:
+        email:
+          type: string
+          description: Account email
+          example: student@example.com
+        password:
+          type: string
+          format: password
+          description: Account password
+          example: Passw0rd1
+        role:
+          type: string
+          description: "Login table router role (USER, TENANT_ADMIN, SYSTEM_ADMIN,\
+            \ or legacy ADMIN)"
+          enum:
+          - USER
+          - TENANT_ADMIN
+          - SYSTEM_ADMIN
+          - ADMIN
+          example: USER
+      required:
+      - email
+      - password
+      - role
+    PasswordResetRequest:
+      type: object
+      description: Reset password with email verification code
+      properties:
+        email:
+          type: string
+          description: Account email
+          example: student@example.com
+        newPassword:
+          type: string
+          format: password
+          description: New password
+          example: NewPassw0rd1
+        verificationCode:
+          type: string
+          description: Email verification code
+          example: "123456"
+      required:
+      - email
+      - newPassword
+      - verificationCode
+    RegisterRequest:
+      type: object
+      description: Public self-registration payload
+      properties:
+        email:
+          type: string
+          description: Email
+          example: student@example.com
+        name:
+          type: string
+          description: Display name
+          example: Student One
+        password:
+          type: string
+          format: password
+          description: Password
+          example: Passw0rd1
+        tenantId:
+          type: integer
+          format: int32
+          description: Tenant to join
+          example: 1
+        username:
+          type: string
+          description: Optional username
+          example: student1
+        verificationCode:
+          type: string
+          description: Email verification code
+          example: "123456"
+      required:
+      - email
+      - name
+      - password
+      - tenantId
+      - verificationCode
+    SystemManagedUserChangeRoleRequest:
+      type: object
+      description: System-admin change of managed user role/level
+      properties:
+        level:
+          type: string
+          description: Required target level. Same role+level is idempotent. Student
+            and Parent identities are immutable; no other identity can become Student
+            or Parent. Canonical uppercase values only.
+          enum:
+          - STUDENT
+          - INSTRUCTOR
+          - ADVISOR
+          - COUNSELLOR
+          - PARENT
+          - INSTRUCTOR_ADVISOR
+          - NOT_APPLICABLE
+          example: INSTRUCTOR_ADVISOR
+        role:
+          type: string
+          description: New role
+          enum:
+          - USER
+          - TENANT_ADMIN
+          example: USER
+      required:
+      - level
+      - role
+    SystemManagedUserCreateRequest:
+      type: object
+      description: System-admin create of a managed user in a tenant
+      properties:
+        email:
+          type: string
+          description: Email
+          example: admin@example.com
+        level:
+          type: string
+          description: "Business identity. USER defaults to STUDENT when omitted.\
+            \ USER allows STUDENT, INSTRUCTOR, ADVISOR, COUNSELLOR, PARENT, or INSTRUCTOR_ADVISOR\
+            \ (the only combined identity). TENANT_ADMIN requires NOT_APPLICABLE."
+          enum:
+          - STUDENT
+          - INSTRUCTOR
+          - ADVISOR
+          - COUNSELLOR
+          - PARENT
+          - INSTRUCTOR_ADVISOR
+          - NOT_APPLICABLE
+          example: NOT_APPLICABLE
+        name:
+          type: string
+          description: Display name
+          example: Tenant Admin
+        role:
+          type: string
+          description: Role
+          enum:
+          - USER
+          - TENANT_ADMIN
+          example: TENANT_ADMIN
+        tenantId:
+          type: integer
+          format: int32
+          description: Target tenant id
+          example: 1
+      required:
+      - email
+      - name
+      - role
+      - tenantId
+    TenantManagedUserChangeRoleRequest:
+      type: object
+      description: Change role/level of a tenant-managed user
+      properties:
+        level:
+          type: string
+          description: Required target level. Same role+level is idempotent. Student
+            and Parent identities are immutable; no other identity can become Student
+            or Parent. Canonical uppercase values only.
+          enum:
+          - STUDENT
+          - INSTRUCTOR
+          - ADVISOR
+          - COUNSELLOR
+          - PARENT
+          - INSTRUCTOR_ADVISOR
+          - NOT_APPLICABLE
+          example: INSTRUCTOR_ADVISOR
+        role:
+          type: string
+          description: New role
+          enum:
+          - USER
+          - TENANT_ADMIN
+          example: USER
+      required:
+      - level
+      - role
+    TenantManagedUserCreateRequest:
+      type: object
+      description: Create a user within the caller tenant
+      properties:
+        email:
+          type: string
+          description: Email
+          example: advisor@example.com
+        level:
+          type: string
+          description: "Business identity. USER defaults to STUDENT when omitted.\
+            \ USER allows STUDENT, INSTRUCTOR, ADVISOR, COUNSELLOR, PARENT, or INSTRUCTOR_ADVISOR\
+            \ (the only combined identity). TENANT_ADMIN requires NOT_APPLICABLE."
+          enum:
+          - STUDENT
+          - INSTRUCTOR
+          - ADVISOR
+          - COUNSELLOR
+          - PARENT
+          - INSTRUCTOR_ADVISOR
+          - NOT_APPLICABLE
+          example: ADVISOR
+        name:
+          type: string
+          description: Display name
+          example: Advisor One
+        role:
+          type: string
+          description: Role (tenant-scoped)
+          enum:
+          - USER
+          - TENANT_ADMIN
+          example: USER
+      required:
+      - email
+      - name
+      - role
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: "Access token from POST /v1/auth/login (Authorization: Bearer <token>)."
+      name: bearerAuth
+      scheme: bearer
+      type: http

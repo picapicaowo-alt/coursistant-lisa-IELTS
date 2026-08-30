@@ -1,0 +1,203 @@
+.page {
+  min-height: 100%;
+  padding: 2rem clamp(1rem, 4vw, 3.5rem) 4rem;
+  background: t.$page-bg;
+  color: t.$text;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+}
+
+.header h1 { margin: .2rem 0; font-size: clamp(2rem, 4vw, t.$fs-h1); }
+.header p { margin: 0; color: t.$text-muted; }
+.eyebrow { color: t.$brand !important; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
+
+.coursePicker {
+  display: grid;
+  gap: .3rem;
+  min-width: min(22rem, 100%);
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.coursePicker select {
+  min-height: 2.75rem;
+  padding: .55rem .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+}
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem;
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+  padding: .35rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  background: t.$card-bg;
+}
+
+.tabs button {
+  min-height: 2.75rem;
+  padding: 0 .9rem;
+  border: 0;
+  border-radius: t.$radius-control-sm;
+  background: transparent;
+  color: t.$text-muted;
+  font-weight: t.$fw-semibold;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.tabs .active { background: t.$brand; color: #fff; }
+.tabs button:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 82rem;
+  margin: 0 auto;
+}
+
+.workspace {
+  display: grid;
+  gap: 1rem;
+  max-width: 82rem;
+  margin: 0 auto;
+}
+
+.card,
+.emptyPanel {
+  display: grid;
+  align-content: start;
+  gap: .85rem;
+  min-width: 0;
+  padding: 1.2rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+}
+
+.card h2,
+.card h3,
+.card p {
+  margin: 0;
+}
+
+.emptyPanel {
+  border-style: dashed;
+  background: t.$subcard-bg;
+}
+
+.emptyPanel span,
+.empty,
+.row small {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.empty { margin: 0; }
+
+.list {
+  display: grid;
+  gap: .55rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .75rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+}
+
+.row div {
+  display: grid;
+  gap: .2rem;
+}
+
+.form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .75rem;
+  max-width: 52rem;
+  margin-top: .5rem;
+}
+
+.form label {
+  display: grid;
+  gap: .3rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.form input,
+.form select,
+.form textarea {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .55rem .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.form textarea {
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .5rem;
+  grid-column: 1 / -1;
+}
+
+.primary,
+.secondary,
+.danger {
+  min-height: 2.6rem;
+  padding: 0 .85rem;
+  border-radius: t.$radius-control-sm;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+
+.primary { border: 1px solid t.$brand; background: t.$brand; color: t.$card-bg; }
+.secondary { border: 1px solid t.$border; background: t.$card-bg; color: t.$text; }
+.danger { border: 1px solid t.$danger; background: t.$danger; color: t.$card-bg; }
+.primary:disabled, .secondary:disabled, .danger:disabled { cursor: not-allowed; opacity: .5; }
+
+.detail {
+  margin-top: .5rem;
+  padding: .75rem;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+@media (max-width: 800px) {
+  .header { align-items: stretch; flex-direction: column; }
+  .grid { grid-template-columns: 1fr; }
+  .row { align-items: stretch; flex-direction: column; }
+  .form { grid-template-columns: 1fr; }
+  .coursePicker { min-width: 0; }
+}

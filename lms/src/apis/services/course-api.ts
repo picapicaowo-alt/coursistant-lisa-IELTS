@@ -409,6 +409,10 @@ export class CourseApiService {
     );
   }
 
+  async enrolStudent(courseId: number, userId: number): Promise<ApiResponse<CourseMember>> {
+    return this.apiClient.post(`/v2/courses/${courseId}/students`, {userId}, idempotent());
+  }
+
   async withdrawStudent(courseId: number, userId: number): Promise<ApiResponse<CourseMember>> {
     return this.apiClient.delete(`/v2/courses/${courseId}/students/${userId}`);
   }

@@ -3,6 +3,9 @@ import {
   ApiResponse,
   AssignAdvisorRequest,
   CancelStudentIntakeRequest,
+  CourseDeliveryConfigResponse,
+  LaunchTransitionRequest,
+  PutCourseDeliveryConfigRequest,
   ReassignAdvisorRequest,
   StudentIntakeResponse,
   TenantIntakeListParams,
@@ -74,6 +77,46 @@ export class TenantAdvisingApiService {
     size = 20,
   ): Promise<ApiResponse<AdvisingPage<StudyPlanRevisionResponse>>> {
     return this.apiClient.get(`/v2/tenant/students/${studentUserId}/study-plan/revisions`, {params: {page, size}});
+  }
+
+  getCourseDeliveryConfig(courseId: number): Promise<ApiResponse<CourseDeliveryConfigResponse>> {
+    return this.apiClient.get(`/v2/tenant/courses/${courseId}/delivery-config`);
+  }
+
+  putCourseDeliveryConfig(
+    courseId: number,
+    request: PutCourseDeliveryConfigRequest,
+    idempotencyKey: string = crypto.randomUUID(),
+  ): Promise<ApiResponse<CourseDeliveryConfigResponse>> {
+    return this.apiClient.put(
+      `/v2/tenant/courses/${courseId}/delivery-config`,
+      request,
+      idempotent(idempotencyKey),
+    );
+  }
+
+  readyCourseLaunch(
+    courseId: number,
+    request: LaunchTransitionRequest,
+    idempotencyKey: string = crypto.randomUUID(),
+  ): Promise<ApiResponse<CourseDeliveryConfigResponse>> {
+    return this.apiClient.post(
+      `/v2/tenant/courses/${courseId}/launch/ready`,
+      request,
+      idempotent(idempotencyKey),
+    );
+  }
+
+  publishCourseLaunch(
+    courseId: number,
+    request: LaunchTransitionRequest,
+    idempotencyKey: string = crypto.randomUUID(),
+  ): Promise<ApiResponse<CourseDeliveryConfigResponse>> {
+    return this.apiClient.post(
+      `/v2/tenant/courses/${courseId}/launch/publish`,
+      request,
+      idempotent(idempotencyKey),
+    );
   }
 }
 

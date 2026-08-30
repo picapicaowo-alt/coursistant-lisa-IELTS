@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {getSignedInHomePath, isAdvisorLevel, isCounsellorLevel} from './signedInHomePath';
+import {getSignedInHomePath, isAdvisorLevel, isCounsellorLevel, isParentLevel} from './signedInHomePath';
 
 describe('getSignedInHomePath', () => {
   it('sends counsellors to the intake dashboard', () => {
@@ -18,5 +18,10 @@ describe('getSignedInHomePath', () => {
 
   it('sends tenant admins to intake operations', () => {
     expect(getSignedInHomePath({role: 'TENANT_ADMIN', level: 'NOT_APPLICABLE'})).toBe('/admin/intakes');
+  });
+
+  it('sends parents to the parent portal', () => {
+    expect(isParentLevel('PARENT')).toBe(true);
+    expect(getSignedInHomePath({role: 'USER', level: 'PARENT'})).toBe('/parent');
   });
 });

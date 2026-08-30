@@ -18,10 +18,11 @@ describe("app shell routing", () => {
     expect(getSidebarIndex("/settings")).toBe(-1);
   });
 
-  it("shows shell for settings, profile, and admin routes", () => {
+  it("shows shell for settings, profile, operations, and admin routes", () => {
     expect(shouldShowAppShell("/settings")).toBe(true);
     expect(shouldShowAppShell("/profile")).toBe(true);
     expect(shouldShowAppShell("/admin")).toBe(true);
     expect(shouldShowAppShell("/admin/users")).toBe(true);
+    expect(shouldShowAppShell("/my-operations")).toBe(true);
   });
 });

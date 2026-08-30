@@ -27,6 +27,11 @@ export class ProfileApiService {
   deleteAvatar(): Promise<ApiResponse<ProfileResponse>> {
     return this.apiClient.delete('/v2/me/profile/avatar', idempotent());
   }
+
+  async getUserAvatar(userId: number): Promise<Blob> {
+    const response = await this.apiClient.getClient().get<Blob>(`/v2/users/${userId}/avatar`, {responseType: 'blob'});
+    return response.data;
+  }
 }
 
 export const profileApiService = new ProfileApiService();

@@ -1,0 +1,438 @@
+.workspace {
+  display: grid;
+  gap: 1.25rem;
+  min-height: 100%;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background: linear-gradient(180deg, t.$exam-canvas-top, t.$page-bg 24rem);
+  color: t.$text;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 2rem;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border-radius: t.$radius-card-lg;
+  color: t.$card-bg;
+  background: linear-gradient(125deg, t.$exam-navy-deep, t.$exam-navy 68%, t.$exam-navy-mid);
+  box-shadow: t.$shadow-card;
+}
+
+.eyebrow {
+  margin: 0 0 .45rem;
+  color: t.$exam-label;
+  font-size: .68rem;
+  font-weight: t.$fw-bold;
+  letter-spacing: .15em;
+  text-transform: uppercase;
+}
+
+.hero h1 {
+  max-width: 48rem;
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -.04em;
+}
+
+.hero p:last-child {
+  max-width: 46rem;
+  margin: 1rem 0 0;
+  color: t.$exam-label;
+  line-height: 1.65;
+}
+
+.metric {
+  min-width: 7.25rem;
+  padding: 1rem 1.2rem;
+  border: 1px solid t.$exam-pill-border;
+  border-radius: t.$radius-control;
+  background: t.$exam-pill-bg;
+  text-align: right;
+}
+
+.metric strong,
+.metric span {
+  display: block;
+}
+
+.metric strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.metric span {
+  margin-top: .35rem;
+  color: t.$exam-label;
+  font-size: t.$fs-caption;
+}
+
+.twoColumn,
+.queueLayout {
+  display: grid;
+  grid-template-columns: minmax(18rem, .8fr) minmax(0, 1.2fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.queueLayout {
+  grid-template-columns: minmax(17rem, .68fr) minmax(0, 1.32fr);
+}
+
+.panel {
+  min-width: 0;
+  padding: clamp(1.1rem, 3vw, 1.75rem);
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-card-lg;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+}
+
+.panelHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid t.$exam-line;
+  color: t.$exam-navy-deep;
+}
+
+.panelHeading .eyebrow {
+  color: t.$text-muted;
+}
+
+.panelHeading h2,
+.panelHeading h3 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  letter-spacing: -.025em;
+}
+
+.contextTag {
+  padding: .45rem .7rem;
+  border-radius: t.$radius-pill;
+  background: t.$exam-accent-soft;
+  color: t.$exam-navy;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.cardList {
+  display: grid;
+  gap: .65rem;
+}
+
+.selectCard,
+.selectedCard {
+  display: grid;
+  gap: .35rem;
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control;
+  background: t.$card-bg;
+  color: t.$text;
+  text-align: left;
+  cursor: pointer;
+}
+
+.selectCard:hover,
+.selectedCard {
+  border-color: t.$exam-navy;
+  box-shadow: 0 .5rem 1.25rem t.$exam-link-shadow;
+}
+
+.selectedCard {
+  background: t.$exam-card-wash;
+}
+
+.selectCard strong,
+.selectedCard strong {
+  color: t.$exam-navy-deep;
+  font-size: 1rem;
+}
+
+.selectCard > span:last-child,
+.selectedCard > span:last-child {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.cardTopline {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: t.$exam-navy;
+  font-size: .68rem;
+  font-weight: t.$fw-bold;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.cardTopline small {
+  color: t.$text-muted;
+  letter-spacing: 0;
+}
+
+.compactForm,
+.editorForm {
+  display: grid;
+  gap: .9rem;
+  margin-top: 1.25rem;
+}
+
+.editorForm {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.compactForm h3 {
+  margin: 0;
+  color: t.$exam-navy-deep;
+}
+
+.compactForm label,
+.editorForm label,
+.selectLabel {
+  display: grid;
+  gap: .4rem;
+  color: t.$text;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.compactForm input,
+.compactForm textarea,
+.editorForm input,
+.editorForm textarea,
+.editorForm select,
+.selectLabel select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .68rem .75rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.compactForm textarea,
+.editorForm textarea {
+  resize: vertical;
+}
+
+.compactForm input:focus-visible,
+.compactForm textarea:focus-visible,
+.editorForm input:focus-visible,
+.editorForm textarea:focus-visible,
+.editorForm select:focus-visible,
+.selectLabel select:focus-visible {
+  outline: 3px solid t.$brand-subtle;
+  border-color: t.$exam-navy;
+}
+
+.compactForm small,
+.editorForm small {
+  color: t.$text-muted;
+  font-weight: t.$fw-regular;
+  line-height: 1.45;
+}
+
+.full,
+.formActions {
+  grid-column: 1 / -1;
+}
+
+.codeField {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace !important;
+  font-size: .78rem !important;
+}
+
+.primary,
+.secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 2.7rem;
+  padding: .65rem 1rem;
+  border: 1px solid transparent;
+  border-radius: t.$radius-control-sm;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+
+.primary {
+  background: t.$exam-navy;
+  color: t.$card-bg;
+}
+
+.secondary {
+  border-color: t.$exam-line;
+  background: t.$card-bg;
+  color: t.$exam-navy;
+}
+
+.primary:disabled,
+.secondary:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.sectionTabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .5rem;
+  margin-bottom: 1rem;
+  padding: .35rem;
+  border-radius: t.$radius-control;
+  background: t.$exam-card-wash;
+}
+
+.sectionTabs button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 2.7rem;
+  border: 0;
+  border-radius: t.$radius-control-sm;
+  background: transparent;
+  color: t.$text-muted;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+
+.sectionTabs .activeTab {
+  background: t.$card-bg;
+  color: t.$exam-navy;
+  box-shadow: t.$shadow-card;
+}
+
+.versionStatus {
+  display: flex;
+  gap: .65rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  padding-bottom: .3rem;
+}
+
+.versionStatus article {
+  display: grid;
+  flex: 0 0 8rem;
+  gap: .2rem;
+  padding: .8rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control-sm;
+}
+
+.versionStatus .activeVersion {
+  border-color: t.$exam-navy;
+  background: t.$exam-card-wash;
+}
+
+.versionStatus span,
+.versionStatus small {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.actionRow,
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+}
+
+.checkGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .5rem;
+}
+
+.checkGrid label {
+  display: flex;
+  align-items: center;
+  gap: .55rem;
+  min-height: 2.75rem;
+  padding: .65rem .75rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control-sm;
+}
+
+.script {
+  max-height: 24rem;
+  overflow: auto;
+  padding: 1rem;
+  border-radius: t.$radius-control;
+  background: t.$exam-card-wash;
+}
+
+.empty,
+.status,
+.error {
+  margin: 1rem 0 0;
+  padding: .9rem 1rem;
+  border-radius: t.$radius-control-sm;
+  background: t.$exam-card-wash;
+  color: t.$text-muted;
+  line-height: 1.5;
+}
+
+.error {
+  border: 1px solid t.$danger;
+  background: t.$type-pink-subtle;
+  color: t.$danger;
+}
+
+@media (max-width: 900px) {
+  .twoColumn,
+  .queueLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .workspace {
+    padding: .75rem;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .metric {
+    justify-self: start;
+    text-align: left;
+  }
+
+  .editorForm,
+  .checkGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .full,
+  .formActions {
+    grid-column: auto;
+  }
+
+  .sectionTabs {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selectCard,
+  .selectedCard {
+    scroll-behavior: auto;
+  }
+}

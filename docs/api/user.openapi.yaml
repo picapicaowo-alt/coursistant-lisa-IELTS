@@ -1,0 +1,513 @@
+openapi: 3.0.1
+info:
+  description: Coursistant LMS REST API contract (OpenAPI 3).
+  title: LMS API
+  version: 1.0.0
+servers:
+- description: Servlet context-path
+  url: /api
+security:
+- bearerAuth: []
+tags:
+- description: System-admin user account reads; write APIs disabled
+  name: Users
+- description: Public avatar binary download
+  name: User Avatars
+- description: Current-user profile and avatar self-service
+  name: Profile
+- description: Platform-admin user tenant migration
+  name: Admin Users
+paths:
+  /v2/admin/users/{id}/tenant:
+    patch:
+      operationId: adminUserChangeTenant
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchUserTenantRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Change a user's tenant
+      tags:
+      - Admin Users
+  /v2/me/profile:
+    get:
+      operationId: meProfileGet
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get my profile
+      tags:
+      - Profile
+    patch:
+      operationId: meProfileUpdate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Update my profile
+      tags:
+      - Profile
+  /v2/me/profile/avatar:
+    delete:
+      operationId: meProfileDeleteAvatar
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete my avatar
+      tags:
+      - Profile
+    put:
+      description: "Multipart field name must be `file`. JPG/JPEG/PNG only, max 5MB."
+      operationId: meProfileUploadAvatar
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Upload my avatar
+      tags:
+      - Profile
+  /v2/users:
+    get:
+      operationId: userList
+      parameters:
+      - in: query
+        name: user
+        required: true
+        schema:
+          $ref: "#/components/schemas/User"
+      - in: query
+        name: role
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List users
+      tags:
+      - Users
+    post:
+      deprecated: true
+      description: Phase 2 disabled — always returns 403 FORBIDDEN until secure management
+        APIs ship.
+      operationId: userAddDisabled
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Create user (disabled)
+      tags:
+      - Users
+      x-availability: disabled
+  /v2/users/batch:
+    delete:
+      deprecated: true
+      description: Phase 2 disabled — always returns 403 FORBIDDEN until secure management
+        APIs ship.
+      operationId: userDeleteBatchDisabled
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Batch delete users (disabled)
+      tags:
+      - Users
+      x-availability: disabled
+  /v2/users/{id}:
+    delete:
+      deprecated: true
+      description: Phase 2 disabled — always returns 403 FORBIDDEN until secure management
+        APIs ship.
+      operationId: userDeleteDisabled
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Delete user (disabled)
+      tags:
+      - Users
+      x-availability: disabled
+    get:
+      operationId: userGetById
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get user by ID
+      tags:
+      - Users
+    put:
+      deprecated: true
+      description: Phase 2 disabled — always returns 403 FORBIDDEN until secure management
+        APIs ship.
+      operationId: userUpdateDisabled
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Update user (disabled)
+      tags:
+      - Users
+      x-availability: disabled
+  /v2/users/{id}/password-status:
+    patch:
+      deprecated: true
+      description: Phase 2 disabled — always returns 403 FORBIDDEN; password flows
+        clear mustChangePassword.
+      operationId: userPasswordStatusDisabled
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN — write API disabled
+      summary: Update password-status (disabled)
+      tags:
+      - Users
+      x-availability: disabled
+  /v2/users/{userId}/avatar:
+    get:
+      description: Returns raw image bytes (not the JSON ApiResponse envelope). Content-Type
+        is image/jpeg or image/png.
+      operationId: userGetAvatar
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/jpg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+          description: Avatar image bytes
+          headers:
+            Cache-Control:
+              description: Caching directive set by the server
+              schema:
+                type: string
+                example: "private, max-age=300"
+              style: simple
+            Content-Length:
+              description: Byte length when provided by the container
+              schema:
+                type: integer
+                format: int64
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Avatar not found
+      security: []
+      summary: Get user avatar image
+      tags:
+      - User Avatars
+components:
+  schemas:
+    ApiErrorResponse:
+      type: object
+      description: Error envelope rendered by ApiExceptionHandler (data is explicitly
+        null unless structured error details are supplied).
+      properties:
+        code:
+          type: string
+          description: Stable ErrorType.name()
+          example: USER_NOT_FOUND
+        data:
+          type: object
+          nullable: true
+        message:
+          type: string
+          example: User Does Not Exist
+        status:
+          type: integer
+          format: int32
+          example: 404
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-07-23T10:00:00Z
+      required:
+      - code
+      - data
+      - message
+      - status
+      - timestamp
+    ApiResponse:
+      type: object
+      description: Unified JSON envelope for LMS APIs
+      properties:
+        code:
+          type: string
+          description: Stable machine code (ErrorType.name() or SUCCESS)
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/ProfileResponse"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-07-23T10:00:00Z
+    PatchUserTenantRequest:
+      type: object
+      description: Change the tenant a user belongs to
+      properties:
+        tenantId:
+          type: integer
+          format: int32
+          description: Target tenant ID
+          example: 1
+      required:
+      - tenantId
+    ProfileResponse:
+      type: object
+      description: Current-user profile view
+      nullable: true
+      properties:
+        avatarUrl:
+          type: string
+          description: "Avatar URL with cache-buster query, or null if none"
+          example: https://example.com/api/v2/users/385/avatar?v=abc
+        displayName:
+          type: string
+          description: Display name
+          example: Alex Rivera
+        email:
+          type: string
+          description: Email
+          example: regtest1@example.com
+        emailNotifications:
+          type: boolean
+          description: Whether the user receives email notifications
+          example: true
+        level:
+          type: string
+          description: Business identity as stored. INSTRUCTOR_ADVISOR is the only
+            combined identity.
+          enum:
+          - STUDENT
+          - INSTRUCTOR
+          - ADVISOR
+          - COUNSELLOR
+          - PARENT
+          - INSTRUCTOR_ADVISOR
+          - NOT_APPLICABLE
+          example: STUDENT
+        phone:
+          type: string
+          description: Optional contact phone
+          example: +1 213 555 0123
+          maxLength: 64
+          nullable: true
+        role:
+          type: string
+          description: Role identifier
+          example: USER
+        userId:
+          type: integer
+          format: int32
+          description: Current user ID
+          example: 385
+    UpdateProfileRequest:
+      type: object
+      description: Partial profile update; at least one field required
+      properties:
+        displayName:
+          type: string
+          description: Display name (1–100 chars after trim)
+          example: Alex Rivera
+          maxLength: 100
+        emailNotifications:
+          type: boolean
+          description: Whether to receive email notifications
+          example: false
+        phone:
+          type: string
+          description: Optional contact phone; blank clears it (max 64 chars after
+            trim)
+          example: +1 213 555 0123
+          maxLength: 64
+          nullable: true
+    User:
+      type: object
+      properties:
+        authVersion:
+          type: integer
+          format: int32
+        avatar:
+          type: string
+        email:
+          type: string
+        emailNotifications:
+          type: boolean
+        encryptPassword:
+          type: string
+          writeOnly: true
+        id:
+          type: integer
+          format: int32
+        level:
+          type: string
+        mustChangePassword:
+          type: boolean
+        name:
+          type: string
+        newPassword:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        phone:
+          type: string
+        role:
+          type: string
+        status:
+          type: string
+        tenantId:
+          type: integer
+          format: int32
+        username:
+          type: string
+        verification:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: "Access token from POST /v1/auth/login (Authorization: Bearer <token>)."
+      name: bearerAuth
+      scheme: bearer
+      type: http

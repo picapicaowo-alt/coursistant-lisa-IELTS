@@ -1,0 +1,466 @@
+openapi: 3.0.1
+info:
+  description: Coursistant LMS REST API contract (OpenAPI 3).
+  title: LMS API
+  version: 1.0.0
+servers:
+- description: Servlet context-path
+  url: /api
+security:
+- bearerAuth: []
+tags:
+- description: Current-user in-app notifications
+  name: MeNotifications
+- description: SYSTEM_ADMIN notification operations
+  name: AdminNotifications
+paths:
+  /v2/admin/notifications/digest/run:
+    post:
+      description: "SYSTEM_ADMIN only. Idempotent via Idempotency-Key header. digestDate\
+        \ is required; tenantId is optional (omit to run all tenants). Main errors:\
+        \ FORBIDDEN, PARAM_MISSING, IDEMPOTENCY_KEY_REQUIRED, IDEMPOTENCY_KEY_INVALID."
+      operationId: adminNotificationDigestRun
+      parameters:
+      - description: "Required idempotency key for safe retries of this mutating request\
+          \ (A-Za-z0-9_- , max 128). Missing/invalid keys return 400 IDEMPOTENCY_KEY_REQUIRED\
+          \ / IDEMPOTENCY_KEY_INVALID."
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DigestRunRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationEmptyApiResponse"
+          description: SUCCESS
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: PARAM_MISSING when digestDate is missing; IDEMPOTENCY_KEY_REQUIRED
+            / IDEMPOTENCY_KEY_INVALID
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN when the caller is not SYSTEM_ADMIN
+      summary: Manually run daily digest
+      tags:
+      - AdminNotifications
+  /v2/me/notifications:
+    get:
+      description: "Paged list for the authenticated user (newest first). page defaults\
+        \ to 1; size defaults to 20 and is capped at 100. Each item includes availability\
+        \ (AVAILABLE / NO_LONGER_AVAILABLE). Main errors: UNAUTHORIZED, USER_NOT_FOUND,\
+        \ BAD_REQUEST (missing tenant)."
+      operationId: meNotificationList
+      parameters:
+      - description: 1-based page; defaults to 1
+        in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - description: "Page size; defaults to 20, max 100"
+        in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationPageApiResponse"
+          description: SUCCESS
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: UNAUTHORIZED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: USER_NOT_FOUND
+      summary: List my notifications
+      tags:
+      - MeNotifications
+  /v2/me/notifications/read-all:
+    patch:
+      description: "Idempotent via Idempotency-Key header. Returns unreadCount=0.\
+        \ Main errors: UNAUTHORIZED, USER_NOT_FOUND, IDEMPOTENCY_KEY_REQUIRED, IDEMPOTENCY_KEY_INVALID."
+      operationId: meNotificationMarkAllRead
+      parameters:
+      - description: "Required idempotency key for safe retries of this mutating request\
+          \ (A-Za-z0-9_- , max 128). Missing/invalid keys return 400 IDEMPOTENCY_KEY_REQUIRED\
+          \ / IDEMPOTENCY_KEY_INVALID."
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnreadCountApiResponse"
+          description: SUCCESS
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: IDEMPOTENCY_KEY_REQUIRED / IDEMPOTENCY_KEY_INVALID / BAD_REQUEST
+      summary: Mark all my notifications as read
+      tags:
+      - MeNotifications
+  /v2/me/notifications/unread-count:
+    get:
+      description: "Returns unreadCount for the authenticated user. Main errors: UNAUTHORIZED,\
+        \ USER_NOT_FOUND, BAD_REQUEST (missing tenant)."
+      operationId: meNotificationUnreadCount
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnreadCountApiResponse"
+          description: SUCCESS
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: UNAUTHORIZED
+      summary: Unread notification count
+      tags:
+      - MeNotifications
+  /v2/me/notifications/{notificationId}/read:
+    patch:
+      description: "Idempotent via Idempotency-Key header. Cross-user or missing ids\
+        \ return 404 NOT_FOUND. Already-read notifications succeed with no change.\
+        \ Main errors: UNAUTHORIZED, USER_NOT_FOUND, NOT_FOUND, IDEMPOTENCY_KEY_REQUIRED,\
+        \ IDEMPOTENCY_KEY_INVALID."
+      operationId: meNotificationMarkRead
+      parameters:
+      - description: "Required idempotency key for safe retries of this mutating request\
+          \ (A-Za-z0-9_- , max 128). Missing/invalid keys return 400 IDEMPOTENCY_KEY_REQUIRED\
+          \ / IDEMPOTENCY_KEY_INVALID."
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: notificationId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationEmptyApiResponse"
+          description: SUCCESS
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: IDEMPOTENCY_KEY_REQUIRED / IDEMPOTENCY_KEY_INVALID / BAD_REQUEST
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: NOT_FOUND when the notification is not owned by the caller
+      summary: Mark one notification as read
+      tags:
+      - MeNotifications
+components:
+  schemas:
+    ApiErrorResponse:
+      type: object
+      description: Error envelope rendered by ApiExceptionHandler (data is explicitly
+        null unless structured error details are supplied).
+      properties:
+        code:
+          type: string
+          description: Stable ErrorType.name()
+          example: USER_NOT_FOUND
+        data:
+          type: object
+          nullable: true
+        message:
+          type: string
+          example: User Does Not Exist
+        status:
+          type: integer
+          format: int32
+          example: 404
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-07-23T10:00:00Z
+      required:
+      - code
+      - data
+      - message
+      - status
+      - timestamp
+    DigestRunRequest:
+      type: object
+      description: Manual daily digest run (SYSTEM_ADMIN)
+      properties:
+        digestDate:
+          type: string
+          format: date
+          description: Digest calendar date (required)
+          example: 2026-08-17
+        tenantId:
+          type: integer
+          format: int32
+          description: Optional tenant scope. Omit or null to run all tenants.
+          example: 1
+      required:
+      - digestDate
+    NotificationEmptyApiResponse:
+      type: object
+      description: Success envelope with no payload (data omitted/null)
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          type: object
+          description: Always null on this operation
+          nullable: true
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-08-17T18:00:00Z
+    NotificationPageApiResponse:
+      type: object
+      description: Success envelope wrapping a paged notification list
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/NotificationPageResponse"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-08-17T18:00:00Z
+    NotificationPageResponse:
+      type: object
+      description: Paged notification list
+      properties:
+        items:
+          type: array
+          description: Page items
+          items:
+            $ref: "#/components/schemas/NotificationResponse"
+        page:
+          type: integer
+          format: int32
+          description: 1-based page number
+          example: 1
+        size:
+          type: integer
+          format: int32
+          description: Page size (max 100)
+          example: 20
+        total:
+          type: integer
+          format: int64
+          description: Total matching rows
+          example: 3
+    NotificationResponse:
+      type: object
+      description: One in-app notification for the current user
+      properties:
+        availability:
+          type: string
+          description: "Whether the subject is currently reachable for this viewer.\
+            \ AVAILABLE means the deep link is safe to open; NO_LONGER_AVAILABLE means\
+            \ the subject was unpublished, deleted, or the viewer lost access."
+          enum:
+          - AVAILABLE
+          - NO_LONGER_AVAILABLE
+          example: AVAILABLE
+        courseCode:
+          type: string
+          description: Course code when available. Null when courseId is null.
+          example: CS101
+          nullable: true
+        courseId:
+          type: integer
+          format: int32
+          description: Course id when the event is course-scoped. Null for course-less
+            ADVISOR_TASK and STUDY_PLAN_CHECKPOINT events.
+          example: 7
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+          description: Created at (UTC)
+        deepLink:
+          type: string
+          description: Frontend path (not an absolute URL)
+          example: /course/7/assignments/12
+        message:
+          type: string
+          description: Student-facing message. Never includes numeric scores.
+          example: "New assignment published: Homework 1"
+        notificationId:
+          type: integer
+          format: int32
+          description: Notification id
+          example: 42
+        notificationType:
+          type: string
+          description: Stable notification type
+          enum:
+          - ANNOUNCEMENT_POSTED
+          - ASSIGNMENT_PUBLISHED
+          - ASSIGNMENT_SUBMISSION_RECEIVED
+          - ASSIGNMENT_GRADE_RELEASED
+          - QUIZ_GRADE_RELEASED
+          - ASSIGNMENT_GRADE_CORRECTED
+          - QUIZ_GRADE_CORRECTED
+          - WEEK_PUBLISHED
+          - ASSIGNMENT_SCHEDULE_CHANGED
+          - QUIZ_PUBLISHED
+          - QUIZ_SCHEDULE_CHANGED
+          - QUIZ_TIME_LIMIT_CHANGED
+          - COURSE_EVENT_CREATED
+          - COURSE_EVENT_UPDATED
+          - COURSE_EVENT_CANCELLED
+          - GROUP_MEMBER_ADDED
+          - GROUP_MEMBER_REMOVED
+          - GROUP_MEMBER_MOVED
+          - REPORT_PUBLISHED
+          - ABSENCE_REQUEST_DECIDED
+          - CHECKPOINT_REACHED_INCOMPLETE
+          - SCHEDULE_REQUEST_CREATED
+          - SCHEDULE_REQUEST_DECIDED
+          example: ASSIGNMENT_PUBLISHED
+        readAt:
+          type: string
+          format: date-time
+          description: Read at (UTC). Null when unread.
+        recipientUserId:
+          type: integer
+          format: int32
+          description: Recipient user id (always the caller)
+          example: 10
+        subjectId:
+          type: integer
+          format: int32
+          description: Subject id (assignment/quiz/week/announcement/etc.)
+          example: 12
+        subjectType:
+          type: string
+          description: Subject kind used for availability and deep links
+          enum:
+          - ANNOUNCEMENT
+          - ASSIGNMENT
+          - QUIZ
+          - ASSIGNMENT_GRADE
+          - QUIZ_GRADE
+          - ASSIGNMENT_SUBMISSION
+          - WEEK
+          - COURSE_EVENT
+          - GROUP_SET
+          - COURSE_REPORT
+          - SCHEDULE_REQUEST
+          - STUDY_PLAN_CHECKPOINT
+          example: ASSIGNMENT
+        tenantId:
+          type: integer
+          format: int32
+          description: Tenant id
+          example: 1
+    UnreadCountApiResponse:
+      type: object
+      description: Success envelope wrapping unreadCount
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/UnreadCountResponse"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-08-17T18:00:00Z
+    UnreadCountResponse:
+      type: object
+      description: Unread in-app notification count
+      properties:
+        unreadCount:
+          type: integer
+          format: int64
+          description: Unread count for the caller
+          example: 3
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: "Access token from POST /v1/auth/login (Authorization: Bearer <token>)."
+      name: bearerAuth
+      scheme: bearer
+      type: http

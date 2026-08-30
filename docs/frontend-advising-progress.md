@@ -2,9 +2,9 @@
 
 仓库：`coursistant-lisa-IELTS`。对照后端当前说明：Counselor 招生交接、Advisor 建档与学习计划、Advisor 课程编排。
 
-**当前准确口径：本地 Vite `/api` 和 IELTS Dev 8085 均连接 Dev advising LMS `https://dev.xlearnedu.com:8083`。Counselor / Advisor Core 已用 Dev fixture 账号走通；Tenant 只读与改派连续性也已验证。8084 保留给 USC LMS，不能部署本仓库。课程编排前端未接线。**
+**2026-08-28 更新：本地 Vite `/api` 和 IELTS Dev 8085 仍连接 `https://dev.xlearnedu.com:8083`。后端新发 9 份 OpenAPI 已纳入 `docs/api/`；Parent、Mock Exam、Advising Course Orchestration、task/conversation/action-task 与 Course Operations 前端接线已经补齐。8084 仍保留给 USC LMS。**
 
-当前仍不能对外说「全部联调完成」：A/B 和 Tenant 主流程已点通，但新学生本人读取同一 aggregate 仍待验证码，Promotion C 也尚未授权接线。
+当前仍不能把「前端已实现」表述成「全部真实账号联调完成」：新模块已通过静态检查和自动化测试，但共享 Dev 的角色写流程仍需使用授权 fixture 做浏览器验收。
 
 契约：`docs/api/counsellor.openapi.yaml`、`docs/api/advising.openapi.yaml`。
 走查步骤：`docs/counsellor-dev-frontend-walkthrough.md`、`docs/advisor-frontend-handoff.md`。
@@ -19,8 +19,8 @@
 | Advisor Profile / Study Plan | 已部署到 8083，B 写开关已开 | **页面已完成** | **通过**：接管、Profile/Plan 创建更新、revision |
 | Student / TENANT_ADMIN 只读 | 已部署到 8083 | **页面已完成**（含 Tenant revisions） | Tenant 同 aggregate 通过；Student fixture 空态通过，新学生首次设密待验证码 |
 | TENANT_ADMIN 取消 / 首派 / 改派 | 已部署到 8083 | **页面已完成** | 改派连续性通过；取消/首派未对共享数据执行破坏性点验 |
-| Advisor Course Orchestration | 对方说本地完成；8083 OpenAPI **已有** Group/1-on-1/READY/PUBLISH | **前端未接线** | 不开始 |
-| Instructor → 考试 → 报告 → 持续干预 | 后续阶段 | 不做 | — |
+| Advisor Course Orchestration | 新 OpenAPI 已交付 | **前端 API + Courses 页面已接线** | 待授权 fixture 验收 |
+| Parent / Mock Exam / reports / intervention | 新 OpenAPI 已交付 | **核心页面与 typed services 已接线** | 待各角色 fixture 验收 |
 
 ### Dev 端口（2026-08-26 探活）
 
@@ -132,21 +132,23 @@ Tenant 改派后前端立刻刷新 Advisor 队列。资料不复制、ID/version
 
 ---
 
-## 三、Advisor Course Orchestration（前端未做）
+## 三、Advisor Course Orchestration（2026-08-28 已接线）
 
-后端本地已验收 Group / 1-on-1 / READY / PUBLISH / reconfirm / Instructor 最小上下文。
+后端新 OpenAPI 已明确 Group / 1-on-1 / READY / PUBLISH / reconfirm / Instructor 最小上下文。
 
-前端：**零调用**。不接 `advisorListStudentCourses`、group link/withdraw、1-on-1 create/instructor/sessions、READY、PUBLISH、reconfirm、tenant delivery config、`instructorGetStudentProfileContext`。
+前端：`advisor-api.ts` 已覆盖学生课程、group link/withdraw/complete、1-on-1 create/instructor/sessions、READY/PUBLISH、reconfirm、Instructor context；Advisor 学生工作区新增 Courses 页面。`tenant-advising-api.ts` 与 Tenant Delivery 页面覆盖 delivery config 和 READY/PUBLISH。
 
-原因：仓库约定 Promotion C 授权前不接线；即使 8083 OpenAPI 已公开相关契约，前端也不提前实现。
+契约仍以 `docs/api/advising.openapi.yaml` 为唯一来源；写请求保留 Idempotency-Key 与 courseLinkVersion/courseLaunchVersion 乐观并发控制。
 
-Advisor Course 业务流前端 **尚未开始**。
+自动化验证已补；共享 Dev 写验收需使用后端授权的 fixture 账号和数据范围。
 
 ---
 
-## 四、当前版本还不包含（前后端一致）
+## 四、2026-08-28 新增模块
 
-与后端「不属于已经完成的 Counselor/Advisor 范围」对齐，前端同样没有：
+新 YAML 现已新增 Parent、Mock Exam、课程运营、Advisor Dashboard/Hub/Conversation/Action Tasks。实现与覆盖边界详见 `docs/api-integration-coverage.md`。
+
+当前仍不包含或不主动暴露：
 
 - 自动发送学生邀请邮件
 - Counselor 取消 Intake
@@ -154,13 +156,10 @@ Advisor Course 业务流前端 **尚未开始**。
 - Counselor 查看已交接学生详情
 - 批量导入学生
 - Counselor/Advisor 搜索
-- Advisor Dashboard
 - 自动分配 Advisor
-- 教学过程中的教师授课功能完善
-- 作业批改业务验收
-- 考试评估工作流
-- 学习报告生成
-- Advisor 干预记录、预警和跟进闭环
+- OpenAPI operationId 明确带 `Disabled` 的管理操作
+- 未经授权 fixture 的共享 Dev 破坏性/高影响写验收
+- Figma 视觉定稿（当前先交付功能与响应式基础）
 
 另：前端未做 Figma 定稿。
 

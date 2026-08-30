@@ -8,6 +8,7 @@ import {isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {ParentLinksPanel} from '@/components/ParentLinksPanel';
 
 interface IntakeFormState {
   name: string;
@@ -144,6 +145,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
           <button className={styles.primary} disabled={save.isPending}>{save.isPending ? 'Saving…' : isCreate ? 'Create intake' : 'Save changes'}</button>
         </form>
       </section>
+      {!isCreate ? <ParentLinksPanel scope="counsellor" subjectId={numericId}/> : null}
     </main>
   );
 };

@@ -1,0 +1,659 @@
+openapi: 3.0.1
+info:
+  title: LMS Parent API
+  version: 1.0.0
+  description: >-
+    Parent Phase 1 contracts. Authored YAML (not a springdoc group).
+    Parent responses are allow-lists: no clientMessageId, object keys, checksum,
+    version, CAS, link watermarks, or private notes.
+servers:
+- url: /api
+  description: Servlet context-path
+security:
+- bearerAuth: []
+tags:
+- name: Counsellor Parent Links
+- name: Tenant Parent Links
+- name: Advisor Parent Links
+- name: Parent Academic Reads
+- name: ParentScheduleRequests
+- name: Parent Reports
+- name: Parent Notifications
+- name: ParentConversations
+paths:
+  /v2/counsellor/student-intakes/{intakeId}/parent-links:
+    post:
+      operationId: counsellorCreateOrReuseParentLink
+      tags: [Counsellor Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/IntakeId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateOrReuseParentLinkRequest" }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: "STUDENT_INTAKE_NOT_FOUND, NOT_FOUND"
+        "409":
+          description: "CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
+  /v2/counsellor/student-intakes/{intakeId}/parent-links/{parentUserId}:
+    put:
+      operationId: counsellorLinkExistingParent
+      tags: [Counsellor Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/IntakeId"
+      - $ref: "#/components/parameters/ParentUserId"
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LinkParentRequest" }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: "STUDENT_INTAKE_NOT_FOUND, NOT_FOUND"
+        "409":
+          description: "CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
+    delete:
+      operationId: counsellorUnlinkParent
+      tags: [Counsellor Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/IntakeId"
+      - $ref: "#/components/parameters/ParentUserId"
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UnlinkParentRequest" }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: "STUDENT_INTAKE_NOT_FOUND, NOT_FOUND"
+        "409":
+          description: "IDEMPOTENCY_KEY_MISMATCH"
+  /v2/tenant/students/{studentUserId}/parent-links:
+    get:
+      operationId: tenantListParentLinks
+      tags: [Tenant Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/tenant/students/{studentUserId}/parent-links/{parentUserId}:
+    put:
+      operationId: tenantLinkParent
+      tags: [Tenant Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/StudentUserId"
+      - $ref: "#/components/parameters/ParentUserId"
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LinkParentRequest" }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+        "409":
+          description: "CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
+    delete:
+      operationId: tenantUnlinkParent
+      tags: [Tenant Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/StudentUserId"
+      - $ref: "#/components/parameters/ParentUserId"
+      requestBody:
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UnlinkParentRequest" }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+        "409":
+          description: "IDEMPOTENCY_KEY_MISMATCH"
+  /v2/advisor/students/{studentUserId}/parent-links:
+    get:
+      operationId: advisorListParentLinks
+      tags: [Advisor Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/linked-students:
+    get:
+      operationId: parentListLinkedStudents
+      tags: [Parent Academic Reads]
+      parameters:
+      - name: page
+        in: query
+        schema: { type: integer, default: 0 }
+      - name: size
+        in: query
+        schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /v2/parent/students/{studentUserId}/dashboard:
+    get:
+      operationId: parentGetStudentDashboard
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/profile:
+    get:
+      operationId: parentGetStudentProfile
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/study-plan:
+    get:
+      operationId: parentGetStudentStudyPlan
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/courses:
+    get:
+      operationId: parentListStudentCourses
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/assignments:
+    get:
+      operationId: parentListStudentAssignments
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/calendar:
+    get:
+      operationId: parentListStudentCalendar
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      - name: limit
+        in: query
+        schema: { type: integer, default: 50 }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/attendance:
+    get:
+      operationId: parentListStudentAttendance
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/hours:
+    get:
+      operationId: parentGetStudentHours
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/risk:
+    get:
+      operationId: parentGetStudentRisk
+      tags: [Parent Academic Reads]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/reports:
+    get:
+      operationId: parentListStudentReports
+      tags: [Parent Reports]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      - name: page
+        in: query
+        schema: { type: integer, default: 0 }
+      - name: size
+        in: query
+        schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/reports/{reportId}:
+    get:
+      operationId: parentGetStudentReport
+      tags: [Parent Reports]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      - name: reportId
+        in: path
+        required: true
+        schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/students/{studentUserId}/schedule-requests:
+    get:
+      operationId: listParentScheduleRequests
+      tags: [ParentScheduleRequests]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+    post:
+      operationId: createParentScheduleRequest
+      tags: [ParentScheduleRequests]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/StudentUserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ParentCreateScheduleRequest" }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+        "409":
+          description: "SCHEDULE_REQUEST_IDEMPOTENCY_MISMATCH, IDEMPOTENCY_KEY_MISMATCH"
+  /v2/parent/notifications:
+    get:
+      operationId: parentListNotifications
+      tags: [Parent Notifications]
+      parameters:
+      - name: page
+        in: query
+        schema: { type: integer, default: 0 }
+      - name: size
+        in: query
+        schema: { type: integer, default: 20 }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /v2/parent/notifications/unread-count:
+    get:
+      operationId: parentNotificationUnreadCount
+      tags: [Parent Notifications]
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /v2/parent/notifications/{notificationId}/read:
+    patch:
+      operationId: parentMarkNotificationRead
+      tags: [Parent Notifications]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      - name: notificationId
+        in: path
+        required: true
+        schema: { type: integer }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+  /v2/parent/notifications/read-all:
+    patch:
+      operationId: parentMarkAllNotificationsRead
+      tags: [Parent Notifications]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+  /v2/parent/students/{studentUserId}/conversation/messages:
+    get:
+      operationId: parentListConversationMessages
+      tags: [ParentConversations]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      - name: beforeId
+        in: query
+        schema: { type: integer, format: int64 }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS. Messages with id greater than the current link watermark."
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+    post:
+      operationId: parentSendConversationMessage
+      tags: [ParentConversations]
+      parameters:
+      - $ref: "#/components/parameters/IdempotencyKey"
+      - $ref: "#/components/parameters/StudentUserId"
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: "#/components/schemas/SendParentMessageMultipart" }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "400":
+          description: "UNSUPPORTED_FILE_TYPE, FILE_TOO_LARGE, PARAM_MISSING or BAD_REQUEST"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+        "409":
+          description: "IDEMPOTENCY_KEY_MISMATCH"
+  /v2/parent/students/{studentUserId}/conversation/read:
+    post:
+      operationId: parentMarkConversationRead
+      tags: [ParentConversations]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MarkConversationReadRequest" }
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: "NOT_FOUND, CONVERSATION_NOT_FOUND"
+
+  /v2/parent/students/{studentUserId}/conversation/attachments/{attachmentId}/preview:
+    get:
+      operationId: parentPreviewConversationAttachment
+      tags: [ParentConversations]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      - $ref: "#/components/parameters/AttachmentId"
+      responses:
+        "200":
+          description: Preview stream
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        "400":
+          description: UNSUPPORTED_FILE_TYPE
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: "NOT_FOUND, CONVERSATION_NOT_FOUND"
+  /v2/parent/students/{studentUserId}/conversation/attachments/{attachmentId}/download:
+    get:
+      operationId: parentDownloadConversationAttachment
+      tags: [ParentConversations]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      - $ref: "#/components/parameters/AttachmentId"
+      responses:
+        "200":
+          description: Download stream
+          content:
+            application/octet-stream:
+              schema: { type: string, format: binary }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: "NOT_FOUND, CONVERSATION_NOT_FOUND"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: true
+      description: Required idempotency key for safe retries of this mutating request
+      schema: { type: string, maxLength: 128 }
+    IntakeId:
+      name: intakeId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+    StudentUserId:
+      name: studentUserId
+      in: path
+      required: true
+      schema: { type: integer }
+    ParentUserId:
+      name: parentUserId
+      in: path
+      required: true
+      schema: { type: integer }
+    AttachmentId:
+      name: attachmentId
+      in: path
+      required: true
+      schema: { type: integer, format: int64 }
+  responses:
+    BadRequest:
+      description: PARAM_MISSING or BAD_REQUEST
+    Unauthorized:
+      description: UNAUTHORIZED
+    Forbidden:
+      description: FORBIDDEN
+  schemas:
+    CreateOrReuseParentLinkRequest:
+      type: object
+      required: [email, name]
+      properties:
+        email: { type: string }
+        name: { type: string, maxLength: 100 }
+        reason: { type: string, maxLength: 1000 }
+    LinkParentRequest:
+      type: object
+      properties:
+        reason: { type: string, maxLength: 1000 }
+    UnlinkParentRequest:
+      type: object
+      properties:
+        reason: { type: string, maxLength: 1000 }
+    ParentStudentLinkResponse:
+      type: object
+      properties:
+        linkId: { type: integer, format: int64 }
+        parentUserId: { type: integer }
+        studentUserId: { type: integer }
+        linkedAt: { type: string, format: date-time }
+        parentName: { type: string }
+        parentEmail: { type: string }
+    ParentCreateScheduleRequest:
+      type: object
+      required: [courseId, occurrenceId, requestType]
+      properties:
+        courseId: { type: integer }
+        occurrenceId: { type: integer, format: int64 }
+        requestType: { type: string, enum: [ABSENCE, SCHEDULE_CHANGE] }
+        reason: { type: string }
+        proposedOccurrenceDate: { type: string, format: date }
+        proposedStartTime: { type: string }
+        proposedEndTime: { type: string }
+    SendParentMessageMultipart:
+      type: object
+      required: [clientMessageId]
+      properties:
+        clientMessageId:
+          type: string
+          maxLength: 128
+          description: Request-only idempotency field; never returned on Parent responses
+        body: { type: string, maxLength: 4000 }
+        files:
+          type: array
+          items: { type: string, format: binary }
+    ParentConversationMessageResponse:
+      type: object
+      properties:
+        messageId: { type: integer, format: int64 }
+        threadId: { type: integer, format: int64 }
+        senderUserId: { type: integer }
+        body: { type: string }
+        createdAt: { type: string, format: date-time }
+        attachments:
+          type: array
+          items: { $ref: "#/components/schemas/ParentConversationAttachmentResponse" }
+    ParentConversationAttachmentResponse:
+      type: object
+      properties:
+        attachmentId: { type: integer, format: int64 }
+        originalName: { type: string }
+        contentType: { type: string }
+        sizeBytes: { type: integer, format: int64 }
+        previewAvailable: { type: boolean }
+        downloadUrl: { type: string }
+        previewUrl: { type: string }
+    MarkConversationReadRequest:
+      type: object
+      required: [messageId]
+      properties:
+        messageId: { type: integer, format: int64 }
+    ParentNotification:
+      type: object
+      properties:
+        notificationId: { type: integer }
+        studentUserId: { type: integer }
+        courseId: { type: integer, nullable: true, description: "Null for course-less Study Plan / Advisor Task events" }
+        courseCode: { type: string, nullable: true }
+        notificationType: { type: string }
+        message: { type: string }
+        subjectType: { type: string }
+        subjectId: { type: integer }
+        deepLink: { type: string }
+        createdAt: { type: string, format: date-time }
+        readAt: { type: string, format: date-time }
+        availability: { type: string, enum: [AVAILABLE, NO_LONGER_AVAILABLE] }
+    ParentStudyPlanCheckpoint:
+      type: object
+      properties:
+        checkpointId: { type: integer, format: int64 }
+        position: { type: integer }
+        description: { type: string }
+        goal: { type: string }
+        dueDate: { type: string, format: date }
+        derivedStatus:
+          type: string
+          enum: [NOT_REACHED, REACHED_INCOMPLETE, REACHED_COMPLETED]
+        tasks:
+          type: array
+          items: { type: object }
+    ParentReportDetail:
+      type: object
+      properties:
+        reportId: { type: integer, format: int64 }
+        reportType: { type: string, enum: [MID_TERM, FINAL] }
+        overallSummary: { type: string }
+        strengths: { type: string }
+        weaknesses: { type: string }
+        skillEvaluation: { type: string }
+        improvementSuggestions: { type: string }
+        publishedAt: { type: string, format: date-time }

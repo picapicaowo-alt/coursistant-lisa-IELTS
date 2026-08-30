@@ -49,4 +49,16 @@ describe('AdminApiService', () => {
     expect(client.post).toHaveBeenNthCalledWith(1, '/v2/courses/37/primary-instructor', {primaryInstructorUserId: 443}, expect.objectContaining({headers: expect.any(Object)}));
     expect(client.post).toHaveBeenNthCalledWith(2, '/v2/system/grade-corrections/assignments', {assignmentId: 57, studentUserId: 438, score: 9.5, reason: 'Appeal approved'}, expect.objectContaining({headers: expect.any(Object)}));
   });
+
+  it('uses the auth-contract administrator and user detail routes', async () => {
+    client.get.mockResolvedValue({status: 200, data: {}});
+
+    await service.listAdmins({email: 'admin@example.com', status: 'ACTIVE'});
+    await service.getAdmin(12);
+    await service.getUser(41);
+
+    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/admins', {params: {query: {email: 'admin@example.com', status: 'ACTIVE'}}});
+    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/admins/12');
+    expect(client.get).toHaveBeenNthCalledWith(3, '/v2/users/41');
+  });
 });

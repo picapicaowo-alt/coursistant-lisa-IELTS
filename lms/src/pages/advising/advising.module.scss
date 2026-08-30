@@ -152,11 +152,12 @@ a:focus-visible {
 .primary,
 .secondary,
 .danger {
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: 0 .9rem;
   border-radius: t.$radius-control-sm;
   font-weight: t.$fw-semibold;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .primary {
@@ -169,6 +170,17 @@ a:focus-visible {
   border: 1px solid t.$border;
   background: t.$card-bg;
   color: t.$text;
+}
+
+.selectedOption {
+  min-height: 2.75rem;
+  padding: 0 .9rem;
+  border: 1px solid t.$brand;
+  border-radius: t.$radius-control-sm;
+  background: t.$brand-subtle;
+  color: t.$brand;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
 }
 
 .danger {
@@ -226,7 +238,7 @@ a:focus-visible {
 }
 
 .tabs a {
-  min-height: 2.5rem;
+  min-height: 2.75rem;
   padding: .55rem 1rem;
   border-radius: t.$radius-control-sm;
   color: t.$text-muted;
@@ -285,8 +297,419 @@ a:focus-visible {
   margin: 0 0 .75rem;
 }
 
+.primaryLink,
+.secondaryLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  padding: 0 .9rem;
+  border-radius: t.$radius-control-sm;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.primaryLink {
+  border: 1px solid t.$brand;
+  background: t.$brand;
+  color: t.$card-bg;
+}
+
+.secondaryLink {
+  border: 1px solid t.$border;
+  background: t.$card-bg;
+  color: t.$text;
+}
+
+.advisorStats {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: .7rem;
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+}
+
+.advisorStat {
+  display: grid;
+  gap: .25rem;
+  min-height: 7.2rem;
+  align-content: space-between;
+  padding: 1rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+}
+
+.advisorStat strong {
+  font-size: clamp(1.8rem, 3vw, t.$fs-doc-title);
+  font-weight: t.$fw-extrabold;
+}
+
+.advisorStat span {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.advisorColumns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: 1rem;
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+}
+
+.wideCard {
+  max-width: 82rem;
+  margin: 0 auto 1rem;
+}
+
+.sectionHeading,
+.rowTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.sectionHeading {
+  margin-bottom: 1rem;
+}
+
+.sectionHeading h2,
+.sectionHeading p {
+  margin: 0;
+}
+
+.sectionKicker {
+  color: t.$brand;
+  font-size: t.$fs-logo;
+  font-weight: t.$fw-bold;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.countBadge,
+.unreadBadge,
+.statusPill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: t.$radius-pill;
+  font-size: t.$fs-logo;
+  font-weight: t.$fw-bold;
+}
+
+.countBadge {
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2rem;
+  padding: 0 .55rem;
+  background: t.$brand-subtle;
+  color: t.$brand;
+}
+
+.unreadBadge {
+  padding: .22rem .55rem;
+  background: t.$brand;
+  color: t.$card-bg;
+}
+
+.statusPill {
+  padding: .2rem .5rem;
+  background: t.$subcard-bg;
+  color: t.$text-muted;
+  text-transform: capitalize;
+}
+
+.inboxList {
+  display: grid;
+  gap: .65rem;
+}
+
+.inboxRow {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: .85rem 0;
+  border-top: 1px solid t.$border;
+}
+
+.inboxRow:first-child {
+  border-top: 0;
+}
+
+.inboxMain {
+  display: grid;
+  flex: 1;
+  gap: .25rem;
+  min-width: 0;
+}
+
+.inboxMain > span,
+.inboxMain small,
+.reviewPanel span {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.45;
+}
+
+.studentMark {
+  display: grid;
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: t.$radius-control;
+  background: t.$brand-subtle;
+  color: t.$brand;
+  font-weight: t.$fw-extrabold;
+}
+
+.emptyState {
+  display: grid;
+  gap: .25rem;
+  padding: 1.1rem;
+  border: 1px dashed t.$border;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.emptyState span {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.reviewPanel,
+.inlineLookup {
+  display: grid;
+  gap: .8rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.reviewPanel label,
+.inlineLookup label {
+  display: grid;
+  gap: .3rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.reviewPanel input,
+.reviewPanel select,
+.reviewPanel textarea,
+.inlineLookup input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .55rem .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.inlineLookup {
+  grid-template-columns: minmax(12rem, 24rem) auto;
+  align-items: end;
+}
+
+.compactResult {
+  max-height: 20rem;
+  margin-top: .75rem;
+  overflow: auto;
+  padding: .85rem;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.messageList {
+  display: grid;
+  gap: .75rem;
+  margin-top: 1rem;
+}
+
+.messageRow {
+  display: grid;
+  gap: .65rem;
+  max-width: 52rem;
+  padding: 1rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.messageRow p,
+.messageRow small {
+  margin: 0;
+}
+
+.messageRow small,
+.attachmentRow span {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.attachmentList {
+  display: grid;
+  gap: .5rem;
+}
+
+.attachmentRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  padding: .65rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+}
+
+.textButton {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: t.$brand;
+  font: inherit;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+
+.composeBox {
+  display: grid;
+  gap: .55rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid t.$border;
+}
+
+.composeBox label,
+.coursePicker {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.composeBox textarea {
+  width: 100%;
+  min-height: 7rem;
+  padding: .75rem;
+  resize: vertical;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.composeBox input[type='file'] {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .55rem;
+  border: 1px dashed t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$subcard-bg;
+  color: t.$text-muted;
+  font: inherit;
+}
+
+.selectedFiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4rem;
+}
+
+.selectedFiles span {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .55rem;
+  border-radius: t.$radius-pill;
+  background: t.$brand-subtle;
+  color: t.$brand;
+  font-size: t.$fs-caption;
+}
+
+.selectedFiles button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: t.$fw-bold;
+  cursor: pointer;
+}
+
+.coursePicker {
+  display: grid;
+  gap: .35rem;
+  max-width: 32rem;
+  margin-bottom: 1rem;
+}
+
+.coursePicker select {
+  min-height: 2.75rem;
+  padding: .55rem .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.detailsSummary {
+  cursor: pointer;
+  font-weight: t.$fw-bold;
+}
+
+.selectionSummary {
+  display: grid;
+  gap: .2rem;
+  padding: .8rem;
+  border-left: 3px solid t.$brand;
+  border-radius: t.$radius-control-sm;
+  background: t.$brand-subtle;
+}
+
+.selectionSummary span {
+  color: t.$text-muted;
+  font-size: t.$fs-logo;
+  font-weight: t.$fw-semibold;
+  text-transform: uppercase;
+}
+
+.reportDetail {
+  display: grid;
+  gap: .65rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-left: 3px solid t.$brand;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.reportDetail h3,
+.reportDetail p {
+  margin: 0;
+  line-height: 1.5;
+}
+
 @media (max-width: 800px) {
   .stats { grid-template-columns: 1fr; }
-  .header, .row, .toolbar { flex-direction: column; }
+  .header, .row, .toolbar, .inboxRow, .attachmentRow { align-items: stretch; flex-direction: column; }
   .tabs { flex-wrap: wrap; }
+  .advisorStats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .advisorColumns, .inlineLookup { grid-template-columns: 1fr; }
+  .studentMark { display: none; }
+  .primaryLink, .secondaryLink { width: 100%; }
 }

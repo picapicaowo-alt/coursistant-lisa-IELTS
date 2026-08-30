@@ -1,0 +1,2561 @@
+openapi: 3.0.1
+info:
+  description: Coursistant LMS REST API contract (OpenAPI 3).
+  title: LMS API
+  version: 1.0.0
+servers:
+- description: Servlet context-path
+  url: /api
+security:
+- bearerAuth: []
+paths:
+  /v2/advisor/mock-exam-templates:
+    get:
+      operationId: listAdvisorMockExamTemplates
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - AdvisorMockExams
+  /v2/advisor/mock-exam-templates/{templateId}:
+    get:
+      operationId: getAdvisorMockExamTemplate
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - AdvisorMockExams
+  /v2/advisor/students/{studentUserId}/mock-exams:
+    get:
+      operationId: listAdvisorStudentMockExams
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - AdvisorMockExams
+    post:
+      operationId: createAdvisorStudentMockExam
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentMockExamRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - AdvisorMockExams
+  /v2/advisor/students/{studentUserId}/mock-exams/{studentMockExamId}:
+    get:
+      operationId: getAdvisorStudentMockExam
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - AdvisorMockExams
+  /v2/instructor/mock-exams/writing-grades:
+    get:
+      operationId: listInstructorWritingGrades
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - InstructorMockExamWritingGrades
+  /v2/instructor/mock-exams/writing-grades/{gradeId}:
+    get:
+      operationId: getInstructorWritingGrade
+      parameters:
+      - in: path
+        name: gradeId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - InstructorMockExamWritingGrades
+    post:
+      operationId: gradeInstructorWriting
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: gradeId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GradeWritingRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - InstructorMockExamWritingGrades
+  /v2/parent/students/{studentUserId}/mock-exams:
+    get:
+      operationId: listParentStudentMockExams
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - ParentMockExams
+  /v2/parent/students/{studentUserId}/mock-exams/{studentMockExamId}:
+    get:
+      operationId: getParentStudentMockExam
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - ParentMockExams
+  /v2/student/mock-exams:
+    get:
+      operationId: listStudentMockExams
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}:
+    get:
+      operationId: getStudentMockExam
+      parameters:
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/attempts:
+    post:
+      operationId: createStudentMockExamAttempt
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/attempts/{attemptId}/listening-submissions:
+    post:
+      operationId: submitStudentMockExamListening
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitListeningRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/attempts/{attemptId}/reading-submissions:
+    post:
+      operationId: submitStudentMockExamReading
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitReadingRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/attempts/{attemptId}/writing-submissions:
+    post:
+      operationId: submitStudentMockExamWriting
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitWritingRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/listening:
+    get:
+      operationId: getStudentMockExamListening
+      parameters:
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/listening/parts/{partSeq}/audio:
+    get:
+      operationId: getStudentMockExamListeningPartAudio
+      parameters:
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: partSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/reading:
+    get:
+      operationId: getStudentMockExamReading
+      parameters:
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/reading/passages/{passageSeq}/questions/{sortOrder}/image:
+    get:
+      operationId: getStudentMockExamReadingQuestionImage
+      parameters:
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: passageSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: sortOrder
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/writing:
+    get:
+      operationId: getStudentMockExamWriting
+      parameters:
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/student/mock-exams/{studentMockExamId}/writing/tasks/{taskSeq}/image:
+    get:
+      operationId: getStudentMockExamWritingTaskImage
+      parameters:
+      - in: path
+        name: studentMockExamId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: taskSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - StudentMockExams
+  /v2/system/mock-exams:
+    get:
+      operationId: listSystemMockExams
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - SystemMockExams
+  /v2/system/mock-exams/{testId}:
+    get:
+      operationId: getSystemMockExam
+      parameters:
+      - in: path
+        name: testId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - SystemMockExams
+  /v2/system/mock-exams/{testId}/listening:
+    get:
+      operationId: getSystemMockExamListening
+      parameters:
+      - in: path
+        name: testId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - SystemMockExams
+  /v2/system/mock-exams/{testId}/listening/parts/{partSeq}/audio:
+    get:
+      operationId: getSystemMockExamListeningPartAudio
+      parameters:
+      - in: path
+        name: testId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: partSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - SystemMockExams
+  /v2/system/mock-exams/{testId}/reading:
+    get:
+      operationId: getSystemMockExamReading
+      parameters:
+      - in: path
+        name: testId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - SystemMockExams
+  /v2/system/mock-exams/{testId}/reading/passages/{passageSeq}/questions/{sortOrder}/image:
+    get:
+      operationId: getSystemMockExamReadingQuestionImage
+      parameters:
+      - in: path
+        name: testId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: passageSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: sortOrder
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - SystemMockExams
+  /v2/system/mock-exams/{testId}/writing:
+    get:
+      operationId: getSystemMockExamWriting
+      parameters:
+      - in: path
+        name: testId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - SystemMockExams
+  /v2/system/mock-exams/{testId}/writing/tasks/{taskSeq}/image:
+    get:
+      operationId: getSystemMockExamWritingTaskImage
+      parameters:
+      - in: path
+        name: testId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: taskSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - SystemMockExams
+  /v2/tenant/mock-exam-templates:
+    get:
+      operationId: listTenantMockExamTemplates
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+    post:
+      operationId: createTenantMockExamTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTemplateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}:
+    get:
+      operationId: getTenantMockExamTemplate
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}:
+    delete:
+      operationId: deleteTenantMockExamDraft
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: No Content
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+    get:
+      operationId: getTenantMockExamVersion
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/archive:
+    post:
+      operationId: archiveTenantMockExamVersion
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/copies:
+    post:
+      operationId: copyTenantMockExamVersion
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CopyVersionRequest"
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/listening:
+    get:
+      operationId: getTenantMockExamListening
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+    post:
+      operationId: createTenantMockExamListening
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateListeningRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/listening/parts/{partSeq}/audio:
+    get:
+      operationId: getTenantMockExamListeningPartAudio
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: partSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/publish:
+    post:
+      operationId: publishTenantMockExamVersion
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/reading:
+    get:
+      operationId: getTenantMockExamReading
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+    post:
+      operationId: createTenantMockExamReading
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReadingRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/reading/passages/{passageSeq}/questions/{sortOrder}/image:
+    get:
+      operationId: getTenantMockExamReadingQuestionImage
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: passageSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: sortOrder
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/writing:
+    get:
+      operationId: getTenantMockExamWriting
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+    post:
+      operationId: createTenantMockExamWriting
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWritingRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/writing/tasks/{taskSeq}/image:
+    get:
+      operationId: getTenantMockExamWritingTaskImage
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: versionId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: taskSeq
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Bad request
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Forbidden
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Not found
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: Conflict
+      tags:
+      - TenantMockExamTemplates
+components:
+  schemas:
+    ApiErrorResponse:
+      type: object
+      description: Error envelope rendered by ApiExceptionHandler (data is explicitly
+        null unless structured error details are supplied).
+      properties:
+        code:
+          type: string
+          description: Stable ErrorType.name()
+          example: USER_NOT_FOUND
+        data:
+          type: object
+          nullable: true
+        message:
+          type: string
+          example: User Does Not Exist
+        status:
+          type: integer
+          format: int32
+          example: 404
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-07-23T10:00:00Z
+      required:
+      - status
+      - code
+      - data
+      - message
+      - timestamp
+    ApiResponse:
+      type: object
+      description: Unified JSON envelope for LMS APIs
+      properties:
+        code:
+          type: string
+          description: Stable machine code (ErrorType.name() or SUCCESS)
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/TemplateSummaryDto"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-07-23T10:00:00Z
+    CopyVersionRequest:
+      type: object
+      properties:
+        sourceVersionId:
+          type: integer
+          format: int64
+    CreateListeningPartRequest:
+      type: object
+      properties:
+        audioPath:
+          type: string
+        label:
+          type: string
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateListeningSectionRequest"
+        seq:
+          type: integer
+          format: int32
+    CreateListeningRequest:
+      type: object
+      properties:
+        parts:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateListeningPartRequest"
+        totalMinutes:
+          type: integer
+          format: int32
+    CreateListeningSectionRequest:
+      type: object
+      properties:
+        instruction:
+          type: string
+        kind:
+          type: string
+        payload:
+          $ref: "#/components/schemas/JsonNode"
+        questionEnd:
+          type: integer
+          format: int32
+        questionStart:
+          type: integer
+          format: int32
+        sortOrder:
+          type: integer
+          format: int32
+        title:
+          type: string
+    CreatePassageQuestionRequest:
+      type: object
+      properties:
+        instruction:
+          type: string
+        kind:
+          type: string
+        payload:
+          $ref: "#/components/schemas/JsonNode"
+        questionEnd:
+          type: integer
+          format: int32
+        questionStart:
+          type: integer
+          format: int32
+        sortOrder:
+          type: integer
+          format: int32
+        title:
+          type: string
+    CreatePassageRequest:
+      type: object
+      properties:
+        intro:
+          type: string
+        paragraphs:
+          $ref: "#/components/schemas/JsonNode"
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreatePassageQuestionRequest"
+        seq:
+          type: integer
+          format: int32
+        shortLabel:
+          type: string
+        title:
+          type: string
+    CreateReadingRequest:
+      type: object
+      properties:
+        passages:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreatePassageRequest"
+        totalMinutes:
+          type: integer
+          format: int32
+    CreateStudentMockExamRequest:
+      type: object
+      properties:
+        listeningSelected:
+          type: boolean
+        readingSelected:
+          type: boolean
+        templateId:
+          type: integer
+          format: int64
+        writingInstructorUserId:
+          type: integer
+          format: int32
+        writingSelected:
+          type: boolean
+    CreateTemplateRequest:
+      type: object
+      properties:
+        label:
+          type: string
+        title:
+          type: string
+    CreateWritingRequest:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/CreateWritingTaskRequest"
+        totalMinutes:
+          type: integer
+          format: int32
+    CreateWritingTaskRequest:
+      type: object
+      properties:
+        imagePath:
+          type: string
+        minWords:
+          type: integer
+          format: int32
+        prompt:
+          type: string
+        seq:
+          type: integer
+          format: int32
+        taskKey:
+          type: string
+        title:
+          type: string
+    GradeWritingRequest:
+      type: object
+      properties:
+        feedback:
+          type: string
+        score:
+          type: number
+    JsonNode:
+      type: object
+    SubmitListeningRequest:
+      type: object
+      properties:
+        answers:
+          type: object
+          additionalProperties:
+            type: string
+    SubmitReadingRequest:
+      type: object
+      properties:
+        answers:
+          type: object
+          additionalProperties:
+            type: string
+    SubmitWritingRequest:
+      type: object
+      properties:
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/SubmitWritingTaskDto"
+    SubmitWritingTaskDto:
+      type: object
+      properties:
+        content:
+          type: string
+        taskKey:
+          type: string
+    TemplateSummaryDto:
+      type: object
+      description: Payload; explicitly null when no payload is available
+      nullable: true
+      properties:
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+        publishedVersionId:
+          type: integer
+          format: int64
+        publishedVersionNo:
+          type: integer
+          format: int32
+        title:
+          type: string
+        versions:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemplateVersionSummaryDto"
+    TemplateVersionSummaryDto:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        hasListening:
+          type: boolean
+        hasReading:
+          type: boolean
+        hasWriting:
+          type: boolean
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+        publishedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+        templateId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        versionNo:
+          type: integer
+          format: int32
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: "Access token from POST /v1/auth/login (Authorization: Bearer <token>)."
+      name: bearerAuth
+      scheme: bearer
+      type: http

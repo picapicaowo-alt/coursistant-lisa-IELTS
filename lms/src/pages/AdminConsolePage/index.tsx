@@ -14,6 +14,7 @@ import {adminApiService} from '@/apis/services/admin-api';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {getManagedUserCreateError} from './adminFeedback';
 import {CourseMembershipPanel} from './components/CourseMembershipPanel';
+import {AdminContractOperations} from './components/AdminContractOperations';
 import styles from './index.module.scss';
 
 type ManagedRole = CreateManagedUserRequest['role'];
@@ -254,7 +255,7 @@ const AdminConsolePage: React.FC = () => {
         <button type="button" aria-pressed={tab === 'users'} className={tab === 'users' ? styles.activeTab : ''} onClick={() => setTab('users')}>Managed users</button>
         <button type="button" aria-pressed={tab === 'members'} className={tab === 'members' ? styles.activeTab : ''} onClick={() => setTab('members')}>Course members</button>
         {isSystemAdmin ? <button type="button" aria-pressed={tab === 'tenants'} className={tab === 'tenants' ? styles.activeTab : ''} onClick={() => setTab('tenants')}>Tenants</button> : null}
-        {isSystemAdmin ? <button type="button" aria-pressed={tab === 'operations'} className={tab === 'operations' ? styles.activeTab : ''} onClick={() => setTab('operations')}>Audited operations</button> : null}
+        <button type="button" aria-pressed={tab === 'operations'} className={tab === 'operations' ? styles.activeTab : ''} onClick={() => setTab('operations')}>Operations</button>
       </nav>
 
       {message ? <p className={message.tone === 'error' ? styles.errorMessage : styles.message} role={message.tone === 'error' ? 'alert' : 'status'}>{message.text}</p> : null}
@@ -319,9 +320,10 @@ const AdminConsolePage: React.FC = () => {
 
       {tab === 'members' ? <CourseMembershipPanel/> : null}
 
-      {tab === 'operations' && isSystemAdmin ? (
+      {tab === 'operations' ? (
         <div className={styles.operationsGrid}>
-          <section className={styles.card} aria-labelledby="reassign-instructor-title">
+          <AdminContractOperations isSystemAdmin={isSystemAdmin} users={usersQuery.data ?? []}/>
+          {isSystemAdmin ? <section className={styles.card} aria-labelledby="reassign-instructor-title">
             <h2 id="reassign-instructor-title">Reassign primary instructor</h2>
             <p className={styles.hint}>Use this administrative path when the current primary instructor must be replaced. The target must satisfy the course tenant and enrolment rules.</p>
             <div className={styles.form}>
@@ -334,9 +336,9 @@ const AdminConsolePage: React.FC = () => {
                 </div>
               ) : <button type="button" className={styles.primaryButton} disabled={!Number(courseId) || !Number(primaryInstructorUserId)} onClick={() => setConfirmReassignment(true)}>Review reassignment</button>}
             </div>
-          </section>
+          </section> : null}
 
-          <section className={styles.card} aria-labelledby="correct-grade-title">
+          {isSystemAdmin ? <section className={styles.card} aria-labelledby="correct-grade-title">
             <h2 id="correct-grade-title">Correct assignment grade</h2>
             <p className={styles.hint}>Emergency system correction only—not daily grading. It updates an existing grade and writes before/after values plus your reason to the audit log.</p>
             <div className={styles.form}>
@@ -351,7 +353,7 @@ const AdminConsolePage: React.FC = () => {
                 </div>
               ) : <button type="button" className={styles.primaryButton} disabled={correction.assignmentId < 1 || correction.studentUserId < 1 || !Number.isFinite(correction.score) || !correction.reason.trim()} onClick={() => setConfirmCorrection(true)}>Review correction</button>}
             </div>
-          </section>
+          </section> : null}
         </div>
       ) : null}
     </main>

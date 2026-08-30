@@ -1,7 +1,9 @@
 import {
   ApiResponse,
   AssignmentAttachment,
+  AssignmentAttachmentManifestItem,
   AssignmentDetail,
+  AssignmentListRead,
   AssignmentSummary,
   CreateAssignmentPayload,
   DueDateChangePreview,
@@ -66,6 +68,14 @@ export class AssignmentApiService {
       console.error(`Failed to get assignment summaries for courseId: ${courseId}`, error);
       throw error;
     }
+  }
+
+  listAssignments(courseId: number): Promise<ApiResponse<AssignmentListRead>> {
+    return this.apiClient.get(`/v2/courses/${courseId}/assignments`);
+  }
+
+  listAssignmentAttachmentManifest(courseId: number): Promise<ApiResponse<AssignmentAttachmentManifestItem[]>> {
+    return this.apiClient.get(`/v2/courses/${courseId}/assignment-attachments`);
   }
 
   /** Role-shaped assignment detail from the current 8081 contract. */

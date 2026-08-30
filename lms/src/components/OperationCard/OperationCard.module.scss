@@ -1,0 +1,147 @@
+.card {
+  display: grid;
+  align-content: start;
+  gap: .85rem;
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+}
+
+.heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.heading h3,
+.heading p {
+  margin: 0;
+}
+
+.heading h3 {
+  color: t.$text;
+  font-size: 1rem;
+}
+
+.heading p,
+.timestamp,
+.field small {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.45;
+}
+
+.timestamp {
+  flex: 0 0 auto;
+}
+
+.fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .7rem;
+}
+
+.field {
+  display: grid;
+  gap: .3rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.field input,
+.field select,
+.field textarea {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .55rem .65rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.field textarea {
+  min-height: 5.5rem;
+  resize: vertical;
+}
+
+.field input:focus-visible,
+.field select:focus-visible,
+.field textarea:focus-visible,
+.primary:focus-visible,
+.danger:focus-visible {
+  outline: 3px solid t.$brand-subtle;
+  outline-offset: 2px;
+}
+
+.primary,
+.danger {
+  justify-self: start;
+  min-height: 2.75rem;
+  padding: 0 .9rem;
+  border-radius: t.$radius-control-sm;
+  color: #fff;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.primary:hover:not(:disabled),
+.danger:hover:not(:disabled) {
+  filter: brightness(.94);
+}
+
+.primary {
+  border: 1px solid t.$brand;
+  background: t.$brand;
+}
+
+.danger {
+  border: 1px solid t.$danger;
+  background: t.$danger;
+}
+
+.primary:disabled,
+.danger:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+.result {
+  max-height: 24rem;
+  overflow: auto;
+  padding: .75rem;
+  border-radius: t.$radius-control;
+  background: t.$page-bg;
+}
+
+.error {
+  margin: 0;
+  padding: .7rem;
+  border-radius: t.$radius-control;
+  background: rgba(t.$danger, .1);
+  color: t.$danger;
+  font-size: t.$fs-caption;
+}
+
+@media (max-width: 640px) {
+  .heading,
+  .fields {
+    grid-template-columns: 1fr;
+  }
+
+  .heading {
+    display: grid;
+  }
+
+  .primary,
+  .danger {
+    width: 100%;
+  }
+}

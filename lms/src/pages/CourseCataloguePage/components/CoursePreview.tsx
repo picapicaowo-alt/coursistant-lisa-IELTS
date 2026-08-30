@@ -16,6 +16,9 @@ interface CoursePreviewProps {
   instructorName: string | null;
   /** Course Managers get the archive action; everyone else does not. */
   canManage: boolean;
+  /** Course operations are staff-only: Instructor, TA, or platform admin. */
+  showOperations: boolean;
+  showDelivery?: boolean;
   avatarUrl?: string;
 }
 
@@ -48,6 +51,8 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
                                                               state,
                                                               instructorName,
                                                               canManage,
+                                                              showOperations,
+                                                              showDelivery = false,
                                                               avatarUrl = '/icons/default_avatar.jpg'
                                                             }) => {
   const navigate = useNavigate();
@@ -156,6 +161,16 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
           {t("card.viewDetails")}
           <span aria-hidden="true">›</span>
         </button>
+        {showOperations ? (
+          <button type="button" className={styles.viewDetails} onClick={() => navigate(`/course/${id}/operations`)}>
+            Course operations
+          </button>
+        ) : null}
+        {showDelivery ? (
+          <button type="button" className={styles.viewDetails} onClick={() => navigate(`/admin/courses/${id}/delivery`)}>
+            Delivery setup
+          </button>
+        ) : null}
 
         {/* The design also offers Share Courses and Delete Course. Sharing has
             no endpoint, and deleting is not how a course is retired: it only

@@ -1,0 +1,5209 @@
+openapi: 3.0.1
+info:
+  description: Coursistant LMS REST API contract (OpenAPI 3).
+  title: LMS API
+  version: 1.0.0
+servers:
+- description: Servlet context-path
+  url: /api
+security:
+- bearerAuth: []
+tags:
+- description: Reuse one CourseMaterial in multiple Lectures and Assignments without
+    copying its S3 object
+  name: Material links
+- description: CourseWeek is the source of truth and is exposed as the Lecture content
+    model
+  name: Weeks / Lectures
+- description: Current-user enrolled courses
+  name: MeCourses
+- description: "Course membership: students, TAs, members, admin enroll"
+  name: Enrollment
+- description: Course syllabus metadata and file stream
+  name: Syllabus
+- description: "Group sets, groups, and membership"
+  name: Groups
+- description: Course announcements
+  name: Announcements
+- description: Course schedule sessions
+  name: Sessions
+- description: Course calendar events
+  name: Events
+- description: Current-user upcoming course activities
+  name: MeEvents
+- description: "Course lifecycle, archive, and primary instructor"
+  name: Courses
+- description: Current-user recent announcements across courses
+  name: MeAnnouncements
+- description: Dated course session occurrences and attendance
+  name: TeachingOccurrences
+- description: Instructor/TA teaching dashboard
+  name: Teaching
+- description: "Course-wide Week resources; V1 has no section-scoped materials. Active\
+    \ TAs may view Draft content, upload, and delete only their own uploads; they\
+    \ cannot publish, unpublish, rename, move, reorder, or delete another uploader's\
+    \ material."
+  name: Materials
+paths:
+  /v2/admin/courses/{courseId}/enrollments:
+    post:
+      operationId: adminEnrollmentEnroll
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminEnrollRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: System-admin enroll a student (legacy path)
+      tags:
+      - Enrollment
+  /v2/admin/courses/{courseId}/enrollments/batch:
+    post:
+      operationId: adminEnrollmentEnrollBatch
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBatchEnrollRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: System-admin batch enroll students (legacy path)
+      tags:
+      - Enrollment
+  /v2/admin/courses/{courseId}/enrollments/{userId}:
+    delete:
+      operationId: adminEnrollmentDeactivate
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: System-admin withdraw a student (legacy path)
+      tags:
+      - Enrollment
+  /v2/advisor/instructors/{instructorUserId}/availability:
+    get:
+      operationId: advisorGetInstructorAvailability
+      parameters:
+      - in: path
+        name: instructorUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - InstructorAvailability
+  /v2/advisor/schedule-requests:
+    get:
+      operationId: advisorScheduleRequests
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseScheduleRequests
+  /v2/advisor/schedule-requests/{requestId}/decision:
+    post:
+      operationId: decideAdvisorScheduleRequest
+      parameters:
+      - in: path
+        name: requestId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScheduleRequestDecisionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseScheduleRequests
+  /v2/advisor/students/{studentUserId}/attendance:
+    get:
+      operationId: advisorStudentAttendanceHistory
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: from
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: to
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: courseId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TeachingOccurrences
+  /v2/advisor/students/{studentUserId}/courses/{courseId}/hours:
+    get:
+      operationId: advisorGetStudentCourseHours
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseHours
+    put:
+      operationId: advisorSetStudentCourseHours
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SetPurchasedHoursRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseHours
+  /v2/advisor/students/{studentUserId}/courses/{courseId}/session-occurrences/{occurrenceId}/attendance:
+    get:
+      operationId: advisorGetStudentAttendance
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TeachingOccurrences
+  /v2/advisor/students/{studentUserId}/courses/{courseId}/student-reports:
+    get:
+      operationId: advisorListPublishedCourseReports
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+  /v2/advisor/students/{studentUserId}/courses/{courseId}/student-reports/{reportId}:
+    get:
+      operationId: advisorGetPublishedCourseReport
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: reportId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+  /v2/advisor/students/{studentUserId}/student-reports:
+    get:
+      operationId: advisorListStudentPublishedReports
+      parameters:
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+  /v2/courses:
+    get:
+      operationId: courseList
+      parameters:
+      - in: query
+        name: q
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: state
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: tenantId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Browse/list courses with optional filters
+      tags:
+      - Courses
+    post:
+      operationId: courseCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a course
+      tags:
+      - Courses
+  /v2/courses/{courseId}/announcements:
+    get:
+      operationId: courseAnnouncementList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List course announcements
+      tags:
+      - Announcements
+    post:
+      operationId: courseAnnouncementCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAnnouncementRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create an announcement
+      tags:
+      - Announcements
+  /v2/courses/{courseId}/announcements/{announcementId}:
+    delete:
+      description: Returns 204 No Content with an empty body on success.
+      operationId: courseAnnouncementDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: announcementId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: confirm
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "204":
+          description: Announcement deleted; no response body
+      summary: Delete an announcement
+      tags:
+      - Announcements
+    get:
+      operationId: courseAnnouncementGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: announcementId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get an announcement by id
+      tags:
+      - Announcements
+    patch:
+      operationId: courseAnnouncementUpdate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: announcementId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateAnnouncementRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Update an announcement
+      tags:
+      - Announcements
+  /v2/courses/{courseId}/assignments/{assignmentId}/materials:
+    get:
+      description: Students only receive Published materials whose origin Lecture
+        is Published.
+      operationId: courseMaterialAssignmentList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List materials linked to an Assignment
+      tags:
+      - Material links
+  /v2/courses/{courseId}/discussion/posts:
+    get:
+      operationId: listCourseDiscussionPosts
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseDiscussion
+    post:
+      operationId: createCourseDiscussionPost
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: body
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: files
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: binary
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDiscussionPostRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: "Create a discussion post with optional file, image, or audio attachments"
+      tags:
+      - CourseDiscussion
+  /v2/courses/{courseId}/discussion/posts/{postId}:
+    get:
+      operationId: getCourseDiscussionPost
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseDiscussion
+  /v2/courses/{courseId}/discussion/posts/{postId}/attachments:
+    get:
+      operationId: listCourseDiscussionAttachments
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseDiscussion
+  /v2/courses/{courseId}/discussion/posts/{postId}/attachments/{attachmentId}/download:
+    get:
+      operationId: downloadCourseDiscussionAttachment
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: attachmentId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+      summary: Download a discussion attachment as binary
+      tags:
+      - CourseDiscussion
+  /v2/courses/{courseId}/discussion/posts/{postId}/attachments/{attachmentId}/preview:
+    get:
+      operationId: previewCourseDiscussionAttachment
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: path
+        name: attachmentId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+      summary: Preview a supported discussion attachment as inline binary
+      tags:
+      - CourseDiscussion
+  /v2/courses/{courseId}/discussion/posts/{postId}/replies:
+    get:
+      operationId: listCourseDiscussionReplies
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseDiscussion
+    post:
+      operationId: createCourseDiscussionReply
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: postId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: query
+        name: body
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: files
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: binary
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateDiscussionPostRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: "Create a one-level reply with optional file, image, or audio attachments"
+      tags:
+      - CourseDiscussion
+  /v2/courses/{courseId}/events:
+    get:
+      operationId: courseEventList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List events for a course
+      tags:
+      - Events
+    post:
+      description: date/startTime/endTime are interpreted in the course IANA timezone.
+        DST gaps and overlaps are rejected with INVALID_LOCAL_TIME.
+      operationId: courseEventCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCourseEventRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a course event
+      tags:
+      - Events
+  /v2/courses/{courseId}/events/{eventId}:
+    delete:
+      operationId: courseEventDelete
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - description: Optimistic concurrency token from the last read response
+        in: query
+        name: expectedVersion
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete a course event
+      tags:
+      - Events
+    get:
+      operationId: courseEventGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get a course event by id
+      tags:
+      - Events
+    put:
+      description: "Partial merge: omitted or null fields are unchanged. Non-empty\
+        \ values update. Empty string clears location/description. Empty name is 400.\
+        \ Requires expectedVersion. The merged local time must be unambiguous in the\
+        \ course IANA timezone; DST gaps/overlaps return INVALID_LOCAL_TIME."
+      operationId: courseEventUpdate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCourseEventRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Update a course event
+      tags:
+      - Events
+  /v2/courses/{courseId}/group-sets:
+    get:
+      operationId: courseGroupSetList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List group sets for a course
+      tags:
+      - Groups
+    post:
+      operationId: courseGroupSetCreate
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGroupSetRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a group set
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}:
+    delete:
+      operationId: courseGroupSetDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete a group set
+      tags:
+      - Groups
+    get:
+      operationId: courseGroupSetGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get a group set by id
+      tags:
+      - Groups
+    patch:
+      operationId: courseGroupSetPatch
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchGroupSetRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Patch a group set
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/distribute-random:
+    post:
+      operationId: courseGroupDistributeRandom
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Randomly distribute ungrouped students
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/groups:
+    post:
+      operationId: courseGroupCreate
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGroupRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a group in a set
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/groups/batch:
+    post:
+      operationId: courseGroupBatchCreate
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchCreateGroupsRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Batch create groups in a set
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/groups/{groupId}:
+    delete:
+      operationId: courseGroupDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete a group
+      tags:
+      - Groups
+    patch:
+      operationId: courseGroupPatch
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchGroupRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Patch a group
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/groups/{groupId}/join:
+    post:
+      operationId: courseGroupJoin
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Join a group
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/groups/{groupId}/leave:
+    post:
+      operationId: courseGroupLeave
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Leave a group
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/groups/{groupId}/members:
+    post:
+      operationId: courseGroupMemberAssign
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AssignMemberRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Assign a member to a group
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/groups/{groupId}/members/{userId}:
+    delete:
+      operationId: courseGroupMemberRemove
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: confirmAcademicImpact
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Remove a member from a group
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/members/{userId}/move:
+    post:
+      operationId: courseGroupMemberMove
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MoveMemberRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Move a member between groups
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/switch:
+    post:
+      operationId: courseGroupSwitch
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SwitchGroupRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Switch to another group in the set
+      tags:
+      - Groups
+  /v2/courses/{courseId}/group-sets/{groupSetId}/ungrouped-students:
+    get:
+      operationId: courseGroupUngroupedStudents
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupSetId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List ungrouped students in a set
+      tags:
+      - Groups
+  /v2/courses/{courseId}/materials/{materialId}/assignment-links/{assignmentId}:
+    delete:
+      operationId: courseMaterialAssignmentLinkDetach
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Detach a material from an Assignment
+      tags:
+      - Material links
+    post:
+      description: Naturally idempotent through the unique material/Assignment association.
+      operationId: courseMaterialAssignmentLinkAttach
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Attach a material to an Assignment in the same course
+      tags:
+      - Material links
+  /v2/courses/{courseId}/materials/{materialId}/lecture-links/{lectureId}:
+    delete:
+      description: The origin Lecture cannot be detached; use the existing move operation
+        instead.
+      operationId: courseMaterialLectureLinkDetach
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: lectureId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Detach a material from a secondary Lecture
+      tags:
+      - Material links
+    post:
+      description: Naturally idempotent through the unique material/Lecture association.
+      operationId: courseMaterialLectureLinkAttach
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: lectureId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Attach a material to another Lecture
+      tags:
+      - Material links
+  /v2/courses/{courseId}/materials/{materialId}/links:
+    get:
+      description: Course Manager only. originLectureId remains backed by course_material.week_id.
+      operationId: courseMaterialLinksGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get a material's Lecture and Assignment links
+      tags:
+      - Material links
+  /v2/courses/{courseId}/members:
+    get:
+      operationId: courseMemberList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: courseRole
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: active
+        required: false
+        schema:
+          type: boolean
+      - in: query
+        name: q
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List course members with optional filters
+      tags:
+      - Enrollment
+  /v2/courses/{courseId}/schedule-requests/{requestId}/instructor-review:
+    post:
+      operationId: reviewCourseScheduleRequest
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: requestId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScheduleRequestDecisionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseScheduleRequests
+  /v2/courses/{courseId}/session-occurrences:
+    get:
+      operationId: listSessionOccurrences
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: from
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: to
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: includeHistory
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TeachingOccurrences
+    post:
+      description: Creates one dated occurrence after timezone-aware instructor availability
+        validation.
+      operationId: createSessionOccurrence
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateOccurrenceRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SCHEDULE_AVAILABILITY_CONFLICT
+      tags:
+      - TeachingOccurrences
+  /v2/courses/{courseId}/session-occurrences/generate:
+    post:
+      description: Generates all template slots transactionally and rejects the batch
+        when any slot is outside instructor availability.
+      operationId: generateSessionOccurrences
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateOccurrencesRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SCHEDULE_AVAILABILITY_CONFLICT
+      tags:
+      - TeachingOccurrences
+  /v2/courses/{courseId}/session-occurrences/{occurrenceId}:
+    get:
+      operationId: getSessionOccurrence
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TeachingOccurrences
+  /v2/courses/{courseId}/session-occurrences/{occurrenceId}/attendance:
+    get:
+      operationId: getOccurrenceAttendance
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TeachingOccurrences
+    put:
+      operationId: saveOccurrenceAttendance
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveAttendanceRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TeachingOccurrences
+  /v2/courses/{courseId}/session-occurrences/{occurrenceId}/attendance/me:
+    get:
+      operationId: getOwnOccurrenceAttendance
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TeachingOccurrences
+  /v2/courses/{courseId}/session-occurrences/{occurrenceId}/attendance/roster-sync:
+    post:
+      operationId: syncOccurrenceAttendanceRoster
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TeachingOccurrences
+  /v2/courses/{courseId}/session-occurrences/{occurrenceId}/cancel:
+    post:
+      description: Cancels only unopened occurrences without attendance; otherwise
+        returns SESSION_OCCURRENCE_NOT_RESCHEDULABLE.
+      operationId: cancelSessionOccurrence
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CancelOccurrenceRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SESSION_OCCURRENCE_NOT_RESCHEDULABLE
+      tags:
+      - TeachingOccurrences
+  /v2/courses/{courseId}/session-occurrences/{occurrenceId}/reschedule:
+    post:
+      description: Creates an available replacement and preserves the original row
+        as RESCHEDULED. Occurrences with opened attendance cannot be rescheduled.
+      operationId: rescheduleSessionOccurrence
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RescheduleOccurrenceRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SESSION_OCCURRENCE_NOT_RESCHEDULABLE or SCHEDULE_AVAILABILITY_CONFLICT
+      tags:
+      - TeachingOccurrences
+  /v2/courses/{courseId}/session-occurrences/{occurrenceId}/schedule-requests:
+    get:
+      operationId: listCourseScheduleRequests
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseScheduleRequests
+    post:
+      operationId: createCourseScheduleRequest
+      parameters:
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: occurrenceId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateScheduleRequestRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseScheduleRequests
+  /v2/courses/{courseId}/sessions:
+    get:
+      operationId: courseSessionList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List sessions for a course
+      tags:
+      - Sessions
+    post:
+      description: Validates the recurring template against instructor availability
+        in each window timezone.
+      operationId: courseSessionCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: COURSE_MUTATION_ORCHESTRATED or SCHEDULE_AVAILABILITY_CONFLICT
+      summary: Create a session
+      tags:
+      - Sessions
+  /v2/courses/{courseId}/sessions/{sessionId}:
+    delete:
+      operationId: courseSessionDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: sessionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete a session
+      tags:
+      - Sessions
+    get:
+      operationId: courseSessionGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: sessionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get a session by id
+      tags:
+      - Sessions
+    put:
+      description: Validates the complete resulting template before releasing future
+        unopened occurrences.
+      operationId: courseSessionUpdate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: sessionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateSessionRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: COURSE_MUTATION_ORCHESTRATED or SCHEDULE_AVAILABILITY_CONFLICT
+      summary: Update a session
+      tags:
+      - Sessions
+  /v2/courses/{courseId}/student-reports:
+    get:
+      operationId: listCourseStudentReports
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: studentUserId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: reportType
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: status
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+    post:
+      operationId: createCourseStudentReport
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertCourseStudentReportRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+  /v2/courses/{courseId}/student-reports/published/me:
+    get:
+      operationId: listMyPublishedCourseReports
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+  /v2/courses/{courseId}/student-reports/published/me/{reportId}:
+    get:
+      operationId: getMyPublishedCourseReport
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: reportId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+  /v2/courses/{courseId}/student-reports/{reportId}:
+    get:
+      operationId: getCourseStudentReport
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: reportId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+    patch:
+      operationId: updateCourseStudentReport
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: reportId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertCourseStudentReportRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+  /v2/courses/{courseId}/student-reports/{reportId}/publish:
+    post:
+      operationId: publishCourseStudentReport
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: reportId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertCourseStudentReportRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseReports
+  /v2/courses/{courseId}/students:
+    post:
+      operationId: courseStudentAdd
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminEnrollRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: COURSE_ENROLLMENT_ORCHESTRATED for configured courses
+      summary: Add a student to the course
+      tags:
+      - Enrollment
+  /v2/courses/{courseId}/students/batch:
+    post:
+      operationId: courseStudentBatch
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminBatchEnrollRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: COURSE_ENROLLMENT_ORCHESTRATED for configured courses
+      summary: Batch add students by userIds and/or emails
+      tags:
+      - Enrollment
+  /v2/courses/{courseId}/students/{userId}:
+    delete:
+      operationId: courseStudentWithdraw
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: COURSE_ENROLLMENT_ORCHESTRATED for configured courses
+      summary: Withdraw a student from the course
+      tags:
+      - Enrollment
+  /v2/courses/{courseId}/syllabus:
+    delete:
+      operationId: courseSyllabusClear
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Clear current syllabus
+      tags:
+      - Syllabus
+    get:
+      operationId: courseSyllabusGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get syllabus metadata
+      tags:
+      - Syllabus
+    post:
+      description: Multipart field name must be `file`.
+      operationId: courseSyllabusUpload
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              description: Multipart form with part `file`
+              required:
+              - file
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Upload syllabus file
+      tags:
+      - Syllabus
+  /v2/courses/{courseId}/syllabus/download:
+    get:
+      description: Returns raw file bytes (not JSON ApiResponse). Content-Disposition
+        is attachment.
+      operationId: courseSyllabusDownload
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: Syllabus file bytes for download
+          headers:
+            Content-Disposition:
+              description: attachment; filename="..."
+              schema:
+                type: string
+                example: attachment; filename="syllabus.pdf"
+              style: simple
+      summary: Download syllabus file (attachment binary)
+      tags:
+      - Syllabus
+  /v2/courses/{courseId}/syllabus/preview:
+    get:
+      description: Returns raw file bytes (not JSON ApiResponse). Content-Disposition
+        is inline.
+      operationId: courseSyllabusPreview
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: Syllabus file bytes for inline preview
+          headers:
+            Content-Disposition:
+              description: inline; filename="..."
+              schema:
+                type: string
+                example: inline; filename="syllabus.pdf"
+              style: simple
+      summary: Preview syllabus file (inline binary)
+      tags:
+      - Syllabus
+  /v2/courses/{courseId}/syllabus/restore:
+    post:
+      operationId: courseSyllabusRestore
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Restore previous syllabus version
+      tags:
+      - Syllabus
+  /v2/courses/{courseId}/tas:
+    post:
+      operationId: courseTaAdd
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AdminEnrollRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Add a TA to the course
+      tags:
+      - Enrollment
+  /v2/courses/{courseId}/tas/{userId}:
+    delete:
+      operationId: courseTaRemove
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Remove a TA from the course
+      tags:
+      - Enrollment
+  /v2/courses/{courseId}/tas/{userId}/permissions:
+    patch:
+      operationId: courseTaPatchPermissions
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTaPermissionsRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Update TA permissions
+      tags:
+      - Enrollment
+  /v2/courses/{courseId}/weeks:
+    get:
+      description: Each item exposes compatible Week fields plus lectureId/lectureNumber
+        and associated assignments.
+      operationId: courseWeekList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List Lecture content backed by CourseWeek
+      tags:
+      - Weeks / Lectures
+    post:
+      operationId: courseWeekCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateWeekRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a week
+      tags:
+      - Weeks / Lectures
+  /v2/courses/{courseId}/weeks/reorder:
+    put:
+      operationId: courseWeekReorder
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderWeeksRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Reorder weeks
+      tags:
+      - Weeks / Lectures
+  /v2/courses/{courseId}/weeks/{weekId}:
+    delete:
+      operationId: courseWeekDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete a week
+      tags:
+      - Weeks / Lectures
+    get:
+      description: weekId and lectureId identify the same CourseWeek row. Students
+        only see Published weeks; Draft weeks return WEEK_NOT_FOUND. Material and
+        assignment filtering matches the list endpoint.
+      operationId: courseWeekGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get Lecture content by CourseWeek id
+      tags:
+      - Weeks / Lectures
+    patch:
+      operationId: courseWeekRename
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RenameWeekRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Rename a week
+      tags:
+      - Weeks / Lectures
+  /v2/courses/{courseId}/weeks/{weekId}/download.zip:
+    get:
+      description: Streams a ZIP archive (not JSON ApiResponse). Content-Disposition
+        is attachment.
+      operationId: courseWeekDownloadZip
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+          description: ZIP stream of week materials
+          headers:
+            Content-Disposition:
+              description: attachment; filename="..."
+              schema:
+                type: string
+                example: attachment; filename="week-1.zip"
+              style: simple
+      summary: Download week materials as ZIP
+      tags:
+      - Weeks / Lectures
+  /v2/courses/{courseId}/weeks/{weekId}/materials:
+    post:
+      description: "Multipart parts: `files` (optional array), `linkUrl` (optional),\
+        \ `linkDisplayName` (optional). Provide at least one file or a linkUrl. New\
+        \ FILE rows return checksumSha256 over the exact uploaded bytes and a server-derived\
+        \ teachingType; LINK and legacy FILE rows return null checksum. Storage materialType\
+        \ remains FILE/LINK. Materials are general course resources, not the authoritative\
+        \ location for graded-work files."
+      operationId: courseMaterialCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: files
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: binary
+      - in: query
+        name: linkUrl
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: linkDisplayName
+        required: false
+        schema:
+          type: string
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: "#/components/schemas/MaterialCreateRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create file and/or link materials
+      tags:
+      - Materials
+  /v2/courses/{courseId}/weeks/{weekId}/materials/reorder:
+    put:
+      operationId: courseMaterialReorder
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderMaterialsRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Reorder materials in a week
+      tags:
+      - Materials
+  /v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}:
+    delete:
+      operationId: courseMaterialDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete a material
+      tags:
+      - Materials
+    patch:
+      operationId: courseMaterialRename
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RenameMaterialRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Rename a material
+      tags:
+      - Materials
+  /v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}/download:
+    get:
+      description: FILE materials return 200 binary with Content-Disposition attachment.
+        LINK materials return 302 with Location set to the external URL.
+      operationId: courseMaterialDownload
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: File material bytes
+          headers:
+            Content-Disposition:
+              description: attachment; filename="..."
+              schema:
+                type: string
+              style: simple
+        "302":
+          description: Link material redirect to external URL
+          headers:
+            Location:
+              description: External link URL
+              schema:
+                type: string
+                format: uri
+              style: simple
+      summary: Download a material (file bytes or link redirect)
+      tags:
+      - Materials
+  /v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}/move:
+    post:
+      operationId: courseMaterialMove
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MoveMaterialRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Move a material to another week
+      tags:
+      - Materials
+  /v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}/preview:
+    get:
+      description: Returns raw file bytes (not JSON ApiResponse). Only for previewable
+        FILE materials.
+      operationId: courseMaterialPreview
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+          description: Material file bytes for inline preview
+          headers:
+            Content-Disposition:
+              description: inline; filename="..."
+              schema:
+                type: string
+              style: simple
+      summary: Preview a file material (inline binary)
+      tags:
+      - Materials
+  /v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}/publish:
+    post:
+      description: Course Manager only; Active TAs cannot publish materials.
+      operationId: courseMaterialPublish
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Publish a material so students can see it on a Published week
+      tags:
+      - Materials
+  /v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}/unpublish:
+    post:
+      description: Course Manager only; Active TAs cannot unpublish materials.
+      operationId: courseMaterialUnpublish
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: materialId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Hide a material from students without deleting it
+      tags:
+      - Materials
+  /v2/courses/{courseId}/weeks/{weekId}/publish:
+    post:
+      operationId: courseWeekPublish
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Publish a week
+      tags:
+      - Weeks / Lectures
+  /v2/courses/{courseId}/weeks/{weekId}/unpublish:
+    post:
+      operationId: courseWeekUnpublish
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: weekId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Unpublish a week
+      tags:
+      - Weeks / Lectures
+  /v2/courses/{id}:
+    delete:
+      operationId: courseDelete
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete a course
+      tags:
+      - Courses
+    get:
+      operationId: courseGetById
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get course by id
+      tags:
+      - Courses
+    patch:
+      operationId: coursePatch
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchCourseRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Partial update of course fields
+      tags:
+      - Courses
+  /v2/courses/{id}/archive:
+    post:
+      operationId: courseArchive
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Archive a course
+      tags:
+      - Courses
+  /v2/courses/{id}/primary-instructor:
+    post:
+      operationId: courseReassignPrimaryInstructor
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReassignPrimaryInstructorRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Reassign the primary instructor
+      tags:
+      - Courses
+  /v2/courses/{id}/unarchive:
+    post:
+      operationId: courseUnarchive
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Unarchive a course
+      tags:
+      - Courses
+  /v2/me/alerts:
+    get:
+      description: "Fact-derived overdue/missing submission, upcoming deadline, and\
+        \ checkpoint incomplete. Alerts disappear when the underlying facts clear.\
+        \ Not notification inbox items."
+      operationId: meStudentAlerts
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List derived student alerts
+      tags:
+      - StudentAlerts
+  /v2/me/announcements/recent:
+    get:
+      operationId: meAnnouncementsRecent
+      parameters:
+      - in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List my recent announcements
+      tags:
+      - MeAnnouncements
+  /v2/me/attendance:
+    get:
+      operationId: meAttendanceHistory
+      parameters:
+      - in: query
+        name: from
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: to
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: courseId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - MeAttendance
+  /v2/me/calendar:
+    get:
+      operationId: meCalendar
+      parameters:
+      - in: query
+        name: from
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: to
+        required: false
+        schema:
+          type: string
+          format: date
+      - in: query
+        name: timezone
+        required: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: "Unified Student/Instructor calendar in a half-open [from,to) window"
+      tags:
+      - MeCalendar
+  /v2/me/courses:
+    get:
+      operationId: meCoursesList
+      parameters:
+      - in: query
+        name: state
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List my enrolled courses
+      tags:
+      - MeCourses
+  /v2/me/courses/{courseId}/hours:
+    get:
+      operationId: meCourseHours
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseHours
+  /v2/me/events/upcoming:
+    get:
+      description: "Returns future Events and effective Session slots with local,\
+        \ UTC, and IANA timezone fields. Dated occurrences override matching recurring\
+        \ templates; ungenerated dates fall back to templates. Use source=SESSION&limit=1\
+        \ for the next class."
+      operationId: meEventsUpcoming
+      parameters:
+      - description: "Calendar window; omitted or <1 uses 7, values >30 are capped\
+          \ at 30"
+        in: query
+        name: days
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - description: Case-insensitive activity source filter
+        in: query
+        name: source
+        required: false
+        schema:
+          type: string
+          enum:
+          - SESSION
+          - EVENT
+      - description: Maximum results after UTC sorting
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: string
+          maximum: 100
+          minimum: 1
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List my upcoming course activities
+      tags:
+      - MeEvents
+  /v2/me/personal-events:
+    get:
+      operationId: listMyPersonalEvents
+      parameters:
+      - in: query
+        name: fromUtc
+        required: true
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: toUtc
+        required: true
+        schema:
+          type: string
+          format: date-time
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - MePersonalEvents
+    post:
+      operationId: createMyPersonalEvent
+      parameters:
+      - in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonalEventRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - MePersonalEvents
+  /v2/me/personal-events/{eventId}:
+    delete:
+      operationId: deleteMyPersonalEvent
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      - in: query
+        name: expectedVersion
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - MePersonalEvents
+    get:
+      operationId: getMyPersonalEvent
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - MePersonalEvents
+    patch:
+      operationId: patchMyPersonalEvent
+      parameters:
+      - in: path
+        name: eventId
+        required: true
+        schema:
+          type: integer
+          format: int64
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PersonalEventRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - MePersonalEvents
+  /v2/me/progress:
+    get:
+      operationId: meProgress
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - StudentDashboard
+  /v2/me/schedule-requests:
+    get:
+      operationId: meScheduleRequests
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseScheduleRequests
+  /v2/me/teaching/activities/upcoming:
+    get:
+      description: "Dated occurrences override matching recurring template slots.\
+        \ CANCELLED and RESCHEDULED rows suppress the original slot, while ungenerated\
+        \ dates fall back to the template."
+      operationId: meTeachingActivitiesUpcoming
+      parameters:
+      - in: query
+        name: days
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List upcoming teaching activities
+      tags:
+      - Teaching
+  /v2/me/teaching/activity/recent:
+    get:
+      operationId: meTeachingActivityRecent
+      parameters:
+      - in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List recent teaching activity
+      tags:
+      - Teaching
+  /v2/me/teaching/alerts:
+    get:
+      description: "PENDING_GRADING, UPCOMING_CLASS, and SCHEDULE_CONFLICT based on\
+        \ the effective occurrence-over-template schedule."
+      operationId: meTeachingAlerts
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List teaching alerts
+      tags:
+      - Teaching
+  /v2/me/teaching/availability:
+    get:
+      operationId: meTeachingAvailability
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - InstructorAvailability
+    put:
+      operationId: replaceMeTeachingAvailability
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReplaceAvailabilityRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - InstructorAvailability
+  /v2/me/teaching/courses:
+    get:
+      description: "My Classes sorted by next/today session, status, then course code.\
+        \ Includes studentCount, lectureNumber (term-week index), scheduled time,\
+        \ and UPCOMING/ONGOING/COMPLETED. Dated occurrences override matching recurring\
+        \ template slots; ungenerated dates still fall back to the template."
+      operationId: meTeachingCourses
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List courses I teach
+      tags:
+      - Teaching
+  /v2/me/teaching/deadlines/upcoming:
+    get:
+      operationId: meTeachingDeadlinesUpcoming
+      parameters:
+      - in: query
+        name: days
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List upcoming teaching deadlines
+      tags:
+      - Teaching
+  /v2/me/teaching/grading-items:
+    get:
+      description: One row per Assignment × Student. PENDING = submitted without Entered
+        grade; IN_PROGRESS = Entered but not Released; COMPLETED = Released.
+      operationId: meTeachingGradingItems
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List per-student grading items
+      tags:
+      - Teaching
+  /v2/me/teaching/grading-queue:
+    get:
+      description: "Assignment and course-bound Quiz items only. Sorted OVERDUE, DUE_TODAY,\
+        \ then UPCOMING. Global Exam is an Assessment dependency and is not listed."
+      operationId: meTeachingGradingQueue
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List grading queue items
+      tags:
+      - Teaching
+  /v2/me/teaching/schedule-requests:
+    get:
+      operationId: meTeachingScheduleRequests
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - CourseScheduleRequests
+  /v2/me/teaching/students-needing-support:
+    get:
+      operationId: meTeachingStudentsNeedingSupport
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List students matching tenant support thresholds
+      tags:
+      - Teaching
+  /v2/me/teaching/today-classes:
+    get:
+      operationId: meTeachingTodayClasses
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List all effective classes today
+      tags:
+      - Teaching
+  /v2/me/work-queue:
+    get:
+      operationId: meWorkQueue
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - StudentDashboard
+  /v2/tenant/alert-rules:
+    get:
+      operationId: tenantGetAlertRules
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TenantAlertRules
+    put:
+      operationId: tenantPutAlertRules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TenantAlertRuleRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TenantAlertRules
+  /v2/tenant/instructors/{instructorUserId}/availability:
+    get:
+      operationId: tenantGetInstructorAvailability
+      parameters:
+      - in: path
+        name: instructorUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - InstructorAvailability
+components:
+  schemas:
+    AdminBatchEnrollRequest:
+      type: object
+      description: Batch enroll students by userIds and/or emails
+      properties:
+        emails:
+          type: array
+          items:
+            type: string
+        userIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+    AdminEnrollRequest:
+      type: object
+      description: Enroll a single user by userId (student or TA)
+      properties:
+        userId:
+          type: integer
+          format: int32
+    ApiResponse:
+      type: object
+      description: Unified JSON envelope for LMS APIs
+      properties:
+        code:
+          type: string
+          description: Stable machine code (ErrorType.name() or SUCCESS)
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/TenantAlertRuleResponse"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-07-23T10:00:00Z
+    AssignMemberRequest:
+      type: object
+      properties:
+        confirmAcademicImpact:
+          type: boolean
+        confirmCapacityOverfill:
+          type: boolean
+        userId:
+          type: integer
+          format: int32
+    AttendanceEntryRequest:
+      type: object
+      properties:
+        status:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+    AvailabilityExceptionRequest:
+      type: object
+      properties:
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        exceptionDate:
+          type: string
+          format: date
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        timezone:
+          type: string
+    AvailabilityWindowRequest:
+      type: object
+      properties:
+        dayOfWeek:
+          type: string
+        effectiveFrom:
+          type: string
+          format: date
+        effectiveTo:
+          type: string
+          format: date
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        timezone:
+          type: string
+    BatchCreateGroupsRequest:
+      type: object
+      properties:
+        count:
+          type: integer
+          format: int32
+        namePrefix:
+          type: string
+    CancelOccurrenceRequest:
+      type: object
+      properties:
+        expectedVersion:
+          type: integer
+          format: int32
+    CourseEventResponse:
+      type: object
+      description: Concrete course event with legacy local fields plus canonical local/UTC
+        timestamps
+      properties:
+        courseId:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        endsAtLocal:
+          type: string
+          format: date-time
+          description: Local end date-time in timezone; null only for invalid legacy
+            DST data
+          nullable: true
+        endsAtUtc:
+          type: string
+          format: date-time
+          description: UTC end instant; null only for invalid legacy DST data
+          nullable: true
+        id:
+          type: integer
+          format: int32
+        location:
+          type: string
+        name:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        startsAtLocal:
+          type: string
+          format: date-time
+          description: Local start date-time in timezone; null only for invalid legacy
+            DST data
+          nullable: true
+        startsAtUtc:
+          type: string
+          format: date-time
+          description: UTC start instant; null only for invalid legacy DST data
+          nullable: true
+        timezone:
+          type: string
+          description: IANA timezone
+          example: America/Los_Angeles
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int32
+    CreateAnnouncementRequest:
+      type: object
+      properties:
+        body:
+          type: string
+        title:
+          type: string
+    CreateCourseEventRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        location:
+          type: string
+        name:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+    CreateCourseRequest:
+      type: object
+      description: Create a new course
+      properties:
+        courseCode:
+          type: string
+        description:
+          type: string
+        instructorId:
+          type: integer
+          format: int32
+        location:
+          type: string
+        primaryInstructorUserId:
+          type: integer
+          format: int32
+        tenantId:
+          type: integer
+          format: int32
+        termEndDate:
+          type: string
+          format: date
+        termStartDate:
+          type: string
+          format: date
+        title:
+          type: string
+    CreateDiscussionPostRequest:
+      type: object
+      properties:
+        body:
+          type: string
+    CreateGroupRequest:
+      type: object
+      properties:
+        capacityOverride:
+          type: integer
+          format: int32
+        name:
+          type: string
+    CreateGroupSetRequest:
+      type: object
+      description: Create a course group set
+      properties:
+        defaultCapacity:
+          type: integer
+          format: int32
+        joinClosesAt:
+          type: string
+          format: date-time
+        joinOpensAt:
+          type: string
+          format: date-time
+        locked:
+          type: boolean
+        name:
+          type: string
+    CreateOccurrenceRequest:
+      type: object
+      properties:
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        occurrenceDate:
+          type: string
+          format: date
+        sessionId:
+          type: integer
+          format: int32
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        weekId:
+          type: integer
+          format: int32
+    CreateScheduleRequestRequest:
+      type: object
+      properties:
+        proposedEndTime:
+          $ref: "#/components/schemas/LocalTime"
+        proposedOccurrenceDate:
+          type: string
+          format: date
+        proposedStartTime:
+          $ref: "#/components/schemas/LocalTime"
+        reason:
+          type: string
+        requestType:
+          type: string
+    CreateSessionRequest:
+      type: object
+      properties:
+        dayOfWeek:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        location:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        type:
+          type: string
+        weekId:
+          type: integer
+          format: int32
+    CreateWeekRequest:
+      type: object
+      properties:
+        summary:
+          type: string
+        title:
+          type: string
+    GenerateOccurrencesRequest:
+      type: object
+      properties:
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        weekId:
+          type: integer
+          format: int32
+    LocalTime:
+      type: object
+      properties:
+        hour:
+          type: integer
+          format: int32
+        minute:
+          type: integer
+          format: int32
+        nano:
+          type: integer
+          format: int32
+        second:
+          type: integer
+          format: int32
+    MaterialCreateRequest:
+      type: object
+      description: "Multipart form: upload files and/or create an external link material"
+      properties:
+        files:
+          type: array
+          description: "One or more validated document, image, archive, MP3/WAV, or\
+            \ MP4 files (materialType=FILE)"
+          items:
+            type: string
+            format: binary
+        linkDisplayName:
+          type: string
+          description: Display name when creating a link material
+          example: Week 1 reading
+        linkUrl:
+          type: string
+          description: External URL for a link material (materialType=LINK)
+          example: https://example.com/reading
+    MaterialResponse:
+      type: object
+      description: Lecture material. weekId remains the immutable origin Week/Lecture
+        association.
+      properties:
+        checksumSha256:
+          type: string
+          description: Lowercase SHA-256 of uploaded FILE bytes; null for LINK and
+            legacy FILE materials
+          nullable: true
+          pattern: "^[0-9a-f]{64}$"
+        contentType:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        displayName:
+          type: string
+        downloadUrl:
+          type: string
+        effectiveStudentVisible:
+          type: boolean
+          description: True only when week.state is Published and publicationState
+            is PUBLISHED
+        extension:
+          type: string
+        id:
+          type: integer
+          format: int32
+        linkUrl:
+          type: string
+        materialType:
+          type: string
+          description: Storage representation; independent from teachingType
+          enum:
+          - FILE
+          - LINK
+        orderPosition:
+          type: integer
+          format: int32
+        originalFilename:
+          type: string
+        previewAvailable:
+          type: boolean
+        previewUrl:
+          type: string
+          description: Preview URL when previewAvailable is true
+        publicationState:
+          type: string
+          description: DRAFT is staff-only; PUBLISHED is student-visible when the
+            week is Published
+          enum:
+          - DRAFT
+          - PUBLISHED
+        sizeBytes:
+          type: integer
+          format: int64
+        teachingType:
+          type: string
+          description: Server-derived teaching semantic; clients cannot choose this
+            value
+          enum:
+          - DOCUMENT
+          - IMAGE
+          - AUDIO
+          - VIDEO
+          - ARCHIVE
+          - LINK
+        updatedAt:
+          type: string
+          format: date-time
+        uploadedBy:
+          type: integer
+          format: int32
+        weekId:
+          type: integer
+          format: int32
+          description: Origin CourseWeek id; CourseWeek is the Lecture source of truth
+    MoveMaterialRequest:
+      type: object
+      properties:
+        targetWeekId:
+          type: integer
+          format: int32
+    MoveMemberRequest:
+      type: object
+      properties:
+        confirmAcademicImpact:
+          type: boolean
+        confirmCapacityOverfill:
+          type: boolean
+        targetGroupId:
+          type: integer
+          format: int32
+    PatchCourseRequest:
+      type: object
+      description: Partial course update; only non-null whitelist fields are applied
+      properties:
+        clearDescription:
+          type: boolean
+        clearLocation:
+          type: boolean
+        courseCode:
+          type: string
+        description:
+          type: string
+        instructorId:
+          type: integer
+          format: int32
+        location:
+          type: string
+        primaryInstructorUserId:
+          type: integer
+          format: int32
+        tenantId:
+          type: integer
+          format: int32
+        termEndDate:
+          type: string
+          format: date
+        termStartDate:
+          type: string
+          format: date
+        title:
+          type: string
+    PatchGroupRequest:
+      type: object
+      properties:
+        capacityOverride:
+          type: integer
+          format: int32
+        clearCapacityOverride:
+          type: boolean
+        confirmCapacityShorten:
+          type: boolean
+        name:
+          type: string
+    PatchGroupSetRequest:
+      type: object
+      properties:
+        clearJoinClosesAt:
+          type: boolean
+        clearJoinOpensAt:
+          type: boolean
+        confirmCapacityShorten:
+          type: boolean
+        confirmWindowShorten:
+          type: boolean
+        defaultCapacity:
+          type: integer
+          format: int32
+        joinClosesAt:
+          type: string
+          format: date-time
+        joinOpensAt:
+          type: string
+          format: date-time
+        locked:
+          type: boolean
+        name:
+          type: string
+    PersonalEventRequest:
+      type: object
+      properties:
+        endsAtLocal:
+          type: string
+          format: date-time
+        expectedVersion:
+          type: integer
+          format: int32
+        reminderMinutesBefore:
+          type: integer
+          format: int32
+        startsAtLocal:
+          type: string
+          format: date-time
+        timezone:
+          type: string
+        title:
+          type: string
+    ReassignPrimaryInstructorRequest:
+      type: object
+      properties:
+        primaryInstructorUserId:
+          type: integer
+          format: int32
+    RenameMaterialRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+    RenameWeekRequest:
+      type: object
+      properties:
+        summary:
+          type: string
+        title:
+          type: string
+    ReorderMaterialsRequest:
+      type: object
+      properties:
+        materialIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+    ReorderWeeksRequest:
+      type: object
+      properties:
+        weekIds:
+          type: array
+          items:
+            type: integer
+            format: int32
+    ReplaceAvailabilityRequest:
+      type: object
+      properties:
+        exceptions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AvailabilityExceptionRequest"
+        expectedVersion:
+          type: integer
+          format: int32
+        windows:
+          type: array
+          items:
+            $ref: "#/components/schemas/AvailabilityWindowRequest"
+    RescheduleOccurrenceRequest:
+      type: object
+      properties:
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        expectedVersion:
+          type: integer
+          format: int32
+        occurrenceDate:
+          type: string
+          format: date
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        weekId:
+          type: integer
+          format: int32
+    SaveAttendanceRequest:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttendanceEntryRequest"
+        expectedAttendanceVersion:
+          type: integer
+          format: int32
+    ScheduleRequestDecisionRequest:
+      type: object
+      properties:
+        decision:
+          type: string
+        expectedVersion:
+          type: integer
+          format: int32
+        rejectionReason:
+          type: string
+    SessionResponse:
+      type: object
+      description: "Weekly recurring template. It has no occurrence date, so no UTC\
+        \ Instant is exposed; use /v2/me/events/upcoming for concrete occurrences."
+      properties:
+        courseId:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        dayOfWeek:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        id:
+          type: integer
+          format: int32
+        lectureId:
+          type: integer
+          format: int32
+        lectureNumber:
+          type: integer
+          format: int32
+        location:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        timezone:
+          type: string
+        type:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        weekId:
+          type: integer
+          format: int32
+    SetPurchasedHoursRequest:
+      type: object
+      properties:
+        expectedVersion:
+          type: integer
+          format: int32
+        purchasedMinutes:
+          type: integer
+          format: int32
+        reason:
+          type: string
+    SwitchGroupRequest:
+      type: object
+      properties:
+        targetGroupId:
+          type: integer
+          format: int32
+    TenantAlertRuleRequest:
+      type: object
+      properties:
+        absenceCount:
+          type: integer
+          format: int32
+        absenceWindowDays:
+          type: integer
+          format: int32
+        checkpointIncompleteEnabled:
+          type: integer
+          format: int32
+        completionMinimumSample:
+          type: integer
+          format: int32
+        completionPercentage:
+          type: number
+        completionWindowDays:
+          type: integer
+          format: int32
+        deadlineWindowDays:
+          type: integer
+          format: int32
+        expectedVersion:
+          type: integer
+          format: int32
+        gradingDelayDays:
+          type: integer
+          format: int32
+        inactivityDays:
+          type: integer
+          format: int32
+        negativeHoursEnabled:
+          type: integer
+          format: int32
+        overdueTaskEnabled:
+          type: integer
+          format: int32
+        performanceMinimumGradedSample:
+          type: integer
+          format: int32
+        performancePercentage:
+          type: number
+    TenantAlertRuleResponse:
+      type: object
+      description: Payload; explicitly null when no payload is available
+      nullable: true
+      properties:
+        absenceCount:
+          type: integer
+          format: int32
+        absenceWindowDays:
+          type: integer
+          format: int32
+        checkpointIncompleteEnabled:
+          type: integer
+          format: int32
+        completionMinimumSample:
+          type: integer
+          format: int32
+        completionPercentage:
+          type: number
+        completionWindowDays:
+          type: integer
+          format: int32
+        deadlineWindowDays:
+          type: integer
+          format: int32
+        gradingDelayDays:
+          type: integer
+          format: int32
+        inactivityDays:
+          type: integer
+          format: int32
+        negativeHoursEnabled:
+          type: integer
+          format: int32
+        overdueTaskEnabled:
+          type: integer
+          format: int32
+        performanceMinimumGradedSample:
+          type: integer
+          format: int32
+        performancePercentage:
+          type: number
+        tenantId:
+          type: integer
+          format: int32
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int32
+    UpcomingCourseActivityResponse:
+      type: object
+      description: Concrete future Event or expanded Session occurrence; raw SessionResponse
+        remains a recurring template
+      properties:
+        courseCode:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        endsAtLocal:
+          type: string
+          format: date-time
+          description: Local occurrence end in timezone
+        endsAtUtc:
+          type: string
+          format: date-time
+          description: UTC occurrence end
+          example: 2026-08-24T18:15:00Z
+        location:
+          type: string
+        source:
+          type: string
+        sourceId:
+          type: integer
+          format: int32
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        startsAtLocal:
+          type: string
+          format: date-time
+          description: Local occurrence start in timezone
+        startsAtUtc:
+          type: string
+          format: date-time
+          description: UTC occurrence start
+          example: 2026-08-24T17:00:00Z
+        timezone:
+          type: string
+          description: IANA timezone
+          example: America/Los_Angeles
+        title:
+          type: string
+        type:
+          type: string
+    UpdateAnnouncementRequest:
+      type: object
+      properties:
+        body:
+          type: string
+        title:
+          type: string
+    UpdateCourseEventRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        expectedVersion:
+          type: integer
+          format: int32
+        location:
+          type: string
+        name:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+    UpdateSessionRequest:
+      type: object
+      properties:
+        dayOfWeek:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        location:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        type:
+          type: string
+        weekId:
+          type: integer
+          format: int32
+    UpdateTaPermissionsRequest:
+      type: object
+      properties:
+        canGrade:
+          type: boolean
+        canManageCourseEvents:
+          type: boolean
+        canManageGroups:
+          type: boolean
+        canPostAnnouncements:
+          type: boolean
+    UpsertCourseStudentReportRequest:
+      type: object
+      properties:
+        expectedVersion:
+          type: integer
+          format: int32
+        improvementSuggestions:
+          type: string
+        overallSummary:
+          type: string
+        reportType:
+          type: string
+        skillEvaluation:
+          type: string
+        strengths:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+        weaknesses:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: "Access token from POST /v1/auth/login (Authorization: Bearer <token>)."
+      name: bearerAuth
+      scheme: bearer
+      type: http

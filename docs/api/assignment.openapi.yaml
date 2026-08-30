@@ -1,0 +1,2339 @@
+openapi: 3.0.1
+info:
+  description: Coursistant LMS REST API contract (OpenAPI 3).
+  title: LMS API
+  version: 1.0.0
+servers:
+- description: Servlet context-path
+  url: /api
+security:
+- bearerAuth: []
+tags:
+- description: Student view of own released/unreleased assignment grades in a course
+  name: MyGrades
+- description: "PDF rubric upload, download, preview, and version restore"
+  name: AssignmentRubrics
+- description: Instructor/TA daily grading; grade release/retract is Instructor-only
+  name: AssignmentGrading
+- description: SYSTEM_ADMIN audited grade corrections (not daily grading)
+  name: SystemGradeCorrections
+- description: "Student staging, submit, and submission file access"
+  name: AssignmentSubmissions
+- description: Current-user cross-course assignment dashboard
+  name: MeAssignments
+- description: "Assignment CRUD, publish lifecycle, and authoritative graded-work\
+    \ attachments"
+  name: Assignments
+paths:
+  /v2/courses/{courseId}/assignment-attachments:
+    get:
+      description: "Returns attachment metadata only. No instructions, points, due\
+        \ dates, grades, submissions, or roster data. Staff and AI ingest see Draft\
+        \ and Published parents; students see Published only. Empty when the course\
+        \ has no attachments."
+      operationId: assignmentAttachmentManifest
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AssignmentAttachmentManifestApiResponse"
+          description: SUCCESS
+      summary: List assignment attachments in a course
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments:
+    get:
+      description: "Instructor/TA see all states including Draft. Students only see\
+        \ Published; drafts are omitted. Student items are grouped OVERDUE, UPCOMING,\
+        \ COMPLETED and include Lecture display, learningType, submission state, and\
+        \ Released grade data only."
+      operationId: assignmentList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List assignments in a course
+      tags:
+      - Assignments
+    post:
+      description: "Instructor only. dueAt/lateUntil are course-local wall-clock times\
+        \ without Z, UTC offset, or fractional seconds. A same-course weekId (Lecture)\
+        \ and learningType are required. Group assignments require submissionType=Group\
+        \ and groupSetId."
+      operationId: assignmentCreate
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateAssignmentRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "PARAM_MISSING, BAD_REQUEST, INVALID_LOCAL_TIME, ASSIGNMENT_FILE_CONSTRAINT_INVALID"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: WEEK_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_GROUP_SET_REQUIRED
+      summary: Create an assignment
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/summaries:
+    get:
+      description: "Any course member. Students only see Published and receive Lecture\
+        \ display, learningType, submissionStatus, studentListGroup, and Released\
+        \ score/feedback only."
+      operationId: assignmentListSummaries
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List slim assignment summary cards
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/{assignmentId}:
+    delete:
+      description: Instructor only. May fail when submissions already exist.
+      operationId: assignmentDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_HAS_SUBMISSIONS
+      summary: Delete an assignment
+      tags:
+      - Assignments
+    get:
+      description: Instructor/TA may open Draft. Students receive ASSIGNMENT_NOT_FOUND
+        for non-Published assignments. Staff get roster/grading counters; students
+        get submission/grade view fields.
+      operationId: assignmentGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND (including student access to Draft) or
+            COURSE_NOT_FOUND
+      summary: Get assignment detail
+      tags:
+      - Assignments
+    patch:
+      description: "Instructor only. Partial update; only non-null fields apply. Requires\
+        \ expectedVersion. dueAt/lateUntil are course-local wall-clock times without\
+        \ Z, UTC offset, or fractional seconds. Shortening due date may require confirmShortenDueDate=true."
+      operationId: assignmentPatch
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request;
+          also stored on the assignment audit row
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - description: Optional caller-declared audit marker. This does not replace
+          the authenticated instructor identity.
+        in: header
+        name: X-Write-Origin
+        schema:
+          type: string
+          example: ai-assistant
+          maxLength: 64
+          pattern: "^[A-Za-z0-9._-]+$"
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchAssignmentRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "PARAM_MISSING, BAD_REQUEST, INVALID_LOCAL_TIME, IDEMPOTENCY_KEY_REQUIRED"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or WEEK_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_TYPE_LOCKED, ASSIGNMENT_GROUP_SET_REQUIRED, ASSIGNMENT_DUE_SHORTEN_CONFIRM_REQUIRED,\
+            \ ASSIGNMENT_HAS_SUBMISSIONS, ASSIGNMENT_VERSION_CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
+      summary: Patch an assignment
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/{assignmentId}/attachments:
+    post:
+      description: Instructor only. Multipart part `files` (array of binary files).
+        All files required for submission or grading must use Assignment Attachments;
+        Week Materials are general course resources and are not an authoritative representation
+        of graded work.
+      operationId: assignmentUploadAttachments
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: files
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: binary
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "UNSUPPORTED_FILE_TYPE, FILE_TOO_LARGE, PARAM_MISSING"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+      summary: Upload instructor attachments
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/{assignmentId}/attachments/{attachmentId}:
+    delete:
+      description: Instructor only.
+      operationId: assignmentDeleteAttachment
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attachmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or attachment NOT_FOUND
+      summary: Delete an instructor attachment
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/{assignmentId}/attachments/{attachmentId}/download:
+    get:
+      description: Course members with assignment visibility. Returns raw bytes (not
+        JSON ApiResponse). Students cannot download attachments on Draft assignments
+        (ASSIGNMENT_NOT_FOUND).
+      operationId: assignmentDownloadAttachment
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attachmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+          description: Attachment bytes
+          headers:
+            Content-Disposition:
+              description: attachment; filename="..."; filename*=UTF-8''...
+              schema:
+                type: string
+                example: attachment; filename="brief.pdf"; filename*=UTF-8''brief.pdf
+              style: simple
+            Content-Type:
+              description: "Stored content type, or application/octet-stream when\
+                \ unknown"
+              schema:
+                type: string
+                example: application/pdf
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or attachment NOT_FOUND
+      summary: Download an assignment attachment
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/{assignmentId}/attachments/{attachmentId}/preview:
+    get:
+      description: "Course members with assignment visibility. Returns raw bytes with\
+        \ Content-Disposition: inline for PDF and images. Students cannot preview\
+        \ attachments on Draft assignments (ASSIGNMENT_NOT_FOUND). Non-previewable\
+        \ types return UNSUPPORTED_FILE_TYPE — use download."
+      operationId: assignmentPreviewAttachment
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attachmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+          description: Attachment bytes for inline preview
+          headers:
+            Content-Disposition:
+              description: inline; filename="..."; filename*=UTF-8''...
+              schema:
+                type: string
+                example: inline; filename="brief.pdf"; filename*=UTF-8''brief.pdf
+              style: simple
+            Content-Type:
+              description: "Stored content type, or application/octet-stream when\
+                \ unknown"
+              schema:
+                type: string
+                example: application/pdf
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: UNSUPPORTED_FILE_TYPE when the attachment is not PDF or image
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or attachment NOT_FOUND
+      summary: Preview an assignment attachment inline
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/{assignmentId}/due-date-change-preview:
+    post:
+      description: "Instructor-only dry-run. Writes nothing; reports who would become\
+        \ late / need confirmation. dueAt/lateUntil are course-local wall-clock times\
+        \ without Z, UTC offset, or fractional seconds."
+      operationId: assignmentPreviewDueDateChange
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DueDateChangePreviewRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DueDateChangePreviewApiResponse"
+          description: SUCCESS
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "PARAM_MISSING, BAD_REQUEST, INVALID_LOCAL_TIME"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+      summary: Preview due-date change impact
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/{assignmentId}/grades/release:
+    post:
+      description: Instructor only. Provide studentUserIds and/or groupIds. Skips
+        students not in Entered state.
+      operationId: assignmentReleaseGrades
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GradeStudentSelectionRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: PARAM_MISSING when selection is empty/invalid
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_NOT_FOUND, GRADE_NOT_FOUND"
+      summary: Release selected grades
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/grades/release-all:
+    post:
+      description: Instructor only. Makes Entered grades visible to students. Idempotent.
+      operationId: assignmentReleaseAllGrades
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+      summary: Release all entered grades
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/grades/retract:
+    post:
+      description: Instructor only. Pulls Released grades back to Entered without
+        notifying students. Provide studentUserIds and/or groupIds.
+      operationId: assignmentRetractGrades
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GradeStudentSelectionRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: PARAM_MISSING when selection is empty/invalid
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_NOT_FOUND, GRADE_NOT_FOUND"
+      summary: Retract selected grades
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/grading-roster:
+    get:
+      description: Instructor/TA with grade permission. Students and system admins
+        cannot use daily grading APIs.
+      operationId: assignmentGetGradingRoster
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED or FORBIDDEN (admins cannot perform daily grading)
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+      summary: Get grading roster
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/groups/{groupId}/grade:
+    put:
+      description: Instructor/TA. score is required. Applies to the group submission
+        target.
+      operationId: assignmentUpsertGroupGrade
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertGradeRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "PARAM_MISSING, GRADE_SCORE_OUT_OF_RANGE, BAD_REQUEST"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+      summary: Upsert a group grade
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/groups/{groupId}/grade/annotated-file:
+    get:
+      description: "Instructor/TA. Returns raw bytes with Content-Disposition: attachment."
+      operationId: assignmentDownloadGroupAnnotatedFile
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: Annotated file bytes
+          headers:
+            Content-Disposition:
+              description: attachment; filename="..."; filename*=UTF-8''...
+              schema:
+                type: string
+              style: simple
+            Content-Type:
+              description: Stored content type or application/octet-stream
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_NOT_FOUND, GRADE_NOT_FOUND, or annotated file NOT_FOUND"
+      summary: Download annotated file for a group grade
+      tags:
+      - AssignmentGrading
+    post:
+      description: Instructor/TA. Multipart part name must be `file`.
+      operationId: assignmentUploadGroupAnnotatedFile
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+              - file
+        required: true
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_NOT_FOUND, GRADE_NOT_FOUND"
+      summary: Upload annotated file for a group grade
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/groups/{groupId}/grading:
+    get:
+      description: Instructor/TA. Group assignment grading view for one group.
+      operationId: assignmentGetGroupGradingView
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: groupId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get grading view for a group
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/publish:
+    post:
+      description: "Instructor only. Requires a valid same-course weekId (Lecture)\
+        \ and learningType, then makes the assignment visible to students. Published\
+        \ assignments remain patchable."
+      operationId: assignmentPublish
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: PARAM_MISSING or BAD_REQUEST
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or WEEK_NOT_FOUND
+      summary: Publish an assignment
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/assignments/{assignmentId}/rubric:
+    get:
+      description: Course members with assignment visibility. Students only see Published
+        assignment rubrics; posted=false when no rubric has been uploaded.
+      operationId: assignmentGetRubric
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or RUBRIC_NOT_FOUND
+      summary: Get current rubric pointer
+      tags:
+      - AssignmentRubrics
+    post:
+      description: "Instructor only. Multipart parts: required `file` (PDF), optional\
+        \ `confirmReplaceAfterGrading` when replacing after grading has started."
+      operationId: assignmentUploadRubric
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: confirmReplaceAfterGrading
+        required: false
+        schema:
+          type: boolean
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                confirmReplaceAfterGrading:
+                  type: boolean
+                  description: Required true when grades already exist against a previous
+                    rubric
+                file:
+                  type: string
+                  format: binary
+                  description: PDF rubric file
+              required:
+              - file
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "UNSUPPORTED_FILE_TYPE (non-PDF), FILE_TOO_LARGE"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: RUBRIC_REPLACE_CONFIRM_REQUIRED
+      summary: Upload a PDF rubric
+      tags:
+      - AssignmentRubrics
+  /v2/courses/{courseId}/assignments/{assignmentId}/rubric/download:
+    get:
+      description: "Course members with assignment visibility. Returns PDF bytes with\
+        \ Content-Disposition: attachment. Students cannot access Draft assignment\
+        \ rubrics."
+      operationId: assignmentDownloadRubric
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: Rubric PDF bytes
+          headers:
+            Content-Disposition:
+              description: attachment; filename="..."; filename*=UTF-8''...
+              schema:
+                type: string
+                example: attachment; filename="rubric.pdf"; filename*=UTF-8''rubric.pdf
+              style: simple
+            Content-Type:
+              description: Typically application/pdf
+              schema:
+                type: string
+                example: application/pdf
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or RUBRIC_NOT_FOUND
+      summary: Download current rubric PDF
+      tags:
+      - AssignmentRubrics
+  /v2/courses/{courseId}/assignments/{assignmentId}/rubric/preview:
+    get:
+      description: "Course members with assignment visibility. Returns PDF bytes with\
+        \ Content-Disposition: inline. Students cannot access Draft assignment rubrics."
+      operationId: assignmentPreviewRubric
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: Rubric PDF bytes for inline preview
+          headers:
+            Content-Disposition:
+              description: inline; filename="..."; filename*=UTF-8''...
+              schema:
+                type: string
+                example: inline; filename="rubric.pdf"; filename*=UTF-8''rubric.pdf
+              style: simple
+            Content-Type:
+              description: Typically application/pdf
+              schema:
+                type: string
+                example: application/pdf
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or RUBRIC_NOT_FOUND
+      summary: Preview current rubric PDF inline
+      tags:
+      - AssignmentRubrics
+  /v2/courses/{courseId}/assignments/{assignmentId}/rubric/restore-previous:
+    post:
+      description: Instructor only. Rolls the current pointer back one version. May
+        require confirmReplaceAfterGrading when grading already occurred against the
+        current rubric.
+      operationId: assignmentRestorePreviousRubric
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: confirmReplaceAfterGrading
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_NOT_FOUND, RUBRIC_NOT_FOUND, RUBRIC_NO_PREVIOUS_VERSION"
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: RUBRIC_REPLACE_CONFIRM_REQUIRED
+      summary: Restore previous rubric version
+      tags:
+      - AssignmentRubrics
+  /v2/courses/{courseId}/assignments/{assignmentId}/students/{studentUserId}/grade:
+    put:
+      description: Instructor/TA. score is required. Students never see Entered scores
+        until released.
+      operationId: assignmentUpsertGrade
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpsertGradeRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "PARAM_MISSING, GRADE_SCORE_OUT_OF_RANGE"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_NOT_FOUND, NOT_IN_GRADING_ROSTER"
+      summary: Upsert a student grade
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/students/{studentUserId}/grade/annotated-file:
+    get:
+      description: "Instructor/TA. Returns raw bytes with Content-Disposition: attachment."
+      operationId: assignmentDownloadAnnotatedFile
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: Annotated file bytes
+          headers:
+            Content-Disposition:
+              description: attachment; filename="..."; filename*=UTF-8''...
+              schema:
+                type: string
+              style: simple
+            Content-Type:
+              description: Stored content type or application/octet-stream
+              schema:
+                type: string
+              style: simple
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_NOT_FOUND, GRADE_NOT_FOUND, or annotated file NOT_FOUND"
+      summary: Download annotated file for a student grade
+      tags:
+      - AssignmentGrading
+    post:
+      description: Instructor/TA. Multipart part name must be `file`.
+      operationId: assignmentUploadAnnotatedFile
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+              required:
+              - file
+        required: true
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ASSIGNMENT_NOT_FOUND, GRADE_NOT_FOUND"
+      summary: Upload annotated feedback file for a student
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/students/{studentUserId}/grading:
+    get:
+      description: "Instructor/TA. Includes submission history, rubric, and current\
+        \ grade (if any)."
+      operationId: assignmentGetStudentGradingView
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: studentUserId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get grading view for a student
+      tags:
+      - AssignmentGrading
+  /v2/courses/{courseId}/assignments/{assignmentId}/submission:
+    get:
+      description: "Student sees own submission; instructor/TA with grade permission\
+        \ may also read. Includes current version, staging files, and window flags."
+      operationId: assignmentGetMySubmission
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+      summary: Get my submission state
+      tags:
+      - AssignmentSubmissions
+  /v2/courses/{courseId}/assignments/{assignmentId}/submission-staging-files:
+    get:
+      description: Student only. Lists files staged but not yet submitted.
+      operationId: assignmentListStagingFiles
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List my staging files
+      tags:
+      - AssignmentSubmissions
+    post:
+      description: "Student only. Multipart parts: `files` (preferred, array) and/or\
+        \ single `file`. Uploading does not hand in — call POST /submissions afterward."
+      operationId: assignmentUploadStagingFiles
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: files
+        required: false
+        schema:
+          type: array
+          items:
+            type: string
+            format: binary
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Single-file fallback when `files` is omitted
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "PARAM_MISSING, SUBMISSION_FILE_COUNT_EXCEEDED, UNSUPPORTED_FILE_TYPE,\
+            \ FILE_TOO_LARGE"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ACCESS_DENIED (non-student), SUBMISSION_FROZEN"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "SUBMISSION_WINDOW_CLOSED, ASSIGNMENT_GROUP_SET_REQUIRED"
+      summary: Upload staging files (not yet submitted)
+      tags:
+      - AssignmentSubmissions
+  /v2/courses/{courseId}/assignments/{assignmentId}/submission-staging-files/{stagingFileId}:
+    delete:
+      description: Student only. Removes one staged upload before submit.
+      operationId: assignmentDeleteStagingFile
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: stagingFileId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or STAGING_FILE_INVALID / NOT_FOUND
+      summary: Delete a staging file
+      tags:
+      - AssignmentSubmissions
+  /v2/courses/{courseId}/assignments/{assignmentId}/submissions:
+    post:
+      description: Student only. Consumes staging files (all active ones when stagingFileIds
+        omitted) into an immutable submission version. Idempotent.
+      operationId: assignmentSubmit
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SubmitAssignmentRequest"
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "STAGING_FILE_INVALID, SUBMISSION_FILE_COUNT_EXCEEDED"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "ACCESS_DENIED, SUBMISSION_FROZEN"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "SUBMISSION_WINDOW_CLOSED, ASSIGNMENT_GROUP_SET_REQUIRED, NO_GROUP_MEMBERSHIP"
+      summary: Submit staged files as a new version
+      tags:
+      - AssignmentSubmissions
+  /v2/courses/{courseId}/assignments/{assignmentId}/submissions/{submissionId}/files/{fileId}/download:
+    get:
+      description: "Owner student or grading staff. Returns raw bytes with Content-Disposition:\
+        \ attachment."
+      operationId: assignmentDownloadSubmissionFile
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: submissionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: fileId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+          description: Submission file bytes
+          headers:
+            Content-Disposition:
+              description: attachment; filename="..."; filename*=UTF-8''...
+              schema:
+                type: string
+                example: attachment; filename="essay.pdf"; filename*=UTF-8''essay.pdf
+              style: simple
+            Content-Type:
+              description: Stored content type or application/octet-stream
+              schema:
+                type: string
+              style: simple
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or file NOT_FOUND
+      summary: Download a submission file
+      tags:
+      - AssignmentSubmissions
+  /v2/courses/{courseId}/assignments/{assignmentId}/submissions/{submissionId}/files/{fileId}/preview:
+    get:
+      description: "Owner student or grading staff. Returns raw bytes with Content-Disposition:\
+        \ inline (for browser preview when content type is previewable)."
+      operationId: assignmentPreviewSubmissionFile
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: submissionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: fileId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+            image/png:
+              schema:
+                type: string
+                format: binary
+          description: Submission file bytes for inline preview
+          headers:
+            Content-Disposition:
+              description: inline; filename="..."; filename*=UTF-8''...
+              schema:
+                type: string
+                example: inline; filename="essay.pdf"; filename*=UTF-8''essay.pdf
+              style: simple
+            Content-Type:
+              description: Stored content type or application/octet-stream
+              schema:
+                type: string
+              style: simple
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: UNSUPPORTED_FILE_TYPE when the file is not previewable
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or file NOT_FOUND
+      summary: Preview a submission file inline
+      tags:
+      - AssignmentSubmissions
+  /v2/courses/{courseId}/assignments/{assignmentId}/submissions/{submissionId}/versions:
+    get:
+      description: Owner student or instructor/TA with grade access. Others receive
+        ACCESS_DENIED.
+      operationId: assignmentListSubmissionVersions
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: submissionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND or submission NOT_FOUND
+      summary: List submission versions
+      tags:
+      - AssignmentSubmissions
+  /v2/courses/{courseId}/assignments/{assignmentId}/unpublish:
+    post:
+      description: Instructor only. Returns the assignment to Draft; students then
+        see ASSIGNMENT_NOT_FOUND.
+      operationId: assignmentUnpublish
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: assignmentId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ASSIGNMENT_NOT_FOUND
+      summary: Unpublish an assignment
+      tags:
+      - Assignments
+  /v2/courses/{courseId}/my-grades:
+    get:
+      description: "Student only. Score, feedback, and annotated file appear only\
+        \ when grade status is Released; otherwise released=false and score fields\
+        \ are omitted."
+      operationId: assignmentListMyGrades
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List my grades for a course
+      tags:
+      - MyGrades
+  /v2/me/assignments/upcoming:
+    get:
+      description: Authenticated user. Returns published assignments due within the
+        window across enrolled courses.
+      operationId: meAssignmentUpcoming
+      parameters:
+      - description: Look-ahead window in days; server default applies when omitted
+        in: query
+        name: days
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List upcoming assignment deadlines
+      tags:
+      - MeAssignments
+  /v2/system/grade-corrections/assignments:
+    post:
+      description: SYSTEM_ADMIN only. Updates an existing grade score and writes a
+        correction audit row. Not for Instructor/TA daily grading.
+      operationId: systemGradeCorrectionCreate
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SystemGradeCorrectionRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "PARAM_MISSING when assignmentId, studentUserId, score, or\
+            \ reason is missing"
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: NOT_FOUND when assignment or grade row does not exist
+      summary: Correct an assignment grade (system admin)
+      tags:
+      - SystemGradeCorrections
+components:
+  schemas:
+    ApiErrorResponse:
+      type: object
+      description: Error envelope rendered by ApiExceptionHandler (data is explicitly
+        null unless structured error details are supplied).
+      properties:
+        code:
+          type: string
+          description: Stable ErrorType.name()
+          example: USER_NOT_FOUND
+        data:
+          type: object
+          nullable: true
+        message:
+          type: string
+          example: User Does Not Exist
+        status:
+          type: integer
+          format: int32
+          example: 404
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-07-23T10:00:00Z
+      required:
+      - code
+      - data
+      - message
+      - status
+      - timestamp
+    ApiResponse:
+      type: object
+      description: Unified JSON envelope for LMS APIs
+      properties:
+        code:
+          type: string
+          description: Stable machine code (ErrorType.name() or SUCCESS)
+          example: SUCCESS
+        data:
+          type: array
+          description: Payload; explicitly null when no payload is available
+          items:
+            $ref: "#/components/schemas/UpcomingAssignmentDeadlineResponse"
+          nullable: true
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-07-23T10:00:00Z
+    AssignmentAttachmentManifestApiResponse:
+      type: object
+      description: Success envelope wrapping assignment attachment manifest items
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/AssignmentAttachmentManifestItem"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 response timestamp
+          example: 2026-08-24T18:00:00Z
+    AssignmentAttachmentManifestItem:
+      type: object
+      properties:
+        assignmentId:
+          type: integer
+          format: int32
+        assignmentState:
+          type: string
+        attachmentId:
+          type: integer
+          format: int32
+        contentType:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        originalName:
+          type: string
+        sizeBytes:
+          type: integer
+          format: int64
+    CreateAssignmentRequest:
+      type: object
+      description: Create assignment payload
+      properties:
+        allowedFileTypes:
+          type: array
+          description: Allowed file extensions/types
+          example:
+          - pdf
+          - docx
+          items:
+            type: string
+            description: Allowed file extensions/types
+            example: "[\"pdf\",\"docx\"]"
+        description:
+          type: string
+          description: Rich-text or plain description
+          example: Submit your lab write-up as PDF.
+        dueAt:
+          type: string
+          description: "Course-local due datetime without Z, UTC offset, or fractional\
+            \ seconds"
+          example: 2026-09-15T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        groupSetId:
+          type: integer
+          format: int32
+          description: Required when submissionType=Group
+          example: 7
+        lateUntil:
+          type: string
+          description: "Course-local late window end without Z, UTC offset, or fractional\
+            \ seconds; omit for no late window"
+          example: 2026-09-16T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        learningType:
+          type: string
+          description: Assignment learning category
+          enum:
+          - PRE_CLASS
+          - HOMEWORK
+          - PRACTICE
+          example: HOMEWORK
+        maxFileCount:
+          type: integer
+          format: int32
+          description: Max number of files per submission
+          example: 3
+        maxFileSizeBytes:
+          type: integer
+          format: int64
+          description: Max size per file in bytes
+          example: 10485760
+        pointsPossible:
+          type: number
+          description: Maximum points
+          example: 100
+        submissionType:
+          type: string
+          description: Individual or Group
+          enum:
+          - Individual
+          - Group
+          example: Individual
+        title:
+          type: string
+          description: Assignment title
+          example: Week 3 Lab Report
+        weekId:
+          type: integer
+          format: int32
+          description: Required same-course CourseWeek id represented as the Lecture
+            reference
+      required:
+      - dueAt
+      - learningType
+      - title
+      - weekId
+    DueDateChangePreviewApiResponse:
+      type: object
+      description: Success envelope wrapping an Assignment due-date change preview
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/DueDateChangePreviewResponse"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 response timestamp
+          example: 2026-08-24T18:00:00Z
+    DueDateChangePreviewRequest:
+      type: object
+      description: Dry-run due date change preview
+      properties:
+        clearLateUntil:
+          type: boolean
+          description: "When true, preview clearing the late window"
+          example: false
+        dueAt:
+          type: string
+          description: "Proposed course-local due datetime without Z, UTC offset,\
+            \ or fractional seconds"
+          example: 2026-09-20T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        lateUntil:
+          type: string
+          description: "Proposed course-local late-until datetime without Z, UTC offset,\
+            \ or fractional seconds"
+          example: 2026-09-21T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+    DueDateChangePreviewResponse:
+      type: object
+      description: Impact summary for a proposed due date change
+      properties:
+        activeStudentCount:
+          type: integer
+          format: int32
+        confirmationRequired:
+          type: boolean
+        currentDueAt:
+          type: string
+          description: Current due datetime in the course timezone; no Z or UTC offset
+          example: 2026-09-20T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        currentLateUntil:
+          type: string
+          description: Current late-until datetime in the course timezone; no Z or
+            UTC offset
+          example: 2026-09-21T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        gradedCount:
+          type: integer
+          format: int32
+        newDueAt:
+          type: string
+          description: Proposed due datetime in the course timezone; no Z or UTC offset
+          example: 2026-09-22T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        newLateUntil:
+          type: string
+          description: Proposed late-until datetime in the course timezone; no Z or
+            UTC offset
+          example: 2026-09-23T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        notSubmittedCount:
+          type: integer
+          format: int32
+        shortening:
+          type: boolean
+        submissionsBecomingLateCount:
+          type: integer
+          format: int32
+        submittedCount:
+          type: integer
+          format: int32
+        timezone:
+          type: string
+          description: IANA timezone used for all current/new date-time fields
+          example: America/Los_Angeles
+    GradeStudentSelectionRequest:
+      type: object
+      description: Select students and/or groups for grade release/retract
+      properties:
+        groupIds:
+          type: array
+          description: "Group ids (group assignments); when non-empty, group path\
+            \ is used"
+          example:
+          - 11
+          items:
+            type: integer
+            format: int32
+            description: "Group ids (group assignments); when non-empty, group path\
+              \ is used"
+        studentUserIds:
+          type: array
+          description: Student user ids to release/retract
+          example:
+          - 385
+          - 386
+          items:
+            type: integer
+            format: int32
+            description: Student user ids to release/retract
+    PatchAssignmentRequest:
+      type: object
+      description: Partial assignment update; null fields are ignored
+      properties:
+        allowedFileTypes:
+          type: array
+          description: Allowed file extensions/types
+          example:
+          - pdf
+          items:
+            type: string
+            description: Allowed file extensions/types
+            example: "[\"pdf\"]"
+        clearLateUntil:
+          type: boolean
+          description: "When true, clears lateUntil regardless of lateUntil field"
+          example: false
+        confirmShortenDueDate:
+          type: boolean
+          description: Must be true when shortening due date would affect students
+          example: true
+        description:
+          type: string
+          description: New description
+        dueAt:
+          type: string
+          description: "New course-local due datetime without Z, UTC offset, or fractional\
+            \ seconds"
+          example: 2026-09-20T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        expectedVersion:
+          type: integer
+          format: int32
+          description: Required optimistic concurrency token from the last read response
+          example: 1
+        groupSetId:
+          type: integer
+          format: int32
+          description: Group set id when submissionType=Group
+          example: 7
+        lateUntil:
+          type: string
+          description: "New course-local late-until datetime without Z, UTC offset,\
+            \ or fractional seconds; use clearLateUntil to remove"
+          example: 2026-09-21T23:59:00
+          pattern: "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}(?::\\d{2})?$"
+        learningType:
+          type: string
+          description: Assignment learning category; ignored when null
+          enum:
+          - PRE_CLASS
+          - HOMEWORK
+          - PRACTICE
+          example: HOMEWORK
+        maxFileCount:
+          type: integer
+          format: int32
+          description: Max number of files per submission
+          example: 3
+        maxFileSizeBytes:
+          type: integer
+          format: int64
+          description: Max size per file in bytes
+          example: 10485760
+        pointsPossible:
+          type: number
+          description: New points possible
+          example: 100
+        submissionType:
+          type: string
+          description: Individual or Group; may be locked after submissions
+          enum:
+          - Individual
+          - Group
+          example: Individual
+        title:
+          type: string
+          description: New title
+          example: Week 3 Lab Report (Revised)
+        weekId:
+          type: integer
+          format: int32
+          description: Optional same-course week/lecture id; ignored when null
+      required:
+      - expectedVersion
+    SubmitAssignmentRequest:
+      type: object
+      description: Submit staged files; omit stagingFileIds to consume all active
+        staging files
+      properties:
+        stagingFileIds:
+          type: array
+          description: Staging file ids to include; omit to submit all active staging
+            files
+          example:
+          - 101
+          - 102
+          items:
+            type: integer
+            format: int32
+            description: Staging file ids to include; omit to submit all active staging
+              files
+    SystemGradeCorrectionRequest:
+      type: object
+      description: SYSTEM_ADMIN grade correction payload
+      properties:
+        assignmentId:
+          type: integer
+          format: int32
+          description: Assignment id
+          example: 12
+        reason:
+          type: string
+          description: "Audit reason (required, non-blank)"
+          example: Regrade after appeal
+        score:
+          type: number
+          description: Corrected score
+          example: 88.5
+        studentUserId:
+          type: integer
+          format: int32
+          description: Student user id whose grade is corrected
+          example: 385
+      required:
+      - assignmentId
+      - reason
+      - score
+      - studentUserId
+    UpcomingAssignmentDeadlineResponse:
+      type: object
+      description: Upcoming deadline card across enrolled courses
+      nullable: true
+      properties:
+        assignmentId:
+          type: integer
+          format: int32
+        courseCode:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        dueAtLocal:
+          type: string
+          format: date-time
+        dueAtUtc:
+          type: string
+          format: date-time
+        submissionStatus:
+          type: string
+        timezone:
+          type: string
+        title:
+          type: string
+    UpsertGradeRequest:
+      type: object
+      description: Create or update a grade; score is always required
+      properties:
+        aiAssisted:
+          type: boolean
+          description: Whether AI assistance was used
+          example: false
+        aiProvenanceJson:
+          type: string
+          description: Opaque AI provenance JSON when aiAssisted is true
+        feedbackHtml:
+          type: string
+          description: HTML feedback for the student (visible after release)
+          example: <p>Solid work.</p>
+        rubricVersionId:
+          type: integer
+          format: int32
+          description: Rubric version used while grading
+          example: 2
+        score:
+          type: number
+          description: Numeric score (required; never null for Ungraded — omit the
+            grade row instead)
+          example: 92.5
+        submissionVersionId:
+          type: integer
+          format: int32
+          description: Submission version this grade applies to
+          example: 3
+      required:
+      - score
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: "Access token from POST /v1/auth/login (Authorization: Bearer <token>)."
+      name: bearerAuth
+      scheme: bearer
+      type: http

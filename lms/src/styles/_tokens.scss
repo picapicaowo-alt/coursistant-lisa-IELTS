@@ -15,6 +15,18 @@ $card-bg: #FFFFFF; // Widgets, course cards, modals
 $subcard-bg: #F5F6FA; // Inner blocks, disabled inputs, dashed placeholders
 $brand: #4F46E5; // Publish/Create/Send buttons, active sidebar, selected date, links
 $brand-subtle: #E7E5FD; // Active sidebar item background
+$exam-navy-deep: #1F3350; // Candidate workspace chrome and mock-exam mastheads
+$exam-navy: #2F4A6E;
+$exam-navy-mid: #3D5A7A;
+$exam-accent-soft: #E8EEF6;
+$exam-canvas-top: #E4EBF4;
+$exam-card-wash: #F4F7FB;
+$exam-line: #D8DEE8;
+$exam-index: rgba(#FFFFFF, .34);
+$exam-label: rgba(#FFFFFF, .72);
+$exam-pill-border: rgba(#FFFFFF, .24);
+$exam-pill-bg: rgba(#FFFFFF, .1);
+$exam-link-shadow: rgba(#152033, .1);
 $text: #141A2B; // Headings, values
 $text-muted: #69728A; // Labels, descriptions
 $text-placeholder: #A3AAB8; // "Name your Course", "Enter the name of the course"

@@ -9,6 +9,9 @@ export const isAdvisorLevel = (level: UserLevel | null | undefined): boolean =>
 export const isStudentLevel = (level: UserLevel | null | undefined): boolean =>
   level === 'STUDENT';
 
+export const isParentLevel = (level: UserLevel | null | undefined): boolean =>
+  level === 'PARENT';
+
 export const isTenantAdminRole = (role: LoginAccountType): boolean =>
   role === 'TENANT_ADMIN';
 
@@ -22,5 +25,6 @@ export const getSignedInHomePath = (user: Pick<LoginResponse, 'role' | 'level'>)
   if (user.role !== 'USER') return '/course';
   if (isCounsellorLevel(user.level)) return '/counsellor';
   if (isAdvisorLevel(user.level)) return '/advisor/students';
+  if (isParentLevel(user.level)) return '/parent';
   return '/';
 };

@@ -14,6 +14,7 @@ export type UserLevel =
   | 'INSTRUCTOR'
   | 'COUNSELLOR'
   | 'ADVISOR'
+  | 'PARENT'
   | 'INSTRUCTOR_ADVISOR'
   | 'NOT_APPLICABLE';
 
@@ -22,6 +23,7 @@ export const USER_LEVELS: UserLevel[] = [
   'INSTRUCTOR',
   'COUNSELLOR',
   'ADVISOR',
+  'PARENT',
   'INSTRUCTOR_ADVISOR',
   'NOT_APPLICABLE',
 ];
@@ -31,6 +33,7 @@ export const MANAGED_USER_LEVELS: Exclude<UserLevel, 'NOT_APPLICABLE'>[] = [
   'INSTRUCTOR',
   'COUNSELLOR',
   'ADVISOR',
+  'PARENT',
   'INSTRUCTOR_ADVISOR',
 ];
 

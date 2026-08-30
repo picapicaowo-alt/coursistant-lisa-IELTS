@@ -27,6 +27,16 @@ describe('AssignmentApiService 8081 routes', () => {
     expect(client.get).toHaveBeenCalledWith('/v2/courses/4/assignments/9');
   });
 
+  it('loads the full assignment collection and attachment manifest', async () => {
+    client.get.mockResolvedValue({status: 200, data: []});
+
+    await service.listAssignments(4);
+    await service.listAssignmentAttachmentManifest(4);
+
+    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/courses/4/assignments');
+    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/courses/4/assignment-attachments');
+  });
+
   it('loads the current student released-grade feed for dashboard averages', async () => {
     client.get.mockResolvedValue({status: 200, data: []});
     await service.listMyGrades(4);

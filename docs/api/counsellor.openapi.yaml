@@ -42,7 +42,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "409":
-          description: "USER_ALREADY_EXISTS, ADVISING_FEATURE_DISABLED, IDEMPOTENCY_KEY_MISMATCH"
+          description: "USER_ALREADY_EXISTS, IDEMPOTENCY_KEY_MISMATCH"
     get:
       operationId: counsellorListStudentIntakes
       tags: [CounsellorIntakes]
@@ -108,7 +108,7 @@ paths:
         "404":
           description: STUDENT_INTAKE_NOT_FOUND
         "409":
-          description: "STUDENT_INTAKE_VERSION_CONFLICT, ADVISING_FEATURE_DISABLED, IDEMPOTENCY_KEY_MISMATCH"
+          description: "STUDENT_INTAKE_VERSION_CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
   /v2/counsellor/advisors:
     get:
       operationId: counsellorListAdvisors
@@ -157,14 +157,14 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
-          description: STUDENT_INTAKE_NOT_FOUND
+          description: "STUDENT_INTAKE_NOT_FOUND, NOT_FOUND"
         "409":
-          description: "ADVISOR_NOT_ELIGIBLE, STUDENT_ALREADY_ASSIGNED, STUDENT_INTAKE_VERSION_CONFLICT, ADVISING_FEATURE_DISABLED, IDEMPOTENCY_KEY_MISMATCH"
+          description: "STUDENT_NOT_ELIGIBLE, ADVISOR_NOT_ELIGIBLE, STUDENT_ALREADY_ASSIGNED, STUDENT_INTAKE_VERSION_CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
   /v2/counsellor/dashboard:
     get:
       operationId: counsellorGetDashboard
       tags: [CounsellorIntakes]
-      description: Read-only counsellor aggregates. Available even when intake-assignment-writes-enabled is false.
+      description: Read-only counsellor aggregates.
       responses:
         "200":
           description: "HTTP 200. ApiResponse.status=200. ApiResponse.code=SUCCESS."
@@ -232,7 +232,7 @@ components:
         expectedIntakeVersion: { type: integer }
     StudentIntakeResponse:
       type: object
-      required: [intakeId, studentUserId, lifecycleStatus, assignmentStatus, intakeVersion]
+      required: [intakeId, studentUserId, lifecycleStatus, assignmentStatus, intakeVersion, activationMethod]
       properties:
         intakeId: { type: integer, format: int64 }
         studentUserId: { type: integer }

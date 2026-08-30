@@ -7,6 +7,7 @@ import {isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {ParentLinksPanel} from '@/components/ParentLinksPanel';
 
 const TenantStudentRecordPage: React.FC = () => {
   const {studentUserId} = useParams();
@@ -104,6 +105,7 @@ const TenantStudentRecordPage: React.FC = () => {
           ) : null}
         </section>
       ) : null}
+      <ParentLinksPanel scope="tenant" subjectId={id}/>
     </main>
   );
 };

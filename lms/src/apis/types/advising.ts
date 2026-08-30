@@ -1,7 +1,4 @@
-/**
- * Advising contracts from docs/api/advising.openapi.yaml (Gates A and B).
- * Gate C course orchestration types stay out until Promotion C is authorized.
- */
+/** Advising contracts from docs/api/advising.openapi.yaml. */
 
 export type StudentType = 'VIP' | 'STANDARD';
 export type IntakeLifecycleStatus = 'OPEN' | 'CANCELLED';
@@ -88,6 +85,11 @@ export interface AdvisorStudentSummaryResponse {
   email: string;
   studentType: StudentType;
   assignmentVersion: number;
+  targetGoal?: string;
+  riskStatus?: string;
+  riskReasons?: string[];
+  lastActivityAt?: string;
+  highestPriority?: string;
 }
 
 export interface TenantIntakeListParams {
@@ -221,6 +223,24 @@ export interface AdvisorTaskResponse {
   dueDate?: string;
   submissionRequirement?: string;
   position?: number;
+  status?: string;
+  startedAt?: string;
+  completedAt?: string;
+  submissionText?: string;
+  submissionFileObjectKey?: string;
+  advisorFeedback?: string;
+  version?: number;
+}
+
+export interface CompleteAdvisorTaskRequest {
+  expectedVersion?: number;
+  submissionText?: string;
+  fileObjectKey?: string;
+}
+
+export interface AdvisorTaskFeedbackRequest {
+  expectedVersion?: number;
+  feedback?: string;
 }
 
 export interface CheckpointResponse {
@@ -265,6 +285,206 @@ export interface StudyPlanRevisionResponse {
   createdAt?: string;
   actorId?: number;
 }
+
+export interface LaunchTransitionRequest {
+  expectedCourseLaunchVersion?: number;
+}
+
+export interface ReconfirmCourseLinkRequest {
+  expectedCourseLinkVersion?: number;
+  expectedStudyPlanVersion?: number;
+}
+
+export interface CourseReadinessBlocker {
+  code?: string;
+  message?: string;
+}
+
+export interface CourseDeliveryConfigResponse {
+  courseId?: number;
+  deliveryMode?: string;
+  capacity?: number;
+  catalogCode?: string;
+  launchState?: string;
+  courseLaunchVersion?: number;
+  blockers?: CourseReadinessBlocker[];
+}
+
+export interface PutCourseDeliveryConfigRequest {
+  catalogCode?: string;
+  capacity?: number;
+  expectedCourseLaunchVersion?: number;
+}
+
+export interface StudyPlanCourseLink {
+  courseLinkVersion?: number;
+  basedOnStudyPlanVersion?: number;
+  alignmentNotes?: string;
+  status?: string;
+  planChangedSinceCourseLink?: boolean;
+}
+
+export interface LinkGroupCourseRequest {
+  courseId?: number;
+  expectedStudyPlanVersion?: number;
+  alignmentNotes?: string;
+}
+
+export interface WithdrawGroupCourseRequest {
+  expectedCourseLinkVersion?: number;
+  reason?: string;
+}
+
+export interface CompleteStudentCourseRequest {
+  expectedCompletionVersion?: number;
+}
+
+export interface AdvisingSessionRequest {
+  type?: string;
+  dayOfWeek?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+}
+
+export interface CreateOneOnOneCourseRequest {
+  primaryInstructorUserId?: number;
+  expectedStudyPlanVersion?: number;
+  courseCode?: string;
+  title?: string;
+  termStartDate?: string;
+  termEndDate?: string;
+  description?: string;
+  location?: string;
+  alignmentNotes?: string;
+  sessions?: AdvisingSessionRequest[];
+}
+
+export interface ReassignOneOnOneInstructorRequest {
+  primaryInstructorUserId?: number;
+  expectedCourseLaunchVersion?: number;
+}
+
+export interface ReplaceOneOnOneSessionsRequest {
+  expectedCourseLaunchVersion?: number;
+  sessions?: AdvisingSessionRequest[];
+}
+
+export interface AdvisorStudentCourseResponse {
+  courseId?: number;
+  courseCode?: string;
+  title?: string;
+  catalogCode?: string;
+  deliveryMode?: string;
+  launchState?: string;
+  status?: string;
+  courseLinkVersion?: number;
+  basedOnStudyPlanVersion?: number;
+  planChangedSinceCourseLink?: boolean;
+  alignmentNotes?: string;
+  courseLaunchVersion?: number;
+  instructorUserId?: number;
+  instructorDisplayName?: string;
+  lifecycleStatus?: string;
+  lectureTotal?: number;
+  lectureCompleted?: number;
+  completionVersion?: number;
+  completedAt?: string;
+  schedule?: unknown[];
+  instructors?: unknown[];
+}
+
+export interface GroupCourseOptionResponse {
+  courseId?: number;
+  courseCode?: string;
+  title?: string;
+  catalogCode?: string;
+  capacity?: number;
+  activeStudents?: number;
+  remainingCapacity?: number;
+}
+
+export interface InstructorStudentProfileContextResponse {
+  studentUserId?: number;
+  targetGoal?: string;
+  skills?: ProfileSkillResponse[];
+  strategySummary?: string;
+  startDate?: string;
+  planEndDate?: string;
+  checkpoints?: unknown[];
+  profileVersion?: number;
+  studyPlanVersion?: number;
+  basedOnProfileVersion?: number;
+  profileChangedSincePlanUpdate?: boolean;
+  courseLinkVersion?: number;
+  basedOnStudyPlanVersion?: number;
+  planChangedSinceCourseLink?: boolean;
+  alignmentNotes?: string;
+  academicBackground?: string;
+  performanceSummary?: unknown;
+}
+
+export interface AdvisorActionTaskResponse {
+  taskId?: number;
+  studentUserId?: number;
+  taskType?: string;
+  category?: string;
+  description?: string;
+  priority?: string;
+  status?: string;
+  version?: number;
+  sourceType?: string;
+  sourceId?: number;
+  sourceReference?: string;
+  createdAt?: string;
+  startedAt?: string;
+  resolvedAt?: string;
+}
+
+export interface ActionTaskMutationRequest {
+  expectedVersion?: number;
+  resolutionNote?: string;
+}
+
+export interface AdvisorConversationAttachmentResponse {
+  attachmentId?: number;
+  originalName?: string;
+  contentType?: string;
+  sizeBytes?: number;
+  previewAvailable?: boolean;
+  downloadUrl?: string;
+  previewUrl?: string;
+}
+
+export interface AdvisorConversationMessageResponse {
+  messageId?: number;
+  senderUserId?: number;
+  body?: string;
+  createdAt?: string;
+  attachments?: AdvisorConversationAttachmentResponse[];
+}
+
+export interface SendAdvisorMessageRequest {
+  clientMessageId: string;
+  body?: string;
+  fileObjectKey?: string;
+  originalName?: string;
+  contentType?: string;
+  sizeBytes?: number;
+}
+
+export interface SendAdvisorMessageMultipartRequest {
+  clientMessageId: string;
+  body?: string;
+  files?: File[];
+}
+
+export interface MarkConversationReadRequest {
+  messageId?: number;
+}
+
+/** New dashboard, hub and conversation-list responses lack response schemas. */
+export type AdvisingOpenApiRead = unknown;
 
 export const ADVISING_ERROR_CODES = {
   featureDisabled: 'ADVISING_FEATURE_DISABLED',

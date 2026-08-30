@@ -5,7 +5,7 @@
 端到端逐步走查（Counselor → Advisor Profile/Plan → Group / 1-on-1 → READY/PUBLISH → Instructor）：`docs/advising-frontend-walkthrough.md`。
 
 Milestone B（本轮可联调）：Student 工作队列、Intake、Profile、Study Plan、revision、改派连续性。
-Milestone C（Course Orchestration）本地已验收；Dev Promotion C 见 `docs/advisor-dev-promotion.md`，需单独授权。
+Milestone C（Course Orchestration）已按 2026-08-28 新 OpenAPI 接入前端；真实 Dev 写验收仍需后端授权 fixture 与数据范围。
 
 ## 环境
 
@@ -96,10 +96,10 @@ Profile / Study Plan 的 POST、PUT **必须**带 `Idempotency-Key`（最长 128
 
 ## 不要做
 
-- Advisor Dashboard、搜索、批量导入、自动分配
+- 批量导入、自动分配
 - Advisor 主动改派 / 取消 Intake / 改 email
 - 把 `advisorPrivateNotes` 画进学生或租户页面
-- 在 B 联调期打开 Course Orchestration 写入，除非 Promotion C 已授权
+- 在没有授权 fixture 与明确数据范围时，对共享 Dev 执行 Course Orchestration 写入
 
 ## Milestone C 要点
 

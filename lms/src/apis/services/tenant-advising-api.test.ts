@@ -30,4 +30,24 @@ describe('TenantAdvisingApiService', () => {
       {headers: {'Idempotency-Key': 'cancel-1'}},
     );
   });
+
+  it('configures and launches course delivery with optimistic versions', async () => {
+    client.get.mockResolvedValue({status: 200, data: {courseLaunchVersion: 1}});
+    client.put.mockResolvedValue({status: 200, data: {}});
+    client.post.mockResolvedValue({status: 200, data: {}});
+    await service.getCourseDeliveryConfig(8);
+    await service.putCourseDeliveryConfig(8, {catalogCode: 'IELTS-A', capacity: 12, expectedCourseLaunchVersion: 1}, 'delivery-8');
+    await service.publishCourseLaunch(8, {expectedCourseLaunchVersion: 2}, 'publish-8');
+    expect(client.get).toHaveBeenCalledWith('/v2/tenant/courses/8/delivery-config');
+    expect(client.put).toHaveBeenCalledWith(
+      '/v2/tenant/courses/8/delivery-config',
+      {catalogCode: 'IELTS-A', capacity: 12, expectedCourseLaunchVersion: 1},
+      {headers: {'Idempotency-Key': 'delivery-8'}},
+    );
+    expect(client.post).toHaveBeenCalledWith(
+      '/v2/tenant/courses/8/launch/publish',
+      {expectedCourseLaunchVersion: 2},
+      {headers: {'Idempotency-Key': 'publish-8'}},
+    );
+  });
 });

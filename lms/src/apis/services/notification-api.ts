@@ -48,6 +48,18 @@ export class NotificationApiService {
       idempotent(idempotencyKey)
     );
   }
+
+  /** SYSTEM_ADMIN operational action from notification.openapi.yaml. */
+  runAdminDigest(
+    request: {digestDate: string; tenantId?: number},
+    idempotencyKey: string = crypto.randomUUID(),
+  ): Promise<ApiResponse<void>> {
+    return this.apiClient.post<void>(
+      '/v2/admin/notifications/digest/run',
+      request,
+      idempotent(idempotencyKey),
+    );
+  }
 }
 
 export const notificationApiService = new NotificationApiService();

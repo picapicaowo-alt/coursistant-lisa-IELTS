@@ -1,0 +1,16 @@
+.page { min-height: 100%; padding: 2rem clamp(1rem, 4vw, 3.5rem) 4rem; background: t.$page-bg; color: t.$text; }
+.header { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; max-width: 82rem; margin: 0 auto 1rem; }
+.header h1 { margin: .2rem 0; font-size: clamp(2rem, 4vw, t.$fs-h1); }
+.header p { margin: 0; color: t.$text-muted; }
+.eyebrow { color: t.$brand !important; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
+.back { min-height: 2.75rem; display: inline-flex; align-items: center; color: t.$brand; font-weight: t.$fw-semibold; text-decoration: none; }
+.shortcuts { display: flex; flex-wrap: wrap; gap: .65rem; max-width: 82rem; margin: 0 auto 1rem; }
+.shortcuts a { min-height: 2.75rem; display: inline-flex; align-items: center; padding: 0 .9rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; color: t.$text; font-weight: t.$fw-semibold; text-decoration: none; }
+.shortcuts a:hover { border-color: t.$brand; color: t.$brand; }
+.shortcuts a:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
+.tabs { display: flex; flex-wrap: wrap; gap: .35rem; max-width: 82rem; margin: 0 auto 1rem; padding: .35rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
+.tabs button { min-height: 2.75rem; padding: 0 .9rem; border: 0; border-radius: t.$radius-control-sm; background: transparent; color: t.$text-muted; font-weight: t.$fw-semibold; text-transform: capitalize; cursor: pointer; }
+.tabs .active { background: t.$brand; color: #fff; }
+.tabs button:focus-visible, .back:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; max-width: 82rem; margin: 0 auto; }
+@media (max-width: 800px) { .header { align-items: flex-start; flex-direction: column; } .grid { grid-template-columns: 1fr; } }

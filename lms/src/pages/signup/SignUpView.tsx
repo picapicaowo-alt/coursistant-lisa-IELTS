@@ -239,7 +239,7 @@ export default function SignUpView() {
                   type="button"
                   onClick={() => setShowPassword(previous => !previous)}
                   aria-label={showPassword ? t('login.hidePassword') : t('login.showPassword')}
-                  className="absolute inset-y-0 right-3 flex items-center rounded px-1 text-[#718096] hover:text-[#2D3748] focus-visible:outline-2 focus-visible:outline-[#566FE8]"
+                  className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded text-[#718096] hover:text-[#2D3748] focus-visible:outline-2 focus-visible:outline-[#566FE8]"
                 >
                   <Icon icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} width={22} height={22}/>
                 </button>

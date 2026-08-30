@@ -94,8 +94,12 @@
 
 .visibility {
   position: absolute;
-  right: 0.75rem;
+  right: 0.25rem;
   top: 50%;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
   transform: translateY(-50%);
   border: 0;
   background: transparent;

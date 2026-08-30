@@ -1,6 +1,8 @@
 import {
   AdminTenant,
   AdminTenantPayload,
+  AdminDirectoryQuery,
+  AdminDirectoryRead,
   ApiResponse,
   AssignmentGradeCorrectionRequest,
   ChangeManagedUserRoleRequest,
@@ -44,6 +46,18 @@ export class AdminApiService {
 
   listUsers(): Promise<ApiResponse<ManagedUser[]>> {
     return this.apiClient.get('/v2/users');
+  }
+
+  getUser(userId: number): Promise<ApiResponse<ManagedUser>> {
+    return this.apiClient.get(`/v2/users/${userId}`);
+  }
+
+  listAdmins(query: AdminDirectoryQuery = {}): Promise<ApiResponse<AdminDirectoryRead>> {
+    return this.apiClient.get('/v2/admins', {params: {query}});
+  }
+
+  getAdmin(adminId: number): Promise<ApiResponse<AdminDirectoryRead>> {
+    return this.apiClient.get(`/v2/admins/${adminId}`);
   }
 
   createManagedUser(scope: 'system' | 'tenant', request: CreateManagedUserRequest): Promise<ApiResponse<number>> {
