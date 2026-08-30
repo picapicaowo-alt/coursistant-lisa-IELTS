@@ -50,7 +50,7 @@ const VocabularyListPage = () => {
   });
 
   if (query.isPending) return <main className={styles.page}><PageState kind="loading" title="Loading units" detail="Preparing this list and your current pass…"/></main>;
-  if (query.isError || !query.data) return <main className={styles.page}><PageState kind="error" title="This list is unavailable" detail="The list may have moved, or the localhost API may be offline." onRetry={() => void query.refetch()}/></main>;
+  if (query.isError || !query.data) return <main className={styles.page}><PageState kind="error" title="This list is unavailable" detail="The list may have moved, or the Vocabulary service may be temporarily unavailable." onRetry={() => void query.refetch()}/></main>;
 
   const list = query.data;
   return (

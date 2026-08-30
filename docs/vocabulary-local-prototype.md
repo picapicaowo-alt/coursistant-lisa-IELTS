@@ -1,4 +1,4 @@
-# Vocabulary localhost prototype
+# Vocabulary service
 
 ## Scope and isolation
 
@@ -8,9 +8,21 @@
 - Frontend URL: `http://127.0.0.1:13005/vocabulary`
 - API URL: `http://127.0.0.1:18083`
 
-This prototype does not inspect, modify, or deploy the LMS 8083 backend and it
-does not deploy assets to the 8085 frontend host. Vite proxies only
-`/vocabulary-api` to the standalone localhost service.
+The localhost prototype does not inspect or modify the LMS 8083 backend. Vite
+proxies `/vocabulary-api` to the standalone localhost service.
+
+## Dev deployment
+
+- The React application remains part of the static 8085 frontend release.
+- The independent Vocabulary API runs as its own loopback-only service and
+  stores progress in its own durable SQLite database.
+- Nginx routes the same-origin `/vocabulary-api` prefix to that service. It is
+  intentionally separate from the existing `/api` → 8083 route.
+- In Dev, the API verifies the existing LMS bearer token against the configured
+  current-user identity endpoint and accepts only `STUDENT` identities. The
+  browser never supplies or chooses its own student ID.
+- API releases and progress data are separated so an application rollback does
+  not roll back or erase student learning history.
 
 ## Contract ownership
 
@@ -74,11 +86,10 @@ The mock LMS process is only for a local student login. It is not part of the
 Vocabulary API and is not required when the browser already has a valid LMS
 session.
 
-## Future 8083 handoff
+## Optional future 8083 handoff
 
-The future backend owner should implement the OpenAPI unchanged behind the
-same-origin `/vocabulary-api` gateway, replace the local identity adapter with
-trusted authenticated identity, migrate catalogue and progress tables to the
-shared database, and import the scheduling engine's invariant tests. The
-frontend environment should only be promoted after that contract passes in
-Dev; no localhost header adapter may be enabled in a production build.
+If Vocabulary is later absorbed into 8083, the backend owner should implement
+the OpenAPI unchanged behind the same-origin `/vocabulary-api` gateway, migrate
+catalogue and progress tables deliberately, and import the scheduling engine's
+invariant tests. The localhost identity header must never be enabled in a
+deployed build.

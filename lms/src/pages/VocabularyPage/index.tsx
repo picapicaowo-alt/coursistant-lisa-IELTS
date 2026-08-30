@@ -34,7 +34,7 @@ const VocabularyPage = () => {
   });
 
   if (query.isPending) return <main className={styles.page}><PageState kind="loading" title="Opening your library" detail="Loading lists and private study progress…"/></main>;
-  if (query.isError) return <main className={styles.page}><PageState kind="error" title="The library could not be loaded" detail="Your progress is safe. Check the localhost Vocabulary API and try again." onRetry={() => void query.refetch()}/></main>;
+  if (query.isError) return <main className={styles.page}><PageState kind="error" title="The library could not be loaded" detail="Your progress is safe. The Vocabulary service is temporarily unavailable; please try again." onRetry={() => void query.refetch()}/></main>;
 
   const data = query.data;
   return (
