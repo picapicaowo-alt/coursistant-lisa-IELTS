@@ -69,20 +69,27 @@ const VocabularyListPage = () => {
         <div className={styles.modeControls}>
           <div className={styles.segmented} aria-label="Study mode">
             <button type="button" className={mode === 'TEST' ? styles.selected : ''} onClick={() => setMode('TEST')}>
-              <Check size={17}/><span><strong>Test</strong><small>Recall, rate, reveal</small></span>
+              <Check size={17}/><span><strong>Test</strong><small>Word first · rate to reveal</small></span>
             </button>
             <button type="button" className={mode === 'REMEMBER' ? styles.selected : ''} onClick={() => setMode('REMEMBER')}>
-              <BookOpenCheck size={17}/><span><strong>Remember</strong><small>Browse complete cards</small></span>
+              <BookOpenCheck size={17}/><span><strong>Remember</strong><small>Full card · browse only</small></span>
             </button>
           </div>
-          {mode === 'REMEMBER' ? (
-            <label className={styles.shuffle}>
-              <input type="checkbox" checked={shuffle} onChange={event => setShuffle(event.target.checked)}/>
-              <Shuffle size={16}/> Shuffle this session
-            </label>
-          ) : (
-            <span className={styles.testNote}><Shuffle size={16}/> Test mode always shuffles</span>
-          )}
+          <p className={styles.modeDescription}>
+            {mode === 'TEST'
+              ? "See the word first. Choose a recall rating—including Don't remember—to reveal the answer."
+              : 'See the complete card from the start. Browsing does not record a rating or change completion.'}
+          </p>
+          <div className={styles.modeOption}>
+            {mode === 'REMEMBER' ? (
+              <label className={styles.shuffle}>
+                <input type="checkbox" checked={shuffle} onChange={event => setShuffle(event.target.checked)}/>
+                <Shuffle size={16}/> Shuffle this session
+              </label>
+            ) : (
+              <span className={styles.testNote}><Shuffle size={16}/> Test mode always shuffles</span>
+            )}
+          </div>
         </div>
       </section>
 

@@ -130,6 +130,14 @@ const VocabularySessionPage = () => {
 
       <div className={styles.progressBar} aria-label={`${progress}% through this session`}><span style={{width: `${progress}%`}}/></div>
 
+      <p className={styles.modeGuidance}>
+        {session.mode === 'TEST'
+          ? session.revealed
+            ? 'Rating saved · answer revealed'
+            : "Word first · choose a rating, including Don't remember, to reveal the answer"
+          : 'Full-card browsing · no recall rating or completion change'}
+      </p>
+
       <section className={`${styles.studyCard} ${session.revealed ? styles.revealed : ''}`} aria-live="polite">
         <div className={styles.cardPrompt}>
           <span className={styles.partOfSpeech}>{card.partOfSpeech}</span>

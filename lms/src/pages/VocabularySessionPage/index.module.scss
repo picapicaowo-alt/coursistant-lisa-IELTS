@@ -4,6 +4,7 @@
 .sessionMeta {text-align: center; span, strong {display: block;} span {color: t.$text-muted; font-size: t.$fs-caption;} strong {margin-top: 0.15rem; font-size: t.$fs-label;}}
 .position {justify-self: end; color: t.$text-muted; font-size: t.$fs-caption; font-variant-numeric: tabular-nums;}
 .progressBar {height: 0.35rem; margin-top: 1rem; border-radius: t.$radius-pill; background: t.$neutral-fill; overflow: hidden; span {display: block; height: 100%; border-radius: inherit; background: t.$brand; transition: width 180ms ease;}}
+.modeGuidance {margin: 0.75rem auto 0; color: t.$text-muted; text-align: center; font-size: t.$fs-caption; font-weight: t.$fw-semibold;}
 .studyCard {
   width: min(100%, 54rem);
   min-height: 27rem;

@@ -17,13 +17,15 @@
 .facts {margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; color: t.$text-muted; font-size: t.$fs-caption; span {display: inline-flex; align-items: center; gap: 0.4rem;} svg {color: t.$brand;}}
 .kicker {color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-bold; letter-spacing: 0.08em; text-transform: uppercase;}
 .modeSection {margin: 2rem 0 1rem; display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; h2 {margin: 0.25rem 0 0; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.03em;}}
-.modeControls {display: grid; justify-items: end; gap: 0.55rem;}
+.modeControls {width: min(100%, 34rem); display: grid; justify-items: end; gap: 0.55rem;}
 .segmented {padding: 0.3rem; border: 1px solid t.$border; border-radius: t.$radius-card; background: t.$card-bg; display: flex; gap: 0.25rem;
   button {min-width: 10.5rem; min-height: 3.5rem; padding: 0.6rem 0.8rem; border: 0; border-radius: t.$radius-control; background: transparent; color: t.$text-muted; display: flex; align-items: center; gap: 0.65rem; text-align: left; cursor: pointer;}
   strong, small {display: block;} strong {color: t.$text;} small {margin-top: 0.12rem; font-size: 0.68rem;}
   .selected {background: t.$brand; color: t.$card-bg; strong {color: t.$card-bg;} small {color: rgba(t.$card-bg, 0.75);}}
 }
 .shuffle, .testNote {min-height: 1.5rem; color: t.$text-muted; display: inline-flex; align-items: center; gap: 0.4rem; font-size: t.$fs-caption; input {accent-color: t.$brand;}}
+.modeDescription {max-width: 34rem; margin: 0; color: t.$text-muted; text-align: right; font-size: t.$fs-caption; line-height: 1.5;}
+.modeOption {min-height: 1.5rem;}
 .units {display: grid; gap: 0.75rem;}
 .unitCard {
   padding: 1.25rem;
@@ -47,6 +49,7 @@
 @media (max-width: 1050px) {
   .modeSection {align-items: stretch; flex-direction: column;}
   .modeControls {justify-items: start;}
+  .modeDescription {text-align: left;}
   .unitCard {grid-template-columns: 3.5rem 1fr auto; .unitStats {grid-column: 2 / -1;} > button {grid-column: 2 / -1; justify-content: center;}}
 }
 
