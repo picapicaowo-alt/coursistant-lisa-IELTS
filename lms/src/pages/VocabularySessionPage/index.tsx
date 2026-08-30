@@ -86,14 +86,17 @@ const VocabularySessionPage = () => {
   const isBusy = rateMutation.isPending || advanceMutation.isPending || exitMutation.isPending;
   const mutationError = rateMutation.isError || advanceMutation.isError || exitMutation.isError;
 
-  if (session.status === 'COMPLETED') {
+  if (session.status === 'COMPLETED' || session.status === 'ENDED') {
+    const wasEnded = session.status === 'ENDED';
     return (
       <main className={styles.resultPage}>
         <section className={styles.resultCard}>
           <div className={styles.resultIcon}><CheckCircle2/></div>
-          <span className={styles.kicker}>{session.mode === 'TEST' ? 'Session complete' : 'Remember mode complete'}</span>
-          <h1>{session.mode === 'TEST' && session.summary?.unitCompletionOccurred ? 'A full pass, cleared.' : 'Good work. Take the win.'}</h1>
-          {session.summary ? (
+          <span className={styles.kicker}>{wasEnded ? 'Session ended' : session.mode === 'TEST' ? 'Session complete' : 'Remember mode complete'}</span>
+          <h1>{wasEnded ? 'Ready for a fresh start.' : session.mode === 'TEST' && session.summary?.unitCompletionOccurred ? 'A full pass, cleared.' : 'Good work. Take the win.'}</h1>
+          {wasEnded ? (
+            <p>Your saved ratings remain in your learning history, but this session position can no longer be resumed.</p>
+          ) : session.summary ? (
             <>
               <p>{session.summary.carriedForward > 0 ? 'The session ended on time. Words that still need work are already prioritised for next time.' : 'Every word scheduled for this pass is clear.'}</p>
               <dl className={styles.resultStats}>

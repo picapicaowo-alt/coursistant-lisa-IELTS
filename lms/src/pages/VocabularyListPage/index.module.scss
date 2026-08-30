@@ -39,18 +39,26 @@
 
   h3 {margin: 0.15rem 0 0.7rem; font-size: t.$fs-item-title;}
   p {margin: 0.4rem 0 0; color: t.$text-muted; font-size: t.$fs-caption;}
-  > button {min-height: 2.9rem; padding: 0 1rem; border: 0; border-radius: t.$radius-control; background: t.$text; color: t.$card-bg; display: inline-flex; align-items: center; gap: 0.5rem; font-weight: t.$fw-semibold; cursor: pointer; &:hover {background: t.$brand;} &:disabled {opacity: 0.58; cursor: wait;}}
 }
 .unitNumber {font-size: 2.35rem; color: t.$neutral-fill; font-weight: t.$fw-extrabold; letter-spacing: -0.06em;}
 .progressTrack {height: 0.38rem; border-radius: t.$radius-pill; background: t.$neutral-fill; overflow: hidden; span {display: block; height: 100%; border-radius: inherit; background: t.$brand;}}
 .unitStats {margin: 0; display: flex; gap: 1.2rem; div {min-width: 5rem;} dt {color: t.$text-muted; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;} dd {margin: 0.2rem 0 0; font-weight: t.$fw-bold;}}
+.unitActions {min-width: 15rem;}
+.startButton, .resumeButton {min-height: 2.9rem; padding: 0 1rem; border: 0; border-radius: t.$radius-control; background: t.$text; color: t.$card-bg; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: t.$fw-semibold; cursor: pointer; &:hover {background: t.$brand;} &:disabled {opacity: 0.58; cursor: wait;}}
+.startButton {width: 100%;}
+.activeSession {padding: 0.8rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$subcard-bg;}
+.activeSessionCopy {strong {display: block; margin-top: 0.35rem;} p {max-width: 24rem; margin: 0.3rem 0 0; color: t.$text-muted; font-size: 0.72rem; line-height: 1.45;}}
+.sessionLabel {color: t.$brand; display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.68rem; font-weight: t.$fw-bold; letter-spacing: 0.05em; text-transform: uppercase;}
+.activeSessionButtons {margin-top: 0.7rem; display: flex; gap: 0.45rem; .resumeButton {flex: 1;}}
+.endButton, .endConfirmation button {min-height: 2.7rem; padding: 0 0.8rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; color: t.$text-muted; display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; font-weight: t.$fw-semibold; cursor: pointer; &:hover {border-color: t.$danger; color: t.$danger;} &:disabled {opacity: 0.58; cursor: wait;}}
+.endConfirmation {margin-top: 0.7rem; padding-top: 0.7rem; border-top: 1px solid t.$border; p {margin: 0 0 0.6rem; color: t.$text; font-size: 0.72rem; line-height: 1.45;} > div {display: flex; justify-content: flex-end; gap: 0.45rem;} .dangerButton {border-color: t.$danger; background: t.$danger; color: t.$card-bg;}}
 .inlineError {margin-bottom: 1rem; padding: 0.85rem 1rem; border: 1px solid t.$danger; border-radius: t.$radius-control; background: rgba(t.$danger, 0.08); color: t.$danger; font-size: t.$fs-caption;}
 
 @media (max-width: 1050px) {
   .modeSection {align-items: stretch; flex-direction: column;}
   .modeControls {justify-items: start;}
   .modeDescription {text-align: left;}
-  .unitCard {grid-template-columns: 3.5rem 1fr auto; .unitStats {grid-column: 2 / -1;} > button {grid-column: 2 / -1; justify-content: center;}}
+  .unitCard {grid-template-columns: 3.5rem 1fr auto; .unitStats {grid-column: 2 / -1;} .unitActions {grid-column: 2 / -1;}}
 }
 
 @media (max-width: 700px) {
@@ -58,6 +66,7 @@
   .overview {align-items: flex-start; flex-direction: column;}
   .overview > :last-child {align-self: center;}
   .segmented {width: 100%; button {min-width: 0; flex: 1; align-items: flex-start; small {display: none;}}}
-  .unitCard {grid-template-columns: 2.5rem 1fr; gap: 0.85rem; .unitStats {grid-column: 1 / -1; justify-content: space-between;} > button {grid-column: 1 / -1;}}
+  .unitCard {grid-template-columns: 2.5rem 1fr; gap: 0.85rem; .unitStats {grid-column: 1 / -1; justify-content: space-between;} .unitActions {grid-column: 1 / -1; min-width: 0;}}
+  .activeSessionButtons {flex-direction: column;}
   .unitNumber {font-size: 1.8rem;}
 }

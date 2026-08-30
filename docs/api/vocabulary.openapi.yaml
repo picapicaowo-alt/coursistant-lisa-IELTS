@@ -172,6 +172,23 @@ paths:
                 $ref: '#/components/schemas/StudySessionResponse'
         '401': {$ref: '#/components/responses/Unauthorized'}
         '404': {$ref: '#/components/responses/NotFound'}
+  /v1/vocabulary/sessions/{sessionId}/end:
+    post:
+      tags: [Vocabulary sessions]
+      operationId: endVocabularySession
+      summary: Permanently end a resumable session without changing completion
+      parameters:
+        - $ref: '#/components/parameters/SessionId'
+        - $ref: '#/components/parameters/IdempotencyKey'
+      responses:
+        '200':
+          description: Ended session; persisted ratings remain but position is no longer resumable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StudySessionResponse'
+        '401': {$ref: '#/components/responses/Unauthorized'}
+        '404': {$ref: '#/components/responses/NotFound'}
 components:
   parameters:
     ListId:
@@ -229,6 +246,9 @@ components:
       properties:
         code: {type: string}
         message: {type: string}
+        details:
+          type: object
+          additionalProperties: true
     VocabularyListCollectionResponse:
       type: object
       required: [items, filters]
@@ -265,7 +285,7 @@ components:
               items: {$ref: '#/components/schemas/VocabularyUnitSummary'}
     VocabularyUnitSummary:
       type: object
-      required: [id, number, name, wordCount, progress]
+      required: [id, number, name, wordCount, progress, activeSessionId, activeSession]
       properties:
         id: {type: string, format: uuid}
         number: {type: integer, minimum: 1}
@@ -275,6 +295,23 @@ components:
         activeSessionId:
           type: [string, 'null']
           format: uuid
+          deprecated: true
+          description: Compatibility alias for activeSession.id.
+        activeSession:
+          oneOf:
+            - {$ref: '#/components/schemas/ActiveSessionSummary'}
+            - {type: 'null'}
+    ActiveSessionSummary:
+      type: object
+      required: [id, mode, status, position, totalScheduled]
+      properties:
+        id: {type: string, format: uuid}
+        mode: {$ref: '#/components/schemas/StudyMode'}
+        status:
+          type: string
+          enum: [ACTIVE, PAUSED]
+        position: {type: integer, minimum: 0}
+        totalScheduled: {type: integer, minimum: 1}
     VocabularyUnitResponse:
       allOf:
         - $ref: '#/components/schemas/VocabularyUnitSummary'
@@ -344,7 +381,7 @@ components:
       enum: [KNOW_WELL, KIND_OF_KNOW, DONT_REMEMBER]
     SessionStatus:
       type: string
-      enum: [ACTIVE, PAUSED, COMPLETED]
+      enum: [ACTIVE, PAUSED, COMPLETED, ENDED]
     StudySessionResponse:
       type: object
       required: [id, unitId, mode, status, position, totalScheduled, revealed, canGoPrevious]

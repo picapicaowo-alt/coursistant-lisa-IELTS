@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {ArrowLeft, ArrowRight, BookOpenCheck, Check, Clock3, Layers3, RefreshCcw, Shuffle} from 'lucide-react';
+import {ArrowLeft, ArrowRight, BookOpenCheck, Check, Clock3, Layers3, RefreshCcw, Shuffle, Square, X} from 'lucide-react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import type {StudyMode, VocabularyUnitSummary} from '@/apis/types/vocabulary';
 import {vocabularyApi} from '@/apis/services/vocabulary-api';
@@ -9,6 +9,7 @@ import {PageState} from '@/pages/vocabulary/components/PageState';
 import {ProgressRing} from '@/pages/vocabulary/components/ProgressRing';
 import {vocabularyQueryKeys} from '@/pages/vocabulary/queryKeys';
 import {VOCABULARY_PATHS} from '@/pages/vocabulary/routes';
+import {getApiErrorMessage} from '@/utils/apiError';
 import styles from './index.module.scss';
 
 const VocabularyListPage = () => {
@@ -26,18 +27,26 @@ const VocabularyListPage = () => {
     enabled: Boolean(listId),
   });
   const startMutation = useMutation({
-    mutationFn: (unitId: string) => vocabularyApi.startSession(
+    mutationFn: ({unitId, sessionMode}: {unitId: string; sessionMode: StudyMode}) => vocabularyApi.startSession(
       studentId,
       unitId,
-      {mode, ...(mode === 'REMEMBER' ? {shuffle} : {})},
+      {mode: sessionMode, ...(sessionMode === 'REMEMBER' ? {shuffle} : {})},
       crypto.randomUUID(),
     ),
-    onMutate: unitId => setStartingUnitId(unitId),
+    onMutate: ({unitId}) => setStartingUnitId(unitId),
     onSuccess: session => {
       void queryClient.invalidateQueries({queryKey: vocabularyQueryKeys.all});
       navigate(VOCABULARY_PATHS.session(session.unitId, session.id));
     },
     onSettled: () => setStartingUnitId(null),
+  });
+  const endMutation = useMutation({
+    mutationFn: ({sessionId}: {sessionId: string; unitId: string}) => vocabularyApi.endSession(
+      studentId,
+      sessionId,
+      crypto.randomUUID(),
+    ),
+    onSuccess: () => queryClient.invalidateQueries({queryKey: vocabularyQueryKeys.all}),
   });
 
   if (query.isPending) return <main className={styles.page}><PageState kind="loading" title="Loading units" detail="Preparing this list and your current pass…"/></main>;
@@ -93,8 +102,12 @@ const VocabularyListPage = () => {
         </div>
       </section>
 
-      {startMutation.isError ? (
-        <div className={styles.inlineError} role="alert">The session could not start. If another mode is paused, resume or finish it first.</div>
+      {startMutation.isError || endMutation.isError ? (
+        <div className={styles.inlineError} role="alert">
+          {startMutation.isError
+            ? getApiErrorMessage(startMutation.error, 'The session could not start. Review the active session shown below.')
+            : getApiErrorMessage(endMutation.error, 'The session could not be ended. It is still available to resume.')}
+        </div>
       ) : null}
 
       <section className={styles.units} aria-label="Units">
@@ -104,7 +117,9 @@ const VocabularyListPage = () => {
             unit={unit}
             mode={mode}
             pending={startingUnitId === unit.id}
-            onStart={() => startMutation.mutate(unit.id)}
+            ending={endMutation.isPending && endMutation.variables?.unitId === unit.id}
+            onStart={sessionMode => startMutation.mutate({unitId: unit.id, sessionMode})}
+            onEnd={sessionId => endMutation.mutate({sessionId, unitId: unit.id})}
           />
         ))}
       </section>
@@ -116,12 +131,24 @@ interface UnitCardProps {
   unit: VocabularyUnitSummary;
   mode: StudyMode;
   pending: boolean;
-  onStart: () => void;
+  ending: boolean;
+  onStart: (mode: StudyMode) => void;
+  onEnd: (sessionId: string) => void;
 }
 
-const UnitCard = ({unit, mode, pending, onStart}: UnitCardProps) => {
+const modeLabel = (mode: StudyMode): string => mode === 'TEST' ? 'Test' : 'Remember';
+
+const UnitCard = ({unit, mode, pending, ending, onStart, onEnd}: UnitCardProps) => {
+  const [confirmingEnd, setConfirmingEnd] = useState(false);
   const percent = Math.round((unit.progress.clearedWords / unit.progress.totalWords) * 100);
-  const buttonLabel = unit.activeSessionId ? 'Resume session' : `Start ${mode === 'TEST' ? 'test' : 'remembering'}`;
+  const activeSession = unit.activeSession;
+  const activeModeLabel = activeSession ? modeLabel(activeSession.mode) : null;
+  const activeStatusLabel = activeSession?.status === 'ACTIVE' ? 'Active' : 'Paused';
+  const selectedModeLabel = modeLabel(mode);
+  const blockedByDifferentMode = Boolean(activeSession && activeSession.mode !== mode);
+  const currentCard = activeSession
+    ? Math.min(activeSession.position + 1, activeSession.totalScheduled)
+    : null;
   return (
     <article className={styles.unitCard}>
       <div className={styles.unitNumber}>{String(unit.number).padStart(2, '0')}</div>
@@ -138,9 +165,45 @@ const UnitCard = ({unit, mode, pending, onStart}: UnitCardProps) => {
         <div><dt>Completions</dt><dd>{unit.progress.completionCount}</dd></div>
         <div><dt>Ready to review</dt><dd>{unit.progress.readyForReview}</dd></div>
       </dl>
-      <button type="button" onClick={onStart} disabled={pending}>
-        {pending ? <Clock3 size={17}/> : null}{pending ? 'Starting…' : buttonLabel}<ArrowRight size={18}/>
-      </button>
+      <div className={styles.unitActions}>
+        {activeSession ? (
+          <div className={styles.activeSession}>
+            <div className={styles.activeSessionCopy}>
+              <span className={styles.sessionLabel}><Clock3 size={15}/> Current session</span>
+              <strong>{activeStatusLabel} {activeModeLabel} session · card {currentCard} of {activeSession.totalScheduled}</strong>
+              <p>
+                {blockedByDifferentMode
+                  ? `This session must be resumed or ended before ${selectedModeLabel} can start.`
+                  : `Continue from the exact saved position, or end this session to start over.`}
+              </p>
+            </div>
+            {confirmingEnd ? (
+              <div className={styles.endConfirmation} role="alert">
+                <p>End this {activeModeLabel} session? Saved ratings remain, but this position cannot be resumed.</p>
+                <div>
+                  <button type="button" onClick={() => setConfirmingEnd(false)} disabled={ending}>Keep session</button>
+                  <button type="button" className={styles.dangerButton} onClick={() => onEnd(activeSession.id)} disabled={ending}>
+                    {ending ? <Clock3 size={16}/> : <Square size={15}/>} {ending ? 'Ending…' : 'End session'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className={styles.activeSessionButtons}>
+                <button type="button" className={styles.resumeButton} onClick={() => onStart(activeSession.mode)} disabled={pending || ending}>
+                  {pending ? <Clock3 size={17}/> : null}{pending ? 'Resuming…' : `Resume ${activeModeLabel}`}<ArrowRight size={18}/>
+                </button>
+                <button type="button" className={styles.endButton} onClick={() => setConfirmingEnd(true)} disabled={pending || ending}>
+                  <X size={16}/> End session
+                </button>
+              </div>
+            )}
+          </div>
+        ) : (
+          <button type="button" className={styles.startButton} onClick={() => onStart(mode)} disabled={pending}>
+            {pending ? <Clock3 size={17}/> : null}{pending ? 'Starting…' : `Start ${selectedModeLabel}`}<ArrowRight size={18}/>
+          </button>
+        )}
+      </div>
     </article>
   );
 };

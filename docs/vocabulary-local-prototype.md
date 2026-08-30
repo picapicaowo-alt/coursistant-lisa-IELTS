@@ -38,6 +38,10 @@ Cambridge licence. Production content must be supplied and approved separately.
   unfinished words carry forward and are prioritised next time.
 - Position, reveal state, rating history, current-pass progress, completion
   count, and long-term due scheduling persist in SQLite.
+- A blocking session is identified by mode, status, and exact card position.
+  Students can resume it or explicitly end it after confirmation; ending keeps
+  submitted ratings but discards the resumable position and does not award
+  completion.
 - Completing every word increments the unit count and starts a fresh repeatable
   pass without deleting long-term history.
 

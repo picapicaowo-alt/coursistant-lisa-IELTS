@@ -22,6 +22,9 @@ const installSession = async (page: Page): Promise<void> => {
     window.localStorage.setItem('user', JSON.stringify(user));
     window.localStorage.setItem('accToken', user.accessToken);
   }, STUDENT);
+  await page.route('**/v2/me/notifications/unread-count', route => route.fulfill({
+    json: {status: 200, code: 'SUCCESS', message: 'Success', data: {unreadCount: 0}},
+  }));
 };
 
 const library = {
@@ -46,9 +49,31 @@ const unit = {
   wordCount: 20,
   progress: {clearedWords: 4, totalWords: 20, completionCount: 1, readyForReview: 2},
   activeSessionId: SESSION_ID,
+  activeSession: {id: SESSION_ID, mode: 'TEST', status: 'ACTIVE', position: 0, totalScheduled: 20},
   listId: LIST_ID,
   listName: 'Academic Foundations',
 };
+
+const rememberSession = {
+  id: SESSION_ID,
+  mode: 'REMEMBER',
+  status: 'PAUSED',
+  position: 5,
+  totalScheduled: 20,
+};
+
+const listDetail = (active: boolean) => ({
+  ...library.items[0],
+  units: [{
+    id: UNIT_ID,
+    number: 1,
+    name: 'Evidence and Change',
+    wordCount: 20,
+    progress: {clearedWords: 4, totalWords: 20, completionCount: 1, readyForReview: 2},
+    activeSessionId: active ? SESSION_ID : null,
+    activeSession: active ? rememberSession : null,
+  }],
+});
 
 const hiddenCard = {
   id: SESSION_ID,
@@ -112,4 +137,28 @@ test('test mode requires a rating, reveals once, and hides the LMS shell', async
   await expect(page.getByText('分析', {exact: true})).toBeVisible();
   await expect(page.getByRole('button', {name: 'Next card'})).toBeVisible();
   await expect(page.getByRole('button', {name: /Know well/})).toHaveCount(0);
+});
+
+test('identifies and ends the session blocking a different mode', async ({page}) => {
+  await installSession(page);
+  let active = true;
+  let endRequests = 0;
+  await page.route(`**/vocabulary-api/v1/vocabulary/lists/${LIST_ID}`, route => route.fulfill({json: listDetail(active)}));
+  await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}/end`, route => {
+    active = false;
+    endRequests += 1;
+    return route.fulfill({json: {...hiddenCard, status: 'ENDED', currentCard: null}});
+  });
+  await page.goto(`/vocabulary/lists/${LIST_ID}`);
+
+  await expect(page.getByText('Paused Remember session · card 6 of 20')).toBeVisible();
+  await expect(page.getByText('This session must be resumed or ended before Test can start.')).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Resume Remember'})).toBeVisible();
+
+  await page.getByRole('button', {name: 'End session'}).click();
+  await expect(page.getByText(/Saved ratings remain, but this position cannot be resumed/)).toBeVisible();
+  await page.getByRole('button', {name: 'End session'}).click();
+
+  await expect(page.getByRole('button', {name: 'Start Test'})).toBeVisible();
+  expect(endRequests).toBe(1);
 });

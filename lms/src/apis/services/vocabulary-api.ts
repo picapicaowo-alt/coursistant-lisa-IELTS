@@ -95,4 +95,13 @@ export const vocabularyApi = {
     );
     return response.data;
   },
+
+  async endSession(studentId: string, sessionId: string, idempotencyKey: string): Promise<StudySessionResponse> {
+    const response = await client.getClient().post<StudySessionResponse>(
+      `/v1/vocabulary/sessions/${sessionId}/end`,
+      undefined,
+      {headers: requestHeaders(studentId, idempotencyKey)},
+    );
+    return response.data;
+  },
 };

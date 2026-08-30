@@ -3,7 +3,7 @@ export type StudyMode = typeof STUDY_MODES[number];
 
 export const RECALL_RATINGS = ['KNOW_WELL', 'KIND_OF_KNOW', 'DONT_REMEMBER'] as const;
 export type RecallRating = typeof RECALL_RATINGS[number];
-export type SessionStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED';
+export type SessionStatus = 'ACTIVE' | 'PAUSED' | 'COMPLETED' | 'ENDED';
 
 export interface VocabularyProgress {
   clearedWords: number;
@@ -54,6 +54,15 @@ export interface VocabularyUnitSummary {
   wordCount: number;
   progress: UnitProgress;
   activeSessionId: string | null;
+  activeSession: ActiveSessionSummary | null;
+}
+
+export interface ActiveSessionSummary {
+  id: string;
+  mode: StudyMode;
+  status: 'ACTIVE' | 'PAUSED';
+  position: number;
+  totalScheduled: number;
 }
 
 export interface VocabularyListDetailResponse extends VocabularyListSummary {
