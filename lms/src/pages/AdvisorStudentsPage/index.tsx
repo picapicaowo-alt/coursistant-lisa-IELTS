@@ -6,6 +6,7 @@ import {advisorApiService} from '@/apis/services/advisor-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {formatPersonName} from '@/utils/personName';
 
 const AdvisorStudentsPage: React.FC = () => {
   const [page, setPage] = useState(0);
@@ -33,7 +34,7 @@ const AdvisorStudentsPage: React.FC = () => {
         {items.map(student => (
           <article key={student.studentUserId} className={styles.row}>
             <div className={styles.identity}>
-              <strong>{student.name}</strong>
+              <strong>{formatPersonName(student, `Student #${student.studentUserId}`)}</strong>
               <span>{student.email}</span>
               <small>{student.studentType} · assignment v{student.assignmentVersion}</small>
             </div>

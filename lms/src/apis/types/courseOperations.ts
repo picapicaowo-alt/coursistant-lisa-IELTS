@@ -72,11 +72,24 @@ export interface SetPurchasedHoursRequest {
   reason?: string;
 }
 
+export interface TransferCourseOwnerRequest {
+  expectedOwnershipVersion?: number;
+  ownerAdvisorUserId?: number;
+  reason?: string;
+}
+
+export interface CourseOwnershipListParams {
+  q?: string;
+  ownerAdvisorUserId?: number;
+  page?: number;
+  size?: number;
+}
+
 export interface UpsertCourseStudentReportRequest {
   expectedVersion?: number;
   improvementSuggestions?: string;
   overallSummary?: string;
-  reportType?: string;
+  reportType?: 'MID_TERM' | 'FINAL';
   skillEvaluation?: string;
   strengths?: string;
   studentUserId?: number;
@@ -95,7 +108,7 @@ export interface PersonalEventRequest {
 export interface TenantAlertRuleRequest {
   absenceCount?: number;
   absenceWindowDays?: number;
-  checkpointIncompleteEnabled?: boolean;
+  checkpointIncompleteEnabled?: number;
   completionMinimumSample?: number;
   completionPercentage?: number;
   completionWindowDays?: number;
@@ -103,8 +116,9 @@ export interface TenantAlertRuleRequest {
   expectedVersion?: number;
   gradingDelayDays?: number;
   inactivityDays?: number;
-  negativeHoursEnabled?: boolean;
-  overdueTaskEnabled?: boolean;
+  mode?: string;
+  negativeHoursEnabled?: number;
+  overdueTaskEnabled?: number;
   performanceMinimumGradedSample?: number;
   performancePercentage?: number;
 }
@@ -117,7 +131,7 @@ export interface OccurrenceListParams {
 
 export interface CourseStudentReportListParams {
   studentUserId?: number;
-  reportType?: string;
+  reportType?: 'MID_TERM' | 'FINAL';
   status?: string;
   page?: number;
   size?: number;

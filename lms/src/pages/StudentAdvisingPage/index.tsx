@@ -8,6 +8,7 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import {advisorConversationMessageViews} from '../AdvisorOperationsPage/advisorViewModels';
 import styles from '../advising/advising.module.scss';
+import {formatPersonName} from '@/utils/personName';
 
 const StudentAdvisingPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -82,7 +83,7 @@ const StudentAdvisingPage: React.FC = () => {
         {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')}</p> : null}
         {profile.data ? (
           <dl className={styles.readonly}>
-            <dt>Name</dt><dd>{profile.data.name}</dd>
+            <dt>Name</dt><dd>{formatPersonName(profile.data, '—')}</dd>
             <dt>Goal</dt><dd>{profile.data.targetGoal || '—'}</dd>
             <dt>Target</dt><dd>{[profile.data.targetMetric, profile.data.targetValue, profile.data.targetDate].filter(Boolean).join(' · ') || '—'}</dd>
             <dt>Skills</dt>

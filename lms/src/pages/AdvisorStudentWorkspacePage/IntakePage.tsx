@@ -6,6 +6,7 @@ import {advisorApiService} from '@/apis/services/advisor-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {formatPersonName} from '@/utils/personName';
 
 const AdvisorStudentIntakePage: React.FC = () => {
   const {studentUserId} = useParams();
@@ -27,7 +28,7 @@ const AdvisorStudentIntakePage: React.FC = () => {
     <section className={styles.card}>
       <h2>Counsellor intake</h2>
       <dl className={styles.readonly}>
-        <dt>Name</dt><dd>{intake.name || '—'}</dd>
+        <dt>Name</dt><dd>{formatPersonName(intake, '—')}</dd>
         <dt>Email</dt><dd>{intake.email || '—'}</dd>
         <dt>Student type</dt><dd>{intake.studentType || '—'}</dd>
         <dt>Course request</dt><dd>{intake.courseRequest || '—'}</dd>

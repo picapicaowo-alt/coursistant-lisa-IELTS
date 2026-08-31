@@ -742,7 +742,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: ASSIGNMENT_NOT_FOUND
+          description: "ASSIGNMENT_NOT_FOUND, SUBMISSION_VERSION_NOT_FOUND"
       summary: Upsert a group grade
       tags:
       - AssignmentGrading
@@ -1184,12 +1184,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
           description: "PARAM_MISSING, GRADE_SCORE_OUT_OF_RANGE"
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: "NOT_COURSE_MEMBER, ENROLLMENT_NOT_ACTIVE, ACCESS_DENIED"
         "404":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: "ASSIGNMENT_NOT_FOUND, NOT_IN_GRADING_ROSTER"
+          description: "ASSIGNMENT_NOT_FOUND, NOT_IN_GRADING_ROSTER, SUBMISSION_VERSION_NOT_FOUND"
       summary: Upsert a student grade
       tags:
       - AssignmentGrading

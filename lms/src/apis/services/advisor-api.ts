@@ -12,6 +12,7 @@ import {
   ApiResponse,
   CompleteAdvisorTaskRequest,
   CompleteStudentCourseRequest,
+  CourseDeliveryConfigResponse,
   CreateOneOnOneCourseRequest,
   CreateStudentProfileRequest,
   CreateStudyPlanRequest,
@@ -20,6 +21,7 @@ import {
   LaunchTransitionRequest,
   LinkGroupCourseRequest,
   MarkConversationReadRequest,
+  PutCourseDeliveryConfigRequest,
   ReassignOneOnOneInstructorRequest,
   ReconfirmCourseLinkRequest,
   ReplaceOneOnOneSessionsRequest,
@@ -182,6 +184,46 @@ export class AdvisorApiService {
 
   publishOneOnOneLaunch(studentUserId: number, courseId: number, request: LaunchTransitionRequest, idempotencyKey: string = crypto.randomUUID()): Promise<ApiResponse<AdvisorStudentCourseResponse>> {
     return this.apiClient.post(`/v2/advisor/students/${studentUserId}/courses/${courseId}/launch/publish`, request, idempotent(idempotencyKey));
+  }
+
+  getCourseDeliveryConfig(courseId: number): Promise<ApiResponse<CourseDeliveryConfigResponse>> {
+    return this.apiClient.get(`/v2/advisor/courses/${courseId}/delivery-config`);
+  }
+
+  putCourseDeliveryConfig(
+    courseId: number,
+    request: PutCourseDeliveryConfigRequest,
+    idempotencyKey: string = crypto.randomUUID(),
+  ): Promise<ApiResponse<CourseDeliveryConfigResponse>> {
+    return this.apiClient.put(
+      `/v2/advisor/courses/${courseId}/delivery-config`,
+      request,
+      idempotent(idempotencyKey),
+    );
+  }
+
+  readyCourseLaunch(
+    courseId: number,
+    request: LaunchTransitionRequest,
+    idempotencyKey: string = crypto.randomUUID(),
+  ): Promise<ApiResponse<CourseDeliveryConfigResponse>> {
+    return this.apiClient.post(
+      `/v2/advisor/courses/${courseId}/launch/ready`,
+      request,
+      idempotent(idempotencyKey),
+    );
+  }
+
+  publishCourseLaunch(
+    courseId: number,
+    request: LaunchTransitionRequest,
+    idempotencyKey: string = crypto.randomUUID(),
+  ): Promise<ApiResponse<CourseDeliveryConfigResponse>> {
+    return this.apiClient.post(
+      `/v2/advisor/courses/${courseId}/launch/publish`,
+      request,
+      idempotent(idempotencyKey),
+    );
   }
 
   reconfirmCourseLink(studentUserId: number, courseId: number, request: ReconfirmCourseLinkRequest, idempotencyKey: string = crypto.randomUUID()): Promise<ApiResponse<AdvisorStudentCourseResponse>> {

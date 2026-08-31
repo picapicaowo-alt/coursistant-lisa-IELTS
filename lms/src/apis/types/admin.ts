@@ -16,25 +16,53 @@ export interface AdminTenantPayload {
 export interface ManagedUser {
   id: number;
   tenantId: number;
-  username: string;
-  name: string;
-  avatar: string | null;
+  username?: string;
+  name?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  avatar?: string | null;
   role: LoginAccountType;
   level: UserLevel;
   email: string;
-  mustChangePassword: boolean;
-  emailNotifications: boolean;
+  mustChangePassword?: boolean;
+  emailNotifications?: boolean;
   status: 'ACTIVE' | 'DISABLED';
-  authVersion: number;
+  authVersion?: number;
 }
 
 export interface CreateManagedUserRequest {
   email: string;
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   role: 'USER' | 'TENANT_ADMIN';
   level?: UserLevel;
   tenantId?: number;
 }
+
+export interface TenantUserDirectoryParams {
+  q?: string;
+  role?: string;
+  level?: string;
+  status?: string;
+  page?: number;
+  size?: number;
+}
+
+export interface TenantAuditEventParams {
+  actorUserId?: number;
+  targetUserId?: number;
+  action?: string;
+  resourceType?: string;
+  from?: string;
+  to?: string;
+  page?: number;
+  size?: number;
+}
+
+/** The new tenant directory and audit endpoints currently expose generic data. */
+export type TenantDirectoryRead = unknown;
 
 export interface ChangeManagedUserRoleRequest {
   role: 'USER' | 'TENANT_ADMIN';

@@ -97,6 +97,25 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
           description: NOT_FOUND
+    post:
+      operationId: tenantCreateOrReuseParentLink
+      tags: [Tenant Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/StudentUserId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CreateOrReuseParentLinkRequest" }
+      responses:
+        "200":
+          description: Linked or reused Parent
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: NOT_FOUND
+        "409":
+          description: CONFLICT
   /v2/tenant/students/{studentUserId}/parent-links/{parentUserId}:
     put:
       operationId: tenantLinkParent
@@ -546,10 +565,13 @@ components:
   schemas:
     CreateOrReuseParentLinkRequest:
       type: object
-      required: [email, name]
+      required: [email]
       properties:
         email: { type: string }
-        name: { type: string, maxLength: 100 }
+        name: { type: string, maxLength: 100, description: "Legacy alias; non-blank is rejected" }
+        firstName: { type: string, maxLength: 100 }
+        middleName: { type: string, maxLength: 100 }
+        lastName: { type: string, maxLength: 100 }
         reason: { type: string, maxLength: 1000 }
     LinkParentRequest:
       type: object
@@ -566,7 +588,9 @@ components:
         parentUserId: { type: integer }
         studentUserId: { type: integer }
         linkedAt: { type: string, format: date-time }
-        parentName: { type: string }
+        parentFirstName: { type: string }
+        parentMiddleName: { type: string }
+        parentLastName: { type: string }
         parentEmail: { type: string }
     ParentCreateScheduleRequest:
       type: object

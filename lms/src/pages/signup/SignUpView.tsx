@@ -13,7 +13,7 @@ import {isValidPassword} from '@/utils/passwordRules';
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VERIFICATION_CODE_PATTERN = /^\d{6}$/;
 
-type SignupField = 'name' | 'email' | 'password' | 'verificationCode';
+type SignupField = 'firstName' | 'middleName' | 'lastName' | 'tenantId' | 'email' | 'password' | 'verificationCode';
 type SignupFieldErrors = Partial<Record<SignupField, string>>;
 
 const formatCountdown = (seconds: number) => {
@@ -28,7 +28,10 @@ export default function SignUpView() {
   const {t} = useTranslation('auth');
   const idempotency = useIdempotencyCheckpoint();
 
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [middleName, setMiddleName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [tenantId, setTenantId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
@@ -60,7 +63,11 @@ export default function SignUpView() {
 
   const validate = (): SignupFieldErrors => {
     const errors: SignupFieldErrors = {};
-    if (!name.trim()) errors.name = t('signupErrors.nicknameRequired');
+    if (!firstName.trim()) errors.firstName = t('signupErrors.firstNameRequired');
+    if (!lastName.trim()) errors.lastName = t('signupErrors.lastNameRequired');
+    if (!Number.isInteger(Number(tenantId)) || Number(tenantId) < 1) {
+      errors.tenantId = t('signupErrors.tenantIdRequired');
+    }
     if (!email.trim()) errors.email = t('signupErrors.emailRequired');
     else if (!EMAIL_PATTERN.test(email.trim())) errors.email = t('signupErrors.emailInvalid');
     if (!password) errors.password = t('signupErrors.passwordRequired');
@@ -113,7 +120,10 @@ export default function SignUpView() {
 
     setIsSubmitting(true);
     const request = {
-      name: name.trim(),
+      firstName: firstName.trim(),
+      ...(middleName.trim() ? {middleName: middleName.trim()} : {}),
+      lastName: lastName.trim(),
+      tenantId: Number(tenantId),
       email: email.trim().toLowerCase(),
       password,
       verificationCode: verificationCode.trim(),
@@ -178,23 +188,42 @@ export default function SignUpView() {
           <p className="mb-10 text-sm text-[#718096]">{t('signup.subtitle')}</p>
 
           <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-            <div>
-              <label className="sr-only" htmlFor="signup-name">{t('signup.nameLabel')}</label>
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+              <label className="sr-only" htmlFor="signup-first-name">{t('signup.firstNameLabel')}</label>
               <input
-                id="signup-name"
+                id="signup-first-name"
                 type="text"
-                autoComplete="name"
-                value={name}
+                autoComplete="given-name"
+                value={firstName}
                 onChange={event => {
-                  setName(event.target.value);
-                  clearFieldError('name');
+                  setFirstName(event.target.value);
+                  clearFieldError('firstName');
                 }}
-                placeholder={t('signup.nicknamePlaceholder')}
-                aria-invalid={Boolean(fieldErrors.name)}
-                aria-describedby={fieldErrors.name ? 'signup-name-error' : undefined}
-                className={`h-[50px] w-full rounded-[15px] border bg-white px-[18px] text-sm outline-none transition focus:border-[#566FE8] focus:ring-2 focus:ring-[#566FE8]/15 ${fieldErrors.name ? 'border-red-500' : 'border-[#E2E8F0]'}`}
+                placeholder={t('signup.firstNamePlaceholder')}
+                aria-invalid={Boolean(fieldErrors.firstName)}
+                aria-describedby={fieldErrors.firstName ? 'signup-first-name-error' : undefined}
+                className={`h-[50px] w-full rounded-[15px] border bg-white px-[18px] text-sm outline-none transition focus:border-[#566FE8] focus:ring-2 focus:ring-[#566FE8]/15 ${fieldErrors.firstName ? 'border-red-500' : 'border-[#E2E8F0]'}`}
               />
-              {fieldErrors.name ? <p id="signup-name-error" className="mt-1 text-right text-xs text-red-500">{fieldErrors.name}</p> : null}
+              {fieldErrors.firstName ? <p id="signup-first-name-error" className="mt-1 text-right text-xs text-red-500">{fieldErrors.firstName}</p> : null}
+              </div>
+              <div>
+                <label className="sr-only" htmlFor="signup-last-name">{t('signup.lastNameLabel')}</label>
+                <input id="signup-last-name" type="text" autoComplete="family-name" value={lastName} onChange={event => { setLastName(event.target.value); clearFieldError('lastName'); }} placeholder={t('signup.lastNamePlaceholder')} aria-invalid={Boolean(fieldErrors.lastName)} aria-describedby={fieldErrors.lastName ? 'signup-last-name-error' : undefined} className={`h-[50px] w-full rounded-[15px] border bg-white px-[18px] text-sm outline-none transition focus:border-[#566FE8] focus:ring-2 focus:ring-[#566FE8]/15 ${fieldErrors.lastName ? 'border-red-500' : 'border-[#E2E8F0]'}`}/>
+                {fieldErrors.lastName ? <p id="signup-last-name-error" className="mt-1 text-right text-xs text-red-500">{fieldErrors.lastName}</p> : null}
+              </div>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div>
+                <label className="sr-only" htmlFor="signup-middle-name">{t('signup.middleNameLabel')}</label>
+                <input id="signup-middle-name" type="text" autoComplete="additional-name" value={middleName} onChange={event => setMiddleName(event.target.value)} placeholder={t('signup.middleNamePlaceholder')} className="h-[50px] w-full rounded-[15px] border border-[#E2E8F0] bg-white px-[18px] text-sm outline-none transition focus:border-[#566FE8] focus:ring-2 focus:ring-[#566FE8]/15"/>
+              </div>
+              <div>
+                <label className="sr-only" htmlFor="signup-tenant-id">{t('signup.tenantIdLabel')}</label>
+                <input id="signup-tenant-id" type="number" inputMode="numeric" min="1" value={tenantId} onChange={event => { setTenantId(event.target.value); clearFieldError('tenantId'); }} placeholder={t('signup.tenantIdPlaceholder')} aria-invalid={Boolean(fieldErrors.tenantId)} aria-describedby={fieldErrors.tenantId ? 'signup-tenant-id-error' : undefined} className={`h-[50px] w-full rounded-[15px] border bg-white px-[18px] text-sm outline-none transition focus:border-[#566FE8] focus:ring-2 focus:ring-[#566FE8]/15 ${fieldErrors.tenantId ? 'border-red-500' : 'border-[#E2E8F0]'}`}/>
+                {fieldErrors.tenantId ? <p id="signup-tenant-id-error" className="mt-1 text-right text-xs text-red-500">{fieldErrors.tenantId}</p> : null}
+              </div>
             </div>
 
             <div>

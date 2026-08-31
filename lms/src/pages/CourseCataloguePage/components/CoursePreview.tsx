@@ -167,7 +167,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
           </button>
         ) : null}
         {showDelivery ? (
-          <button type="button" className={styles.viewDetails} onClick={() => navigate(`/admin/courses/${id}/delivery`)}>
+          <button type="button" className={styles.viewDetails} onClick={() => navigate(`/advisor/courses/${id}/delivery`)}>
             Delivery setup
           </button>
         ) : null}

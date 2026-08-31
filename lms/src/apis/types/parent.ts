@@ -3,7 +3,9 @@ import type {AdvisingPage} from './advising';
 /** Contracts declared by docs/api/parent.openapi.yaml. */
 export interface CreateOrReuseParentLinkRequest {
   email: string;
-  name: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   reason?: string;
 }
 
@@ -16,7 +18,9 @@ export interface ParentStudentLinkResponse {
   parentUserId?: number;
   studentUserId?: number;
   linkedAt?: string;
-  parentName?: string;
+  parentFirstName?: string;
+  parentMiddleName?: string;
+  parentLastName?: string;
   parentEmail?: string;
 }
 

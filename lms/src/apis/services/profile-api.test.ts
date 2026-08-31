@@ -12,9 +12,9 @@ describe('ProfileApiService', () => {
     client.get.mockResolvedValue({status: 200, data: {}});
     client.patch.mockResolvedValue({status: 200, data: {}});
     await service.getMyProfile();
-    await service.updateMyProfile({displayName: 'Lisa', emailNotifications: false});
+    await service.updateMyProfile({firstName: 'Lisa', lastName: 'Coursistant', emailNotifications: false});
     expect(client.get).toHaveBeenCalledWith('/v2/me/profile');
-    expect(client.patch).toHaveBeenCalledWith('/v2/me/profile', {displayName: 'Lisa', emailNotifications: false}, expect.objectContaining({headers: expect.any(Object)}));
+    expect(client.patch).toHaveBeenCalledWith('/v2/me/profile', {firstName: 'Lisa', lastName: 'Coursistant', emailNotifications: false}, expect.objectContaining({headers: expect.any(Object)}));
   });
 
   it('uploads and removes the current avatar', async () => {

@@ -1,14 +1,20 @@
 export interface ProfileResponse {
   userId: number;
-  displayName: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   email: string;
   role: string;
   level: string | null;
   avatarUrl: string | null;
+  phone: string | null;
   emailNotifications: boolean;
 }
 
 export interface UpdateProfileRequest {
-  displayName?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
+  phone?: string | null;
   emailNotifications?: boolean;
 }

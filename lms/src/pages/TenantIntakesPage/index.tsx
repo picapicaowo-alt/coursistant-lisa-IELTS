@@ -2,11 +2,14 @@ import React, {FormEvent, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {IntakeAssignmentStatus, IntakeLifecycleStatus, unwrapData} from '@/apis';
+import {StudentIntakeFormFields} from '@/components/StudentIntakeFormFields';
+import {emptyStudentIntakeForm} from '@/components/StudentIntakeFormFields/model';
 import {tenantAdvisingApiService} from '@/apis/services/tenant-advising-api';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {formatPersonName} from '@/utils/personName';
 
 const TenantIntakesPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -17,6 +20,7 @@ const TenantIntakesPage: React.FC = () => {
   const [selectedIntakeId, setSelectedIntakeId] = useState<number | null>(null);
   const [advisorUserId, setAdvisorUserId] = useState('');
   const [reason, setReason] = useState('');
+  const [createForm, setCreateForm] = useState(emptyStudentIntakeForm);
 
   const params = {
     page,
@@ -68,8 +72,29 @@ const TenantIntakesPage: React.FC = () => {
     onSuccess: refresh,
   });
 
-  const busy = assign.isPending || reassign.isPending || cancel.isPending;
-  const mutationError = assign.error || reassign.error || cancel.error;
+  const createIntake = useMutation({
+    mutationFn: async () => {
+      const payload = {
+        firstName: createForm.firstName.trim(),
+        ...(createForm.middleName.trim() ? {middleName: createForm.middleName.trim()} : {}),
+        lastName: createForm.lastName.trim(),
+        email: createForm.email.trim().toLowerCase(),
+        studentType: createForm.studentType,
+        courseRequest: createForm.courseRequest.trim(),
+        ...(createForm.contactPhone.trim() ? {contactPhone: createForm.contactPhone.trim()} : {}),
+        ...(createForm.basicBackground.trim() ? {basicBackground: createForm.basicBackground.trim()} : {}),
+      };
+      const key = idempotency.keyFor('tenant-create-intake', idempotencyFingerprint(payload));
+      return unwrapData(await tenantAdvisingApiService.createStudentIntake(payload, key), 'tenantCreateIntake');
+    },
+    onSuccess: async () => {
+      setCreateForm(emptyStudentIntakeForm);
+      await refresh();
+    },
+  });
+
+  const busy = assign.isPending || reassign.isPending || cancel.isPending || createIntake.isPending;
+  const mutationError = assign.error || reassign.error || cancel.error || createIntake.error;
   const onAssign = (event: FormEvent) => {
     event.preventDefault();
     if (selected?.assignmentStatus === 'ASSIGNED') reassign.mutate();
@@ -86,6 +111,16 @@ const TenantIntakesPage: React.FC = () => {
         </div>
       </header>
       {mutationError ? <p className={styles.error} role="alert">{advisingErrorMessage(mutationError, 'The operation failed.')}</p> : null}
+      <section className={styles.card}>
+        <h2>Create student intake</h2>
+        <p className={styles.muted}>Student accounts are created through intake. The student activates access with Forgot password.</p>
+        <form className={styles.form} onSubmit={event => { event.preventDefault(); createIntake.mutate(); }}>
+          <StudentIntakeFormFields value={createForm} onChange={setCreateForm}/>
+          <button className={styles.primary} disabled={createIntake.isPending}>
+            {createIntake.isPending ? 'Creating…' : 'Create intake'}
+          </button>
+        </form>
+      </section>
       <div className={styles.toolbar}>
         <label>
           <span className={styles.muted}>Lifecycle</span>
@@ -110,7 +145,7 @@ const TenantIntakesPage: React.FC = () => {
         {(intakes.data?.items ?? []).map(intake => (
           <article key={intake.intakeId} className={styles.row}>
             <div className={styles.identity}>
-              <strong>{intake.name || `Intake #${intake.intakeId}`}</strong>
+              <strong>{formatPersonName(intake, `Intake #${intake.intakeId}`)}</strong>
               <span>{intake.email}</span>
               <small>{intake.lifecycleStatus} · {intake.assignmentStatus} · student {intake.studentUserId}</small>
             </div>

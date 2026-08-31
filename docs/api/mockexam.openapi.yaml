@@ -147,12 +147,12 @@ paths:
               $ref: "#/components/schemas/CreateStudentMockExamRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -198,10 +198,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/ObserverMockExamDetailApiResponse"
+          description: SUCCESS
         "400":
           content:
             application/json:
@@ -329,12 +329,12 @@ paths:
               $ref: "#/components/schemas/GradeWritingRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -423,10 +423,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/ObserverMockExamDetailApiResponse"
+          description: SUCCESS
         "400":
           content:
             application/json:
@@ -502,10 +502,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/StudentMockExamDetailApiResponse"
+          description: SUCCESS
         "400":
           content:
             application/json:
@@ -549,12 +549,12 @@ paths:
           type: integer
           format: int64
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -610,12 +610,12 @@ paths:
               $ref: "#/components/schemas/SubmitListeningRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -671,12 +671,12 @@ paths:
               $ref: "#/components/schemas/SubmitReadingRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -732,12 +732,12 @@ paths:
               $ref: "#/components/schemas/SubmitWritingRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -1458,12 +1458,12 @@ paths:
               $ref: "#/components/schemas/CreateTemplateRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -1697,12 +1697,12 @@ paths:
             schema:
               $ref: "#/components/schemas/CopyVersionRequest"
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -1800,12 +1800,12 @@ paths:
               $ref: "#/components/schemas/CreateListeningRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -2008,12 +2008,12 @@ paths:
               $ref: "#/components/schemas/CreateReadingRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -2173,12 +2173,12 @@ paths:
               $ref: "#/components/schemas/CreateWritingRequest"
         required: true
       responses:
-        "200":
+        "201":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Created
         "400":
           content:
             application/json:
@@ -2316,6 +2316,31 @@ components:
           format: date-time
           description: ISO-8601 timestamp
           example: 2026-07-23T10:00:00Z
+    AttemptDto:
+      type: object
+      properties:
+        candidateName:
+          type: string
+        id:
+          type: integer
+          format: int64
+        startedAt:
+          type: string
+          format: date-time
+        status:
+          type: string
+        studentMockExamId:
+          type: integer
+          format: int64
+        studentUserId:
+          type: integer
+          format: int32
+        submittedAt:
+          type: string
+          format: date-time
+        testId:
+          type: integer
+          format: int64
     CopyVersionRequest:
       type: object
       properties:
@@ -2472,6 +2497,286 @@ components:
           type: number
     JsonNode:
       type: object
+    ListeningDetailDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        parts:
+          type: array
+          items:
+            $ref: "#/components/schemas/ListeningPartDto"
+        totalMinutes:
+          type: integer
+          format: int32
+    ListeningPartDto:
+      type: object
+      properties:
+        audioSrc:
+          type: string
+        id:
+          type: integer
+          format: int64
+        label:
+          type: string
+        questionNumbers:
+          type: array
+          items:
+            type: integer
+            format: int32
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/ListeningSectionDto"
+        seq:
+          type: integer
+          format: int32
+    ListeningSectionDto:
+      type: object
+      properties:
+        instruction:
+          type: string
+        kind:
+          type: string
+        payload:
+          $ref: "#/components/schemas/JsonNode"
+        questionEnd:
+          type: integer
+          format: int32
+        questionStart:
+          type: integer
+          format: int32
+        title:
+          type: string
+    ObserverMockExamDetailApiResponse:
+      type: object
+      description: Success envelope wrapping Advisor/Parent mock-exam detail without
+        writing content
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/ObserverMockExamDetailDto"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+    ObserverMockExamDetailDto:
+      type: object
+      description: Advisor/Parent mock-exam detail; writing feedback and task content
+        are omitted
+      properties:
+        attempt:
+          $ref: "#/components/schemas/AttemptDto"
+        createdAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+        listeningCorrect:
+          type: integer
+          format: int32
+        listeningSelected:
+          type: boolean
+        listeningTotal:
+          type: integer
+          format: int32
+        readingCorrect:
+          type: integer
+          format: int32
+        readingSelected:
+          type: boolean
+        readingTotal:
+          type: integer
+          format: int32
+        status:
+          type: string
+        templateId:
+          type: integer
+          format: int64
+        testId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        versionNo:
+          type: integer
+          format: int32
+        writingGradeStatus:
+          type: string
+        writingInstructorUserId:
+          type: integer
+          format: int32
+        writingScore:
+          type: number
+        writingSelected:
+          type: boolean
+    PassageDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        intro:
+          type: string
+        paragraphs:
+          type: array
+          items:
+            type: string
+        questionNumbers:
+          type: array
+          items:
+            type: integer
+            format: int32
+        questions:
+          type: array
+          items:
+            $ref: "#/components/schemas/QuestionDto"
+        seq:
+          type: integer
+          format: int32
+        shortLabel:
+          type: string
+        title:
+          type: string
+    QuestionDto:
+      type: object
+      properties:
+        instruction:
+          type: string
+        kind:
+          type: string
+        payload:
+          $ref: "#/components/schemas/JsonNode"
+        questionEnd:
+          type: integer
+          format: int32
+        questionStart:
+          type: integer
+          format: int32
+        title:
+          type: string
+    ReadingDetailDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        passages:
+          type: array
+          items:
+            $ref: "#/components/schemas/PassageDto"
+        totalMinutes:
+          type: integer
+          format: int32
+    StudentMockExamDetailApiResponse:
+      type: object
+      description: "Success envelope wrapping Student mock-exam detail, including\
+        \ writing feedback and tasks"
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/StudentMockExamDetailDto"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+    StudentMockExamDetailDto:
+      type: object
+      description: Student mock-exam detail including writing feedback and submitted
+        task content
+      properties:
+        attempt:
+          $ref: "#/components/schemas/AttemptDto"
+        createdAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+        listeningCorrect:
+          type: integer
+          format: int32
+        listeningSelected:
+          type: boolean
+        listeningTotal:
+          type: integer
+          format: int32
+        readingCorrect:
+          type: integer
+          format: int32
+        readingSelected:
+          type: boolean
+        readingTotal:
+          type: integer
+          format: int32
+        status:
+          type: string
+        templateId:
+          type: integer
+          format: int64
+        testId:
+          type: integer
+          format: int64
+        title:
+          type: string
+        versionNo:
+          type: integer
+          format: int32
+        writingFeedback:
+          type: string
+        writingGradeStatus:
+          type: string
+        writingInstructorUserId:
+          type: integer
+          format: int32
+        writingScore:
+          type: number
+        writingSelected:
+          type: boolean
+        writingTasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentWritingTaskViewDto"
+    StudentWritingTaskViewDto:
+      type: object
+      description: Student-visible submitted writing task
+      properties:
+        content:
+          type: string
+        seq:
+          type: integer
+          format: int32
+        taskKey:
+          type: string
+        wordCount:
+          type: integer
+          format: int32
     SubmitListeningRequest:
       type: object
       properties:
@@ -2552,6 +2857,41 @@ components:
         versionNo:
           type: integer
           format: int32
+    WritingDetailDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/WritingTaskDto"
+        totalMinutes:
+          type: integer
+          format: int32
+    WritingTaskDto:
+      type: object
+      properties:
+        hasImage:
+          type: boolean
+        id:
+          type: integer
+          format: int64
+        imageSrc:
+          type: string
+        minWords:
+          type: integer
+          format: int32
+        prompt:
+          type: string
+        seq:
+          type: integer
+          format: int32
+        taskKey:
+          type: string
+        title:
+          type: string
   securitySchemes:
     bearerAuth:
       bearerFormat: JWT

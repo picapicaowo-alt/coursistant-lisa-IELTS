@@ -256,6 +256,13 @@ paths:
     put:
       operationId: advisorSetStudentCourseHours
       parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          maxLength: 128
       - in: path
         name: studentUserId
         required: true
@@ -277,10 +284,41 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
           description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "IDEMPOTENCY_KEY_REQUIRED, IDEMPOTENCY_KEY_INVALID, PARAM_MISSING,\
+            \ BAD_REQUEST"
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: INVALID_TOKEN
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "COURSE_NOT_FOUND, COURSE_HOURS_NOT_FOUND"
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "IDEMPOTENCY_KEY_MISMATCH, COURSE_HOURS_VERSION_CONFLICT"
       tags:
       - CourseHours
   /v2/advisor/students/{studentUserId}/courses/{courseId}/session-occurrences/{occurrenceId}/attendance:
@@ -316,6 +354,8 @@ paths:
       - TeachingOccurrences
   /v2/advisor/students/{studentUserId}/courses/{courseId}/student-reports:
     get:
+      description: "1-based pagination. Omitted, 0, or negative page normalizes to\
+        \ 1; omitted or size below 1 defaults to 20; size above 50 is capped at 50."
       operationId: advisorListPublishedCourseReports
       parameters:
       - in: path
@@ -330,13 +370,17 @@ paths:
         schema:
           type: integer
           format: int32
-      - in: query
+      - description: "1-based page index. Omitted, 0, or negative values normalize\
+          \ to 1."
+        in: query
         name: page
         required: false
         schema:
           type: integer
           format: int32
-      - in: query
+      - description: Page size. Omitted or values below 1 default to 20; values above
+          50 cap at 50.
+        in: query
         name: size
         required: false
         schema:
@@ -345,10 +389,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportPageApiResponse"
+          description: SUCCESS
       tags:
       - CourseReports
   /v2/advisor/students/{studentUserId}/courses/{courseId}/student-reports/{reportId}:
@@ -376,14 +420,17 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: SUCCESS
       tags:
       - CourseReports
   /v2/advisor/students/{studentUserId}/student-reports:
     get:
+      description: Zero-based pagination. Omitted or negative page normalizes to 0;
+        omitted or size below 1 defaults to 20; size above 50 is capped at 50. Offset
+        is page * size.
       operationId: advisorListStudentPublishedReports
       parameters:
       - in: path
@@ -392,25 +439,29 @@ paths:
         schema:
           type: integer
           format: int32
-      - in: query
+      - description: Zero-based page index. Omitted or negative values normalize to
+          0.
+        in: query
         name: page
         required: false
         schema:
           type: integer
-          format: int32
-      - in: query
+          default: 0
+      - description: Page size. Omitted or values below 1 default to 20; values above
+          50 cap at 50.
+        in: query
         name: size
         required: false
         schema:
           type: integer
-          format: int32
+          default: 20
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportPageApiResponse"
+          description: SUCCESS
       tags:
       - CourseReports
   /v2/courses:
@@ -689,24 +740,24 @@ paths:
         schema:
           type: integer
           format: int32
-      - in: query
-        name: body
-        required: true
-        schema:
-          type: string
-      - in: query
-        name: files
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: binary
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateDiscussionPostRequest"
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+              required:
+              - body
         required: true
       responses:
         "200":
@@ -886,24 +937,24 @@ paths:
         schema:
           type: integer
           format: int64
-      - in: query
-        name: body
-        required: true
-        schema:
-          type: string
-      - in: query
-        name: files
-        required: false
-        schema:
-          type: array
-          items:
-            type: string
-            format: binary
       requestBody:
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/CreateDiscussionPostRequest"
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                body:
+                  type: string
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+              required:
+              - body
         required: true
       responses:
         "200":
@@ -1833,6 +1884,38 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
           description: OK
+        "400":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: PARAM_MISSING or BAD_REQUEST
+        "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: UNAUTHORIZED or INVALID_TOKEN
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED when the actor can see the Course but is not
+            an active Instructor
+        "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: COURSE_NOT_FOUND when the Course is absent or hidden; SCHEDULE_REQUEST_NOT_FOUND
+            when the request is absent or belongs to another Course
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SCHEDULE_REQUEST_STATE_CONFLICT
       tags:
       - CourseScheduleRequests
   /v2/courses/{courseId}/session-occurrences:
@@ -2009,12 +2092,24 @@ paths:
               $ref: "#/components/schemas/SaveAttendanceRequest"
         required: true
       responses:
-        "200":
+        "403":
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "COURSE_NOT_FOUND, SESSION_OCCURRENCE_NOT_FOUND"
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "ATTENDANCE_ROSTER_MISMATCH, ATTENDANCE_VERSION_CONFLICT"
       tags:
       - TeachingOccurrences
   /v2/courses/{courseId}/session-occurrences/{occurrenceId}/attendance/me:
@@ -2344,6 +2439,8 @@ paths:
       - Sessions
   /v2/courses/{courseId}/student-reports:
     get:
+      description: "1-based pagination. Omitted, 0, or negative page normalizes to\
+        \ 1; omitted or size below 1 defaults to 20; size above 50 is capped at 50."
       operationId: listCourseStudentReports
       parameters:
       - in: path
@@ -2358,23 +2455,35 @@ paths:
         schema:
           type: integer
           format: int32
-      - in: query
+      - description: Optional filter. Omit or blank means no type filter.
+        in: query
         name: reportType
         required: false
         schema:
           type: string
-      - in: query
+          enum:
+          - MID_TERM
+          - FINAL
+      - description: Optional filter. Omit or blank means no status filter.
+        in: query
         name: status
         required: false
         schema:
           type: string
-      - in: query
+          enum:
+          - DRAFT
+          - PUBLISHED
+      - description: "1-based page index. Omitted, 0, or negative values normalize\
+          \ to 1."
+        in: query
         name: page
         required: false
         schema:
           type: integer
           format: int32
-      - in: query
+      - description: Page size. Omitted or values below 1 default to 20; values above
+          50 cap at 50.
+        in: query
         name: size
         required: false
         schema:
@@ -2383,10 +2492,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportPageApiResponse"
+          description: SUCCESS
       tags:
       - CourseReports
     post:
@@ -2413,14 +2522,34 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: SUCCESS
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: COURSE_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: COURSE_REPORT_ALREADY_EXISTS
       tags:
       - CourseReports
   /v2/courses/{courseId}/student-reports/published/me:
     get:
+      description: "1-based pagination. Omitted, 0, or negative page normalizes to\
+        \ 1; omitted or size below 1 defaults to 20; size above 50 is capped at 50."
       operationId: listMyPublishedCourseReports
       parameters:
       - in: path
@@ -2429,13 +2558,17 @@ paths:
         schema:
           type: integer
           format: int32
-      - in: query
+      - description: "1-based page index. Omitted, 0, or negative values normalize\
+          \ to 1."
+        in: query
         name: page
         required: false
         schema:
           type: integer
           format: int32
-      - in: query
+      - description: Page size. Omitted or values below 1 default to 20; values above
+          50 cap at 50.
+        in: query
         name: size
         required: false
         schema:
@@ -2444,10 +2577,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportPageApiResponse"
+          description: SUCCESS
       tags:
       - CourseReports
   /v2/courses/{courseId}/student-reports/published/me/{reportId}:
@@ -2469,10 +2602,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: SUCCESS
       tags:
       - CourseReports
   /v2/courses/{courseId}/student-reports/{reportId}:
@@ -2494,10 +2627,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: SUCCESS
       tags:
       - CourseReports
     patch:
@@ -2524,10 +2657,28 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: SUCCESS
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: "COURSE_NOT_FOUND, COURSE_REPORT_NOT_FOUND"
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: "COURSE_REPORT_PUBLISHED_READONLY, COURSE_REPORT_VERSION_CONFLICT"
       tags:
       - CourseReports
   /v2/courses/{courseId}/student-reports/{reportId}/publish:
@@ -2555,10 +2706,28 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: SUCCESS
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: "COURSE_NOT_FOUND, COURSE_REPORT_NOT_FOUND"
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportApiResponse"
+          description: "COURSE_REPORT_PUBLISHED_READONLY, COURSE_REPORT_VERSION_CONFLICT"
       tags:
       - CourseReports
   /v2/courses/{courseId}/students:
@@ -3742,10 +3911,22 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentAlertsResponse"
+          description: OK
+        "401":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Missing or invalid token (code INVALID_TOKEN)
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Caller is not a STUDENT (code FORBIDDEN)
       summary: List derived student alerts
       tags:
       - StudentAlerts
@@ -4045,10 +4226,22 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentProgressApiResponse"
+          description: OK
+        "401":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Missing or invalid token (code INVALID_TOKEN)
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Caller is not a STUDENT (code FORBIDDEN)
       tags:
       - StudentDashboard
   /v2/me/schedule-requests:
@@ -4195,10 +4388,22 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeachingGradingItemsApiResponse"
+          description: OK
+        "401":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Missing or invalid token (code INVALID_TOKEN)
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Caller is not Instructor level (code ACCESS_DENIED)
       summary: List per-student grading items
       tags:
       - Teaching
@@ -4235,10 +4440,22 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeachingStudentSupportApiResponse"
+          description: OK
+        "401":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Missing or invalid token (code INVALID_TOKEN)
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Caller is not Instructor level (code FORBIDDEN)
       summary: List students matching tenant support thresholds
       tags:
       - Teaching
@@ -4248,10 +4465,22 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeachingTodayClassesApiResponse"
+          description: OK
+        "401":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Missing or invalid token (code INVALID_TOKEN)
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Caller is not Instructor level (code ACCESS_DENIED)
       summary: List all effective classes today
       tags:
       - Teaching
@@ -4261,10 +4490,22 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentWorkQueueApiResponse"
+          description: OK
+        "401":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Missing or invalid token (code INVALID_TOKEN)
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Caller is not a STUDENT (code FORBIDDEN)
       tags:
       - StudentDashboard
   /v2/tenant/alert-rules:
@@ -4296,12 +4537,48 @@ paths:
           description: OK
       tags:
       - TenantAlertRules
-  /v2/tenant/instructors/{instructorUserId}/availability:
+  /v2/tenant/course-ownerships:
     get:
-      operationId: tenantGetInstructorAvailability
+      operationId: tenantListCourseOwnerships
+      parameters:
+      - in: query
+        name: q
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: ownerAdvisorUserId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TenantCourseOwnership
+  /v2/tenant/courses/{courseId}/owner:
+    get:
+      operationId: tenantGetCourseOwner
       parameters:
       - in: path
-        name: instructorUserId
+        name: courseId
         required: true
         schema:
           type: integer
@@ -4314,7 +4591,31 @@ paths:
                 $ref: "#/components/schemas/ApiResponse"
           description: OK
       tags:
-      - InstructorAvailability
+      - TenantCourseOwnership
+    put:
+      operationId: tenantTransferCourseOwner
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransferCourseOwnerRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TenantCourseOwnership
 components:
   schemas:
     AdminBatchEnrollRequest:
@@ -4346,7 +4647,9 @@ components:
           description: Stable machine code (ErrorType.name() or SUCCESS)
           example: SUCCESS
         data:
-          $ref: "#/components/schemas/TenantAlertRuleResponse"
+          type: object
+          description: Payload; explicitly null when no payload is available
+          nullable: true
         message:
           type: string
           description: Human-readable message
@@ -4422,6 +4725,19 @@ components:
         expectedVersion:
           type: integer
           format: int32
+    CheckpointProgressResponse:
+      type: object
+      properties:
+        checkpointId:
+          type: integer
+          format: int64
+        dueDate:
+          type: string
+          format: date
+        status:
+          type: string
+        title:
+          type: string
     CourseEventResponse:
       type: object
       description: Concrete course event with legacy local fields plus canonical local/UTC
@@ -4481,6 +4797,217 @@ components:
         version:
           type: integer
           format: int32
+    CourseProgressResponse:
+      type: object
+      properties:
+        completedAssignmentCount:
+          type: integer
+          format: int32
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        totalAssignmentCount:
+          type: integer
+          format: int32
+    CourseReportPerformanceSnapshot:
+      type: object
+      properties:
+        absentCount:
+          type: integer
+          format: int32
+        approvedAbsenceCount:
+          type: integer
+          format: int32
+        assignmentCount:
+          type: integer
+          format: int32
+        completedSessionCount:
+          type: integer
+          format: int32
+        presentCount:
+          type: integer
+          format: int32
+        releasedGradeCount:
+          type: integer
+          format: int32
+        releasedScoreAverage:
+          type: number
+        submittedCount:
+          type: integer
+          format: int32
+        unapprovedAbsenceCount:
+          type: integer
+          format: int32
+    CourseStudentReportApiResponse:
+      type: object
+      description: Success envelope wrapping a course student report detail
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/CourseStudentReportResponse"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 response timestamp
+          example: 2026-08-28T10:00:00Z
+    CourseStudentReportPageApiResponse:
+      type: object
+      description: Success envelope wrapping a paginated course student report list
+      properties:
+        code:
+          type: string
+          description: Stable machine code
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/CourseStudentReportPageResponse"
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 response timestamp
+          example: 2026-08-28T10:00:00Z
+    CourseStudentReportPageResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseStudentReportSummaryResponse"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
+    CourseStudentReportResponse:
+      type: object
+      properties:
+        courseCode:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdByInstructorUserId:
+          type: integer
+          format: int32
+        id:
+          type: integer
+          format: int64
+        improvementSuggestions:
+          type: string
+        overallSummary:
+          type: string
+        performanceSnapshot:
+          $ref: "#/components/schemas/CourseReportPerformanceSnapshot"
+        publishedAt:
+          type: string
+          format: date-time
+        reportType:
+          type: string
+          enum:
+          - MID_TERM
+          - FINAL
+        skillEvaluation:
+          type: string
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - PUBLISHED
+        strengths:
+          type: string
+        studentFirstName:
+          type: string
+        studentLastName:
+          type: string
+        studentMiddleName:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+        title:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int32
+        weaknesses:
+          type: string
+    CourseStudentReportSummaryResponse:
+      type: object
+      properties:
+        courseCode:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+        publishedAt:
+          type: string
+          format: date-time
+        reportType:
+          type: string
+          enum:
+          - MID_TERM
+          - FINAL
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - PUBLISHED
+        studentFirstName:
+          type: string
+        studentLastName:
+          type: string
+        studentMiddleName:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+        title:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
     CreateAnnouncementRequest:
       type: object
       properties:
@@ -4976,12 +5503,323 @@ components:
           format: int32
         reason:
           type: string
+    StudentAlertResponse:
+      type: object
+      properties:
+        assignmentId:
+          type: integer
+          format: int32
+        checkpointId:
+          type: integer
+          format: int64
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        deepLink:
+          type: string
+        dueAt:
+          type: string
+          format: date-time
+        title:
+          type: string
+        type:
+          type: string
+        urgency:
+          type: string
+    StudentAlertsResponse:
+      type: object
+      description: Success envelope wrapping derived student alerts
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentAlertResponse"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    StudentProgressApiResponse:
+      type: object
+      description: Success envelope wrapping student progress
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/StudentProgressResponse"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    StudentProgressResponse:
+      type: object
+      properties:
+        checkpoints:
+          type: array
+          items:
+            $ref: "#/components/schemas/CheckpointProgressResponse"
+        completedAssignmentCount:
+          type: integer
+          format: int32
+        courses:
+          type: array
+          items:
+            $ref: "#/components/schemas/CourseProgressResponse"
+        totalAssignmentCount:
+          type: integer
+          format: int32
+    StudentWorkQueueApiResponse:
+      type: object
+      description: Success envelope wrapping student work-queue items
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentWorkQueueItemResponse"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    StudentWorkQueueItemResponse:
+      type: object
+      properties:
+        alertType:
+          type: string
+        assignmentId:
+          type: integer
+          format: int32
+        checkpointId:
+          type: integer
+          format: int64
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        deepLink:
+          type: string
+        description:
+          type: string
+        dueAt:
+          type: string
+          format: date-time
+        gradeStatus:
+          type: string
+        learningType:
+          type: string
+        notificationId:
+          type: integer
+          format: int64
+        notificationType:
+          type: string
+        occurrenceId:
+          type: integer
+          format: int64
+        read:
+          type: boolean
+        releasedScore:
+          type: number
+        sessionId:
+          type: integer
+          format: int32
+        sourceType:
+          type: string
+        status:
+          type: string
+        submissionRequirement:
+          type: string
+        submissionStatus:
+          type: string
+        taskId:
+          type: integer
+          format: int64
+        taskStatus:
+          type: string
+        title:
+          type: string
+        urgency:
+          type: string
     SwitchGroupRequest:
       type: object
       properties:
         targetGroupId:
           type: integer
           format: int32
+    TeachingGradingItemResponse:
+      type: object
+      properties:
+        assignmentId:
+          type: integer
+          format: int32
+        courseCode:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        dueAt:
+          type: string
+          format: date-time
+        gradingDeepLink:
+          type: string
+        status:
+          type: string
+        studentFirstName:
+          type: string
+        studentLastName:
+          type: string
+        studentMiddleName:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+        submittedAt:
+          type: string
+          format: date-time
+        title:
+          type: string
+        urgency:
+          type: string
+    TeachingGradingItemsApiResponse:
+      type: object
+      description: Success envelope wrapping per-student grading items
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeachingGradingItemResponse"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    TeachingStudentSupportApiResponse:
+      type: object
+      description: Success envelope wrapping students needing support
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeachingStudentSupportResponse"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    TeachingStudentSupportResponse:
+      type: object
+      properties:
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        deepLink:
+          type: string
+        reasons:
+          type: array
+          items:
+            type: string
+        studentFirstName:
+          type: string
+        studentLastName:
+          type: string
+        studentMiddleName:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+    TeachingTodayClassResponse:
+      type: object
+      properties:
+        courseCode:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        date:
+          type: string
+          format: date
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        lectureNumber:
+          type: integer
+          format: int32
+        location:
+          type: string
+        occurrenceId:
+          type: integer
+          format: int64
+        sessionId:
+          type: integer
+          format: int32
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        status:
+          type: string
+        studentCount:
+          type: integer
+          format: int32
+        timezone:
+          type: string
+    TeachingTodayClassesApiResponse:
+      type: object
+      description: Success envelope wrapping today classes
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeachingTodayClassResponse"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
     TenantAlertRuleRequest:
       type: object
       properties:
@@ -5014,68 +5852,30 @@ components:
         inactivityDays:
           type: integer
           format: int32
-        negativeHoursEnabled:
-          type: integer
-          format: int32
-        overdueTaskEnabled:
-          type: integer
-          format: int32
-        performanceMinimumGradedSample:
-          type: integer
-          format: int32
-        performancePercentage:
-          type: number
-    TenantAlertRuleResponse:
-      type: object
-      description: Payload; explicitly null when no payload is available
-      nullable: true
-      properties:
-        absenceCount:
-          type: integer
-          format: int32
-        absenceWindowDays:
-          type: integer
-          format: int32
-        checkpointIncompleteEnabled:
-          type: integer
-          format: int32
-        completionMinimumSample:
-          type: integer
-          format: int32
-        completionPercentage:
-          type: number
-        completionWindowDays:
-          type: integer
-          format: int32
-        deadlineWindowDays:
-          type: integer
-          format: int32
-        gradingDelayDays:
-          type: integer
-          format: int32
-        inactivityDays:
-          type: integer
-          format: int32
-        negativeHoursEnabled:
-          type: integer
-          format: int32
-        overdueTaskEnabled:
-          type: integer
-          format: int32
-        performanceMinimumGradedSample:
-          type: integer
-          format: int32
-        performancePercentage:
-          type: number
-        tenantId:
-          type: integer
-          format: int32
-        updatedAt:
+        mode:
           type: string
-          format: date-time
-        version:
+        negativeHoursEnabled:
           type: integer
           format: int32
+        overdueTaskEnabled:
+          type: integer
+          format: int32
+        performanceMinimumGradedSample:
+          type: integer
+          format: int32
+        performancePercentage:
+          type: number
+    TransferCourseOwnerRequest:
+      type: object
+      properties:
+        expectedOwnershipVersion:
+          type: integer
+          format: int32
+        ownerAdvisorUserId:
+          type: integer
+          format: int32
+        reason:
+          type: string
     UpcomingCourseActivityResponse:
       type: object
       description: Concrete future Event or expanded Session occurrence; raw SessionResponse
@@ -5191,6 +5991,9 @@ components:
           type: string
         reportType:
           type: string
+          enum:
+          - MID_TERM
+          - FINAL
         skillEvaluation:
           type: string
         strengths:

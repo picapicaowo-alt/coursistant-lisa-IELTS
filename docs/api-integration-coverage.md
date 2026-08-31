@@ -1,21 +1,23 @@
 # Frontend API integration coverage
 
-Snapshot received 2026-08-28. The nine files under `docs/api/` are the
-frontend-consumed copies of the backend OpenAPI supplied for the 8085 training
-product. The browser continues to use same-origin `/api`; 8085 proxies that to
-the training LMS on 8083.
+Registration snapshot received 2026-08-31. The ten registration-related files
+under `docs/api/` are the frontend-consumed copies of the latest backend
+OpenAPI supplied for the 8085 training product. `vocabulary.openapi.yaml`
+remains a separately versioned contract. The browser continues to use
+same-origin `/api`; 8085 proxies that to the training LMS on 8083.
 
 | Contract | Paths | Operations | Frontend status |
 |---|---:|---:|---|
 | User | 8 | 13 | Current profile/avatar, user directory/detail/avatar, and supported admin writes connected; five `*Disabled` operations intentionally have no UI |
-| Parent | 26 | 30 | New typed service plus Parent portal and Counsellor/Advisor/Tenant link controls |
+| Parent | 26 | 31 | Parent portal and Counsellor/Advisor/Tenant link controls, including Tenant create-or-reuse |
 | Notification | 5 | 5 | Personal notification center already connected; admin digest transport added |
 | Counsellor | 5 | 7 | All operations already connected |
-| Course | 111 | 148 | Existing course UI retained; Course Operations and My Operations expose attendance, occurrences, scheduling, hours, reports, alerts, availability, discussions, relationships, and personal events |
-| Mock Exam | 40 | 47 | Role-scoped transport retained; the complete exam loop is explicitly excluded from this delivery |
+| Course | 112 | 150 | Existing course UI retained; Course Operations and My Operations expose attendance, occurrences, scheduling, hours, reports, alerts, availability, discussions, relationships, ownership, delivery configuration, and personal events |
+| Mock Exam | 40 | 47 | Role-scoped transport and typed observer/student detail responses retained |
 | Assignment | 35 | 42 | Existing workflows plus the full assignment collection and course attachment manifest are connected, including authenticated binary helpers |
-| Auth | 18 | 21 | Login/register/reset/session, administrator directory/detail, and enabled managed-user operations connected; four `*Disabled` admin CRUD operations intentionally omitted |
-| Advising | 53 | 62 | Existing A/B plus course orchestration, tasks, dashboard/hub, reports, conversations, and action tasks connected |
+| Auth | 22 | 25 | Split-name registration, Tenant-scoped managed-user directory/detail/audit/enable, login/reset/session, and supported admin operations connected |
+| Advising | 50 | 60 | Split-name intake records, Tenant student intake, Advisor workspaces, course orchestration, tasks, dashboard/hub, reports, conversations, and action tasks connected |
+| Quiz | 22 | 29 | Existing quiz authoring/attempt workflow retained; current-user attempt history and submission receipt added |
 
 ## UI delivered before Figma
 
@@ -30,15 +32,17 @@ the training LMS on 8083.
   and the student conversation.
 - Advisor `/operations` covers dashboard, action-task detail and transitions,
   schedule-request decisions, conversations, and instructor availability.
-- Tenant course cards link to delivery configuration for catalog/capacity and
-  READY/PUBLISH transitions.
+- Advisor course cards link to delivery configuration for catalog/capacity and
+  READY/PUBLISH transitions. Removed Tenant delivery routes are no longer called.
 - `/my-operations` provides the current user's alerts, attendance, progress,
   work queue, calendar, course hours, personal events, reports, and instructor
   teaching/availability operations.
 - `/course/:courseId/operations` provides the course-level non-authoring
   operations, assignment manifest, and instructor-safe student context.
-- Admin Console operations expose admin/user detail, user avatar, notification
-  digest, tenant instructor availability, and versioned tenant alert rules.
+- Admin Console operations expose admin/user detail, user avatar, Tenant user
+  directory/detail/audit/enable, notification digest, and versioned Tenant
+  alert rules. Managed-user creation is restricted to contract-supported staff
+  and Tenant administrator levels.
 - Student advising supports task transitions, messaging, read state, and
   authenticated conversation attachment preview/download.
 
@@ -58,6 +62,7 @@ components. They do not claim final visual parity with a future Figma file.
   operationId explicitly says `Disabled`.
 - Real shared-Dev writes still require an authorized fixture account and must
   respect the backend's idempotency and optimistic-version checks.
-- The backend `/api/v3/api-docs` aggregation endpoint currently returns 500.
-  This prevents a live operation-count comparison; the checked-in nine YAML
-  files remain the frontend contract snapshot. See `backend-openapi-handoff.md`.
+- The backend `/api/v3/api-docs` aggregation endpoint returned 500 during the
+  previous Dev verification. Until a live recheck succeeds, the checked-in
+  YAML files remain the frontend contract snapshot. See
+  `backend-openapi-handoff.md`.

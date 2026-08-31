@@ -8,6 +8,7 @@ import {
   ChangeManagedUserRoleRequest,
   CreateManagedUserRequest,
   ManagedUser,
+  UserLevel,
   unwrapData,
 } from '@/apis';
 import {adminApiService} from '@/apis/services/admin-api';
@@ -16,17 +17,24 @@ import {getManagedUserCreateError} from './adminFeedback';
 import {CourseMembershipPanel} from './components/CourseMembershipPanel';
 import {AdminContractOperations} from './components/AdminContractOperations';
 import styles from './index.module.scss';
+import {normalizeManagedUsers} from './adminDirectory';
+import {formatPersonName} from '@/utils/personName';
 
 type ManagedRole = CreateManagedUserRequest['role'];
-type ManagedLevel = 'STUDENT' | 'INSTRUCTOR' | 'COUNSELLOR' | 'ADVISOR' | 'INSTRUCTOR_ADVISOR';
-const MANAGED_LEVEL_OPTIONS: ManagedLevel[] = ['STUDENT', 'INSTRUCTOR', 'COUNSELLOR', 'ADVISOR', 'INSTRUCTOR_ADVISOR'];
-const asManagedLevel = (level: string): ManagedLevel =>
-  MANAGED_LEVEL_OPTIONS.includes(level as ManagedLevel) ? level as ManagedLevel : 'STUDENT';
-const levelSelect = (value: ManagedLevel, onChange: (level: ManagedLevel) => void) => (
+type ManagedLevel = Exclude<UserLevel, 'NOT_APPLICABLE'>;
+const SYSTEM_MANAGED_LEVEL_OPTIONS: ManagedLevel[] = ['STUDENT', 'PARENT', 'INSTRUCTOR', 'COUNSELLOR', 'ADVISOR', 'INSTRUCTOR_ADVISOR'];
+const TENANT_MANAGED_LEVEL_OPTIONS: ManagedLevel[] = ['INSTRUCTOR', 'COUNSELLOR', 'ADVISOR', 'INSTRUCTOR_ADVISOR'];
+const asManagedLevel = (level: string, fallback: ManagedLevel): ManagedLevel =>
+  SYSTEM_MANAGED_LEVEL_OPTIONS.includes(level as ManagedLevel) ? level as ManagedLevel : fallback;
+const levelSelect = (
+  value: ManagedLevel,
+  onChange: (level: ManagedLevel) => void,
+  options: ManagedLevel[],
+) => (
   <label>
     <span>Level</span>
     <select value={value} onChange={event => onChange(event.target.value as ManagedLevel)}>
-      {MANAGED_LEVEL_OPTIONS.map(option => <option key={option} value={option}>{option}</option>)}
+      {options.map(option => <option key={option} value={option}>{option}</option>)}
     </select>
   </label>
 );
@@ -61,42 +69,47 @@ const TenantRow = ({tenant, busy, onSave, onDelete}: {
   );
 };
 
-const ManagedUserRow = ({account, tenants, busy, onUpdate, onDisable, onMoveTenant}: {
+const ManagedUserRow = ({account, tenants, busy, systemScope, onUpdate, onDisable, onEnable, onMoveTenant}: {
   account: ManagedUser;
   tenants: AdminTenant[];
   busy: boolean;
+  systemScope: boolean;
   onUpdate: (id: number, request: ChangeManagedUserRoleRequest) => void;
   onDisable: (id: number) => void;
+  onEnable: (id: number) => void;
   onMoveTenant: (id: number, tenantId: number) => void;
 }) => {
   const [role, setRole] = useState<ManagedRole>(account.role === 'TENANT_ADMIN' ? 'TENANT_ADMIN' : 'USER');
-  const [level, setLevel] = useState<ManagedLevel>(asManagedLevel(account.level));
+  const [level, setLevel] = useState<ManagedLevel>(asManagedLevel(account.level, systemScope ? 'STUDENT' : 'INSTRUCTOR'));
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [targetTenantId, setTargetTenantId] = useState(String(account.tenantId));
   const [confirmMove, setConfirmMove] = useState(false);
+  const immutableTenantIdentity = !systemScope && (account.level === 'STUDENT' || account.level === 'PARENT');
 
   return (
     <article className={styles.listRow}>
       <div className={styles.rowIdentity}>
-        <strong>{account.name || account.email}</strong>
+        <strong>{formatPersonName(account, account.name || account.email)}</strong>
         <span>{account.email} · User #{account.id} · Tenant #{account.tenantId}</span>
         <small>{account.role}{account.role === 'USER' ? ` / ${account.level}` : ''} · {account.status}</small>
       </div>
       <details className={styles.details}>
         <summary>Manage</summary>
         <div className={styles.inlineForm}>
-          <label><span>Account role</span><select value={role} onChange={event => setRole(event.target.value as ManagedRole)}><option value="USER">User</option><option value="TENANT_ADMIN">Tenant admin</option></select></label>
-          {role === 'USER' ? levelSelect(level, setLevel) : null}
-          <button type="button" className={styles.primaryButton} disabled={busy} onClick={() => onUpdate(account.id, {role, level: role === 'USER' ? level : 'NOT_APPLICABLE'})}>Update role</button>
-          <div className={styles.operationDivider}/>
+          {immutableTenantIdentity ? <p>Student and Parent identities cannot be changed through managed-user role transitions.</p> : <>
+            <label><span>Account role</span><select value={role} onChange={event => setRole(event.target.value as ManagedRole)}><option value="USER">User</option><option value="TENANT_ADMIN">Tenant admin</option></select></label>
+            {role === 'USER' ? levelSelect(level, setLevel, systemScope ? SYSTEM_MANAGED_LEVEL_OPTIONS : TENANT_MANAGED_LEVEL_OPTIONS) : null}
+            <button type="button" className={styles.primaryButton} disabled={busy} onClick={() => onUpdate(account.id, {role, level: role === 'USER' ? level : 'NOT_APPLICABLE'})}>Update role</button>
+          </>}
+          {systemScope ? <><div className={styles.operationDivider}/>
           <label><span>Tenant</span><select value={targetTenantId} onChange={event => { setTargetTenantId(event.target.value); setConfirmMove(false); }}>{tenants.map(tenant => <option key={tenant.id} value={tenant.id}>{tenant.name} (#{tenant.id})</option>)}</select></label>
           {Number(targetTenantId) !== account.tenantId ? confirmMove ? (
             <div className={styles.confirmStack}>
               <p>Move this identity to tenant #{targetTenantId}? Active course memberships or responsibilities may prevent the move.</p>
               <div className={styles.confirmRow}><button type="button" className={styles.dangerButton} disabled={busy} onClick={() => onMoveTenant(account.id, Number(targetTenantId))}>Confirm tenant move</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmMove(false)}>Cancel</button></div>
             </div>
-          ) : <button type="button" className={styles.dangerLink} disabled={busy} onClick={() => setConfirmMove(true)}>Move to another tenant</button> : null}
-          {account.status !== 'DISABLED' ? confirmDisable ? <><button type="button" className={styles.dangerButton} disabled={busy} onClick={() => onDisable(account.id)}>Confirm disable</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmDisable(false)}>Cancel</button></> : <button type="button" className={styles.dangerLink} onClick={() => setConfirmDisable(true)}>Disable account</button> : null}
+          ) : <button type="button" className={styles.dangerLink} disabled={busy} onClick={() => setConfirmMove(true)}>Move to another tenant</button> : null}</> : null}
+          {account.status !== 'DISABLED' ? confirmDisable ? <><button type="button" className={styles.dangerButton} disabled={busy} onClick={() => onDisable(account.id)}>Confirm disable</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmDisable(false)}>Cancel</button></> : <button type="button" className={styles.dangerLink} onClick={() => setConfirmDisable(true)}>Disable account</button> : !systemScope ? <button type="button" className={styles.primaryButton} disabled={busy} onClick={() => onEnable(account.id)}>Enable account</button> : null}
         </div>
       </details>
     </article>
@@ -117,13 +130,15 @@ const AdminConsolePage: React.FC = () => {
   const [tenantName, setTenantName] = useState('');
   const [tenantTimezone, setTenantTimezone] = useState('America/Los_Angeles');
   const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [middleName, setMiddleName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [role, setRole] = useState<ManagedRole>('USER');
-  const [level, setLevel] = useState<ManagedLevel>('STUDENT');
+  const [level, setLevel] = useState<ManagedLevel>(isSystemAdmin ? 'STUDENT' : 'INSTRUCTOR');
   const [tenantId, setTenantId] = useState('');
   const [managedUserId, setManagedUserId] = useState('');
   const [manualRole, setManualRole] = useState<ManagedRole>('USER');
-  const [manualLevel, setManualLevel] = useState<ManagedLevel>('STUDENT');
+  const [manualLevel, setManualLevel] = useState<ManagedLevel>('INSTRUCTOR');
   const [confirmManualDisable, setConfirmManualDisable] = useState(false);
   const [courseId, setCourseId] = useState('');
   const [primaryInstructorUserId, setPrimaryInstructorUserId] = useState('');
@@ -141,6 +156,14 @@ const AdminConsolePage: React.FC = () => {
     queryKey: ['admin', 'users'],
     queryFn: async () => unwrapData(await adminApiService.listUsers(), 'listUsers'),
     enabled: isSystemAdmin,
+    retry: 1,
+  });
+  const tenantUsersQuery = useQuery({
+    queryKey: ['tenant', 'users'],
+    queryFn: async () => normalizeManagedUsers(
+      unwrapData(await adminApiService.listTenantUsers({page: 0, size: 100}), 'listTenantUsers'),
+    ),
+    enabled: isTenantAdmin,
     retry: 1,
   });
 
@@ -175,9 +198,11 @@ const AdminConsolePage: React.FC = () => {
       const id = unwrapData(response, 'createManagedUser');
       setManagedUserId(String(id));
       setEmail('');
-      setName('');
+      setFirstName('');
+      setMiddleName('');
+      setLastName('');
       setMessage({tone: 'success', text: `Managed user #${id} created. They must use Forgot Password to establish their first password.`});
-      if (isSystemAdmin) await queryClient.invalidateQueries({queryKey: ['admin', 'users']});
+      await queryClient.invalidateQueries({queryKey: isSystemAdmin ? ['admin', 'users'] : ['tenant', 'users']});
     },
     onError: error => setMessage({tone: 'error', text: getManagedUserCreateError(error)}),
   });
@@ -185,7 +210,7 @@ const AdminConsolePage: React.FC = () => {
     mutationFn: ({id, request}: {id: number; request: ChangeManagedUserRoleRequest}) => adminApiService.changeManagedUserRole(scope, id, request),
     onSuccess: async () => {
       setMessage({tone: 'success', text: 'User role updated. Existing sessions have been signed out.'});
-      if (isSystemAdmin) await queryClient.invalidateQueries({queryKey: ['admin', 'users']});
+      await queryClient.invalidateQueries({queryKey: isSystemAdmin ? ['admin', 'users'] : ['tenant', 'users']});
     },
     onError: () => setMessage({tone: 'error', text: 'The role could not be changed. Check tenant scope and active course responsibilities.'}),
   });
@@ -194,9 +219,17 @@ const AdminConsolePage: React.FC = () => {
     onSuccess: async () => {
       setConfirmManualDisable(false);
       setMessage({tone: 'success', text: 'User disabled and active enrolments withdrawn.'});
-      if (isSystemAdmin) await queryClient.invalidateQueries({queryKey: ['admin', 'users']});
+      await queryClient.invalidateQueries({queryKey: isSystemAdmin ? ['admin', 'users'] : ['tenant', 'users']});
     },
     onError: () => setMessage({tone: 'error', text: 'The user could not be disabled.'}),
+  });
+  const enableUser = useMutation({
+    mutationFn: (id: number) => adminApiService.enableTenantManagedUser(id),
+    onSuccess: async () => {
+      setMessage({tone: 'success', text: 'User enabled. Previous assignments and enrolments were not restored.'});
+      await queryClient.invalidateQueries({queryKey: ['tenant', 'users']});
+    },
+    onError: () => setMessage({tone: 'error', text: 'The user could not be enabled.'}),
   });
   const moveTenant = useMutation({
     mutationFn: ({id, targetTenantId}: {id: number; targetTenantId: number}) => adminApiService.changeUserTenant(id, {tenantId: targetTenantId}),
@@ -225,9 +258,10 @@ const AdminConsolePage: React.FC = () => {
 
   const filteredUsers = useMemo(() => {
     const needle = search.trim().toLowerCase();
-    if (!needle) return usersQuery.data ?? [];
-    return (usersQuery.data ?? []).filter(account => `${account.name} ${account.email} ${account.id} ${account.tenantId}`.toLowerCase().includes(needle));
-  }, [search, usersQuery.data]);
+    const source = isSystemAdmin ? usersQuery.data ?? [] : tenantUsersQuery.data ?? [];
+    if (!needle) return source;
+    return source.filter(account => `${formatPersonName(account, account.name)} ${account.email} ${account.id} ${account.tenantId}`.toLowerCase().includes(needle));
+  }, [isSystemAdmin, search, tenantUsersQuery.data, usersQuery.data]);
 
   if (!isSystemAdmin && !isTenantAdmin) return <Navigate to="/" replace/>;
 
@@ -236,13 +270,15 @@ const AdminConsolePage: React.FC = () => {
     const resolvedTenantId = Number(tenantId || tenantsQuery.data?.[0]?.id);
     createUser.mutate({
       email: email.trim(),
-      name: name.trim(),
+      firstName: firstName.trim(),
+      ...(middleName.trim() ? {middleName: middleName.trim()} : {}),
+      lastName: lastName.trim(),
       role,
       level: role === 'USER' ? level : 'NOT_APPLICABLE',
       ...(isSystemAdmin ? {tenantId: resolvedTenantId} : {}),
     });
   };
-  const busy = changeRole.isPending || disableUser.isPending || moveTenant.isPending;
+  const busy = changeRole.isPending || disableUser.isPending || enableUser.isPending || moveTenant.isPending;
   const manualId = Number(managedUserId);
 
   return (
@@ -284,37 +320,38 @@ const AdminConsolePage: React.FC = () => {
           <section className={styles.card} aria-labelledby="create-user-title">
             <h2 id="create-user-title">Create managed user</h2>
             <form className={styles.form} onSubmit={submitUser}>
-              <label><span>Name</span><input required value={name} onChange={event => setName(event.target.value)}/></label>
+              <label><span>First name</span><input required maxLength={100} value={firstName} onChange={event => setFirstName(event.target.value)}/></label>
+              <label><span>Middle name</span><input maxLength={100} value={middleName} onChange={event => setMiddleName(event.target.value)}/></label>
+              <label><span>Last name</span><input required maxLength={100} value={lastName} onChange={event => setLastName(event.target.value)}/></label>
               <label><span>Email</span><input required type="email" value={email} onChange={event => setEmail(event.target.value)}/></label>
               {isSystemAdmin ? <label><span>Tenant</span><select required value={tenantId || tenantsQuery.data?.[0]?.id || ''} onChange={event => setTenantId(event.target.value)}>{tenantsQuery.data?.map(tenant => <option key={tenant.id} value={tenant.id}>{tenant.name} (#{tenant.id})</option>)}</select></label> : null}
               <label><span>Account role</span><select value={role} onChange={event => setRole(event.target.value as ManagedRole)}><option value="USER">User</option><option value="TENANT_ADMIN">Tenant admin</option></select></label>
-              {role === 'USER' ? levelSelect(level, setLevel) : null}
-              <button className={styles.primaryButton} disabled={createUser.isPending || !name.trim() || !email.trim() || (isSystemAdmin && !Number(tenantId || tenantsQuery.data?.[0]?.id))}>{createUser.isPending ? 'Creating…' : 'Create user'}</button>
+              {role === 'USER' ? levelSelect(level, setLevel, isSystemAdmin ? SYSTEM_MANAGED_LEVEL_OPTIONS : TENANT_MANAGED_LEVEL_OPTIONS) : null}
+              <button className={styles.primaryButton} disabled={createUser.isPending || !firstName.trim() || !lastName.trim() || !email.trim() || (isSystemAdmin && !Number(tenantId || tenantsQuery.data?.[0]?.id))}>{createUser.isPending ? 'Creating…' : 'Create user'}</button>
             </form>
-            <p className={styles.hint}>New accounts must establish their password through Forgot Password before signing in.</p>
+            <p className={styles.hint}>{isSystemAdmin ? 'New accounts must establish their password through Forgot Password before signing in.' : 'Create staff here. Students use Student intake; parents use the Parent link flow.'}</p>
           </section>
 
-          {isSystemAdmin ? (
-            <section className={`${styles.card} ${styles.listCard}`} aria-labelledby="managed-users-title">
-              <div className={styles.cardHeader}><div><h2 id="managed-users-title">System users</h2><p>Read access is system-admin only.</p></div><span>{filteredUsers.length}</span></div>
+          <section className={`${styles.card} ${styles.listCard}`} aria-labelledby="managed-users-title">
+              <div className={styles.cardHeader}><div><h2 id="managed-users-title">{isSystemAdmin ? 'System users' : 'Tenant user directory'}</h2><p>{isSystemAdmin ? 'Read access is system-admin only.' : 'Users are limited to your authenticated tenant.'}</p></div><span>{filteredUsers.length}</span></div>
               <label className={styles.search}><span>Search users</span><input value={search} onChange={event => setSearch(event.target.value)} placeholder="Name, email, user ID, or tenant ID"/></label>
-              {usersQuery.isPending ? <p className={styles.status}>Loading users…</p> : null}
-              {usersQuery.isError ? <p className={styles.errorMessage}>Users could not be loaded.</p> : null}
-              <div className={styles.list}>{filteredUsers.map(account => <ManagedUserRow key={`${account.id}-${account.tenantId}`} account={account} tenants={tenantsQuery.data ?? []} busy={busy} onUpdate={(id, request) => changeRole.mutate({id, request})} onDisable={id => disableUser.mutate(id)} onMoveTenant={(id, targetTenantId) => moveTenant.mutate({id, targetTenantId})}/>)}</div>
+              {(isSystemAdmin ? usersQuery.isPending : tenantUsersQuery.isPending) ? <p className={styles.status}>Loading users…</p> : null}
+              {(isSystemAdmin ? usersQuery.isError : tenantUsersQuery.isError) ? <p className={styles.errorMessage}>Users could not be loaded.</p> : null}
+              <div className={styles.list}>{filteredUsers.map(account => <ManagedUserRow key={`${account.id}-${account.tenantId}`} account={account} tenants={tenantsQuery.data ?? []} busy={busy} systemScope={isSystemAdmin} onUpdate={(id, request) => changeRole.mutate({id, request})} onDisable={id => disableUser.mutate(id)} onEnable={id => enableUser.mutate(id)} onMoveTenant={(id, targetTenantId) => moveTenant.mutate({id, targetTenantId})}/>)}</div>
             </section>
-          ) : (
+          {!isSystemAdmin ? (
             <section className={styles.card} aria-labelledby="manage-user-title">
               <h2 id="manage-user-title">Manage an existing user</h2>
               <p className={styles.hint}>Enter the user ID shown when the account was created.</p>
               <div className={styles.form}>
                 <label><span>User ID</span><input type="number" min="1" value={managedUserId} onChange={event => setManagedUserId(event.target.value)}/></label>
                 <label><span>Account role</span><select value={manualRole} onChange={event => setManualRole(event.target.value as ManagedRole)}><option value="USER">User</option><option value="TENANT_ADMIN">Tenant admin</option></select></label>
-                {manualRole === 'USER' ? levelSelect(manualLevel, setManualLevel) : null}
+                {manualRole === 'USER' ? levelSelect(manualLevel, setManualLevel, TENANT_MANAGED_LEVEL_OPTIONS) : null}
                 <button type="button" className={styles.primaryButton} disabled={busy || !Number.isInteger(manualId) || manualId < 1} onClick={() => changeRole.mutate({id: manualId, request: {role: manualRole, level: manualRole === 'USER' ? manualLevel : 'NOT_APPLICABLE'}})}>Update role</button>
                 {confirmManualDisable ? <div className={styles.confirmRow}><button type="button" className={styles.dangerButton} disabled={busy} onClick={() => disableUser.mutate(manualId)}>Confirm disable</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmManualDisable(false)}>Cancel</button></div> : <button type="button" className={styles.dangerLink} disabled={!Number.isInteger(manualId) || manualId < 1} onClick={() => setConfirmManualDisable(true)}>Disable user</button>}
               </div>
             </section>
-          )}
+          ) : null}
         </div>
       ) : null}
 
@@ -322,7 +359,7 @@ const AdminConsolePage: React.FC = () => {
 
       {tab === 'operations' ? (
         <div className={styles.operationsGrid}>
-          <AdminContractOperations isSystemAdmin={isSystemAdmin} users={usersQuery.data ?? []}/>
+          <AdminContractOperations isSystemAdmin={isSystemAdmin} users={filteredUsers}/>
           {isSystemAdmin ? <section className={styles.card} aria-labelledby="reassign-instructor-title">
             <h2 id="reassign-instructor-title">Reassign primary instructor</h2>
             <p className={styles.hint}>Use this administrative path when the current primary instructor must be replaced. The target must satisfy the course tenant and enrolment rules.</p>

@@ -8,6 +8,7 @@ import {getApiErrorCode, isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {formatPersonName} from '@/utils/personName';
 
 const CounsellorAssignAdvisorPage: React.FC = () => {
   const {intakeId} = useParams();
@@ -71,7 +72,7 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
           <p className={styles.eyebrow}>Counsellor</p>
           <h1>Assign advisor</h1>
           <p className={styles.lede}>
-            {intake.data ? `${intake.data.name ?? 'Student'} · version ${intake.data.intakeVersion}` : 'Load the current intake version, then assign. You cannot cancel or reassign afterwards.'}
+            {intake.data ? `${formatPersonName(intake.data, 'Student')} · version ${intake.data.intakeVersion}` : 'Load the current intake version, then assign. You cannot cancel or reassign afterwards.'}
           </p>
         </div>
         <Link className={styles.link} to={`/counsellor/intakes/${numericId}`}>Back to intake</Link>
@@ -84,7 +85,7 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
             {(advisors.data?.items ?? []).map(advisor => (
               <label key={advisor.advisorUserId} className={styles.row}>
                 <div className={styles.identity}>
-                  <strong>{advisor.name}</strong>
+                  <strong>{formatPersonName(advisor, `Advisor #${advisor.advisorUserId}`)}</strong>
                   <span>{advisor.email}</span>
                   <small>{advisor.level}</small>
                 </div>

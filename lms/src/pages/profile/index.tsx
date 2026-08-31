@@ -7,6 +7,7 @@ import {profileApiService} from '@/apis/services/profile-api';
 import {useAuth} from '@/contexts/AuthContext';
 import {getApiErrorMessage} from '@/utils/apiError';
 import {normalizeAvatarUrl} from '@/utils/avatarUrl';
+import {formatPersonName} from '@/utils/personName';
 
 interface StatusMessage {
   kind: 'success' | 'error';
@@ -15,7 +16,10 @@ interface StatusMessage {
 
 const ProfilePage = () => {
   const [editing, setEditing] = useState(false);
-  const [displayName, setDisplayName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [middleName, setMiddleName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [status, setStatus] = useState<StatusMessage | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
@@ -28,12 +32,17 @@ const ProfilePage = () => {
 
   const commitProfile = (data: ProfileResponse) => {
     queryClient.setQueryData(['my-profile'], data);
-    updateProfile({name: data.displayName, avatar: data.avatarUrl});
+    updateProfile({name: formatPersonName(data), avatar: data.avatarUrl});
   };
 
   const updateName = useMutation({
     mutationFn: async () => unwrapData(
-      await profileApiService.updateMyProfile({displayName: displayName.trim()}),
+      await profileApiService.updateMyProfile({
+        firstName: firstName.trim(),
+        middleName: middleName.trim(),
+        lastName: lastName.trim(),
+        phone: phone.trim(),
+      }),
       'Update profile',
     ),
     onSuccess: data => {
@@ -126,14 +135,17 @@ const ProfilePage = () => {
           <div className={styles.profileHeading}>
             <div>
               <p className={styles.eyebrow}>PROFILE</p>
-              <h1 id="profile-title">{profile.displayName}</h1>
+              <h1 id="profile-title">{formatPersonName(profile)}</h1>
             </div>
             {!editing ? (
               <button
                 type="button"
                 className={styles.secondaryButton}
                 onClick={() => {
-                  setDisplayName(profile.displayName || '');
+                  setFirstName(profile.firstName || '');
+                  setMiddleName(profile.middleName || '');
+                  setLastName(profile.lastName || '');
+                  setPhone(profile.phone || '');
                   setEditing(true);
                   setStatus(null);
                 }}
@@ -156,14 +168,14 @@ const ProfilePage = () => {
                 updateName.mutate();
               }}
             >
-              <label htmlFor="profile-display-name">Display name</label>
-              <input
-                id="profile-display-name"
-                value={displayName}
-                onChange={event => setDisplayName(event.target.value)}
-                required
-                autoFocus
-              />
+              <label htmlFor="profile-first-name">First name</label>
+              <input id="profile-first-name" value={firstName} onChange={event => setFirstName(event.target.value)} required autoFocus maxLength={100}/>
+              <label htmlFor="profile-middle-name">Middle name</label>
+              <input id="profile-middle-name" value={middleName} onChange={event => setMiddleName(event.target.value)} maxLength={100}/>
+              <label htmlFor="profile-last-name">Last name</label>
+              <input id="profile-last-name" value={lastName} onChange={event => setLastName(event.target.value)} required maxLength={100}/>
+              <label htmlFor="profile-phone">Phone</label>
+              <input id="profile-phone" value={phone} onChange={event => setPhone(event.target.value)} maxLength={64} autoComplete="tel"/>
               <div className={styles.profileActions}>
                 <button type="button" className={styles.secondaryButton} onClick={() => setEditing(false)}>
                   Cancel
@@ -171,7 +183,7 @@ const ProfilePage = () => {
                 <button
                   type="submit"
                   className={styles.primaryButton}
-                  disabled={updateName.isPending || !displayName.trim()}
+                  disabled={updateName.isPending || !firstName.trim() || !lastName.trim()}
                 >
                   {updateName.isPending ? 'Saving…' : 'Save changes'}
                 </button>

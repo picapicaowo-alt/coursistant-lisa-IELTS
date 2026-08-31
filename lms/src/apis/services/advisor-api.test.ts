@@ -91,6 +91,28 @@ describe('AdvisorApiService', () => {
     );
   });
 
+  it('owns course delivery configuration under the advisor scope', async () => {
+    client.get.mockResolvedValue({status: 200, data: {courseLaunchVersion: 1}});
+    client.put.mockResolvedValue({status: 200, data: {}});
+    client.post.mockResolvedValue({status: 200, data: {}});
+
+    await service.getCourseDeliveryConfig(8);
+    await service.putCourseDeliveryConfig(8, {catalogCode: 'IELTS-A', capacity: 12, expectedCourseLaunchVersion: 1}, 'delivery-8');
+    await service.publishCourseLaunch(8, {expectedCourseLaunchVersion: 2}, 'publish-8');
+
+    expect(client.get).toHaveBeenCalledWith('/v2/advisor/courses/8/delivery-config');
+    expect(client.put).toHaveBeenCalledWith(
+      '/v2/advisor/courses/8/delivery-config',
+      {catalogCode: 'IELTS-A', capacity: 12, expectedCourseLaunchVersion: 1},
+      {headers: {'Idempotency-Key': 'delivery-8'}},
+    );
+    expect(client.post).toHaveBeenCalledWith(
+      '/v2/advisor/courses/8/launch/publish',
+      {expectedCourseLaunchVersion: 2},
+      {headers: {'Idempotency-Key': 'publish-8'}},
+    );
+  });
+
   it('connects the advisor conversation inbox, messages, and read receipt', async () => {
     client.get.mockResolvedValue({status: 200, data: {items: []}});
     client.post.mockResolvedValue({status: 200, data: {}});

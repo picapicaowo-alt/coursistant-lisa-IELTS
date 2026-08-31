@@ -25,7 +25,9 @@ describe('AuthApiService registration', () => {
     const post = vi.fn().mockResolvedValue({status: 200, data: null});
     const service = new AuthApiService({post} as unknown as typeof V2ApiClient);
     const request = {
-      name: 'Student One',
+      firstName: 'Student',
+      lastName: 'One',
+      tenantId: 1,
       email: 'student@example.com',
       password: 'Passw0rd1',
       verificationCode: '123456',

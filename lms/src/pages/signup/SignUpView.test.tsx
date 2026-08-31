@@ -39,11 +39,17 @@ vi.mock('@iconify/react', () => ({Icon: () => <span/>}));
 const copy: Record<string, string> = {
   'signup.title': 'Create an account',
   'signup.subtitle': 'Enter your details',
-  'signup.nameLabel': 'Name',
+  'signup.firstNameLabel': 'First name',
+  'signup.middleNameLabel': 'Middle name',
+  'signup.lastNameLabel': 'Last name',
+  'signup.tenantIdLabel': 'Institution ID',
   'signup.emailLabel': 'Email',
   'signup.passwordLabel': 'Password',
   'signup.verificationLabel': 'Verification code',
-  'signup.nicknamePlaceholder': 'Enter name',
+  'signup.firstNamePlaceholder': 'Enter first name',
+  'signup.middleNamePlaceholder': 'Enter middle name',
+  'signup.lastNamePlaceholder': 'Enter last name',
+  'signup.tenantIdPlaceholder': 'Enter institution ID',
   'signup.emailPlaceholder': 'Enter email',
   'signup.passwordPlaceholder': 'Enter password',
   'signup.passwordHint': 'Password help',
@@ -55,7 +61,9 @@ const copy: Record<string, string> = {
   'signup.continueButton': 'Continue',
   'signup.alreadyRegistered': 'Already registered?',
   'signup.signinLink': 'Sign in',
-  'signupErrors.nicknameRequired': 'Name is required.',
+  'signupErrors.firstNameRequired': 'First name is required.',
+  'signupErrors.lastNameRequired': 'Last name is required.',
+  'signupErrors.tenantIdRequired': 'Institution ID is required.',
   'signupErrors.emailRequired': 'Email is required.',
   'signupErrors.emailInvalid': 'Email is invalid.',
   'signupErrors.passwordRequired': 'Password is required.',
@@ -114,7 +122,9 @@ const renderSignup = () => render(
 
 const fillRegistration = async () => {
   const user = userEvent.setup();
-  await user.type(screen.getByLabelText('Name'), 'Student One');
+  await user.type(screen.getByLabelText('First name'), 'Student');
+  await user.type(screen.getByLabelText('Last name'), 'One');
+  await user.type(screen.getByLabelText('Institution ID'), '1');
   await user.type(screen.getByLabelText('Email'), ' Student@Example.com ');
   await user.type(screen.getByLabelText('Password'), 'Passw0rd1');
   await user.type(screen.getByLabelText('Verification code'), '123456');
@@ -141,7 +151,9 @@ describe('SignUpView', () => {
 
     expect(mocks.register).toHaveBeenCalledWith(
       {
-        name: 'Student One',
+        firstName: 'Student',
+        lastName: 'One',
+        tenantId: 1,
         email: 'student@example.com',
         password: 'Passw0rd1',
         verificationCode: '123456',
@@ -156,7 +168,9 @@ describe('SignUpView', () => {
   it('blocks a password that the backend would reject', async () => {
     renderSignup();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText('Name'), 'Student One');
+    await user.type(screen.getByLabelText('First name'), 'Student');
+    await user.type(screen.getByLabelText('Last name'), 'One');
+    await user.type(screen.getByLabelText('Institution ID'), '1');
     await user.type(screen.getByLabelText('Email'), 'student@example.com');
     await user.type(screen.getByLabelText('Password'), 'passwordonly');
     await user.type(screen.getByLabelText('Verification code'), '123456');

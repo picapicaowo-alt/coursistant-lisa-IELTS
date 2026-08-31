@@ -8,6 +8,7 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {ParentLinksPanel} from '@/components/ParentLinksPanel';
+import {formatPersonName} from '@/utils/personName';
 
 const AdvisorStudentLayout: React.FC = () => {
   const {studentUserId} = useParams();
@@ -32,7 +33,7 @@ const AdvisorStudentLayout: React.FC = () => {
       <header className={styles.header}>
         <div>
           <p className={styles.eyebrow}>Advisor</p>
-          <h1>{intake.data?.name || `Student #${id}`}</h1>
+          <h1>{formatPersonName(intake.data, `Student #${id}`)}</h1>
           <p className={styles.lede}>{intake.data?.email} · {intake.data?.studentType}</p>
         </div>
       </header>

@@ -12,6 +12,7 @@ import {canAccessCourseOperations} from '@/utils/roleCapabilities';
 import styles from './index.module.scss';
 
 type Section = 'occurrences' | 'attendance' | 'reports' | 'discussion' | 'content' | 'enrolment';
+type CourseReportType = '' | 'MID_TERM' | 'FINAL';
 
 const positive = (value: string): number => Number(value);
 const validId = (value: string): boolean => Number.isInteger(Number(value)) && Number(value) > 0;
@@ -30,7 +31,18 @@ const CourseOperationsPage: React.FC = () => {
   const [range, setRange] = useState({from: '', to: '', includeHistory: false});
   const [attendance, setAttendance] = useState({studentUserId: '', status: 'PRESENT', version: ''});
   const [schedule, setSchedule] = useState({requestId: '', requestType: 'RESCHEDULE', date: '', start: '', end: '', reason: '', decision: 'APPROVE', version: '', rejectionReason: ''});
-  const [report, setReport] = useState({reportId: '', studentUserId: '', reportType: '', status: '', version: '', summary: '', strengths: '', weaknesses: '', skills: '', suggestions: ''});
+  const [report, setReport] = useState<{
+    reportId: string;
+    studentUserId: string;
+    reportType: CourseReportType;
+    status: string;
+    version: string;
+    summary: string;
+    strengths: string;
+    weaknesses: string;
+    skills: string;
+    suggestions: string;
+  }>({reportId: '', studentUserId: '', reportType: '', status: '', version: '', summary: '', strengths: '', weaknesses: '', skills: '', suggestions: ''});
   const [discussion, setDiscussion] = useState({postId: '', attachmentId: '', body: '', reply: ''});
   const [links, setLinks] = useState({materialId: '', assignmentId: '', lectureId: ''});
   const [enrolment, setEnrolment] = useState({userId: '', userIds: '', emails: ''});
@@ -166,15 +178,15 @@ const CourseOperationsPage: React.FC = () => {
           {staff ? <>
             <OperationCard title="Course student reports" actionLabel="Load reports" onRun={() => courseOperationsApiService.listCourseStudentReports(id, {studentUserId: report.studentUserId ? positive(report.studentUserId) : undefined, reportType: report.reportType || undefined, status: report.status || undefined, page: 0, size: 50})}>
               <Field label="Student user ID"><input inputMode="numeric" value={report.studentUserId} onChange={change => setReport(current => ({...current, studentUserId: change.target.value}))}/></Field>
-              <Field label="Report type"><input value={report.reportType} onChange={change => setReport(current => ({...current, reportType: change.target.value}))}/></Field>
+              <Field label="Report type"><select value={report.reportType} onChange={change => setReport(current => ({...current, reportType: change.target.value as CourseReportType}))}><option value="">All</option><option value="MID_TERM">MID_TERM</option><option value="FINAL">FINAL</option></select></Field>
               <Field label="Status"><input value={report.status} onChange={change => setReport(current => ({...current, status: change.target.value}))}/></Field>
             </OperationCard>
             <OperationCard title="Report detail" actionLabel="Load report" disabled={!reportValid} onRun={() => courseOperationsApiService.getCourseStudentReport(id, positive(report.reportId))}>
               <Field label="Report ID"><input inputMode="numeric" value={report.reportId} onChange={change => setReport(current => ({...current, reportId: change.target.value}))}/></Field>
             </OperationCard>
-            <OperationCard title="Create student report" actionLabel="Create report" disabled={!validId(report.studentUserId) || !report.reportType} onRun={() => courseOperationsApiService.createCourseStudentReport(id, {studentUserId: positive(report.studentUserId), reportType: report.reportType, overallSummary: report.summary || undefined, strengths: report.strengths || undefined, weaknesses: report.weaknesses || undefined, skillEvaluation: report.skills || undefined, improvementSuggestions: report.suggestions || undefined})}>
+            <OperationCard title="Create student report" actionLabel="Create report" disabled={!validId(report.studentUserId) || !report.reportType} onRun={() => courseOperationsApiService.createCourseStudentReport(id, {studentUserId: positive(report.studentUserId), reportType: report.reportType || undefined, overallSummary: report.summary || undefined, strengths: report.strengths || undefined, weaknesses: report.weaknesses || undefined, skillEvaluation: report.skills || undefined, improvementSuggestions: report.suggestions || undefined})}>
               <Field label="Student user ID"><input inputMode="numeric" value={report.studentUserId} onChange={change => setReport(current => ({...current, studentUserId: change.target.value}))}/></Field>
-              <Field label="Report type"><input required value={report.reportType} onChange={change => setReport(current => ({...current, reportType: change.target.value}))}/></Field>
+              <Field label="Report type"><select required value={report.reportType} onChange={change => setReport(current => ({...current, reportType: change.target.value as CourseReportType}))}><option value="">Select report type</option><option value="MID_TERM">MID_TERM</option><option value="FINAL">FINAL</option></select></Field>
               <Field label="Overall summary"><textarea value={report.summary} onChange={change => setReport(current => ({...current, summary: change.target.value}))}/></Field>
               <Field label="Strengths"><textarea value={report.strengths} onChange={change => setReport(current => ({...current, strengths: change.target.value}))}/></Field>
               <Field label="Weaknesses"><textarea value={report.weaknesses} onChange={change => setReport(current => ({...current, weaknesses: change.target.value}))}/></Field>

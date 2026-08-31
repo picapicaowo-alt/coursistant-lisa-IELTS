@@ -19,12 +19,12 @@ describe('CounsellorApiService', () => {
   });
 
   it('sends Idempotency-Key on create, patch, and first assign', async () => {
-    const create = {name: 'Alex Chen', email: 'alex@example.com', studentType: 'STANDARD' as const, courseRequest: 'Writing'};
+    const create = {firstName: 'Alex', lastName: 'Chen', email: 'alex@example.com', studentType: 'STANDARD' as const, courseRequest: 'Writing'};
     client.post.mockResolvedValue({status: 201, data: {intakeId: 1}});
     client.patch.mockResolvedValue({status: 200, data: {intakeId: 1}});
     client.put.mockResolvedValue({status: 200, data: {assignmentStatus: 'ASSIGNED'}});
     await service.createStudentIntake(create, 'create-1');
-    await service.patchStudentIntake(1, {expectedIntakeVersion: 0, name: 'Alexandra Chen'}, 'patch-1');
+    await service.patchStudentIntake(1, {expectedIntakeVersion: 0, firstName: 'Alexandra', lastName: 'Chen'}, 'patch-1');
     await service.assignAdvisor(1, {advisorUserId: 88, expectedIntakeVersion: 1}, 'assign-1');
     expect(client.post).toHaveBeenCalledWith(
       '/v2/counsellor/student-intakes',
@@ -33,7 +33,7 @@ describe('CounsellorApiService', () => {
     );
     expect(client.patch).toHaveBeenCalledWith(
       '/v2/counsellor/student-intakes/1',
-      {expectedIntakeVersion: 0, name: 'Alexandra Chen'},
+      {expectedIntakeVersion: 0, firstName: 'Alexandra', lastName: 'Chen'},
       {headers: {'Idempotency-Key': 'patch-1'}},
     );
     expect(client.put).toHaveBeenCalledWith(

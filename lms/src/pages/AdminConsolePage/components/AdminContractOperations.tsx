@@ -14,21 +14,13 @@ export const AdminContractOperations: React.FC<{isSystemAdmin: boolean; users: M
   const queryClient = useQueryClient();
   const [adminSearch, setAdminSearch] = useState('');
   const [submittedAdminSearch, setSubmittedAdminSearch] = useState('');
-  const [instructorId, setInstructorId] = useState('');
   const [digest, setDigest] = useState({date: '', tenantId: ''});
   const [alerts, setAlerts] = useState({version: '', inactivityDays: '', gradingDelayDays: '', absenceCount: '', absenceWindowDays: ''});
-  const instructors = users.filter(user => user.level === 'INSTRUCTOR_ADVISOR');
 
   const directory = useQuery({
     queryKey: ['admin', 'directory', submittedAdminSearch],
     queryFn: async () => unwrapData(await adminApiService.listAdmins({email: submittedAdminSearch || undefined, name: submittedAdminSearch || undefined, username: submittedAdminSearch || undefined}), 'adminDirectory'),
     enabled: isSystemAdmin,
-    retry: false,
-  });
-  const availability = useQuery({
-    queryKey: ['tenant', 'instructor-availability', instructorId],
-    queryFn: async () => unwrapData(await courseOperationsApiService.getTenantInstructorAvailability(Number(instructorId)), 'tenantInstructorAvailability'),
-    enabled: Boolean(instructorId),
     retry: false,
   });
   const alertRules = useQuery({queryKey: ['tenant', 'alert-rules'], queryFn: async () => unwrapData(await courseOperationsApiService.getTenantAlertRules(), 'tenantAlertRules'), retry: false});
@@ -53,12 +45,6 @@ export const AdminContractOperations: React.FC<{isSystemAdmin: boolean; users: M
         <form className={styles.form} onSubmit={event => { event.preventDefault(); setSubmittedAdminSearch(adminSearch.trim()); }}><label><span>Name, email, or username</span><input value={adminSearch} onChange={event => setAdminSearch(event.target.value)}/></label><button className={styles.primaryButton}>Search administrators</button></form>
         <RecordSummaryList value={directory.data} emptyMessage="No administrators match this search."/>
       </section> : null}
-
-      <section className={styles.card}>
-        <h2>Instructor availability</h2>
-        {instructors.length === 0 ? <p className={styles.hint}>No instructor accounts are available in the live user directory.</p> : <label className={styles.search}><span>Instructor</span><select value={instructorId} onChange={event => setInstructorId(event.target.value)}><option value="">Select an instructor</option>{instructors.map(instructor => <option key={instructor.id} value={instructor.id}>{instructor.name} · {instructor.email}</option>)}</select></label>}
-        {instructorId ? <RecordSummaryList value={availability.data} emptyMessage="No availability is recorded for this instructor."/> : null}
-      </section>
 
       <section className={styles.card}>
         <h2>Tenant alert rules</h2>

@@ -37,6 +37,17 @@ export const MANAGED_USER_LEVELS: Exclude<UserLevel, 'NOT_APPLICABLE'>[] = [
   'INSTRUCTOR_ADVISOR',
 ];
 
+/** Tenant admins create staff here; Student and Parent use intake/link flows. */
+export const TENANT_MANAGED_USER_LEVELS: Extract<
+  UserLevel,
+  'INSTRUCTOR' | 'COUNSELLOR' | 'ADVISOR' | 'INSTRUCTOR_ADVISOR'
+>[] = [
+  'INSTRUCTOR',
+  'COUNSELLOR',
+  'ADVISOR',
+  'INSTRUCTOR_ADVISOR',
+];
+
 export interface LoginRequest {
   email: string;
   password: string;
@@ -44,15 +55,15 @@ export interface LoginRequest {
   role: LoginAccountType;
 }
 
-/** Public self-registration payload for `POST /v1/auth/register`.
- * Do not send tenantId: the backend ignores a client tenant and binds public
- * registration to the platform tenant from the request host.
- */
+/** Public self-registration payload for `POST /v1/auth/register`. */
 export interface RegisterRequest {
   email: string;
   verificationCode: string;
   password: string;
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
+  tenantId: number;
   /** Optional. The backend derives it from the email when omitted. */
   username?: string;
 }

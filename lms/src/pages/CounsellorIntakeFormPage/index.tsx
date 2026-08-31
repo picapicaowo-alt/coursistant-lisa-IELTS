@@ -1,7 +1,7 @@
 import React, {FormEvent, useEffect, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {StudentType, unwrapData} from '@/apis';
+import {unwrapData} from '@/apis';
 import {counsellorApiService} from '@/apis/services/counsellor-api';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {isNotFound} from '@/utils/apiError';
@@ -9,24 +9,11 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {ParentLinksPanel} from '@/components/ParentLinksPanel';
-
-interface IntakeFormState {
-  name: string;
-  email: string;
-  studentType: StudentType;
-  courseRequest: string;
-  contactPhone: string;
-  basicBackground: string;
-}
-
-const emptyForm: IntakeFormState = {
-  name: '',
-  email: '',
-  studentType: 'STANDARD',
-  courseRequest: '',
-  contactPhone: '',
-  basicBackground: '',
-};
+import {StudentIntakeFormFields} from '@/components/StudentIntakeFormFields';
+import {
+  emptyStudentIntakeForm,
+  type StudentIntakeFormValue,
+} from '@/components/StudentIntakeFormFields/model';
 
 const CounsellorIntakeFormPage: React.FC = () => {
   const {intakeId} = useParams();
@@ -35,7 +22,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
-  const [form, setForm] = useState<IntakeFormState>(emptyForm);
+  const [form, setForm] = useState<StudentIntakeFormValue>(emptyStudentIntakeForm);
   const [handover, setHandover] = useState(false);
 
   const detail = useQuery({
@@ -48,7 +35,9 @@ const CounsellorIntakeFormPage: React.FC = () => {
   useEffect(() => {
     if (!detail.data) return;
     setForm({
-      name: detail.data.name ?? '',
+      firstName: detail.data.firstName ?? '',
+      middleName: detail.data.middleName ?? '',
+      lastName: detail.data.lastName ?? '',
       email: detail.data.email ?? '',
       studentType: detail.data.studentType ?? 'STANDARD',
       courseRequest: detail.data.courseRequest ?? '',
@@ -65,7 +54,9 @@ const CounsellorIntakeFormPage: React.FC = () => {
     mutationFn: async () => {
       if (isCreate) {
         const payload = {
-          name: form.name.trim(),
+          firstName: form.firstName.trim(),
+          ...(form.middleName.trim() ? {middleName: form.middleName.trim()} : {}),
+          lastName: form.lastName.trim(),
           email: form.email.trim(),
           studentType: form.studentType,
           courseRequest: form.courseRequest.trim(),
@@ -77,7 +68,9 @@ const CounsellorIntakeFormPage: React.FC = () => {
       }
       const payload = {
         expectedIntakeVersion: detail.data?.intakeVersion ?? 0,
-        name: form.name.trim(),
+        firstName: form.firstName.trim(),
+        middleName: form.middleName.trim(),
+        lastName: form.lastName.trim(),
         studentType: form.studentType,
         courseRequest: form.courseRequest.trim(),
         ...(form.contactPhone.trim() ? {contactPhone: form.contactPhone.trim()} : {}),
@@ -89,13 +82,6 @@ const CounsellorIntakeFormPage: React.FC = () => {
     onSuccess: async intake => {
       await queryClient.invalidateQueries({queryKey: ['counsellor']});
       navigate(isCreate ? `/counsellor/intakes/${intake.intakeId}` : `/counsellor/intakes/${numericId}/assign`);
-    },
-  });
-
-  const field = (key: keyof IntakeFormState) => ({
-    value: form[key],
-    onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-      setForm(current => ({...current, [key]: event.target.value}));
     },
   });
 
@@ -127,21 +113,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
       {detail.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(detail.error, 'Intake could not be loaded.')}</p> : null}
       <section className={styles.card}>
         <form className={styles.form} onSubmit={onSubmit}>
-          <label><span>Name</span><input required maxLength={255} {...field('name')}/></label>
-          <label>
-            <span>Email</span>
-            <input required type="email" maxLength={255} disabled={!isCreate} {...field('email')}/>
-          </label>
-          <label>
-            <span>Student type</span>
-            <select value={form.studentType} onChange={event => setForm(current => ({...current, studentType: event.target.value as StudentType}))}>
-              <option value="STANDARD">STANDARD</option>
-              <option value="VIP">VIP</option>
-            </select>
-          </label>
-          <label><span>Course request</span><textarea required maxLength={2000} {...field('courseRequest')}/></label>
-          <label><span>Contact phone</span><input minLength={7} maxLength={64} {...field('contactPhone')}/></label>
-          <label><span>Basic background</span><textarea maxLength={4000} {...field('basicBackground')}/></label>
+          <StudentIntakeFormFields value={form} onChange={setForm} emailDisabled={!isCreate}/>
           <button className={styles.primary} disabled={save.isPending}>{save.isPending ? 'Saving…' : isCreate ? 'Create intake' : 'Save changes'}</button>
         </form>
       </section>

@@ -25,7 +25,7 @@ describe('AdminApiService', () => {
   });
 
   it('keeps system and tenant managed-user scopes distinct', async () => {
-    const systemRequest = {email: 'instructor@example.com', name: 'Instructor', role: 'USER' as const, level: 'INSTRUCTOR' as const, tenantId: 2};
+    const systemRequest = {email: 'instructor@example.com', firstName: 'Ivy', lastName: 'Instructor', role: 'USER' as const, level: 'INSTRUCTOR' as const, tenantId: 2};
     const roleRequest = {role: 'TENANT_ADMIN' as const, level: 'NOT_APPLICABLE' as const};
     client.post.mockResolvedValue({status: 200, data: 41});
     client.put.mockResolvedValue({status: 200, data: null});
@@ -35,6 +35,21 @@ describe('AdminApiService', () => {
     expect(client.post).toHaveBeenNthCalledWith(1, '/v2/system/managed-users', systemRequest, expect.objectContaining({headers: expect.any(Object)}));
     expect(client.put).toHaveBeenCalledWith('/v2/tenant/managed-users/41/role', roleRequest, expect.objectContaining({headers: expect.any(Object)}));
     expect(client.post).toHaveBeenNthCalledWith(2, '/v2/tenant/managed-users/41/disable', undefined, expect.objectContaining({headers: expect.any(Object)}));
+  });
+
+  it('uses tenant directory, audit, and account re-enable contracts', async () => {
+    client.get.mockResolvedValue({status: 200, data: {items: []}});
+    client.post.mockResolvedValue({status: 200, data: null});
+
+    await service.listTenantUsers({q: 'advisor', page: 0, size: 20});
+    await service.getTenantUser(41);
+    await service.listTenantAuditEvents({targetUserId: 41, page: 0, size: 20});
+    await service.enableTenantManagedUser(41);
+
+    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/tenant/users', {params: {q: 'advisor', page: 0, size: 20}});
+    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/tenant/users/41');
+    expect(client.get).toHaveBeenNthCalledWith(3, '/v2/tenant/audit-events', {params: {targetUserId: 41, page: 0, size: 20}});
+    expect(client.post).toHaveBeenCalledWith('/v2/tenant/managed-users/41/enable');
   });
 
   it('uses the audited system operation contracts', async () => {

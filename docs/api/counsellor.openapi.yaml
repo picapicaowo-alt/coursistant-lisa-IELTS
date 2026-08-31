@@ -173,7 +173,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/CounsellorDashboardApiResponse"
         "401":
-          description: UNAUTHORIZED
+          description: INVALID_TOKEN
         "403": { $ref: "#/components/responses/Forbidden" }
 components:
   securitySchemes:
@@ -199,15 +199,18 @@ components:
     BadRequest:
       description: PARAM_MISSING or BAD_REQUEST
     Unauthorized:
-      description: UNAUTHORIZED
+      description: INVALID_TOKEN
     Forbidden:
       description: FORBIDDEN
   schemas:
     CreateStudentIntakeRequest:
       type: object
-      required: [name, email, studentType, courseRequest]
+      required: [firstName, lastName, email, studentType, courseRequest]
       properties:
-        name: { type: string, minLength: 1, maxLength: 255 }
+        name: { type: string, deprecated: true, description: Rejected when non-blank. Use firstName and lastName. }
+        firstName: { type: string, minLength: 1, maxLength: 100 }
+        middleName: { type: string, maxLength: 100 }
+        lastName: { type: string, minLength: 1, maxLength: 100 }
         email: { type: string, maxLength: 255 }
         studentType: { type: string, enum: [VIP, STANDARD] }
         courseRequest: { type: string, minLength: 1, maxLength: 2000 }
@@ -219,7 +222,10 @@ components:
       description: email, role, level and tenantId are not accepted. At least one mutable field besides expectedIntakeVersion is required.
       properties:
         expectedIntakeVersion: { type: integer }
-        name: { type: string, minLength: 1, maxLength: 255 }
+        name: { type: string, deprecated: true, description: Rejected when non-blank. Use firstName and lastName. }
+        firstName: { type: string, minLength: 1, maxLength: 100 }
+        middleName: { type: string, maxLength: 100 }
+        lastName: { type: string, minLength: 1, maxLength: 100 }
         studentType: { type: string, enum: [VIP, STANDARD] }
         courseRequest: { type: string, maxLength: 2000 }
         contactPhone: { type: string, minLength: 7, maxLength: 64 }
@@ -236,7 +242,9 @@ components:
       properties:
         intakeId: { type: integer, format: int64 }
         studentUserId: { type: integer }
-        name: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
         email: { type: string }
         studentType: { type: string, enum: [VIP, STANDARD] }
         courseRequest: { type: string }
@@ -252,10 +260,12 @@ components:
         updatedAt: { type: string, format: date-time }
     AdvisorCandidateResponse:
       type: object
-      required: [advisorUserId, name, email, level]
+      required: [advisorUserId, firstName, lastName, email, level]
       properties:
         advisorUserId: { type: integer }
-        name: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
         email: { type: string }
         level: { type: string, enum: [ADVISOR, INSTRUCTOR_ADVISOR] }
     CounsellorDashboardResponse:

@@ -20,6 +20,18 @@ const NOTIFICATION_TITLES: Record<NotificationType, string> = {
   GROUP_MEMBER_ADDED: 'Group member added',
   GROUP_MEMBER_REMOVED: 'Group member removed',
   GROUP_MEMBER_MOVED: 'Group membership updated',
+  REPORT_PUBLISHED: 'Student report published',
+  ABSENCE_REQUEST_DECIDED: 'Absence request decided',
+  CHECKPOINT_REACHED_INCOMPLETE: 'Checkpoint needs attention',
+  SCHEDULE_REQUEST_CREATED: 'Schedule request created',
+  SCHEDULE_REQUEST_DECIDED: 'Schedule request decided',
+  SESSION_SCHEDULE_CHANGED: 'Session schedule changed',
+  SESSION_CANCELLED: 'Session cancelled',
+  ATTENDANCE_STATUS_CHANGED: 'Attendance updated',
+  COURSE_HOURS_CHANGED: 'Course hours updated',
+  ADVISOR_TASK_CREATED: 'Advisor task created',
+  ADVISOR_TASK_STATUS_CHANGED: 'Advisor task status changed',
+  ADVISOR_TASK_FEEDBACK_CHANGED: 'Advisor task feedback updated',
 };
 
 export const getNotificationTitle = (type: NotificationType) => NOTIFICATION_TITLES[type];

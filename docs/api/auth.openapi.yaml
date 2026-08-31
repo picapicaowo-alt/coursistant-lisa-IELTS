@@ -15,6 +15,8 @@ tags:
   name: Auth
 - description: Tenant-admin managed user lifecycle
   name: Tenant Managed Users
+- description: Tenant-admin account directory
+  name: Tenant User Directory
 - description: System admin read APIs; write APIs disabled until Phase 2
   name: Admins
 paths:
@@ -246,7 +248,8 @@ paths:
                   email: student@example.com
                   verificationCode: "123456"
                   password: Passw0rd1
-                  name: Student One
+                  firstName: Student
+                  lastName: One
                   username: student1
                   tenantId: 1
             schema:
@@ -406,7 +409,8 @@ paths:
                 description: createTenantAdmin
                 value:
                   email: admin@example.com
-                  name: Tenant Admin
+                  firstName: Tenant
+                  lastName: Admin
                   role: TENANT_ADMIN
                   level: NOT_APPLICABLE
                   tenantId: 1
@@ -515,11 +519,70 @@ paths:
       summary: Change role/level of a system-managed user
       tags:
       - System Managed Users
+  /v2/tenant/audit-events:
+    get:
+      operationId: tenantListAuditEvents
+      parameters:
+      - in: query
+        name: actorUserId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: targetUserId
+        required: false
+        schema:
+          type: integer
+          format: int64
+      - in: query
+        name: action
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: resourceType
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: from
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: to
+        required: false
+        schema:
+          type: string
+          format: date-time
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List tenant governance audit events
+      tags:
+      - Tenant Governance Audit
   /v2/tenant/managed-users:
     post:
-      description: "USER without level defaults to STUDENT. USER may be STUDENT, INSTRUCTOR,\
-        \ ADVISOR, COUNSELLOR, PARENT, or INSTRUCTOR_ADVISOR. TENANT_ADMIN requires\
-        \ NOT_APPLICABLE."
+      description: "USER may be COUNSELLOR, ADVISOR, INSTRUCTOR, or INSTRUCTOR_ADVISOR.\
+        \ STUDENT and PARENT cannot be created here. TENANT_ADMIN requires NOT_APPLICABLE."
       operationId: tenantManagedUserCreate
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
@@ -536,7 +599,8 @@ paths:
                 description: createAdvisor
                 value:
                   email: advisor@example.com
-                  name: Advisor One
+                  firstName: Advisor
+                  lastName: One
                   role: USER
                   level: ADVISOR
             schema:
@@ -576,6 +640,28 @@ paths:
                 $ref: "#/components/schemas/ApiResponse"
           description: OK
       summary: Disable a tenant-managed user
+      tags:
+      - Tenant Managed Users
+  /v2/tenant/managed-users/{id}/enable:
+    post:
+      description: "Restores login eligibility only. ACTIVE is a natural no-op. Does\
+        \ not restore assignments, enrollments, parent links, or course ownership."
+      operationId: tenantManagedUserEnable
+      parameters:
+      - in: path
+        name: id
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Enable a tenant-managed user
       tags:
       - Tenant Managed Users
   /v2/tenant/managed-users/{id}/role:
@@ -644,6 +730,72 @@ paths:
       summary: Change role/level of a tenant-managed user
       tags:
       - Tenant Managed Users
+  /v2/tenant/users:
+    get:
+      operationId: tenantListUsers
+      parameters:
+      - in: query
+        name: q
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: role
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: level
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: status
+        required: false
+        schema:
+          type: string
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List users in the caller tenant
+      tags:
+      - Tenant User Directory
+  /v2/tenant/users/{userId}:
+    get:
+      operationId: tenantGetUser
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Get a user in the caller tenant
+      tags:
+      - Tenant User Directory
 components:
   schemas:
     AdminQuery:
@@ -794,9 +946,22 @@ components:
           type: string
           description: Email
           example: student@example.com
+        firstName:
+          type: string
+          description: Given name
+          example: Student
+        lastName:
+          type: string
+          description: Family name
+          example: One
+        middleName:
+          type: string
+          description: Middle name
+          example: Marie
         name:
           type: string
-          description: Display name
+          deprecated: true
+          description: Rejected when non-blank. Use firstName and lastName.
           example: Student One
         password:
           type: string
@@ -818,7 +983,8 @@ components:
           example: "123456"
       required:
       - email
-      - name
+      - firstName
+      - lastName
       - password
       - tenantId
       - verificationCode
@@ -858,6 +1024,14 @@ components:
           type: string
           description: Email
           example: admin@example.com
+        firstName:
+          type: string
+          description: Given name
+          example: Tenant
+        lastName:
+          type: string
+          description: Family name
+          example: Admin
         level:
           type: string
           description: "Business identity. USER defaults to STUDENT when omitted.\
@@ -872,9 +1046,13 @@ components:
           - INSTRUCTOR_ADVISOR
           - NOT_APPLICABLE
           example: NOT_APPLICABLE
+        middleName:
+          type: string
+          description: Middle name
         name:
           type: string
-          description: Display name
+          deprecated: true
+          description: Rejected when non-blank. Use firstName and lastName.
           example: Tenant Admin
         role:
           type: string
@@ -890,7 +1068,8 @@ components:
           example: 1
       required:
       - email
-      - name
+      - firstName
+      - lastName
       - role
       - tenantId
     TenantManagedUserChangeRoleRequest:
@@ -929,23 +1108,33 @@ components:
           type: string
           description: Email
           example: advisor@example.com
+        firstName:
+          type: string
+          description: Given name
+          example: Advisor
+        lastName:
+          type: string
+          description: Family name
+          example: One
         level:
           type: string
-          description: "Business identity. USER defaults to STUDENT when omitted.\
-            \ USER allows STUDENT, INSTRUCTOR, ADVISOR, COUNSELLOR, PARENT, or INSTRUCTOR_ADVISOR\
-            \ (the only combined identity). TENANT_ADMIN requires NOT_APPLICABLE."
+          description: "Business identity. Required for USER: COUNSELLOR, ADVISOR,\
+            \ INSTRUCTOR, or INSTRUCTOR_ADVISOR. STUDENT and PARENT are not creatable.\
+            \ TENANT_ADMIN requires NOT_APPLICABLE."
           enum:
-          - STUDENT
           - INSTRUCTOR
           - ADVISOR
           - COUNSELLOR
-          - PARENT
           - INSTRUCTOR_ADVISOR
           - NOT_APPLICABLE
           example: ADVISOR
+        middleName:
+          type: string
+          description: Middle name
         name:
           type: string
-          description: Display name
+          deprecated: true
+          description: Rejected when non-blank. Use firstName and lastName.
           example: Advisor One
         role:
           type: string
@@ -956,7 +1145,8 @@ components:
           example: USER
       required:
       - email
-      - name
+      - firstName
+      - lastName
       - role
   securitySchemes:
     bearerAuth:

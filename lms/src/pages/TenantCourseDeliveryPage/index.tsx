@@ -2,18 +2,18 @@ import React, {useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useParams} from 'react-router-dom';
 import {unwrapData} from '@/apis';
-import {tenantAdvisingApiService} from '@/apis/services/tenant-advising-api';
+import {advisorApiService} from '@/apis/services/advisor-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import styles from '../advising/advising.module.scss';
 
-const TenantCourseDeliveryPage: React.FC = () => {
+const AdvisorCourseDeliveryPage: React.FC = () => {
   const {courseId} = useParams();
   const id = Number(courseId);
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState({catalogCode: '', capacity: ''});
   const config = useQuery({
-    queryKey: ['tenant', 'course-delivery', id],
-    queryFn: async () => unwrapData(await tenantAdvisingApiService.getCourseDeliveryConfig(id), 'tenantCourseDelivery'),
+    queryKey: ['advisor', 'course-delivery', id],
+    queryFn: async () => unwrapData(await advisorApiService.getCourseDeliveryConfig(id), 'advisorCourseDelivery'),
     enabled: Number.isInteger(id),
     retry: false,
   });
@@ -23,9 +23,9 @@ const TenantCourseDeliveryPage: React.FC = () => {
     setDraft({catalogCode: config.data.catalogCode ?? '', capacity: config.data.capacity == null ? '' : String(config.data.capacity)});
   }, [config.data]);
 
-  const refresh = () => queryClient.invalidateQueries({queryKey: ['tenant', 'course-delivery', id]});
+  const refresh = () => queryClient.invalidateQueries({queryKey: ['advisor', 'course-delivery', id]});
   const save = useMutation({
-    mutationFn: () => tenantAdvisingApiService.putCourseDeliveryConfig(id, {
+    mutationFn: () => advisorApiService.putCourseDeliveryConfig(id, {
       catalogCode: draft.catalogCode,
       capacity: Number(draft.capacity),
       expectedCourseLaunchVersion: config.data?.courseLaunchVersion,
@@ -34,8 +34,8 @@ const TenantCourseDeliveryPage: React.FC = () => {
   });
   const transition = useMutation({
     mutationFn: (action: 'ready' | 'publish') => action === 'ready'
-      ? tenantAdvisingApiService.readyCourseLaunch(id, {expectedCourseLaunchVersion: config.data?.courseLaunchVersion})
-      : tenantAdvisingApiService.publishCourseLaunch(id, {expectedCourseLaunchVersion: config.data?.courseLaunchVersion}),
+      ? advisorApiService.readyCourseLaunch(id, {expectedCourseLaunchVersion: config.data?.courseLaunchVersion})
+      : advisorApiService.publishCourseLaunch(id, {expectedCourseLaunchVersion: config.data?.courseLaunchVersion}),
     onSuccess: refresh,
   });
 
@@ -45,7 +45,7 @@ const TenantCourseDeliveryPage: React.FC = () => {
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Tenant course operations</p>
+          <p className={styles.eyebrow}>Advisor course operations</p>
           <h1>Delivery configuration</h1>
           <p className={styles.lede}>Course #{id} · configure, validate readiness, then publish.</p>
         </div>
@@ -75,4 +75,4 @@ const TenantCourseDeliveryPage: React.FC = () => {
   );
 };
 
-export default TenantCourseDeliveryPage;
+export default AdvisorCourseDeliveryPage;

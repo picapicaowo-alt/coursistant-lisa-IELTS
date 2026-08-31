@@ -20,11 +20,21 @@ describe('ParentApiService', () => {
 
   it('links a parent with an idempotency key', async () => {
     client.post.mockResolvedValue({status: 201, data: {}});
-    await service.createOrReuseParentLink(7, {email: 'parent@example.test', name: 'Parent'}, 'parent-link-7');
+    await service.createOrReuseParentLink(7, {email: 'parent@example.test', firstName: 'Pat', lastName: 'Parent'}, 'parent-link-7');
     expect(client.post).toHaveBeenCalledWith(
       '/v2/counsellor/student-intakes/7/parent-links',
-      {email: 'parent@example.test', name: 'Parent'},
+      {email: 'parent@example.test', firstName: 'Pat', lastName: 'Parent'},
       {headers: {'Idempotency-Key': 'parent-link-7'}},
+    );
+  });
+
+  it('creates or reuses a parent from the tenant student scope', async () => {
+    client.post.mockResolvedValue({status: 201, data: {}});
+    await service.createOrReuseTenantParentLink(41, {email: 'parent@example.test'}, 'tenant-parent-41');
+    expect(client.post).toHaveBeenCalledWith(
+      '/v2/tenant/students/41/parent-links',
+      {email: 'parent@example.test'},
+      {headers: {'Idempotency-Key': 'tenant-parent-41'}},
     );
   });
 

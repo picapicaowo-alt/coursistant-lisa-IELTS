@@ -57,6 +57,50 @@ export interface SubmitMockExamWritingRequest {
   tasks?: SubmitMockExamWritingTask[];
 }
 
+export interface MockExamAttempt {
+  candidateName?: string;
+  id?: number;
+  startedAt?: string;
+  status?: string;
+  studentMockExamId?: number;
+  studentUserId?: number;
+  submittedAt?: string;
+  testId?: number;
+}
+
+export interface ObserverMockExamDetail {
+  attempt?: MockExamAttempt;
+  createdAt?: string;
+  id?: number;
+  listeningCorrect?: number;
+  listeningSelected?: boolean;
+  listeningTotal?: number;
+  readingCorrect?: number;
+  readingSelected?: boolean;
+  readingTotal?: number;
+  status?: string;
+  templateId?: number;
+  testId?: number;
+  title?: string;
+  versionNo?: number;
+  writingGradeStatus?: string;
+  writingInstructorUserId?: number;
+  writingScore?: number;
+  writingSelected?: boolean;
+}
+
+export interface StudentWritingTaskView {
+  content?: string;
+  seq?: number;
+  taskKey?: string;
+  wordCount?: number;
+}
+
+export interface StudentMockExamDetail extends ObserverMockExamDetail {
+  writingFeedback?: string;
+  writingTasks?: StudentWritingTaskView[];
+}
+
 export interface CreateMockExamListeningSectionRequest {
   instruction?: string;
   kind?: string;
@@ -109,5 +153,5 @@ export interface CreateMockExamWritingRequest {
   totalMinutes?: number;
 }
 
-/** Response payloads are not described for most mock-exam operations. */
+/** Response payloads remain generic where the supplied OpenAPI has no schema. */
 export type MockExamRead = unknown;

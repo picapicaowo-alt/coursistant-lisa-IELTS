@@ -11,6 +11,7 @@ import {useAuth} from '@/contexts/AuthContext';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {getApiErrorMessage} from '@/utils/apiError';
 import {isValidPassword} from '@/utils/passwordRules';
+import {formatPersonName} from '@/utils/personName';
 
 const tabList = ['Account', 'Password', 'Notifications'] as const;
 type SettingsTab = (typeof tabList)[number];
@@ -23,7 +24,10 @@ interface StatusMessage {
 const SettingsPage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<SettingsTab>('Account');
-  const [displayName, setDisplayName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [middleName, setMiddleName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const [emailNotifications, setEmailNotifications] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -51,7 +55,10 @@ const SettingsPage = () => {
 
   useEffect(() => {
     if (!profileQuery.data) return;
-    setDisplayName(profileQuery.data.displayName || '');
+    setFirstName(profileQuery.data.firstName || '');
+    setMiddleName(profileQuery.data.middleName || '');
+    setLastName(profileQuery.data.lastName || '');
+    setPhone(profileQuery.data.phone || '');
     setEmailNotifications(Boolean(profileQuery.data.emailNotifications));
   }, [profileQuery.data]);
 
@@ -62,7 +69,7 @@ const SettingsPage = () => {
     ),
     onSuccess: data => {
       queryClient.setQueryData(['my-profile'], data);
-      updateProfile({name: data.displayName, avatar: data.avatarUrl});
+      updateProfile({name: formatPersonName(data), avatar: data.avatarUrl});
       setStatus({kind: 'success', text: 'Settings saved.'});
     },
     onError: error => setStatus({kind: 'error', text: getApiErrorMessage(error, 'Could not save settings.')}),
@@ -167,12 +174,24 @@ const SettingsPage = () => {
             onSubmit={event => {
               event.preventDefault();
               setStatus(null);
-              saveProfile.mutate({displayName: displayName.trim()});
+              saveProfile.mutate({firstName: firstName.trim(), middleName: middleName.trim(), lastName: lastName.trim(), phone: phone.trim()});
             }}
           >
             <div className={styles.inputGroup}>
-              <label htmlFor="displayName">Display name</label>
-              <input id="displayName" value={displayName} onChange={event => setDisplayName(event.target.value)} required/>
+              <label htmlFor="firstName">First name</label>
+              <input id="firstName" value={firstName} onChange={event => setFirstName(event.target.value)} required maxLength={100}/>
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="middleName">Middle name</label>
+              <input id="middleName" value={middleName} onChange={event => setMiddleName(event.target.value)} maxLength={100}/>
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="lastName">Last name</label>
+              <input id="lastName" value={lastName} onChange={event => setLastName(event.target.value)} required maxLength={100}/>
+            </div>
+            <div className={styles.inputGroup}>
+              <label htmlFor="phone">Phone</label>
+              <input id="phone" value={phone} onChange={event => setPhone(event.target.value)} maxLength={64} autoComplete="tel"/>
             </div>
             <div className={styles.inputGroup}>
               <label htmlFor="email">Email</label>
@@ -190,7 +209,7 @@ const SettingsPage = () => {
             <button
               type="submit"
               className={styles.primaryButton}
-              disabled={saveProfile.isPending || !displayName.trim()}
+              disabled={saveProfile.isPending || !firstName.trim() || !lastName.trim()}
             >
               {saveProfile.isPending ? 'Saving…' : 'Save account'}
             </button>

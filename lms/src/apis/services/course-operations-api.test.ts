@@ -32,12 +32,12 @@ describe('CourseOperationsApiService', () => {
     client.post.mockResolvedValue({status: 201, data: {}});
     client.patch.mockResolvedValue({status: 200, data: {}});
     client.put.mockResolvedValue({status: 200, data: {}});
-    await service.createCourseStudentReport(3, {studentUserId: 41, reportType: 'MONTHLY'}, 'report-1');
+    await service.createCourseStudentReport(3, {studentUserId: 41, reportType: 'MID_TERM'}, 'report-1');
     await service.patchMyPersonalEvent(8, {title: 'Practice', expectedVersion: 1}, 'event-8');
     await service.putTenantAlertRules({expectedVersion: 2, inactivityDays: 7}, 'alerts-2');
     expect(client.post).toHaveBeenCalledWith(
       '/v2/courses/3/student-reports',
-      {studentUserId: 41, reportType: 'MONTHLY'},
+      {studentUserId: 41, reportType: 'MID_TERM'},
       {headers: {'Idempotency-Key': 'report-1'}},
     );
     expect(client.patch).toHaveBeenCalledWith(
@@ -50,6 +50,19 @@ describe('CourseOperationsApiService', () => {
       {expectedVersion: 2, inactivityDays: 7},
       {headers: {'Idempotency-Key': 'alerts-2'}},
     );
+  });
+
+  it('uses the tenant course-ownership contracts', async () => {
+    client.get.mockResolvedValue({status: 200, data: {items: []}});
+    client.put.mockResolvedValue({status: 200, data: {}});
+
+    await service.listTenantCourseOwnerships({q: 'IELTS', page: 0, size: 20});
+    await service.getTenantCourseOwner(3);
+    await service.transferTenantCourseOwner(3, {ownerAdvisorUserId: 44, expectedOwnershipVersion: 2, reason: 'Coverage'});
+
+    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/tenant/course-ownerships', {params: {q: 'IELTS', page: 0, size: 20}});
+    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/tenant/courses/3/owner');
+    expect(client.put).toHaveBeenCalledWith('/v2/tenant/courses/3/owner', {ownerAdvisorUserId: 44, expectedOwnershipVersion: 2, reason: 'Coverage'});
   });
 
   it('uses the advisor schedule and availability contracts without invented list parameters', async () => {

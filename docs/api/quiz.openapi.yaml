@@ -1,0 +1,1624 @@
+openapi: 3.0.1
+info:
+  description: Coursistant LMS REST API contract (OpenAPI 3).
+  title: LMS API
+  version: 1.0.0
+servers:
+- description: Servlet context-path
+  url: /api
+security:
+- bearerAuth: []
+tags:
+- description: Question CRUD; list/get are role-shaped (QuestionResponse vs StudentQuestionResponse)
+  name: Quiz Questions
+- description: Manual short-answer grading and grade release/retract
+  name: Quiz Grading
+- description: Student-facing quiz results and attempt summaries
+  name: Quiz Results
+- description: "Quiz authoring: list/create/patch/publish/delete"
+  name: Quizzes
+- description: "Start, autosave, submit, and inspect quiz attempts"
+  name: Quiz Attempts
+paths:
+  /v2/courses/{courseId}/quizzes:
+    get:
+      operationId: quizList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List quizzes in a course
+      tags:
+      - Quizzes
+    post:
+      operationId: quizCreate
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuizRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a draft quiz
+      tags:
+      - Quizzes
+  /v2/courses/{courseId}/quizzes/{quizId}:
+    delete:
+      description: Requires confirm=true. Fails with QUIZ_HAS_ATTEMPTS when attempts
+        exist.
+      operationId: quizDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: confirm
+        required: false
+        schema:
+          type: boolean
+          default: false
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: BAD_REQUEST when confirm is not true
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_HAS_ATTEMPTS
+      summary: Delete a quiz
+      tags:
+      - Quizzes
+    get:
+      operationId: quizGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_NOT_FOUND
+      summary: Get quiz detail
+      tags:
+      - Quizzes
+    patch:
+      operationId: quizPatch
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchQuizRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_VERSION_CONFLICT / QUIZ_CONTENT_LOCKED
+      summary: Patch quiz settings
+      tags:
+      - Quizzes
+  /v2/courses/{courseId}/quizzes/{quizId}/attempts:
+    get:
+      description: Students see own attempts; instructors may filter by userId.
+      operationId: quizListAttempts
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: userId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - in: query
+        name: pageSize
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 50
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List attempts
+      tags:
+      - Quiz Attempts
+    post:
+      description: "Idempotent via Idempotency-Key header. Students only. Main errors:\
+        \ QUIZ_NOT_FOUND, QUIZ_NOT_PUBLISHED, QUIZ_WINDOW_CLOSED, QUIZ_ATTEMPTS_EXCEEDED,\
+        \ QUIZ_FEATURE_DISABLED, ACCESS_DENIED."
+      operationId: quizStartAttempt
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED / FORBIDDEN
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_NOT_FOUND / QUIZ_NOT_PUBLISHED
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_WINDOW_CLOSED / QUIZ_ATTEMPTS_EXCEEDED / QUIZ_FEATURE_DISABLED
+      summary: Start a new attempt
+      tags:
+      - Quiz Attempts
+  /v2/courses/{courseId}/quizzes/{quizId}/attempts/current:
+    get:
+      description: "Main errors: QUIZ_NOT_FOUND, QUIZ_ATTEMPT_NOT_FOUND."
+      operationId: quizGetCurrentAttempt
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_NOT_FOUND / QUIZ_ATTEMPT_NOT_FOUND
+      summary: Get current in-progress attempt for the caller
+      tags:
+      - Quiz Attempts
+  /v2/courses/{courseId}/quizzes/{quizId}/attempts/{attemptId}:
+    get:
+      description: "Main errors: QUIZ_ATTEMPT_NOT_FOUND, ACCESS_DENIED."
+      operationId: quizGetAttempt
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_ATTEMPT_NOT_FOUND
+      summary: Get attempt detail
+      tags:
+      - Quiz Attempts
+  /v2/courses/{courseId}/quizzes/{quizId}/attempts/{attemptId}/answers/{questionId}:
+    put:
+      description: "Main errors: QUIZ_NOT_FOUND, QUIZ_ATTEMPT_NOT_IN_PROGRESS, QUIZ_QUESTION_NOT_FOUND,\
+        \ QUIZ_ANSWER_INVALID."
+      operationId: quizAutosave
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: questionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AutosaveRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_ANSWER_INVALID
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_NOT_FOUND / QUIZ_QUESTION_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_ATTEMPT_NOT_IN_PROGRESS
+      summary: Autosave one answer
+      tags:
+      - Quiz Attempts
+  /v2/courses/{courseId}/quizzes/{quizId}/attempts/{attemptId}/answers/{questionId}/grade:
+    put:
+      description: "Main errors: QUIZ_GRADING_FORBIDDEN, QUIZ_TA_SELF_CONFLICT, QUIZ_QUESTION_NOT_FOUND,\
+        \ QUIZ_ATTEMPT_NOT_FOUND, QUIZ_ANSWER_INVALID, BAD_REQUEST (score/reason)."
+      operationId: quizGradeAnswer
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: questionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GradeAnswerRequest"
+        required: true
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_ANSWER_INVALID / BAD_REQUEST
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_GRADING_FORBIDDEN / QUIZ_TA_SELF_CONFLICT
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_QUESTION_NOT_FOUND / QUIZ_ATTEMPT_NOT_FOUND
+      summary: Grade a short-answer response
+      tags:
+      - Quiz Grading
+  /v2/courses/{courseId}/quizzes/{quizId}/attempts/{attemptId}/receipt:
+    get:
+      description: "Main errors: QUIZ_ATTEMPT_NOT_FOUND (or receipt not issued), ACCESS_DENIED."
+      operationId: quizGetReceipt
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_ATTEMPT_NOT_FOUND
+      summary: Get submission receipt
+      tags:
+      - Quiz Attempts
+  /v2/courses/{courseId}/quizzes/{quizId}/attempts/{attemptId}/result:
+    get:
+      description: "Main errors: QUIZ_NOT_FOUND, QUIZ_ATTEMPT_NOT_FOUND, ACCESS_DENIED."
+      operationId: quizAttemptResult
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_NOT_FOUND / QUIZ_ATTEMPT_NOT_FOUND
+      summary: Get result for a specific attempt
+      tags:
+      - Quiz Results
+  /v2/courses/{courseId}/quizzes/{quizId}/attempts/{attemptId}/submit:
+    post:
+      description: "Idempotent via Idempotency-Key header. Main errors: QUIZ_ATTEMPT_NOT_FOUND,\
+        \ QUIZ_ATTEMPT_NOT_IN_PROGRESS, ACCESS_DENIED."
+      operationId: quizSubmitAttempt
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: attemptId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_ATTEMPT_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_ATTEMPT_NOT_IN_PROGRESS
+      summary: Submit an in-progress attempt
+      tags:
+      - Quiz Attempts
+  /v2/courses/{courseId}/quizzes/{quizId}/grades/release:
+    post:
+      description: "Optional body.userIds filter; omit for all. Empty array rejected\
+        \ (BAD_REQUEST). Main errors: QUIZ_GRADING_FORBIDDEN, QUIZ_TA_SELF_CONFLICT,\
+        \ BAD_REQUEST."
+      operationId: quizReleaseGrades
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReleaseGradesRequest"
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: BAD_REQUEST when userIds is an empty array
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_GRADING_FORBIDDEN / QUIZ_TA_SELF_CONFLICT
+      summary: Release grades
+      tags:
+      - Quiz Grading
+  /v2/courses/{courseId}/quizzes/{quizId}/grades/retract:
+    post:
+      description: "Optional body.userIds filter; omit for all. Empty array rejected\
+        \ (BAD_REQUEST). Main errors: QUIZ_GRADING_FORBIDDEN, QUIZ_TA_SELF_CONFLICT,\
+        \ BAD_REQUEST."
+      operationId: quizRetractGrades
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReleaseGradesRequest"
+      responses:
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: BAD_REQUEST when userIds is an empty array
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_GRADING_FORBIDDEN / QUIZ_TA_SELF_CONFLICT
+      summary: Retract released grades
+      tags:
+      - Quiz Grading
+  /v2/courses/{courseId}/quizzes/{quizId}/grading-summary:
+    get:
+      description: "Instructor/TA. Main errors: QUIZ_GRADING_FORBIDDEN, QUIZ_TA_SELF_CONFLICT."
+      operationId: quizGradingSummary
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_GRADING_FORBIDDEN / QUIZ_TA_SELF_CONFLICT
+      summary: Get grading progress summary
+      tags:
+      - Quiz Grading
+  /v2/courses/{courseId}/quizzes/{quizId}/grading/questions/{questionId}/answers:
+    get:
+      description: "Main errors: QUIZ_QUESTION_NOT_FOUND, QUIZ_GRADING_FORBIDDEN."
+      operationId: quizListShortAnswers
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: questionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_GRADING_FORBIDDEN / QUIZ_TA_SELF_CONFLICT
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_QUESTION_NOT_FOUND
+      summary: List short-answer submissions for a question
+      tags:
+      - Quiz Grading
+  /v2/courses/{courseId}/quizzes/{quizId}/my-attempts:
+    get:
+      operationId: quizMyAttempts
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: List my attempt result summaries
+      tags:
+      - Quiz Results
+  /v2/courses/{courseId}/quizzes/{quizId}/my-result:
+    get:
+      description: "Main errors: QUIZ_NOT_FOUND, NOT_FOUND (no grade yet)."
+      operationId: quizMyResult
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_NOT_FOUND / NOT_FOUND
+      summary: Get my counted quiz result
+      tags:
+      - Quiz Results
+  /v2/courses/{courseId}/quizzes/{quizId}/publish:
+    post:
+      operationId: quizPublish
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Publish a quiz
+      tags:
+      - Quizzes
+  /v2/courses/{courseId}/quizzes/{quizId}/questions:
+    get:
+      description: "Instructors receive QuestionResponse (includes answer keys / version).\
+        \ Active TAs receive the student-safe shape. When the Release B feature flag\
+        \ `lms.quiz.question-attempt-gate.enabled` is enabled, students must first\
+        \ start/resume an InProgress attempt and may read questions only while the\
+        \ quiz window and attempt deadline are open."
+      operationId: quizQuestionList
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  oneOf:
+                  - $ref: "#/components/schemas/QuestionResponse"
+                  - $ref: "#/components/schemas/StudentQuestionResponse"
+          description: ApiResponse envelope; data is an array of QuestionResponse
+            or StudentQuestionResponse
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_NOT_FOUND or QUIZ_ATTEMPT_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_WINDOW_CLOSED or QUIZ_ATTEMPT_NOT_IN_PROGRESS
+      summary: List questions (role-shaped)
+      tags:
+      - Quiz Questions
+    post:
+      operationId: quizQuestionCreate
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateQuestionRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Create a question (instructor)
+      tags:
+      - Quiz Questions
+  /v2/courses/{courseId}/quizzes/{quizId}/questions/order:
+    put:
+      operationId: quizQuestionReorder
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderQuestionsRequest"
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Reorder questions (instructor)
+      tags:
+      - Quiz Questions
+  /v2/courses/{courseId}/quizzes/{quizId}/questions/{questionId}:
+    delete:
+      operationId: quizQuestionDelete
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: questionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      summary: Delete a question (instructor)
+      tags:
+      - Quiz Questions
+    get:
+      description: "Instructors receive QuestionResponse (includes answer keys / version).\
+        \ Active TAs receive the student-safe shape. When the Release B feature flag\
+        \ `lms.quiz.question-attempt-gate.enabled` is enabled, students need their\
+        \ own valid InProgress attempt; the single-question URL applies the same gate\
+        \ as list."
+      operationId: quizQuestionGet
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: questionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - $ref: "#/components/schemas/QuestionResponse"
+                - $ref: "#/components/schemas/StudentQuestionResponse"
+          description: ApiResponse envelope; data is oneOf QuestionResponse | StudentQuestionResponse
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_QUESTION_NOT_FOUND / QUIZ_NOT_FOUND / QUIZ_ATTEMPT_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_WINDOW_CLOSED or QUIZ_ATTEMPT_NOT_IN_PROGRESS
+      summary: Get a question (role-shaped)
+      tags:
+      - Quiz Questions
+    patch:
+      operationId: quizQuestionPatch
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: questionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchQuestionRequest"
+        required: true
+      responses:
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_VERSION_CONFLICT / QUIZ_CONTENT_LOCKED
+      summary: Patch question stem/points/options (instructor)
+      tags:
+      - Quiz Questions
+  /v2/courses/{courseId}/quizzes/{quizId}/questions/{questionId}/answer-key:
+    patch:
+      description: "May trigger regrade when attempts exist. Main errors: QUIZ_VERSION_CONFLICT,\
+        \ QUIZ_QUESTION_NOT_FOUND."
+      operationId: quizQuestionPatchAnswerKey
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: questionId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchAnswerKeyRequest"
+        required: true
+      responses:
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_QUESTION_NOT_FOUND
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_VERSION_CONFLICT
+      summary: Patch answer key (instructor)
+      tags:
+      - Quiz Questions
+  /v2/courses/{courseId}/quizzes/{quizId}/unpublish:
+    post:
+      operationId: quizUnpublish
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - in: path
+        name: quizId
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: QUIZ_HAS_ATTEMPTS
+      summary: Unpublish a quiz (blocked if attempts exist)
+      tags:
+      - Quizzes
+components:
+  schemas:
+    ApiErrorResponse:
+      type: object
+      description: Error envelope rendered by ApiExceptionHandler (data is explicitly
+        null unless structured error details are supplied).
+      properties:
+        code:
+          type: string
+          description: Stable ErrorType.name()
+          example: USER_NOT_FOUND
+        data:
+          type: object
+          nullable: true
+        message:
+          type: string
+          example: User Does Not Exist
+        status:
+          type: integer
+          format: int32
+          example: 404
+        timestamp:
+          type: string
+          format: date-time
+          example: 2026-07-23T10:00:00Z
+      required:
+      - code
+      - data
+      - message
+      - status
+      - timestamp
+    ApiResponse:
+      type: object
+      description: Unified JSON envelope for LMS APIs
+      properties:
+        code:
+          type: string
+          description: Stable machine code (ErrorType.name() or SUCCESS)
+          example: SUCCESS
+        data:
+          type: object
+          description: Payload; explicitly null when no payload is available
+          nullable: true
+        message:
+          type: string
+          description: Human-readable message
+          example: Success
+        status:
+          type: integer
+          format: int32
+          description: HTTP status mirrored in body
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO-8601 timestamp
+          example: 2026-07-23T10:00:00Z
+    AutosaveRequest:
+      type: object
+      description: Save one question answer during an in-progress attempt
+      properties:
+        selectedOptionIds:
+          type: array
+          description: Selected option ids for objective questions
+          items:
+            type: integer
+            format: int32
+            description: Selected option ids for objective questions
+        textAnswer:
+          type: string
+          description: Free-text answer for ShortAnswer
+    CreateQuestionRequest:
+      type: object
+      description: Create a quiz question with optional answer-key options
+      properties:
+        options:
+          type: array
+          description: "Options with isCorrect; required for objective types, empty\
+            \ for ShortAnswer"
+          items:
+            $ref: "#/components/schemas/OptionInput"
+        points:
+          type: number
+          description: Points (>= 0)
+          example: 2.0
+        stem:
+          type: string
+          description: Question stem
+        type:
+          type: string
+          description: Question type
+          enum:
+          - SingleChoice
+          - MultipleSelect
+          - TrueFalse
+          - ShortAnswer
+          example: SingleChoice
+      required:
+      - points
+      - stem
+      - type
+    CreateQuizRequest:
+      type: object
+      description: Create a draft quiz; times are wall-clock in course timezone
+      properties:
+        attemptsAllowed:
+          type: integer
+          format: int32
+          description: Max attempts allowed (>= 1)
+          example: 1
+        closesAt:
+          type: string
+          format: date-time
+          description: Window close wall-clock (course timezone)
+        instructions:
+          type: string
+          description: Instructions shown to students
+        opensAt:
+          type: string
+          format: date-time
+          description: Window open wall-clock (course timezone)
+        resultVisibility:
+          type: string
+          description: Result visibility policy
+          enum:
+          - AfterRelease
+          - InstantAutoScore
+          example: AfterRelease
+        timeLimitSeconds:
+          type: integer
+          format: int32
+          description: Per-attempt time limit in seconds; omit or null for unlimited
+          example: 3600
+        title:
+          type: string
+          description: Title
+          example: Week 1 Quiz
+      required:
+      - closesAt
+      - opensAt
+      - title
+    GradeAnswerRequest:
+      type: object
+      description: Manual grade for a short-answer question
+      properties:
+        feedback:
+          type: string
+          description: Feedback shown to student when released
+        reason:
+          type: string
+          description: Required when changing a score after grades were released
+        score:
+          type: number
+          description: Score awarded (0..question points)
+          example: 1.5
+      required:
+      - score
+    MyResultResponse:
+      type: object
+      description: Student-facing quiz result / counted attempt summary
+      properties:
+        autoScore:
+          type: number
+          description: Auto-scored points
+        closeReason:
+          type: string
+          description: Close reason of counted attempt
+        countedAttemptId:
+          type: integer
+          format: int32
+          description: Attempt id that counts toward grade
+        gradeStatus:
+          type: string
+          description: Grade status
+          enum:
+          - Entered
+          - Released
+          example: Released
+        manualGradingPending:
+          type: boolean
+          description: True when short answers still need grading
+        manualScore:
+          type: number
+          description: Manual points
+        questions:
+          type: array
+          description: Per-question breakdown when visible
+          items:
+            $ref: "#/components/schemas/QuestionResultItem"
+        quizId:
+          type: integer
+          format: int32
+          description: Quiz id
+          example: 3
+        receiptId:
+          type: string
+          description: Receipt id of counted attempt
+        releasedAt:
+          type: string
+          format: date-time
+          description: Exact UTC release time for the released counted attempt; otherwise
+            null
+          example: 2026-08-20T17:30:00Z
+          nullable: true
+        showCorrectAnswers:
+          type: boolean
+          description: "Whether correct answers are included in questions[]"
+        totalScore:
+          type: number
+          description: Total points
+    OptionInput:
+      type: object
+      description: Option payload for create/patch question
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Existing option id when updating; omit for new
+        isCorrect:
+          type: boolean
+          description: Whether this option is correct
+          example: true
+        label:
+          type: string
+          description: Option label
+        position:
+          type: integer
+          format: int32
+          description: Display position
+          example: 1
+      required:
+      - label
+    OptionKeyInput:
+      type: object
+      description: Answer-key flip for an existing option
+      properties:
+        isCorrect:
+          type: boolean
+          description: Whether this option is correct
+          example: true
+        optionId:
+          type: integer
+          format: int32
+          description: Existing option id
+          example: 101
+      required:
+      - isCorrect
+      - optionId
+    OptionResponse:
+      type: object
+      description: Instructor option including answer-key flag
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Option id
+          example: 101
+        isCorrect:
+          type: boolean
+          description: Whether this option is correct (answer key; instructor only)
+          example: true
+        label:
+          type: string
+          description: Option label / text
+        position:
+          type: integer
+          format: int32
+          description: Display position
+          example: 1
+    PatchAnswerKeyRequest:
+      type: object
+      description: Patch answer keys and optionally trigger regrade
+      properties:
+        expectedVersion:
+          type: integer
+          format: int32
+          description: Expected question version
+          example: 1
+        options:
+          type: array
+          description: Option id → isCorrect pairs
+          items:
+            $ref: "#/components/schemas/OptionKeyInput"
+        reason:
+          type: string
+          description: Reason for key change (required when attempts exist / regrade)
+          example: Typo in key
+      required:
+      - expectedVersion
+      - options
+    PatchQuestionRequest:
+      type: object
+      description: Partial question update (stem/points/options)
+      properties:
+        expectedVersion:
+          type: integer
+          format: int32
+          description: Expected version for optimistic concurrency
+          example: 1
+        options:
+          type: array
+          description: Replacement options including isCorrect when provided
+          items:
+            $ref: "#/components/schemas/OptionInput"
+        points:
+          type: number
+          description: Points (>= 0)
+        stem:
+          type: string
+          description: Question stem
+      required:
+      - expectedVersion
+    PatchQuizRequest:
+      type: object
+      description: Partial quiz update; times are wall-clock in course timezone
+      properties:
+        attemptsAllowed:
+          type: integer
+          format: int32
+          description: Max attempts allowed (>= 1)
+        closesAt:
+          type: string
+          format: date-time
+          description: Window close wall-clock (course timezone)
+        expectedVersion:
+          type: integer
+          format: int32
+          description: Expected version for optimistic concurrency
+          example: 1
+        instructions:
+          type: string
+          description: Instructions
+        opensAt:
+          type: string
+          format: date-time
+          description: Window open wall-clock (course timezone)
+        resultVisibility:
+          type: string
+          description: Result visibility policy
+          enum:
+          - AfterRelease
+          - InstantAutoScore
+        timeLimitSeconds:
+          type: integer
+          format: int32
+          description: Per-attempt time limit in seconds
+        title:
+          type: string
+          description: Title
+      required:
+      - expectedVersion
+    QuestionResponse:
+      type: object
+      description: Instructor question view including answer keys
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Question id
+          example: 10
+        options:
+          type: array
+          description: Options including isCorrect answer-key flags
+          items:
+            $ref: "#/components/schemas/OptionResponse"
+        points:
+          type: number
+          description: Points for this question
+          example: 2.0
+        position:
+          type: integer
+          format: int32
+          description: 1-based position in quiz
+          example: 1
+        quizId:
+          type: integer
+          format: int32
+          description: Parent quiz id
+          example: 3
+        stem:
+          type: string
+          description: Question stem / prompt
+        type:
+          type: string
+          description: Question type
+          enum:
+          - SingleChoice
+          - MultipleSelect
+          - TrueFalse
+          - ShortAnswer
+          example: SingleChoice
+        version:
+          type: integer
+          format: int32
+          description: Optimistic concurrency version
+          example: 1
+    QuestionResultItem:
+      type: object
+      description: Per-question result row; correctOptionIds only when showCorrectAnswers
+      properties:
+        correctOptionIds:
+          type: array
+          description: Correct option ids when policy/visibility allows
+          items:
+            type: integer
+            format: int32
+            description: Correct option ids when policy/visibility allows
+        points:
+          type: number
+          description: Max points
+          example: 2.0
+        questionId:
+          type: integer
+          format: int32
+          description: Question id
+          example: 10
+        score:
+          type: number
+          description: Points awarded
+          example: 2.0
+        selectedOptionIds:
+          type: array
+          description: Student selected option ids
+          items:
+            type: integer
+            format: int32
+            description: Student selected option ids
+        textAnswer:
+          type: string
+          description: Student short-answer text
+        type:
+          type: string
+          description: Question type
+          example: SingleChoice
+    ReleaseGradesRequest:
+      type: object
+      description: Optional user filter for release/retract; omit or null = all eligible
+        users. Empty array is rejected.
+      properties:
+        userIds:
+          type: array
+          description: User ids to release/retract; omit for all
+          items:
+            type: integer
+            format: int32
+            description: User ids to release/retract; omit for all
+    ReorderQuestionsRequest:
+      type: object
+      description: New question order; must include every question id exactly once
+      properties:
+        questionIds:
+          type: array
+          description: Ordered question ids
+          example:
+          - 10
+          - 12
+          - 11
+          items:
+            type: integer
+            format: int32
+            description: Ordered question ids
+      required:
+      - questionIds
+    StudentOptionResponse:
+      type: object
+      description: Student-safe option without answer key
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Option id
+          example: 101
+        label:
+          type: string
+          description: Option label / text
+        position:
+          type: integer
+          format: int32
+          description: Display position
+          example: 1
+    StudentQuestionResponse:
+      type: object
+      description: Student-safe question view; never includes answer keys (no isCorrect
+        / version)
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Question id
+          example: 10
+        options:
+          type: array
+          description: Student-safe options without isCorrect
+          items:
+            $ref: "#/components/schemas/StudentOptionResponse"
+        points:
+          type: number
+          description: Points for this question
+          example: 2.0
+        position:
+          type: integer
+          format: int32
+          description: 1-based position in quiz
+          example: 1
+        quizId:
+          type: integer
+          format: int32
+          description: Parent quiz id
+          example: 3
+        stem:
+          type: string
+          description: Question stem / prompt
+        type:
+          type: string
+          description: Question type
+          enum:
+          - SingleChoice
+          - MultipleSelect
+          - TrueFalse
+          - ShortAnswer
+          example: SingleChoice
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      description: "Access token from POST /v1/auth/login (Authorization: Bearer <token>)."
+      name: bearerAuth
+      scheme: bearer
+      type: http

@@ -58,7 +58,7 @@ const MockExamsPage = lazy(() => import('./pages/MockExamsPage'));
 const MockExamSessionPage = lazy(() => import('./pages/MockExamSessionPage'));
 const TenantIntakesPage = lazy(() => import('./pages/TenantIntakesPage'));
 const TenantStudentRecordPage = lazy(() => import('./pages/TenantStudentRecordPage'));
-const TenantCourseDeliveryPage = lazy(() => import('./pages/TenantCourseDeliveryPage'));
+const AdvisorCourseDeliveryPage = lazy(() => import('./pages/TenantCourseDeliveryPage'));
 const CourseOperationsPage = lazy(() => import('./pages/CourseOperationsPage'));
 const MyOperationsPage = lazy(() => import('./pages/MyOperationsPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
@@ -174,7 +174,7 @@ const App = () => {
               <Route path={VOCABULARY_ROUTE_PATTERNS.session} element={<RequireVocabularyStudent><VocabularySessionPage/></RequireVocabularyStudent>}/>
               <Route path="admin/intakes" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantIntakesPage/></RequireAdvisingAccess>}/>
               <Route path="admin/students/:studentUserId" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantStudentRecordPage/></RequireAdvisingAccess>}/>
-              <Route path="admin/courses/:courseId/delivery" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantCourseDeliveryPage/></RequireAdvisingAccess>}/>
+              <Route path="advisor/courses/:courseId/delivery" element={<RequireAdvisingAccess gate="advisor"><AdvisorCourseDeliveryPage/></RequireAdvisingAccess>}/>
               <Route path="*" element={<NotFoundPage/>}/>
             </Route>
             <Route

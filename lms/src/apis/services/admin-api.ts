@@ -12,6 +12,9 @@ import {
   idempotent,
   ManagedUser,
   ReassignPrimaryInstructorRequest,
+  TenantAuditEventParams,
+  TenantDirectoryRead,
+  TenantUserDirectoryParams,
   V2ApiClient,
 } from '@/apis';
 
@@ -48,6 +51,18 @@ export class AdminApiService {
     return this.apiClient.get('/v2/users');
   }
 
+  listTenantUsers(params: TenantUserDirectoryParams = {}): Promise<ApiResponse<TenantDirectoryRead>> {
+    return this.apiClient.get('/v2/tenant/users', {params});
+  }
+
+  getTenantUser(userId: number): Promise<ApiResponse<TenantDirectoryRead>> {
+    return this.apiClient.get(`/v2/tenant/users/${userId}`);
+  }
+
+  listTenantAuditEvents(params: TenantAuditEventParams = {}): Promise<ApiResponse<TenantDirectoryRead>> {
+    return this.apiClient.get('/v2/tenant/audit-events', {params});
+  }
+
   getUser(userId: number): Promise<ApiResponse<ManagedUser>> {
     return this.apiClient.get(`/v2/users/${userId}`);
   }
@@ -72,6 +87,10 @@ export class AdminApiService {
 
   disableManagedUser(scope: 'system' | 'tenant', userId: number): Promise<ApiResponse<void>> {
     return this.apiClient.post(`/v2/${scope}/managed-users/${userId}/disable`, undefined, idempotent());
+  }
+
+  enableTenantManagedUser(userId: number): Promise<ApiResponse<void>> {
+    return this.apiClient.post(`/v2/tenant/managed-users/${userId}/enable`);
   }
 
   changeUserTenant(userId: number, request: ChangeUserTenantRequest): Promise<ApiResponse<ManagedUser>> {

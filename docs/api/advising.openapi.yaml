@@ -182,7 +182,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/CounsellorDashboardApiResponse"
         "401":
-          description: UNAUTHORIZED
+          description: INVALID_TOKEN
         "403": { $ref: "#/components/responses/Forbidden" }
   /v2/advisor/students:
     get:
@@ -226,6 +226,35 @@ paths:
         "403": { $ref: "#/components/responses/Forbidden" }
         "404": { $ref: "#/components/responses/NotFound" }
   /v2/tenant/student-intakes:
+    post:
+      operationId: tenantCreateStudentIntake
+      tags: [TenantIntakes]
+      parameters:
+      - description: Required idempotency key for safe retries of this mutating request
+        in: header
+        name: Idempotency-Key
+        required: true
+        schema:
+          type: string
+          maxLength: 128
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateStudentIntakeRequest"
+      responses:
+        "201":
+          description: Created OPEN unassigned Student intake
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentIntakeApiResponse"
+        "400": { $ref: "#/components/responses/BadRequest" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "403": { $ref: "#/components/responses/Forbidden" }
+        "409":
+          description: IDEMPOTENCY_KEY_MISMATCH
     get:
       operationId: tenantListStudentIntakes
       tags: [TenantIntakes]
@@ -633,58 +662,6 @@ paths:
         "404": { $ref: "#/components/responses/NotFound" }
         "409":
           description: "ADVISOR_TASK_STATE_CONFLICT, ADVISOR_TASK_VERSION_CONFLICT"
-  /v2/tenant/students/{studentUserId}/profile:
-    get:
-      operationId: tenantGetStudentProfile
-      tags: [TenantProfiles]
-      parameters:
-      - $ref: "#/components/parameters/StudentUserId"
-      responses:
-        "200":
-          description: Tenant-admin read profile without advisorPrivateNotes
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TenantStudentProfileApiResponse"
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "404":
-          description: STUDENT_PROFILE_NOT_FOUND or hidden cross-tenant
-  /v2/tenant/students/{studentUserId}/study-plan:
-    get:
-      operationId: tenantGetStudentStudyPlan
-      tags: [TenantProfiles]
-      parameters:
-      - $ref: "#/components/parameters/StudentUserId"
-      responses:
-        "200":
-          description: Tenant-admin read current study plan
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TenantStudyPlanApiResponse"
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "404":
-          description: STUDY_PLAN_NOT_FOUND or hidden cross-tenant
-  /v2/tenant/students/{studentUserId}/study-plan/revisions:
-    get:
-      operationId: tenantListStudyPlanRevisions
-      tags: [TenantProfiles]
-      parameters:
-      - $ref: "#/components/parameters/StudentUserId"
-      - $ref: "#/components/parameters/Page"
-      - $ref: "#/components/parameters/Size"
-      responses:
-        "200":
-          description: Tenant-admin revision history
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/StudyPlanRevisionPageApiResponse"
-        "401": { $ref: "#/components/responses/Unauthorized" }
-        "403": { $ref: "#/components/responses/Forbidden" }
-        "404": { $ref: "#/components/responses/NotFound" }
   /v2/advisor/students/{studentUserId}/courses:
     get:
       operationId: advisorListStudentCourses
@@ -1026,10 +1003,10 @@ paths:
           description: "COURSE_NOT_FOUND, STUDY_PLAN_COURSE_LINK_NOT_FOUND"
         "409":
           description: "STUDY_PLAN_VERSION_CONFLICT, CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
-  /v2/tenant/courses/{courseId}/delivery-config:
+  /v2/advisor/courses/{courseId}/delivery-config:
     get:
-      operationId: tenantGetCourseDeliveryConfig
-      tags: [TenantCourseConfig]
+      operationId: advisorGetCourseDeliveryConfig
+      tags: [AdvisorCourseLaunch]
       parameters:
       - name: courseId
         in: path
@@ -1047,8 +1024,8 @@ paths:
         "404":
           description: "COURSE_NOT_FOUND, COURSE_DELIVERY_CONFIG_NOT_FOUND"
     put:
-      operationId: tenantPutCourseDeliveryConfig
-      tags: [TenantCourseConfig]
+      operationId: advisorPutCourseDeliveryConfig
+      tags: [AdvisorCourseLaunch]
       description: "catalogCode and capacity are always required. expectedCourseLaunchVersion is required when updating an existing config and optional/ignored on first create."
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
@@ -1080,10 +1057,10 @@ paths:
           description: COURSE_NOT_FOUND
         "409":
           description: "COURSE_ADOPTION_REQUIRED, COURSE_NOT_GROUP, COURSE_LAUNCH_VERSION_CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
-  /v2/tenant/courses/{courseId}/launch/ready:
+  /v2/advisor/courses/{courseId}/launch/ready:
     post:
-      operationId: tenantReadyCourseLaunch
-      tags: [TenantCourseConfig]
+      operationId: advisorReadyCourseLaunch
+      tags: [AdvisorCourseLaunch]
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
         in: header
@@ -1113,10 +1090,10 @@ paths:
           description: "COURSE_NOT_FOUND, COURSE_DELIVERY_CONFIG_NOT_FOUND"
         "409":
           description: "COURSE_NOT_GROUP, COURSE_NOT_READY, COURSE_LAUNCH_TRANSITION_INVALID, COURSE_LAUNCH_VERSION_CONFLICT, IDEMPOTENCY_KEY_MISMATCH"
-  /v2/tenant/courses/{courseId}/launch/publish:
+  /v2/advisor/courses/{courseId}/launch/publish:
     post:
-      operationId: tenantPublishCourseLaunch
-      tags: [TenantCourseConfig]
+      operationId: advisorPublishCourseLaunch
+      tags: [AdvisorCourseLaunch]
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
         in: header
@@ -1199,21 +1176,26 @@ paths:
     get:
       operationId: advisorListStudentPublishedReports
       tags: [AdvisorReports]
+      description: >
+        Zero-based pagination. Omitted or negative page normalizes to 0; omitted or size below 1
+        defaults to 20; size above 50 is capped at 50. Offset is page * size.
       parameters:
       - $ref: "#/components/parameters/StudentUserId"
       - name: page
         in: query
-        schema: { type: integer }
+        description: Zero-based page index. Omitted or negative values normalize to 0.
+        schema: { type: integer, default: 0 }
       - name: size
         in: query
-        schema: { type: integer }
+        description: Page size. Omitted or values below 1 default to 20; values above 50 cap at 50.
+        schema: { type: integer, default: 20 }
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
-          description: STUDY_PLAN_NOT_FOUND
+          description: COURSE_NOT_FOUND
   /v2/advisor/conversations:
     get:
       operationId: advisorListConversations
@@ -1586,7 +1568,7 @@ components:
     BadRequest:
       description: PARAM_MISSING or BAD_REQUEST
     Unauthorized:
-      description: UNAUTHORIZED
+      description: INVALID_TOKEN
     Forbidden:
       description: FORBIDDEN
     NotFound:
@@ -1594,9 +1576,12 @@ components:
   schemas:
     CreateStudentIntakeRequest:
       type: object
-      required: [name, email, studentType, courseRequest]
+      required: [firstName, lastName, email, studentType, courseRequest]
       properties:
-        name: { type: string, minLength: 1, maxLength: 255 }
+        name: { type: string, deprecated: true, description: Rejected when non-blank. Use firstName and lastName. }
+        firstName: { type: string, minLength: 1, maxLength: 100 }
+        middleName: { type: string, maxLength: 100 }
+        lastName: { type: string, minLength: 1, maxLength: 100 }
         email: { type: string, maxLength: 255 }
         studentType: { type: string, enum: [VIP, STANDARD] }
         courseRequest: { type: string, minLength: 1, maxLength: 2000 }
@@ -1608,7 +1593,10 @@ components:
       description: email, role, level and tenantId are not accepted. At least one mutable field besides expectedIntakeVersion is required.
       properties:
         expectedIntakeVersion: { type: integer }
-        name: { type: string, minLength: 1, maxLength: 255 }
+        name: { type: string, deprecated: true, description: Rejected when non-blank. Use firstName and lastName. }
+        firstName: { type: string, minLength: 1, maxLength: 100 }
+        middleName: { type: string, maxLength: 100 }
+        lastName: { type: string, minLength: 1, maxLength: 100 }
         studentType: { type: string, enum: [VIP, STANDARD] }
         courseRequest: { type: string, maxLength: 2000 }
         contactPhone: { type: string, minLength: 7, maxLength: 64 }
@@ -1638,7 +1626,9 @@ components:
       properties:
         intakeId: { type: integer, format: int64 }
         studentUserId: { type: integer }
-        name: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
         email: { type: string }
         studentType: { type: string, enum: [VIP, STANDARD] }
         courseRequest: { type: string }
@@ -1654,10 +1644,12 @@ components:
         updatedAt: { type: string, format: date-time }
     AdvisorCandidateResponse:
       type: object
-      required: [advisorUserId, name, email, level]
+      required: [advisorUserId, firstName, lastName, email, level]
       properties:
         advisorUserId: { type: integer }
-        name: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
         email: { type: string }
         level: { type: string, enum: [ADVISOR, INSTRUCTOR_ADVISOR] }
     CounsellorDashboardResponse:
@@ -1669,10 +1661,12 @@ components:
         unassignedCount: { type: integer, format: int64 }
     AdvisorStudentSummaryResponse:
       type: object
-      required: [studentUserId, name, email, studentType, assignmentVersion]
+      required: [studentUserId, firstName, lastName, email, studentType, assignmentVersion]
       properties:
         studentUserId: { type: integer }
-        name: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
         email: { type: string }
         studentType: { type: string, enum: [VIP, STANDARD] }
         assignmentVersion: { type: integer }
@@ -1821,7 +1815,9 @@ components:
       properties:
         profileId: { type: integer, format: int64 }
         studentUserId: { type: integer }
-        name: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
         email: { type: string }
         studentType: { type: string, enum: [VIP, STANDARD] }
         advisorUserId: { type: integer }
@@ -1848,7 +1844,9 @@ components:
       properties:
         profileId: { type: integer, format: int64 }
         studentUserId: { type: integer }
-        name: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
         email: { type: string }
         studentType: { type: string, enum: [VIP, STANDARD] }
         contactPhone: { type: string }
@@ -1862,7 +1860,9 @@ components:
         advisorInterpretation: { type: string }
         enrollmentStatus: { type: string }
         assignedAdvisorUserId: { type: integer }
-        assignedAdvisorDisplayName: { type: string }
+        assignedAdvisorFirstName: { type: string }
+        assignedAdvisorMiddleName: { type: string }
+        assignedAdvisorLastName: { type: string }
         skills:
           type: array
           items: { $ref: "#/components/schemas/ProfileSkillResponse" }
@@ -1874,7 +1874,9 @@ components:
       properties:
         profileId: { type: integer, format: int64 }
         studentUserId: { type: integer }
-        name: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
         email: { type: string }
         studentType: { type: string, enum: [VIP, STANDARD] }
         advisorUserId: { type: integer }
@@ -2234,7 +2236,9 @@ components:
         alignmentNotes: { type: string }
         courseLaunchVersion: { type: integer }
         instructorUserId: { type: integer }
-        instructorDisplayName: { type: string }
+        instructorFirstName: { type: string }
+        instructorMiddleName: { type: string }
+        instructorLastName: { type: string }
         lifecycleStatus: { type: string, enum: [DRAFT, READY, PUBLISHED, ONGOING, COMPLETED, HIDDEN] }
         lectureTotal: { type: integer }
         lectureCompleted: { type: integer }
@@ -2259,7 +2263,9 @@ components:
       type: object
       properties:
         userId: { type: integer }
-        displayName: { type: string }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
     GroupCourseOptionResponse:
       type: object
       properties:

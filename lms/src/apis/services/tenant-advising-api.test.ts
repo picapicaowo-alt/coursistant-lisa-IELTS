@@ -13,6 +13,7 @@ describe('TenantAdvisingApiService', () => {
     client.put.mockResolvedValue({status: 200, data: {}});
     client.post.mockResolvedValue({status: 200, data: {}});
     await service.listStudentIntakes({page: 0, size: 20, assignmentStatus: 'ASSIGNED'});
+    await service.createStudentIntake({firstName: 'New', lastName: 'Student', email: 'student@example.test', studentType: 'STANDARD', courseRequest: 'IELTS'}, 'create-1');
     await service.reassignAdvisor(41, {advisorUserId: 90, expectedAssignmentVersion: 0, reason: 'Coverage'}, 'reassign-1');
     await service.cancelStudentIntake(9, {expectedIntakeVersion: 1, reason: 'Duplicate'}, 'cancel-1');
     expect(client.get).toHaveBeenCalledWith(
@@ -24,30 +25,18 @@ describe('TenantAdvisingApiService', () => {
       {advisorUserId: 90, expectedAssignmentVersion: 0, reason: 'Coverage'},
       {headers: {'Idempotency-Key': 'reassign-1'}},
     );
-    expect(client.post).toHaveBeenCalledWith(
+    expect(client.post).toHaveBeenNthCalledWith(
+      1,
+      '/v2/tenant/student-intakes',
+      {firstName: 'New', lastName: 'Student', email: 'student@example.test', studentType: 'STANDARD', courseRequest: 'IELTS'},
+      {headers: {'Idempotency-Key': 'create-1'}},
+    );
+    expect(client.post).toHaveBeenNthCalledWith(
+      2,
       '/v2/tenant/student-intakes/9/cancel',
       {expectedIntakeVersion: 1, reason: 'Duplicate'},
       {headers: {'Idempotency-Key': 'cancel-1'}},
     );
   });
 
-  it('configures and launches course delivery with optimistic versions', async () => {
-    client.get.mockResolvedValue({status: 200, data: {courseLaunchVersion: 1}});
-    client.put.mockResolvedValue({status: 200, data: {}});
-    client.post.mockResolvedValue({status: 200, data: {}});
-    await service.getCourseDeliveryConfig(8);
-    await service.putCourseDeliveryConfig(8, {catalogCode: 'IELTS-A', capacity: 12, expectedCourseLaunchVersion: 1}, 'delivery-8');
-    await service.publishCourseLaunch(8, {expectedCourseLaunchVersion: 2}, 'publish-8');
-    expect(client.get).toHaveBeenCalledWith('/v2/tenant/courses/8/delivery-config');
-    expect(client.put).toHaveBeenCalledWith(
-      '/v2/tenant/courses/8/delivery-config',
-      {catalogCode: 'IELTS-A', capacity: 12, expectedCourseLaunchVersion: 1},
-      {headers: {'Idempotency-Key': 'delivery-8'}},
-    );
-    expect(client.post).toHaveBeenCalledWith(
-      '/v2/tenant/courses/8/launch/publish',
-      {expectedCourseLaunchVersion: 2},
-      {headers: {'Idempotency-Key': 'publish-8'}},
-    );
-  });
 });

@@ -129,7 +129,7 @@ const CoursesList: React.FC<{state: CourseState}> = ({state}) => {
             // enrolment role rather than any of them.
             canManage={!isUserAccount || ('courseRole' in course && (course.courseRole ?? course.role) === 'Instructor')}
             showOperations={canAccessCourseOperations(user, 'courseRole' in course ? course.courseRole ?? course.role : null)}
-            showDelivery={user.role === 'TENANT_ADMIN'}
+            showDelivery={user.level === 'ADVISOR' || user.level === 'INSTRUCTOR_ADVISOR'}
           />
         ))}
       </div>

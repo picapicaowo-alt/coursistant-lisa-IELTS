@@ -28,11 +28,13 @@ const response = <T,>(data: T) => ({
 
 const profile = {
   userId: 9,
-  displayName: 'Student One',
+  firstName: 'Student',
+  lastName: 'One',
   email: 'student@example.com',
   role: 'USER',
   level: 'STUDENT',
   avatarUrl: null,
+  phone: null,
   emailNotifications: true,
 };
 
@@ -56,7 +58,7 @@ describe('SettingsPage', () => {
 
   it('rejects a password that would fail the backend letter-and-digit rule', async () => {
     renderPage();
-    expect(await screen.findByLabelText('Display name')).toBeInTheDocument();
+    expect(await screen.findByLabelText('First name')).toBeInTheDocument();
     await userEvent.click(screen.getByRole('tab', {name: 'Password'}));
     await userEvent.type(screen.getByLabelText('Current password'), 'OldPassw0rd');
     await userEvent.type(screen.getByLabelText('New password'), 'passwordonly');
@@ -68,7 +70,7 @@ describe('SettingsPage', () => {
 
   it('updates a valid password through the authenticated change-password route', async () => {
     renderPage();
-    await screen.findByLabelText('Display name');
+    await screen.findByLabelText('First name');
     await userEvent.click(screen.getByRole('tab', {name: 'Password'}));
     await userEvent.type(screen.getByLabelText('Current password'), 'OldPassw0rd');
     await userEvent.type(screen.getByLabelText('New password'), 'NewPassw0rd');
@@ -87,7 +89,7 @@ describe('SettingsPage', () => {
 
   it('toggles password visibility for all password fields', async () => {
     renderPage();
-    await screen.findByLabelText('Display name');
+    await screen.findByLabelText('First name');
     await userEvent.click(screen.getByRole('tab', {name: 'Password'}));
 
     const currentInput = screen.getByLabelText('Current password');

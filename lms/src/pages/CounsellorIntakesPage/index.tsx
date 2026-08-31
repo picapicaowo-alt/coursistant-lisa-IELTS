@@ -6,6 +6,7 @@ import {counsellorApiService} from '@/apis/services/counsellor-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {formatPersonName} from '@/utils/personName';
 
 const PAGE_SIZE = 20;
 
@@ -37,7 +38,7 @@ const CounsellorIntakesPage: React.FC = () => {
           {items.map(intake => (
             <article key={intake.intakeId} className={styles.row}>
               <div className={styles.identity}>
-                <strong>{intake.name || `Student #${intake.studentUserId}`}</strong>
+                <strong>{formatPersonName(intake, `Student #${intake.studentUserId}`)}</strong>
                 <span>{intake.email}</span>
                 <small>{intake.studentType} · version {intake.intakeVersion}</small>
               </div>

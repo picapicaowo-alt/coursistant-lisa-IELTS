@@ -7,6 +7,7 @@ import {advisorApiService} from '@/apis/services/advisor-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {formatPersonName} from '@/utils/personName';
 
 const CoursesPage: React.FC = () => {
   const {studentUserId} = useParams();
@@ -113,7 +114,7 @@ const CoursesPage: React.FC = () => {
               <div className={styles.identity}>
                 <strong>{course.title || course.courseCode || `Course #${course.courseId}`}</strong>
                 <span>{course.deliveryMode || 'Course'} · {course.launchState || course.status || 'Pending'}</span>
-                <small>{course.instructorDisplayName || 'Instructor not assigned'} · link v{course.courseLinkVersion ?? '—'} · launch v{course.courseLaunchVersion ?? '—'}</small>
+                <small>{formatPersonName({firstName: course.instructorFirstName, middleName: course.instructorMiddleName, lastName: course.instructorLastName}, 'Instructor not assigned')} · link v{course.courseLinkVersion ?? '—'} · launch v{course.courseLaunchVersion ?? '—'}</small>
               </div>
               <div className={styles.actions}>
                 {course.deliveryMode === 'ONE_ON_ONE' && course.courseId != null ? <button className={styles.secondary} onClick={() => setCourseEdit(current => ({...current, courseId: String(course.courseId), expectedVersion: course.courseLaunchVersion == null ? '' : String(course.courseLaunchVersion), instructorId: course.instructorUserId == null ? '' : String(course.instructorUserId)}))}>Edit schedule</button> : null}

@@ -7,10 +7,12 @@ import type {
   CreateStudentMockExamRequest,
   GradeMockExamWritingRequest,
   MockExamRead,
+  ObserverMockExamDetail,
   MockExamTemplateSummary,
   SubmitMockExamListeningRequest,
   SubmitMockExamReadingRequest,
   SubmitMockExamWritingRequest,
+  StudentMockExamDetail,
 } from '@/apis';
 import {idempotent, V2ApiClient} from '@/apis';
 
@@ -39,7 +41,7 @@ export class MockExamApiService {
     return this.apiClient.post(`/v2/advisor/students/${studentUserId}/mock-exams`, request, idempotent(key));
   }
 
-  getAdvisorStudentExam(studentUserId: number, studentMockExamId: number): Promise<ApiResponse<MockExamRead>> {
+  getAdvisorStudentExam(studentUserId: number, studentMockExamId: number): Promise<ApiResponse<ObserverMockExamDetail>> {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/mock-exams/${studentMockExamId}`);
   }
 
@@ -59,7 +61,7 @@ export class MockExamApiService {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/mock-exams`, {params: {page, size}});
   }
 
-  getParentStudentExam(studentUserId: number, studentMockExamId: number): Promise<ApiResponse<MockExamRead>> {
+  getParentStudentExam(studentUserId: number, studentMockExamId: number): Promise<ApiResponse<ObserverMockExamDetail>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/mock-exams/${studentMockExamId}`);
   }
 
@@ -67,7 +69,7 @@ export class MockExamApiService {
     return this.apiClient.get('/v2/student/mock-exams', {params: {page, size}});
   }
 
-  getStudentExam(studentMockExamId: number): Promise<ApiResponse<MockExamRead>> {
+  getStudentExam(studentMockExamId: number): Promise<ApiResponse<StudentMockExamDetail>> {
     return this.apiClient.get(`/v2/student/mock-exams/${studentMockExamId}`);
   }
 

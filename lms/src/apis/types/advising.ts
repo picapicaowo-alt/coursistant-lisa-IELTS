@@ -14,7 +14,9 @@ export interface AdvisingPage<T> {
 }
 
 export interface CreateStudentIntakeRequest {
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   email: string;
   studentType: StudentType;
   courseRequest: string;
@@ -24,7 +26,9 @@ export interface CreateStudentIntakeRequest {
 
 export interface PatchStudentIntakeRequest {
   expectedIntakeVersion: number;
-  name?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   studentType?: StudentType;
   courseRequest?: string;
   contactPhone?: string;
@@ -50,7 +54,9 @@ export interface CancelStudentIntakeRequest {
 export interface StudentIntakeResponse {
   intakeId: number;
   studentUserId: number;
-  name?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   email?: string;
   studentType?: StudentType;
   courseRequest?: string;
@@ -68,7 +74,9 @@ export interface StudentIntakeResponse {
 
 export interface AdvisorCandidateResponse {
   advisorUserId: number;
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   email: string;
   level: AdvisorCandidateLevel;
 }
@@ -81,7 +89,9 @@ export interface CounsellorDashboardResponse {
 
 export interface AdvisorStudentSummaryResponse {
   studentUserId: number;
-  name: string;
+  firstName: string;
+  middleName?: string;
+  lastName: string;
   email: string;
   studentType: StudentType;
   assignmentVersion: number;
@@ -120,6 +130,20 @@ export interface ProfileSkillResponse {
   position?: number;
 }
 
+export interface AcademicPerformanceSummaryResponse {
+  releasedAssignmentCount?: number;
+  releasedScoreAverage?: number;
+  presentCount?: number;
+  absentCount?: number;
+  approvedAbsenceCount?: number;
+  unapprovedAbsenceCount?: number;
+  completedSessionCount?: number;
+  completedAdvisorTaskCount?: number;
+  reachedIncompleteCheckpointCount?: number;
+  publishedReportCount?: number;
+  activityHistory?: unknown[];
+}
+
 export interface CreateStudentProfileRequest {
   contactPhone?: string;
   academicBackground?: string;
@@ -142,7 +166,9 @@ export interface UpdateStudentProfileRequest extends CreateStudentProfileRequest
 export interface AdvisorStudentProfileResponse {
   profileId: number;
   studentUserId: number;
-  name?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   email?: string;
   studentType?: StudentType;
   advisorUserId?: number;
@@ -157,6 +183,7 @@ export interface AdvisorStudentProfileResponse {
   advisorInterpretation?: string;
   advisorPrivateNotes?: string;
   skills?: ProfileSkillResponse[];
+  performanceSummary?: AcademicPerformanceSummaryResponse;
   profileVersion: number;
   createdAt?: string;
   updatedAt?: string;
@@ -166,7 +193,9 @@ export interface AdvisorStudentProfileResponse {
 export interface StudentFacingProfileResponse {
   profileId: number;
   studentUserId: number;
-  name?: string;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
   email?: string;
   studentType?: StudentType;
   contactPhone?: string;
@@ -178,7 +207,13 @@ export interface StudentFacingProfileResponse {
   targetValue?: string;
   targetDate?: string;
   advisorInterpretation?: string;
+  enrollmentStatus?: string;
+  assignedAdvisorUserId?: number;
+  assignedAdvisorFirstName?: string;
+  assignedAdvisorMiddleName?: string;
+  assignedAdvisorLastName?: string;
   skills?: ProfileSkillResponse[];
+  performanceSummary?: AcademicPerformanceSummaryResponse;
   profileVersion: number;
 }
 
@@ -384,14 +419,23 @@ export interface AdvisorStudentCourseResponse {
   alignmentNotes?: string;
   courseLaunchVersion?: number;
   instructorUserId?: number;
-  instructorDisplayName?: string;
+  instructorFirstName?: string;
+  instructorMiddleName?: string;
+  instructorLastName?: string;
   lifecycleStatus?: string;
   lectureTotal?: number;
   lectureCompleted?: number;
   completionVersion?: number;
   completedAt?: string;
   schedule?: unknown[];
-  instructors?: unknown[];
+  instructors?: GroupCourseInstructorPreviewResponse[];
+}
+
+export interface GroupCourseInstructorPreviewResponse {
+  userId?: number;
+  firstName?: string;
+  middleName?: string;
+  lastName?: string;
 }
 
 export interface GroupCourseOptionResponse {

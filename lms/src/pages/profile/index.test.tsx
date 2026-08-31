@@ -27,11 +27,13 @@ const response = <T,>(data: T) => ({
 
 const profile = {
   userId: 9,
-  displayName: 'Student One',
+  firstName: 'Student',
+  lastName: 'One',
   email: 'student@example.com',
   role: 'USER',
   level: 'STUDENT',
   avatarUrl: null,
+  phone: null,
   emailNotifications: true,
 };
 
@@ -48,22 +50,22 @@ describe('ProfilePage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     api.getMyProfile.mockResolvedValue(response(profile));
-    api.updateMyProfile.mockResolvedValue(response({...profile, displayName: 'Student Two'}));
+    api.updateMyProfile.mockResolvedValue(response({...profile, lastName: 'Two'}));
   });
 
-  it('loads the live profile and saves a display-name change', async () => {
+  it('loads the live profile and saves split-name fields', async () => {
     renderPage();
     expect(await screen.findByRole('heading', {name: 'Student One'})).toBeInTheDocument();
     expect(screen.getByText('student@example.com')).toBeInTheDocument();
 
     await userEvent.click(screen.getByRole('button', {name: 'Edit profile'}));
-    const name = screen.getByLabelText('Display name');
+    const name = screen.getByLabelText('Last name');
     await userEvent.clear(name);
-    await userEvent.type(name, 'Student Two');
+    await userEvent.type(name, 'Two');
     await userEvent.click(screen.getByRole('button', {name: 'Save changes'}));
 
     await waitFor(() => {
-      expect(api.updateMyProfile).toHaveBeenCalledWith({displayName: 'Student Two'});
+      expect(api.updateMyProfile).toHaveBeenCalledWith({firstName: 'Student', middleName: '', lastName: 'Two', phone: ''});
     });
     expect(await screen.findByText('Profile updated.')).toBeInTheDocument();
   });

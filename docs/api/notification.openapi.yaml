@@ -62,8 +62,9 @@ paths:
     get:
       description: "Paged list for the authenticated user (newest first). page defaults\
         \ to 1; size defaults to 20 and is capped at 100. Each item includes availability\
-        \ (AVAILABLE / NO_LONGER_AVAILABLE). Main errors: UNAUTHORIZED, USER_NOT_FOUND,\
-        \ BAD_REQUEST (missing tenant)."
+        \ (AVAILABLE / NO_LONGER_AVAILABLE). Parent callers must use /v2/parent/notifications.\
+        \ Main errors: INVALID_TOKEN, USER_NOT_FOUND, FORBIDDEN (PARENT), BAD_REQUEST\
+        \ (missing tenant)."
       operationId: meNotificationList
       parameters:
       - description: 1-based page; defaults to 1
@@ -92,7 +93,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: UNAUTHORIZED
+          description: INVALID_TOKEN
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN when the caller is PARENT
         "404":
           content:
             application/json:
@@ -105,7 +112,8 @@ paths:
   /v2/me/notifications/read-all:
     patch:
       description: "Idempotent via Idempotency-Key header. Returns unreadCount=0.\
-        \ Main errors: UNAUTHORIZED, USER_NOT_FOUND, IDEMPOTENCY_KEY_REQUIRED, IDEMPOTENCY_KEY_INVALID."
+        \ Parent callers must use /v2/parent/notifications. Main errors: INVALID_TOKEN,\
+        \ USER_NOT_FOUND, FORBIDDEN (PARENT), IDEMPOTENCY_KEY_REQUIRED, IDEMPOTENCY_KEY_INVALID."
       operationId: meNotificationMarkAllRead
       parameters:
       - description: "Required idempotency key for safe retries of this mutating request\
@@ -129,13 +137,26 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
           description: IDEMPOTENCY_KEY_REQUIRED / IDEMPOTENCY_KEY_INVALID / BAD_REQUEST
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: INVALID_TOKEN
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN when the caller is PARENT
       summary: Mark all my notifications as read
       tags:
       - MeNotifications
   /v2/me/notifications/unread-count:
     get:
-      description: "Returns unreadCount for the authenticated user. Main errors: UNAUTHORIZED,\
-        \ USER_NOT_FOUND, BAD_REQUEST (missing tenant)."
+      description: "Returns unreadCount for the authenticated user. Parent callers\
+        \ must use /v2/parent/notifications. Main errors: INVALID_TOKEN, USER_NOT_FOUND,\
+        \ FORBIDDEN (PARENT), BAD_REQUEST (missing tenant)."
       operationId: meNotificationUnreadCount
       responses:
         "200":
@@ -149,7 +170,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: UNAUTHORIZED
+          description: INVALID_TOKEN
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN when the caller is PARENT
       summary: Unread notification count
       tags:
       - MeNotifications
@@ -157,7 +184,8 @@ paths:
     patch:
       description: "Idempotent via Idempotency-Key header. Cross-user or missing ids\
         \ return 404 NOT_FOUND. Already-read notifications succeed with no change.\
-        \ Main errors: UNAUTHORIZED, USER_NOT_FOUND, NOT_FOUND, IDEMPOTENCY_KEY_REQUIRED,\
+        \ Parent callers must use /v2/parent/notifications. Main errors: INVALID_TOKEN,\
+        \ USER_NOT_FOUND, FORBIDDEN (PARENT), NOT_FOUND, IDEMPOTENCY_KEY_REQUIRED,\
         \ IDEMPOTENCY_KEY_INVALID."
       operationId: meNotificationMarkRead
       parameters:
@@ -188,6 +216,18 @@ paths:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
           description: IDEMPOTENCY_KEY_REQUIRED / IDEMPOTENCY_KEY_INVALID / BAD_REQUEST
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: INVALID_TOKEN
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: FORBIDDEN when the caller is PARENT
         "404":
           content:
             application/json:
@@ -387,6 +427,13 @@ components:
           - CHECKPOINT_REACHED_INCOMPLETE
           - SCHEDULE_REQUEST_CREATED
           - SCHEDULE_REQUEST_DECIDED
+          - SESSION_SCHEDULE_CHANGED
+          - SESSION_CANCELLED
+          - ATTENDANCE_STATUS_CHANGED
+          - COURSE_HOURS_CHANGED
+          - ADVISOR_TASK_CREATED
+          - ADVISOR_TASK_STATUS_CHANGED
+          - ADVISOR_TASK_FEEDBACK_CHANGED
           example: ASSIGNMENT_PUBLISHED
         readAt:
           type: string
@@ -418,6 +465,9 @@ components:
           - COURSE_REPORT
           - SCHEDULE_REQUEST
           - STUDY_PLAN_CHECKPOINT
+          - SESSION_OCCURRENCE
+          - COURSE_HOURS
+          - ADVISOR_TASK
           example: ASSIGNMENT
         tenantId:
           type: integer

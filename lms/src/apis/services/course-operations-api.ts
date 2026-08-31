@@ -1,6 +1,7 @@
 import type {
   ApiResponse,
   CourseOperationRead,
+  CourseOwnershipListParams,
   CourseStudentReportListParams,
   CreateOccurrenceRequest,
   CreateScheduleRequestRequest,
@@ -13,6 +14,7 @@ import type {
   ScheduleRequestDecisionRequest,
   SetPurchasedHoursRequest,
   TenantAlertRuleRequest,
+  TransferCourseOwnerRequest,
   UpsertCourseStudentReportRequest,
 } from '@/apis';
 import {idempotent, V2ApiClient} from '@/apis';
@@ -40,8 +42,19 @@ export class CourseOperationsApiService {
     return this.apiClient.get(`/v2/advisor/instructors/${instructorUserId}/availability`);
   }
 
-  getTenantInstructorAvailability(instructorUserId: number): Promise<ApiResponse<CourseOperationRead>> {
-    return this.apiClient.get(`/v2/tenant/instructors/${instructorUserId}/availability`);
+  listTenantCourseOwnerships(params: CourseOwnershipListParams = {}): Promise<ApiResponse<CourseOperationRead>> {
+    return this.apiClient.get('/v2/tenant/course-ownerships', {params});
+  }
+
+  getTenantCourseOwner(courseId: number): Promise<ApiResponse<CourseOperationRead>> {
+    return this.apiClient.get(`/v2/tenant/courses/${courseId}/owner`);
+  }
+
+  transferTenantCourseOwner(
+    courseId: number,
+    request: TransferCourseOwnerRequest,
+  ): Promise<ApiResponse<CourseOperationRead>> {
+    return this.apiClient.put(`/v2/tenant/courses/${courseId}/owner`, request);
   }
 
   listAdvisorScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> {

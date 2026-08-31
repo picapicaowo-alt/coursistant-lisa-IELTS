@@ -37,6 +37,14 @@ export class ParentApiService {
     return this.apiClient.get(`/v2/tenant/students/${studentUserId}/parent-links`);
   }
 
+  createOrReuseTenantParentLink(
+    studentUserId: number,
+    request: CreateOrReuseParentLinkRequest,
+    key: string = crypto.randomUUID(),
+  ): Promise<ApiResponse<ParentStudentLinkResponse>> {
+    return this.apiClient.post(`/v2/tenant/students/${studentUserId}/parent-links`, request, idempotent(key));
+  }
+
   linkTenantParent(studentUserId: number, parentUserId: number, request: ParentLinkRequest = {}, key: string = crypto.randomUUID()): Promise<ApiResponse<ParentStudentLinkResponse>> {
     return this.apiClient.put(`/v2/tenant/students/${studentUserId}/parent-links/${parentUserId}`, request, idempotent(key));
   }

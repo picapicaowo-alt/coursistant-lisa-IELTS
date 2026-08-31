@@ -171,6 +171,14 @@ export class QuizApiService {
     );
   }
 
+  listMyAttempts(courseId: number, quizId: number): Promise<ApiResponse<QuizAttemptSummary[]>> {
+    return this.apiClient.get(`/v2/courses/${courseId}/quizzes/${quizId}/my-attempts`);
+  }
+
+  getAttemptReceipt(courseId: number, quizId: number, attemptId: number): Promise<ApiResponse<QuizReceipt>> {
+    return this.apiClient.get(`/v2/courses/${courseId}/quizzes/${quizId}/attempts/${attemptId}/receipt`);
+  }
+
   autosaveAnswer(
     courseId: number,
     quizId: number,
