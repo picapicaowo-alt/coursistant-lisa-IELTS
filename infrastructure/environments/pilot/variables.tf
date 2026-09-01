@@ -92,11 +92,16 @@ variable "max_size" {
   default = 2
 }
 
-variable "certificate_arn" {
-  description = "Optional ACM certificate ARN in Tokyo. Leave null for the temporary HTTP pilot endpoint."
+variable "domain_name" {
+  description = "Pilot API hostname. DNS remains externally hosted and is changed only with exact new CNAME records."
   type        = string
-  default     = null
-  nullable    = true
+  default     = "api-cn.xlearnedu.com"
+}
+
+variable "enable_https" {
+  description = "Attach the managed ACM certificate only after DNS validation has completed."
+  type        = bool
+  default     = false
 }
 
 variable "cors_allowed_origins" {

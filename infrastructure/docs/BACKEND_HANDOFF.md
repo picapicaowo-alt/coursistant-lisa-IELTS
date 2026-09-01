@@ -36,11 +36,14 @@ Recommended JSON keys for the OpenAI secret:
 {
   "OPENAI_API_KEY": "managed-outside-source-control",
   "OPENAI_BASE_URL": "https://api.openai.com/v1",
-  "OPENAI_MODEL": "team-approved-model"
+  "OPENAI_MODEL": "gpt-5.6-luna",
+  "OPENAI_PROJECT_ID": "project-scoped-id"
 }
 ```
 
 OpenAI is enabled for the Tokyo backend path. Browser clients must call the Coursistant backend; they must not receive or call with the OpenAI API key directly.
+
+The application secret contract currently contains `APP_ENV`, `AWS_REGION`, `PORT`, `UPLOADS_BUCKET`, `ARTIFACTS_BUCKET`, `LOG_LEVEL`, `OPENAI_SECRET_NAME`, and a generated `SESSION_SECRET`. Database, Redis, email, and vector-store credentials are deliberately absent until the backend supplies those concrete contracts.
 
 ## Deployment acceptance
 

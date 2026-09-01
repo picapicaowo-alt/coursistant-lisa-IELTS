@@ -1,6 +1,14 @@
 output "application_url" {
-  description = "Temporary pilot URL. Replace with a Route 53 alias and ACM certificate before production use."
-  value       = var.certificate_arn == null ? "http://${module.compute.alb_dns_name}" : "https://${module.compute.alb_dns_name}"
+  description = "Pilot URL. The ALB DNS fallback remains active until the external DNS record and HTTPS listener are enabled."
+  value       = var.enable_https ? "https://${var.domain_name}" : "http://${module.compute.alb_dns_name}"
+}
+
+output "certificate_arn" {
+  value = module.tls.certificate_arn
+}
+
+output "certificate_dns_validation" {
+  value = module.tls.domain_validation_options
 }
 
 output "alb_dns_name" {

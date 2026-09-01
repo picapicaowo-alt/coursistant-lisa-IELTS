@@ -32,6 +32,13 @@ module "storage" {
   tags                 = local.common_tags
 }
 
+module "tls" {
+  source = "../../modules/tls"
+
+  domain_name = var.domain_name
+  tags        = local.common_tags
+}
+
 module "compute" {
   source = "../../modules/compute"
 
@@ -48,7 +55,7 @@ module "compute" {
   min_size                            = var.min_size
   desired_capacity                    = var.desired_capacity
   max_size                            = var.max_size
-  certificate_arn                     = var.certificate_arn
+  certificate_arn                     = var.enable_https ? module.tls.certificate_arn : null
   kms_key_arn                         = module.security.kms_key_arn
   autoscaling_service_linked_role_arn = module.security.autoscaling_service_linked_role_arn
   uploads_bucket_arn                  = module.storage.uploads_bucket_arn

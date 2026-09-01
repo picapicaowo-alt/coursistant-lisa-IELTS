@@ -27,10 +27,13 @@ infrastructure/
     ├── network/
     ├── observability/
     ├── security/
+│   ├── tls/
     └── storage/
 ```
 
 Environment roots consume modules. Application teams change reviewed variables in the environment root; shared module logic is changed only when the platform contract itself changes.
+
+The pilot TLS module requests `api-cn.xlearnedu.com` in Tokyo ACM. Because the `xlearnedu.com` zone is externally hosted, apply once with `enable_https = false`, add only the emitted validation CNAME at the DNS provider, wait for ACM `ISSUED`, and then enable HTTPS in a second reviewed apply.
 
 ## One-time bootstrap
 

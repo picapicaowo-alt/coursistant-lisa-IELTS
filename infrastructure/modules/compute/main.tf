@@ -269,6 +269,7 @@ resource "aws_lb_target_group" "application" {
 }
 
 resource "aws_lb_listener" "http_forward" {
+  #checkov:skip=CKV_AWS_2:This listener exists only during external DNS validation; enable_https removes it and creates HTTPS plus redirect listeners.
   #checkov:skip=CKV_AWS_103:This listener exists only while certificate_arn is null; the HTTPS listener enforces TLS 1.2 or newer when configured.
   count = var.certificate_arn == null ? 1 : 0
 

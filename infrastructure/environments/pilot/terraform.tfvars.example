@@ -15,8 +15,9 @@ min_size         = 1
 desired_capacity = 1
 max_size         = 2
 
-# Set an ACM certificate ARN in ap-northeast-1 before attaching a production domain.
-certificate_arn = null
+# Stage 1 requests the certificate and outputs its validation CNAME. Set true only after ACM reports ISSUED.
+domain_name  = "api-cn.xlearnedu.com"
+enable_https = false
 
 # Add exact HTTPS origins only when direct browser-to-S3 uploads are required.
 cors_allowed_origins = []
