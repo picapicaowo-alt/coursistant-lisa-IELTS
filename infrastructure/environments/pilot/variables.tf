@@ -101,7 +101,7 @@ variable "domain_name" {
 variable "enable_https" {
   description = "Attach the managed ACM certificate only after DNS validation has completed."
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "cors_allowed_origins" {

@@ -5,9 +5,9 @@ readonly COURSI_PROFILE="${COURSI_AWS_PROFILE:-coursistant-admin}"
 readonly COURSI_REGION="${COURSI_AWS_REGION:-ap-northeast-1}"
 readonly COURSI_ACCOUNT="658424472610"
 readonly COURSI_ASG="coursistant-ielts-pilot-application"
-readonly COURSI_ALB="coursistant-ielts-pilot-alb"
 readonly COURSI_TARGET_GROUP="coursistant-ielts-pilot-app"
 readonly COURSI_TRAIL="coursistant-ielts-pilot-management"
+readonly COURSI_APPLICATION_URL="${COURSI_APPLICATION_URL:-https://api-cn.xlearnedu.com}"
 
 if [[ "${COURSI_REGION}" != "ap-northeast-1" ]]; then
   echo "Refusing verification outside ap-northeast-1: ${COURSI_REGION}" >&2
@@ -50,6 +50,28 @@ if [[ "${public_ip}" != "None" ]]; then
   exit 1
 fi
 
+application_security_group_id="$(aws ec2 describe-instances \
+  --profile "${COURSI_PROFILE}" \
+  --region "${COURSI_REGION}" \
+  --instance-ids "${instance_id}" \
+  --query 'Reservations[0].Instances[0].SecurityGroups[0].GroupId' \
+  --output text)"
+
+# Reject any ingress rule whose protocol/port range could admit SSH, regardless
+# of its source. The application instance is managed only through SSM.
+# shellcheck disable=SC2016
+ssh_ingress_rule_count="$(aws ec2 describe-security-group-rules \
+  --profile "${COURSI_PROFILE}" \
+  --region "${COURSI_REGION}" \
+  --filters "Name=group-id,Values=${application_security_group_id}" \
+  --query 'length(SecurityGroupRules[?IsEgress==`false` && (IpProtocol==`"-1"` || (FromPort<=`22` && ToPort>=`22`))])' \
+  --output text)"
+
+if [[ "${ssh_ingress_rule_count}" != "0" ]]; then
+  echo "Application security group permits SSH ingress" >&2
+  exit 1
+fi
+
 target_group_arn="$(aws elbv2 describe-target-groups \
   --profile "${COURSI_PROFILE}" \
   --region "${COURSI_REGION}" \
@@ -82,14 +104,15 @@ if [[ "${ssm_state}" != "Online" ]]; then
   exit 1
 fi
 
-alb_dns="$(aws elbv2 describe-load-balancers \
-  --profile "${COURSI_PROFILE}" \
-  --region "${COURSI_REGION}" \
-  --names "${COURSI_ALB}" \
-  --query 'LoadBalancers[0].DNSName' \
-  --output text)"
+http_url="${COURSI_APPLICATION_URL/https:\/\//http://}"
+redirect_code="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 15 "${http_url}/health")"
 
-curl --fail --silent --show-error --max-time 15 "http://${alb_dns}/health" >/dev/null
+if [[ "${redirect_code}" != "301" ]]; then
+  echo "HTTP endpoint did not redirect to HTTPS: ${redirect_code}" >&2
+  exit 1
+fi
+
+curl --fail --silent --show-error --max-time 15 "${COURSI_APPLICATION_URL}/health" >/dev/null
 
 trail_logging="$(aws cloudtrail get-trail-status \
   --profile "${COURSI_PROFILE}" \
@@ -107,6 +130,7 @@ echo "Pilot verification passed"
 echo "Account: ${actual_account}"
 echo "Region: ${COURSI_REGION}"
 echo "Instance: ${instance_id} (private, SSM ${ssm_state})"
+echo "SSH ingress rules: ${ssh_ingress_rule_count}"
 echo "ALB target: ${target_state}"
-echo "Health URL: http://${alb_dns}/health"
+echo "Health URL: ${COURSI_APPLICATION_URL}/health (HTTPS 200, HTTP 301)"
 echo "CloudTrail logging: ${trail_logging}"

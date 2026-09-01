@@ -4,7 +4,7 @@
 
 After Terraform apply, use `terraform output` in `environments/pilot` to obtain:
 
-- `application_url`: temporary ALB endpoint.
+- `application_url`: public HTTPS endpoint for the approved API hostname.
 - `autoscaling_group_name`: deployment target group of EC2 instances.
 - `uploads_bucket_name` and `artifacts_bucket_name`: private application buckets.
 - `openai_secret_name` and `application_secret_name`: Secrets Manager paths.

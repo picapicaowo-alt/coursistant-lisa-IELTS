@@ -7,7 +7,7 @@ Terraform in this directory provisions the initial 300-person Coursistant IELTS 
 - Region: `ap-northeast-1` (Tokyo), two availability zones.
 - Network: one VPC, two public ALB subnets, two private application subnets, one NAT gateway, and an S3 gateway endpoint.
 - Compute: `m7i.xlarge` launch template, 100 GiB encrypted gp3 root disk, Auto Scaling Group `1/1/2`, no public IP, no SSH ingress, Systems Manager access only.
-- Edge: public Application Load Balancer, AWS WAF managed protections and per-IP rate limiting. HTTP is temporary until a Tokyo ACM certificate is supplied.
+- Edge: public Application Load Balancer, AWS WAF managed protections and per-IP rate limiting. A Tokyo ACM certificate terminates HTTPS for `api-cn.xlearnedu.com`; HTTP redirects to HTTPS.
 - Storage: private versioned `uploads`, `artifacts`, and `audit` buckets. Application buckets use a customer-managed KMS key; the audit bucket supports ALB and CloudTrail delivery.
 - Secrets: Secrets Manager placeholders for OpenAI and application configuration. Terraform stores no secret value.
 - Operations: CloudTrail, encrypted VPC Flow Logs and WAF logs, instance logs, alarms, dashboard, SNS topic, and a USD 400 monthly budget.
@@ -33,7 +33,7 @@ infrastructure/
 
 Environment roots consume modules. Application teams change reviewed variables in the environment root; shared module logic is changed only when the platform contract itself changes.
 
-The pilot TLS module requests `api-cn.xlearnedu.com` in Tokyo ACM. Because the `xlearnedu.com` zone is externally hosted, apply once with `enable_https = false`, add only the emitted validation CNAME at the DNS provider, wait for ACM `ISSUED`, and then enable HTTPS in a second reviewed apply.
+The pilot TLS module manages the issued Tokyo ACM certificate for `api-cn.xlearnedu.com`. The `xlearnedu.com` zone remains externally hosted at Namecheap; its ACM validation and application-routing CNAMEs are recorded in the live delivery manifest. For a new externally hosted environment, apply once with `enable_https = false`, add only the emitted validation CNAME, wait for ACM `ISSUED`, and then enable HTTPS in a second reviewed apply.
 
 ## One-time bootstrap
 

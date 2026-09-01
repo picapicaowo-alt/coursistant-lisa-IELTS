@@ -12,9 +12,9 @@ Verified on 2026-09-01 against AWS account `658424472610`. This manifest contain
 | Terraform state key | `pilot/terraform.tfstate` |
 | Terraform state KMS key | `arn:aws:kms:us-east-1:658424472610:key/9e94ead8-bd34-4cf2-81ab-31d21416329b` |
 | VPC | `vpc-0296dc123a76d3712` |
-| Application URL | `http://coursistant-ielts-pilot-alb-513932727.ap-northeast-1.elb.amazonaws.com` |
+| Application URL | `https://api-cn.xlearnedu.com` |
 | Approved API hostname | `api-cn.xlearnedu.com` |
-| Tokyo ACM certificate | `arn:aws:acm:ap-northeast-1:658424472610:certificate/a01a80c3-905d-4e3e-8cc7-7b1bd21aa2f4` (`PENDING_VALIDATION`) |
+| Tokyo ACM certificate | `arn:aws:acm:ap-northeast-1:658424472610:certificate/a01a80c3-905d-4e3e-8cc7-7b1bd21aa2f4` (`ISSUED`) |
 | Auto Scaling Group | `coursistant-ielts-pilot-application` |
 | Instance type / capacity | `m7i.xlarge`, min `1`, desired `1`, max `2` |
 | Backend port / health path | `8080` / `GET /health` |
@@ -36,7 +36,7 @@ The instance ID is intentionally not a deployment parameter because Auto Scaling
 | Operations notifications | SNS `arn:aws:sns:ap-northeast-1:658424472610:coursistant-ielts-pilot-operations` |
 | Regional management trail | CloudTrail `coursistant-ielts-pilot-management` |
 
-Terraform manages neither secret value. The application container has an operationally managed version containing the documented runtime contract and a generated session secret. The OpenAI container remains empty until the project service-account key is created and transferred directly into AWS. Do not give a backend engineer the OpenAI key through chat, source control, Terraform variables, or an EC2 environment file.
+Terraform manages neither secret value. The application container has an operationally managed version containing the documented runtime contract and a generated session secret. The OpenAI container has a project-scoped service-account key that passed a Tokyo-instance connectivity check. Do not give a backend engineer the OpenAI key through chat, source control, Terraform variables, or an EC2 environment file.
 
 The OpenAI organization has a dedicated project, `Coursistant IELTS China Pilot` (`proj_YA0oSwTSyXAXKU1ZZjynBJPN`). Its API key must belong to a project-scoped service account rather than a person's reusable login.
 
@@ -50,7 +50,7 @@ The OpenAI organization has a dedicated project, `Coursistant IELTS China Pilot`
 6. Disable the Nginx placeholder only after the real service answers locally, then verify the target remains healthy and the public health endpoint returns `200`.
 7. Run `infrastructure/scripts/verify-pilot.sh`, review CloudWatch logs/alarms, and record the deployed artifact SHA.
 
-The current public endpoint is HTTP and serves only the infrastructure placeholder. Do not send learner data through it. Terraform has requested the Tokyo ACM certificate for `api-cn.xlearnedu.com`; external DNS validation and the reviewed HTTPS switch remain before real testing.
+The public endpoint uses the managed Tokyo ACM certificate for `api-cn.xlearnedu.com`; HTTP redirects to HTTPS. It continues to serve the infrastructure placeholder until the backend release replaces it.
 
 ## External DNS records
 
@@ -58,8 +58,8 @@ The `xlearnedu.com` DNS zone is hosted at Namecheap rather than Route 53. Add on
 
 | Stage | Namecheap host | Target |
 |---|---|---|
-| ACM validation | `_a108c7f1423ce650700f53bc33753895.api-cn` | `_3bbabd3129af32abe17f2814ac4553a0.jkddzztszm.acm-validations.aws.` |
-| Application routing, after ACM is issued | `api-cn` | `coursistant-ielts-pilot-alb-513932727.ap-northeast-1.elb.amazonaws.com.` |
+| ACM validation (active) | `_a108c7f1423ce650700f53bc33753895.api-cn` | `_3bbabd3129af32abe17f2814ac4553a0.jkddzztszm.acm-validations.aws.` |
+| Application routing (active) | `api-cn` | `coursistant-ielts-pilot-alb-513932727.ap-northeast-1.elb.amazonaws.com.` |
 
 ## Verified acceptance snapshot
 
