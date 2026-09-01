@@ -43,7 +43,7 @@ terraform apply bootstrap.tfplan
 terraform output backend_configuration
 ```
 
-Copy the returned values into an untracked `infrastructure/environments/pilot/backend.hcl`, using `backend.hcl.example` as the schema. State resources have `prevent_destroy`; deleting them requires a separately reviewed break-glass change.
+On the first run, initialize with `terraform init -backend=false`. After the bucket exists, copy `bootstrap/backend.hcl.example` to the ignored `bootstrap/backend.hcl`, fill it from the outputs, and migrate the bootstrap state with `terraform init -migrate-state -backend-config=backend.hcl`. Copy the same bucket/KMS values into the ignored `environments/pilot/backend.hcl`, using its example as the schema. State resources have `prevent_destroy`; deleting them requires a separately reviewed break-glass change.
 
 ## Pilot workflow
 
