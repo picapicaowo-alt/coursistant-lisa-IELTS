@@ -2,6 +2,10 @@ variable "name_prefix" {
   type = string
 }
 
+variable "account_id" {
+  type = string
+}
+
 variable "log_group_prefix" {
   type = string
 }

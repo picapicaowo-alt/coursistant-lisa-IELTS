@@ -66,6 +66,8 @@ resource "aws_cloudtrail" "this" {
   kms_key_id                    = var.kms_key_arn
   sns_topic_name                = aws_sns_topic.operations.name
 
+  depends_on = [aws_sns_topic_policy.operations]
+
   event_selector {
     include_management_events = true
     read_write_type           = "All"
@@ -78,6 +80,54 @@ resource "aws_sns_topic" "operations" {
   name              = "${var.name_prefix}-operations"
   kms_master_key_id = "alias/aws/sns"
   tags              = var.tags
+}
+
+data "aws_iam_policy_document" "operations_topic" {
+  statement {
+    sid    = "AllowAccountAdministration"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${var.account_id}:root"]
+    }
+
+    actions = [
+      "SNS:AddPermission",
+      "SNS:DeleteTopic",
+      "SNS:GetTopicAttributes",
+      "SNS:ListSubscriptionsByTopic",
+      "SNS:Publish",
+      "SNS:RemovePermission",
+      "SNS:SetTopicAttributes",
+      "SNS:Subscribe"
+    ]
+    resources = [aws_sns_topic.operations.arn]
+  }
+
+  statement {
+    sid    = "AllowCloudTrailPublish"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions   = ["SNS:Publish"]
+    resources = [aws_sns_topic.operations.arn]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:aws:cloudtrail:${data.aws_region.current.region}:${var.account_id}:trail/${var.name_prefix}-management"]
+    }
+  }
+}
+
+resource "aws_sns_topic_policy" "operations" {
+  arn    = aws_sns_topic.operations.arn
+  policy = data.aws_iam_policy_document.operations_topic.json
 }
 
 resource "aws_cloudwatch_metric_alarm" "unhealthy_targets" {

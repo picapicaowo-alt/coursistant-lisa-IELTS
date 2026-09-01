@@ -81,6 +81,7 @@ module "observability" {
   source = "../../modules/observability"
 
   name_prefix                = local.name_prefix
+  account_id                 = data.aws_caller_identity.current.account_id
   log_group_prefix           = local.log_group_prefix
   audit_bucket_name          = module.storage.audit_bucket_name
   kms_key_arn                = module.security.kms_key_arn
