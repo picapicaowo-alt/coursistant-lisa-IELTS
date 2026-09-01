@@ -78,7 +78,7 @@ resource "aws_cloudtrail" "this" {
 
 resource "aws_sns_topic" "operations" {
   name              = "${var.name_prefix}-operations"
-  kms_master_key_id = "alias/aws/sns"
+  kms_master_key_id = var.kms_key_arn
   tags              = var.tags
 }
 

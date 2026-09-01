@@ -114,6 +114,28 @@ data "aws_iam_policy_document" "application_kms" {
       values   = ["arn:${data.aws_partition.current.partition}:cloudtrail:*:${var.account_id}:trail/${var.name_prefix}-*"]
     }
   }
+
+  statement {
+    sid    = "AllowCloudTrailEncryptedSns"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudtrail.amazonaws.com"]
+    }
+
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey*"
+    ]
+    resources = ["*"]
+
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = ["arn:${data.aws_partition.current.partition}:cloudtrail:${var.aws_region}:${var.account_id}:trail/${var.name_prefix}-management"]
+    }
+  }
 }
 
 resource "aws_kms_alias" "application" {
