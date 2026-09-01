@@ -28,7 +28,7 @@ The bootstrap placeholder returns `200` from `/health` and `503` elsewhere. Repl
 
 ## Secrets contract
 
-Terraform creates secret containers but deliberately creates no secret versions. Populate them using an authorized operational identity. Never paste values into Terraform, GitHub issues, CI logs, shell history, or this repository.
+Terraform creates the secret containers but deliberately does not manage their values or versions. An authorized operational identity has populated both pilot secrets and each currently has an `AWSCURRENT` version. Rotate them outside Terraform; never paste values into Terraform, GitHub issues, CI logs, shell history, or this repository.
 
 Recommended JSON keys for the OpenAI secret:
 
@@ -50,7 +50,7 @@ The application secret contract currently contains `APP_ENV`, `AWS_REGION`, `POR
 - The target group reports one healthy target.
 - `GET <application_url>/health` returns `200`.
 - The instance appears as `Online` in Systems Manager.
-- The instance role can read both secret containers after versions are populated.
+- The instance role can read both current secret versions without exposing their values in deployment logs.
 - A test object can be written and read through each application S3 bucket using the runtime role.
 - CloudWatch receives instance logs and alarms are `OK`.
 - No instance has a public IPv4 address and port 22 is not allowed by any security group.
