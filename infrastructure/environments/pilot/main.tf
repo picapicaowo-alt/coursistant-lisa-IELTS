@@ -35,32 +35,33 @@ module "storage" {
 module "compute" {
   source = "../../modules/compute"
 
-  name_prefix          = local.name_prefix
-  aws_region           = var.aws_region
-  vpc_id               = module.network.vpc_id
-  public_subnet_ids    = module.network.public_subnet_ids
-  private_subnet_ids   = module.network.private_subnet_ids
-  instance_type        = var.instance_type
-  root_volume_size_gib = var.root_volume_size_gib
-  app_port             = var.app_port
-  health_check_path    = var.health_check_path
-  log_group_prefix     = local.log_group_prefix
-  min_size             = var.min_size
-  desired_capacity     = var.desired_capacity
-  max_size             = var.max_size
-  certificate_arn      = var.certificate_arn
-  kms_key_arn          = module.security.kms_key_arn
-  uploads_bucket_arn   = module.storage.uploads_bucket_arn
-  artifacts_bucket_arn = module.storage.artifacts_bucket_arn
-  audit_bucket_name    = module.storage.audit_bucket_name
-  openai_secret_arn    = module.security.openai_secret_arn
-  openai_secret_name   = module.security.openai_secret_name
-  app_secret_arn       = module.security.app_secret_arn
-  app_secret_name      = module.security.app_secret_name
-  waf_rate_limit       = var.waf_rate_limit
-  tags                 = local.common_tags
+  name_prefix                         = local.name_prefix
+  aws_region                          = var.aws_region
+  vpc_id                              = module.network.vpc_id
+  public_subnet_ids                   = module.network.public_subnet_ids
+  private_subnet_ids                  = module.network.private_subnet_ids
+  instance_type                       = var.instance_type
+  root_volume_size_gib                = var.root_volume_size_gib
+  app_port                            = var.app_port
+  health_check_path                   = var.health_check_path
+  log_group_prefix                    = local.log_group_prefix
+  min_size                            = var.min_size
+  desired_capacity                    = var.desired_capacity
+  max_size                            = var.max_size
+  certificate_arn                     = var.certificate_arn
+  kms_key_arn                         = module.security.kms_key_arn
+  autoscaling_service_linked_role_arn = module.security.autoscaling_service_linked_role_arn
+  uploads_bucket_arn                  = module.storage.uploads_bucket_arn
+  artifacts_bucket_arn                = module.storage.artifacts_bucket_arn
+  audit_bucket_name                   = module.storage.audit_bucket_name
+  openai_secret_arn                   = module.security.openai_secret_arn
+  openai_secret_name                  = module.security.openai_secret_name
+  app_secret_arn                      = module.security.app_secret_arn
+  app_secret_name                     = module.security.app_secret_name
+  waf_rate_limit                      = var.waf_rate_limit
+  tags                                = local.common_tags
 
-  depends_on = [module.storage]
+  depends_on = [module.network, module.storage]
 }
 
 module "identity" {

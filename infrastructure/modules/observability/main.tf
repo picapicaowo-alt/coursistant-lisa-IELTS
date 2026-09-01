@@ -54,11 +54,12 @@ resource "aws_iam_role_policy" "cloudtrail_logs" {
 }
 
 resource "aws_cloudtrail" "this" {
+  #checkov:skip=CKV_AWS_67:The pilot trail is intentionally regional so it cannot duplicate logging for existing us-west-2 production workloads.
   name                          = "${var.name_prefix}-management"
   s3_bucket_name                = var.audit_bucket_name
   s3_key_prefix                 = "cloudtrail"
-  include_global_service_events = true
-  is_multi_region_trail         = true
+  include_global_service_events = false
+  is_multi_region_trail         = false
   enable_log_file_validation    = true
   cloud_watch_logs_group_arn    = "${aws_cloudwatch_log_group.cloudtrail.arn}:*"
   cloud_watch_logs_role_arn     = aws_iam_role.cloudtrail.arn

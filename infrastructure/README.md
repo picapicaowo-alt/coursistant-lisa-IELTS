@@ -12,6 +12,7 @@ Terraform in this directory provisions the initial 300-person Coursistant IELTS 
 - Secrets: Secrets Manager placeholders for OpenAI and application configuration. Terraform stores no secret value.
 - Operations: CloudTrail, encrypted VPC Flow Logs and WAF logs, instance logs, alarms, dashboard, SNS topic, and a USD 400 monthly budget.
 - Access: instance role with only the S3/KMS/Secrets Manager permissions needed at runtime, plus a backend-developers IAM group. No IAM users or access keys are created.
+- Isolation guardrails: the provider rejects any account other than `658424472610`, and the pilot root rejects any region other than Tokyo. Existing us-west-2 services are outside this state and provider region.
 
 ## Repository layout
 

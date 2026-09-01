@@ -9,6 +9,17 @@ variable "aws_region" {
   }
 }
 
+variable "expected_account_id" {
+  description = "AWS account guardrail. Terraform refuses to run when the active identity belongs to another account."
+  type        = string
+  default     = "658424472610"
+
+  validation {
+    condition     = can(regex("^[0-9]{12}$", var.expected_account_id))
+    error_message = "expected_account_id must be a 12-digit AWS account ID."
+  }
+}
+
 variable "project_name" {
   type    = string
   default = "coursistant-ielts"

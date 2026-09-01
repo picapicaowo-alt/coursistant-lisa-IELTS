@@ -14,5 +14,6 @@ These exceptions are scoped to the 300-person Tokyo pilot. Checkov suppressions 
 | `CKV_AWS_21`, `CKV2_AWS_6`, `CKV2_AWS_61` | Application S3 map | Versioning, full public-access blocking, and lifecycle configuration are present for every `for_each` bucket; Checkov CI cannot correlate the companion resources. | Remove suppressions when the scanner correctly resolves these graph edges. |
 | `CKV_AWS_145` | Application S3 map | Uploads and artifacts use the customer KMS key. The audit bucket uses SSE-S3 for ALB log-delivery compatibility; Checkov cannot distinguish the map members. | Reassess the audit encryption destination when ALB logging requirements change. |
 | `CKV2_AWS_76` | ALB/WAF graph | The ALB is associated with a WAF Web ACL containing AWS Managed Known Bad Inputs protection; Checkov cannot trace both graph edges. | Remove when the scanner recognizes the association. |
+| `CKV_AWS_67` | CloudTrail | The pilot trail is deliberately Tokyo-only so it does not duplicate account-wide logging or costs for existing us-west-2 production workloads. | Reassess against the organization's central trail before production; never create a competing organization trail. |
 
 Inline suppressions are not permission to add another exception silently. Any new suppression requires a matching row here and PR review.

@@ -4,6 +4,17 @@ variable "aws_region" {
   default     = "us-east-1"
 }
 
+variable "expected_account_id" {
+  description = "AWS account guardrail for the Coursistant management and billing account."
+  type        = string
+  default     = "658424472610"
+
+  validation {
+    condition     = can(regex("^[0-9]{12}$", var.expected_account_id))
+    error_message = "expected_account_id must be a 12-digit AWS account ID."
+  }
+}
+
 variable "project_name" {
   description = "Stable project identifier used in resource names and tags."
   type        = string

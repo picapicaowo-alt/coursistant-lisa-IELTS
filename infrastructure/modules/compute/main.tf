@@ -317,6 +317,7 @@ resource "aws_lb_listener" "https" {
 
 resource "aws_autoscaling_group" "this" {
   name                      = "${var.name_prefix}-application"
+  service_linked_role_arn   = var.autoscaling_service_linked_role_arn
   min_size                  = var.min_size
   desired_capacity          = var.desired_capacity
   max_size                  = var.max_size

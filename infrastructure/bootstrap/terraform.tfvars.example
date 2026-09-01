@@ -1,4 +1,5 @@
 aws_region   = "us-east-1"
+expected_account_id = "658424472610"
 project_name = "coursistant-ielts"
 owner        = "coursistant-platform"
 

@@ -62,6 +62,10 @@ variable "kms_key_arn" {
   type = string
 }
 
+variable "autoscaling_service_linked_role_arn" {
+  type = string
+}
+
 variable "uploads_bucket_arn" {
   type = string
 }

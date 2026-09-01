@@ -1,3 +1,9 @@
+resource "aws_iam_service_linked_role" "autoscaling" {
+  aws_service_name = "autoscaling.amazonaws.com"
+  custom_suffix    = var.name_prefix
+  description      = "Scoped Auto Scaling service role for ${var.name_prefix}"
+}
+
 resource "aws_kms_key" "application" {
   description             = "Encrypts ${var.name_prefix} application data and secrets"
   deletion_window_in_days = 30
@@ -23,6 +29,44 @@ data "aws_iam_policy_document" "application_kms" {
 
     actions   = ["kms:*"]
     resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowAutoScalingUse"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_service_linked_role.autoscaling.arn]
+    }
+
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    sid    = "AllowAutoScalingGrantForAwsResources"
+    effect = "Allow"
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_iam_service_linked_role.autoscaling.arn]
+    }
+
+    actions   = ["kms:CreateGrant"]
+    resources = ["*"]
+
+    condition {
+      test     = "Bool"
+      variable = "kms:GrantIsForAWSResource"
+      values   = ["true"]
+    }
   }
 
   statement {
