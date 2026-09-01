@@ -28,8 +28,10 @@ node_modules/
 *.tfplan
 *.tfvars
 *.tfvars.json
+**/backend.hcl
 !*.tfvars.example
 !terraform.tfvars.example
+!*.hcl.example
 override.tf
 override.tf.json
 *_override.tf
