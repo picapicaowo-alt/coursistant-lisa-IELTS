@@ -75,7 +75,7 @@ The apply job is manual and GitHub-environment gated. A later platform change ca
 
 ## Backend handoff
 
-See [BACKEND_HANDOFF.md](docs/BACKEND_HANDOFF.md). Terraform brings up a healthy placeholder on port 8080 so network and load-balancer acceptance can complete before backend artifacts exist. The backend team replaces that placeholder with its supervised service while preserving the `/health` contract.
+Start with the live [DELIVERY_MANIFEST.md](docs/DELIVERY_MANIFEST.md), then use [BACKEND_HANDOFF.md](docs/BACKEND_HANDOFF.md) for the runtime contract. Terraform brings up a healthy placeholder on port 8080 so network and load-balancer acceptance can complete before backend artifacts exist. The backend team replaces that placeholder with its supervised service while preserving the `/health` contract. After a release, run `infrastructure/scripts/verify-pilot.sh` for read-only account, region, ASG, ALB, SSM, health, and CloudTrail checks.
 
 Pilot-only Checkov suppressions and their production exit conditions are recorded in [SECURITY_EXCEPTIONS.md](docs/SECURITY_EXCEPTIONS.md).
 

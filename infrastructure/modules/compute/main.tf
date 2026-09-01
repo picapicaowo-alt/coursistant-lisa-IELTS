@@ -321,6 +321,8 @@ resource "aws_autoscaling_group" "this" {
   min_size                  = var.min_size
   desired_capacity          = var.desired_capacity
   max_size                  = var.max_size
+  enabled_metrics           = ["GroupInServiceInstances"]
+  metrics_granularity       = "1Minute"
   health_check_grace_period = 300
   health_check_type         = "ELB"
   target_group_arns         = [aws_lb_target_group.application.arn]
