@@ -1,5 +1,9 @@
 # Pilot operations
 
+## Security telemetry
+
+VPC traffic metadata is retained in an encrypted CloudWatch log group for 365 days. WAF request logs are retained for 365 days with the `Authorization` header redacted. Both log groups use the application KMS key; do not replace them with unencrypted destinations.
+
 ## Access an instance
 
 Find an instance in the Auto Scaling Group returned by Terraform, then start a Systems Manager session. Access is controlled through IAM; there are no long-lived Terraform-generated credentials.

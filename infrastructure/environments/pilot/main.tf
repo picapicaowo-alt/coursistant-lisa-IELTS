@@ -5,6 +5,8 @@ module "network" {
   vpc_cidr           = var.vpc_cidr
   availability_zones = slice(data.aws_availability_zones.available.names, 0, 2)
   enable_nat_gateway = var.enable_nat_gateway
+  log_group_prefix   = local.log_group_prefix
+  kms_key_arn        = module.security.kms_key_arn
   tags               = local.common_tags
 }
 

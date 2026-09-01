@@ -24,6 +24,14 @@ variable "enable_nat_gateway" {
   default     = true
 }
 
+variable "log_group_prefix" {
+  type = string
+}
+
+variable "kms_key_arn" {
+  type = string
+}
+
 variable "tags" {
   description = "Tags applied to every resource."
   type        = map(string)

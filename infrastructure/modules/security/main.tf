@@ -45,7 +45,10 @@ data "aws_iam_policy_document" "application_kms" {
     condition {
       test     = "ArnLike"
       variable = "kms:EncryptionContext:aws:logs:arn"
-      values   = ["arn:${data.aws_partition.current.partition}:logs:${var.aws_region}:${var.account_id}:log-group:${var.log_group_prefix}/*"]
+      values = [
+        "arn:${data.aws_partition.current.partition}:logs:${var.aws_region}:${var.account_id}:log-group:${var.log_group_prefix}/*",
+        "arn:${data.aws_partition.current.partition}:logs:${var.aws_region}:${var.account_id}:log-group:aws-waf-logs-${var.name_prefix}*"
+      ]
     }
   }
 

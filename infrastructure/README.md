@@ -10,7 +10,7 @@ Terraform in this directory provisions the initial 300-person Coursistant IELTS 
 - Edge: public Application Load Balancer, AWS WAF managed protections and per-IP rate limiting. HTTP is temporary until a Tokyo ACM certificate is supplied.
 - Storage: private versioned `uploads`, `artifacts`, and `audit` buckets. Application buckets use a customer-managed KMS key; the audit bucket supports ALB and CloudTrail delivery.
 - Secrets: Secrets Manager placeholders for OpenAI and application configuration. Terraform stores no secret value.
-- Operations: CloudTrail, encrypted CloudWatch Logs, alarms, dashboard, SNS topic, and a USD 400 monthly budget.
+- Operations: CloudTrail, encrypted VPC Flow Logs and WAF logs, instance logs, alarms, dashboard, SNS topic, and a USD 400 monthly budget.
 - Access: instance role with only the S3/KMS/Secrets Manager permissions needed at runtime, plus a backend-developers IAM group. No IAM users or access keys are created.
 
 ## Repository layout
