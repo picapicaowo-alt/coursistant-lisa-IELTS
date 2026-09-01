@@ -224,6 +224,8 @@ resource "aws_launch_template" "this" {
 }
 
 resource "aws_lb" "this" {
+  #checkov:skip=CKV2_AWS_20:The temporary pilot has no domain or ACM certificate; supplying certificate_arn automatically enables HTTP-to-HTTPS redirect.
+  #checkov:skip=CKV2_AWS_76:The associated Web ACL includes AWSManagedRulesKnownBadInputsRuleSet; the source graph cannot trace the association and rule together.
   name                       = substr("${var.name_prefix}-alb", 0, 32)
   internal                   = false
   load_balancer_type         = "application"
@@ -242,6 +244,7 @@ resource "aws_lb" "this" {
 }
 
 resource "aws_lb_target_group" "application" {
+  #checkov:skip=CKV_AWS_378:TLS terminates at the ALB; private target traffic is restricted to the ALB security group inside the VPC.
   name        = substr("${var.name_prefix}-app", 0, 32)
   port        = var.app_port
   protocol    = "HTTP"
@@ -266,6 +269,7 @@ resource "aws_lb_target_group" "application" {
 }
 
 resource "aws_lb_listener" "http_forward" {
+  #checkov:skip=CKV_AWS_103:This listener exists only while certificate_arn is null; the HTTPS listener enforces TLS 1.2 or newer when configured.
   count = var.certificate_arn == null ? 1 : 0
 
   load_balancer_arn = aws_lb.this.arn

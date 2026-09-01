@@ -40,6 +40,9 @@ resource "aws_kms_alias" "terraform_state" {
 }
 
 resource "aws_s3_bucket" "terraform_state" {
+  #checkov:skip=CKV_AWS_18:Dedicated access-log storage is deferred for the pilot; CloudTrail records state-bucket API activity.
+  #checkov:skip=CKV_AWS_144:The pilot is single-region and retains versioned state locally; cross-region disaster recovery is a production requirement.
+  #checkov:skip=CKV2_AWS_62:Terraform state is not an application event source and must not trigger bucket notifications.
   bucket = local.state_bucket_name
 
   lifecycle {

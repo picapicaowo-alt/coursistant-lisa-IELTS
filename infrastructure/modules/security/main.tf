@@ -78,6 +78,7 @@ resource "aws_kms_alias" "application" {
 }
 
 resource "aws_secretsmanager_secret" "openai" {
+  #checkov:skip=CKV2_AWS_57:OpenAI key rotation has no provider-managed rotation API; versions are rotated through the operations runbook.
   name                    = var.openai_secret_name
   description             = "OpenAI API configuration for ${var.name_prefix}; value is managed outside Terraform"
   kms_key_id              = aws_kms_key.application.arn
@@ -86,6 +87,7 @@ resource "aws_secretsmanager_secret" "openai" {
 }
 
 resource "aws_secretsmanager_secret" "application" {
+  #checkov:skip=CKV2_AWS_57:Automatic rotation needs a backend-specific Lambda contract; the empty pilot container is manually versioned until that contract exists.
   name                    = var.app_secret_name
   description             = "Backend runtime secrets for ${var.name_prefix}; value is managed outside Terraform"
   kms_key_id              = aws_kms_key.application.arn

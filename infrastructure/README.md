@@ -76,6 +76,8 @@ The apply job is manual and GitHub-environment gated. A later platform change ca
 
 See [BACKEND_HANDOFF.md](docs/BACKEND_HANDOFF.md). Terraform brings up a healthy placeholder on port 8080 so network and load-balancer acceptance can complete before backend artifacts exist. The backend team replaces that placeholder with its supervised service while preserving the `/health` contract.
 
+Pilot-only Checkov suppressions and their production exit conditions are recorded in [SECURITY_EXCEPTIONS.md](docs/SECURITY_EXCEPTIONS.md).
+
 ## Future environments
 
 Create `environments/dev`, `environments/staging`, or `environments/prod` by consuming the existing modules with separate state keys, CIDRs, Secrets Manager paths, budgets, and GitHub environments. Never reuse the pilot state for production.

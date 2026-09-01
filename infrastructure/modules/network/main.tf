@@ -114,6 +114,7 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_eip" "nat" {
+  #checkov:skip=CKV2_AWS_19:This EIP is attached to the managed NAT Gateway below, not directly to an EC2 instance.
   count = var.enable_nat_gateway ? 1 : 0
 
   domain = "vpc"
