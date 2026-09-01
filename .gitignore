@@ -21,6 +21,24 @@ lms/lms@0.0.0
 lms/vite
 node_modules/
 
+# Terraform local state, plans, caches, and private variable files
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+!terraform.tfvars.example
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+crash.log
+crash.*.log
+
 .idea
 
 # Claude

@@ -1,0 +1,27 @@
+aws_region  = "ap-northeast-1"
+environment = "pilot"
+owner       = "coursistant-platform"
+
+vpc_cidr          = "10.42.0.0/16"
+enable_nat_gateway = true
+
+instance_type        = "m7i.xlarge"
+root_volume_size_gib = 100
+app_port              = 8080
+health_check_path     = "/health"
+
+min_size         = 1
+desired_capacity = 1
+max_size         = 2
+
+# Set an ACM certificate ARN in ap-northeast-1 before attaching a production domain.
+certificate_arn = null
+
+# Add exact HTTPS origins only when direct browser-to-S3 uploads are required.
+cors_allowed_origins = []
+
+waf_rate_limit    = 2000
+monthly_budget_usd = 400
+
+# Supply actual recipients only in an untracked terraform.tfvars file or CI variable.
+budget_notification_emails = []

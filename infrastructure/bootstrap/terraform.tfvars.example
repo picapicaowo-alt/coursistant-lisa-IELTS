@@ -1,0 +1,6 @@
+aws_region   = "us-east-1"
+project_name = "coursistant-ielts"
+owner        = "coursistant-platform"
+
+# Optional override. The default includes the active AWS account ID.
+# state_bucket_name = "coursistant-ielts-tfstate-123456789012"
