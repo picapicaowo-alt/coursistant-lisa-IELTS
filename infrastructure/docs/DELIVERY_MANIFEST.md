@@ -8,7 +8,9 @@ Verified on 2026-09-01 against AWS account `658424472610`. This manifest contain
 |---|---|
 | Environment | `pilot` |
 | AWS region | `ap-northeast-1` (Tokyo) |
+| Terraform state bucket | `coursistant-ielts-tfstate-658424472610` in `us-east-1` |
 | Terraform state key | `pilot/terraform.tfstate` |
+| Terraform state KMS key | `arn:aws:kms:us-east-1:658424472610:key/9e94ead8-bd34-4cf2-81ab-31d21416329b` |
 | VPC | `vpc-0296dc123a76d3712` |
 | Application URL | `http://coursistant-ielts-pilot-alb-513932727.ap-northeast-1.elb.amazonaws.com` |
 | Auto Scaling Group | `coursistant-ielts-pilot-application` |
@@ -53,7 +55,7 @@ The current public endpoint is HTTP and serves only the infrastructure placehold
 - Load balancer: target healthy on port `8080`; `/health` returned `200`.
 - Systems Manager: instance `Online`; no public IPv4 address; no port `22` ingress.
 - Storage: all three buckets block public access and have versioning enabled. Uploads and artifacts use the pilot customer-managed KMS key; the audit bucket uses SSE-S3 for AWS log-delivery compatibility.
-- Security/operations: WAF associated and logging, CloudTrail logging in Tokyo only, encrypted SNS notifications, CloudWatch dashboard and alarms present.
+- Security/operations: WAF associated and logging, CloudTrail logging in Tokyo only, encrypted SNS notifications, and all three CloudWatch alarms `OK`.
 - Existing production boundary: the us-west-2 instances and VPC are not in this Terraform state. The 2026-09-01 post-apply check found `Prod`, `Dev`, `GroupChat`, and `VPN` still running, and `Individual_dev` still stopped.
 
 See [BACKEND_HANDOFF.md](BACKEND_HANDOFF.md) for the runtime contract and [OPERATIONS.md](OPERATIONS.md) for access, scaling, rollback, and emergency controls.
