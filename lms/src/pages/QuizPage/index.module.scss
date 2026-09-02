@@ -1,6 +1,6 @@
 .page {
   min-height: 100%;
-  padding: 2rem clamp(1rem, 4vw, 3.75rem) 4rem;
+  padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem;
   background: t.$page-bg;
   color: t.$text;
 }
@@ -9,7 +9,7 @@
 .summaryCard,
 .card,
 .attempt {
-  max-width: 1050px;
+  max-width: t.$workspace-task-max-inline-size;
   margin-inline: auto;
 }
 
@@ -324,7 +324,7 @@
 }
 
 .error {
-  max-width: 1050px;
+  max-width: t.$workspace-task-max-inline-size;
   margin: 1rem auto;
   color: t.$danger;
 }

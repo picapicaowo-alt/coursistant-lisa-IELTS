@@ -1,6 +1,6 @@
 .page {
     min-height: 100%;
-    padding: 2rem clamp(1rem, 4vw, 3.75rem) 3rem;
+    padding: t.$workspace-gutter-block t.$workspace-gutter-inline 3rem;
     background: t.$page-bg;
     color: t.$text;
 }
@@ -9,7 +9,7 @@
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    max-width: 1180px;
+    max-width: t.$workspace-record-max-inline-size;
     margin: 0 auto 1.5rem;
 }
 
@@ -71,7 +71,7 @@
 
 .errorBanner,
 .successBanner {
-    max-width: 1180px;
+    max-width: t.$workspace-record-max-inline-size;
     margin: -0.75rem auto 1rem;
     padding: .75rem 1rem;
     border-radius: t.$radius-control-sm;
@@ -127,7 +127,7 @@
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(260px, 330px);
     gap: 1.25rem;
-    max-width: 1180px;
+    max-width: t.$workspace-record-max-inline-size;
     margin: 0 auto;
     align-items: start;
 }

@@ -6,7 +6,7 @@
     .postFooterContainer {
         margin-left: -1.5rem;
         margin-top: 2rem;
-        max-width: 1050px;
+        max-width: t.$workspace-task-max-inline-size;
         position: fixed;
         bottom: 3rem;
         width: 100%;
