@@ -34,7 +34,7 @@ describe('CourseOperationsApiService', () => {
     client.put.mockResolvedValue({status: 200, data: {}});
     await service.createCourseStudentReport(3, {studentUserId: 41, reportType: 'MID_TERM'}, 'report-1');
     await service.patchMyPersonalEvent(8, {title: 'Practice', expectedVersion: 1}, 'event-8');
-    await service.putTenantAlertRules({expectedVersion: 2, inactivityDays: 7}, 'alerts-2');
+    await service.putTenantAlertRules({mode: 'TENANT_OVERRIDE', expectedVersion: 2, inactivityDays: 7});
     expect(client.post).toHaveBeenCalledWith(
       '/v2/courses/3/student-reports',
       {studentUserId: 41, reportType: 'MID_TERM'},
@@ -47,8 +47,7 @@ describe('CourseOperationsApiService', () => {
     );
     expect(client.put).toHaveBeenCalledWith(
       '/v2/tenant/alert-rules',
-      {expectedVersion: 2, inactivityDays: 7},
-      {headers: {'Idempotency-Key': 'alerts-2'}},
+      {mode: 'TENANT_OVERRIDE', expectedVersion: 2, inactivityDays: 7},
     );
   });
 

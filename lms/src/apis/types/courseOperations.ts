@@ -73,9 +73,9 @@ export interface SetPurchasedHoursRequest {
 }
 
 export interface TransferCourseOwnerRequest {
-  expectedOwnershipVersion?: number;
-  ownerAdvisorUserId?: number;
-  reason?: string;
+  expectedOwnershipVersion: number;
+  ownerAdvisorUserId: number;
+  reason: string;
 }
 
 export interface CourseOwnershipListParams {
@@ -83,6 +83,26 @@ export interface CourseOwnershipListParams {
   ownerAdvisorUserId?: number;
   page?: number;
   size?: number;
+}
+
+export interface TenantCourseOwnership {
+  courseId: number;
+  courseCode: string;
+  title: string;
+  launchState?: string;
+  lifecycleState?: string;
+  ownerAdvisorUserId?: number;
+  ownerAdvisorFirstName?: string;
+  ownerAdvisorMiddleName?: string;
+  ownerAdvisorLastName?: string;
+  ownershipVersion: number;
+}
+
+export interface TenantCourseOwnershipPage {
+  items: TenantCourseOwnership[];
+  page: number;
+  size: number;
+  total: number;
 }
 
 export interface UpsertCourseStudentReportRequest {
@@ -105,22 +125,34 @@ export interface PersonalEventRequest {
   title?: string;
 }
 
-export interface TenantAlertRuleRequest {
-  absenceCount?: number;
-  absenceWindowDays?: number;
-  checkpointIncompleteEnabled?: number;
-  completionMinimumSample?: number;
-  completionPercentage?: number;
-  completionWindowDays?: number;
-  deadlineWindowDays?: number;
+export type TenantAlertRuleMode = 'SYSTEM_DEFAULT' | 'TENANT_OVERRIDE' | 'DISABLED';
+
+export interface TenantAlertRuleThresholds {
+  absenceCount?: number | null;
+  absenceWindowDays?: number | null;
+  checkpointIncompleteEnabled?: number | null;
+  completionMinimumSample?: number | null;
+  completionPercentage?: number | null;
+  completionWindowDays?: number | null;
+  deadlineWindowDays?: number | null;
+  gradingDelayDays?: number | null;
+  inactivityDays?: number | null;
+  negativeHoursEnabled?: number | null;
+  overdueTaskEnabled?: number | null;
+  performanceMinimumGradedSample?: number | null;
+  performancePercentage?: number | null;
+}
+
+export interface TenantAlertRuleRequest extends TenantAlertRuleThresholds {
   expectedVersion?: number;
-  gradingDelayDays?: number;
-  inactivityDays?: number;
-  mode?: string;
-  negativeHoursEnabled?: number;
-  overdueTaskEnabled?: number;
-  performanceMinimumGradedSample?: number;
-  performancePercentage?: number;
+  mode: TenantAlertRuleMode;
+}
+
+export interface TenantAlertRuleResponse extends TenantAlertRuleThresholds {
+  tenantId: number;
+  mode: TenantAlertRuleMode;
+  version: number;
+  updatedAt?: string;
 }
 
 export interface OccurrenceListParams {

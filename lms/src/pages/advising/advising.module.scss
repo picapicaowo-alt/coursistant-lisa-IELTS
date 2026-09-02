@@ -1,6 +1,6 @@
 .page {
   min-height: 100%;
-  padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem;
+  padding: 2rem clamp(1rem, 4vw, 3.5rem) 4rem;
   background: t.$page-bg;
   color: t.$text;
 }
@@ -10,7 +10,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1.25rem;
 }
 
@@ -37,16 +37,16 @@
 
 .grid {
   display: grid;
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto;
   gap: 1.25rem;
 }
 
 .stats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1.25rem;
 }
 
@@ -77,7 +77,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1rem;
 }
 
@@ -122,6 +122,14 @@
   font-weight: t.$fw-semibold;
 }
 
+.pickerField {
+  display: grid;
+  gap: .35rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
 .form input,
 .form select,
 .form textarea {
@@ -133,6 +141,29 @@
   background: t.$card-bg;
   color: t.$text;
   font: inherit;
+}
+
+.advisorSearch > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: .5rem;
+  padding-left: .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+}
+
+.advisorSearch > div input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+}
+
+.advisorSearch small {
+  color: t.$text-muted;
+  font-weight: t.$fw-regular;
+  line-height: 1.45;
 }
 
 .form textarea {
@@ -205,7 +236,7 @@ a:focus-visible {
 
 .status,
 .error {
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1rem;
   padding: .75rem 1rem;
   border-radius: t.$radius-control;
@@ -218,7 +249,7 @@ a:focus-visible {
 }
 
 .success {
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1rem;
   padding: .75rem 1rem;
   border-radius: t.$radius-control;
@@ -229,7 +260,7 @@ a:focus-visible {
 .tabs {
   display: flex;
   gap: .35rem;
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1rem;
   padding: .35rem;
   border: 1px solid t.$border;
@@ -325,9 +356,9 @@ a:focus-visible {
 
 .advisorStats {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: .7rem;
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1rem;
 }
 
@@ -358,12 +389,12 @@ a:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   gap: 1rem;
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1rem;
 }
 
 .wideCard {
-  max-width: t.$workspace-max-inline-size;
+  max-width: 82rem;
   margin: 0 auto 1rem;
 }
 

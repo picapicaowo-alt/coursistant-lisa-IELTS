@@ -29,7 +29,7 @@ describe('Sidebar role navigation', () => {
     render(<MemoryRouter><Sidebar/></MemoryRouter>);
 
     expect(screen.getAllByRole('link', {name: 'Intakes'}).length).toBeGreaterThan(0);
-    expect(screen.getAllByRole('link', {name: 'Admin Console'}).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', {name: 'Governance'}).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', {name: 'Mock exams'}).length).toBeGreaterThan(0);
     expect(screen.queryByRole('link', {name: 'Courses'})).not.toBeInTheDocument();
     expect(screen.queryByRole('link', {name: 'Calendar'})).not.toBeInTheDocument();

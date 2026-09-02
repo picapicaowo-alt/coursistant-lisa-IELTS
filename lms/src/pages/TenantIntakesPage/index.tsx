@@ -1,8 +1,9 @@
 import React, {FormEvent, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {IntakeAssignmentStatus, IntakeLifecycleStatus, unwrapData} from '@/apis';
+import {IntakeAssignmentStatus, IntakeLifecycleStatus, type ManagedUser, unwrapData} from '@/apis';
 import {StudentIntakeFormFields} from '@/components/StudentIntakeFormFields';
+import {TenantUserPicker} from '@/components/TenantUserPicker';
 import {emptyStudentIntakeForm} from '@/components/StudentIntakeFormFields/model';
 import {tenantAdvisingApiService} from '@/apis/services/tenant-advising-api';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
@@ -18,7 +19,7 @@ const TenantIntakesPage: React.FC = () => {
   const [lifecycleStatus, setLifecycleStatus] = useState<IntakeLifecycleStatus | ''>('');
   const [assignmentStatus, setAssignmentStatus] = useState<IntakeAssignmentStatus | ''>('');
   const [selectedIntakeId, setSelectedIntakeId] = useState<number | null>(null);
-  const [advisorUserId, setAdvisorUserId] = useState('');
+  const [advisor, setAdvisor] = useState<ManagedUser | null>(null);
   const [reason, setReason] = useState('');
   const [createForm, setCreateForm] = useState(emptyStudentIntakeForm);
 
@@ -35,32 +36,36 @@ const TenantIntakesPage: React.FC = () => {
   const selected = intakes.data?.items.find(item => item.intakeId === selectedIntakeId);
 
   const refresh = async () => {
-    await queryClient.invalidateQueries({queryKey: ['tenant', 'intakes']});
-    await queryClient.invalidateQueries({queryKey: ['advisor', 'students']});
-    await queryClient.invalidateQueries({queryKey: ['counsellor']});
+    await Promise.all([
+      queryClient.invalidateQueries({queryKey: ['tenant', 'intakes']}),
+      queryClient.invalidateQueries({queryKey: ['advisor', 'students']}),
+      queryClient.invalidateQueries({queryKey: ['counsellor']}),
+    ]);
   };
 
   const assign = useMutation({
     mutationFn: async () => {
       if (!selected) throw new Error('Select an intake');
-      const payload = {advisorUserId: Number(advisorUserId), expectedIntakeVersion: selected.intakeVersion};
+      if (!advisor) throw new Error('Select an eligible advisor');
+      const payload = {advisorUserId: advisor.id, expectedIntakeVersion: selected.intakeVersion};
       const key = idempotency.keyFor(`tenant-assign-${selected.intakeId}`, idempotencyFingerprint(payload));
       return unwrapData(await tenantAdvisingApiService.assignAdvisor(selected.intakeId, payload, key), 'tenantAssign');
     },
-    onSuccess: refresh,
+    onSuccess: async () => { setAdvisor(null); setReason(''); await refresh(); },
   });
   const reassign = useMutation({
     mutationFn: async () => {
       if (!selected?.studentUserId) throw new Error('Select an assigned intake');
+      if (!advisor) throw new Error('Select an eligible advisor');
       const payload = {
-        advisorUserId: Number(advisorUserId),
+        advisorUserId: advisor.id,
         expectedAssignmentVersion: selected.assignmentVersion ?? 0,
         ...(reason.trim() ? {reason: reason.trim()} : {}),
       };
       const key = idempotency.keyFor(`tenant-reassign-${selected.studentUserId}`, idempotencyFingerprint(payload));
       return unwrapData(await tenantAdvisingApiService.reassignAdvisor(selected.studentUserId, payload, key), 'tenantReassign');
     },
-    onSuccess: refresh,
+    onSuccess: async () => { setAdvisor(null); setReason(''); await refresh(); },
   });
   const cancel = useMutation({
     mutationFn: async () => {
@@ -69,7 +74,7 @@ const TenantIntakesPage: React.FC = () => {
       const key = idempotency.keyFor(`tenant-cancel-${selected.intakeId}`, idempotencyFingerprint(payload));
       return unwrapData(await tenantAdvisingApiService.cancelStudentIntake(selected.intakeId, payload, key), 'tenantCancel');
     },
-    onSuccess: refresh,
+    onSuccess: async () => { setAdvisor(null); setReason(''); await refresh(); },
   });
 
   const createIntake = useMutation({
@@ -105,10 +110,10 @@ const TenantIntakesPage: React.FC = () => {
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Tenant admin</p>
           <h1>Student intakes</h1>
-          <p className={styles.lede}>Cancel unassigned intakes or reassign advisors. Counsellors cannot do these operations.</p>
+          <p className={styles.lede}>Create Student accounts, assign the first Advisor, reassign ownership, or cancel an unassigned intake.</p>
         </div>
+        <Link className={styles.secondaryLink} to="/admin">Back to governance</Link>
       </header>
       {mutationError ? <p className={styles.error} role="alert">{advisingErrorMessage(mutationError, 'The operation failed.')}</p> : null}
       <section className={styles.card}>
@@ -151,22 +156,20 @@ const TenantIntakesPage: React.FC = () => {
             </div>
             <div className={styles.actions}>
               {intake.studentUserId ? <Link className={styles.link} to={`/admin/students/${intake.studentUserId}`}>View record</Link> : null}
-              <button type="button" className={styles.secondary} onClick={() => setSelectedIntakeId(intake.intakeId)}>Select</button>
+              <button type="button" className={styles.secondary} onClick={() => { setSelectedIntakeId(intake.intakeId); setAdvisor(null); setReason(''); }}>Manage</button>
             </div>
           </article>
         ))}
       </div>
+      {intakes.data && intakes.data.total > 20 ? <nav className={styles.pagination} aria-label="Intake pages"><button type="button" className={styles.secondary} disabled={page === 0} onClick={() => setPage(current => current - 1)}>Previous</button><span>Page {page + 1} · {intakes.data.total} intakes</span><button type="button" className={styles.secondary} disabled={(page + 1) * 20 >= intakes.data.total} onClick={() => setPage(current => current + 1)}>Next</button></nav> : null}
       {selected ? (
         <section className={styles.card}>
           <h2>{selected.assignmentStatus === 'ASSIGNED' ? 'Reassign advisor' : 'Assign advisor'}</h2>
           <form className={styles.form} onSubmit={onAssign}>
-            <label>
-              <span>Advisor user ID</span>
-              <input required type="number" min="1" value={advisorUserId} onChange={event => setAdvisorUserId(event.target.value)}/>
-            </label>
+            <div className={styles.pickerField}><span>Eligible advisor</span><TenantUserPicker title={selected.assignmentStatus === 'ASSIGNED' ? 'Choose the replacement advisor' : 'Choose an advisor'} description="Searches active Advisor and Instructor Advisor identities in this tenant." triggerLabel="Choose advisor" levels={['ADVISOR', 'INSTRUCTOR_ADVISOR']} selectedUser={advisor} onSelect={setAdvisor}/></div>
             <label><span>Reason {selected.assignmentStatus === 'UNASSIGNED' ? '(required to cancel)' : '(optional for reassignment)'}</span><textarea value={reason} onChange={event => setReason(event.target.value)}/></label>
             <div className={styles.actions}>
-              <button className={styles.primary} disabled={busy || !advisorUserId}>{busy ? 'Saving…' : selected.assignmentStatus === 'ASSIGNED' ? 'Reassign' : 'Assign'}</button>
+              <button className={styles.primary} disabled={busy || !advisor}>{busy ? 'Saving…' : selected.assignmentStatus === 'ASSIGNED' ? 'Reassign advisor' : 'Assign advisor'}</button>
               {selected.assignmentStatus === 'UNASSIGNED' ? (
                 <button type="button" className={styles.danger} disabled={busy || !reason.trim()} onClick={() => cancel.mutate()}>Cancel intake</button>
               ) : null}

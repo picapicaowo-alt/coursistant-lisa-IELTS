@@ -14,6 +14,9 @@ import type {
   ScheduleRequestDecisionRequest,
   SetPurchasedHoursRequest,
   TenantAlertRuleRequest,
+  TenantAlertRuleResponse,
+  TenantCourseOwnership,
+  TenantCourseOwnershipPage,
   TransferCourseOwnerRequest,
   UpsertCourseStudentReportRequest,
 } from '@/apis';
@@ -42,18 +45,18 @@ export class CourseOperationsApiService {
     return this.apiClient.get(`/v2/advisor/instructors/${instructorUserId}/availability`);
   }
 
-  listTenantCourseOwnerships(params: CourseOwnershipListParams = {}): Promise<ApiResponse<CourseOperationRead>> {
+  listTenantCourseOwnerships(params: CourseOwnershipListParams = {}): Promise<ApiResponse<TenantCourseOwnershipPage>> {
     return this.apiClient.get('/v2/tenant/course-ownerships', {params});
   }
 
-  getTenantCourseOwner(courseId: number): Promise<ApiResponse<CourseOperationRead>> {
+  getTenantCourseOwner(courseId: number): Promise<ApiResponse<TenantCourseOwnership>> {
     return this.apiClient.get(`/v2/tenant/courses/${courseId}/owner`);
   }
 
   transferTenantCourseOwner(
     courseId: number,
     request: TransferCourseOwnerRequest,
-  ): Promise<ApiResponse<CourseOperationRead>> {
+  ): Promise<ApiResponse<TenantCourseOwnership>> {
     return this.apiClient.put(`/v2/tenant/courses/${courseId}/owner`, request);
   }
 
@@ -285,12 +288,12 @@ export class CourseOperationsApiService {
     return this.apiClient.put(`/v2/advisor/students/${studentUserId}/courses/${courseId}/hours`, request, idempotent(key));
   }
 
-  getTenantAlertRules(): Promise<ApiResponse<CourseOperationRead>> {
+  getTenantAlertRules(): Promise<ApiResponse<TenantAlertRuleResponse>> {
     return this.apiClient.get('/v2/tenant/alert-rules');
   }
 
-  putTenantAlertRules(request: TenantAlertRuleRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseOperationRead>> {
-    return this.apiClient.put('/v2/tenant/alert-rules', request, idempotent(key));
+  putTenantAlertRules(request: TenantAlertRuleRequest): Promise<ApiResponse<TenantAlertRuleResponse>> {
+    return this.apiClient.put('/v2/tenant/alert-rules', request);
   }
 }
 

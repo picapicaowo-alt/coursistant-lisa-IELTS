@@ -46,6 +46,7 @@ const Header = () => {
   const email = user?.email;
   const profileImage = user?.avatar || '/icons/default_avatar.jpg';
   const canUseAdminConsole = user ? canAccessAdminConsole(user) : false;
+  const isTenantAdmin = user?.role === 'TENANT_ADMIN';
   const canSearchCourses = user ? canAccessCourseCatalogue(user) && user.role === 'USER' : false;
 
   useEffect(() => {
@@ -69,10 +70,10 @@ const Header = () => {
   }, [isProfileOpen]);
 
   const profileMenuItems: MenuItem[] = [
-    {id: 'profile', icon: UserRound, label: t('menu.profile'), path: '/profile'},
-    {id: 'settings', icon: Settings, label: t('menu.settings'), path: '/settings'},
+    ...(!isTenantAdmin ? [{id: 'profile', icon: UserRound, label: t('menu.profile'), path: '/profile'}] : []),
+    {id: 'settings', icon: Settings, label: isTenantAdmin ? 'Password & security' : t('menu.settings'), path: '/settings'},
     ...(canUseAdminConsole
-      ? [{id: 'admin', icon: ShieldCheck, label: 'Admin Console', path: '/admin'}]
+      ? [{id: 'admin', icon: ShieldCheck, label: isTenantAdmin ? 'Tenant governance' : 'Admin Console', path: '/admin'}]
       : []),
     {id: 'logout', icon: LogOut, label: t('menu.signOut')},
   ];

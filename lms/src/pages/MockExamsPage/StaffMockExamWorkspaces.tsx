@@ -1,6 +1,6 @@
-import {useEffect, useState} from 'react'
+import {useEffect, useRef, useState} from 'react'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
-import {Archive, BookOpenText, CheckCircle2, Copy, FilePenLine, Headphones, PenLine, Send, Users} from 'lucide-react'
+import {Archive, BookOpenText, CheckCircle2, FilePenLine, Headphones, Image as ImageIcon, PenLine, Send, Users} from 'lucide-react'
 import {unwrapData} from '@/apis'
 import {advisorApiService} from '@/apis/services/advisor-api'
 import {mockExamApiService} from '@/apis/services/mock-exam-api'
@@ -29,6 +29,83 @@ function idFrom(record: RuntimeRecord, ...keys: string[]): number | null {
   return runtimeNumber(record, ...keys, 'id')
 }
 
+function nestedRecords(value: unknown, key: string): RuntimeRecord[] {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return []
+  const nested = (value as RuntimeRecord)[key]
+  return Array.isArray(nested) ? nested.filter((item): item is RuntimeRecord => Boolean(item) && typeof item === 'object' && !Array.isArray(item)) : []
+}
+
+type MediaState = {loading?: boolean; url?: string; error?: string}
+
+function TenantSectionMedia({templateId, versionId, section, value}: {templateId: number; versionId: number; section: Section; value: unknown}) {
+  const [media, setMedia] = useState<Record<string, MediaState>>({})
+  const objectUrls = useRef(new Set<string>())
+
+  useEffect(() => () => {
+    objectUrls.current.forEach((url) => URL.revokeObjectURL(url))
+    objectUrls.current.clear()
+  }, [])
+
+  const loadMedia = async (key: string, request: () => Promise<Blob>) => {
+    setMedia((current) => ({...current, [key]: {loading: true}}))
+    try {
+      const blob = await request()
+      const url = URL.createObjectURL(blob)
+      objectUrls.current.add(url)
+      setMedia((current) => ({...current, [key]: {url}}))
+    } catch (error) {
+      setMedia((current) => ({...current, [key]: {error: advisingErrorMessage(error, 'The protected media could not be loaded.')}}))
+    }
+  }
+
+  const items = section === 'listening'
+    ? nestedRecords(value, 'parts').map((part, index) => ({
+      key: `listening-${runtimeNumber(part, 'seq') ?? index + 1}`,
+      label: runtimeString(part, 'label') || `Listening part ${index + 1}`,
+      type: 'audio' as const,
+      load: () => mockExamApiService.getTenantListeningAudio(templateId, versionId, runtimeNumber(part, 'seq') ?? index + 1),
+    }))
+    : section === 'reading'
+      ? nestedRecords(value, 'passages').flatMap((passage, passageIndex) => {
+        const passageSeq = runtimeNumber(passage, 'seq') ?? passageIndex + 1
+        return nestedRecords(passage, 'questions').map((question, questionIndex) => {
+          const sortOrder = runtimeNumber(question, 'sortOrder') ?? questionIndex + 1
+          return {
+            key: `reading-${passageSeq}-${sortOrder}`,
+            label: runtimeString(question, 'title') || `Passage ${passageSeq}, question group ${sortOrder}`,
+            type: 'image' as const,
+            load: () => mockExamApiService.getTenantReadingImage(templateId, versionId, passageSeq, sortOrder),
+          }
+        })
+      })
+      : nestedRecords(value, 'tasks')
+        .filter((task) => task.hasImage === true || Boolean(runtimeString(task, 'imageSrc')))
+        .map((task, index) => {
+          const taskSeq = runtimeNumber(task, 'seq') ?? index + 1
+          return {
+            key: `writing-${taskSeq}`,
+            label: runtimeString(task, 'title') || `Writing task ${taskSeq}`,
+            type: 'image' as const,
+            load: () => mockExamApiService.getTenantWritingImage(templateId, versionId, taskSeq),
+          }
+        })
+
+  if (!items.length) return null
+
+  return <section className={styles.mediaReview} aria-label={`${SECTION_META[section].label} protected media`}>
+    <div><h4>Protected media</h4><p>Media is loaded through the authenticated Tenant Mock Exam endpoint only when requested.</p></div>
+    <div className={styles.mediaList}>{items.map((item) => {
+      const state = media[item.key]
+      return <article key={item.key}>
+        <div><strong>{item.label}</strong><button type="button" className={styles.secondary} disabled={state?.loading} onClick={() => void loadMedia(item.key, item.load)}>{item.type === 'audio' ? <Headphones size={16}/> : <ImageIcon size={16}/>} {state?.loading ? 'Loading…' : state?.url ? 'Reload media' : item.type === 'audio' ? 'Load audio' : 'Load image'}</button></div>
+        {state?.url && item.type === 'audio' ? <audio controls preload="none" src={state.url}>Your browser does not support audio playback.</audio> : null}
+        {state?.url && item.type === 'image' ? <img src={state.url} alt={`${item.label} reference`}/> : null}
+        {state?.error ? <p role="alert">{state.error}</p> : null}
+      </article>
+    })}</div>
+  </section>
+}
+
 function TemplateCards({value, selectedId, onSelect}: {value: unknown; selectedId: number | null; onSelect: (id: number) => void}) {
   const templates = templateItems(value)
   if (!templates.length) return <Empty>No mock-exam templates are available.</Empty>
@@ -49,7 +126,7 @@ function TemplateCards({value, selectedId, onSelect}: {value: unknown; selectedI
   )
 }
 
-function TenantSectionComposer({templateId, versionId, onSaved}: {templateId: number; versionId: number; onSaved: () => void}) {
+function TenantSectionComposer({templateId, versionId, existingSections, onSaved}: {templateId: number; versionId: number; existingSections: Record<Section, boolean>; onSaved: () => void}) {
   const [section, setSection] = useState<Section>('listening')
   const [minutes, setMinutes] = useState('40')
   const [title, setTitle] = useState('')
@@ -62,7 +139,16 @@ function TenantSectionComposer({templateId, versionId, onSaved}: {templateId: nu
   const [prompt, setPrompt] = useState('')
   const [minWords, setMinWords] = useState('150')
   const [mediaPath, setMediaPath] = useState('')
+  const [paragraphs, setParagraphs] = useState('[]')
   const [validationError, setValidationError] = useState('')
+  const [confirmCreate, setConfirmCreate] = useState(false)
+  const isExisting = existingSections[section]
+  const sectionDetail = useQuery({
+    queryKey: ['mock-exams', 'tenant', templateId, versionId, section],
+    queryFn: async () => unwrapData(await mockExamApiService.getTenantSection(templateId, versionId, section), `tenantMockExam${section}`),
+    enabled: isExisting,
+    retry: false,
+  })
 
   const save = useMutation({
     mutationFn: async () => {
@@ -97,18 +183,27 @@ function TenantSectionComposer({templateId, versionId, onSaved}: {templateId: nu
         payload: parsedPayload,
       }
       if (section === 'listening') {
+        if (!mediaPath.trim()) throw new Error('Listening requires an audio path prepared by the existing media workflow.')
         return mockExamApiService.createTenantListening(templateId, versionId, {
           totalMinutes,
-          parts: [{seq: 1, label: label.trim(), audioPath: mediaPath.trim() || undefined, sections: [question]}],
+          parts: [{seq: 1, label: label.trim(), audioPath: mediaPath.trim(), sections: [question]}],
         })
       }
+      let parsedParagraphs: unknown
+      try {
+        parsedParagraphs = JSON.parse(paragraphs)
+      } catch {
+        throw new Error('Reading paragraphs must be valid JSON.')
+      }
+      if (!Array.isArray(parsedParagraphs)) throw new Error('Reading paragraphs must be a JSON array.')
       return mockExamApiService.createTenantReading(templateId, versionId, {
         totalMinutes,
-        passages: [{seq: 1, shortLabel: label.trim(), title: title.trim(), intro: instruction.trim(), paragraphs: [], questions: [question]}],
+        passages: [{seq: 1, shortLabel: label.trim(), title: title.trim(), intro: instruction.trim(), paragraphs: parsedParagraphs, questions: [question]}],
       })
     },
     onSuccess: () => {
       setValidationError('')
+      setConfirmCreate(false)
       onSaved()
     },
     onError: (error) => setValidationError(error instanceof Error ? error.message : 'The section could not be saved.'),
@@ -123,10 +218,10 @@ function TenantSectionComposer({templateId, versionId, onSaved}: {templateId: nu
       <div className={styles.sectionTabs} role="tablist" aria-label="Mock exam sections">
         {(Object.keys(SECTION_META) as Section[]).map((key) => {
           const {Icon, label: sectionLabel} = SECTION_META[key]
-          return <button type="button" role="tab" aria-selected={section === key} className={section === key ? styles.activeTab : ''} onClick={() => setSection(key)} key={key}><Icon size={16}/>{sectionLabel}</button>
+          return <button type="button" role="tab" aria-selected={section === key} className={section === key ? styles.activeTab : ''} onClick={() => { setSection(key); setConfirmCreate(false); setValidationError('') }} key={key}><Icon size={16}/>{sectionLabel}{existingSections[key] ? ' · Read only' : ''}</button>
         })}
       </div>
-      <form className={styles.editorForm} onSubmit={(event) => { event.preventDefault(); save.mutate() }}>
+      {isExisting ? <div className={styles.readonlySection}>{sectionDetail.isPending ? <p className={styles.status}>Loading {SECTION_META[section].label}…</p> : sectionDetail.isError ? <ErrorNotice error={sectionDetail.error} fallback={`${SECTION_META[section].label} could not be loaded.`}/> : <><RecordSummaryList value={sectionDetail.data} emptyMessage={`No readable ${SECTION_META[section].label} content was returned.`}/><TenantSectionMedia templateId={templateId} versionId={versionId} section={section} value={sectionDetail.data}/></>}<p>This section is locked after creation. This phase does not provide edit or replacement controls.</p></div> : <form className={styles.editorForm} onSubmit={(event) => { event.preventDefault(); setConfirmCreate(true) }}>
         <label><span>Duration (minutes)</span><input required type="number" min="1" value={minutes} onChange={(event) => setMinutes(event.target.value)}/></label>
         <label><span>{section === 'listening' ? 'Part label' : section === 'reading' ? 'Passage label' : 'Task title'}</span><input required value={section === 'writing' ? title : label} onChange={(event) => section === 'writing' ? setTitle(event.target.value) : setLabel(event.target.value)}/></label>
         {section === 'writing' ? (
@@ -140,14 +235,17 @@ function TenantSectionComposer({templateId, versionId, onSaved}: {templateId: nu
             <label className={styles.full}><span>Question group title</span><input required value={title} onChange={(event) => setTitle(event.target.value)}/></label>
             <label className={styles.full}><span>Candidate instruction</span><textarea rows={3} value={instruction} onChange={(event) => setInstruction(event.target.value)}/></label>
             <label><span>Question kind</span><input required value={kind} onChange={(event) => setKind(event.target.value)} placeholder="Contract-defined kind"/></label>
-            <label><span>{section === 'listening' ? 'Audio path' : 'Media path (optional)'}</span><input value={mediaPath} onChange={(event) => setMediaPath(event.target.value)}/></label>
+            <label><span>{section === 'listening' ? 'Audio path' : 'Media path (optional)'}</span><input required={section === 'listening'} value={mediaPath} onChange={(event) => setMediaPath(event.target.value)}/></label>
             <label><span>First question</span><input required type="number" min="1" value={questionStart} onChange={(event) => setQuestionStart(event.target.value)}/></label>
             <label><span>Last question</span><input required type="number" min="1" value={questionEnd} onChange={(event) => setQuestionEnd(event.target.value)}/></label>
             <label className={styles.full}><span>Contract payload (JSON)</span><textarea className={styles.codeField} rows={5} value={payload} onChange={(event) => setPayload(event.target.value)}/><small>The OpenAPI leaves this JsonNode open; its shape must match the selected backend question kind.</small></label>
+            {section === 'reading' ? <label className={styles.full}><span>Passage paragraphs (JSON array)</span><textarea className={styles.codeField} rows={5} value={paragraphs} onChange={(event) => setParagraphs(event.target.value)}/></label> : null}
           </>
         )}
-        <div className={styles.formActions}><button className={styles.primary} disabled={save.isPending}><FilePenLine size={16}/>{save.isPending ? 'Saving…' : `Save ${SECTION_META[section].label}`}</button></div>
+        <div className={styles.formActions}><button className={styles.primary} disabled={save.isPending}><FilePenLine size={16}/>Review {SECTION_META[section].label}</button></div>
       </form>
+      }
+      {confirmCreate && !isExisting ? <div className={styles.confirmCreate}><p>Create this {SECTION_META[section].label} section now? Content becomes read-only immediately after the backend accepts it.</p><div><button type="button" className={styles.primary} disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending ? 'Creating…' : `Confirm ${SECTION_META[section].label} creation`}</button><button type="button" className={styles.secondary} onClick={() => setConfirmCreate(false)}>Back to form</button></div></div> : null}
       {validationError ? <p className={styles.error} role="alert">{validationError}</p> : null}
     </section>
   )
@@ -158,59 +256,73 @@ export function TenantWorkspace({value}: {value: unknown}) {
   const templates = templateItems(value)
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(templates[0]?.id ?? null)
   const selectedTemplate = templates.find((item) => item.id === selectedTemplateId) ?? null
-  const initialVersion = selectedTemplate?.versions?.find((item) => item.status === 'DRAFT') ?? selectedTemplate?.versions?.[0]
+  const templateDetail = useQuery({
+    queryKey: ['mock-exams', 'tenant', 'template', selectedTemplateId],
+    queryFn: async () => unwrapData(await mockExamApiService.getTenantTemplate(selectedTemplateId as number), 'tenantMockExamTemplate'),
+    enabled: Boolean(selectedTemplateId),
+    initialData: selectedTemplate ?? undefined,
+    retry: false,
+  })
+  const workingTemplate = templateDetail.data ?? selectedTemplate
+  const initialVersion = workingTemplate?.versions?.find((item) => item.status === 'DRAFT') ?? workingTemplate?.versions?.[0]
   const [selectedVersionId, setSelectedVersionId] = useState<number | null>(initialVersion?.id ?? null)
   const [template, setTemplate] = useState({label: '', title: ''})
 
   useEffect(() => {
-    const versions = templates.find((item) => item.id === selectedTemplateId)?.versions ?? []
+    const versions = workingTemplate?.versions ?? []
     if (!versions.some((item) => item.id === selectedVersionId)) {
       setSelectedVersionId((versions.find((item) => item.status === 'DRAFT') ?? versions[0])?.id ?? null)
     }
-  }, [selectedTemplateId, selectedVersionId, templates])
+  }, [selectedVersionId, workingTemplate])
 
-  const selectedVersion = selectedTemplate?.versions?.find((item) => item.id === selectedVersionId) ?? null
-  const copySourceVersionId = selectedTemplate?.publishedVersionId
-    ?? selectedTemplate?.versions?.find((item) => item.id !== selectedVersionId)?.id
-    ?? null
+  const selectedVersion = workingTemplate?.versions?.find((item) => item.id === selectedVersionId) ?? null
+  const versionDetail = useQuery({
+    queryKey: ['mock-exams', 'tenant', selectedTemplateId, 'version', selectedVersionId],
+    queryFn: async () => unwrapData(await mockExamApiService.getTenantVersion(selectedTemplateId as number, selectedVersionId as number), 'tenantMockExamVersion'),
+    enabled: Boolean(selectedTemplateId && selectedVersionId),
+    retry: false,
+  })
 
   const refresh = async () => queryClient.invalidateQueries({queryKey: ['mock-exams', 'tenant']})
-  const create = useMutation({mutationFn: () => mockExamApiService.createTenantTemplate(template), onSuccess: async () => { setTemplate({label: '', title: ''}); await refresh() }})
+  const create = useMutation({mutationFn: () => mockExamApiService.createTenantTemplate({label: template.label.trim(), title: template.title.trim()}), onSuccess: async response => { const created = unwrapData(response, 'createTenantMockExamTemplate'); setTemplate({label: '', title: ''}); if (created.id) setSelectedTemplateId(created.id); await refresh() }})
   const lifecycle = useMutation({
-    mutationFn: (action: 'publish' | 'archive' | 'copy') => {
+    mutationFn: async (action: 'publish' | 'archive') => {
       if (!selectedTemplateId || !selectedVersionId) throw new Error('Select a template version first.')
-      if (action === 'publish') return mockExamApiService.publishTenantVersion(selectedTemplateId, selectedVersionId)
+      if (action === 'publish') {
+        await Promise.all((Object.keys(SECTION_META) as Section[]).map(section => mockExamApiService.getTenantSection(selectedTemplateId, selectedVersionId, section)))
+        return mockExamApiService.publishTenantVersion(selectedTemplateId, selectedVersionId)
+      }
       if (action === 'archive') return mockExamApiService.archiveTenantVersion(selectedTemplateId, selectedVersionId)
-      if (!copySourceVersionId) throw new Error('This template has no other version to copy from.')
-      return mockExamApiService.copyTenantVersion(selectedTemplateId, selectedVersionId, copySourceVersionId)
+      throw new Error('Unsupported lifecycle action.')
     },
     onSuccess: refresh,
   })
 
   return (
     <div className={styles.workspace}>
-      <section className={styles.hero}><div><p className={styles.eyebrow}>Tenant assessment studio</p><h1>Build and release IELTS papers</h1><p>Create versioned templates, compose each paper, then publish one immutable version for advisors.</p></div><div className={styles.metric}><strong>{templates.length}</strong><span>templates</span></div></section>
+      <section className={styles.hero}><div><h1>Build and release IELTS papers</h1><p>Create an empty template, add Listening, Reading, and Writing once, review the locked content, then publish.</p></div></section>
       <div className={styles.twoColumn}>
         <section className={styles.panel}>
           <div className={styles.panelHeading}><div><p className={styles.eyebrow}>Library</p><h2>Template versions</h2></div></div>
           <TemplateCards value={value} selectedId={selectedTemplateId} onSelect={setSelectedTemplateId}/>
           <form className={styles.compactForm} onSubmit={(event) => { event.preventDefault(); create.mutate() }}>
             <h3>New draft template</h3>
-            <label><span>Internal label</span><input value={template.label} onChange={(event) => setTemplate((current) => ({...current, label: event.target.value}))}/></label>
+            <label><span>Internal label</span><input required value={template.label} onChange={(event) => setTemplate((current) => ({...current, label: event.target.value}))}/></label>
             <label><span>Candidate title</span><input required value={template.title} onChange={(event) => setTemplate((current) => ({...current, title: event.target.value}))}/></label>
             <button className={styles.primary} disabled={create.isPending}>Create draft</button>
           </form>
           <ErrorNotice error={create.error} fallback="The template could not be created."/>
         </section>
         <section className={styles.panel}>
-          <div className={styles.panelHeading}><div><p className={styles.eyebrow}>Release control</p><h2>{selectedTemplate?.title || 'Select a template'}</h2></div></div>
-          {selectedTemplate?.versions?.length ? (
+          <div className={styles.panelHeading}><div><p className={styles.eyebrow}>Release control</p><h2>{workingTemplate?.title || 'Select a template'}</h2></div></div>
+          {templateDetail.isError ? <ErrorNotice error={templateDetail.error} fallback="Template details could not be loaded."/> : null}
+          {workingTemplate?.versions?.length ? (
             <>
-              <label className={styles.selectLabel}><span>Working version</span><select value={selectedVersionId ?? ''} onChange={(event) => setSelectedVersionId(Number(event.target.value))}>{selectedTemplate.versions.map((version) => <option value={version.id} key={version.id}>v{version.versionNo ?? '—'} · {version.status || 'UNKNOWN'}</option>)}</select></label>
-              <div className={styles.versionStatus}>{selectedTemplate.versions.map((version) => <article className={version.id === selectedVersionId ? styles.activeVersion : ''} key={version.id}><strong>v{version.versionNo ?? '—'}</strong><span>{version.status || 'Unknown'}</span><small>{[version.hasListening && 'L', version.hasReading && 'R', version.hasWriting && 'W'].filter(Boolean).join(' · ') || 'No sections'}</small></article>)}</div>
+              <label className={styles.selectLabel}><span>Working version</span><select value={selectedVersionId ?? ''} onChange={(event) => setSelectedVersionId(Number(event.target.value))}>{workingTemplate.versions.map((version) => <option value={version.id} key={version.id}>v{version.versionNo ?? '—'} · {version.status || 'UNKNOWN'}</option>)}</select></label>
+              <div className={styles.versionStatus}>{workingTemplate.versions.map((version) => <article className={version.id === selectedVersionId ? styles.activeVersion : ''} key={version.id}><strong>v{version.versionNo ?? '—'}</strong><span>{version.status || 'Unknown'}</span><small>{[version.hasListening && 'L', version.hasReading && 'R', version.hasWriting && 'W'].filter(Boolean).join(' · ') || 'No sections'}</small></article>)}</div>
+              {versionDetail.isPending ? <p className={styles.status}>Loading version detail…</p> : versionDetail.isError ? <ErrorNotice error={versionDetail.error} fallback="Version details could not be loaded."/> : null}
               <div className={styles.actionRow}>
-                <button type="button" className={styles.primary} onClick={() => lifecycle.mutate('publish')} disabled={lifecycle.isPending || selectedVersion?.status !== 'DRAFT'}><CheckCircle2 size={16}/>Publish draft</button>
-                <button type="button" className={styles.secondary} onClick={() => lifecycle.mutate('copy')} disabled={lifecycle.isPending || selectedVersion?.status !== 'DRAFT' || !copySourceVersionId}><Copy size={16}/>Copy published content</button>
+                <button type="button" className={styles.primary} onClick={() => lifecycle.mutate('publish')} disabled={lifecycle.isPending || selectedVersion?.status !== 'DRAFT' || !selectedVersion.hasListening || !selectedVersion.hasReading || !selectedVersion.hasWriting}><CheckCircle2 size={16}/>{lifecycle.isPending ? 'Checking sections…' : 'Publish complete draft'}</button>
                 <button type="button" className={styles.secondary} onClick={() => lifecycle.mutate('archive')} disabled={lifecycle.isPending || selectedVersion?.status !== 'PUBLISHED'}><Archive size={16}/>Archive release</button>
               </div>
             </>
@@ -219,8 +331,8 @@ export function TenantWorkspace({value}: {value: unknown}) {
         </section>
       </div>
       {selectedTemplateId && selectedVersionId && selectedVersion?.status === 'DRAFT'
-        ? <TenantSectionComposer templateId={selectedTemplateId} versionId={selectedVersionId} onSaved={refresh}/>
-        : selectedVersion ? <section className={styles.panel}><Empty>Select a DRAFT version to compose or replace exam sections.</Empty></section> : null}
+        ? <TenantSectionComposer templateId={selectedTemplateId} versionId={selectedVersionId} existingSections={{listening: selectedVersion.hasListening === true, reading: selectedVersion.hasReading === true, writing: selectedVersion.hasWriting === true}} onSaved={refresh}/>
+        : selectedVersion ? <section className={styles.panel}><Empty>Published and archived versions are read only.</Empty></section> : null}
     </div>
   )
 }

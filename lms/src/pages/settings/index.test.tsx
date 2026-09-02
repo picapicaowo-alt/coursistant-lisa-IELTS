@@ -10,7 +10,7 @@ const profileApi = vi.hoisted(() => ({
   updateMyProfile: vi.fn(),
 }));
 const authApi = vi.hoisted(() => ({changePassword: vi.fn()}));
-const auth = vi.hoisted(() => ({updateProfile: vi.fn()}));
+const auth = vi.hoisted(() => ({updateProfile: vi.fn(), user: {role: 'USER'} as {role: string} | null}));
 
 vi.mock('@/apis/services/profile-api', () => ({profileApiService: profileApi}));
 vi.mock('@/apis/services/auth-api', () => ({authApiService: authApi}));
@@ -52,6 +52,7 @@ const renderPage = () => {
 describe('SettingsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    auth.user = {role: 'USER'};
     profileApi.getMyProfile.mockResolvedValue(response(profile));
     authApi.changePassword.mockResolvedValue(response(null));
   });
@@ -124,5 +125,13 @@ describe('SettingsPage', () => {
     renderPage();
     const backButton = await screen.findByRole('button', {name: 'Back'});
     expect(backButton).toBeInTheDocument();
+  });
+
+  it('limits Tenant Admin settings to the auth password API', async () => {
+    auth.user = {role: 'TENANT_ADMIN'};
+    renderPage();
+    expect(await screen.findByLabelText('Current password')).toBeInTheDocument();
+    expect(screen.getAllByRole('tab').map(tab => tab.textContent)).toEqual(['Password']);
+    expect(profileApi.getMyProfile).not.toHaveBeenCalled();
   });
 });

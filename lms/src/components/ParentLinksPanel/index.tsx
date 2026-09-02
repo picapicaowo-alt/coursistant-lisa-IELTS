@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {unwrapData} from '@/apis';
+import {type ManagedUser, unwrapData} from '@/apis';
+import {TenantUserPicker} from '@/components/TenantUserPicker';
 import {parentApiService} from '@/apis/services/parent-api';
 import {advisingErrorMessage} from '@/pages/advising/advisingErrors';
 import styles from '@/pages/advising/advising.module.scss';
@@ -10,6 +11,8 @@ type Scope = 'counsellor' | 'advisor' | 'tenant';
 
 export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: number}) => {
   const queryClient = useQueryClient();
+  const [tenantMode, setTenantMode] = useState<'create' | 'existing'>('create');
+  const [selectedParent, setSelectedParent] = useState<ManagedUser | null>(null);
   const [parent, setParent] = useState({
     parentUserId: '',
     email: '',
@@ -52,6 +55,7 @@ export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: n
     },
     onSuccess: async () => {
       setParent({parentUserId: '', email: '', firstName: '', middleName: '', lastName: '', reason: ''});
+      setSelectedParent(null);
       await queryClient.invalidateQueries({queryKey});
     },
   });
@@ -81,17 +85,19 @@ export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: n
       </div>
       {scope !== 'advisor' ? (
         <form className={styles.form} onSubmit={event => { event.preventDefault(); save.mutate(); }}>
-          <label>Existing parent user ID (optional)<input inputMode="numeric" value={parent.parentUserId} onChange={event => setParent(current => ({...current, parentUserId: event.target.value}))}/></label>
-          {!parent.parentUserId ? (
+          {scope === 'tenant' ? <div className={styles.actions}><button type="button" className={tenantMode === 'create' ? styles.selectedOption : styles.secondary} onClick={() => { setTenantMode('create'); setSelectedParent(null); setParent(current => ({...current, parentUserId: ''})); }}>Create or reuse by email</button><button type="button" className={tenantMode === 'existing' ? styles.selectedOption : styles.secondary} onClick={() => setTenantMode('existing')}>Link existing Parent</button></div> : null}
+          {scope === 'tenant' && tenantMode === 'existing' ? <div className={styles.pickerField}><span>Existing Parent</span><TenantUserPicker title="Choose an existing Parent" description="Searches active Parent identities in this tenant by name or email." triggerLabel="Choose Parent" levels={['PARENT']} selectedUser={selectedParent} onSelect={user => { setSelectedParent(user); setParent(current => ({...current, parentUserId: String(user.id)})); }}/></div> : null}
+          {scope === 'counsellor' ? <label>Existing parent user ID (optional)<input inputMode="numeric" value={parent.parentUserId} onChange={event => setParent(current => ({...current, parentUserId: event.target.value}))}/></label> : null}
+          {(scope === 'tenant' ? tenantMode === 'create' : !parent.parentUserId) ? (
             <>
               <label>Parent email<input required type="email" value={parent.email} onChange={event => setParent(current => ({...current, email: event.target.value}))}/></label>
-              <label>First name<input maxLength={100} value={parent.firstName} onChange={event => setParent(current => ({...current, firstName: event.target.value}))}/></label>
+              <label>First name<input required maxLength={100} value={parent.firstName} onChange={event => setParent(current => ({...current, firstName: event.target.value}))}/></label>
               <label>Middle name<input maxLength={100} value={parent.middleName} onChange={event => setParent(current => ({...current, middleName: event.target.value}))}/></label>
-              <label>Last name<input maxLength={100} value={parent.lastName} onChange={event => setParent(current => ({...current, lastName: event.target.value}))}/></label>
+              <label>Last name<input required maxLength={100} value={parent.lastName} onChange={event => setParent(current => ({...current, lastName: event.target.value}))}/></label>
             </>
           ) : null}
           <label>Reason<input value={parent.reason} onChange={event => setParent(current => ({...current, reason: event.target.value}))}/></label>
-          <button className={styles.primary} disabled={save.isPending}>{!parent.parentUserId ? 'Create or reuse parent' : 'Link parent'}</button>
+          <button className={styles.primary} disabled={save.isPending || (tenantMode === 'existing' && !selectedParent)}>{save.isPending ? 'Saving…' : !parent.parentUserId ? 'Create or reuse Parent' : 'Link Parent'}</button>
         </form>
       ) : null}
     </section>

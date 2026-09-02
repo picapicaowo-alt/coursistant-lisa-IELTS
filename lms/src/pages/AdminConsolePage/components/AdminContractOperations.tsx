@@ -39,7 +39,7 @@ export const AdminContractOperations: React.FC<{isSystemAdmin: boolean; users: M
 
   const digestMutation = useMutation({mutationFn: () => notificationApiService.runAdminDigest({digestDate: digest.date, tenantId: digest.tenantId ? Number(digest.tenantId) : undefined})});
   const alertMutation = useMutation({
-    mutationFn: () => courseOperationsApiService.putTenantAlertRules({expectedVersion: Number(alerts.version), inactivityDays: alerts.inactivityDays ? Number(alerts.inactivityDays) : undefined, gradingDelayDays: alerts.gradingDelayDays ? Number(alerts.gradingDelayDays) : undefined, absenceCount: alerts.absenceCount ? Number(alerts.absenceCount) : undefined, absenceWindowDays: alerts.absenceWindowDays ? Number(alerts.absenceWindowDays) : undefined}),
+    mutationFn: () => courseOperationsApiService.putTenantAlertRules({mode: 'TENANT_OVERRIDE', expectedVersion: Number(alerts.version), inactivityDays: alerts.inactivityDays ? Number(alerts.inactivityDays) : undefined, gradingDelayDays: alerts.gradingDelayDays ? Number(alerts.gradingDelayDays) : undefined, absenceCount: alerts.absenceCount ? Number(alerts.absenceCount) : undefined, absenceWindowDays: alerts.absenceWindowDays ? Number(alerts.absenceWindowDays) : undefined}),
     onSuccess: async () => queryClient.invalidateQueries({queryKey: ['tenant', 'alert-rules']}),
   });
 

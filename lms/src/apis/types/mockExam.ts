@@ -23,8 +23,8 @@ export interface MockExamTemplateSummary {
 }
 
 export interface CreateMockExamTemplateRequest {
-  label?: string;
-  title?: string;
+  label: string;
+  title: string;
 }
 
 export interface CreateStudentMockExamRequest {
@@ -102,55 +102,55 @@ export interface StudentMockExamDetail extends ObserverMockExamDetail {
 }
 
 export interface CreateMockExamListeningSectionRequest {
-  instruction?: string;
-  kind?: string;
-  payload?: unknown;
-  questionEnd?: number;
-  questionStart?: number;
-  sortOrder?: number;
-  title?: string;
+  instruction: string;
+  kind: string;
+  payload: unknown;
+  questionEnd: number;
+  questionStart: number;
+  sortOrder: number;
+  title: string;
 }
 
 export interface CreateMockExamListeningPartRequest {
-  audioPath?: string;
-  label?: string;
-  sections?: CreateMockExamListeningSectionRequest[];
-  seq?: number;
+  audioPath: string;
+  label: string;
+  sections: CreateMockExamListeningSectionRequest[];
+  seq: number;
 }
 
 export interface CreateMockExamListeningRequest {
-  parts?: CreateMockExamListeningPartRequest[];
-  totalMinutes?: number;
+  parts: CreateMockExamListeningPartRequest[];
+  totalMinutes: number;
 }
 
 export type CreateMockExamPassageQuestionRequest = CreateMockExamListeningSectionRequest;
 
 export interface CreateMockExamPassageRequest {
-  intro?: string;
-  paragraphs?: unknown;
-  questions?: CreateMockExamPassageQuestionRequest[];
-  seq?: number;
-  shortLabel?: string;
-  title?: string;
+  intro: string;
+  paragraphs: unknown[];
+  questions: CreateMockExamPassageQuestionRequest[];
+  seq: number;
+  shortLabel: string;
+  title: string;
 }
 
 export interface CreateMockExamReadingRequest {
-  passages?: CreateMockExamPassageRequest[];
-  totalMinutes?: number;
+  passages: CreateMockExamPassageRequest[];
+  totalMinutes: number;
 }
 
 export interface CreateMockExamWritingTaskRequest {
   imagePath?: string;
-  minWords?: number;
-  prompt?: string;
-  seq?: number;
-  taskKey?: string;
-  title?: string;
+  minWords: number;
+  prompt: string;
+  seq: number;
+  taskKey: string;
+  title: string;
 }
 
 export interface CreateMockExamWritingRequest {
-  tasks?: CreateMockExamWritingTaskRequest[];
-  totalMinutes?: number;
+  tasks: CreateMockExamWritingTaskRequest[];
+  totalMinutes: number;
 }
 
 /** Response payloads remain generic where the supplied OpenAPI has no schema. */

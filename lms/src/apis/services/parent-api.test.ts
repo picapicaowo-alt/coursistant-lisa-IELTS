@@ -30,11 +30,10 @@ describe('ParentApiService', () => {
 
   it('creates or reuses a parent from the tenant student scope', async () => {
     client.post.mockResolvedValue({status: 201, data: {}});
-    await service.createOrReuseTenantParentLink(41, {email: 'parent@example.test'}, 'tenant-parent-41');
+    await service.createOrReuseTenantParentLink(41, {email: 'parent@example.test'});
     expect(client.post).toHaveBeenCalledWith(
       '/v2/tenant/students/41/parent-links',
       {email: 'parent@example.test'},
-      {headers: {'Idempotency-Key': 'tenant-parent-41'}},
     );
   });
 

@@ -62,4 +62,18 @@ describe('RequireRoleAccess', () => {
     expect(screen.getByText('Tenant intake home')).toBeInTheDocument();
     expect(screen.queryByText('AI workspace')).not.toBeInTheDocument();
   });
+
+  it('keeps a tenant admin out of the generic profile route', () => {
+    mocks.user = {role: 'TENANT_ADMIN', level: 'NOT_APPLICABLE'};
+    render(
+      <MemoryRouter initialEntries={['/profile']}>
+        <Routes>
+          <Route path="/profile" element={<RequireRoleAccess capability="selfProfile"><div>Generic profile</div></RequireRoleAccess>}/>
+          <Route path="/admin/intakes" element={<div>Tenant intake home</div>}/>
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('Tenant intake home')).toBeInTheDocument();
+    expect(screen.queryByText('Generic profile')).not.toBeInTheDocument();
+  });
 });

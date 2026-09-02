@@ -50,6 +50,13 @@ export interface TenantUserDirectoryParams {
   size?: number;
 }
 
+export interface TenantUserDirectoryPage {
+  items: ManagedUser[];
+  page: number;
+  size: number;
+  total: number;
+}
+
 export interface TenantAuditEventParams {
   actorUserId?: number;
   targetUserId?: number;
@@ -61,8 +68,24 @@ export interface TenantAuditEventParams {
   size?: number;
 }
 
-/** The new tenant directory and audit endpoints currently expose generic data. */
-export type TenantDirectoryRead = unknown;
+export interface TenantAuditEvent {
+  eventId: string;
+  sourceType?: string;
+  createdAt: string;
+  actorUserId?: number;
+  action: string;
+  resourceType: string;
+  targetUserId?: number;
+  before?: Record<string, unknown> | null;
+  after?: Record<string, unknown> | null;
+}
+
+export interface TenantAuditEventPage {
+  items: TenantAuditEvent[];
+  page: number;
+  size: number;
+  total: number;
+}
 
 export interface ChangeManagedUserRoleRequest {
   role: 'USER' | 'TENANT_ADMIN';

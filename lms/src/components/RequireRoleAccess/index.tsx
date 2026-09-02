@@ -11,6 +11,7 @@ import {
   canAccessDashboard,
   canAccessMyOperations,
   canAccessStandaloneMockExams,
+  canAccessSelfProfile,
   canTakeMockExam,
   canCreateCourses,
 } from '@/utils/roleCapabilities';
@@ -25,6 +26,7 @@ type Capability =
   | 'myOperations'
   | 'mockExams'
   | 'mockExamSession'
+  | 'selfProfile'
   | 'adminConsole';
 
 const allowed: Record<Capability, (identity: ReturnType<typeof useRequiredAuth>['user']) => boolean> = {
@@ -37,6 +39,7 @@ const allowed: Record<Capability, (identity: ReturnType<typeof useRequiredAuth>[
   myOperations: canAccessMyOperations,
   mockExams: canAccessStandaloneMockExams,
   mockExamSession: canTakeMockExam,
+  selfProfile: canAccessSelfProfile,
   adminConsole: canAccessAdminConsole,
 };
 

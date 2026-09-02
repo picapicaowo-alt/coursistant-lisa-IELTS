@@ -57,6 +57,10 @@ export const canAccessCourseAuthoringTools = (identity: Identity): boolean =>
 export const canAccessAdminConsole = (identity: Identity): boolean =>
   isSystemAdminAccount(identity) || isTenantAdminAccount(identity);
 
+/** Tenant Admin self-service is limited to the auth contract's password flow. */
+export const canAccessSelfProfile = (identity: Identity): boolean =>
+  !isTenantAdminAccount(identity);
+
 export const canAccessMyOperations = (identity: Identity): boolean =>
   identity.role === 'USER'
     && (identity.level === 'STUDENT' || identity.level === 'INSTRUCTOR' || identity.level === 'INSTRUCTOR_ADVISOR');

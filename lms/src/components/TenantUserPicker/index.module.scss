@@ -1,0 +1,277 @@
+.picker {
+  width: 100%;
+}
+
+.trigger,
+.confirmButton,
+.changeButton,
+.search button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: t.$brand;
+  color: t.$content-on-color;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.trigger {
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.selection {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .75rem;
+  min-height: 58px;
+  padding: .65rem .8rem;
+  border: 1px solid t.$border;
+  border-radius: 14px;
+  background: t.$card-bg;
+  color: t.$text;
+}
+
+.selection span,
+.row span,
+.selectedRow span {
+  min-width: 0;
+}
+
+.selection strong,
+.selection small,
+.row strong,
+.row small,
+.selectedRow strong,
+.selectedRow small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selection small,
+.row small,
+.selectedRow small {
+  margin-top: .15rem;
+  color: t.$text-muted;
+  font-size: .8rem;
+}
+
+.changeButton {
+  min-height: 36px;
+  padding: 0 .8rem;
+  background: t.$brand-subtle;
+  color: t.$brand;
+}
+
+.dialog {
+  width: min(680px, calc(100vw - 2rem));
+  max-height: min(760px, calc(100dvh - 2rem));
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 16px;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-popover;
+  color: t.$text;
+}
+
+.dialog::backdrop {
+  background: t.$modal-backdrop;
+}
+
+.dialogHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.35rem 1.5rem 1rem;
+  border-bottom: 1px solid t.$border;
+}
+
+.dialogHeader h2,
+.dialogHeader p {
+  margin: 0;
+}
+
+.dialogHeader h2 {
+  font-size: 1.25rem;
+}
+
+.dialogHeader p {
+  max-width: 60ch;
+  margin-top: .4rem;
+  color: t.$text-muted;
+  line-height: 1.5;
+}
+
+.iconButton {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 12px;
+  background: t.$neutral-fill;
+  color: t.$text;
+  cursor: pointer;
+}
+
+.search {
+  padding: 1rem 1.5rem;
+  background: t.$subcard-bg;
+}
+
+.search > label {
+  display: block;
+  margin-bottom: .45rem;
+  font-size: .82rem;
+  font-weight: 700;
+}
+
+.search > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .55rem;
+  min-height: 50px;
+  padding-left: .85rem;
+  border: 1px solid t.$border;
+  border-radius: 14px;
+  background: t.$card-bg;
+}
+
+.search input {
+  min-width: 0;
+  height: 48px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font: inherit;
+}
+
+.search button {
+  align-self: stretch;
+  margin: 3px;
+  padding: 0 1rem;
+}
+
+.results {
+  min-height: 230px;
+  max-height: 330px;
+  padding: .5rem 1rem;
+  overflow: auto;
+}
+
+.row,
+.selectedRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .8rem;
+  min-height: 62px;
+  padding: .7rem .75rem;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  cursor: pointer;
+}
+
+.row:hover {
+  background: t.$subcard-bg;
+}
+
+.selectedRow {
+  border-color: t.$border-interactive;
+  background: t.$brand-subtle;
+}
+
+.row em,
+.selectedRow em {
+  color: t.$text-muted;
+  font-size: .72rem;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.status,
+.error {
+  margin: 1.5rem;
+  color: t.$text-muted;
+  text-align: center;
+}
+
+.error {
+  color: t.$danger;
+}
+
+.error button,
+.pagination button,
+.cancelButton {
+  min-height: 40px;
+  padding: 0 .9rem;
+  border: 1px solid t.$border;
+  border-radius: 11px;
+  background: t.$card-bg;
+  color: t.$text;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.pagination,
+.dialogActions {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .8rem 1.5rem;
+  border-top: 1px solid t.$border;
+}
+
+.pagination {
+  justify-content: center;
+  color: t.$text-muted;
+  font-size: .85rem;
+}
+
+.dialogActions {
+  justify-content: flex-end;
+  background: t.$subcard-bg;
+}
+
+.confirmButton {
+  padding: 0 1rem;
+}
+
+button:focus-visible,
+input:focus-visible {
+  outline: 3px solid t.$focus-ring;
+  outline-offset: 2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .55;
+}
+
+@media (max-width: 560px) {
+  .dialog {
+    width: calc(100vw - 1rem);
+    max-height: calc(100dvh - 1rem);
+  }
+
+  .dialogHeader,
+  .search,
+  .pagination,
+  .dialogActions {
+    padding-inline: 1rem;
+  }
+
+  .row em,
+  .selectedRow em {
+    display: none;
+  }
+}

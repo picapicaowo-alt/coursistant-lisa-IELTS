@@ -318,6 +318,99 @@
   box-shadow: t.$shadow-card;
 }
 
+.readonlySection {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control;
+  background: t.$exam-card-wash;
+}
+
+.readonlySection > p:last-child {
+  margin: 0;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.5;
+}
+
+.mediaReview {
+  display: grid;
+  gap: .8rem;
+  padding-top: 1rem;
+  border-top: 1px solid t.$exam-line;
+}
+
+.mediaReview h4,
+.mediaReview p {
+  margin: 0;
+}
+
+.mediaReview > div:first-child p {
+  margin-top: .25rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.5;
+}
+
+.mediaList {
+  display: grid;
+  gap: .65rem;
+}
+
+.mediaList article {
+  display: grid;
+  gap: .65rem;
+  padding: .8rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+}
+
+.mediaList article > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.mediaList audio,
+.mediaList img {
+  width: 100%;
+}
+
+.mediaList img {
+  max-height: 28rem;
+  border-radius: t.$radius-control-sm;
+  object-fit: contain;
+  background: t.$neutral-fill;
+}
+
+.mediaList article > p {
+  color: t.$danger;
+  font-size: t.$fs-caption;
+}
+
+.confirmCreate {
+  display: grid;
+  gap: .8rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: t.$radius-control;
+  background: t.$exam-card-wash;
+}
+
+.confirmCreate p {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.confirmCreate > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .65rem;
+}
+
 .versionStatus {
   display: flex;
   gap: .65rem;
@@ -427,6 +520,11 @@
 
   .sectionTabs {
     grid-template-columns: 1fr;
+  }
+
+  .mediaList article > div {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
 

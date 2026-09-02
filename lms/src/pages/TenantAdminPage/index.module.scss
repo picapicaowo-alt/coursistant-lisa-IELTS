@@ -1,0 +1,769 @@
+.page {
+  min-height: 100%;
+  padding: 2rem clamp(1rem, 4vw, 3.5rem) 4rem;
+  overflow-y: auto;
+  background: t.$page-bg;
+  color: t.$text;
+}
+
+.pageHeader,
+.tabs,
+.directoryLayout,
+.widePanel {
+  width: min(100%, 88rem);
+  margin-inline: auto;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.pageHeader h1,
+.pageHeader p,
+.panelHeading h2,
+.panelHeading p {
+  margin: 0;
+}
+
+.pageHeader h1 {
+  font-size: clamp(2rem, 4vw, t.$fs-h1);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+}
+
+.pageHeader > div:first-child > p {
+  max-width: 68ch;
+  margin-top: .55rem;
+  color: t.$text-muted;
+  line-height: 1.55;
+}
+
+.quickLinks {
+  display: flex;
+  gap: .65rem;
+}
+
+.quickLinks a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: .65rem;
+  min-width: 12.5rem;
+  min-height: 58px;
+  padding: .65rem .8rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  color: t.$text;
+  text-decoration: none;
+}
+
+.quickLinks a:hover {
+  border-color: t.$border-interactive;
+  background: t.$subcard-bg;
+}
+
+.quickLinks strong,
+.quickLinks small {
+  display: block;
+}
+
+.quickLinks small {
+  margin-top: .12rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.tabs {
+  display: flex;
+  gap: .35rem;
+  margin-bottom: 1rem;
+  padding: .35rem;
+  overflow-x: auto;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  background: t.$card-bg;
+}
+
+.tabs button {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: .45rem;
+  min-height: 44px;
+  padding: 0 1rem;
+  border: 0;
+  border-radius: t.$radius-control-sm;
+  background: transparent;
+  color: t.$text-muted;
+  cursor: pointer;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+}
+
+.tabs .activeTab {
+  background: t.$brand;
+  color: t.$content-on-color;
+}
+
+.directoryLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(20rem, .85fr);
+  align-items: start;
+  gap: 1rem;
+}
+
+.sideColumn {
+  display: grid;
+  gap: 1rem;
+}
+
+.primaryPanel,
+.secondaryPanel,
+.widePanel {
+  padding: 1.25rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+}
+
+.panelHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.panelHeading h2 {
+  font-size: t.$fs-card-title;
+}
+
+.panelHeading p {
+  max-width: 65ch;
+  margin-top: .3rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.5;
+}
+
+.iconButton {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  background: t.$card-bg;
+  color: t.$brand;
+  cursor: pointer;
+}
+
+.filterBar {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+  gap: .6rem;
+  margin-top: 1rem;
+  padding: .85rem;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.filterBar .searchField {
+  grid-column: 1 / -1;
+}
+
+.filterBar > button {
+  align-self: end;
+}
+
+.filterBar label,
+.form label,
+.pickerField,
+.singleSearch label,
+.thresholdGrid label,
+.auditFilters label {
+  display: grid;
+  gap: .35rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+  min-width: 0;
+}
+
+.filterBar input,
+.filterBar select,
+.form input,
+.form select,
+.form textarea,
+.singleSearch input,
+.thresholdGrid input,
+.auditFilters input {
+  width: 100%;
+  min-height: 44px;
+  padding: .55rem .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.form textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+
+.searchField > div,
+.singleSearch label > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: .45rem;
+  min-height: 44px;
+  padding-left: .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+}
+
+.searchField input,
+.singleSearch input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+}
+
+.primaryButton,
+.secondaryButton,
+.dangerButton,
+.errorNotice button,
+.pagination button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  min-height: 44px;
+  padding: 0 .9rem;
+  border-radius: t.$radius-control-sm;
+  cursor: pointer;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+}
+
+.primaryButton {
+  border: 1px solid t.$brand;
+  background: t.$brand;
+  color: t.$content-on-color;
+}
+
+.secondaryButton,
+.errorNotice button,
+.pagination button {
+  border: 1px solid t.$border;
+  background: t.$card-bg;
+  color: t.$text;
+}
+
+.dangerButton {
+  border: 1px solid t.$danger;
+  background: t.$danger;
+  color: t.$content-on-color;
+}
+
+.dangerLink {
+  min-height: 44px;
+  border: 0;
+  background: transparent;
+  color: t.$danger;
+  cursor: pointer;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: .5;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+summary:focus-visible {
+  outline: 3px solid t.$focus-ring;
+  outline-offset: 2px;
+}
+
+.recordList {
+  display: grid;
+  gap: .45rem;
+  margin-top: 1rem;
+}
+
+.record,
+.selectedRecord {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(8rem, auto) auto;
+  align-items: center;
+  gap: .8rem;
+  min-height: 68px;
+  padding: .7rem .8rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  background: t.$card-bg;
+  color: t.$text;
+  cursor: pointer;
+  text-align: left;
+}
+
+.record:hover {
+  border-color: t.$border-interactive;
+  background: t.$subcard-bg;
+}
+
+.selectedRecord {
+  border-color: t.$brand;
+  background: t.$brand-subtle;
+  box-shadow: t.$shadow-selected;
+}
+
+.record > span:first-child,
+.selectedRecord > span:first-child,
+.recordMeta {
+  min-width: 0;
+}
+
+.record strong,
+.record small,
+.selectedRecord strong,
+.selectedRecord small,
+.recordMeta em {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.record small,
+.selectedRecord small,
+.recordMeta em {
+  margin-top: .18rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-style: normal;
+}
+
+.recordMeta {
+  text-align: right;
+}
+
+.recordMeta em {
+  color: t.$brand;
+  font-weight: t.$fw-semibold;
+}
+
+.form {
+  display: grid;
+  gap: .8rem;
+  margin-top: 1rem;
+}
+
+.nameGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .55rem;
+}
+
+.hint {
+  margin: .25rem 0;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.5;
+}
+
+.status,
+.empty {
+  margin: 1rem 0 0;
+  padding: 2rem 1rem;
+  color: t.$text-muted;
+  text-align: center;
+}
+
+.empty {
+  border: 1px dashed t.$border-strong;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.errorNotice {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: .75rem;
+  border-radius: t.$radius-control;
+  background: rgba(t.$danger, .1);
+  color: t.$danger;
+}
+
+.errorNotice p {
+  margin: 0;
+}
+
+.detailList,
+.auditMeta {
+  display: grid;
+  grid-template-columns: minmax(6rem, auto) minmax(0, 1fr);
+  gap: .55rem .8rem;
+  margin: 1rem 0;
+}
+
+.detailList dt,
+.auditMeta dt {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.detailList dd,
+.auditMeta dd {
+  min-width: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.governanceActions {
+  display: grid;
+  gap: .8rem;
+}
+
+.confirmBox,
+.blockers {
+  margin-top: .8rem;
+  padding: .85rem;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.confirmBox p {
+  margin: 0 0 .8rem;
+  line-height: 1.5;
+}
+
+.confirmBox > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .55rem;
+}
+
+.blockers {
+  background: rgba(t.$warning, .1);
+  color: t.$warning;
+}
+
+.blockers ul {
+  display: grid;
+  gap: .55rem;
+  margin: .7rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.blockers li span {
+  display: block;
+  margin-top: .15rem;
+  line-height: 1.45;
+}
+
+.inlineSuccess,
+.inlineError {
+  margin-top: .8rem;
+  padding: .7rem .8rem;
+  border-radius: t.$radius-control;
+  background: t.$success-subtle;
+  color: t.$success;
+  font-size: t.$fs-caption;
+  line-height: 1.5;
+}
+
+.inlineError {
+  background: rgba(t.$danger, .1);
+  color: t.$danger;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: .75rem;
+  margin-top: 1rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.singleSearch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: .6rem;
+  margin-top: 1rem;
+}
+
+.modePicker,
+.toggleGrid {
+  margin: 1rem 0 0;
+  padding: 0;
+  border: 0;
+}
+
+.modePicker legend,
+.toggleGrid legend {
+  margin-bottom: .55rem;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.modePicker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .65rem;
+}
+
+.modePicker legend {
+  grid-column: 1 / -1;
+}
+
+.modePicker label {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: .65rem;
+  min-height: 82px;
+  padding: .8rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  cursor: pointer;
+}
+
+.modePicker label:has(input:checked) {
+  border-color: t.$brand;
+  background: t.$brand-subtle;
+}
+
+.modePicker small {
+  display: block;
+  margin-top: .25rem;
+  color: t.$text-muted;
+  line-height: 1.4;
+}
+
+.thresholdGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(8rem, 1fr));
+  gap: .65rem;
+  margin-top: 1rem;
+}
+
+.toggleGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem 1rem;
+}
+
+.toggleGrid legend {
+  width: 100%;
+}
+
+.toggleGrid label {
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  min-height: 44px;
+  cursor: pointer;
+}
+
+.formFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: .25rem;
+  padding-top: 1rem;
+  border-top: 1px solid t.$border;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.auditFilters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: end;
+  gap: .6rem;
+  margin-top: 1rem;
+  padding: .85rem;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.auditFilters input {
+  min-width: 0;
+}
+
+.auditList {
+  display: grid;
+  gap: .7rem;
+  margin-top: 1rem;
+}
+
+.auditEvent {
+  padding: 1rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+}
+
+.auditSummary {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.auditSummary strong,
+.auditSummary small {
+  display: block;
+}
+
+.auditSummary small,
+.auditSummary time {
+  margin-top: .2rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.auditMeta {
+  grid-template-columns: repeat(6, auto);
+  justify-content: start;
+  margin-bottom: 0;
+}
+
+.changeDetails {
+  margin-top: .8rem;
+  padding-top: .8rem;
+  border-top: 1px solid t.$border;
+}
+
+.changeDetails summary {
+  color: t.$brand;
+  cursor: pointer;
+  font-weight: t.$fw-semibold;
+}
+
+.changeDetails > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: .7rem;
+  margin-top: .7rem;
+}
+
+.changeDetails section {
+  min-width: 0;
+}
+
+.changeDetails h3 {
+  margin: 0 0 .4rem;
+  font-size: t.$fs-caption;
+}
+
+.changeDetails pre {
+  max-height: 22rem;
+  margin: 0;
+  padding: .75rem;
+  overflow: auto;
+  border-radius: t.$radius-control-sm;
+  background: t.$neutral-fill;
+  font-size: t.$fs-caption;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 1120px) {
+  .pageHeader {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .filterBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .thresholdGrid,
+  .auditFilters {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .directoryLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .quickLinks {
+    width: 100%;
+  }
+
+  .quickLinks a {
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 1rem .75rem 3rem;
+  }
+
+  .quickLinks,
+  .formFooter,
+  .auditSummary {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .quickLinks a {
+    min-width: 0;
+  }
+
+  .filterBar,
+  .nameGrid,
+  .modePicker,
+  .thresholdGrid,
+  .auditFilters,
+  .changeDetails > div,
+  .singleSearch {
+    grid-template-columns: 1fr;
+  }
+
+  .record,
+  .selectedRecord {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .recordMeta {
+    grid-column: 1;
+    grid-row: 2;
+    text-align: left;
+  }
+
+  .record > svg,
+  .selectedRecord > svg {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+
+  .auditMeta {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+}

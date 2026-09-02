@@ -23,7 +23,9 @@ interface StatusMessage {
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<SettingsTab>('Account');
+  const {user, updateProfile} = useAuth();
+  const tenantAdmin = user?.role === 'TENANT_ADMIN';
+  const [activeTab, setActiveTab] = useState<SettingsTab>(tenantAdmin ? 'Password' : 'Account');
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -37,7 +39,6 @@ const SettingsPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [status, setStatus] = useState<StatusMessage | null>(null);
   const queryClient = useQueryClient();
-  const {updateProfile} = useAuth();
   const idempotency = useIdempotencyCheckpoint();
 
   const handleBack = () => {
@@ -51,6 +52,7 @@ const SettingsPage = () => {
   const profileQuery = useQuery({
     queryKey: ['my-profile'],
     queryFn: async () => unwrapData(await profileApiService.getMyProfile(), 'Load profile'),
+    enabled: !tenantAdmin,
   });
 
   useEffect(() => {
@@ -110,8 +112,8 @@ const SettingsPage = () => {
     changePassword.mutate();
   };
 
-  if (profileQuery.isLoading) return <div className={styles.settingsPageWrapper}>Loading settings…</div>;
-  if (profileQuery.isError) {
+  if (!tenantAdmin && profileQuery.isLoading) return <div className={styles.settingsPageWrapper}>Loading settings…</div>;
+  if (!tenantAdmin && profileQuery.isError) {
     return (
       <div className={styles.settingsPageWrapper} role="alert">
         Could not load settings.
@@ -123,7 +125,7 @@ const SettingsPage = () => {
   }
 
   const profile = profileQuery.data;
-  if (!profile) return <div className={styles.settingsPageWrapper}>Could not load settings.</div>;
+  if (!tenantAdmin && !profile) return <div className={styles.settingsPageWrapper}>Could not load settings.</div>;
 
   return (
     <div className={styles.settingsPageWrapper}>
@@ -142,7 +144,7 @@ const SettingsPage = () => {
         </div>
       </div>
       <div className={styles.tabsContainer} role="tablist" aria-label="Settings sections">
-        {tabList.map(tab => (
+        {(tenantAdmin ? ['Password'] as const : tabList).map(tab => (
           <button
             key={tab}
             type="button"
@@ -165,7 +167,7 @@ const SettingsPage = () => {
         </p>
       ) : null}
 
-      {activeTab === 'Account' && (
+      {activeTab === 'Account' && profile && (
         <section className={styles.generalSection}>
           <h3 className={styles.generalTitle}>Account</h3>
           <p className={styles.generalSubtitle}>Your email, role, and level are managed by your organization.</p>

@@ -105,52 +105,52 @@ export class MockExamApiService {
     return this.apiClient.get(`/v2/system/mock-exams/${testId}/${section}`);
   }
 
-  listTenantTemplates(page = 0, size = 20): Promise<ApiResponse<MockExamTemplateSummary[]>> {
-    return this.apiClient.get('/v2/tenant/mock-exam-templates', {params: {page, size}});
+  listTenantTemplates(): Promise<ApiResponse<MockExamTemplateSummary[]>> {
+    return this.apiClient.get('/v2/tenant/mock-exam-templates');
   }
 
-  createTenantTemplate(request: CreateMockExamTemplateRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<MockExamTemplateSummary>> {
-    return this.apiClient.post('/v2/tenant/mock-exam-templates', request, idempotent(key));
+  createTenantTemplate(request: CreateMockExamTemplateRequest): Promise<ApiResponse<MockExamTemplateSummary>> {
+    return this.apiClient.post('/v2/tenant/mock-exam-templates', request);
   }
 
   getTenantTemplate(templateId: number): Promise<ApiResponse<MockExamTemplateSummary>> {
     return this.apiClient.get(`/v2/tenant/mock-exam-templates/${templateId}`);
   }
 
-  deleteTenantDraft(templateId: number, versionId: number, key: string = crypto.randomUUID()): Promise<ApiResponse<void>> {
-    return this.apiClient.delete(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}`, idempotent(key));
+  deleteTenantDraft(templateId: number, versionId: number): Promise<ApiResponse<void>> {
+    return this.apiClient.delete(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}`);
   }
 
   getTenantVersion(templateId: number, versionId: number): Promise<ApiResponse<MockExamRead>> {
     return this.apiClient.get(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}`);
   }
 
-  archiveTenantVersion(templateId: number, versionId: number, key: string = crypto.randomUUID()): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/archive`, undefined, idempotent(key));
+  archiveTenantVersion(templateId: number, versionId: number): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/archive`);
   }
 
-  copyTenantVersion(templateId: number, versionId: number, sourceVersionId: number, key: string = crypto.randomUUID()): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/copies`, {sourceVersionId}, idempotent(key));
+  copyTenantVersion(templateId: number, versionId: number, sourceVersionId: number): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/copies`, {sourceVersionId});
   }
 
-  publishTenantVersion(templateId: number, versionId: number, key: string = crypto.randomUUID()): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/publish`, undefined, idempotent(key));
+  publishTenantVersion(templateId: number, versionId: number): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/publish`);
   }
 
   getTenantSection(templateId: number, versionId: number, section: MockExamSection): Promise<ApiResponse<MockExamRead>> {
     return this.apiClient.get(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/${section}`);
   }
 
-  createTenantListening(templateId: number, versionId: number, request: CreateMockExamListeningRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/listening`, request, idempotent(key));
+  createTenantListening(templateId: number, versionId: number, request: CreateMockExamListeningRequest): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/listening`, request);
   }
 
-  createTenantReading(templateId: number, versionId: number, request: CreateMockExamReadingRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/reading`, request, idempotent(key));
+  createTenantReading(templateId: number, versionId: number, request: CreateMockExamReadingRequest): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/reading`, request);
   }
 
-  createTenantWriting(templateId: number, versionId: number, request: CreateMockExamWritingRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/writing`, request, idempotent(key));
+  createTenantWriting(templateId: number, versionId: number, request: CreateMockExamWritingRequest): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/writing`, request);
   }
 
   private async getMedia(url: string): Promise<Blob> {

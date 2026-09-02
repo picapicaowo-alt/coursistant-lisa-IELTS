@@ -39,7 +39,7 @@ const Settings = lazy(() => import("./pages/settings"));
 const Login = lazy(() => import("@/pages/LoginPage"));
 const Signup = lazy(() => import("./pages/signup/SignUpView"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPasswordPage"));
-const AdminConsolePage = lazy(() => import('./pages/AdminConsolePage'));
+const AdminLandingPage = lazy(() => import('./pages/AdminLandingPage'));
 const CounsellorDashboardPage = lazy(() => import('./pages/CounsellorDashboardPage'));
 const CounsellorIntakesPage = lazy(() => import('./pages/CounsellorIntakesPage'));
 const CounsellorIntakeFormPage = lazy(() => import('./pages/CounsellorIntakeFormPage'));
@@ -146,11 +146,11 @@ const App = () => {
               <Route path="post/:postId" element={<RequireRoleAccess capability="courses"><PostDetail/></RequireRoleAccess>}/>
               <Route path="roster" element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
               <Route path="roster/:courseId" element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
-              <Route path="profile" element={<Profile/>}/>
+              <Route path="profile" element={<RequireRoleAccess capability="selfProfile"><Profile/></RequireRoleAccess>}/>
               <Route path="create/:contentType" element={<RequireRoleAccess capability="courseAuthoring"><CreateContent/></RequireRoleAccess>}/>
               <Route path="aibot" element={<RequireRoleAccess capability="aiWorkspace"><AIBot/></RequireRoleAccess>}/>
               <Route path="settings" element={<Settings/>}/>
-              <Route path="admin" element={<RequireRoleAccess capability="adminConsole"><AdminConsolePage/></RequireRoleAccess>}/>
+              <Route path="admin" element={<RequireRoleAccess capability="adminConsole"><AdminLandingPage/></RequireRoleAccess>}/>
               <Route path="counsellor" element={<RequireAdvisingAccess gate="counsellor"><CounsellorDashboardPage/></RequireAdvisingAccess>}/>
               <Route path="counsellor/intakes" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakesPage/></RequireAdvisingAccess>}/>
               <Route path="counsellor/intakes/new" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>

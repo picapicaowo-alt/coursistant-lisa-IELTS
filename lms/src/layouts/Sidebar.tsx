@@ -139,7 +139,7 @@ const Sidebar: React.FC = () => {
   if (canUseAdminConsole) {
     addItem({
       to: '/admin',
-      label: 'Admin Console',
+      label: isTenantAdminAccount(user) ? 'Governance' : 'Admin Console',
       icon: Settings,
       active: pathname === '/admin' || (pathname.startsWith('/admin/') && !pathname.startsWith('/admin/intakes') && !pathname.startsWith('/admin/students')),
     });
