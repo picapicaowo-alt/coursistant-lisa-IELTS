@@ -59,7 +59,7 @@
     padding: 1.65rem;
     border: 1px solid #c8d7ef;
     border-radius: 1.5rem;
-    background: #fff;
+    background: t.$surface-raised;
     box-shadow: 0 18px 50px rgb(56 81 120 / 0.07);
 }
 
@@ -262,7 +262,7 @@
 .agentMessage {
     border: 1px solid #dce5f3;
     border-bottom-left-radius: 0.25rem;
-    background: #fff;
+    background: t.$surface-raised;
     color: #2f405d;
     white-space: normal;
 }
@@ -271,7 +271,7 @@
     margin-left: auto;
     border-bottom-right-radius: 0.25rem;
     background: #465fe0;
-    color: #fff;
+    color: t.$content-on-color;
 }
 
 .modalBackdrop {
@@ -289,7 +289,7 @@
     padding: 1.4rem;
     border: 1px solid #d9e2f1;
     border-radius: 1.15rem;
-    background: #fff;
+    background: t.$surface-raised;
     box-shadow: 0 24px 70px rgb(20 38 70 / 0.24);
     color: #263650;
 }
@@ -344,10 +344,10 @@
 .modalWarning {
     margin: 0.85rem 0 0;
     padding: 0.75rem 0.85rem;
-    border-left: 3px solid #d69a17;
+    border-inline-start: 2px solid t.$feedback-warning-border;
     border-radius: 0.3rem 0.65rem 0.65rem 0.3rem;
-    background: #fff9e8;
-    color: #624a12;
+    background: t.$feedback-warning-surface;
+    color: t.$feedback-warning;
     font-size: 0.86rem;
     line-height: 1.45;
 }
@@ -373,7 +373,7 @@
         padding: 0.65rem 1rem;
         border: 1px solid #b6c4da;
         border-radius: 0.65rem;
-        background: #fff;
+        background: t.$surface-raised;
         color: #34445d;
         cursor: pointer;
         font: inherit;
@@ -388,7 +388,7 @@
     .allowButton {
         border-color: #465fe0;
         background: #465fe0;
-        color: #fff;
+        color: t.$content-on-color;
     }
 }
 
@@ -401,9 +401,9 @@
     margin-bottom: 0.6rem;
     overflow: hidden;
     flex-direction: row;
-    border: 1px solid #cbd5e0;
+    border: 1px solid t.$border-strong;
     border-radius: 1rem;
-    background: #fff;
+    background: t.$surface-raised;
 
     .workflowMarkdownEditor {
         min-width: 0;
@@ -443,7 +443,7 @@
         border: 0;
         border-radius: 0.7rem;
         background: #465fe0;
-        color: #fff;
+        color: t.$content-on-color;
         cursor: pointer;
         font: inherit;
         font-weight: 600;

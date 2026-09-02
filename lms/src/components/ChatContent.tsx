@@ -15,6 +15,7 @@ import {studySupportEndpoint} from '@/utils/studySupportEndpoint';
 import {buildStudySupportFormData, buildStudySupportStreamBody} from '@/utils/studySupportRequest';
 import {queryStudySupportWithFile, streamStudySupport} from '@/utils/studySupportStream';
 import {safeStudySupportProgress} from '@/utils/studySupportProgress';
+import {isInstructorLevel} from '@/utils/roleCapabilities';
 
 const STUDY_SUPPORT_THINKING_STEPS = [
   {id: 'understand', text: 'Understanding your question.'},
@@ -102,7 +103,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     const relevantCourseIds = selectedCourseId === 0
       ? courses.map(course => Number(course.id))
       : [selectedCourseId];
-    const requiresStudentExamLockdown = user?.level !== 'INSTRUCTOR';
+    const requiresStudentExamLockdown = user ? !isInstructorLevel(user) : true;
     const examLockdown = useAiExamLockdown(
       relevantCourseIds,
       user?.id ?? null,

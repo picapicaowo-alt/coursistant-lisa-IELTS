@@ -4,7 +4,7 @@
     align-items: center;
     gap: 2rem;
     width: 100%;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid t.$border-default;
     padding: 0.5rem 0;
     
     @media (max-width: 768px) {
@@ -16,7 +16,7 @@
 .assignmentTitle {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #2d3748;
+    color: t.$content-primary;
     margin-bottom: 0.75rem;
     word-wrap: break-word;
 }

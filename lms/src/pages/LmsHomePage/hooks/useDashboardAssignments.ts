@@ -2,6 +2,7 @@ import {useQuery} from '@tanstack/react-query';
 import {dashboardApiService} from '@/apis/services/dashboard-api';
 import {SubmissionStatus, TeachingDeadline, UpcomingDeadline} from '@/apis';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
+import {isInstructorLevel} from '@/utils/roleCapabilities';
 
 /**
  * One row of the per-course list widget.
@@ -82,7 +83,7 @@ export interface DashboardAssignmentsResult {
  */
 export const useDashboardAssignments = (): DashboardAssignmentsResult => {
   const {user} = useRequiredAuth();
-  const isInstructor = user.level === 'INSTRUCTOR';
+  const isInstructor = isInstructorLevel(user);
 
   const query = useQuery({
     queryKey: ['dashboard', 'assignments', user.id, isInstructor],

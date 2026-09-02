@@ -1,4 +1,12 @@
 import type {LoginAccountType, LoginResponse, UserLevel} from '@/apis';
+import {
+  canAccessDashboard,
+  isAdvisorAccount,
+  isCounsellorAccount,
+  isParentAccount,
+  isSystemAdminAccount,
+  isTenantAdminAccount,
+} from '@/utils/roleCapabilities';
 
 export const isCounsellorLevel = (level: UserLevel | null | undefined): boolean =>
   level === 'COUNSELLOR';
@@ -21,10 +29,13 @@ export const isTenantAdminRole = (role: LoginAccountType): boolean =>
  * except TENANT_ADMIN which now lands on intake operations.
  */
 export const getSignedInHomePath = (user: Pick<LoginResponse, 'role' | 'level'>): string => {
-  if (user.role === 'TENANT_ADMIN') return '/admin/intakes';
-  if (user.role !== 'USER') return '/course';
-  if (isCounsellorLevel(user.level)) return '/counsellor';
-  if (isAdvisorLevel(user.level)) return '/advisor/students';
-  if (isParentLevel(user.level)) return '/parent';
-  return '/';
+  if (isTenantAdminAccount(user)) return '/admin/intakes';
+  if (isSystemAdminAccount(user)) return '/course';
+  if (isCounsellorAccount(user)) return '/counsellor';
+  if (isAdvisorAccount(user)) return '/advisor/students';
+  if (isParentAccount(user)) return '/parent';
+  if (canAccessDashboard(user)) return '/';
+  // Unknown/legacy account combinations get only the authenticated profile,
+  // never a business route whose first request is guaranteed to be forbidden.
+  return '/profile';
 };

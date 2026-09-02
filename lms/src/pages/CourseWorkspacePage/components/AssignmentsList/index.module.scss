@@ -7,8 +7,8 @@
 }
 
 .hoverBg:hover {
-    background-color: #F7FAFC;
-    border-color: #CBD5E0;
+    background-color: t.$surface-subtle;
+    border-color: t.$border-strong;
 }
 
 .sectionHeaderRow {
@@ -22,13 +22,13 @@
     margin: 0;
     font-size: 0.95rem;
     font-weight: 600;
-    color: #2D3748;
+    color: t.$content-primary;
     letter-spacing: 0.2px;
 }
 
 .lightActionBtn {
     background: #EEF2F8;
-    color: #2D3748;
+    color: t.$content-primary;
     border: 1px solid #D2DAE6;
     font-size: 0.7rem;
     font-weight: 500;
@@ -51,7 +51,7 @@
 }
 
 .dashedPlaceholder {
-    border: 1.5px dashed #CBD5E0;
+    border: 1.5px dashed t.$border-strong;
     border-radius: 12px;
     min-height: 74px;
     display: flex;
@@ -63,7 +63,7 @@
 }
 
 .dashedPlaceholder:hover {
-    border-color: #566FE8;
+    border-color: t.$action-primary;
     background-color: #FAFBFE;
 }
 
@@ -71,7 +71,7 @@
     display: inline-flex;
     align-items: center;
     gap: 0.65rem;
-    color: #718096;
+    color: t.$content-secondary;
     font-size: 0.78rem;
     font-weight: 500;
     user-select: none;
@@ -88,15 +88,15 @@
     font-size: 22px;
     line-height: 1;
     font-weight: 400;
-    color: #566FE8;
-    border: 1px solid #E2E8F0;
+    color: t.$action-primary;
+    border: 1px solid t.$border-default;
     transition: background-color 0.2s;
 }
 
 .dashedPlaceholder:hover .plusCircle {
-    background-color: #566FE8;
+    background-color: t.$action-primary;
     color: white;
-    border-color: #566FE8;
+    border-color: t.$action-primary;
 }
 
 .assignmentsList {

@@ -1,43 +1,38 @@
 import React from "react";
 import {Navigate} from "react-router-dom";
 import styles from "./index.module.scss"
-import {useWidgetLayout} from "@/pages/LmsHomePage/hooks/useWidgetLayout";
 import {Dashboard} from "@/pages/LmsHomePage/components/Dashboard";
 import {useRequiredAuth} from "@/contexts/RequiredAuthContext";
+import {getSignedInHomePath} from '@/utils/signedInHomePath';
 
 const LMSHome: React.FC = () => {
   const {user} = useRequiredAuth();
 
-  if (user.role !== 'USER') {
-    return <Navigate to="/course" replace/>;
-  }
+  const homePath = getSignedInHomePath(user);
+  if (homePath !== '/') return <Navigate to={homePath} replace/>;
 
   return <UserDashboard/>;
 };
 
 const UserDashboard: React.FC = () => {
-  const {
-    containerRef,
-    width,
-    mounted,
-    widgetConfigs,
-    layout,
-    columns,
-  } = useWidgetLayout();
+  const {user} = useRequiredAuth();
   
   return (
-    <main className={styles['lms-home-container']} aria-labelledby="dashboard-title">
-      <h1 id="dashboard-title" className={styles.srOnly}>Dashboard</h1>
-      <Dashboard
-        layout={layout}
-        width={width}
-        columns={columns}
-        mounted={mounted}
-        widgetConfigs={widgetConfigs}
-        containerRef={containerRef}
-      />
-      
-    </main>
+    <section className={styles.dashboardPage} aria-labelledby="dashboard-title">
+      <header className={styles.welcomeHeader}>
+        <img
+          src={user.avatar || '/icons/figma-dashboard/avatar.png'}
+          alt=""
+          onError={event => {
+            event.currentTarget.onerror = null;
+            event.currentTarget.src = '/icons/default_avatar.jpg';
+          }}
+        />
+        <h1 id="dashboard-title">Welcome back, {user.name || 'learner'}!</h1>
+        <img className={styles.wave} src="/icons/figma-dashboard/wave.png" alt=""/>
+      </header>
+      <Dashboard/>
+    </section>
   );
 };
 

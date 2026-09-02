@@ -46,7 +46,7 @@
 .dangerZone { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; border-color: rgba(t.$danger, .35); }
 .dangerZone h2 { color: t.$danger; font-size: t.$fs-card-title; font-weight: t.$fw-bold; }
 .dangerZone p { margin-top: .25rem; color: t.$text-muted; }
-.dangerButton { min-height: 2.5rem; padding: 0 .95rem; border: 1px solid t.$danger; border-radius: t.$radius-control-sm; background: t.$danger; color: #fff; font-weight: t.$fw-semibold; white-space: nowrap; cursor: pointer; }
+.dangerButton { min-height: 2.5rem; padding: 0 .95rem; border: 1px solid t.$danger; border-radius: t.$radius-control-sm; background: t.$danger; color: t.$content-on-color; font-weight: t.$fw-semibold; white-space: nowrap; cursor: pointer; }
 .dangerButton:disabled { cursor: not-allowed; opacity: .5; }
 .dangerActions { display: flex; gap: .6rem; }
 @media (max-width: 700px) { .page { padding-top: 1rem; } .formGrid { grid-template-columns: 1fr; } .full { grid-column: auto; } .card { padding: 1rem; } .cardHeader, .questionList > li { align-items: stretch; flex-direction: column; } .rowActions { flex-wrap: wrap; } .footer .primaryButton { width: 100%; } }

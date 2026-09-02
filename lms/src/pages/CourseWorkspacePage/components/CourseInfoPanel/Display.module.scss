@@ -6,7 +6,7 @@
 }
 
 .headerCard {
-    background: #566FE8;
+    background: t.$action-primary;
     padding: 1.75rem;
     color: white;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -31,7 +31,7 @@
     align-items: center;
     gap: 0.75rem;
     font-size: 0.875rem;
-    color: #CBD5E0;
+    color: t.$border-strong;
     flex-wrap: wrap;
 }
 
@@ -43,13 +43,13 @@
 }
 
 .separator {
-    color: #94A3B8;
+    color: t.$content-placeholder;
 }
 
 .infoSection {
     background: white;
     padding: 1.5rem;
-    border-bottom: 1px solid #E2E8F0;
+    border-bottom: 1px solid t.$border-default;
 }
 
 .sectionTitle {
@@ -76,14 +76,14 @@
 .infoLabel {
     font-size: 0.75rem;
     font-weight: 500;
-    color: #64748B;
+    color: t.$content-secondary;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
 .infoValue {
     font-size: 0.9375rem;
-    color: #334155;
+    color: t.$content-primary;
     font-weight: 400;
 }
 
@@ -133,12 +133,12 @@
 }
 
 .markdownContent pre {
-    background: #F8FAFC;
+    background: t.$surface-subtle;
     padding: 1rem;
     border-radius: 0.5rem;
     overflow-x: auto;
     margin-bottom: 1rem;
-    border: 1px solid #E2E8F0;
+    border: 1px solid t.$border-default;
 }
 
 @media (max-width: 768px) {

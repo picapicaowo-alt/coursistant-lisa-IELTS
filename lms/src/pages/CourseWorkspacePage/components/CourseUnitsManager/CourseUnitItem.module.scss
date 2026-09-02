@@ -10,34 +10,34 @@
     transition: all 0.2s;
     
     &:hover {
-        background: #F8FAFC;
-        border-color: #E2E8F0;
+        background: t.$surface-subtle;
+        border-color: t.$border-default;
         transform: translateY(-1px);
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     }
     
     &.active {
-        background: #F0F7FF;
-        border-color: #566FE8;
-        box-shadow: 0 0 0 1px #566FE8, 0 2px 8px rgba(86, 111, 232, 0.1);
+        background: t.$surface-brand-tint;
+        border-color: t.$action-primary;
+        box-shadow: t.$shadow-selected;
     }
 }
 
 .unitIndex {
     width: 28px;
     height: 28px;
-    background: #EDF2FF;
+    background: t.$surface-brand-subtle;
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #566FE8;
+    color: t.$action-primary;
     flex-shrink: 0;
     
     .active & {
-        background: #566FE8;
+        background: t.$action-primary;
         color: white;
     }
 }
@@ -50,7 +50,7 @@
 .unitTitle {
     font-size: 0.875rem;
     font-weight: 600;
-    color: #2D3748;
+    color: t.$content-primary;
     margin: 0 0 0.125rem 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -63,7 +63,7 @@
 
 .unitDescription {
     font-size: 0.75rem;
-    color: #64748B;
+    color: t.$content-secondary;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;

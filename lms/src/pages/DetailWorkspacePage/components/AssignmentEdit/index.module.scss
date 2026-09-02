@@ -21,16 +21,16 @@
     font-weight: 700;
     padding: 0.75rem 0;
     margin-bottom: 0.5rem;
-    color: #1a202c;
+    color: t.$content-primary;
     background: transparent;
     
     &:focus {
         outline: none;
-        box-shadow: 0 2px 0 0 #566fe8;
+        box-shadow: 0 2px 0 0 t.$action-primary;
     }
     
     &::placeholder {
-        color: #a0aec0;
+        color: t.$content-placeholder;
         font-weight: 600;
     }
 }
@@ -39,14 +39,14 @@
     @include mixins.datetime-input;
     padding: 0.625rem 0.875rem;
     border-radius: 0.5rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid t.$border-default;
     background-color: white;
     font-size: 0.875rem;
     width: 100%;
     max-width: 300px;
     
     &:focus {
-        border-color: #566fe8;
+        border-color: t.$action-primary;
         box-shadow: 0 0 0 3px rgba(86, 111, 232, 0.1);
     }
     
@@ -67,11 +67,11 @@
     max-width: 200px;
     
     &:hover {
-        border-color: #cbd5e0;
+        border-color: t.$border-strong;
     }
     
     &:focus {
-        border-color: #566fe8;
+        border-color: t.$action-primary;
         box-shadow: 0 0 0 3px rgba(86, 111, 232, 0.1);
     }
 }

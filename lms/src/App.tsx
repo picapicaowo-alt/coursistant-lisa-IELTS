@@ -138,19 +138,19 @@ const App = () => {
                 <Route path="course/:courseId/quizzes/:quizId/edit" element={<QuizEditorPage/>}/>
                 <Route path="course/:courseId/quizzes/:quizId/grading" element={<QuizGradingPage/>}/>
                 <Route path="course/:courseId/grades" element={<CourseGradesPage/>}/>
-                <Route path="course/add-content" element={<CourseCreatePage/>}/>
+                <Route path="course/add-content" element={<RequireRoleAccess capability="courseCreation"><CourseCreatePage/></RequireRoleAccess>}/>
               </Route>
-              <Route path="calendar" element={<CalendarPage/>}/>
+              <Route path="calendar" element={<RequireRoleAccess capability="calendar"><CalendarPage/></RequireRoleAccess>}/>
               <Route path="my-operations" element={<RequireRoleAccess capability="myOperations"><MyOperationsPage/></RequireRoleAccess>}/>
-              <Route path="post" element={<Post/>}/>
-              <Route path="post/:postId" element={<PostDetail/>}/>
-              <Route path="roster" element={<Roster/>}/>
-              <Route path="roster/:courseId" element={<Roster/>}/>
+              <Route path="post" element={<RequireRoleAccess capability="courses"><Post/></RequireRoleAccess>}/>
+              <Route path="post/:postId" element={<RequireRoleAccess capability="courses"><PostDetail/></RequireRoleAccess>}/>
+              <Route path="roster" element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
+              <Route path="roster/:courseId" element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
               <Route path="profile" element={<Profile/>}/>
-              <Route path="create/:contentType" element={<CreateContent/>}/>
-              <Route path="aibot" element={<AIBot/>}/>
+              <Route path="create/:contentType" element={<RequireRoleAccess capability="courseAuthoring"><CreateContent/></RequireRoleAccess>}/>
+              <Route path="aibot" element={<RequireRoleAccess capability="aiWorkspace"><AIBot/></RequireRoleAccess>}/>
               <Route path="settings" element={<Settings/>}/>
-              <Route path="admin" element={<AdminConsolePage/>}/>
+              <Route path="admin" element={<RequireRoleAccess capability="adminConsole"><AdminConsolePage/></RequireRoleAccess>}/>
               <Route path="counsellor" element={<RequireAdvisingAccess gate="counsellor"><CounsellorDashboardPage/></RequireAdvisingAccess>}/>
               <Route path="counsellor/intakes" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakesPage/></RequireAdvisingAccess>}/>
               <Route path="counsellor/intakes/new" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>

@@ -1,56 +1,117 @@
-// Emits the design tokens as CSS custom properties on :root.
-//
-// Import this exactly once, from main.tsx. SCSS modules should use the `t.$*`
-// variables instead — they are injected automatically and cost nothing at
-// runtime. These custom properties exist for the places SCSS cannot reach:
-// .tsx inline styles, MUI sx props, and third-party components.
+// Runtime bridge for inline styles, Tailwind arbitrary values, and third-party
+// components. SCSS Modules should consume semantic Sass tokens directly.
 
 @use "tokens" as t;
 
 :root {
-  --xl-page-bg: #{t.$page-bg};
-  --xl-card-bg: #{t.$card-bg};
-  --xl-subcard-bg: #{t.$subcard-bg};
-  --xl-brand: #{t.$brand};
-  --xl-brand-subtle: #{t.$brand-subtle};
-  --xl-text: #{t.$text};
-  --xl-text-muted: #{t.$text-muted};
-  --xl-text-placeholder: #{t.$text-placeholder};
-  --xl-border: #{t.$border};
-  --xl-danger: #{t.$danger};
-  --xl-neutral-fill: #{t.$neutral-fill};
+  color-scheme: light;
 
-  --xl-type-cyan: #{t.$type-cyan};
-  --xl-type-green: #{t.$type-green};
-  --xl-type-orange: #{t.$type-orange};
-  --xl-type-pink: #{t.$type-pink};
-  --xl-type-cyan-subtle: #{t.$type-cyan-subtle};
-  --xl-type-green-subtle: #{t.$type-green-subtle};
-  --xl-type-orange-subtle: #{t.$type-orange-subtle};
-  --xl-type-pink-subtle: #{t.$type-pink-subtle};
+  --xl-surface-page: #{t.$surface-page};
+  --xl-surface-canvas: #{t.$surface-canvas};
+  --xl-surface-raised: #{t.$surface-raised};
+  --xl-surface-subtle: #{t.$surface-subtle};
+  --xl-surface-muted: #{t.$surface-muted};
+  --xl-surface-brand-subtle: #{t.$surface-brand-subtle};
+
+  --xl-content-primary: #{t.$content-primary};
+  --xl-content-secondary: #{t.$content-secondary};
+  --xl-content-placeholder: #{t.$content-placeholder};
+  --xl-content-on-color: #{t.$content-on-color};
+
+  --xl-border-default: #{t.$border-default};
+  --xl-border-strong: #{t.$border-strong};
+  --xl-border-interactive: #{t.$border-interactive};
+
+  --xl-action-primary: #{t.$action-primary};
+  --xl-action-primary-hover: #{t.$action-primary-hover};
+  --xl-action-primary-active: #{t.$action-primary-active};
+  --xl-action-secondary: #{t.$action-secondary};
+  --xl-focus-ring: #{t.$focus-ring};
+
+  --xl-feedback-success: #{t.$feedback-success};
+  --xl-feedback-danger: #{t.$feedback-danger};
+  --xl-feedback-warning: #{t.$feedback-warning};
+  --xl-feedback-info: #{t.$feedback-info};
 
   --xl-font-family: #{t.$font-family};
+  --xl-font-title-1: #{t.$font-size-title-1};
+  --xl-font-title-2: #{t.$font-size-title-2};
+  --xl-font-headline: #{t.$font-size-headline};
+  --xl-font-subhead: #{t.$font-size-subhead};
+  --xl-font-body-lg: #{t.$font-size-body-lg};
+  --xl-font-body: #{t.$font-size-body};
+  --xl-font-caption: #{t.$font-size-caption};
+  --xl-font-micro: #{t.$font-size-micro};
 
-  --xl-fs-hero: #{t.$fs-hero};
-  --xl-fs-h1: #{t.$fs-h1};
-  --xl-fs-doc-title: #{t.$fs-doc-title};
-  --xl-fs-course-name: #{t.$fs-course-name};
-  --xl-fs-modal-title: #{t.$fs-modal-title};
-  --xl-fs-card-title: #{t.$fs-card-title};
-  --xl-fs-item-title: #{t.$fs-item-title};
-  --xl-fs-item-sub: #{t.$fs-item-sub};
-  --xl-fs-label: #{t.$fs-label};
-  --xl-fs-caption: #{t.$fs-caption};
-  --xl-fs-logo: #{t.$fs-logo};
+  --xl-space-1: #{t.$space-1};
+  --xl-space-2: #{t.$space-2};
+  --xl-space-3: #{t.$space-3};
+  --xl-space-4: #{t.$space-4};
+  --xl-space-5: #{t.$space-5};
+  --xl-space-6: #{t.$space-6};
+  --xl-space-8: #{t.$space-8};
+  --xl-space-10: #{t.$space-10};
+  --xl-space-12: #{t.$space-12};
+  --xl-space-16: #{t.$space-16};
 
-  --xl-radius-card: #{t.$radius-card};
-  --xl-radius-card-lg: #{t.$radius-card-lg};
-  --xl-radius-modal: #{t.$radius-modal};
-  --xl-radius-control: #{t.$radius-control};
-  --xl-radius-control-sm: #{t.$radius-control-sm};
-  --xl-radius-pill: #{t.$radius-pill};
+  --xl-shell-sidebar-width: #{t.$shell-sidebar-width};
+  --xl-shell-header-height: #{t.$shell-header-height};
+  --xl-content-max-width: #{t.$content-max-width};
+  --xl-control-sm: #{t.$control-height-sm};
+  --xl-control-md: #{t.$control-height-md};
+  --xl-control-lg: #{t.$control-height-lg};
+  --xl-touch-target: #{t.$touch-target};
 
-  --xl-control-size: #{t.$control-size};
-  --xl-shadow-card: #{t.$shadow-card};
-  --xl-modal-backdrop-blur: #{t.$modal-backdrop-blur};
+  --xl-radius-sm: #{t.$radius-sm};
+  --xl-radius-md: #{t.$radius-md};
+  --xl-radius-lg: #{t.$radius-lg};
+  --xl-radius-round: #{t.$radius-round};
+  --xl-shadow-sm: #{t.$shadow-sm};
+  --xl-shadow-lg: #{t.$shadow-lg};
+  --xl-shadow-popover: #{t.$shadow-popover};
+  --xl-duration-fast: #{t.$duration-fast};
+  --xl-duration-standard: #{t.$duration-standard};
+  --xl-ease-out: #{t.$ease-out};
+
+  --xl-type-cyan: #{t.$type-cyan};
+  --xl-type-cyan-subtle: #{t.$type-cyan-subtle};
+  --xl-type-green: #{t.$type-green};
+  --xl-type-green-subtle: #{t.$type-green-subtle};
+  --xl-type-orange: #{t.$type-orange};
+  --xl-type-orange-subtle: #{t.$type-orange-subtle};
+  --xl-type-pink: #{t.$type-pink};
+  --xl-type-pink-subtle: #{t.$type-pink-subtle};
+
+  // Deprecated runtime aliases. New code uses the roles above.
+  --xl-page-bg: var(--xl-surface-page);
+  --xl-card-bg: var(--xl-surface-raised);
+  --xl-subcard-bg: var(--xl-surface-subtle);
+  --xl-brand: var(--xl-action-primary);
+  --xl-brand-subtle: var(--xl-surface-brand-subtle);
+  --xl-text: var(--xl-content-primary);
+  --xl-text-muted: var(--xl-content-secondary);
+  --xl-text-placeholder: var(--xl-content-placeholder);
+  --xl-border: var(--xl-border-default);
+  --xl-danger: var(--xl-feedback-danger);
+  --xl-neutral-fill: var(--xl-surface-muted);
+  --xl-fs-hero: var(--xl-font-title-1);
+  --xl-fs-h1: var(--xl-font-title-1);
+  --xl-fs-doc-title: var(--xl-font-title-2);
+  --xl-fs-course-name: var(--xl-font-headline);
+  --xl-fs-modal-title: var(--xl-font-headline);
+  --xl-fs-card-title: var(--xl-font-subhead);
+  --xl-fs-item-title: var(--xl-font-body-lg);
+  --xl-fs-item-sub: var(--xl-font-body);
+  --xl-fs-label: var(--xl-font-body);
+  --xl-fs-caption: var(--xl-font-caption);
+  --xl-fs-logo: var(--xl-font-micro);
+  --xl-radius-card: var(--xl-radius-md);
+  --xl-radius-card-lg: var(--xl-radius-lg);
+  --xl-radius-modal: var(--xl-radius-lg);
+  --xl-radius-control: var(--xl-radius-sm);
+  --xl-radius-control-sm: var(--xl-radius-sm);
+  --xl-radius-pill: var(--xl-radius-round);
+  --xl-control-size: var(--xl-touch-target);
+  --xl-shadow-card: var(--xl-shadow-lg);
+  --xl-modal-backdrop-blur: 8px;
 }

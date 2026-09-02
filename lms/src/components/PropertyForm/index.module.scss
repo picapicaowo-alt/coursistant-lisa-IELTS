@@ -5,15 +5,15 @@
 
 .settingsSection.noTransparent {
     padding: 1.5rem;
-    background-color: #f8fafc;
+    background-color: t.$surface-subtle;
     border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid t.$border-default;
 }
 
 .settingsTitle {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #2d3748;
+    color: t.$content-primary;
     margin-bottom: 1.25rem;
 }
 

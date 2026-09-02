@@ -7,7 +7,7 @@
 .eyebrow { margin: 0; color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; text-transform: uppercase; letter-spacing: .08em; }
 .backLink { display: inline-grid; place-items: center; flex: 0 0 t.$control-size; width: t.$control-size; height: t.$control-size; border-radius: t.$radius-control; background: t.$neutral-fill; color: t.$text; }
 .primaryButton, .secondaryButton, .dangerButton, .iconButton { display: inline-flex; min-height: 2.5rem; align-items: center; justify-content: center; gap: .4rem; padding: 0 .85rem; border-radius: t.$radius-control-sm; font-weight: t.$fw-semibold; cursor: pointer; }
-.primaryButton { border: 1px solid t.$brand; background: t.$brand; color: #fff; }
+.primaryButton { border: 1px solid t.$brand; background: t.$brand; color: t.$content-on-color; }
 .secondaryButton, .iconButton { border: 1px solid t.$border; background: t.$card-bg; color: t.$text; }
 .dangerButton { border: 1px solid t.$danger; background: transparent; color: t.$danger; }
 .iconButton { min-width: 2.5rem; padding: 0; }

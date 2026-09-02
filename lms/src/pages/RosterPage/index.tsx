@@ -1,6 +1,8 @@
 import React, {useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, Navigate, useParams} from 'react-router-dom';
 import {CourseRole} from '@/apis';
+import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
+import {useCourseAccess} from '@/hooks/useCourseAccess';
 import {EnrolStudentsPanel} from './EnrolStudentsPanel';
 import {MemberRow} from './MemberRow';
 import {useRoster} from './useRoster';
@@ -9,13 +11,23 @@ import styles from './index.module.scss';
 const ROLE_FILTERS: Array<CourseRole | 'All'> = ['All', 'Instructor', 'TA', 'Student'];
 
 const RosterPage: React.FC = () => {
+  const {courseId: courseIdParam} = useParams();
+  const parsedCourseId = Number(courseIdParam);
+  const requestedCourseId = Number.isInteger(parsedCourseId) && parsedCourseId > 0 ? parsedCourseId : null;
+  const {user} = useRequiredAuth();
+  const access = useCourseAccess(requestedCourseId);
+  const isSystemAdmin = user.role === 'SYSTEM_ADMIN';
+  const canViewRoster = isSystemAdmin || (access.isResolved && access.isInstructor);
   const {
     courseId, members, total, page, pageCount, setPage, filters, setFilters,
     isLoading, isError, isForbidden, refetch, withdraw, promote, demote, updatePermissions, enrol,
-  } = useRoster();
+  } = useRoster({enabled: canViewRoster});
   const [search, setSearch] = useState('');
 
   if (courseId === null) return <p className={styles.status}>Open a course to see its roster.</p>;
+  if (!isSystemAdmin && access.isLoading) return <p className={styles.status} role="status">Checking course access…</p>;
+  if (!isSystemAdmin && access.isError) return <p className={styles.status} role="alert">Course access could not be verified.</p>;
+  if (!canViewRoster) return <Navigate to={access.membership ? `/course/${courseId}` : '/course'} replace/>;
   if (isForbidden) return <p className={styles.status} role="alert">Only the course instructor can view the roster.</p>;
 
   const isBusy = withdraw.isPending || promote.isPending || demote.isPending || updatePermissions.isPending;

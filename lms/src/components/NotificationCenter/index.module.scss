@@ -6,10 +6,10 @@
 .bellButton {
     position: relative;
     display: inline-grid;
-    width: 2.65rem;
-    height: 2.65rem;
+    width: 2.5rem;
+    height: 2.5rem;
     place-items: center;
-    border: 1px solid t.$border;
+    border: 0;
     border-radius: t.$radius-control;
     background: t.$card-bg;
     color: t.$text-muted;
@@ -17,7 +17,6 @@
 
     &:hover,
     &[aria-expanded='true'] {
-        border-color: t.$brand;
         background: t.$brand-subtle;
         color: t.$brand;
     }
@@ -41,10 +40,17 @@
     border: 2px solid t.$card-bg;
     border-radius: t.$radius-pill;
     background: #b42318;
-    color: #fff;
+    color: t.$content-on-color;
     font-size: 0.65rem;
     font-weight: t.$fw-bold;
     line-height: 1;
+}
+
+@media (max-width: 700px) {
+    .bellButton {
+        width: t.$touch-target;
+        height: t.$touch-target;
+    }
 }
 
 .panel {

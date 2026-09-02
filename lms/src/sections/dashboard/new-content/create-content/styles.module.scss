@@ -16,30 +16,30 @@
     flex-direction: row;
     align-items: center;
     gap: 0.1rem;
-    border: 1px solid #CBD5E0;
+    border: 1px solid t.$border-strong;
     border-radius: 0.5rem;
     padding: 0.1rem 0.1rem;
     .submitted {
         font-size: 0.9rem;
         letter-spacing: 0.05em;
-        color: #A0AEC0;
+        color: t.$content-placeholder;
         cursor: pointer; 
         border-radius: 0.5rem;
         padding: 0.1rem 0.5rem;
         transition: background-color 0.3s ease;
         &:hover {
             color: white;
-            background-color: #566FE8;
+            background-color: t.$action-primary;
         }
         &.active {
             color: white;
-            background-color: #566FE8;
+            background-color: t.$action-primary;
         }
     }
     .notSubmitted {
         font-size: 0.9rem;
         letter-spacing: 0.05em;
-        color: #A0AEC0;
+        color: t.$content-placeholder;
         cursor: pointer; 
         border-radius: 0.5rem;
         padding: 0.1rem 0.5rem;
@@ -77,7 +77,7 @@
             p {
                 font-size: 1rem;
                 font-weight: 400;
-                color: #718096;
+                color: t.$content-secondary;
                 letter-spacing: 0;
             }
             
@@ -85,7 +85,7 @@
         .horizontalDivider {
             margin: 0.7rem 0;
             width: 100%;
-            border: 1px dashed #E2E8F0;
+            border: 1px dashed t.$border-default;
         }
         .courseUnitsListContainer {
             display: flex;
@@ -97,15 +97,15 @@
                 gap: 0.7rem;
                 align-items: center;
                 justify-content: space-between;
-                border: 1px solid #CBD5E0;
+                border: 1px solid t.$border-strong;
                 border-radius: 1rem;
                 padding: 1rem;
                 cursor: pointer;
                 &:hover {
-                    border: 1px solid #566FE8;
+                    border: 1px solid t.$action-primary;
                 }
                 &.active {
-                    border: 1px solid #566FE8;
+                    border: 1px solid t.$action-primary;
                 }
                 .courseUnitsItemHeader {
                     display: flex;

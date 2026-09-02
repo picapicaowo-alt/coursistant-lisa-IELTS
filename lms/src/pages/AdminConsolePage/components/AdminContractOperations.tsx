@@ -23,7 +23,12 @@ export const AdminContractOperations: React.FC<{isSystemAdmin: boolean; users: M
     enabled: isSystemAdmin,
     retry: false,
   });
-  const alertRules = useQuery({queryKey: ['tenant', 'alert-rules'], queryFn: async () => unwrapData(await courseOperationsApiService.getTenantAlertRules(), 'tenantAlertRules'), retry: false});
+  const alertRules = useQuery({
+    queryKey: ['tenant', 'alert-rules'],
+    queryFn: async () => unwrapData(await courseOperationsApiService.getTenantAlertRules(), 'tenantAlertRules'),
+    enabled: !isSystemAdmin,
+    retry: false,
+  });
 
   useEffect(() => {
     const record = asRecord(alertRules.data);
@@ -46,12 +51,12 @@ export const AdminContractOperations: React.FC<{isSystemAdmin: boolean; users: M
         <RecordSummaryList value={directory.data} emptyMessage="No administrators match this search."/>
       </section> : null}
 
-      <section className={styles.card}>
+      {!isSystemAdmin ? <section className={styles.card}>
         <h2>Tenant alert rules</h2>
         {alertRules.isPending ? <p className={styles.status}>Loading alert rules…</p> : null}
         {alertRules.isError ? <p className={styles.errorMessage}>Alert rules could not be loaded.</p> : null}
         {alerts.version ? <form className={styles.form} onSubmit={event => { event.preventDefault(); alertMutation.mutate(); }}><label><span>Inactivity days</span><input type="number" min="0" value={alerts.inactivityDays} onChange={event => setAlerts(current => ({...current, inactivityDays: event.target.value}))}/></label><label><span>Grading delay days</span><input type="number" min="0" value={alerts.gradingDelayDays} onChange={event => setAlerts(current => ({...current, gradingDelayDays: event.target.value}))}/></label><label><span>Absence count</span><input type="number" min="0" value={alerts.absenceCount} onChange={event => setAlerts(current => ({...current, absenceCount: event.target.value}))}/></label><label><span>Absence window days</span><input type="number" min="0" value={alerts.absenceWindowDays} onChange={event => setAlerts(current => ({...current, absenceWindowDays: event.target.value}))}/></label><button className={styles.primaryButton} disabled={alertMutation.isPending}>Save alert rules</button></form> : !alertRules.isPending && !alertRules.isError ? <p className={styles.hint}>The backend response did not include the version required for safe updates.</p> : null}
-      </section>
+      </section> : null}
 
       {isSystemAdmin ? <section className={styles.card}>
         <h2>Notification digest</h2><p className={styles.hint}>Run the digest for a selected date. Leave tenant blank for a system-wide run.</p>

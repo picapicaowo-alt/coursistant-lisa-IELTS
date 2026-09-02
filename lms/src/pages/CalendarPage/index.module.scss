@@ -28,7 +28,8 @@
 .dayCell[data-outside='true'] { background: t.$subcard-bg; color: t.$text-placeholder; }
 .dayCell > time { display: inline-grid; width: 1.75rem; height: 1.75rem; place-items: center; border-radius: 50%; font-size: t.$fs-caption; font-weight: t.$fw-semibold; }
 .dayItems { display: grid; gap: .28rem; margin-top: .3rem; }
-.calendarItem { display: grid; min-width: 0; grid-template-columns: auto minmax(0, 1fr); gap: .35rem; padding: .28rem .4rem; border-left: 3px solid var(--course-color); border-radius: .35rem; background: t.$subcard-bg; color: t.$text; font-size: .68rem; text-decoration: none; }
+.calendarItem { position: relative; display: grid; min-width: 0; grid-template-columns: auto minmax(0, 1fr); gap: .35rem; padding: .28rem .4rem .28rem .65rem; border-radius: .35rem; background: t.$subcard-bg; color: t.$text; font-size: .68rem; text-decoration: none; }
+.calendarItem::before, .weekItem::before { position: absolute; inset-block: .25rem; inset-inline-start: 0; width: 3px; border-radius: t.$radius-round; background: var(--course-color); content: ''; }
 .calendarItem:hover, .calendarItem:focus-visible { background: t.$brand-subtle; }
 .calendarItem strong { color: var(--course-color); }
 .calendarItem span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -39,7 +40,7 @@
 .weekDay time { display: grid; gap: .2rem; }
 .weekDay time span, .weekDay > div > p { color: t.$text-muted; font-size: t.$fs-caption; }
 .weekDay > div { display: grid; align-content: start; gap: .5rem; padding: .75rem; }
-.weekItem { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: .75rem; padding: .75rem; border-left: 4px solid var(--course-color); border-radius: t.$radius-control-sm; background: t.$subcard-bg; color: t.$text; text-decoration: none; }
+.weekItem { position: relative; display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: .75rem; padding: .75rem .75rem .75rem 1rem; border-radius: t.$radius-control-sm; background: t.$subcard-bg; color: t.$text; text-decoration: none; }
 .weekItem:hover, .weekItem:focus-visible { background: t.$brand-subtle; }
 .itemTime { color: var(--course-color); font-size: t.$fs-caption; font-weight: t.$fw-semibold; }
 .itemBody { display: grid; gap: .25rem; }

@@ -5,7 +5,7 @@
 .eyebrow { color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
 .tabs { display: flex; max-width: 82rem; margin: 0 auto 1rem; gap: .35rem; padding: .35rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
 .tabs button { min-height: 2.5rem; padding: 0 1rem; border-radius: t.$radius-control-sm; color: t.$text-muted; font-weight: t.$fw-semibold; cursor: pointer; }
-.tabs .activeTab { background: t.$brand; color: #fff; }
+.tabs .activeTab { background: t.$brand; color: t.$content-on-color; }
 .contentGrid { display: grid; max-width: 82rem; margin: 0 auto; grid-template-columns: minmax(18rem, 25rem) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
 .card { padding: 1.35rem; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; box-shadow: t.$shadow-card; }
 .card h2 { font-size: t.$fs-card-title; font-weight: t.$fw-bold; }
@@ -18,9 +18,9 @@
 .form textarea { min-height: 6rem; resize: vertical; font: inherit; }
 .form input:focus-visible, .form select:focus-visible, .form textarea:focus-visible, .inlineForm input:focus-visible, .inlineForm select:focus-visible, .search input:focus-visible, .search select:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
 .primaryButton, .secondaryButton, .dangerButton { min-height: 2.5rem; padding: 0 .9rem; border-radius: t.$radius-control-sm; font-weight: t.$fw-semibold; cursor: pointer; }
-.primaryButton { border: 1px solid t.$brand; background: t.$brand; color: #fff; }
+.primaryButton { border: 1px solid t.$brand; background: t.$brand; color: t.$content-on-color; }
 .secondaryButton { border: 1px solid t.$border; background: t.$card-bg; color: t.$text; }
-.dangerButton { border: 1px solid t.$danger; background: t.$danger; color: #fff; }
+.dangerButton { border: 1px solid t.$danger; background: t.$danger; color: t.$content-on-color; }
 .primaryButton:disabled, .secondaryButton:disabled, .dangerButton:disabled, .dangerLink:disabled { cursor: not-allowed; opacity: .5; }
 .dangerLink { justify-self: start; color: t.$danger; font-size: t.$fs-caption; cursor: pointer; }
 .hint { margin-top: .85rem; color: t.$text-muted; font-size: t.$fs-caption; line-height: 1.5; }

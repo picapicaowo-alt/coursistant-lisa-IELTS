@@ -5,7 +5,7 @@
   padding: 14px;
   border: 1px solid #dfe3f1;
   border-radius: 16px;
-  background: #fff;
+  background: t.$surface-raised;
   box-shadow: 0 18px 48px rgba(37, 40, 74, 0.18), 0 3px 12px rgba(37, 40, 74, 0.1);
   color: #161b2e;
   font-family: inherit;
@@ -107,7 +107,7 @@
 .days .selectedDay:hover,
 .days .selectedDay:focus-visible {
   background: #5750e8;
-  color: #fff;
+  color: t.$content-on-color;
 }
 
 .days button[aria-current='date']:not(.selectedDay) {
@@ -153,7 +153,7 @@
   border: 1px solid #dfe3f1;
   border-radius: 9px;
   outline: none;
-  background: #fff;
+  background: t.$surface-raised;
   color: #171c2f;
   font: inherit;
   font-size: 13px;
@@ -202,13 +202,13 @@
 
 .cancelButton {
   border-color: #dfe3f1;
-  background: #fff;
+  background: t.$surface-raised;
 }
 
 .applyButton {
   border: 1px solid #5750e8;
   background: #5750e8;
-  color: #fff;
+  color: t.$content-on-color;
 }
 
 .textButton:hover,

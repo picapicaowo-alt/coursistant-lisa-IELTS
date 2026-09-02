@@ -60,7 +60,7 @@
   cursor: pointer;
 }
 
-.tabs .active { background: t.$brand; color: #fff; }
+.tabs .active { background: t.$brand; color: t.$content-on-color; }
 .tabs button:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
 
 .grid {

@@ -5,15 +5,15 @@
     justify-content: space-between;
     padding: 1.25rem 1.5rem;
     background: white;
-    border-bottom: 1px solid #E2E8F0;
+    border-bottom: 1px solid t.$border-default;
     z-index: 10;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .backButton {
     cursor: pointer;
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
+    background: t.$surface-subtle;
+    border: 1px solid t.$border-default;
     border-radius: 0.75rem;
     padding: 0.625rem;
     display: flex;
@@ -23,7 +23,7 @@
     
     &:hover {
         background: #F1F5F9;
-        border-color: #CBD5E0;
+        border-color: t.$border-strong;
     }
     
     svg {
@@ -43,32 +43,32 @@
     transition: all 0.3s;
     
     &:hover {
-        background: #F8FAFC;
+        background: t.$surface-subtle;
     }
 }
 
 .courseTitle {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #2D3748;
+    color: t.$content-primary;
     max-width: 400px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     
     &.placeholderTitle {
-        color: #94A3B8;
+        color: t.$content-placeholder;
         font-style: italic;
     }
 }
 
 .titleArrow {
-    color: #94A3B8;
+    color: t.$content-placeholder;
     opacity: 0.6;
     transition: transform 0.3s;
     
     .titleContainer:hover & {
-        color: #64748B;
+        color: t.$content-secondary;
     }
 }
 
@@ -81,7 +81,7 @@
 .cancelButton {
     cursor: pointer;
     background: white;
-    border: 1px solid #E2E8F0;
+    border: 1px solid t.$border-default;
     border-radius: 0.75rem;
     padding: 0.625rem 1.25rem;
     font-size: 0.875rem;
@@ -90,16 +90,16 @@
     transition: all 0.3s;
     
     &:hover {
-        background: #F8FAFC;
-        border-color: #CBD5E0;
-        color: #2D3748;
+        background: t.$surface-subtle;
+        border-color: t.$border-strong;
+        color: t.$content-primary;
     }
 }
 
 .publishButton {
     cursor: pointer;
-    background: #566FE8;
-    border: 1px solid #566FE8;
+    background: t.$action-primary;
+    border: 1px solid t.$action-primary;
     border-radius: 0.75rem;
     padding: 0.625rem 1.5rem;
     font-size: 0.875rem;

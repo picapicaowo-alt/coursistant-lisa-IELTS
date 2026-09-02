@@ -163,7 +163,7 @@ a:focus-visible {
 .primary {
   border: 1px solid t.$brand;
   background: t.$brand;
-  color: #fff;
+  color: t.$content-on-color;
 }
 
 .secondary {
@@ -186,7 +186,7 @@ a:focus-visible {
 .danger {
   border: 1px solid t.$danger;
   background: t.$danger;
-  color: #fff;
+  color: t.$content-on-color;
 }
 
 .primary:disabled,
@@ -248,7 +248,7 @@ a:focus-visible {
 
 .tabActive {
   background: t.$brand;
-  color: #fff;
+  color: t.$content-on-color;
 }
 
 .badge {
@@ -676,7 +676,7 @@ a:focus-visible {
   display: grid;
   gap: .2rem;
   padding: .8rem;
-  border-left: 3px solid t.$brand;
+  border-inline-start: 2px solid t.$brand;
   border-radius: t.$radius-control-sm;
   background: t.$brand-subtle;
 }
@@ -693,7 +693,7 @@ a:focus-visible {
   gap: .65rem;
   margin-top: 1rem;
   padding: 1rem;
-  border-left: 3px solid t.$brand;
+  border-inline-start: 2px solid t.$brand;
   border-radius: t.$radius-control;
   background: t.$subcard-bg;
 }

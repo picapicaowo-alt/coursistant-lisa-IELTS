@@ -1,5 +1,5 @@
-import React, {useMemo, useState} from "react";
-import {Link} from "react-router-dom";
+import React, {useMemo, useState} from 'react';
+import {Link} from 'react-router-dom';
 import {
   addDays,
   addMonths,
@@ -11,205 +11,101 @@ import {
   startOfMonth,
   startOfWeek,
   subMonths,
-} from "date-fns";
-import "./LearningScheduleComponent.scss";
-import {useDashboardActivities, ACTIVITY_WINDOW_DAYS} from "@/pages/LmsHomePage/hooks/useDashboardActivities";
-import {UpcomingActivity} from "@/apis";
+} from 'date-fns';
+import {useDashboardActivities, ACTIVITY_WINDOW_DAYS} from '@/pages/LmsHomePage/hooks/useDashboardActivities';
+import './LearningScheduleComponent.scss';
 
-const DATE_KEY = "yyyy-MM-dd";
+const DATE_KEY = 'yyyy-MM-dd';
 
-const ActivityIcon: React.FC<{source: UpcomingActivity["source"]}> = ({source}) => (
-  <svg className="mr-2 ml-1" width="24" height="24" viewBox="0 0 24 24" fill="none"
-       xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-    {source === "CourseEvent" || source === "Event" ? (
-      <>
-        <path d="M7 2V5" stroke="var(--xl-brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M17 2V5" stroke="var(--xl-brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <rect x="3" y="5" width="18" height="16" rx="2" stroke="var(--xl-brand)" strokeWidth="2"
-              strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M8 10H16" stroke="var(--xl-brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      </>
-    ) : (
-      <path
-        d="M10.0495 2.53028L4.02953 6.46028C2.09953 7.72028 2.09953 10.5403 4.02953 11.8003L10.0495 15.7303C11.1295 16.4403 12.9095 16.4403 13.9895 15.7303L19.9795 11.8003C21.8995 10.5403 21.8995 7.73028 19.9795 6.47028L13.9895 2.54028C12.9095 1.82028 11.1295 1.82028 10.0495 2.53028Z"
-        stroke="var(--xl-brand)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    )}
-  </svg>
-);
-
-/**
- * Learning Schedule widget.
- *
- * The Figma design is a month calendar with free navigation, but the API only
- * looks forward and only 30 days at a time. Rather than render an empty grid
- * for months it knows nothing about — which would read as "no classes" — the
- * widget marks the covered range and says plainly where its knowledge stops.
- */
 const LearningScheduleComponent: React.FC = () => {
-  const {activities, coveredFrom, coveredTo, isLoading, isError, refetch} = useDashboardActivities();
-  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const {activities, isLoading, isError, refetch} = useDashboardActivities();
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const byDate = useMemo(() => {
-    const map = new Map<string, UpcomingActivity[]>();
-    activities.forEach((activity) => {
-      const existing = map.get(activity.date);
-      if (existing) {
-        existing.push(activity);
-      } else {
-        map.set(activity.date, [activity]);
-      }
-    });
-    return map;
-  }, [activities]);
+  const activityDates = useMemo(() => new Set(activities.map(activity => activity.date)), [activities]);
+  const upcoming = activities.slice(0, 3);
 
-  const isCovered = (dateKey: string) => dateKey >= coveredFrom && dateKey <= coveredTo;
-
-  const renderCells = () => {
+  const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
     const gridStart = startOfWeek(monthStart, {weekStartsOn: 1});
     const gridEnd = endOfWeek(endOfMonth(monthStart), {weekStartsOn: 1});
-
-    const weeks: React.ReactNode[] = [];
-    let days: React.ReactNode[] = [];
-    let day = gridStart;
-
-    while (day <= gridEnd) {
-      for (let i = 0; i < 7; i++) {
-        const thisDay = day;
-        const dateKey = format(thisDay, DATE_KEY);
-        const isSelected = isSameDay(thisDay, selectedDate);
-        const inMonth = isSameMonth(thisDay, monthStart);
-        const hasActivity = byDate.has(dateKey);
-
-        days.push(
-          <button
-            type="button"
-            key={dateKey}
-            onClick={() => setSelectedDate(thisDay)}
-            aria-label={format(thisDay, "EEEE, MMMM d, yyyy")}
-            aria-pressed={isSelected}
-            className={`ml-1 h-8 w-8 flex items-center justify-center text-sm cursor-pointer relative transition
-              ${isSelected ? "text-white font-semibold rounded-xl" : ""}
-              ${!inMonth ? "opacity-40" : ""}`}
-            style={isSelected ? {backgroundColor: "var(--xl-brand)"} : undefined}
-          >
-            {format(thisDay, "d")}
-            {hasActivity && (
-              <span
-                className="absolute bottom-1 w-1 h-1 rounded-full"
-                style={{backgroundColor: isSelected ? "#FFFFFF" : "var(--xl-brand)"}}
-              />
-            )}
-          </button>
-        );
-        day = addDays(day, 1);
-      }
-      weeks.push(<div key={format(day, DATE_KEY)} className="grid grid-cols-7">{days}</div>);
-      days = [];
-    }
-
-    return <div className="space-y-2">{weeks}</div>;
-  };
-
-  const renderItems = () => {
-    if (isLoading) {
-      return <p className="text-center text-sm">Loading schedule…</p>;
-    }
-
-    if (isError) {
-      return (
-        <div className="text-center text-sm">
-          <p>Couldn&apos;t load your schedule.</p>
-          <button type="button" onClick={refetch} className="text-primary-color underline cursor-pointer mt-1">
-            Retry
-          </button>
-        </div>
-      );
-    }
-
-    const dateKey = format(selectedDate, DATE_KEY);
-
-    // Outside the window the answer is "we don't know", not "nothing". Saying
-    // "No scheduled sessions" here would be a false state.
-    if (!isCovered(dateKey)) {
-      return (
-        <p className="text-center text-sm opacity-70">
-          Only the next {ACTIVITY_WINDOW_DAYS} days are available.
-        </p>
-      );
-    }
-
-    const items = byDate.get(dateKey) ?? [];
-
-    if (items.length === 0) {
-      return <p className="text-center text-sm opacity-70">No scheduled sessions</p>;
-    }
-
-    return items.map((activity) => (
-      <Link
-        className="schedule-item"
-        key={`${activity.source}-${activity.sourceId}-${activity.startTime}`}
-        to={`/course/${activity.courseId}`}
-        aria-label={`Open ${activity.courseCode}: ${activity.title}`}
-      >
-        <ActivityIcon source={activity.source}/>
-        <div className="schedule-item-content">
-          <h3>{activity.title}</h3>
-          <p>
-            {activity.startTime.slice(0, 5)} - {activity.endTime.slice(0, 5)}
-            {activity.location ? ` · ${activity.location}` : ""}
-          </p>
-        </div>
-        <div className="spacer"/>
-        <span className="schedule-item-course">{activity.courseCode}</span>
-        <svg className="schedule-item-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" strokeWidth="2" aria-hidden="true">
-          <path d="m9 18 6-6-6-6"/>
-        </svg>
-      </Link>
-    ));
-  };
+    const days: Date[] = [];
+    for (let day = gridStart; day <= gridEnd; day = addDays(day, 1)) days.push(day);
+    return days;
+  }, [currentMonth]);
 
   return (
-    <div className="learning-schedule-container">
-      <div className="flex justify-between items-center">
-        <h1 className="font-semibold text-[1.2rem] text-primary-color ml-1">Learning Schedule</h1>
-      </div>
-      <div className="horizontal-line"/>
-      <div className="schedule-container">
-        <div className="min-w-[300px] w-1/2 p-3 mx-auto mt-[-0.5rem]">
-          <div className="flex justify-between items-center mb-4 py-1 px-3 rounded-lg border"
-               style={{borderColor: "var(--xl-border)"}}>
-            <button
-              aria-label="Previous month"
-              className="cursor-pointer"
-              onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}
-            >
-              <img src="icons/schedule/arrow-left.png" alt=""/>
-            </button>
-            <h2 className="text-lg font-medium">{format(currentMonth, "MMMM yyyy")}</h2>
-            <button
-              aria-label="Next month"
-              className="cursor-pointer"
-              onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
-            >
-              <img src="icons/schedule/arrow-right.png" alt=""/>
-            </button>
-          </div>
+    <div className="learning-schedule">
+      <header className="learning-schedule__header">
+        <h2>Learning Schedule</h2>
+        <Link to="/calendar" aria-label="Open full calendar">
+          <img src="/icons/figma-dashboard/maximize.svg" alt=""/>
+        </Link>
+      </header>
 
-          <div className="mb-2">
-            <div className="grid grid-cols-7 text-center text-sm">
-              {["M", "T", "W", "T", "F", "S", "S"].map((label, index) => (
-                <div key={index}>{label}</div>
-              ))}
-            </div>
-          </div>
-
-          {renderCells()}
+      <div className="learning-schedule__calendar">
+        <div className="learning-schedule__month">
+          <button type="button" aria-label="Previous month" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+            <img src="/icons/figma-dashboard/arrow-left.svg" alt=""/>
+          </button>
+          <strong>{format(currentMonth, 'MMMM yyyy')}</strong>
+          <button type="button" aria-label="Next month" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+            <img src="/icons/figma-dashboard/arrow-right.svg" alt=""/>
+          </button>
         </div>
-        <div className="horizontal-line"/>
-        <div className="schedule-items">{renderItems()}</div>
+
+        <div className="learning-schedule__weekdays" aria-hidden="true">
+          {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((label, index) => <span key={`${label}-${index}`}>{label}</span>)}
+        </div>
+
+        <div className="learning-schedule__days">
+          {calendarDays.map(day => {
+            const dateKey = format(day, DATE_KEY);
+            const selected = isSameDay(day, selectedDate);
+            const outside = !isSameMonth(day, currentMonth);
+            return (
+              <button
+                type="button"
+                key={dateKey}
+                className={selected ? 'is-selected' : undefined}
+                data-outside={outside || undefined}
+                data-has-activity={activityDates.has(dateKey) || undefined}
+                onClick={() => setSelectedDate(day)}
+                aria-label={format(day, 'EEEE, MMMM d, yyyy')}
+                aria-pressed={selected}
+              >
+                {format(day, 'd')}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="learning-schedule__timeline">
+        {isLoading ? <p className="learning-schedule__status">Loading schedule…</p> : null}
+        {isError ? (
+          <p className="learning-schedule__status" role="alert">
+            Couldn&apos;t load your schedule. <button type="button" onClick={refetch}>Retry</button>
+          </p>
+        ) : null}
+        {!isLoading && !isError && upcoming.length === 0 ? (
+          <p className="learning-schedule__status">No sessions in the next {ACTIVITY_WINDOW_DAYS} days.</p>
+        ) : null}
+        {!isLoading && !isError ? upcoming.map((activity, index) => (
+          <Link
+            to={`/course/${activity.courseId}`}
+            className="learning-schedule__event"
+            key={`${activity.source}-${activity.sourceId}-${activity.startTime}`}
+            aria-label={`Open ${activity.courseCode}: ${activity.title}`}
+          >
+            <i data-muted={index === 2 || undefined}/>
+            <span>
+              <small>{isSameDay(new Date(`${activity.date}T00:00:00`), new Date()) ? 'Today' : format(new Date(`${activity.date}T00:00:00`), 'MMM d, EEE')}</small>
+              <strong>{activity.title}</strong>
+              <em>{activity.startTime.slice(0, 5)} - {activity.endTime.slice(0, 5)}</em>
+            </span>
+          </Link>
+        )) : null}
       </div>
     </div>
   );

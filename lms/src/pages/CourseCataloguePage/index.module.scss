@@ -1,53 +1,55 @@
 .pageContainer {
-    min-height: calc(100vh - 64px);
-    background-color: transparent;
-    padding: 24px;
+    min-height: calc(100dvh - t.$shell-header-height);
+    padding: t.$space-6;
     display: flex;
     justify-content: center;
 }
 
 .contentContainer {
     width: 100%;
-    max-width: 1200px;
+    max-width: 75rem;
 }
 
 .tabsContainer {
     display: flex;
     align-items: center;
-    background: #ffffff;
-    border-radius: 12px;
-    padding: 16px 24px;
-    margin-bottom: 24px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    gap: t.$space-2;
+    padding: t.$space-3;
+    margin-bottom: t.$space-6;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-md;
+    background: t.$surface-raised;
+    box-shadow: t.$shadow-sm;
 }
 
 .tab {
-    padding: 10px 20px;
+    min-height: t.$touch-target;
+    padding: t.$space-2 t.$space-4;
     cursor: pointer;
-    font-size: 16px;
-    font-weight: 500;
-    color: #64748b;
+    font-size: t.$font-size-body;
+    font-weight: t.$fw-medium;
+    color: t.$content-secondary;
     position: relative;
-    transition: all 0.3s ease;
-    border-radius: 8px;
+    transition: color t.$duration-fast t.$ease-out, background-color t.$duration-fast t.$ease-out;
+    border-radius: t.$radius-sm;
     
     &:hover {
-        color: #334155;
-        background-color: #f8fafc;
+        color: t.$content-primary;
+        background-color: t.$surface-subtle;
     }
     
     &.active {
-        color: #566FE8;
+        color: t.$action-primary;
         
         &::after {
             content: "";
             position: absolute;
-            bottom: -10px;
+            bottom: calc(t.$space-2 * -1);
             left: 50%;
             transform: translateX(-50%);
             width: 24px;
             height: 3px;
-            background-color: #566FE8;
+            background-color: t.$action-primary;
             border-radius: 2px;
         }
     }
@@ -62,21 +64,22 @@
 }
 
 .addButton {
-    background-color: #566FE8;
-    color: white;
+    min-height: t.$touch-target;
+    background-color: t.$action-primary;
+    color: t.$content-on-color;
     border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 500;
+    border-radius: t.$radius-sm;
+    padding: t.$space-2 t.$space-4;
+    font-size: t.$font-size-body;
+    font-weight: t.$fw-medium;
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
+    gap: t.$space-2;
+    transition: background-color t.$duration-fast t.$ease-out, transform t.$duration-fast t.$ease-out;
     
     &:hover {
-        background-color: #4a5fd1;
+        background-color: t.$action-primary-hover;
         transform: translateY(-1px);
     }
     
@@ -97,8 +100,8 @@
 .courseGrid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
+    gap: t.$space-6;
+    margin-bottom: t.$space-8;
     
     @media (max-width: 768px) {
         grid-template-columns: 1fr;
@@ -109,28 +112,29 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    gap: t.$space-4;
+    padding: t.$space-5;
+    border: 1px solid t.$border-default;
+    background: t.$surface-raised;
+    border-radius: t.$radius-md;
+    box-shadow: t.$shadow-sm;
 }
 
 .paginationButton {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid #e2e8f0;
-    background: #ffffff;
-    border-radius: 8px;
+    width: t.$touch-target;
+    height: t.$touch-target;
+    border: 1px solid t.$border-default;
+    background: t.$surface-raised;
+    border-radius: t.$radius-sm;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color t.$duration-fast t.$ease-out, background-color t.$duration-fast t.$ease-out;
     
     &:hover:not(:disabled) {
-        border-color: #566FE8;
-        background-color: #f8fafc;
+        border-color: t.$action-primary;
+        background-color: t.$surface-subtle;
     }
     
     &:disabled {
@@ -142,39 +146,63 @@
 .arrowIcon {
     width: 24px;
     height: 24px;
-    fill: #64748b;
+    fill: t.$content-secondary;
     
     .paginationButton:hover:not(:disabled) & {
-        fill: #566FE8;
+        fill: t.$action-primary;
     }
 }
 
 .pageNumbers {
     display: flex;
-    gap: 8px;
+    gap: t.$space-2;
 }
 
 .pageButton {
-    width: 40px;
-    height: 40px;
-    border: 1px solid #e2e8f0;
-    background: #ffffff;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #64748b;
+    width: t.$touch-target;
+    height: t.$touch-target;
+    border: 1px solid t.$border-default;
+    background: t.$surface-raised;
+    border-radius: t.$radius-sm;
+    font-size: t.$font-size-body;
+    font-weight: t.$fw-medium;
+    color: t.$content-secondary;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: border-color t.$duration-fast t.$ease-out, color t.$duration-fast t.$ease-out, background-color t.$duration-fast t.$ease-out;
     
     &:hover {
-        border-color: #566FE8;
-        color: #566FE8;
+        border-color: t.$action-primary;
+        color: t.$action-primary;
     }
     
     &.active {
-        background-color: #566FE8;
-        border-color: #566FE8;
-        color: #ffffff;
+        background-color: t.$action-primary;
+        border-color: t.$action-primary;
+        color: t.$content-on-color;
+    }
+}
+
+@media (max-width: 768px) {
+    .pageContainer {
+        padding: t.$space-4;
+    }
+
+    .tabsContainer {
+        align-items: stretch;
+        overflow-x: auto;
+    }
+
+    .tab {
+        flex: 0 0 auto;
+    }
+
+    .tabSpacer {
+        min-width: t.$space-2;
+    }
+
+    .paginationContainer {
+        gap: t.$space-2;
+        padding: t.$space-3;
     }
 }
 .emptyState {

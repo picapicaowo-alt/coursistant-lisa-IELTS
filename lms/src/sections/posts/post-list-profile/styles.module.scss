@@ -16,12 +16,12 @@
         margin: 2rem auto;
         padding: 0 1rem;
         .postItem {
-            background-color: #FFFFFF;
+            background-color: t.$content-on-color;
             display: flex;
             flex-direction: column;
             gap: 1rem;
             border-radius: 1rem;
-            border: 1px solid #E2E8F0;
+            border: 1px solid t.$border-default;
             padding: 1.5rem 1.5rem 1rem 1.5rem;
             .postItemContent {
                 display: flex;
@@ -38,7 +38,7 @@
                     p {
                         margin-left: 0.5rem;
                         font-size: 0.8rem;
-                        color: #A0AEC0;
+                        color: t.$content-placeholder;
                     }
                     .spacer {
                         flex: 1;
@@ -53,7 +53,7 @@
                         width: 50px;
                         height: 50px;
                         border-radius: 50%;
-                        border: 1px solid #E2E8F0;
+                        border: 1px solid t.$border-default;
                     }
                     .courseHeaderInstructor {
                         margin-left: 1rem;
@@ -61,11 +61,11 @@
                             font-size: 1rem;
                             font-weight: 400;
                             margin: 0;
-                            color: #2D3748;
+                            color: t.$content-primary;
                         }
                         p {
                             font-size: 0.95rem;
-                            color: #718096;
+                            color: t.$content-secondary;
                             margin: 0;
                         }
                     }
@@ -83,7 +83,7 @@
                     flex-direction: row;
                     p {
                         font-size: 1.1rem;
-                        color: #718096;
+                        color: t.$content-secondary;
                     }
                 }
             }
@@ -101,12 +101,12 @@
                             flex-direction: row;
                             gap: 0.2rem;
                             align-items: center;
-                            color: #A0AEC0;
+                            color: t.$content-placeholder;
                             img {
                                 cursor: pointer;
                             }   
                             .message {
-                                color: #566FE8;
+                                color: t.$action-primary;
                             }
                         }
                         
@@ -115,7 +115,7 @@
                     flex: 1;
                 }
                 a {
-                    color: #566FE8;
+                    color: t.$action-primary;
                     text-decoration: none;
                     margin-left: 0.5rem;
                     cursor: pointer;

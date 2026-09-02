@@ -7,7 +7,7 @@ type TestIdentity = {
   name: string;
   username: string;
   role: 'USER' | 'TENANT_ADMIN';
-  level: 'STUDENT' | 'ADVISOR' | 'INSTRUCTOR' | 'PARENT' | null;
+  level: 'STUDENT' | 'ADVISOR' | 'INSTRUCTOR' | 'PARENT' | 'NOT_APPLICABLE' | null;
   avatar: null;
   accessToken: string;
 };
@@ -71,15 +71,34 @@ test('student can enter both learning products but not advisor operations', asyn
   await page.goto('/mock-exams');
   await expect(page.getByRole('heading', {name: 'Choose a paper. Enter exam mode.'})).toBeVisible();
   await expect(page.getByRole('link', {name: /Listening/})).toHaveAttribute('href', '/mock-exams/71/listening');
-  await expect(page.getByRole('link', {name: 'Mock exams'})).toBeVisible();
+  await expect(page.getByRole('link', {name: 'Exams'})).toBeVisible();
 
   await page.goto('/vocabulary');
   await expect(page.getByRole('heading', {name: 'Vocabulary'})).toBeVisible();
   await expect(page.getByRole('link', {name: /Academic Foundations/})).toBeVisible();
-  await expect(page.getByRole('link', {name: 'Vocabulary', exact: true})).toBeVisible();
 
   await page.goto('/advisor/operations');
   await expect(page).toHaveURL(/\/$/);
+});
+
+test('dashboard quick prompt hands structured context to Study Support', async ({page}) => {
+  await installIdentity(page, identity('STUDENT'));
+  await page.goto('/');
+  await page.evaluate(() => {
+    const originalSetItem = Storage.prototype.setItem;
+    Storage.prototype.setItem = function (key, value) {
+      if (key === 'pendingChat') {
+        (window as Window & {capturedPendingChat?: string}).capturedPendingChat = value;
+      }
+      originalSetItem.call(this, key, value);
+    };
+  });
+
+  await page.getByRole('button', {name: 'Explain a concept'}).click();
+  await expect(page).toHaveURL('/aibot');
+
+  const pendingChat = await page.evaluate(() => (window as Window & {capturedPendingChat?: string}).capturedPendingChat);
+  expect(JSON.parse(pendingChat ?? '{}')).toEqual({text: 'Explain a concept', courseId: 0});
 });
 
 test('advisor can assign a published mock exam and cannot enter Vocabulary', async ({page}) => {
@@ -124,4 +143,27 @@ test('non-student roles remain outside Vocabulary and parent stays outside stand
 
   await page.goto('/mock-exams');
   await expect(page).toHaveURL(/\/parent$/);
+});
+
+test('tenant admin never sees or requests the system course catalogue', async ({page}) => {
+  await installIdentity(page, identity('NOT_APPLICABLE', {
+    id: 904,
+    userId: 904,
+    role: 'TENANT_ADMIN',
+  }));
+  let courseCatalogueRequests = 0;
+  await page.route('**/v2/courses**', route => {
+    courseCatalogueRequests += 1;
+    return route.fulfill({status: 403, json: {code: 'ACCESS_DENIED'}});
+  });
+  await page.route('**/v2/tenant/student-intakes**', route => route.fulfill({
+    json: response({items: [], page: 0, size: 20, total: 0}),
+  }));
+
+  await page.goto('/admin/intakes');
+  await expect(page.getByRole('link', {name: 'Courses'})).toHaveCount(0);
+
+  await page.goto('/course');
+  await expect(page).toHaveURL(/\/admin\/intakes$/);
+  await expect.poll(() => courseCatalogueRequests).toBe(0);
 });

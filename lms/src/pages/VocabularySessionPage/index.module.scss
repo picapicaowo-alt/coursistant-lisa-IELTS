@@ -3,7 +3,7 @@
 .exitButton {width: fit-content; min-height: 2.6rem; padding: 0 0.8rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; color: t.$text-muted; display: inline-flex; align-items: center; gap: 0.4rem; font-weight: t.$fw-semibold; cursor: pointer;}
 .sessionMeta {text-align: center; span, strong {display: block;} span {color: t.$text-muted; font-size: t.$fs-caption;} strong {margin-top: 0.15rem; font-size: t.$fs-label;}}
 .position {justify-self: end; color: t.$text-muted; font-size: t.$fs-caption; font-variant-numeric: tabular-nums;}
-.progressBar {height: 0.35rem; margin-top: 1rem; border-radius: t.$radius-pill; background: t.$neutral-fill; overflow: hidden; span {display: block; height: 100%; border-radius: inherit; background: t.$brand; transition: width 180ms ease;}}
+.progressBar {height: 0.35rem; margin-top: 1rem; border-radius: t.$radius-pill; background: t.$neutral-fill; overflow: hidden; span {display: block; height: 100%; border-radius: inherit; background: t.$brand;}}
 .modeGuidance {margin: 0.75rem auto 0; color: t.$text-muted; text-align: center; font-size: t.$fs-caption; font-weight: t.$fw-semibold;}
 .studyCard {
   width: min(100%, 54rem);
@@ -27,7 +27,7 @@
 .answer {padding: clamp(1.5rem, 4vw, 3rem); display: flex; flex-direction: column; justify-content: center;}
 .pronunciation {display: flex; flex-wrap: wrap; align-items: center; gap: 0.65rem 1rem; color: t.$text-muted; font-size: t.$fs-caption; span {display: inline-flex; align-items: center; gap: 0.35rem;} small {color: t.$brand; font-weight: t.$fw-bold;} button {width: 2.35rem; height: 2.35rem; border: 0; border-radius: 50%; background: t.$brand-subtle; color: t.$brand; display: grid; place-content: center;}}
 .meaning {margin: 1.4rem 0; strong, span {display: block;} strong {font-size: clamp(1.7rem, 4vw, 2.6rem); letter-spacing: -0.03em;} span {margin-top: 0.35rem; color: t.$text-muted;}}
-.answer blockquote {margin: 0; padding: 1rem 1.1rem; border-left: 3px solid t.$brand; border-radius: 0 t.$radius-control t.$radius-control 0; background: t.$subcard-bg; p {margin: 0; font-size: 1rem; line-height: 1.55;} footer {margin-top: 0.45rem; color: t.$text-muted; font-size: t.$fs-caption;}}
+.answer blockquote {margin: 0; padding: 1rem 1.1rem; border-inline-start: 2px solid t.$brand; border-radius: 0 t.$radius-control t.$radius-control 0; background: t.$subcard-bg; p {margin: 0; font-size: 1rem; line-height: 1.55;} footer {margin-top: 0.45rem; color: t.$text-muted; font-size: t.$fs-caption;}}
 .controls {width: min(100%, 54rem); margin: auto auto 0;}
 .ratingPanel {display: grid; gap: 0.55rem;}
 .ratingInstruction {margin: 0; color: t.$text-muted; text-align: center; font-size: t.$fs-caption;}

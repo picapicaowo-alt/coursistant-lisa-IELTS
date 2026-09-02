@@ -1,98 +1,228 @@
-// Design tokens — see docs/design-spec.md section 1.
+// X-Learn design tokens.
 //
-// This file is the single source of truth for color, type and shape.
-// SCSS modules get it injected automatically via additionalData in
-// vite.config.ts, so use `t.$brand` directly (no @use needed).
-// For .tsx inline styles and MUI, use the CSS custom properties that
-// tokens.global.scss emits on :root, e.g. var(--xl-brand).
+// Architecture:
+//   1. Palette tokens describe Figma primitives and are never consumed by pages.
+//   2. Semantic tokens describe purpose and are the default implementation API.
+//   3. Compatibility aliases keep existing modules compiling while they migrate.
 //
-// Never hardcode a color. If a color is missing, add it here first.
+// Figma source: x-learning / page 0:1 / styles extracted 2026-09-01.
+// Do not add raw colors to page or component styles. Add a semantic role here.
 
-// ---------------------------------------------------------------- Color
+// ---------------------------------------------------------------- Primitives
 
-$page-bg: #F1F3F8; // Every screen. Cards float as white on top of this.
-$card-bg: #FFFFFF; // Widgets, course cards, modals
-$subcard-bg: #F5F6FA; // Inner blocks, disabled inputs, dashed placeholders
-$brand: #4F46E5; // Publish/Create/Send buttons, active sidebar, selected date, links
-$brand-subtle: #E7E5FD; // Active sidebar item background
-$exam-navy-deep: #1F3350; // Candidate workspace chrome and mock-exam mastheads
+$white: #FFFFFF;
+$slate-25: #F8FAFC;
+$slate-50: #F3F4F8;
+$slate-100: #EDF2F7;
+$slate-200: #E2E8F0;
+$slate-300: #CBD5E0;
+$slate-400: #A0AEC0;
+$slate-500: #718096;
+$slate-700: #2D3748;
+
+$violet-50: #EBE9FF;
+$violet-100: #EBF4FF;
+$violet-200: #C3DAFE;
+$violet-400: #7F9CF5;
+$violet-600: #566FE8;
+$violet-700: #4835EB;
+$violet-800: #3A4FBF;
+$violet-900: #2A3A8F;
+
+$green-500: #48BB78;
+$green-700: #276749;
+$red-500: #F56565;
+$red-700: #C53030;
+$orange-500: #ED8936;
+$orange-800: #9C4221;
+$blue-500: #4299E1;
+$blue-700: #2B6CB0;
+
+// ---------------------------------------------------------------- Semantic color
+
+$surface-page: $white;
+$surface-canvas: $white;
+$surface-raised: $white;
+$surface-subtle: $slate-25;
+$surface-muted: $slate-100;
+$surface-brand-subtle: #E6E3FF;
+$surface-navigation: #F9F9F9;
+$surface-dashboard-card: #F3F4F8;
+$surface-assistant-start: #F6F9FF;
+$surface-assistant-end: #F1EFFF;
+
+$content-ink: #161616;
+$content-primary: $slate-700;
+$content-secondary: #5D6B7C;
+$content-placeholder: #667085;
+$content-on-color: $white;
+
+$border-default: $slate-200;
+$border-strong: $slate-300;
+$border-interactive: $violet-400;
+$border-dashboard: $border-default;
+
+$action-primary: $violet-700;
+$action-primary-hover: $violet-800;
+$action-primary-active: $violet-900;
+$action-secondary: $violet-400;
+$focus-ring: rgba($violet-700, 0.24);
+
+$feedback-success: $green-700;
+$feedback-danger: $red-700;
+$feedback-warning: $orange-800;
+$feedback-info: $blue-700;
+$feedback-warning-surface: rgba($orange-500, .1);
+$feedback-warning-border: $orange-500;
+
+// Content-category colors are data encodings, not action colors.
+$type-cyan: #22CCEE;
+$type-cyan-subtle: #E3F9FF;
+$type-mint: #2FB88F;
+$type-mint-subtle: #CEEDE0;
+$type-green: #1BC033;
+$type-green-subtle: #C3EDC3;
+$type-yellow: #FFE600;
+$type-yellow-subtle: #FAF16C;
+$type-orange: #F27316;
+$type-orange-subtle: #FCC5A9;
+$type-pink: #F63D68;
+$type-pink-subtle: #FFBBC2;
+$type-fuchsia: #AE55E2;
+$type-fuchsia-subtle: #EECAFF;
+$type-indigo: #0000FF;
+$type-indigo-subtle: #D5E9FF;
+
+// Product-surface roles used across workspaces.
+$surface-toolbar: #F1F5F9;
+$surface-brand-tint: #F0F7FF;
+$surface-profile-accent: #67D8CB;
+$border-chart: #E8EDF5;
+
+// ---------------------------------------------------------------- Typography
+
+// HarmonyOS Sans TC is the Figma face. The checked-in app does not ship the
+// font binary, so the stack falls back to Inter and native UI sans fonts.
+$font-family: 'HarmonyOS Sans TC', 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+$font-size-title-1: 2rem;
+$font-size-title-2: 1.75rem;
+$font-size-headline: 1.375rem;
+$font-size-subhead: 1.125rem;
+$font-size-body-lg: 1rem;
+$font-size-body: .875rem;
+$font-size-caption: .75rem;
+$font-size-micro: .625rem;
+
+$line-height-title-1: 2.5rem;
+$line-height-title-2: 2.25rem;
+$line-height-headline: 1.75rem;
+$line-height-subhead: 1.5rem;
+$line-height-body: 1.25rem;
+$line-height-caption: 1rem;
+$line-height-micro: .875rem;
+
+$fw-bold: 700;
+$fw-semibold: 600;
+$fw-medium: 500;
+$fw-regular: 400;
+
+// ---------------------------------------------------------------- Spacing and layout
+
+$space-1: .25rem;
+$space-2: .5rem;
+$space-3: .75rem;
+$space-4: 1rem;
+$space-5: 1.25rem;
+$space-6: 1.5rem;
+$space-8: 2rem;
+$space-10: 2.5rem;
+$space-12: 3rem;
+$space-16: 4rem;
+
+$shell-sidebar-width: 11.25rem;
+$shell-header-height: 5.5rem;
+$content-max-width: 100rem;
+$control-height-sm: 2.25rem;
+$control-height-md: 2.75rem;
+$control-height-lg: 3.125rem;
+$touch-target: 2.75rem;
+
+// ---------------------------------------------------------------- Shape, elevation, motion
+
+$radius-xs: .3125rem;
+$radius-sm: .625rem;
+$radius-md: .9375rem;
+$radius-lg: 1.25rem;
+$radius-round: 9999px;
+
+$shadow-sm: 0 1px 2px rgba(0, 0, 0, .06), 0 1px 3px rgba(0, 0, 0, .10);
+$shadow-lg: 0 4px 6px -2px rgba(0, 0, 0, .05), 0 10px 15px -3px rgba(0, 0, 0, .05);
+$shadow-popover: 0 12px 32px rgba($slate-700, .14);
+$shadow-selected: 0 0 0 1px $action-primary, 0 2px 8px rgba($action-primary, .1);
+$shadow-dashboard-card: 0 1px 2px rgba($slate-700, .04);
+
+$duration-fast: 140ms;
+$duration-standard: 200ms;
+$ease-out: cubic-bezier(.16, 1, .3, 1);
+
+// ---------------------------------------------------------------- Compatibility aliases
+// Existing modules use these names. Their values now resolve through the new
+// semantic layer, so the full product moves with the design system.
+
+$page-bg: $surface-page;
+$card-bg: $surface-raised;
+$subcard-bg: $surface-subtle;
+$neutral-fill: $surface-muted;
+$brand: $action-primary;
+$brand-subtle: $surface-brand-subtle;
+$brand-secondary: $action-secondary;
+$brand-light: $violet-200;
+$text: $content-primary;
+$text-muted: $content-secondary;
+$text-placeholder: $content-placeholder;
+$border: $border-default;
+$danger: $feedback-danger;
+$warning: $feedback-warning;
+$success: $feedback-success;
+$info: $feedback-info;
+$success-subtle: rgba($feedback-success, .12);
+$success-border: rgba($feedback-success, .32);
+
+$fs-hero: $font-size-title-1;
+$fs-h1: $font-size-title-1;
+$fs-doc-title: $font-size-title-2;
+$fs-course-name: $font-size-headline;
+$fs-modal-title: $font-size-headline;
+$fs-card-title: $font-size-subhead;
+$fs-item-title: $font-size-body-lg;
+$fs-item-sub: $font-size-body;
+$fs-label: $font-size-body;
+$fs-caption: $font-size-caption;
+$fs-logo: $font-size-micro;
+$fw-extrabold: $fw-bold;
+
+$radius-card: $radius-md;
+$radius-card-lg: $radius-lg;
+$radius-modal: $radius-lg;
+$radius-control: $radius-sm;
+$radius-control-sm: $radius-sm;
+$radius-pill: $radius-round;
+$control-size: $touch-target;
+$shadow-card: $shadow-lg;
+$modal-backdrop-blur: 8px;
+$modal-backdrop: rgba($content-primary, .28);
+
+// Mock-exam workspaces intentionally retain their exam-paper visual family.
+$exam-navy-deep: #1F3350;
 $exam-navy: #2F4A6E;
 $exam-navy-mid: #3D5A7A;
 $exam-accent-soft: #E8EEF6;
 $exam-canvas-top: #E4EBF4;
 $exam-card-wash: #F4F7FB;
 $exam-line: #D8DEE8;
-$exam-index: rgba(#FFFFFF, .34);
-$exam-label: rgba(#FFFFFF, .72);
-$exam-pill-border: rgba(#FFFFFF, .24);
-$exam-pill-bg: rgba(#FFFFFF, .1);
+$exam-index: rgba($white, .34);
+$exam-label: rgba($white, .72);
+$exam-pill-border: rgba($white, .24);
+$exam-pill-bg: rgba($white, .1);
 $exam-link-shadow: rgba(#152033, .1);
-$text: #141A2B; // Headings, values
-$text-muted: #69728A; // Labels, descriptions
-$text-placeholder: #A3AAB8; // "Name your Course", "Enter the name of the course"
-$border: #E4E7EE; // Cards, inputs, dividers
-$danger: #EF4444; // Delete Course, Delete project, delete icons
-$warning: #F97316; // Pending/manual review states
-$neutral-fill: #E9EBF0; // Back button background (sec. 2), selected card (sec. 9)
-
-// Content type colors — used on badges. Saturated fill with white text,
-// not the pale background other badges use.
-// Figma note: "Color automatically generates background color" — picking a
-// color derives a pale background. Derived values live in $type-*-subtle.
-$type-cyan: #22CCEE; // Assignments
-$type-green: #22C55E; // In Class ICE (1)
-$type-orange: #F97316; // In Class ICE (2)
-$type-pink: #F43F5E; // In Class ICE (3)
-
-$type-cyan-subtle: rgba($type-cyan, 0.12);
-$type-green-subtle: rgba($type-green, 0.12);
-$type-orange-subtle: rgba($type-orange, 0.12);
-$type-pink-subtle: rgba($type-pink, 0.12);
-
-// Positive operation/checkpoint feedback.
-$success: $type-green;
-$success-subtle: $type-green-subtle;
-$success-border: rgba($type-green, 0.28);
-
-// Lab Manual / Course Slides / Term Project / Textbook / Course Notes / Others
-// only appear as legend dots and their exact hex values are not readable from
-// the screenshots. Add them here once confirmed in Figma.
-
-// ---------------------------------------------------------------- Typography
-//
-// Plus Jakarta Sans, a geometric sans.
-// Note: this font is not loaded in the project yet, so it currently falls back.
-
-$font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
-
-$fs-hero: 48px; // Sign up h1 (sec. 3)
-$fs-h1: 36px; // Page h1
-$fs-doc-title: 30px; // Document title inside modals, Content page h1
-$fs-course-name: 26px; // Course name on course cards (sec. 5)
-$fs-modal-title: 24px; // Modal title
-$fs-card-title: 22px; // Card title
-$fs-item-title: 20px; // Assignment name (sec. 15)
-$fs-item-sub: 17px; // Week card content title (sec. 6)
-$fs-label: 15px; // Section labels and body text
-$fs-caption: 13px; // Secondary text
-$fs-logo: 11px; // "X – LEARN" (sec. 2)
-
-$fw-extrabold: 800; // h1
-$fw-bold: 700; // Titles
-$fw-semibold: 600; // Section labels
-$fw-regular: 400; // Body
-
-// ---------------------------------------------------------------- Shape
-
-$radius-card: 16px; // Cards and sidebar (spec says 16–18px)
-$radius-card-lg: 18px;
-$radius-modal: 20px;
-$radius-control: 12px; // Buttons, inputs (10–12px), back button
-$radius-control-sm: 10px;
-$radius-pill: 9999px; // Badges
-
-$control-size: 44px; // Back button, avatar
-
-$shadow-card: 0 1px 2px rgba($text, 0.04), 0 4px 16px rgba($text, 0.04); // Very light
-$modal-backdrop-blur: 8px; // Modal backdrop is blurred, not dimmed
-$modal-backdrop: rgba($text, 0.28);

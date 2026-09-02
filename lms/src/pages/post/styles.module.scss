@@ -32,7 +32,7 @@
             background-clip: padding-box, border-box;
             
             p {
-                color: #A0AEC0;
+                color: t.$content-placeholder;
                 margin-left: 0.3rem;
             }
             
@@ -40,7 +40,7 @@
                 display: flex;
                 align-items: center;
                 cursor: pointer;
-                background-color: #566FE8;
+                background-color: t.$action-primary;
                 padding: 0.5rem 0.5rem;
                 border-radius: 1rem;
                 font-size: 0.9rem;

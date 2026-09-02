@@ -1,12 +1,12 @@
 // Variables
 :root {
-  --color-primary: #566fe8;
-  --color-text-primary: #2d3748;
-  --color-text-secondary: #718096;
-  --color-text-disabled: #a0aec0;
-  --color-border: #e2e8f0;
-  --color-background: #fff;
-  --color-background-hover: #f7fafc;
+  --color-primary: t.$action-primary;
+  --color-text-primary: t.$content-primary;
+  --color-text-secondary: t.$content-secondary;
+  --color-text-disabled: t.$content-placeholder;
+  --color-border: t.$border-default;
+  --color-background: t.$surface-raised;
+  --color-background-hover: t.$surface-subtle;
   
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
@@ -17,7 +17,7 @@
   --border-radius: 0.6rem;
   --border-width: 1.5px;
   
-  --font-family: Inter, sans-serif;
+  --font-family: #{t.$font-family};
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
   --font-size-lg: 1.1rem;
@@ -315,7 +315,7 @@
   border: 0;
   border-radius: var(--border-radius);
   background: var(--color-primary);
-  color: #fff;
+  color: t.$content-on-color;
   padding: 0.7rem 1.1rem;
   font-weight: 600;
   cursor: pointer;

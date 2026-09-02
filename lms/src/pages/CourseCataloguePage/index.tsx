@@ -1,5 +1,5 @@
 import React, {Suspense, useState} from "react";
-import {useNavigate} from "react-router-dom";
+import {Navigate, useNavigate} from "react-router-dom";
 import styles from "./index.module.scss";
 import {useTranslation} from "react-i18next";
 import {CoursePreview} from "./components/CoursePreview";
@@ -9,15 +9,25 @@ import {dashboardApiService} from "@/apis/services/dashboard-api";
 import {CourseState, unwrapData} from "@/apis";
 import {useRequiredAuth} from "@/contexts/RequiredAuthContext";
 import {courseApiService} from "@/apis/services/course-api";
-import {canAccessCourseOperations} from '@/utils/roleCapabilities';
+import {
+  canAccessCourseCatalogue,
+  canAccessCourseOperations,
+  canCreateCourses,
+  isAdvisorAccount,
+} from '@/utils/roleCapabilities';
+import {getSignedInHomePath} from '@/utils/signedInHomePath';
 
 const CourseCataloguePage: React.FC = () => {
   const {t} = useTranslation("course");
   const navigate = useNavigate();
   const {user} = useRequiredAuth();
   const isUserAccount = user.role === 'USER';
-  
+  const canCreateCourse = canCreateCourses(user);
   const [courseState, setCourseState] = useState<CourseState>('Active');
+
+  if (!canAccessCourseCatalogue(user)) {
+    return <Navigate to={getSignedInHomePath(user)} replace/>;
+  }
   
   return (
     <div className={styles.pageContainer}>
@@ -42,7 +52,7 @@ const CourseCataloguePage: React.FC = () => {
           
           <div className={styles.tabSpacer}/>
           
-          {user?.level !== "STUDENT" && (
+          {canCreateCourse ? (
             <button
               className={styles.addButton}
               onClick={() => navigate("/course/add-content")}
@@ -52,7 +62,7 @@ const CourseCataloguePage: React.FC = () => {
                 {t("list.newContent")}
               </span>
             </button>
-          )}
+          ) : null}
         </div>
         
         <Suspense fallback={<LoadingOverlay/>}>
@@ -129,7 +139,7 @@ const CoursesList: React.FC<{state: CourseState}> = ({state}) => {
             // enrolment role rather than any of them.
             canManage={!isUserAccount || ('courseRole' in course && (course.courseRole ?? course.role) === 'Instructor')}
             showOperations={canAccessCourseOperations(user, 'courseRole' in course ? course.courseRole ?? course.role : null)}
-            showDelivery={user.level === 'ADVISOR' || user.level === 'INSTRUCTOR_ADVISOR'}
+            showDelivery={isAdvisorAccount(user)}
           />
         ))}
       </div>

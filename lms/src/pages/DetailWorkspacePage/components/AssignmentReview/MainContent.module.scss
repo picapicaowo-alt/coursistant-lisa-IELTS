@@ -19,7 +19,7 @@
 }
 
 .dueTime {
-    color: #64748b;
+    color: t.$content-secondary;
     font-size: 13px;
     display: flex;
     align-items: center;
@@ -45,7 +45,7 @@
 .verticalDivider {
     height: 100%;
     width: 1px;
-    background-color: #e2e8f0;
+    background-color: t.$border-default;
 }
 
 .submissionContent {
@@ -55,10 +55,10 @@
 .noSubmission {
     padding: 48px 24px;
     text-align: center;
-    color: #64748b;
-    background-color: #f8fafc;
+    color: t.$content-secondary;
+    background-color: t.$surface-subtle;
     border-radius: 8px;
-    border: 2px dashed #e2e8f0;
+    border: 2px dashed t.$border-default;
     font-size: 14px;
 }
 

@@ -4,7 +4,7 @@
     align-items: center;
     padding: 1.5rem 0;
     margin-top: 2rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid t.$border-default;
 }
 
 .errorMessage {
@@ -20,17 +20,17 @@
 
 .cancelButton {
     cursor: pointer;
-    background-color: #f7fafc;
-    color: #718096;
+    background-color: t.$surface-subtle;
+    color: t.$content-secondary;
     font-size: 0.875rem;
     font-weight: 500;
     padding: 0.625rem 1.5rem;
     border-radius: 0.75rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid t.$border-default;
     transition: all 0.2s;
     
     &:hover:not(:disabled) {
-        background-color: #e2e8f0;
+        background-color: t.$border-default;
         color: #4a5568;
     }
     
@@ -45,7 +45,7 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
-    background-color: #566fe8;
+    background-color: t.$action-primary;
     cursor: pointer;
     color: white;
     font-size: 0.875rem;
@@ -63,7 +63,7 @@
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        background-color: #a0aec0;
+        background-color: t.$content-placeholder;
     }
 }
 

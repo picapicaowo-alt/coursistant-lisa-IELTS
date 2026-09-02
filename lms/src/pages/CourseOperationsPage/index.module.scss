@@ -10,7 +10,7 @@
 .shortcuts a:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
 .tabs { display: flex; flex-wrap: wrap; gap: .35rem; max-width: 82rem; margin: 0 auto 1rem; padding: .35rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
 .tabs button { min-height: 2.75rem; padding: 0 .9rem; border: 0; border-radius: t.$radius-control-sm; background: transparent; color: t.$text-muted; font-weight: t.$fw-semibold; text-transform: capitalize; cursor: pointer; }
-.tabs .active { background: t.$brand; color: #fff; }
+.tabs .active { background: t.$brand; color: t.$content-on-color; }
 .tabs button:focus-visible, .back:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
 .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; max-width: 82rem; margin: 0 auto; }
 @media (max-width: 800px) { .header { align-items: flex-start; flex-direction: column; } .grid { grid-template-columns: 1fr; } }

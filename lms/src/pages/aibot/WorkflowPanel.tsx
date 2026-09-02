@@ -22,6 +22,7 @@ import MarkdownMessage from '@/components/MarkdownMessage';
 import {RichTextEditor} from '@/components/RichTextEditor';
 import PanelExpandButton from './PanelExpandButton';
 import styles from './index.module.scss';
+import {isInstructorLevel} from '@/utils/roleCapabilities';
 
 const READ_ONLY_QUICK_PROMPTS = [
   'What assignments are due in the next 14 days?',
@@ -39,9 +40,9 @@ const WORKFLOW_THINKING_STEPS = [
   {id: 'response', text: 'Preparing the next step.'},
 ];
 
-const getAgentRole = (level: string | null): AiAgentRole =>
+const getAgentRole = (user: ReturnType<typeof useRequiredAuth>['user']): AiAgentRole =>
   // UI-only. The agent backend must derive authorization from the Bearer token.
-  level === 'INSTRUCTOR' ? 'INSTRUCTOR' : 'STUDENT';
+  isInstructorLevel(user) ? 'INSTRUCTOR' : 'STUDENT';
 
 const getErrorMessage = (error: unknown): string => {
   const code = getApiErrorCode(error);
@@ -64,7 +65,7 @@ const WorkflowPanel = ({
   onToggleExpand = () => undefined,
 }: WorkflowPanelProps) => {
   const {user} = useRequiredAuth();
-  const role = getAgentRole(user.level);
+  const role = getAgentRole(user);
   const canChangeDeadlines = role === 'INSTRUCTOR';
   const quickPrompts = canChangeDeadlines ? INSTRUCTOR_QUICK_PROMPTS : READ_ONLY_QUICK_PROMPTS;
   const nextMessageId = useRef(1);

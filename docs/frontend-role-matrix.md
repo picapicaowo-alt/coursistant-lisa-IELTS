@@ -5,7 +5,7 @@ This matrix controls navigation and route visibility. Backend authorization rema
 | Account / membership | Frontend areas |
 | --- | --- |
 | `SYSTEM_ADMIN` | Courses, Course Operations, legacy system enrolment, Admin Console, cross-tenant Mock Exam read |
-| `TENANT_ADMIN` | Courses, Course Operations, Delivery setup, Intake and Student administration, Admin Console, tenant Mock Exam templates |
+| `TENANT_ADMIN` | Intake and Student administration, Admin Console, tenant Mock Exam templates. Generic Courses and Course Operations stay hidden because `/v2/courses` is not authorized for this account role. |
 | `USER / COUNSELLOR` | Counsellor dashboard and unassigned Intake queue only |
 | `USER / ADVISOR` | Advisor Operations, assigned Students, course search and adjustment, support/report/hour/conversation tools, published Mock Exam templates |
 | `USER / INSTRUCTOR_ADVISOR` | Advisor areas plus Teaching Operations and course areas allowed by the user's course membership |
