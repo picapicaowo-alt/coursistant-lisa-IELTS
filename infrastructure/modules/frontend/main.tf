@@ -169,6 +169,7 @@ resource "aws_s3_bucket" "logs" {
 }
 
 resource "aws_s3_bucket_ownership_controls" "logs" {
+  #checkov:skip=CKV2_AWS_65:CloudFront standard access logging still requires ACL delivery; BucketOwnerPreferred keeps bucket-owner control while permitting the service writer.
   bucket = aws_s3_bucket.logs.id
 
   rule {
@@ -391,6 +392,7 @@ resource "aws_cloudfront_distribution" "this" {
   #checkov:skip=CKV_AWS_310:Single private S3 origin is sufficient for the pilot; origin-group failover is a production enhancement.
   #checkov:skip=CKV_AWS_174:Stage 1 uses CloudFront's default certificate; stage 2 conditionally enforces TLSv1.2_2021 with the issued ACM certificate.
   #checkov:skip=CKV_AWS_374:The product is intentionally global; AWS WAF and rate limiting protect access without a geographic deny list.
+  #checkov:skip=CKV2_AWS_47:The attached Web ACL contains AWSManagedRulesKnownBadInputsRuleSet; Checkov cannot correlate the CloudFront and managed-rule graph edges.
   enabled             = true
   is_ipv6_enabled     = true
   wait_for_deployment = true

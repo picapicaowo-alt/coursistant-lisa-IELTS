@@ -39,6 +39,7 @@ resource "aws_secretsmanager_secret_version" "cache" {
 
 resource "aws_elasticache_replication_group" "this" {
   #checkov:skip=CKV_AWS_31:The cache uses TLS plus auth_token_wo; its ephemeral token is written directly to Secrets Manager and never persisted in Terraform state or plan output.
+  #checkov:skip=CKV2_AWS_50:The 300-person pilot accepts one cache node and no failover; a replica and Multi-AZ are mandatory before production.
   replication_group_id = "${var.name_prefix}-cache"
   description          = "Managed Valkey cache for ${var.name_prefix}"
 
