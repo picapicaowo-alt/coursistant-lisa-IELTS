@@ -37,6 +37,12 @@ describe('ParentApiService', () => {
     );
   });
 
+  it('reads the counsellor parent links so relationships survive a refresh', async () => {
+    client.get.mockResolvedValue({status: 200, data: []});
+    await service.listCounsellorParentLinks(7);
+    expect(client.get).toHaveBeenCalledWith('/v2/counsellor/student-intakes/7/parent-links');
+  });
+
   it('sends parent schedule and conversation writes through their scoped routes', async () => {
     client.post.mockResolvedValue({status: 201, data: {}});
     await service.createScheduleRequest(41, {courseId: 3, occurrenceId: 9, requestType: 'RESCHEDULE'}, 'schedule-1');

@@ -108,6 +108,9 @@ export interface TenantIntakeListParams {
   lifecycleStatus?: IntakeLifecycleStatus;
   assignmentStatus?: IntakeAssignmentStatus;
   advisorUserId?: number;
+  q?: string;
+  intakeId?: number;
+  studentUserId?: number;
 }
 
 export interface ProfileSkillRequest {

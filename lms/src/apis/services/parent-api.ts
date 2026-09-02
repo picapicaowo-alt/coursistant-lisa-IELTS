@@ -33,6 +33,10 @@ export class ParentApiService {
     return this.apiClient.delete(`/v2/counsellor/student-intakes/${intakeId}/parent-links/${parentUserId}`, {data: request, ...idempotent(key)});
   }
 
+  listCounsellorParentLinks(intakeId: number): Promise<ApiResponse<ParentStudentLinkResponse[]>> {
+    return this.apiClient.get(`/v2/counsellor/student-intakes/${intakeId}/parent-links`);
+  }
+
   listTenantParentLinks(studentUserId: number): Promise<ApiResponse<ParentStudentLinkResponse[]>> {
     return this.apiClient.get(`/v2/tenant/students/${studentUserId}/parent-links`);
   }

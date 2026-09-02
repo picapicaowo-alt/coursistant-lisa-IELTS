@@ -4,10 +4,12 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {AdvisorTaskRequest, CheckpointRequest, unwrapData} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
+import {EnglishDateInput} from '@/components/EnglishDateInput';
 import {isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
 
 const emptyTask = (position: number): AdvisorTaskRequest => ({
   title: '',
@@ -159,6 +161,23 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
     }));
   };
 
+  const removeTask = (checkpointIndex: number, taskIndex: number) => {
+    setForm(current => ({
+      ...current,
+      checkpoints: current.checkpoints.map((checkpoint, index) => index !== checkpointIndex ? checkpoint : {
+        ...checkpoint,
+        tasks: (checkpoint.tasks ?? []).filter((_, inner) => inner !== taskIndex).map((task, inner) => ({...task, position: inner + 1})),
+      }),
+    }));
+  };
+
+  const removeCheckpoint = (checkpointIndex: number) => {
+    setForm(current => ({
+      ...current,
+      checkpoints: current.checkpoints.filter((_, index) => index !== checkpointIndex).map((checkpoint, index) => ({...checkpoint, position: index + 1})),
+    }));
+  };
+
   if (planQuery.isPending) return <p className={styles.status}>Loading study plan…</p>;
   if (planQuery.isError && !missing) {
     return <p className={styles.error} role="alert">{advisingErrorMessage(planQuery.error, 'Study plan could not be loaded.')}</p>;
@@ -166,50 +185,83 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
 
   return (
     <section className={styles.card}>
-      <h2>{missing ? 'Create study plan' : `Study plan · version ${planQuery.data?.plan.studyPlanVersion}`}</h2>
+      <WorkspaceSectionHeader
+        title={missing ? 'Create study plan' : 'Study plan'}
+        description="Turn the student's target into a dated strategy, then break it into checkpoints and concrete tasks."
+        meta={!missing ? <span className={styles.versionBadge}>Version {planQuery.data?.plan.studyPlanVersion}</span> : undefined}
+      />
+      {!missing ? <div className={styles.dashboardNotice}><strong>About versions</strong><p>The version increases only after a successful save. It protects this record from conflicting edits; it is not created on every keystroke.</p></div> : null}
       {planQuery.data?.plan.profileChangedSincePlanUpdate ? (
         <p className={styles.warn} role="status">The profile changed after this plan. Saving will require the current profile version.</p>
       ) : null}
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'Study plan could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Study plan saved.</p> : null}
       <form className={styles.form} onSubmit={(event: FormEvent) => { event.preventDefault(); save.mutate(); }}>
-        <label><span>Strategy</span><textarea required value={form.strategySummary} onChange={event => setForm(current => ({...current, strategySummary: event.target.value}))}/></label>
-        <label><span>Start date</span><input required type="date" value={form.startDate} onChange={event => setForm(current => ({...current, startDate: event.target.value}))}/></label>
-        <label><span>End date</span><input required type="date" value={form.planEndDate} onChange={event => setForm(current => ({...current, planEndDate: event.target.value}))}/></label>
-        {form.checkpoints.map((checkpoint, index) => (
-          <fieldset key={checkpoint.position} className={styles.nested}>
-            <legend>Checkpoint {index + 1}</legend>
-            <label><span>Description</span><textarea required value={checkpoint.description} onChange={event => setCheckpoint(index, {description: event.target.value})}/></label>
-            <label><span>Goal</span><textarea required value={checkpoint.goal} onChange={event => setCheckpoint(index, {goal: event.target.value})}/></label>
-            <label><span>Due date</span><input required type="date" value={checkpoint.dueDate} onChange={event => setCheckpoint(index, {dueDate: event.target.value})}/></label>
-            {(checkpoint.tasks ?? []).map((task, taskIndex) => (
-              <fieldset key={task.position} className={styles.nested}>
-                <legend>Task {taskIndex + 1}</legend>
-                <label><span>Title</span><input required={taskIndex === 0} value={task.title} onChange={event => setTask(index, taskIndex, {title: event.target.value})}/></label>
-                <label><span>Description</span><textarea value={task.description} onChange={event => setTask(index, taskIndex, {description: event.target.value})}/></label>
-                <label><span>Due date</span><input type="date" value={task.dueDate} onChange={event => setTask(index, taskIndex, {dueDate: event.target.value})}/></label>
-              </fieldset>
-            ))}
-            <button type="button" className={styles.secondary} onClick={() => setCheckpoint(index, {tasks: [...(checkpoint.tasks ?? []), emptyTask((checkpoint.tasks?.length ?? 0) + 1)]})}>Add task</button>
-          </fieldset>
-        ))}
-        <button type="button" className={styles.secondary} onClick={() => setForm(current => ({...current, checkpoints: [...current.checkpoints, emptyCheckpoint(current.checkpoints.length + 1)]}))}>Add checkpoint</button>
-        <button className={styles.primary} disabled={save.isPending}>{save.isPending ? 'Saving…' : missing ? 'Create study plan' : 'Save study plan'}</button>
+        <section className={styles.formSection}>
+          <h3>Plan direction</h3>
+          <p>Keep the strategy concise enough to scan, while making the start and end dates explicit.</p>
+          <div className={styles.formGrid}>
+            <label className={styles.spanTwo}><span>Strategy</span><textarea required value={form.strategySummary} onChange={event => setForm(current => ({...current, strategySummary: event.target.value}))}/></label>
+            <label><span>Start date</span><EnglishDateInput required value={form.startDate} onChangeValue={startDate => setForm(current => ({...current, startDate}))}/></label>
+            <label><span>End date</span><EnglishDateInput required value={form.planEndDate} onChangeValue={planEndDate => setForm(current => ({...current, planEndDate}))}/></label>
+          </div>
+        </section>
+        <section className={styles.formSection}>
+          <h3>Checkpoints and tasks</h3>
+          <p>Open one checkpoint at a time to reduce visual noise. Checkpoints define progress milestones; tasks are the actions a student completes.</p>
+          {form.checkpoints.map((checkpoint, index) => (
+            <details key={`${checkpoint.position}-${index}`} className={styles.recordDisclosure} open={index === 0}>
+              <summary className={styles.disclosureSummary}>
+                <span>Checkpoint {index + 1}{checkpoint.description.trim() ? ` · ${checkpoint.description.trim()}` : ''}</span>
+                <small>{checkpoint.dueDate ? `Due ${checkpoint.dueDate}` : 'Due date not set'} · {(checkpoint.tasks ?? []).length} task{(checkpoint.tasks ?? []).length === 1 ? '' : 's'}</small>
+              </summary>
+              <div className={styles.disclosureBody}>
+                <div className={styles.formGrid}>
+                  <label><span>Description</span><textarea required value={checkpoint.description} onChange={event => setCheckpoint(index, {description: event.target.value})}/></label>
+                  <label><span>Goal</span><textarea required value={checkpoint.goal} onChange={event => setCheckpoint(index, {goal: event.target.value})}/></label>
+                  <label><span>Due date</span><EnglishDateInput required value={checkpoint.dueDate} onChangeValue={dueDate => setCheckpoint(index, {dueDate})}/></label>
+                </div>
+                {(checkpoint.tasks ?? []).map((task, taskIndex) => (
+                  <fieldset key={`${task.position}-${taskIndex}`} className={styles.taskGroup}>
+                    <legend>Task {taskIndex + 1}</legend>
+                    <div className={styles.recordGrid}>
+                      <label className={styles.spanTwo}><span>Title</span><input required={taskIndex === 0} value={task.title} onChange={event => setTask(index, taskIndex, {title: event.target.value})}/></label>
+                      <label className={styles.spanTwo}><span>Description</span><textarea value={task.description} onChange={event => setTask(index, taskIndex, {description: event.target.value})}/></label>
+                      <label><span>Due date</span><EnglishDateInput value={task.dueDate ?? ''} onChangeValue={dueDate => setTask(index, taskIndex, {dueDate})}/></label>
+                    </div>
+                    {(checkpoint.tasks ?? []).length > 1 ? <div className={styles.recordActions}><button type="button" className={styles.textDanger} onClick={() => removeTask(index, taskIndex)}>Remove task</button></div> : null}
+                  </fieldset>
+                ))}
+                <div className={styles.recordActions}>
+                  {form.checkpoints.length > 1 ? <button type="button" className={styles.textDanger} onClick={() => removeCheckpoint(index)}>Remove checkpoint</button> : null}
+                  <button type="button" className={styles.secondary} onClick={() => setCheckpoint(index, {tasks: [...(checkpoint.tasks ?? []), emptyTask((checkpoint.tasks?.length ?? 0) + 1)]})}>Add task</button>
+                </div>
+              </div>
+            </details>
+          ))}
+          <button type="button" className={styles.secondary} onClick={() => setForm(current => ({...current, checkpoints: [...current.checkpoints, emptyCheckpoint(current.checkpoints.length + 1)]}))}>Add checkpoint</button>
+        </section>
+        <div className={styles.formActions}><button className={styles.primary} disabled={save.isPending}>{save.isPending ? 'Saving…' : missing ? 'Create study plan' : 'Save study plan'}</button></div>
       </form>
       {!missing ? (
-        <div>
-          <h3>Revisions</h3>
-          <p className={styles.muted}>Immutable metadata only. This is not an editor.</p>
-          {(revisions.data?.items ?? []).map(revision => (
-            <p key={`${revision.entityVersion}-${revision.createdAt}`}>{revision.action} · v{revision.entityVersion} · {revision.createdAt} · actor {revision.actorId}</p>
-          ))}
+        <details className={styles.revisionPanel}>
+          <summary>Revision activity <span className={styles.countBadge}>{revisions.data?.total ?? 0}</span></summary>
+          <div className={styles.revisionBody}>
+          <p className={styles.muted}>The current backend returns immutable audit metadata, not the previous field values. Earlier plan content cannot be opened or restored from this screen.</p>
+          <ol className={styles.revisionList}>{(revisions.data?.items ?? []).map(revision => (
+            <li className={styles.revisionItem} key={`${revision.entityVersion}-${revision.createdAt}`}>
+              <strong>{revision.action === 'STUDY_PLAN_CREATED' ? 'Plan created' : 'Plan updated'}</strong>
+              <div className={styles.revisionMeta}><span>Version {revision.entityVersion ?? '—'}</span><span>{revision.createdAt || 'Time unavailable'}</span><span>Actor #{revision.actorId ?? '—'}</span></div>
+            </li>
+          ))}</ol>
           {revisions.data && revisions.data.total > 20 ? (
             <nav className={styles.pagination}>
               <button type="button" className={styles.secondary} disabled={revisionPage === 0} onClick={() => setRevisionPage(revisionPage - 1)}>Previous</button>
               <button type="button" className={styles.secondary} disabled={(revisionPage + 1) * 20 >= revisions.data.total} onClick={() => setRevisionPage(revisionPage + 1)}>Next</button>
             </nav>
           ) : null}
-        </div>
+          </div>
+        </details>
       ) : null}
     </section>
   );

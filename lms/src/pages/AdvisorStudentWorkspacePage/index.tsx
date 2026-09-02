@@ -7,7 +7,6 @@ import {isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
-import {ParentLinksPanel} from '@/components/ParentLinksPanel';
 import {formatPersonName} from '@/utils/personName';
 
 const AdvisorStudentLayout: React.FC = () => {
@@ -32,7 +31,6 @@ const AdvisorStudentLayout: React.FC = () => {
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Advisor</p>
           <h1>{formatPersonName(intake.data, `Student #${id}`)}</h1>
           <p className={styles.lede}>{intake.data?.email} · {intake.data?.studentType}</p>
         </div>
@@ -45,7 +43,6 @@ const AdvisorStudentLayout: React.FC = () => {
         <NavLink to={`/advisor/students/${id}/courses`} className={({isActive}) => isActive ? styles.tabActive : ''}>Courses</NavLink>
         <NavLink to={`/advisor/students/${id}/support`} className={({isActive}) => isActive ? styles.tabActive : ''}>Support &amp; reports</NavLink>
       </nav>
-      <ParentLinksPanel scope="advisor" subjectId={id}/>
       <Outlet/>
     </main>
   );

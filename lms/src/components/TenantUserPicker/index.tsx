@@ -1,5 +1,5 @@
 import {FormEvent, useMemo, useRef, useState} from 'react';
-import {useQueries} from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import {Search, UserRoundCheck, X} from 'lucide-react';
 import type {ManagedUser, UserLevel} from '@/apis';
 import {unwrapData} from '@/apis';
@@ -33,30 +33,24 @@ export const TenantUserPicker = ({
   const [page, setPage] = useState(0);
   const [pendingSelection, setPendingSelection] = useState<ManagedUser | null>(selectedUser ?? null);
 
-  const results = useQueries({
-    queries: levels.map(level => ({
-      queryKey: ['tenant', 'user-picker', level, query, page, PAGE_SIZE],
-      queryFn: async () => unwrapData(await adminApiService.listTenantUsers({
-        q: query || undefined,
-        role: 'USER',
-        level,
-        status: 'ACTIVE',
-        page,
-        size: PAGE_SIZE,
-      }), `tenant${level}Picker`),
-      enabled: isOpen,
-      retry: false,
-    })),
+  const results = useQuery({
+    queryKey: ['tenant', 'user-picker', levels, query, page, PAGE_SIZE],
+    queryFn: async () => unwrapData(await adminApiService.listTenantUsers({
+      q: query || undefined,
+      role: 'USER',
+      levels,
+      status: 'ACTIVE',
+      page,
+      size: PAGE_SIZE,
+    }), 'tenantUserPicker'),
+    enabled: isOpen,
+    retry: false,
   });
 
-  const users = useMemo(() => {
-    const byId = new Map<number, ManagedUser>();
-    results.forEach(result => result.data?.items.forEach(user => byId.set(user.id, user)));
-    return [...byId.values()];
-  }, [results]);
-  const isPending = results.some(result => result.isPending);
-  const isError = results.some(result => result.isError);
-  const hasNextPage = results.some(result => result.data && (page + 1) * PAGE_SIZE < result.data.total);
+  const users = useMemo(() => results.data?.items ?? [], [results.data?.items]);
+  const isPending = results.isPending;
+  const isError = results.isError;
+  const hasNextPage = Boolean(results.data && (page + 1) * PAGE_SIZE < results.data.total);
 
   const open = () => {
     setPendingSelection(selectedUser ?? null);
@@ -101,7 +95,7 @@ export const TenantUserPicker = ({
 
         <div className={styles.results} aria-busy={isPending}>
           {isPending ? <p className={styles.status} role="status">Loading eligible people…</p> : null}
-          {isError ? <div className={styles.error} role="alert"><p>Eligible people could not be loaded.</p><button type="button" onClick={() => results.forEach(result => void result.refetch())}>Try again</button></div> : null}
+          {isError ? <div className={styles.error} role="alert"><p>Eligible people could not be loaded.</p><button type="button" onClick={() => void results.refetch()}>Try again</button></div> : null}
           {!isPending && !isError && users.length === 0 ? <p className={styles.status}>No active users match this search.</p> : null}
           {users.map(user => (
             <label className={pendingSelection?.id === user.id ? styles.selectedRow : styles.row} key={user.id}>

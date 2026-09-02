@@ -111,10 +111,10 @@ const CounsellorIntakeFormPage: React.FC = () => {
       </header>
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'The intake could not be saved.')}</p> : null}
       {detail.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(detail.error, 'Intake could not be loaded.')}</p> : null}
-      <section className={styles.card}>
-        <form className={styles.form} onSubmit={onSubmit}>
+      <section className={`${styles.card} ${styles.wideCard}`}>
+        <form className={`${styles.form} ${styles.formColumns}`} onSubmit={onSubmit}>
           <StudentIntakeFormFields value={form} onChange={setForm} emailDisabled={!isCreate}/>
-          <button className={styles.primary} disabled={save.isPending}>{save.isPending ? 'Saving…' : isCreate ? 'Create intake' : 'Save changes'}</button>
+          <button className={`${styles.primary} ${styles.fullWidth}`} disabled={save.isPending}>{save.isPending ? 'Saving…' : isCreate ? 'Create intake' : 'Save changes'}</button>
         </form>
       </section>
       {!isCreate ? <ParentLinksPanel scope="counsellor" subjectId={numericId}/> : null}

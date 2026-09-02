@@ -1,24 +1,27 @@
-﻿@mixin form-input-base {
-    font-size: 0.875rem;
-    border: 1px solid t.$border-strong;
-    border-radius: 0.375rem;
-    padding: 0.5rem 0.75rem;
-    color: t.$content-primary;
-    outline: none;
-    background-color: white;
-    transition: border-color 0.2s, box-shadow 0.2s;
+@mixin form-input-base {
     box-sizing: border-box;
     width: 100%;
+    height: t.$control-height-lg;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-sm;
+    padding: 0 t.$space-4;
+    background: t.$surface-raised;
+    color: t.$content-primary;
+    font: inherit;
+    font-size: t.$font-size-body;
+    line-height: t.$line-height-body;
+    outline: none;
+    transition: border-color t.$duration-fast t.$ease-out, box-shadow t.$duration-fast t.$ease-out;
     
-    &:focus {
-        border-color: t.$feedback-info;
-        box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+    &:focus-visible {
+        border-color: t.$border-interactive;
+        box-shadow: 0 0 0 3px t.$focus-ring;
     }
     
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        background-color: t.$surface-subtle;
+        background: t.$surface-subtle;
     }
     
     &::placeholder {
@@ -30,7 +33,6 @@
     @include form-input-base;
     
     position: relative;
-    min-height: 2.5rem;
     cursor: text;
     
     &::-webkit-calendar-picker-indicator {
@@ -77,8 +79,8 @@
 @mixin form-row {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 1rem;
+    gap: t.$space-4;
+    margin-bottom: t.$space-4;
     
     &:last-child {
         margin-bottom: 0;
@@ -88,10 +90,44 @@
 @mixin form-label {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: t.$space-2;
     min-width: 90px;
     color: t.$content-secondary;
-    font-size: 0.875rem;
-    font-weight: 500;
-    margin-bottom: 0.25rem;
+    font-size: t.$font-size-body;
+    font-weight: t.$fw-semibold;
+    margin-bottom: t.$space-1;
+}
+
+@mixin field-label {
+    display: grid;
+    min-width: 0;
+    gap: t.$space-2;
+    color: t.$content-primary;
+    font-size: t.$font-size-body;
+    font-weight: t.$fw-semibold;
+    line-height: t.$line-height-body;
+}
+
+@mixin textarea-base {
+    @include form-input-base;
+
+    height: auto;
+    min-height: 7rem;
+    padding-block: t.$space-3;
+    line-height: 1.55;
+    resize: vertical;
+}
+
+@mixin surface-card {
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-lg;
+    background: t.$surface-raised;
+    box-shadow: t.$shadow-lg;
+}
+
+@mixin helper-text {
+    color: t.$content-secondary;
+    font-size: t.$font-size-caption;
+    font-weight: t.$fw-regular;
+    line-height: t.$line-height-caption;
 }

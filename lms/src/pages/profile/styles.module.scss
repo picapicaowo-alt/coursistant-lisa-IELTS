@@ -61,7 +61,7 @@
   cursor: pointer;
 }
 
-.profilePage { width: 100%; max-width: t.$workspace-profile-max-inline-size; margin: 0 auto; padding: t.$workspace-gutter-block t.$workspace-gutter-inline; }
+.profilePage { width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; }
 .profileCover { height: 180px; border-radius: 24px; background: linear-gradient(135deg, t.$action-primary, t.$surface-profile-accent); }
 .profileCard { display: grid; grid-template-columns: 190px 1fr; gap: 2rem; margin: -72px 2rem 0; padding: 2rem; background: t.$surface-raised; border: 1px solid t.$border-default; border-radius: 24px; box-shadow: t.$shadow-lg; position: relative; }
 .avatarColumn { display: flex; flex-direction: column; align-items: center; gap: .75rem; }

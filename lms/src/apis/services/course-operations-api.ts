@@ -17,6 +17,10 @@ import type {
   TenantAlertRuleResponse,
   TenantCourseOwnership,
   TenantCourseOwnershipPage,
+  TeachingAvailabilityResponse,
+  TeachingGradingItemResponse,
+  TeachingStudentSupportResponse,
+  TeachingTodayClassResponse,
   TransferCourseOwnerRequest,
   UpsertCourseStudentReportRequest,
 } from '@/apis';
@@ -243,10 +247,10 @@ export class CourseOperationsApiService {
   getMyWorkQueue(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/work-queue'); }
   getMyCourseHours(courseId: number): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get(`/v2/me/courses/${courseId}/hours`); }
   getMyTeachingAlerts(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/alerts'); }
-  getMyTeachingGradingItems(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/grading-items'); }
+  getMyTeachingGradingItems(): Promise<ApiResponse<TeachingGradingItemResponse[]>> { return this.apiClient.get('/v2/me/teaching/grading-items'); }
   getMyTeachingScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/schedule-requests'); }
-  getMyTeachingStudentsNeedingSupport(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/students-needing-support'); }
-  getMyTeachingTodayClasses(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/today-classes'); }
+  getMyTeachingStudentsNeedingSupport(): Promise<ApiResponse<TeachingStudentSupportResponse[]>> { return this.apiClient.get('/v2/me/teaching/students-needing-support'); }
+  getMyTeachingTodayClasses(): Promise<ApiResponse<TeachingTodayClassResponse[]>> { return this.apiClient.get('/v2/me/teaching/today-classes'); }
 
   listMyPersonalEvents(): Promise<ApiResponse<CourseOperationRead>> {
     return this.apiClient.get('/v2/me/personal-events');
@@ -268,7 +272,7 @@ export class CourseOperationsApiService {
     return this.apiClient.delete(`/v2/me/personal-events/${eventId}`, idempotent(key));
   }
 
-  getMyTeachingAvailability(): Promise<ApiResponse<CourseOperationRead>> {
+  getMyTeachingAvailability(): Promise<ApiResponse<TeachingAvailabilityResponse>> {
     return this.apiClient.get('/v2/me/teaching/availability');
   }
 

@@ -22,11 +22,33 @@ describe('MockExamApiService', () => {
   it('uses tenant template create-only routes without invented idempotency headers', async () => {
     client.post.mockResolvedValue({status: 201, data: {}});
     await service.createTenantTemplate({label: 'Academic A', title: 'IELTS Academic A'});
-    await service.createTenantListening(3, 8, {totalMinutes: 40, parts: [{seq: 1, label: 'Part 1', audioPath: 'media/audio.mp3', sections: [{sortOrder: 1, kind: 'SHORT_ANSWER', title: 'Questions', instruction: 'Answer', questionStart: 1, questionEnd: 10, payload: {}}]}]});
+    await service.createTenantListening(3, 8, {totalMinutes: 40, parts: [{seq: 1, label: 'Part 1', audioMediaId: 91, sections: [{sortOrder: 1, kind: 'SHORT_ANSWER', title: 'Questions', instruction: 'Answer', questionStart: 1, questionEnd: 10, payload: {}}]}]});
     await service.publishTenantVersion(3, 8);
     expect(client.post).toHaveBeenNthCalledWith(1, '/v2/tenant/mock-exam-templates', {label: 'Academic A', title: 'IELTS Academic A'});
     expect(client.post).toHaveBeenNthCalledWith(2, '/v2/tenant/mock-exam-templates/3/versions/8/listening', expect.any(Object));
     expect(client.post).toHaveBeenNthCalledWith(3, '/v2/tenant/mock-exam-templates/3/versions/8/publish');
+  });
+
+  it('uploads, lists, previews, and deletes tenant version media without object paths', async () => {
+    const file = new File(['audio'], 'part-1.mp3', {type: 'audio/mpeg'});
+    const preview = new Blob(['preview'], {type: 'audio/mpeg'});
+    client.post.mockResolvedValue({status: 201, data: {mediaId: 91}});
+    client.get.mockResolvedValue({status: 200, data: []});
+    client.delete.mockResolvedValue({status: 204});
+    rawClient.get.mockResolvedValue({data: preview});
+
+    await service.uploadTenantMedia(3, 8, 'LISTENING_AUDIO', file, 'media-key');
+    await service.listTenantMedia(3, 8);
+    await expect(service.previewTenantMedia(3, 8, 91)).resolves.toBe(preview);
+    await service.deleteTenantMedia(3, 8, 91);
+
+    const form = client.post.mock.calls[0][1] as FormData;
+    expect(form.get('kind')).toBe('LISTENING_AUDIO');
+    expect(form.get('file')).toBe(file);
+    expect(client.post).toHaveBeenCalledWith('/v2/tenant/mock-exam-templates/3/versions/8/media', form, {headers: {'Idempotency-Key': 'media-key'}});
+    expect(client.get).toHaveBeenCalledWith('/v2/tenant/mock-exam-templates/3/versions/8/media');
+    expect(rawClient.get).toHaveBeenCalledWith('/v2/tenant/mock-exam-templates/3/versions/8/media/91/preview', {responseType: 'blob'});
+    expect(client.delete).toHaveBeenCalledWith('/v2/tenant/mock-exam-templates/3/versions/8/media/91');
   });
 
   it('creates a student assignment and attempt with stable keys', async () => {

@@ -9,6 +9,7 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import {advisorConversationMessageViews} from '../AdvisorOperationsPage/advisorViewModels';
 import styles from '../advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
+import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
 
 const StudentAdvisingPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -71,53 +72,54 @@ const StudentAdvisingPage: React.FC = () => {
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Student</p>
           <h1>My advising record</h1>
-          <p className={styles.lede}>Read-only. Your advisor maintains the profile and study plan.</p>
+          <p className={styles.lede}>Review the profile and plan maintained by your Advisor, complete assigned tasks, and keep the conversation in one place.</p>
         </div>
       </header>
       <section className={styles.card}>
-        <h2>Profile</h2>
+        <WorkspaceSectionHeader title="Learning profile" description="Your current goal and the skills being measured." meta={<span className={styles.readOnlyBadge}>Read only</span>}/>
         {profile.isPending ? <p className={styles.status}>Loading profile…</p> : null}
         {profile.isError && isNotFound(profile.error) ? <p className={styles.status}>Your advisor has not created a profile yet.</p> : null}
         {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')}</p> : null}
         {profile.data ? (
-          <dl className={styles.readonly}>
-            <dt>Name</dt><dd>{formatPersonName(profile.data, '—')}</dd>
-            <dt>Goal</dt><dd>{profile.data.targetGoal || '—'}</dd>
-            <dt>Target</dt><dd>{[profile.data.targetMetric, profile.data.targetValue, profile.data.targetDate].filter(Boolean).join(' · ') || '—'}</dd>
-            <dt>Skills</dt>
-            <dd>
-              {(profile.data.skills ?? []).map(skill => (
-                <div key={skill.skillCode}>{skill.displayName}: {skill.currentValue || '—'} → {skill.targetValue || '—'}</div>
-              ))}
-            </dd>
-          </dl>
+          <>
+            <dl className={styles.summaryGrid}>
+              <div className={styles.summaryItem}><dt>Name</dt><dd>{formatPersonName(profile.data, '—')}</dd></div>
+              <div className={styles.summaryItem}><dt>Primary target</dt><dd>{[profile.data.targetMetric, profile.data.targetValue, profile.data.targetDate].filter(Boolean).join(' · ') || '—'}</dd></div>
+              <div className={`${styles.summaryItem} ${styles.spanTwo}`}><dt>Goal</dt><dd>{profile.data.targetGoal || '—'}</dd></div>
+            </dl>
+            {(profile.data.skills ?? []).length > 0 ? <div className={styles.skillSummary}>{(profile.data.skills ?? []).map(skill => (
+              <article className={styles.skillCard} key={skill.skillCode}>
+                <h3>{skill.displayName || skill.skillCode || 'Measured skill'}</h3>
+                <div className={styles.metaRow}><span>{skill.scale || 'Scale not specified'}</span><span>Current {skill.currentValue || '—'}</span><span>Target {skill.targetValue || '—'}</span></div>
+                {skill.gapSummary ? <p>{skill.gapSummary}</p> : null}
+              </article>
+            ))}</div> : null}
+          </>
         ) : null}
         {'advisorPrivateNotes' in (profile.data ?? {}) ? <p className={styles.error}>Private notes leaked into the student view.</p> : null}
       </section>
       <section className={styles.card}>
-        <h2>Study plan</h2>
+        <WorkspaceSectionHeader title="Study plan" description="Follow the plan one checkpoint at a time. Tasks can be started and completed here." meta={plan.data ? <span className={styles.versionBadge}>Version {plan.data.plan.studyPlanVersion}</span> : undefined}/>
         {plan.isPending ? <p className={styles.status}>Loading study plan…</p> : null}
         {plan.isError && isNotFound(plan.error) ? <p className={styles.status}>Your advisor has not created a study plan yet.</p> : null}
         {plan.isError && !isNotFound(plan.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, 'Study plan could not be loaded.')}</p> : null}
         {plan.data ? (
-          <div>
-            <p>{plan.data.plan.strategySummary}</p>
-            <p className={styles.muted}>{plan.data.plan.startDate} – {plan.data.plan.planEndDate} · version {plan.data.plan.studyPlanVersion}</p>
-            {(plan.data.plan.checkpoints ?? []).map(checkpoint => (
-              <article key={checkpoint.id ?? checkpoint.position} className={styles.nested}>
-                <strong>{checkpoint.description}</strong>
-                <p>{checkpoint.goal}</p>
-                <p className={styles.muted}>Due {checkpoint.dueDate}</p>
-                {(checkpoint.tasks ?? []).map(task => (
-                  <div key={task.id ?? task.position} className={styles.nested}>
-                    <strong>{task.title || 'Advisor task'}</strong>
-                    <p className={styles.muted}>{task.dueDate ? `Due ${task.dueDate} · ` : ''}{task.status || 'Not started'}</p>
+          <div className={styles.checkpointList}>
+            <div className={styles.summaryItem}><strong>{plan.data.plan.strategySummary}</strong><span className={styles.muted}>{plan.data.plan.startDate} – {plan.data.plan.planEndDate}</span></div>
+            {(plan.data.plan.checkpoints ?? []).map((checkpoint, checkpointIndex) => (
+              <article key={checkpoint.id ?? checkpoint.position} className={styles.checkpointCard}>
+                <div className={styles.recordTitle}><h3>Checkpoint {checkpointIndex + 1}: {checkpoint.description}</h3><p>{checkpoint.goal}</p></div>
+                <div className={styles.metaRow}><span>Due {checkpoint.dueDate || 'date not set'}</span><span>{(checkpoint.tasks ?? []).length} task{(checkpoint.tasks ?? []).length === 1 ? '' : 's'}</span></div>
+                <div className={styles.taskList}>{(checkpoint.tasks ?? []).map(task => (
+                  <div key={task.id ?? task.position} className={styles.taskCard}>
+                    <div className={styles.rowTitle}><h4>{task.title || 'Advisor task'}</h4><span className={styles.taskStatus}>{(task.status || 'NOT_STARTED').replace(/_/g, ' ').toLowerCase()}</span></div>
+                    {task.description ? <p>{task.description}</p> : null}
+                    {task.dueDate ? <div className={styles.metaRow}><span>Due {task.dueDate}</span></div> : null}
                     {task.id != null && task.status !== 'COMPLETED' ? (
                       <>
                         <label className={styles.form}>
-                          Submission note
+                          <span>Submission note</span>
                           <textarea value={taskSubmissions[task.id] ?? ''} onChange={event => setTaskSubmissions(current => ({...current, [task.id!]: event.target.value}))}/>
                         </label>
                         <div className={styles.actions}>
@@ -126,9 +128,9 @@ const StudentAdvisingPage: React.FC = () => {
                         </div>
                       </>
                     ) : null}
-                    {task.advisorFeedback ? <p>Advisor feedback: {task.advisorFeedback}</p> : null}
+                    {task.advisorFeedback ? <p><strong>Advisor feedback:</strong> {task.advisorFeedback}</p> : null}
                   </div>
-                ))}
+                ))}</div>
               </article>
             ))}
           </div>
@@ -136,7 +138,7 @@ const StudentAdvisingPage: React.FC = () => {
       </section>
       {taskMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskMutation.error, 'The task could not be updated.')}</p> : null}
       <section className={styles.card}>
-        <div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Study support</p><h2>Advisor conversation</h2></div><span className={styles.countBadge}>{conversationRows.length}</span></div>
+        <WorkspaceSectionHeader title="Advisor conversation" description="Ask questions, share context, or attach supporting files." meta={<span className={styles.countBadge}>{conversationRows.length}</span>}/>
         {messageMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(messageMutation.error, 'Message could not be sent.')}</p> : null}
         {conversation.isPending ? <p className={styles.status}>Loading messages…</p> : null}
         {conversation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(conversation.error, 'Messages could not be loaded.')}</p> : null}

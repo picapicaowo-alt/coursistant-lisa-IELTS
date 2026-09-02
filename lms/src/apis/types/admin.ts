@@ -29,6 +29,8 @@ export interface ManagedUser {
   emailNotifications?: boolean;
   status: 'ACTIVE' | 'DISABLED';
   authVersion?: number;
+  accountVersion?: number;
+  phone?: string;
 }
 
 export interface CreateManagedUserRequest {
@@ -45,9 +47,32 @@ export interface TenantUserDirectoryParams {
   q?: string;
   role?: string;
   level?: string;
+  levels?: UserLevel[];
   status?: string;
   page?: number;
   size?: number;
+}
+
+export interface PatchTenantManagedUserRequest {
+  expectedAccountVersion: number;
+  firstName?: string;
+  middleName?: string | null;
+  lastName?: string;
+  email?: string;
+  phone?: string | null;
+}
+
+export interface ManagedUserDisableBlocker {
+  code?: string;
+  type?: string;
+  resourceId?: number | string;
+  label?: string;
+  message?: string;
+}
+
+export interface ManagedUserDisableBlockersResponse {
+  canDisable: boolean;
+  blockers: Array<string | ManagedUserDisableBlocker>;
 }
 
 export interface TenantUserDirectoryPage {

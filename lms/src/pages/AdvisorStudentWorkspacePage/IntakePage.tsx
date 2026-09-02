@@ -7,6 +7,8 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
+import {ParentLinksPanel} from '@/components/ParentLinksPanel';
+import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
 
 const AdvisorStudentIntakePage: React.FC = () => {
   const {studentUserId} = useParams();
@@ -25,8 +27,13 @@ const AdvisorStudentIntakePage: React.FC = () => {
   const intake = query.data;
 
   return (
+    <>
     <section className={styles.card}>
-      <h2>Counsellor intake</h2>
+      <WorkspaceSectionHeader
+        title="Counsellor intake"
+        description="The intake captures the student's starting context at handover. It is read-only for Advisors."
+        meta={<span className={styles.readOnlyBadge}>Read only</span>}
+      />
       <dl className={styles.readonly}>
         <dt>Name</dt><dd>{formatPersonName(intake, '—')}</dd>
         <dt>Email</dt><dd>{intake.email || '—'}</dd>
@@ -37,6 +44,8 @@ const AdvisorStudentIntakePage: React.FC = () => {
         <dt>Assignment</dt><dd>{intake.assignmentStatus} · version {intake.assignmentVersion ?? '—'}</dd>
       </dl>
     </section>
+    <ParentLinksPanel scope="advisor" subjectId={id}/>
+    </>
   );
 };
 

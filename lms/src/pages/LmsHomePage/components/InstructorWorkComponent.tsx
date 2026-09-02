@@ -51,7 +51,7 @@ const InstructorWorkComponent: React.FC = () => {
   return (
     <section className={styles.widget} aria-labelledby="instructor-work-title">
       <header className={styles.header}>
-        <div><p>Instructor workspace</p><h2 id="instructor-work-title">Teaching activity</h2></div>
+        <div><h2 id="instructor-work-title">Teaching activity</h2><p>Grade current work and review recent course changes.</p></div>
         {failed ? <button type="button" onClick={() => { void queueQuery.refetch(); void activityQuery.refetch(); }}>Retry</button> : null}
       </header>
 

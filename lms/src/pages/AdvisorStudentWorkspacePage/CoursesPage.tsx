@@ -8,6 +8,7 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
+import {EnglishDateInput, EnglishTimeInput} from '@/components/EnglishDateInput';
 
 const CoursesPage: React.FC = () => {
   const {studentUserId} = useParams();
@@ -153,11 +154,11 @@ const CoursesPage: React.FC = () => {
         <form className={styles.form} onSubmit={event => { event.preventDefault(); createOneOnOne.mutate(); }}>
           <label>Title<input required value={oneOnOne.title} onChange={event => setOneOnOne(current => ({...current, title: event.target.value}))}/></label>
           <label>Instructor user ID<input required inputMode="numeric" value={oneOnOne.instructorId} onChange={event => setOneOnOne(current => ({...current, instructorId: event.target.value}))}/></label>
-          <label>Term start<input required type="date" value={oneOnOne.startDate} onChange={event => setOneOnOne(current => ({...current, startDate: event.target.value}))}/></label>
-          <label>Term end<input required type="date" value={oneOnOne.endDate} onChange={event => setOneOnOne(current => ({...current, endDate: event.target.value}))}/></label>
+          <label>Term start<EnglishDateInput required value={oneOnOne.startDate} onChangeValue={startDate => setOneOnOne(current => ({...current, startDate}))}/></label>
+          <label>Term end<EnglishDateInput required value={oneOnOne.endDate} onChangeValue={endDate => setOneOnOne(current => ({...current, endDate}))}/></label>
           <label>Day of week<select value={oneOnOne.dayOfWeek} onChange={event => setOneOnOne(current => ({...current, dayOfWeek: event.target.value}))}>{['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'].map(day => <option key={day}>{day}</option>)}</select></label>
-          <label>Start time<input required type="time" value={oneOnOne.startTime} onChange={event => setOneOnOne(current => ({...current, startTime: event.target.value}))}/></label>
-          <label>End time<input required type="time" value={oneOnOne.endTime} onChange={event => setOneOnOne(current => ({...current, endTime: event.target.value}))}/></label>
+          <label>Start time<EnglishTimeInput required value={oneOnOne.startTime} onChangeValue={startTime => setOneOnOne(current => ({...current, startTime}))}/></label>
+          <label>End time<EnglishTimeInput required value={oneOnOne.endTime} onChangeValue={endTime => setOneOnOne(current => ({...current, endTime}))}/></label>
           <label>Location<input value={oneOnOne.location} onChange={event => setOneOnOne(current => ({...current, location: event.target.value}))}/></label>
           <button className={styles.primary} disabled={!plan.data || createOneOnOne.isPending}>Create course</button>
         </form>
@@ -171,8 +172,8 @@ const CoursesPage: React.FC = () => {
           <label>New instructor user ID<input inputMode="numeric" value={courseEdit.instructorId} onChange={event => setCourseEdit(current => ({...current, instructorId: event.target.value}))}/></label>
           <button type="button" className={styles.primary} disabled={!Number(courseEdit.courseId) || !courseEdit.expectedVersion || !Number(courseEdit.instructorId) || updateOneOnOne.isPending} onClick={() => updateOneOnOne.mutate('instructor')}>Reassign instructor</button>
           <label>Day of week<select value={courseEdit.dayOfWeek} onChange={event => setCourseEdit(current => ({...current, dayOfWeek: event.target.value}))}>{['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'].map(day => <option key={day}>{day}</option>)}</select></label>
-          <label>Start time<input type="time" value={courseEdit.startTime} onChange={event => setCourseEdit(current => ({...current, startTime: event.target.value}))}/></label>
-          <label>End time<input type="time" value={courseEdit.endTime} onChange={event => setCourseEdit(current => ({...current, endTime: event.target.value}))}/></label>
+          <label>Start time<EnglishTimeInput value={courseEdit.startTime} onChangeValue={startTime => setCourseEdit(current => ({...current, startTime}))}/></label>
+          <label>End time<EnglishTimeInput value={courseEdit.endTime} onChangeValue={endTime => setCourseEdit(current => ({...current, endTime}))}/></label>
           <label>Location<input value={courseEdit.location} onChange={event => setCourseEdit(current => ({...current, location: event.target.value}))}/></label>
           <button type="button" className={styles.primary} disabled={!Number(courseEdit.courseId) || !courseEdit.expectedVersion || !courseEdit.startTime || !courseEdit.endTime || updateOneOnOne.isPending} onClick={() => updateOneOnOne.mutate('sessions')}>Replace sessions</button>
         </div>

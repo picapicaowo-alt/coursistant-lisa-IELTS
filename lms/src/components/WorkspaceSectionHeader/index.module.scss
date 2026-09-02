@@ -1,0 +1,54 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: t.$space-5;
+  margin-bottom: t.$space-6;
+}
+
+.copy {
+  display: grid;
+  gap: t.$space-2;
+  min-width: 0;
+}
+
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: t.$space-3;
+}
+
+.titleRow h2,
+.titleRow h3,
+.copy p {
+  margin: 0;
+}
+
+.titleRow h2 {
+  font-size: t.$font-size-headline;
+  line-height: t.$line-height-headline;
+}
+
+.titleRow h3 {
+  font-size: t.$font-size-subhead;
+  line-height: t.$line-height-subhead;
+}
+
+.copy p {
+  max-width: t.$reading-max-width;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: 1.55;
+}
+
+.action {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 700px) {
+  .header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

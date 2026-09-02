@@ -74,6 +74,9 @@ $feedback-warning: $orange-800;
 $feedback-info: $blue-700;
 $feedback-warning-surface: rgba($orange-500, .1);
 $feedback-warning-border: $orange-500;
+$feedback-success-surface: rgba($green-500, .1);
+$feedback-danger-surface: rgba($red-500, .1);
+$feedback-info-surface: rgba($blue-500, .1);
 
 // Content-category colors are data encodings, not action colors.
 $type-cyan: #22CCEE;
@@ -140,38 +143,17 @@ $space-10: 2.5rem;
 $space-12: 3rem;
 $space-16: 4rem;
 
-$shell-sidebar-inline-size: clamp(14.25rem, 14vw, 16rem);
+$shell-sidebar-width: 11.25rem;
 $shell-header-height: 5.5rem;
-$workspace-gutter-inline: clamp(1rem, 2.4vw, 3.5rem);
-$workspace-gutter-block: clamp(1rem, 2.2vw, 2rem);
-$workspace-section-gap: clamp(1rem, 1.5vw, 1.5rem);
-$workspace-max-inline-size: none;
-$workspace-compact-max-inline-size: 58rem;
-$workspace-task-max-inline-size: 66rem;
-$workspace-readable-max-inline-size: 72rem;
-$workspace-record-max-inline-size: 74rem;
-$workspace-profile-max-inline-size: 75rem;
-$workspace-editorial-max-inline-size: 96rem;
-$workspace-card-min-inline-size: 20rem;
-$dashboard-column-gap: clamp(.875rem, 1.25vw, 1.5rem);
-$dashboard-chat-min-inline-size: 18rem;
-$dashboard-main-min-inline-size: 30rem;
-$dashboard-side-min-inline-size: 17rem;
-$dashboard-chat-min-block-size: 42rem;
-$dashboard-course-min-block-size: 17rem;
-$dashboard-advisor-min-block-size: 13rem;
-$dashboard-exams-min-block-size: 15rem;
-$dashboard-schedule-min-block-size: 32rem;
-$dashboard-alerts-min-block-size: 11rem;
-$breakpoint-shell-mobile: 43.75rem;
-$breakpoint-dashboard-single: 54rem;
-$breakpoint-dashboard-compact: 38.75rem;
-$content-max-width: $workspace-editorial-max-inline-size;
-$shell-sidebar-width: $shell-sidebar-inline-size;
+$content-max-width: 100rem;
+$workspace-max-width: 82rem;
+$workspace-form-max-width: 68rem;
+$reading-max-width: 72ch;
 $control-height-sm: 2.25rem;
 $control-height-md: 2.75rem;
 $control-height-lg: 3.125rem;
 $touch-target: 2.75rem;
+$selection-indicator-size: .75rem;
 
 // ---------------------------------------------------------------- Shape, elevation, motion
 
