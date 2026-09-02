@@ -1,8 +1,8 @@
-$primary-color: #2D3748;
-$secondary-color: #718096;
+$primary-color: t.$content-primary;
+$secondary-color: t.$content-secondary;
 
 @mixin resources {
-    color: #566FE8;
+    color: t.$action-primary;
     margin-left: 2rem;
     cursor: pointer;
     display: flex;
@@ -75,7 +75,7 @@ $secondary-color: #718096;
     }
     .assignment-body {
         .assignment-body-item {
-            background-color: #F8FAFC;
+            background-color: t.$surface-subtle;
             border-radius: 1rem;
             padding: 1rem;
             display: flex;
@@ -97,7 +97,7 @@ $secondary-color: #718096;
                     }
                     p {
                         font-size: 0.9rem;
-                        color: #718096;
+                        color: t.$content-secondary;
                     }
                 }
                 p {
@@ -118,7 +118,7 @@ $secondary-color: #718096;
                     flex-direction: column;
                     p {
                         font-size: 0.9rem;
-                        color: #718096;
+                        color: t.$content-secondary;
                         margin: 0.2rem 0;
                     }
                 }
@@ -126,17 +126,17 @@ $secondary-color: #718096;
                     font-size: 0.8rem;
                     margin-left: -0.1rem;
                     color: white;
-                    background-color: #A0AEC0;
+                    background-color: t.$content-placeholder;
                     padding: 0.2rem 0.5rem; 
                     border-radius: 0.5rem;
                     &.due-green {
-                        background-color: #48BB78;
+                        background-color: t.$feedback-success;
                     }
                     &.due-red {
-                        background-color: #F56565;
+                        background-color: t.$feedback-danger;
                     }
                     &.due-gray {
-                        background-color: #A0AEC0;
+                        background-color: t.$content-placeholder;
                     }
                 }
            
@@ -159,14 +159,14 @@ $secondary-color: #718096;
                 .assignment-body-item-progress-bar {
                     width: 100px;
                     height: 0.5rem;
-                    background-color: #E2E8F0;
+                    background-color: t.$border-default;
                     border-radius: 0.5rem;
                     margin: 0.4rem auto;
                 }
                 .assignment-body-item-progress-bar-fill {
                     width: 85%;
                     height: 0.5rem;
-                    background-color: #566FE8;
+                    background-color: t.$action-primary;
                     border-radius: 0.5rem;
                 }
             }
@@ -228,7 +228,7 @@ $secondary-color: #718096;
     flex: 0 0 auto;
     font-size: 0.75rem;
     font-weight: t.$fw-semibold;
-    color: #ffffff;
+    color: t.$content-on-color;
     background-color: t.$type-cyan;
     padding: 0.15rem 0.6rem;
     border-radius: t.$radius-pill;
@@ -279,7 +279,7 @@ $secondary-color: #718096;
 
     &--primary {
         background-color: t.$brand;
-        color: #ffffff;
+        color: t.$content-on-color;
     }
 }
 

@@ -3,7 +3,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    font-family: 'Inter', sans-serif;
+    font-family: t.$font-family;
     
     .chatHeader {
         margin-top: 1rem;
@@ -15,7 +15,7 @@
         .chatMenu {
             width: 32px;
             height: 32px;
-            border: 1px solid #A0AEC0;
+            border: 1px solid t.$content-placeholder;
             border-radius: 20%;
             cursor: pointer;
             margin-left: 10px;
@@ -69,7 +69,7 @@
         width: 100%;
         display: flex;
         flex-direction: column;
-        border: 1px solid #E2E8F0;
+        border: 1px solid t.$border-default;
         border-radius: 1rem;
         padding: 0.7rem;
         margin: 0.1rem auto;
@@ -78,7 +78,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid #566FE8;
+            border: 1px solid t.$action-primary;
             border-radius: 0.6rem;
             padding: 0.2rem 0.3rem;
             width: 100px;
@@ -90,7 +90,7 @@
             
             p {
                 font-size: 0.7rem;
-                color: #566FE8;
+                color: t.$action-primary;
                 margin: 0;
                 margin-left: 0.3rem;
             }
@@ -105,7 +105,7 @@
                 width: 100%;
                 font-size: 0.9rem;
                 margin: 1rem 0.3rem;
-                font-family: 'Inter', sans-serif;
+                font-family: t.$font-family;
                 resize: none; /* optional: prevent manual resizing */
                 /* Set min and max height via rows */
                 min-height: calc(1.5rem * 3); /* 3 lines */
@@ -115,7 +115,7 @@
             }
             
             .chatTextarea::placeholder {
-                color: #A0AEC0;
+                color: t.$content-placeholder;
             }
         }
         
@@ -135,7 +135,7 @@
             
             .chatFooterSend {
                 cursor: pointer;
-                background-color: #566FE8;
+                background-color: t.$action-primary;
                 color: white;
                 padding: 0.5rem 1rem;
                 border-radius: 0.5rem;

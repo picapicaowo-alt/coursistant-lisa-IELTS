@@ -6,7 +6,7 @@
 .headerText > p:last-child { margin: .3rem 0 0; color: t.$text-muted; }
 .eyebrow { margin: 0; color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; text-transform: uppercase; letter-spacing: .08em; }
 .backLink { display: inline-grid; place-items: center; flex: 0 0 t.$control-size; width: t.$control-size; height: t.$control-size; border-radius: t.$radius-control; background: t.$neutral-fill; color: t.$text; }
-.primaryButton { display: inline-flex; min-height: 2.5rem; align-items: center; justify-content: center; gap: .4rem; padding: 0 .95rem; border: 1px solid t.$brand; border-radius: t.$radius-control-sm; background: t.$brand; color: #fff; font-weight: t.$fw-semibold; text-decoration: none; cursor: pointer; }
+.primaryButton { display: inline-flex; min-height: 2.5rem; align-items: center; justify-content: center; gap: .4rem; padding: 0 .95rem; border: 1px solid t.$brand; border-radius: t.$radius-control-sm; background: t.$brand; color: t.$content-on-color; font-weight: t.$fw-semibold; text-decoration: none; cursor: pointer; }
 .card { margin-bottom: 1rem; padding: 1.5rem; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; box-shadow: t.$shadow-card; }
 .versionList .card { max-width: none; }
 .versionHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }

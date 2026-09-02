@@ -49,10 +49,12 @@ const loadMyCourses = async (): Promise<MyCourse[]> => {
 
 export const useMyCourses = () => {
   const {user} = useRequiredAuth();
+  const isUserAccount = user.role === 'USER';
 
   return useQuery({
     queryKey: myCoursesQueryKey(user.id),
     queryFn: loadMyCourses,
+    enabled: isUserAccount,
     staleTime: FIVE_MINUTES,
     gcTime: FIVE_MINUTES,
     retry: 2,
@@ -61,7 +63,9 @@ export const useMyCourses = () => {
 };
 
 export const useCourseAccess = (courseId: number | null) => {
+  const {user} = useRequiredAuth();
   const query = useMyCourses();
+  const resolvesFromMembership = user.role === 'USER';
   const membership = courseId === null
     ? undefined
     : query.data?.find(course => (course.id ?? course.courseId) === courseId);
@@ -69,9 +73,9 @@ export const useCourseAccess = (courseId: number | null) => {
   return {
     ...deriveCourseAccess(membership),
     membership,
-    isLoading: query.isPending,
-    isError: query.isError,
-    isResolved: query.isSuccess,
+    isLoading: resolvesFromMembership && query.isPending,
+    isError: resolvesFromMembership && query.isError,
+    isResolved: !resolvesFromMembership || query.isSuccess,
     refetch: () => void query.refetch(),
   };
 };

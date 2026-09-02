@@ -1,11 +1,11 @@
-$primary-color: #2D3748;
-$secondary-color: #718096;
+$primary-color: t.$content-primary;
+$secondary-color: t.$content-secondary;
 $brand-secondary: rgba(127, 156, 245, 1);
 $brand-pallete: rgba(195, 218, 254, 1);
 $brand-primary: rgba(86, 111, 232, 1);
 
 @mixin resources {
-    color: #566FE8;
+    color: t.$action-primary;
     margin-left: 2rem;
     cursor: pointer;
     display: flex;
@@ -63,7 +63,7 @@ $brand-primary: rgba(86, 111, 232, 1);
             flex-direction: row;
             gap: 1rem;
             border-radius: 1rem;
-            border: 1px solid #E2E8F0;
+            border: 1px solid t.$border-default;
             padding: 1rem 1rem 0.5rem 1rem;
             color: inherit;
             text-decoration: none;
@@ -134,7 +134,7 @@ $brand-primary: rgba(86, 111, 232, 1);
                     .post-item-time {
                         margin: 0;
                         font-size: 0.8rem;
-                        color: #A0AEC0;
+                        color: t.$content-placeholder;
                         white-space: nowrap;
                     }
                 }

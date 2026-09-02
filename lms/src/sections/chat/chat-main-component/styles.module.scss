@@ -10,7 +10,7 @@
         display: grid;
         width: 2.75rem;
         height: 2.75rem;
-        border: 1px solid #A0AEC0;
+        border: 1px solid t.$content-placeholder;
         border-radius: 20%;
         background: transparent;
         cursor: pointer;
@@ -81,7 +81,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        border: 1px solid #566FE8;
+        border: 1px solid t.$action-primary;
         border-radius: 0.6rem;
         padding: 0.2rem 0.3rem;
         width: 100px;

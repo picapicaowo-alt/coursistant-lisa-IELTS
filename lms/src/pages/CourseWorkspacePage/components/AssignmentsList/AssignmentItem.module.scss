@@ -4,15 +4,15 @@
     justify-content: space-between;
     padding: 0.6rem 1rem;
     border-radius: 10px;
-    background-color: #FFFFFF;
-    border: 1px solid #E2E8F0;
+    background-color: t.$content-on-color;
+    border: 1px solid t.$border-default;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
 }
 
 .assignmentItem:hover {
-    background-color: #F7FAFC;
-    border-color: #CBD5E0;
+    background-color: t.$surface-subtle;
+    border-color: t.$border-strong;
 }
 
 .assignmentInfo {
@@ -43,11 +43,11 @@
 }
 
 .homeworkBadge {
-    background-color: #4299E1;
+    background-color: t.$feedback-info;
 }
 
 .quizBadge {
-    background-color: #48BB78;
+    background-color: t.$feedback-success;
 }
 
 .projectBadge {
@@ -59,16 +59,16 @@
 }
 
 .labBadge {
-    background-color: #F56565;
+    background-color: t.$feedback-danger;
 }
 
 .defaultBadge {
-    background-color: #718096;
+    background-color: t.$content-secondary;
 }
 
 .assignmentTitle {
     font-size: 0.85rem;
-    color: #2D3748;
+    color: t.$content-primary;
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
@@ -84,12 +84,12 @@
 }
 
 .assignmentItem.viewMode {
-    border-color: #E2E8F0;
-    background-color: #FFFFFF;
+    border-color: t.$border-default;
+    background-color: t.$content-on-color;
 }
 
 .assignmentItem.editMode {
-    border-color: #4299E1;
+    border-color: t.$feedback-info;
     background-color: #EBF8FF;
     border-width: 2px;
     box-shadow: 0 2px 4px rgba(66, 153, 225, 0.1);
@@ -110,7 +110,7 @@
 
 .editableTitle {
     font-size: 0.85rem;
-    color: #2D3748;
+    color: t.$content-primary;
     font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
@@ -132,7 +132,7 @@
     padding: 0.25rem 0.5rem;
     border-radius: 6px;
     background-color: white;
-    color: #2D3748;
+    color: t.$content-primary;
     outline: none;
     width: 100%;
     box-sizing: border-box;
@@ -141,7 +141,7 @@
 
 .dueTime {
     font-size: 0.75rem;
-    color: #718096;
+    color: t.$content-secondary;
     display: flex;
     align-items: center;
     gap: 0.25rem;

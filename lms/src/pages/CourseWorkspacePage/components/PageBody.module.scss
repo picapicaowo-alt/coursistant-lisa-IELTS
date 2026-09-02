@@ -14,7 +14,7 @@
 .unavailable {
     margin: 2rem auto;
     max-width: 32rem;
-    color: #718096;
+    color: t.$content-secondary;
 }
 
 .sidebar {
@@ -22,7 +22,7 @@
     min-width: 320px;
     background: white;
     border-radius: 1rem;
-    border: 1px solid #E2E8F0;
+    border: 1px solid t.$border-default;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -47,7 +47,7 @@
     height: 100%;
     background: white;
     border-radius: 1rem;
-    border: 1px solid #E2E8F0;
+    border: 1px solid t.$border-default;
     overflow-x: hidden;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;

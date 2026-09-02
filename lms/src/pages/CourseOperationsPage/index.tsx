@@ -22,7 +22,7 @@ const CourseOperationsPage: React.FC = () => {
   const id = Number(courseId);
   const access = useCourseAccess(Number.isInteger(id) ? id : null);
   const {user} = useRequiredAuth();
-  const platformAdmin = user.role === 'SYSTEM_ADMIN' || user.role === 'TENANT_ADMIN';
+  const platformAdmin = user.role === 'SYSTEM_ADMIN';
   const systemAdmin = user.role === 'SYSTEM_ADMIN';
   const staff = canAccessCourseOperations(user, access.courseRole);
   const [section, setSection] = useState<Section>('occurrences');

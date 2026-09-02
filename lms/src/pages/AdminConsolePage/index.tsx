@@ -289,7 +289,7 @@ const AdminConsolePage: React.FC = () => {
 
       <nav className={styles.tabs} aria-label="Admin sections">
         <button type="button" aria-pressed={tab === 'users'} className={tab === 'users' ? styles.activeTab : ''} onClick={() => setTab('users')}>Managed users</button>
-        <button type="button" aria-pressed={tab === 'members'} className={tab === 'members' ? styles.activeTab : ''} onClick={() => setTab('members')}>Course members</button>
+        {isSystemAdmin ? <button type="button" aria-pressed={tab === 'members'} className={tab === 'members' ? styles.activeTab : ''} onClick={() => setTab('members')}>Course members</button> : null}
         {isSystemAdmin ? <button type="button" aria-pressed={tab === 'tenants'} className={tab === 'tenants' ? styles.activeTab : ''} onClick={() => setTab('tenants')}>Tenants</button> : null}
         <button type="button" aria-pressed={tab === 'operations'} className={tab === 'operations' ? styles.activeTab : ''} onClick={() => setTab('operations')}>Operations</button>
       </nav>
@@ -355,7 +355,7 @@ const AdminConsolePage: React.FC = () => {
         </div>
       ) : null}
 
-      {tab === 'members' ? <CourseMembershipPanel/> : null}
+      {tab === 'members' && isSystemAdmin ? <CourseMembershipPanel/> : null}
 
       {tab === 'operations' ? (
         <div className={styles.operationsGrid}>

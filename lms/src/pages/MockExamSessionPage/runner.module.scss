@@ -301,7 +301,7 @@
       padding: 4px 8px;
       border: 1px solid var(--border);
       border-radius: 6px;
-      background: #fff;
+      background: t.$surface-raised;
       text-align: center;
       vertical-align: baseline;
       outline: none;
@@ -380,7 +380,7 @@
       padding: 12px 14px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .choice-box__label {
@@ -428,7 +428,7 @@
       padding: 12px 14px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .word-bank__tags {
@@ -441,7 +441,7 @@
       padding: 4px 10px;
       border: 1px solid var(--border);
       border-radius: 999px;
-      background: #f8fafc;
+      background: t.$surface-subtle;
       font-size: 13px;
     }
 
@@ -489,7 +489,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 13.5px;
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .exam-table th,
@@ -539,7 +539,7 @@
       padding: 12px 14px;
       border: 1px solid var(--border);
       border-radius: 10px;
-      background: #fff;
+      background: t.$surface-raised;
       text-align: center;
       font-size: 14px;
       line-height: 1.5;
@@ -558,7 +558,7 @@
       padding: 10px;
       border: 1px solid var(--border);
       border-radius: 12px;
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .diagram-split__image {
@@ -586,7 +586,7 @@
       padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 8px;
-      background: #fff;
+      background: t.$surface-raised;
       cursor: pointer;
       scroll-margin-top: 12px;
     }
@@ -772,7 +772,7 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       background: var(--accent);
-      color: #fff;
+      color: t.$content-on-color;
       font-size: 13px;
       cursor: pointer;
     }
@@ -846,7 +846,7 @@
     .nav-arrow--primary {
       background: var(--accent);
       border-color: var(--accent);
-      color: #fff;
+      color: t.$content-on-color;
     }
 
     .nav-arrow:hover {
@@ -892,7 +892,7 @@
       padding: 0;
       border: 1px solid var(--chip-border);
       border-radius: 4px;
-      background: #fff;
+      background: t.$surface-raised;
       color: #222;
       font-size: 12px;
       cursor: pointer;
@@ -906,14 +906,14 @@
     .q-chip.is-active {
       background: var(--accent);
       border-color: var(--accent);
-      color: #fff;
+      color: t.$content-on-color;
       outline: none;
     }
 
     .q-chip.is-answered.is-active {
       background: var(--accent);
       border-color: var(--accent);
-      color: #fff;
+      color: t.$content-on-color;
     }
 
     .q-chip.is-correct {
@@ -972,7 +972,7 @@
     }
 
     .answer-review__sep {
-      color: #9ca3af;
+      color: t.$content-placeholder;
     }
 
     .gap-input-wrap {
@@ -1049,14 +1049,14 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       background: #f9fafb;
-      color: #1f2937;
+      color: t.$content-primary;
       font-size: 13px;
       cursor: pointer;
       white-space: nowrap;
     }
 
     .bar-btn:hover {
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .bar-btn--danger {
@@ -1112,7 +1112,7 @@
       margin: 20px 0 0;
       padding: 12px;
       border: 1px solid var(--border);
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .writing-prompt__figure img {
@@ -1165,7 +1165,7 @@
       font-size: 16px;
       line-height: 1.6;
       color: var(--text);
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .writing-textarea:focus {
@@ -1346,7 +1346,7 @@
     }
 
     .audio-player__btn:hover {
-      background: #fff;
+      background: t.$surface-raised;
       border-color: var(--accent);
       color: var(--accent);
     }
@@ -1484,7 +1484,7 @@
       border: 1px solid var(--chip-border);
       border-radius: 4px;
       padding: 2px 8px;
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .lq-gap__input:focus,
@@ -1607,7 +1607,7 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       padding: 12px 14px;
-      background: #fff;
+      background: t.$surface-raised;
       text-align: center;
       font-size: 14px;
     }
@@ -1740,7 +1740,7 @@
       height: auto;
       border: 1px solid var(--border);
       border-radius: 6px;
-      background: #fff;
+      background: t.$surface-raised;
     }
 
     .lq-plan__answers {

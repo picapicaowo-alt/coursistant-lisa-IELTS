@@ -1,53 +1,121 @@
 @import "tailwindcss";
 
-body,
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
+body,
 #root {
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-    overflow: hidden;
-    background-color: #EDF2F7;
-    font-family: 'Inter', sans-serif;
+  width: 100%;
+  min-width: 20rem;
+  height: 100%;
+  margin: 0;
+}
+
+html {
+  background: var(--xl-surface-page);
+  scroll-padding-block: var(--xl-shell-header-height) 6rem;
+}
+
+body {
+  overflow: hidden;
+  background: var(--xl-surface-page);
+  color: var(--xl-content-primary);
+  font-family: var(--xl-font-family);
+  font-size: var(--xl-font-body);
+  line-height: 1.45;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  color: inherit;
+  font: inherit;
+}
+
+button,
+[role='button'],
+a,
+summary,
+label[for] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled),
+[role='button']:not([aria-disabled='true']),
+summary {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled='true'] {
+  cursor: not-allowed;
+}
+
+a {
+  color: inherit;
+  text-underline-offset: .18em;
+}
+
+::selection {
+  background: var(--xl-surface-brand-subtle);
+  color: var(--xl-content-primary);
+}
+
+::placeholder {
+  color: var(--xl-content-placeholder);
+  opacity: 1;
+}
+
+:focus-visible {
+  outline: 2px solid var(--xl-action-primary);
+  outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
 }
 
 * {
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-    scroll-behavior: smooth;
+  scrollbar-color: var(--xl-border-strong) transparent;
+  scrollbar-width: thin;
 }
 
 *::-webkit-scrollbar {
-    width: 0;
-    height: 0;
-    background: transparent;
+  width: .5rem;
+  height: .5rem;
 }
 
 *::-webkit-scrollbar-track {
-    background: transparent;
-    border-radius: 0;
+  background: transparent;
 }
 
 *::-webkit-scrollbar-thumb {
-    background: transparent;
-    border-radius: 0;
-    border: 0 solid transparent;
+  border: 2px solid transparent;
+  border-radius: var(--xl-radius-round);
+  background: var(--xl-border-strong);
+  background-clip: padding-box;
 }
 
-*:hover::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
-*:hover::-webkit-scrollbar-thumb {
-    background: rgba(160, 160, 160, 0.4);
-    border-radius: 3px;
-    
-    &:hover {
-        background: rgba(160, 160, 160, 0.6);
-    }
-}
-
-*:hover::-webkit-scrollbar-track {
-    background: transparent;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

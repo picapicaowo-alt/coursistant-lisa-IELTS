@@ -8,7 +8,7 @@ const agentApi = vi.hoisted(() => ({
   decideDeadlineChange: vi.fn(),
 }));
 const auth = vi.hoisted(() => ({
-  user: {id: 42, name: 'Teacher', level: 'INSTRUCTOR'},
+  user: {id: 42, name: 'Teacher', role: 'USER', level: 'INSTRUCTOR'},
 }));
 
 vi.mock('@/apis/services/ai-agent-api', () => ({aiAgentApiService: agentApi}));
@@ -26,12 +26,12 @@ const pasteWorkflowText = async (user: ReturnType<typeof userEvent.setup>, text:
 describe('WorkflowPanel', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    auth.user = {id: 42, name: 'Teacher', level: 'INSTRUCTOR'};
+    auth.user = {id: 42, name: 'Teacher', role: 'USER', level: 'INSTRUCTOR'};
     Element.prototype.scrollIntoView = vi.fn();
   });
 
   it('keeps deadline changes out of the student workflow', async () => {
-    auth.user = {id: 43, name: 'Student', level: 'STUDENT'};
+    auth.user = {id: 43, name: 'Student', role: 'USER', level: 'STUDENT'};
     agentApi.chat.mockResolvedValue({
       reply: 'Allow this deadline change?',
       pendingAction: {actionId: 'action-student', type: 'ASSIGNMENT_DEADLINE_CHANGE'},
@@ -70,6 +70,21 @@ describe('WorkflowPanel', () => {
     expect(await screen.findByText('You teach two courses.')).toBeInTheDocument();
     expect(screen.queryByText('Try asking')).not.toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'List my courses.'})).not.toBeInTheDocument();
+  });
+
+  it('uses the instructor workflow for instructor-advisors', async () => {
+    auth.user = {id: 44, name: 'Hybrid', role: 'USER', level: 'INSTRUCTOR_ADVISOR'};
+    agentApi.chat.mockResolvedValue({reply: 'Ready.', pendingAction: null});
+    const user = userEvent.setup();
+    render(<WorkflowPanel/>);
+
+    expect(screen.getByText('Instructor workflow')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', {name: 'List my courses.'}));
+
+    await waitFor(() => expect(agentApi.chat).toHaveBeenCalledWith({
+      message: 'List my courses.',
+      role: 'INSTRUCTOR',
+    }));
   });
 
   it('toggles the focused Workflow view from the panel header', async () => {

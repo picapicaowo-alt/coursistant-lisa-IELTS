@@ -31,7 +31,7 @@
     padding: 0.55rem 1.2rem;
     border-radius: t.$radius-control;
     background-color: t.$brand;
-    color: #ffffff;
+    color: t.$content-on-color;
     cursor: pointer;
 }
 
@@ -424,7 +424,7 @@
     flex: 0 0 auto;
     font-size: 0.75rem;
     font-weight: t.$fw-semibold;
-    color: #ffffff;
+    color: t.$content-on-color;
     background-color: t.$type-green;
     padding: 0.15rem 0.6rem;
     border-radius: t.$radius-pill;

@@ -34,7 +34,7 @@
                 width: 50px;
                 height: 50px;
                 border-radius: 50%;
-                border: 1px solid #E2E8F0;
+                border: 1px solid t.$border-default;
             }
             .announcement-container-content-header-instructor-info {
                 margin-left: 0.7rem;
@@ -42,11 +42,11 @@
                     font-size: 1rem;
                     font-weight: 400;
                     margin: 0;
-                    color: #2D3748;
+                    color: t.$content-primary;
                 }
                 p {
                     font-size: 0.95rem;
-                    color: #718096;
+                    color: t.$content-secondary;
                     margin: 0;
                 }
             }
@@ -57,7 +57,7 @@
                 margin-left: 1rem;
                 p {
                     font-size: 0.95rem;
-                    color: #A0AEC0;
+                    color: t.$content-placeholder;
                     margin: 0;
                 }
             }
@@ -72,11 +72,11 @@
             }
             p {
                 font-size: 1rem;
-                color: #718096;
+                color: t.$content-secondary;
                 margin: 0;
                 a {
                     margin-left: 0.4rem;
-                    color: #4299E1;
+                    color: t.$feedback-info;
                     text-decoration: none;
                 }
             }

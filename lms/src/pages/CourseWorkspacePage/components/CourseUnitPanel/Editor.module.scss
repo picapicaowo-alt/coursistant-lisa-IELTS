@@ -17,7 +17,7 @@
 .unitTitleInput {
     font-size: 1.25rem;
     font-weight: 600;
-    color: #2D3748;
+    color: t.$content-primary;
     background: transparent;
     border: none;
     padding: 0.5rem;
@@ -25,12 +25,12 @@
     transition: all 0.2s ease;
     
     &::placeholder {
-        color: #94A3B8;
+        color: t.$content-placeholder;
         font-weight: 500;
     }
     
     &:hover {
-        background: #F8FAFC;
+        background: t.$surface-subtle;
     }
     
     &:focus {
@@ -42,7 +42,7 @@
 
 .unitSubtitleInput {
     font-size: 0.875rem;
-    color: #64748B;
+    color: t.$content-secondary;
     background: transparent;
     border: none;
     padding: 0.5rem;
@@ -50,11 +50,11 @@
     transition: all 0.2s ease;
     
     &::placeholder {
-        color: #94A3B8;
+        color: t.$content-placeholder;
     }
     
     &:hover {
-        background: #F8FAFC;
+        background: t.$surface-subtle;
     }
     
     &:focus {
@@ -73,25 +73,25 @@
     width: 100%;
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
-    color: #2D3748;
+    color: t.$content-primary;
     background: white;
-    border: 1px solid #E2E8F0;
+    border: 1px solid t.$border-default;
     border-radius: 0.75rem;
     resize: vertical;
     transition: all 0.2s ease;
     line-height: 1.5;
     
     &::placeholder {
-        color: #94A3B8;
+        color: t.$content-placeholder;
     }
     
     &:hover {
-        border-color: #CBD5E0;
+        border-color: t.$border-strong;
     }
     
     &:focus {
         outline: none;
-        border-color: #566FE8;
+        border-color: t.$action-primary;
         box-shadow: 0 0 0 3px rgba(86, 111, 232, 0.1);
     }
 }

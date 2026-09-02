@@ -25,7 +25,7 @@
 .answerHeading { display: flex; align-items: center; justify-content: space-between; }
 .answerHeading > div { display: grid; gap: .15rem; }
 .answerHeading span, .empty { color: t.$text-muted; }
-.answerCard blockquote { margin: 1rem 0; padding: .85rem 1rem; border-left: 3px solid t.$brand; background: t.$card-bg; line-height: 1.6; }
+.answerCard blockquote { margin: 1rem 0; padding: .85rem 1rem; border-inline-start: 2px solid t.$brand; background: t.$card-bg; line-height: 1.6; }
 .pending { color: t.$warning !important; }
 .graded, .success { color: t.$success !important; }
 .graded { display: inline-flex; align-items: center; gap: .3rem; }
@@ -76,7 +76,7 @@
 .resultQuestionHeader > div > span { color: t.$brand; font-size: .7rem; font-weight: t.$fw-semibold; text-transform: uppercase; }
 .resultQuestionHeader p { margin: .25rem 0 0; }
 .resultQuestionHeader > strong { flex: 0 0 auto; color: t.$brand; }
-.shortAnswerResult { margin-top: .8rem; padding: .8rem; border-left: 3px solid t.$brand; background: t.$subcard-bg; }
+.shortAnswerResult { margin-top: .8rem; padding: .8rem; border-inline-start: 2px solid t.$brand; background: t.$subcard-bg; }
 .shortAnswerResult > span { color: t.$text-muted; font-size: .7rem; font-weight: t.$fw-semibold; text-transform: uppercase; }
 .shortAnswerResult p { margin: .3rem 0 0; }
 .resultOptions { display: grid; gap: .45rem; margin: .8rem 0 0; padding: 0; list-style: none; }

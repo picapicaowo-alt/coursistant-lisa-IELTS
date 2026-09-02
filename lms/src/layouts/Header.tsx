@@ -1,99 +1,161 @@
 import {useEffect, useRef, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
+import {ChevronDown, LogOut, Settings, ShieldCheck, UserRound, type LucideIcon} from 'lucide-react';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import NotificationCenter from '../components/NotificationCenter';
-import './Header.scss';
+import {canAccessAdminConsole, canAccessCourseCatalogue} from '@/utils/roleCapabilities';
+import styles from './Header.module.scss';
 
 interface MenuItem {
   id: string;
-  icon: string;
+  icon: LucideIcon;
   label: string;
   path?: string;
 }
 
+const getWorkspaceLabel = (pathname: string): string => {
+  if (pathname === '/') return 'Dashboard';
+  if (pathname.startsWith('/course')) return 'Courses';
+  if (pathname.startsWith('/calendar')) return 'Calendar';
+  if (pathname.startsWith('/aibot')) return 'AI Workplace';
+  if (pathname.startsWith('/mock-exams')) return 'Mock exams';
+  if (pathname.startsWith('/advisor/students')) return 'Students';
+  if (pathname.startsWith('/advisor')) return 'Advisor operations';
+  if (pathname.startsWith('/counsellor')) return 'Counsellor operations';
+  if (pathname.startsWith('/my-plan')) return 'My plan';
+  if (pathname.startsWith('/my-operations')) return 'Learning operations';
+  if (pathname.startsWith('/profile')) return 'Profile';
+  if (pathname.startsWith('/settings')) return 'Settings';
+  if (pathname.startsWith('/admin')) return 'Administration';
+  if (pathname.startsWith('/parent')) return 'Student progress';
+  if (pathname.startsWith('/vocabulary')) return 'Vocabulary';
+  return 'X-Learn';
+};
+
 const Header = () => {
   const {t} = useTranslation();
   const {user, logout} = useAuth();
+  const {pathname} = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const name = user?.name;
   const email = user?.email;
   const profileImage = user?.avatar || '/icons/default_avatar.jpg';
-  const canUseAdminConsole = user?.role === 'SYSTEM_ADMIN' || user?.role === 'TENANT_ADMIN';
+  const canUseAdminConsole = user ? canAccessAdminConsole(user) : false;
+  const canSearchCourses = user ? canAccessCourseCatalogue(user) && user.role === 'USER' : false;
 
   useEffect(() => {
-    const handleClickOutside = (event: Event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+    if (!isProfileOpen) return;
+
+    const handleClickOutside = (event: PointerEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) setIsProfileOpen(false);
+    };
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
         setIsProfileOpen(false);
+        menuButtonRef.current?.focus();
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('pointerdown', handleClickOutside);
+    document.addEventListener('keydown', handleEscape);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('pointerdown', handleClickOutside);
+      document.removeEventListener('keydown', handleEscape);
     };
-  }, []);
+  }, [isProfileOpen]);
 
   const profileMenuItems: MenuItem[] = [
-    {id: 'profile', icon: '/icons/profile-menu/profile.png', label: t('menu.profile'), path: '/profile'},
-    {id: 'settings', icon: '/icons/profile-menu/setting.png', label: t('menu.settings'), path: '/settings'},
+    {id: 'profile', icon: UserRound, label: t('menu.profile'), path: '/profile'},
+    {id: 'settings', icon: Settings, label: t('menu.settings'), path: '/settings'},
     ...(canUseAdminConsole
-      ? [{id: 'admin', icon: '/icons/profile-menu/setting.png', label: 'Admin Console', path: '/admin'}]
+      ? [{id: 'admin', icon: ShieldCheck, label: 'Admin Console', path: '/admin'}]
       : []),
-    {id: 'logout', icon: '/icons/profile-menu/logout.png', label: t('menu.signOut')},
+    {id: 'logout', icon: LogOut, label: t('menu.signOut')},
   ];
 
   const handleItemClick = (item: MenuItem) => {
+    setIsProfileOpen(false);
     if (item.id === 'logout') {
       void logout();
       return;
     }
-    setIsProfileOpen(false);
     if (item.path) navigate(item.path);
   };
 
   return (
-    <div className="lms-home-header">
-      <div className="spacer"/>
-      {user?.role === 'USER' && <NotificationCenter/>}
-      <div className="profile">
-        <img
-          className="profile-avatar"
-          src={profileImage}
-          alt="profile"
-          onError={event => {
-            event.currentTarget.onerror = null;
-            event.currentTarget.src = '/icons/default_avatar.jpg';
+    <header className={styles.header}>
+      {canSearchCourses ? (
+        <form
+          className={styles.search}
+          role="search"
+          onSubmit={event => {
+            event.preventDefault();
+            if (searchQuery.trim()) navigate(`/course?search=${encodeURIComponent(searchQuery.trim())}`);
           }}
-        />
-        <div className="profile-info">
-          <p>{name}</p>
-          <p className="profile-email">{email}</p>
+        >
+          <img src="/icons/figma-dashboard/search.svg" alt=""/>
+          <input
+            value={searchQuery}
+            onChange={event => setSearchQuery(event.target.value)}
+            placeholder="What do you want to learn?"
+            aria-label="Search courses"
+          />
+        </form>
+      ) : (
+        <div className={styles.workspaceContext}>
+          <span>Workspace</span>
+          <strong>{getWorkspaceLabel(pathname)}</strong>
         </div>
-        <div className="profile-arrow-container" ref={menuRef}>
+      )}
+
+      <div className={styles.accountActions}>
+        {user?.role === 'USER' ? <NotificationCenter/> : null}
+        <div className={styles.profile} ref={menuRef}>
+          <img
+            className={styles.avatar}
+            src={profileImage}
+            alt=""
+            onError={event => {
+              event.currentTarget.onerror = null;
+              event.currentTarget.src = '/icons/default_avatar.jpg';
+            }}
+          />
+          <div className={styles.profileCopy}>
+            <strong>{name}</strong>
+            <span>{email}</span>
+          </div>
           <button
+            ref={menuButtonRef}
             type="button"
-            className="profile-arrow-button"
+            className={styles.menuButton}
             onClick={() => setIsProfileOpen(open => !open)}
             aria-label={t('menu.profile')}
             aria-expanded={isProfileOpen}
+            aria-controls="profile-menu"
           >
-            <img className="profile-arrow" src="/icons/below_arrow.png" alt=""/>
+            <ChevronDown size={17} aria-hidden="true"/>
           </button>
-          {isProfileOpen && (
-            <div className="profile-menu">
-              {profileMenuItems.map(item => (
-                <button type="button" className="dropdown-item" key={item.id} onClick={() => handleItemClick(item)}>
-                  <img className="profile-menu-icon" src={item.icon} alt=""/>
-                  <p>{item.label}</p>
-                </button>
-              ))}
+
+          {isProfileOpen ? (
+            <div id="profile-menu" className={styles.profileMenu}>
+              {profileMenuItems.map(item => {
+                const Icon = item.icon;
+                return (
+                  <button type="button" key={item.id} onClick={() => handleItemClick(item)}>
+                    <Icon size={18} strokeWidth={1.8} aria-hidden="true"/>
+                    <span>{item.label}</span>
+                  </button>
+                );
+              })}
             </div>
-          )}
+          ) : null}
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

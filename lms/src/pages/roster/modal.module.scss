@@ -21,7 +21,7 @@
     max-width: 800px;
     display: flex;
     flex-direction: column;
-    border: 1px solid #E2E8F0;
+    border: 1px solid t.$border-default;
 }
 
 .modalHeader {
@@ -42,7 +42,7 @@
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    color: #A0AEC0;
+    color: t.$content-placeholder;
 }
 
 .bodyContainer {
@@ -57,14 +57,14 @@
     font-weight: 600;
     padding: 0.5rem 0;
     margin-bottom: 1.5rem;
-    // border-bottom: 1px solid #E2E8F0;
+    // border-bottom: 1px solid t.$border-default;
 
     &:focus {
         outline: none;
     }
 
     &::placeholder {
-        color: #A0AEC0;
+        color: t.$content-placeholder;
     }
 }
 
@@ -83,7 +83,7 @@
 }
 
 .detailValue {
-    color: #A0AEC0;
+    color: t.$content-placeholder;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -92,7 +92,7 @@
 .descriptionContainer {
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
-    background-color: #F7FAFC;
+    background-color: t.$surface-subtle;
     padding: 1rem;
     border-radius: 0.5rem;
     flex-grow: 1;
@@ -118,21 +118,21 @@
 
 .publishButtonDraft {
     cursor: pointer;
-    background-color: #F7FAFC;
-    color: #A0AEC0;
+    background-color: t.$surface-subtle;
+    color: t.$content-placeholder;
     font-size: 0.875rem;
     padding: 0.5rem 1rem;
     border-radius: 0.75rem;
-    border: 1px solid #E2E8F0;
+    border: 1px solid t.$border-default;
     transition: all 0.3s;
 
     &:hover {
-        background-color: #E2E8F0;
+        background-color: t.$border-default;
     }
 }
 
 .publishButton {
-    background-color: #566FE8;
+    background-color: t.$action-primary;
     cursor: pointer;
     color: white;
     font-size: 0.875rem;

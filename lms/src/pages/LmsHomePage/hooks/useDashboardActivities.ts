@@ -2,6 +2,7 @@ import {useQuery} from '@tanstack/react-query';
 import {dashboardApiService, DASHBOARD_LIMITS} from '@/apis/services/dashboard-api';
 import {UpcomingActivity} from '@/apis';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
+import {isInstructorLevel} from '@/utils/roleCapabilities';
 
 /**
  * How far ahead the schedule widget loads.
@@ -41,7 +42,7 @@ const toDateKey = (date: Date): string => {
  */
 export const useDashboardActivities = (): DashboardActivitiesResult => {
   const {user} = useRequiredAuth();
-  const isInstructor = user.level === 'INSTRUCTOR';
+  const isInstructor = isInstructorLevel(user);
 
   const query = useQuery({
     queryKey: ['dashboard', 'activities', user.id, isInstructor],

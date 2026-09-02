@@ -26,7 +26,7 @@ const getRolePriority = (role?: string) => (role && ROLE_PRIORITY[role]) || 4;
  * Filters are part of the Query key; successful writes invalidate every page
  * for this course so counts and role groupings cannot drift apart.
  */
-export const useRoster = () => {
+export const useRoster = ({enabled = true}: {enabled?: boolean} = {}) => {
   const {courseId} = useParams();
   const queryClient = useQueryClient();
   const parsedCourseId = Number(courseId);
@@ -46,7 +46,7 @@ export const useRoster = () => {
       }),
       'listCourseMembers',
     ),
-    enabled: id !== null,
+    enabled: id !== null && enabled,
     staleTime: 30_000,
     retry: (failureCount, error) => (
       // A permission denial is stable for the current session and retrying it
@@ -100,7 +100,7 @@ export const useRoster = () => {
       setFilters(next);
       setPage(0);
     },
-    isLoading: id !== null && query.isPending,
+    isLoading: id !== null && enabled && query.isPending,
     isError: query.isError,
     isForbidden: (query.error as {code?: number} | null)?.code === 403,
     refetch: () => void query.refetch(),

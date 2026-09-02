@@ -5,17 +5,17 @@
     padding: 1rem;
     background: white;
     border-radius: 0.5rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid t.$border-default;
     transition: all 0.2s;
     width: 100%;
     
     &:hover {
-        border-color: #cbd5e0;
+        border-color: t.$border-strong;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
     
     &:focus-within {
-        border-color: #566fe8;
+        border-color: t.$action-primary;
         box-shadow: 0 0 0 3px rgba(86, 111, 232, 0.1);
     }
 }
@@ -31,13 +31,13 @@
 }
 
 .title {
-    color: #2d3748;
+    color: t.$content-primary;
     font-size: 0.875rem;
     font-weight: 500;
 }
 
 .description {
-    color: #718096;
+    color: t.$content-secondary;
     font-size: 0.75rem;
     line-height: 1.4;
 }

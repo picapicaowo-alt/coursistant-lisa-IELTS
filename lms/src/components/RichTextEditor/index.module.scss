@@ -1,15 +1,15 @@
 @use "sass:color";
 
-$primary-color: #566FE8;
+$primary-color: t.$action-primary;
 $primary-light: #EDF2FF;
-$border-color: #E2E8F0;
-$border-hover: #CBD5E0;
+$border-color: t.$border-default;
+$border-hover: t.$border-strong;
 $bg-color: white;
-$bg-hover: #F8FAFC;
+$bg-hover: t.$surface-subtle;
 $bg-disabled: #F1F5F9;
-$text-primary: #2D3748;
-$text-secondary: #64748B;
-$text-tertiary: #94A3B8;
+$text-primary: t.$content-primary;
+$text-secondary: t.$content-secondary;
+$text-tertiary: t.$content-placeholder;
 $border-radius: 1rem;
 $spacing-xs: 0.25rem;
 $spacing-sm: 0.5rem;
@@ -89,7 +89,7 @@ $shadow-focus: 0 0 0 3px rgba(86, 111, 232, 0.1);
 .toolbarContainer {
     padding: $spacing-sm $spacing-md;
     border-bottom: 1px solid $border-color;
-    background: linear-gradient(to bottom, #F8FAFC, #F1F5F9);
+    background: linear-gradient(to bottom, t.$surface-subtle, t.$surface-toolbar);
     display: flex;
     flex-wrap: wrap;
     gap: $spacing-sm;
@@ -490,8 +490,8 @@ $shadow-focus: 0 0 0 3px rgba(86, 111, 232, 0.1);
     
     blockquote {
         margin: 1em 0;
-        padding-left: 1em;
-        border-left: 3px solid $primary-color;
+        padding-inline-start: 1em;
+        border-inline-start: 2px solid $primary-color;
         color: $text-secondary;
         font-style: italic;
         
@@ -559,10 +559,10 @@ $shadow-focus: 0 0 0 3px rgba(86, 111, 232, 0.1);
 
     pre {
         background: #111827;
-        border-color: #1F2937;
+        border-color: t.$content-primary;
 
         code {
-            color: #F8FAFC;
+            color: t.$surface-subtle;
         }
     }
 }

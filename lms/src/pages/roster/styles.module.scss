@@ -28,7 +28,7 @@
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                border: 1px solid #CBD5E0;
+                border: 1px solid t.$border-strong;
                 border-radius: 10px;
                 width: 30%;
                 max-width: 300px;
@@ -50,7 +50,7 @@
                 justify-content: flex-start;
                 align-items: center;
                 gap: 0.2rem;
-                border: 1px solid #CBD5E0;
+                border: 1px solid t.$border-strong;
                 border-radius: 0.5rem;
                 padding: 0.1rem 0.2rem;
                 .listView {
@@ -61,7 +61,7 @@
                     cursor: pointer;
                     padding: 0.3rem 0.5rem;
                     border-radius: 0.7rem;
-                    color: #A0AEC0;
+                    color: t.$content-placeholder;
                     transition: background-color 0.3s ease;
                     img {
                         margin-right: 0.5rem;
@@ -102,15 +102,15 @@
                     .rosterBodyListItem {
                         display: flex;
                         flex-direction: column;
-                        border: 1px solid #CBD5E0;
+                        border: 1px solid t.$border-strong;
                         border-radius: 10px;
                         padding: 1rem;
                         cursor: pointer;
                         &.active {
-                            border: 1px solid #566FE8;
+                            border: 1px solid t.$action-primary;
                         }
                         &:hover {
-                            border: 1px solid #566FE8;
+                            border: 1px solid t.$action-primary;
                         }
                         .rosterBodyListItemFooter {
                             display: flex;
@@ -142,7 +142,7 @@
                                 justify-content: center;   
                                 gap: 0.3rem;
                                 .lightText {
-                                    color: #718096;
+                                    color: t.$content-secondary;
                                 }
                             }
                         }
@@ -160,12 +160,12 @@
                     flex-direction: row;
                     align-items: center;
                     justify-content: space-between;
-                    border: 1px solid #CBD5E0;
+                    border: 1px solid t.$border-strong;
                     border-radius: 10px;
                     padding: 0.8rem;
                     background-color: rgba(226, 232, 240, 1);
                     font-size: 0.9rem;
-                    color: #718096;
+                    color: t.$content-secondary;
                     .student {
                         width: 40%;
                         
@@ -206,10 +206,10 @@
                         flex-direction: row;
                         align-items: center;
                         justify-content: space-between;
-                        border-bottom: 1px solid #CBD5E0;
+                        border-bottom: 1px solid t.$border-strong;
                         padding: 0.8rem;
                         font-size: 0.9rem;
-                        color: #718096;
+                        color: t.$content-secondary;
                         cursor: pointer;
                         position: relative;
                         &:hover {
@@ -237,11 +237,11 @@
                                     align-items: center;
                                     h1 {
                                         font-size: 1rem;
-                                        color: #2D3748;
+                                        color: t.$content-primary;
                                     }
                                     .Instrs {
                                         margin-left: 0.3rem;
-                                        border: 1px solid #CBD5E0;
+                                        border: 1px solid t.$border-strong;
                                         border-radius: 0.5rem;
                                         padding: 0rem 0.5rem;
                                         background-color: #A8D2FF;
@@ -249,7 +249,7 @@
                                     }
                                     .TAs {
                                         margin-left: 0.3rem;
-                                        border: 1px solid #CBD5E0;
+                                        border: 1px solid t.$border-strong;
                                         border-radius: 0.5rem;
                                         padding: 0rem 0.5rem;
                                         background-color: #B2DFCC;
@@ -269,26 +269,26 @@
                                 width: 70%;
                                 height: 0.5rem;
                                 max-width: 300px;
-                                // background-color: #E2E8F0;
+                                // background-color: t.$border-default;
                                 border-radius: 0.5rem;
-                                border: 1px solid #E2E8F0;
+                                border: 1px solid t.$border-default;
                                 // margin: 0.4rem auto;
                                 background-color: white;
                             }
                             .progressBarFill {
                                 width: 85%;
                                 height: 0.5rem;
-                                background-color: #566FE8;
+                                background-color: t.$action-primary;
                                 border-radius: 0.5rem;
                             }
                         }
                         .group {
                             width: 15%;
-                            color:#2D3748;
+                            color:t.$content-primary;
                         }
                         .stuId {
                             width: 12%;
-                            color:#2D3748;
+                            color:t.$content-primary;
                             
                             
                         }
@@ -333,12 +333,12 @@
                         padding: 0.2rem 0.6rem;
                         &:hover {
                             color: white;
-                            background-color: #566FE8;
+                            background-color: t.$action-primary;
                             border-radius: 8px;
                         }
                         &.active {
                             color: white;
-                            background-color: #566FE8;
+                            background-color: t.$action-primary;
                             border-radius: 10px;
                         }
                     }
@@ -367,10 +367,10 @@
     .roster-ai-assistant {
         width: 40%;
         max-width: 600px;
-        border: 1px solid #CBD5E0;
+        border: 1px solid t.$border-strong;
         border-radius: 0 10px 10px 0;
         padding: 1rem;
-        background-color: #F8FAFC;
+        background-color: t.$surface-subtle;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -407,10 +407,10 @@
                     background-color: white;
                     cursor: pointer;
                     &:hover {
-                        background-color: #EDF2F7;
+                        background-color: t.$surface-muted;
                     }
                     p {
-                        color: #718096;
+                        color: t.$content-secondary;
                     }
                 }
             }
@@ -429,7 +429,7 @@
                     flex-direction: row;
                     align-items: center;
                     width: 10.2rem;
-                    background-color: #566FE8;
+                    background-color: t.$action-primary;
                     padding: 0.5rem 0.8rem;
                     border-radius: 0.5rem;
                     font-size: 0.9rem;
@@ -481,14 +481,14 @@
             background-origin: border-box;
             background-clip: padding-box, border-box;
             p {
-                color: #A0AEC0;
+                color: t.$content-placeholder;
                 margin-left: 0.3rem;
             }
             .roster-footer-actions {
                 display: flex;
                 align-items: center;
                 cursor: pointer;
-                background-color: #566FE8;
+                background-color: t.$action-primary;
                 padding: 0.8rem 1.2rem;
                 border-radius: 1rem;
                 font-size: 0.9rem;

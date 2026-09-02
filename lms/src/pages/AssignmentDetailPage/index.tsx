@@ -28,6 +28,7 @@ import {SubmitAssignmentDialog} from './SubmitAssignmentDialog';
 import {StudentSubmissionHistory} from './StudentSubmissionHistory';
 import {uploadRubricWithReplaceConfirmation} from './rubricUpload';
 import {loadRubricState} from './rubricState';
+import {isStudentAccount} from '@/utils/roleCapabilities';
 import {
   buildEmptySubmissionState,
   formatSubmissionStatus,
@@ -230,7 +231,7 @@ const AssignmentDetailPage = () => {
     ? access.isStudent
     : assignmentQuery.data
       ? !isStaff
-      : user?.level === 'STUDENT';
+      : user ? isStudentAccount(user) : false;
 
   const submissionQuery = useQuery({
     queryKey: ['assignment-submission', courseId, assignmentId],

@@ -4,7 +4,7 @@
 .backLink { display: inline-block; margin-bottom: 0.35rem; color: t.$brand; font-size: t.$fs-caption; text-decoration: none; }
 .count, .enrolHint { color: t.$text-muted; font-size: t.$fs-caption; }
 .status { display: flex; flex-direction: column; align-items: center; gap: 0.75rem; padding: 3rem 1rem; color: t.$text-muted; }
-.retry, .primary { min-height: 2.4rem; padding: 0 1.2rem; border-radius: t.$radius-control; background: t.$brand; color: #fff; font-weight: t.$fw-semibold; cursor: pointer; }
+.retry, .primary { min-height: 2.4rem; padding: 0 1.2rem; border-radius: t.$radius-control; background: t.$brand; color: t.$content-on-color; font-weight: t.$fw-semibold; cursor: pointer; }
 .addStudents { align-self: flex-start; min-height: 2.5rem; padding: 0 1.2rem; border: 1px dashed t.$border; border-radius: t.$radius-control; color: t.$brand; cursor: pointer; }
 .enrolPanel { display: flex; flex-direction: column; gap: 0.65rem; padding: 1.1rem; border: 1px solid t.$border; border-radius: t.$radius-card; background: t.$card-bg; }
 .enrolTitle { color: t.$text; font-size: t.$fs-card-title; font-weight: t.$fw-bold; }
@@ -22,7 +22,7 @@
 .search { min-width: 16rem; }
 .roleFilters { flex-wrap: wrap; gap: 0.35rem; }
 .filterChip { padding: 0.45rem 0.85rem; border-radius: t.$radius-pill; color: t.$text-muted; font-size: t.$fs-caption; cursor: pointer; }
-.filterChipActive { background: t.$brand; color: #fff; }
+.filterChipActive { background: t.$brand; color: t.$content-on-color; }
 .toggle { color: t.$text-muted; font-size: t.$fs-caption; cursor: pointer; }
 .tableWrap { overflow-x: auto; border: 1px solid t.$border; border-radius: t.$radius-card; background: t.$card-bg; }
 .table { width: 100%; min-width: 52rem; border-collapse: collapse; }
@@ -32,7 +32,7 @@
 .table tr:last-child td { border-bottom: 0; }
 .withdrawnRow { opacity: 0.58; }
 .email { color: t.$text-muted !important; }
-.roleBadge { display: inline-block; padding: 0.16rem 0.6rem; border-radius: t.$radius-pill; color: #fff; font-size: 0.75rem; font-weight: t.$fw-semibold; }
+.roleBadge { display: inline-block; padding: 0.16rem 0.6rem; border-radius: t.$radius-pill; color: t.$content-on-color; font-size: 0.75rem; font-weight: t.$fw-semibold; }
 .roleInstructor { background: t.$brand; } .roleTA { background: t.$type-green; } .roleStudent { background: t.$text-placeholder; }
 .active { color: t.$type-green; font-size: t.$fs-caption; } .withdrawn { color: t.$text-muted; font-size: t.$fs-caption; }
 .frozen { display: block; margin-top: 0.2rem; color: t.$type-orange; font-size: 0.7rem; }
@@ -53,7 +53,7 @@
 .permissionOption small { color: t.$text-muted; font-size: t.$fs-caption; }
 .dialogActions { display: flex; justify-content: flex-end; gap: 0.65rem; }
 .dialogActions button { min-height: 2.4rem; padding: 0 1rem; border: 1px solid t.$border; border-radius: t.$radius-control; cursor: pointer; }
-.dialogActions .primary { border-color: t.$brand; background: t.$brand; color: #fff; }
+.dialogActions .primary { border-color: t.$brand; background: t.$brand; color: t.$content-on-color; }
 .pagination { justify-content: center; color: t.$text-muted; font-size: t.$fs-caption; }
 .visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 

@@ -18,7 +18,7 @@
 .assignmentTitle {
     font-size: 1.75rem;
     font-weight: 700;
-    color: #2d3748;
+    color: t.$content-primary;
     margin-bottom: 0.75rem;
     word-wrap: break-word;
 }
@@ -41,7 +41,7 @@
 }
 
 .dueTime {
-    color: #718096;
+    color: t.$content-secondary;
     font-size: 0.875rem;
     white-space: nowrap;
 }
@@ -57,8 +57,8 @@
 }
 
 .reviewSummary {
-    background-color: #f8fafc;
-    border: 1px solid #e2e8f0;
+    background-color: t.$surface-subtle;
+    border: 1px solid t.$border-default;
     border-radius: 0.75rem;
     padding: 1rem;
     min-width: 200px;
@@ -77,14 +77,14 @@
 }
 
 .gradeLabel {
-    color: #718096;
+    color: t.$content-secondary;
     font-size: 0.875rem;
 }
 
 .gradeValue {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #566fe8;
+    color: t.$action-primary;
 }
 
 .commentPreview {

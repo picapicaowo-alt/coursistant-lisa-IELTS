@@ -36,8 +36,8 @@
     }
     
     &:disabled {
-        background-color: #f8fafc;
-        color: #94a3b8;
+        background-color: t.$surface-subtle;
+        color: t.$content-placeholder;
         cursor: not-allowed;
     }
     
@@ -51,7 +51,7 @@
 .gradeSuffix {
     position: absolute;
     right: 16px;
-    color: #64748b;
+    color: t.$content-secondary;
     font-size: 14px;
     font-weight: 500;
 }
@@ -111,15 +111,15 @@
 
 .previousReview {
     padding: 16px;
-    background-color: #f8fafc;
+    background-color: t.$surface-subtle;
     border-radius: 8px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid t.$border-default;
 }
 
 .previousTitle {
     font-size: 13px;
     font-weight: 500;
-    color: #64748b;
+    color: t.$content-secondary;
     margin-bottom: 8px;
     display: flex;
     align-items: center;
@@ -144,7 +144,7 @@
     }
     
     & span:last-child {
-        color: #94a3b8;
+        color: t.$content-placeholder;
         font-size: 14px;
     }
 }
@@ -156,11 +156,11 @@
     padding: 12px;
     background: white;
     border-radius: 6px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid t.$border-default;
 }
 
 .gradedTime {
     font-size: 12px;
-    color: #94a3b8;
+    color: t.$content-placeholder;
     text-align: right;
 }

@@ -1,9 +1,9 @@
 ﻿@mixin form-input-base {
     font-size: 0.875rem;
-    border: 1px solid #cbd5e0;
+    border: 1px solid t.$border-strong;
     border-radius: 0.375rem;
     padding: 0.5rem 0.75rem;
-    color: #2d3748;
+    color: t.$content-primary;
     outline: none;
     background-color: white;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -11,18 +11,18 @@
     width: 100%;
     
     &:focus {
-        border-color: #4299e1;
+        border-color: t.$feedback-info;
         box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
     }
     
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
-        background-color: #f7fafc;
+        background-color: t.$surface-subtle;
     }
     
     &::placeholder {
-        color: #a0aec0;
+        color: t.$content-placeholder;
     }
 }
 
@@ -65,12 +65,12 @@
     
     option {
         padding: 0.5rem;
-        color: #2d3748;
+        color: t.$content-primary;
         background-color: white;
     }
     
     &:hover:not(:disabled) {
-        border-color: #a0aec0;
+        border-color: t.$content-placeholder;
     }
 }
 
@@ -90,7 +90,7 @@
     align-items: center;
     gap: 0.5rem;
     min-width: 90px;
-    color: #718096;
+    color: t.$content-secondary;
     font-size: 0.875rem;
     font-weight: 500;
     margin-bottom: 0.25rem;
