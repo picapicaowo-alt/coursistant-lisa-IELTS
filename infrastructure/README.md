@@ -82,7 +82,7 @@ The apply job is manual and GitHub-environment gated. A later platform change ca
 
 ## Backend handoff
 
-Start with the live [DELIVERY_MANIFEST.md](docs/DELIVERY_MANIFEST.md), then use [BACKEND_HANDOFF.md](docs/BACKEND_HANDOFF.md) for the runtime contract. Terraform brings up a healthy backend placeholder on port 8080 and publishes a neutral frontend verification page so both delivery paths can be accepted before application artifacts exist. The backend team replaces its placeholder with a supervised service while preserving `/health`; the frontend team uploads an immutable build and invalidates CloudFront. After either release, run `infrastructure/scripts/verify-pilot.sh` for account, network, ALB, SSM, cache, S3, CloudFront, public endpoints, and CloudTrail checks.
+Start with the live [DELIVERY_MANIFEST.md](docs/DELIVERY_MANIFEST.md), use [BACKEND_HANDOFF.md](docs/BACKEND_HANDOFF.md) for the runtime contract, and follow [BACKEND_DEPLOYMENT_RUNBOOK.md](docs/BACKEND_DEPLOYMENT_RUNBOOK.md) for the engineer-facing release, verification, and rollback procedure. Terraform brings up a healthy backend placeholder on port 8080 and publishes a neutral frontend verification page so both delivery paths can be accepted before application artifacts exist. The backend team replaces its placeholder with a supervised service while preserving `/health`; the frontend team uploads an immutable build and invalidates CloudFront. After either release, run `infrastructure/scripts/verify-pilot.sh` for account, network, ALB, SSM, cache, S3, CloudFront, public endpoints, and CloudTrail checks.
 
 Pilot-only Checkov suppressions and their production exit conditions are recorded in [SECURITY_EXCEPTIONS.md](docs/SECURITY_EXCEPTIONS.md).
 

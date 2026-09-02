@@ -96,4 +96,4 @@ The `xlearnedu.com` DNS zone is hosted at Namecheap rather than Route 53. Add on
 - Security/operations: WAF associated and logging, CloudTrail logging in Tokyo only, encrypted SNS notifications, and all three CloudWatch alarms `OK`.
 - Existing production boundary: the us-west-2 instances and VPC are not in this Terraform state. The 2026-09-01 post-apply check found `Prod`, `Dev`, `GroupChat`, and `VPN` still running, and `Individual_dev` still stopped.
 
-See [BACKEND_HANDOFF.md](BACKEND_HANDOFF.md) for the runtime contract and [OPERATIONS.md](OPERATIONS.md) for access, scaling, rollback, and emergency controls.
+See [BACKEND_HANDOFF.md](BACKEND_HANDOFF.md) for the runtime contract, [BACKEND_DEPLOYMENT_RUNBOOK.md](BACKEND_DEPLOYMENT_RUNBOOK.md) for the engineer-facing deployment procedure, and [OPERATIONS.md](OPERATIONS.md) for access, scaling, rollback, and emergency controls.
