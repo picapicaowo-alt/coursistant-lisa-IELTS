@@ -118,7 +118,7 @@ X-Learn is a quiet operational workspace where students and staff can see their 
 
 This is an **Operate** system. Scanability, honest state, and record continuity outrank spectacle. Warmth comes from spacious grouping, rounded working surfaces, restrained assistant tints, human profile cues, and concise copy. MockLab is a deliberate compatibility world: its serif exam-paper voice and navy palette signal examination mode without redefining the rest of X-Learn.
 
-The visual authority for the Student Dashboard is the accessible Figma file `qBAAByIXGNIpoOcilCYISR`, node `17:914` (`Dashborad/student`), a 1440×1024 frame inspected exactly after Dev-seat access. Its hierarchy, density, visual proportions, and component relationships are authoritative; the frame's literal pixel geometry is a reference sample, not an application viewport contract. Any later Figma discrepancy must be resolved in the token or shared layout layer, never with a page-local patch.
+The visual authority for the Student Dashboard is the accessible Figma file `qBAAByIXGNIpoOcilCYISR`, node `17:914` (`Dashborad/student`), a 1440×1024 frame inspected exactly after Dev-seat access. The normative tokens and desktop composition below were verified from that node and the implemented dashboard. Any later Figma discrepancy must be resolved in the token layer, never with a page-local patch.
 
 **Key characteristics:**
 
@@ -181,11 +181,9 @@ Use weights 400/500/600/700 for regular, medium, semibold, and bold. Keep operat
 
 ## Layout
 
-The app shell owns the viewport. The 1440×1024 Figma frame establishes the intended proportions: a readable navigation rail, a compact header, and three dashboard regions whose main work column carries the most visual weight. Production layout expresses those relationships through semantic inline-size, gutter, minimum-content, and breakpoint tokens. Operational workspaces fill the available canvas; only prose, forms, and exam-reading surfaces retain purpose-specific readability caps.
+The app shell owns the viewport. In the authoritative 1440×1024 Student Dashboard frame, the desktop sidebar is exactly 180px and the header is exactly 88px. Dashboard content begins at x=204 and uses three exact columns: 336px New Chat, 558px main work, and 270px schedule/alerts, separated by 23px then 19px gutters. The resulting 1206px dashboard grid is the desktop reference composition, not a proportional approximation.
 
-The desktop navigation rail uses a fluid semantic inline size large enough for every role label at the shipped font stack. Role destinations may wrap when localization requires it, but desktop labels must never be silently clipped or ellipsized. Header search and identity regions are also fluid within bounded semantic ranges.
-
-Dashboard transitions are driven by the dashboard container, not the physical screen width. When all three minimum-content columns fit, New Chat, main work, and schedule/alerts share the full available width using weighted fractions. At the two-column threshold, the schedule rail moves below and becomes a wide/narrow row; at the single-column threshold, every region follows source order; at the compact threshold, record metadata progressively reflows and exam cards stack. Panels use content-driven minimum block sizes instead of locked Figma heights. Preserve the underlying labels and destinations when compacting.
+Responsive dashboard transitions are fixed at 1280px, 900px, and 620px. At 1280px and below, New Chat and the main work column form two fluid columns while the former right rail spans both and becomes a wide/narrow two-column row. At 900px and below, every dashboard region becomes one column in source order. At 620px and below, panels become content-height, assignment/task metadata is progressively removed from the visual grid, and exams stack one per row. Preserve the underlying labels and destinations when compacting.
 
 At 700px and below, the sidebar becomes a fixed bottom navigation with safe-area padding and the header compresses to 4.75rem. Main content reserves the same bottom height so actions and records are never hidden. Header metadata progressively collapses: the “Workspace” eyebrow and email disappear first; the account name may disappear below 430px.
 
@@ -193,7 +191,7 @@ Student navigation follows the inspected Figma order exactly: **Dashboard, My Co
 
 Mobile navigation is route-driven, not a separate information architecture. For the six Student destinations, Dashboard, My Courses, and Study Plan remain visible; **More** occupies the fourth slot; Exams remains in the fifth slot; and More contains AI ChatBot and Calendar. The panel is a two-column, scrollable surface above the navigation with a backdrop, explicit close control, active-route treatment, a 65dvh/30rem height ceiling, and automatic close after navigation. Never silently drop a role-authorized destination to make the bar fit.
 
-Dense desktop structures must adapt, not merely shrink: grids use `auto-fit` or container-driven tracks, calendar months become day cards, two-column auth forms become one column, and side-by-side workspaces become vertical sections. Preserve document order, route meaning, and the 44px interaction floor. Verify structural layout from 320px through high-density and ultra-wide displays; device-pixel screenshots must be interpreted through their CSS viewport and pixel ratio.
+Dense desktop structures must adapt, not merely shrink: grids become stacks, calendar months become day cards, two-column auth forms become one column, and side-by-side workspaces become vertical sections. Preserve document order, route meaning, and the 44px interaction floor.
 
 **The One Scroll Owner Rule.** The shell main element is the application scroll container; nested scrolling is reserved for bounded lists, conversations, and popovers.
 

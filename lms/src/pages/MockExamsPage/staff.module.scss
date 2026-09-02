@@ -214,8 +214,8 @@
 .editorForm select,
 .selectLabel select {
   width: 100%;
-  min-height: 2.75rem;
-  padding: .68rem .75rem;
+  height: t.$control-height-lg;
+  padding: 0 t.$space-4;
   border: 1px solid t.$exam-line;
   border-radius: t.$radius-control-sm;
   background: t.$card-bg;
@@ -225,6 +225,10 @@
 
 .compactForm textarea,
 .editorForm textarea {
+  height: auto;
+  min-height: 7rem;
+  padding-block: t.$space-3;
+  line-height: 1.55;
   resize: vertical;
 }
 
@@ -256,7 +260,8 @@
 }
 
 .primary,
-.secondary {
+.secondary,
+.danger {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -281,8 +286,15 @@
   color: t.$exam-navy;
 }
 
+.danger {
+  border-color: t.$danger;
+  background: t.$danger;
+  color: t.$content-on-color;
+}
+
 .primary:disabled,
-.secondary:disabled {
+.secondary:disabled,
+.danger:disabled {
   cursor: not-allowed;
   opacity: .55;
 }
@@ -419,16 +431,22 @@
   padding-bottom: .3rem;
 }
 
-.versionStatus article {
+.versionStatus button {
   display: grid;
   flex: 0 0 8rem;
   gap: .2rem;
   padding: .8rem;
   border: 1px solid t.$exam-line;
   border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
 }
 
-.versionStatus .activeVersion {
+.versionStatus .activeVersion,
+.versionStatus button:hover {
   border-color: t.$exam-navy;
   background: t.$exam-card-wash;
 }
@@ -437,6 +455,133 @@
 .versionStatus small {
   color: t.$text-muted;
   font-size: t.$fs-caption;
+}
+
+.builderAnchor {
+  scroll-margin-top: 1rem;
+}
+
+.mediaManager {
+  display: grid;
+  gap: .75rem;
+  padding: 1rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control;
+  background: t.$exam-card-wash;
+}
+
+.mediaManagerHeading,
+.pendingFile,
+.mediaChoices article,
+.mediaChoices article > label,
+.mediaChoices article > div {
+  display: flex;
+  align-items: center;
+}
+
+.mediaManagerHeading,
+.pendingFile,
+.mediaChoices article {
+  justify-content: space-between;
+  gap: .75rem;
+}
+
+.mediaManagerHeading > div,
+.pendingFile > span,
+.mediaChoices article > label > span {
+  display: grid;
+  min-width: 0;
+  gap: .15rem;
+}
+
+.mediaManagerHeading small,
+.pendingFile small,
+.mediaChoices small {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-regular;
+}
+
+.fileButton {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.7rem;
+  padding: .65rem 1rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$exam-navy;
+  cursor: pointer;
+}
+
+.fileButton input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
+
+.pendingFile {
+  padding: .7rem;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+}
+
+.mediaChoices {
+  display: grid;
+  gap: .5rem;
+}
+
+.mediaChoices article {
+  padding: .65rem;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+}
+
+.mediaChoices .selectedMedia {
+  border-color: t.$exam-navy;
+  box-shadow: inset 0 0 0 1px t.$exam-navy;
+}
+
+.mediaChoices article > label {
+  min-width: 0;
+  gap: .65rem;
+  cursor: pointer;
+}
+
+.mediaChoices article > div {
+  gap: .35rem;
+}
+
+.iconAction {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$exam-navy;
+  cursor: pointer;
+}
+
+.mediaEmpty {
+  margin: 0;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.mediaPreview {
+  width: 100%;
+  max-height: 28rem;
+  border-radius: t.$radius-control-sm;
+  object-fit: contain;
+  background: t.$neutral-fill;
 }
 
 .actionRow,
@@ -460,6 +605,64 @@
   padding: .65rem .75rem;
   border: 1px solid t.$exam-line;
   border-radius: t.$radius-control-sm;
+  background: t.$surface-raised;
+  cursor: pointer;
+}
+
+.editorForm .checkGrid input {
+  position: relative;
+  flex: 0 0 t.$selection-indicator-size;
+  width: t.$selection-indicator-size;
+  height: t.$selection-indicator-size;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  border: 2px solid t.$border-strong;
+  border-radius: t.$radius-xs;
+  background: t.$surface-raised;
+  cursor: pointer;
+}
+
+.editorForm .checkGrid input:checked {
+  border-color: t.$action-primary;
+  background: t.$action-primary;
+}
+
+.editorForm .checkGrid input:checked::after {
+  position: absolute;
+  top: .04rem;
+  left: .22rem;
+  width: .18rem;
+  height: .38rem;
+  border: solid t.$content-on-color;
+  border-width: 0 2px 2px 0;
+  content: '';
+  transform: rotate(45deg);
+}
+
+.editorForm .checkGrid input:focus-visible {
+  outline: 3px solid t.$focus-ring;
+  outline-offset: 2px;
+}
+
+.checkGrid label:has(input:checked) {
+  border-color: t.$border-interactive;
+  background: t.$surface-brand-subtle;
+}
+
+.editorForm fieldset {
+  min-width: 0;
+  margin: 0;
+  padding: t.$space-4;
+  border: 1px solid t.$exam-line;
+  border-radius: t.$radius-control;
+}
+
+.editorForm legend {
+  padding: 0 t.$space-2;
+  color: t.$content-primary;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-semibold;
 }
 
 .script {

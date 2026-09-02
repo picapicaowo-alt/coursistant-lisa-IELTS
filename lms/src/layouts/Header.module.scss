@@ -6,14 +6,14 @@
   align-items: center;
   justify-content: space-between;
   gap: t.$space-6;
-  padding: 0 t.$workspace-gutter-inline;
+  padding: 0 1.5rem;
   border-bottom: 0;
   background: t.$surface-canvas;
 }
 
 .search {
   display: flex;
-  width: clamp(14rem, 24vw, 24rem);
+  width: 19.4375rem;
   height: 2rem;
   align-items: center;
   gap: .75rem;
@@ -95,8 +95,8 @@
 
 .profileCopy {
   display: grid;
-  width: clamp(8rem, 11vw, 12rem);
-  max-width: 12rem;
+  width: 8.125rem;
+  max-width: 8.125rem;
   min-width: 0;
   gap: .0625rem;
 
@@ -173,7 +173,7 @@
   }
 }
 
-@media (max-width: t.$breakpoint-shell-mobile) {
+@media (max-width: 700px) {
   .header {
     min-height: 4.75rem;
     padding: t.$space-3 t.$space-4;

@@ -7,7 +7,7 @@ type TestIdentity = {
   name: string;
   username: string;
   role: 'USER' | 'TENANT_ADMIN';
-  level: 'STUDENT' | 'ADVISOR' | 'INSTRUCTOR' | 'PARENT' | 'NOT_APPLICABLE' | null;
+  level: 'STUDENT' | 'COUNSELLOR' | 'ADVISOR' | 'INSTRUCTOR' | 'PARENT' | 'NOT_APPLICABLE' | null;
   avatar: null;
   accessToken: string;
 };
@@ -83,25 +83,126 @@ test('student can enter both learning products but not advisor operations', asyn
 
 test('dashboard quick prompt hands structured context to Study Support', async ({page}) => {
   await installIdentity(page, identity('STUDENT'));
-  await page.goto('/');
-  await page.evaluate(() => {
+  // Keep this interaction isolated from unrelated dashboard/AI backend state.
+  // More specific routes below are registered later and therefore take precedence.
+  await page.route('**/v2/**', route => route.fulfill({json: response([])}));
+  await page.route('**/v1/auth/refresh-token', route => route.fulfill({json: response('role-interaction-token-refreshed')}));
+  await page.route('**/v2/me/courses**', route => route.fulfill({json: response({items: [], page: 0, size: 100, total: 0})}));
+  await page.route('**/v2/me/assignments/upcoming**', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/activities/upcoming**', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/work-queue', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/student/mock-exams**', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/alerts', route => route.fulfill({json: response([])}));
+  let pendingChat: string | undefined;
+  await page.exposeFunction('capturePendingChat', (value: string) => {
+    pendingChat = value;
+  });
+  await page.addInitScript(() => {
     const originalSetItem = Storage.prototype.setItem;
     Storage.prototype.setItem = function (key, value) {
       if (key === 'pendingChat') {
-        (window as Window & {capturedPendingChat?: string}).capturedPendingChat = value;
+        void (window as Window & {capturePendingChat: (capturedValue: string) => Promise<void>}).capturePendingChat(value);
       }
       originalSetItem.call(this, key, value);
     };
   });
+  await page.goto('/');
 
   await page.getByRole('button', {name: 'Explain a concept'}).click();
   await expect(page).toHaveURL('/aibot');
 
-  const pendingChat = await page.evaluate(() => (window as Window & {capturedPendingChat?: string}).capturedPendingChat);
+  await expect.poll(() => pendingChat).toBeDefined();
   expect(JSON.parse(pendingChat ?? '{}')).toEqual({text: 'Explain a concept', courseId: 0});
 });
 
-test('advisor can assign a published mock exam and cannot enter Vocabulary', async ({page}) => {
+test('instructor dashboard uses teaching data and availability edits preserve every record', async ({page}, testInfo) => {
+  await installIdentity(page, identity('INSTRUCTOR', {
+    id: 906,
+    userId: 906,
+    name: 'Sarah Instructor',
+  }));
+  const studentOnlyRequests: string[] = [];
+  let savedAvailability: Record<string, unknown> | undefined;
+  const course = {
+    id: 71,
+    courseId: 71,
+    courseCode: 'IELTS-71',
+    title: 'Academic Writing',
+    name: 'Academic Writing',
+    description: null,
+    tenantId: 7,
+    state: 'Active',
+    status: 'Active',
+    courseRole: 'Instructor',
+    role: 'Instructor',
+    canGrade: true,
+    canPostAnnouncements: true,
+    canManageGroups: true,
+    canManageCourseEvents: true,
+    primaryInstructor: null,
+    createdAt: '2026-09-01T09:00:00',
+    updatedAt: '2026-09-01T09:00:00',
+    archivedAt: null,
+  };
+  const windows = [
+    {dayOfWeek: 'MONDAY', startTime: '09:00', endTime: '17:00', effectiveFrom: '2026-09-14', effectiveTo: '2026-10-12', timezone: 'America/Los_Angeles'},
+    {dayOfWeek: 'WEDNESDAY', startTime: '10:00', endTime: '15:00', effectiveFrom: '2026-09-14', effectiveTo: '2026-10-12', timezone: 'America/Los_Angeles'},
+  ];
+  const exceptions = [{exceptionDate: '2026-09-21', startTime: '12:00', endTime: '17:00', timezone: 'America/Los_Angeles'}];
+
+  page.on('request', request => {
+    const pathname = new URL(request.url()).pathname;
+    if (pathname === '/v2/me/work-queue' || pathname === '/v2/me/alerts' || pathname.startsWith('/v2/student/mock-exams')) {
+      studentOnlyRequests.push(pathname);
+    }
+  });
+  await page.route('**/v2/me/courses**', route => route.fulfill({json: response({items: [course], page: 0, size: 100, total: 1})}));
+  await page.route('**/v2/me/teaching/deadlines/upcoming**', route => route.fulfill({json: response([{kind: 'Assignment', courseId: 71, courseCode: 'IELTS-71', title: 'Week 1 Essay', atLocal: '2026-09-14T17:00:00', timezone: 'America/Los_Angeles', submittedCount: 4, totalStudents: 8, assignmentId: 81, quizId: null}])}));
+  await page.route('**/v2/me/teaching/activities/upcoming**', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/teaching/grading-queue**', route => route.fulfill({json: response([{kind: 'AssignmentUngraded', courseId: 71, courseCode: 'IELTS-71', title: 'Week 1 Essay', pendingCount: 4, oldestWaitingAt: '2026-09-02T08:00:00Z', waitingMinutes: 30, timezone: 'America/Los_Angeles', assignmentId: 81, quizId: null}])}));
+  await page.route('**/v2/me/teaching/activity/recent**', route => route.fulfill({json: response([{kind: 'LateSubmission', courseId: 71, courseCode: 'IELTS-71', summary: 'Late submission: Week 1 Essay', occurredAt: '2026-09-02T08:00:00Z', timezone: 'America/Los_Angeles', assignmentId: 81, groupSetId: null, groupId: null, targetUserId: 301}])}));
+  await page.route('**/v2/me/teaching/alerts', route => route.fulfill({json: response([])}));
+
+  await page.goto('/');
+  await expect(page.getByRole('region', {name: 'Teaching dashboard'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Welcome back, Sarah Instructor!'})).toBeVisible();
+  await expect(page.getByText('Week 1 Essay').first()).toBeVisible();
+  await expect(page.getByText(/your teaching today/)).toBeVisible();
+  await expect.poll(() => studentOnlyRequests).toEqual([]);
+
+  await page.route('**/v2/me/teaching/grading-items', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/teaching/schedule-requests', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/teaching/students-needing-support', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/teaching/today-classes', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/teaching/availability', async route => {
+    if (route.request().method() === 'PUT') {
+      savedAvailability = route.request().postDataJSON() as Record<string, unknown>;
+      return route.fulfill({json: response({version: 5, windows, exceptions})});
+    }
+    return route.fulfill({json: response({version: 4, windows, exceptions})});
+  });
+
+  await page.goto('/my-operations');
+  await page.getByRole('button', {name: 'availability'}).click();
+  await expect(page.getByRole('heading', {name: 'Weekly availability'})).toBeVisible();
+  await expect(page.getByText('Monday', {exact: true})).toBeVisible();
+  await expect(page.getByText('Wednesday', {exact: true})).toBeVisible();
+  await expect(page.getByText('1 date exception will be preserved')).toBeVisible();
+  await expect(page.getByText('Record', {exact: true})).toHaveCount(0);
+  await page.getByRole('button', {name: 'Save all availability'}).click();
+  await expect.poll(() => savedAvailability).toBeDefined();
+  expect(savedAvailability).toMatchObject({expectedVersion: 4, windows, exceptions});
+  await expect(page.getByText('Availability saved.')).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('instructor-availability.png'), fullPage: true});
+
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/my-operations');
+  await page.getByRole('button', {name: 'availability'}).click();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({path: testInfo.outputPath('instructor-availability-mobile.png'), fullPage: true});
+});
+
+test('advisor can assign a published mock exam and cannot enter Vocabulary', async ({page}, testInfo) => {
   await installIdentity(page, identity('ADVISOR', {id: 902, userId: 902}));
   let assignmentRequests = 0;
 
@@ -125,6 +226,12 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
 
   await page.goto('/mock-exams');
   await expect(page.getByRole('heading', {name: 'Match students to published papers'})).toBeVisible();
+  const sectionCheckbox = page.getByRole('checkbox', {name: 'Listening'});
+  const sectionCheckboxBox = await sectionCheckbox.boundingBox();
+  expect(sectionCheckboxBox?.width).toBeLessThanOrEqual(22);
+  expect(sectionCheckboxBox?.height).toBeLessThanOrEqual(22);
+  await page.getByRole('group', {name: 'Assigned sections'}).scrollIntoViewIfNeeded();
+  await page.screenshot({path: testInfo.outputPath('advisor-mock-exam-sections.png'), fullPage: true});
   await page.getByLabel('Student').selectOption('301');
   await page.getByLabel('Published template').selectOption('45');
   await page.getByRole('button', {name: 'Assign exam'}).click();
@@ -135,6 +242,55 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
   await expect(page).toHaveURL(/\/advisor\/students$/);
 });
 
+test('advisor profile and study-plan editors explain record semantics and progressively disclose detail', async ({page}, testInfo) => {
+  await installIdentity(page, identity('ADVISOR', {id: 902, userId: 902}));
+  const intake = {studentUserId: 301, firstName: 'Alex', lastName: 'Chen', email: 'alex@example.test', studentType: 'STANDARD', courseRequest: 'IELTS Academic', assignmentStatus: 'ASSIGNED', assignmentVersion: 2};
+  const profile = {studentUserId: 301, profileVersion: 2, firstName: 'Alex', lastName: 'Chen', targetGoal: 'Reach IELTS Writing 6.5', targetMetric: 'IELTS Writing', targetValue: '6.5', targetDate: '2026-10-12', skills: [{skillCode: 'WR', displayName: 'Writing', scale: 'IELTS', currentValue: '5.5', targetValue: '6.5', gapSummary: 'Improve task response and cohesion.', position: 1}]};
+  const plan = {studentUserId: 301, profileContext: {currentProfileVersion: 2}, plan: {studyPlanId: 81, studyPlanVersion: 1, basedOnProfileVersion: 2, strategySummary: 'Weekly timed essays and targeted review.', startDate: '2026-09-14', planEndDate: '2026-10-12', checkpoints: [{id: 91, position: 1, description: 'Complete the first diagnostic', goal: 'Identify recurring patterns', dueDate: '2026-09-21', tasks: [{id: 101, position: 1, title: 'Complete the week 1 diagnostic', description: 'Submit one timed response.', dueDate: '2026-09-21', status: 'NOT_STARTED', version: 0}]}, {id: 92, position: 2, description: 'Review progress', goal: 'Confirm the next focus', dueDate: '2026-10-05', tasks: []}]}};
+
+  await page.route('**/v2/advisor/students/301/intake', route => route.fulfill({json: response(intake)}));
+  await page.route('**/v2/advisor/students/301/profile', route => route.fulfill({json: response(profile)}));
+  await page.route('**/v2/advisor/students/301/study-plan/revisions**', route => route.fulfill({json: response({items: [{entityVersion: 1, action: 'STUDY_PLAN_UPDATED', createdAt: '2026-09-02T07:16:57Z', actorId: 902}], page: 0, size: 20, total: 1})}));
+  await page.route('**/v2/advisor/students/301/study-plan', route => route.fulfill({json: response(plan)}));
+
+  await page.goto('/advisor/students/301/profile');
+  await expect(page.getByRole('heading', {name: 'Student profile'})).toBeVisible();
+  await expect(page.getByText(/stable record identifier/)).toBeVisible();
+  await expect(page.getByText(/human-readable skill name/)).toBeVisible();
+  await expect(page.getByText('Parent or guardian access')).toHaveCount(0);
+  await page.screenshot({path: testInfo.outputPath('advisor-profile-polished.png'), fullPage: true});
+
+  await page.goto('/advisor/students/301/study-plan');
+  await expect(page.getByText(/not created on every keystroke/)).toBeVisible();
+  await expect(page.locator('details').filter({hasText: 'Checkpoint 1'})).toHaveAttribute('open', '');
+  await expect(page.locator('details').filter({hasText: 'Checkpoint 2'})).not.toHaveAttribute('open', '');
+  await page.getByText('Revision activity').click();
+  await expect(page.getByText(/previous field values/)).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('advisor-study-plan-polished.png'), fullPage: true});
+
+  await page.setViewportSize({width: 390, height: 844});
+  await page.goto('/advisor/students/301/profile');
+  await expect(page.getByRole('heading', {name: 'Student profile'})).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({path: testInfo.outputPath('advisor-profile-mobile.png'), fullPage: true});
+});
+
+test('student advising view presents profile, plan, and tasks with scannable hierarchy', async ({page}, testInfo) => {
+  await installIdentity(page, identity('STUDENT', {id: 301, userId: 301}));
+  const profile = {studentUserId: 301, profileVersion: 2, firstName: 'Alex', lastName: 'Chen', targetGoal: 'Reach IELTS Writing 6.5', targetMetric: 'IELTS Writing', targetValue: '6.5', targetDate: '2026-10-12', skills: [{skillCode: 'WR', displayName: 'Writing', scale: 'IELTS', currentValue: '5.5', targetValue: '6.5', gapSummary: 'Improve task response and cohesion.', position: 1}]};
+  const plan = {studentUserId: 301, profileContext: {currentProfileVersion: 2}, plan: {studyPlanId: 81, studyPlanVersion: 1, basedOnProfileVersion: 2, strategySummary: 'Weekly timed essays and targeted review.', startDate: '2026-09-14', planEndDate: '2026-10-12', checkpoints: [{id: 91, position: 1, description: 'Complete the first diagnostic', goal: 'Identify recurring patterns', dueDate: '2026-09-21', tasks: [{id: 101, position: 1, title: 'Complete the week 1 diagnostic', description: 'Submit one timed response.', dueDate: '2026-09-21', status: 'NOT_STARTED', version: 0}]}]}};
+  await page.route('**/v2/student/profile', route => route.fulfill({json: response(profile)}));
+  await page.route('**/v2/student/study-plan', route => route.fulfill({json: response(plan)}));
+  await page.route('**/v2/student/advisor-conversation/messages**', route => route.fulfill({json: response([])}));
+
+  await page.goto('/my-plan');
+  await expect(page.getByRole('heading', {name: 'Learning profile'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: /Checkpoint 1/})).toBeVisible();
+  await expect(page.getByText('not started', {exact: true})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Complete'})).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('student-advising-polished.png'), fullPage: true});
+});
+
 test('non-student roles remain outside Vocabulary and parent stays outside standalone mock exams', async ({page}) => {
   await installIdentity(page, identity('PARENT', {id: 903, userId: 903}));
 
@@ -143,6 +299,196 @@ test('non-student roles remain outside Vocabulary and parent stays outside stand
 
   await page.goto('/mock-exams');
   await expect(page).toHaveURL(/\/parent$/);
+});
+
+test('counsellor dashboard cards disclose their real access boundary and the create form marks contract requirements', async ({page}, testInfo) => {
+  await installIdentity(page, identity('COUNSELLOR', {id: 905, userId: 905, email: 'casey.counsellor@example.test'}));
+  await page.route('**/v2/counsellor/dashboard', route => route.fulfill({
+    json: response({createdCount: 4, assignedCount: 2, unassignedCount: 1}),
+  }));
+
+  await page.goto('/counsellor');
+  await page.getByRole('button', {name: /2 Assigned/}).click();
+  await expect(page.getByText('Assigned means the handover is complete')).toBeVisible();
+  await expect(page.getByRole('link', {name: /1 Unassigned/})).toHaveAttribute('href', '/counsellor/intakes');
+  await page.screenshot({path: testInfo.outputPath('counsellor-dashboard.png'), fullPage: true});
+
+  await page.getByRole('link', {name: 'Create student'}).click();
+  await expect(page.getByRole('heading', {name: 'Create student intake'})).toBeVisible();
+  await expect(page.getByLabel('First name *')).toHaveAttribute('required', '');
+  await expect(page.getByLabel('Middle name Optional')).not.toHaveAttribute('required');
+  await expect(page.getByRole('button', {name: 'Create intake'})).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('counsellor-create-student.png'), fullPage: true});
+});
+
+test('counsellor completes intake, parent link, edit, and first advisor handover as one workflow', async ({page}, testInfo) => {
+  await installIdentity(page, identity('COUNSELLOR', {
+    id: 905,
+    userId: 905,
+    email: 'casey.counsellor@example.test',
+  }));
+  let created = false;
+  let assigned = false;
+  let intakeVersion = 0;
+  let parentLinks: Array<Record<string, unknown>> = [];
+  let createBody: Record<string, unknown> | undefined;
+  let patchBody: Record<string, unknown> | undefined;
+  let parentBody: Record<string, unknown> | undefined;
+  let assignmentBody: Record<string, unknown> | undefined;
+  const idempotencyHeaders: string[] = [];
+  const intake = () => ({
+    intakeId: 99,
+    studentUserId: 399,
+    firstName: 'Alex',
+    middleName: null,
+    lastName: 'Chen',
+    email: 'alex.chen@example.test',
+    studentType: 'STANDARD',
+    courseRequest: 'IELTS writing support',
+    contactPhone: '+1 555 0199',
+    basicBackground: 'Preparing for university admission.',
+    lifecycleStatus: 'OPEN',
+    assignmentStatus: assigned ? 'ASSIGNED' : 'UNASSIGNED',
+    intakeVersion,
+    activationMethod: 'PASSWORD_RESET',
+    advisorUserId: assigned ? 52 : null,
+    assignmentVersion: assigned ? 0 : null,
+  });
+
+  await page.route('**/v2/counsellor/**', async route => {
+    const request = route.request();
+    const path = new URL(request.url()).pathname;
+    const method = request.method();
+    const idempotencyKey = request.headers()['idempotency-key'];
+    if (idempotencyKey) idempotencyHeaders.push(idempotencyKey);
+
+    if (path.endsWith('/v2/counsellor/student-intakes') && method === 'POST') {
+      createBody = request.postDataJSON() as Record<string, unknown>;
+      created = true;
+      return route.fulfill({status: 201, json: response(intake())});
+    }
+    if (path.endsWith('/v2/counsellor/student-intakes') && method === 'GET') {
+      const items = created && !assigned ? [intake()] : [];
+      return route.fulfill({json: response({items, page: 0, size: 20, total: items.length})});
+    }
+    if (path.endsWith('/v2/counsellor/student-intakes/99/parent-links') && method === 'GET') {
+      return route.fulfill({json: response(parentLinks)});
+    }
+    if (path.endsWith('/v2/counsellor/student-intakes/99/parent-links') && method === 'POST') {
+      parentBody = request.postDataJSON() as Record<string, unknown>;
+      parentLinks = [{
+        linkId: 501,
+        parentUserId: 601,
+        studentUserId: 399,
+        parentFirstName: 'Taylor',
+        parentMiddleName: null,
+        parentLastName: 'Chen',
+        parentEmail: 'taylor.chen@example.test',
+        linkedAt: '2026-09-02T03:00:00Z',
+      }];
+      return route.fulfill({status: 201, json: response(parentLinks[0])});
+    }
+    if (path.endsWith('/v2/counsellor/student-intakes/99/advisor') && method === 'PUT') {
+      assignmentBody = request.postDataJSON() as Record<string, unknown>;
+      assigned = true;
+      return route.fulfill({json: response(intake())});
+    }
+    if (path.endsWith('/v2/counsellor/student-intakes/99') && method === 'PATCH') {
+      patchBody = request.postDataJSON() as Record<string, unknown>;
+      intakeVersion += 1;
+      return route.fulfill({json: response(intake())});
+    }
+    if (path.endsWith('/v2/counsellor/student-intakes/99') && method === 'GET') {
+      return route.fulfill({json: response(intake())});
+    }
+    if (path.endsWith('/v2/counsellor/advisors') && method === 'GET') {
+      return route.fulfill({json: response({
+        items: [{advisorUserId: 52, firstName: 'Ari', middleName: null, lastName: 'Advisor', email: 'ari@example.test', level: 'ADVISOR'}],
+        page: 0,
+        size: 100,
+        total: 1,
+      })});
+    }
+    return route.fulfill({status: 404, json: {code: 'NOT_FOUND'}});
+  });
+
+  await page.goto('/counsellor/intakes/new');
+  await page.getByLabel('First name *').fill('Alex');
+  await page.getByLabel('Last name *').fill('Chen');
+  await page.getByLabel('Email *').fill('alex.chen@example.test');
+  await page.getByLabel('Course request *').fill('IELTS writing support');
+  await page.getByLabel('Contact phone Optional').fill('+1 555 0199');
+  await page.getByLabel('Basic background Optional').fill('Preparing for university admission.');
+  await page.getByRole('button', {name: 'Create intake'}).click();
+
+  await expect(page).toHaveURL(/\/counsellor\/intakes\/99$/);
+  await expect(page.getByRole('heading', {name: 'Parent or guardian access'})).toBeVisible();
+  await expect(page.getByText('No parent or guardian linked')).toBeVisible();
+  await page.getByLabel('Parent email').fill('taylor.chen@example.test');
+  await page.getByLabel('First name', {exact: true}).fill('Taylor');
+  await page.getByLabel('Last name', {exact: true}).fill('Chen');
+  await page.getByLabel('Relationship note').fill('Guardian confirmed during intake');
+  await page.getByRole('button', {name: 'Create or reuse Parent'}).click();
+  await expect(page.getByText('Taylor Chen')).toBeVisible();
+
+  await page.getByRole('button', {name: 'Save changes'}).click();
+  await expect(page).toHaveURL(/\/counsellor\/intakes\/99\/assign$/);
+  await expect(page.getByText('Ari Advisor', {exact: true})).toBeVisible();
+  await page.getByRole('radio').check();
+  await page.getByRole('button', {name: 'Assign advisor'}).click();
+  await expect(page).toHaveURL(/\/counsellor\/intakes$/);
+  await expect(page.getByText('No unassigned intakes.')).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('counsellor-handover-complete.png'), fullPage: true});
+
+  expect(createBody).toMatchObject({firstName: 'Alex', lastName: 'Chen', email: 'alex.chen@example.test', studentType: 'STANDARD'});
+  expect(createBody).not.toHaveProperty('role');
+  expect(createBody).not.toHaveProperty('level');
+  expect(createBody).not.toHaveProperty('password');
+  expect(createBody).not.toHaveProperty('name');
+  expect(parentBody).toMatchObject({email: 'taylor.chen@example.test', firstName: 'Taylor', lastName: 'Chen'});
+  expect(patchBody).toMatchObject({expectedIntakeVersion: 0, firstName: 'Alex', lastName: 'Chen'});
+  expect(patchBody).not.toHaveProperty('email');
+  expect(assignmentBody).toEqual({advisorUserId: 52, expectedIntakeVersion: 1});
+  expect(idempotencyHeaders).toHaveLength(4);
+  expect(new Set(idempotencyHeaders).size).toBe(4);
+});
+
+test('tenant intake rows, filters, management panel, and advisor dialog stay aligned and actionable', async ({page}, testInfo) => {
+  await installIdentity(page, identity('NOT_APPLICABLE', {
+    id: 904,
+    userId: 904,
+    email: 'tessa.admin@example.test',
+    role: 'TENANT_ADMIN',
+  }));
+  const intake = {intakeId: 42, studentUserId: 142, firstName: 'Alex', middleName: null, lastName: 'Chen', email: 'alex@example.test', studentType: 'STANDARD', courseRequest: 'IELTS Academic', contactPhone: '555-0100', basicBackground: 'Preparing for university.', lifecycleStatus: 'OPEN', assignmentStatus: 'UNASSIGNED', intakeVersion: 3};
+  await page.route('**/v2/tenant/student-intakes**', route => {
+    const path = new URL(route.request().url()).pathname;
+    return route.fulfill({json: response(path.endsWith('/42') ? intake : {items: [intake], page: 0, size: 20, total: 1})});
+  });
+  await page.route('**/v2/tenant/users**', route => route.fulfill({json: response({items: [{id: 52, tenantId: 7, firstName: 'Ari', lastName: 'Advisor', email: 'ari@example.test', role: 'USER', level: 'ADVISOR', status: 'ACTIVE'}], page: 0, size: 20, total: 1})}));
+
+  await page.goto('/admin/intakes');
+  await expect(page.getByLabel('Lifecycle')).toBeVisible();
+  await expect(page.getByLabel('Assignment')).toBeVisible();
+  const viewRecord = page.getByRole('link', {name: 'View record'});
+  const manage = page.getByRole('button', {name: 'Manage'});
+  const [viewBox, manageBox] = await Promise.all([viewRecord.boundingBox(), manage.boundingBox()]);
+  expect(viewBox).not.toBeNull();
+  expect(manageBox).not.toBeNull();
+  expect(Math.abs((viewBox!.y + viewBox!.height / 2) - (manageBox!.y + manageBox!.height / 2))).toBeLessThan(2);
+
+  await manage.click();
+  await expect(page.getByRole('heading', {name: 'Alex Chen'})).toBeVisible();
+  await page.getByRole('button', {name: 'Choose advisor'}).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+  const dialogBox = await dialog.boundingBox();
+  const viewport = page.viewportSize();
+  expect(dialogBox).not.toBeNull();
+  expect(viewport).not.toBeNull();
+  expect(Math.abs((dialogBox!.x + dialogBox!.width / 2) - viewport!.width / 2)).toBeLessThan(3);
+  expect(Math.abs((dialogBox!.y + dialogBox!.height / 2) - viewport!.height / 2)).toBeLessThan(3);
+  await page.screenshot({path: testInfo.outputPath('tenant-intake-advisor-dialog.png'), fullPage: true});
 });
 
 test('tenant admin never sees or requests the system course catalogue', async ({page}) => {
@@ -191,10 +537,11 @@ test('tenant admin can complete governance work using only the handoff routes', 
     if (Number.isInteger(userId)) {
       return route.fulfill({json: response({id: userId, tenantId: 7, firstName: 'Ivy', lastName: 'Instructor', email: 'ivy@example.test', role: 'USER', level: 'INSTRUCTOR', status: 'ACTIVE'})});
     }
-    const level = url.searchParams.get('level');
-    const items = level === 'ADVISOR' ? [{id: 52, tenantId: 7, firstName: 'Ari', lastName: 'Advisor', email: 'ari@example.test', role: 'USER', level: 'ADVISOR', status: 'ACTIVE'}]
-      : level === 'INSTRUCTOR_ADVISOR' ? [{id: 53, tenantId: 7, firstName: 'Indigo', lastName: 'Advisor', email: 'indigo@example.test', role: 'USER', level: 'INSTRUCTOR_ADVISOR', status: 'ACTIVE'}]
-        : [{id: 41, tenantId: 7, firstName: 'Ivy', lastName: 'Instructor', email: 'ivy@example.test', role: 'USER', level: 'INSTRUCTOR', status: 'ACTIVE'}];
+    const levels = url.searchParams.getAll('levels');
+    const items = levels.length > 0 ? [
+      ...(levels.includes('ADVISOR') ? [{id: 52, tenantId: 7, firstName: 'Ari', lastName: 'Advisor', email: 'ari@example.test', role: 'USER', level: 'ADVISOR', status: 'ACTIVE'}] : []),
+      ...(levels.includes('INSTRUCTOR_ADVISOR') ? [{id: 53, tenantId: 7, firstName: 'Indigo', lastName: 'Advisor', email: 'indigo@example.test', role: 'USER', level: 'INSTRUCTOR_ADVISOR', status: 'ACTIVE'}] : []),
+    ] : [{id: 41, tenantId: 7, firstName: 'Ivy', lastName: 'Instructor', email: 'ivy@example.test', role: 'USER', level: 'INSTRUCTOR', status: 'ACTIVE'}];
     return route.fulfill({json: response({items, page: 0, size: 20, total: items.length})});
   });
   await page.route('**/v2/tenant/course-ownerships**', route => route.fulfill({json: response({items: [{courseId: 71, courseCode: 'IELTS-71', title: 'Academic Writing', launchState: 'ACTIVE', lifecycleState: 'OPEN', ownerAdvisorUserId, ownerAdvisorFirstName: ownerAdvisorUserId === 52 ? 'Ari' : 'Current', ownerAdvisorLastName: 'Advisor', ownershipVersion}], page: 0, size: 20, total: 1})}));
@@ -304,7 +651,9 @@ test('tenant admin reviews protected mock-exam media and publishes only after th
   await page.goto('/mock-exams');
   await expect(page.getByRole('heading', {name: 'Build and release IELTS papers'})).toBeVisible();
   await expect(page.getByRole('tab', {name: /Listening · Read only/})).toBeVisible();
-  await expect(page.getByRole('button', {name: /Copy/})).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Copy to new draft'})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Delete draft'})).toBeVisible();
+  await expect(page.getByText(/Saved sections are read only under the current create-only API/)).toBeVisible();
   await page.getByRole('button', {name: 'Load audio'}).click();
   await expect(page.locator('audio')).toBeVisible();
   await expect.poll(() => audioRequests).toBe(1);
@@ -312,4 +661,36 @@ test('tenant admin reviews protected mock-exam media and publishes only after th
   await page.getByRole('button', {name: 'Publish complete draft'}).click();
   await expect.poll(() => publishRequests).toBe(1);
   expect(sectionRequests).toEqual(expect.arrayContaining(['listening', 'reading', 'writing']));
+});
+
+test('creating a mock-exam draft opens the new version builder immediately', async ({page}, testInfo) => {
+  await installIdentity(page, identity('NOT_APPLICABLE', {
+    id: 904,
+    userId: 904,
+    email: 'tessa.admin@example.test',
+    role: 'TENANT_ADMIN',
+  }));
+  const created = {id: 61, label: 'Academic B', title: 'IELTS Academic B', versions: [{id: 611, templateId: 61, versionNo: 1, status: 'DRAFT', hasListening: false, hasReading: false, hasWriting: false}]};
+  let templates: typeof created[] = [];
+  await page.route('**/v2/tenant/mock-exam-templates**', route => {
+    const path = new URL(route.request().url()).pathname;
+    if (path.endsWith('/versions/611/media')) return route.fulfill({json: response([])});
+    if (path.endsWith('/versions/611')) return route.fulfill({json: response(created.versions[0])});
+    if (path.endsWith('/mock-exam-templates/61')) return route.fulfill({json: response(created)});
+    if (path.endsWith('/mock-exam-templates') && route.request().method() === 'POST') {
+      templates = [created];
+      return route.fulfill({status: 201, json: response(created)});
+    }
+    return route.fulfill({json: response(templates)});
+  });
+
+  await page.goto('/mock-exams');
+  await page.getByLabel('Internal label').fill('Academic B');
+  await page.getByLabel('Candidate title').fill('IELTS Academic B');
+  await page.getByRole('button', {name: 'Create and open draft'}).click();
+  const builder = page.getByRole('heading', {name: 'Compose exam content'});
+  await expect(builder).toBeVisible();
+  await expect(builder).toBeInViewport();
+  await expect(page.getByRole('button', {name: 'Delete draft'})).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('mock-draft-builder.png'), fullPage: true});
 });

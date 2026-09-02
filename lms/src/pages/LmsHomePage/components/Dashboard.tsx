@@ -7,7 +7,10 @@ import LearningScheduleComponent from '@/sections/learning_schedule/LearningSche
 import {useCourseList} from '../hooks/useCourseList';
 import {useDashboardAssignments, type AssignmentRow} from '../hooks/useDashboardAssignments';
 import {dashboardExamActionLabel, resolveDashboardExamRoute} from './dashboardExam';
+import InstructorWorkComponent from './InstructorWorkComponent';
 import styles from './Dashboard.module.scss';
+
+export type DashboardAudience = 'student' | 'instructor';
 
 type UnknownRecord = Record<string, unknown>;
 
@@ -76,10 +79,13 @@ const RegionStatus: React.FC<{
   </div>
 );
 
-const ChatPanel: React.FC = () => {
+const ChatPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
   const navigate = useNavigate();
   const [prompt, setPrompt] = useState('');
-  const quickPrompts = ['Explain a concept', 'Review my writing', 'Practice speaking', 'Study advice'];
+  const instructor = audience === 'instructor';
+  const quickPrompts = instructor
+    ? ['Plan a lesson', 'Create practice questions', 'Review course materials', 'Draft student feedback']
+    : ['Explain a concept', 'Review my writing', 'Practice speaking', 'Study advice'];
 
   const openChat = (message: string) => {
     if (message.trim()) {
@@ -101,8 +107,8 @@ const ChatPanel: React.FC = () => {
       </header>
 
       <div className={styles.chatIntro}>
-        <p>Hi there! <img src="/icons/figma-dashboard/wave.png" alt=""/></p>
-        <strong>How can I help you with<br/>your learning today?</strong>
+        <p>Hi there!</p>
+        <strong>How can I help you with<br/>{instructor ? 'your teaching' : 'your learning'} today?</strong>
       </div>
 
       <div className={styles.quickPrompts}>
@@ -117,7 +123,7 @@ const ChatPanel: React.FC = () => {
           value={prompt}
           onChange={event => setPrompt(event.target.value)}
           placeholder="Ask me anything…"
-          aria-label="Ask the learning assistant"
+          aria-label={instructor ? 'Ask the teaching assistant' : 'Ask the learning assistant'}
         />
         <button type="submit" aria-label="Send message" className={styles.sendButton}>
           <img src="/icons/figma-dashboard/send.svg" alt=""/>
@@ -263,10 +269,12 @@ const ExamsPanel: React.FC = () => {
   );
 };
 
-const AlertsPanel: React.FC = () => {
+const AlertsPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
   const query = useQuery({
-    queryKey: ['dashboard', 'alerts'],
-    queryFn: async () => (await courseOperationsApiService.getMyAlerts()).data,
+    queryKey: ['dashboard', audience, 'alerts'],
+    queryFn: async () => (await (audience === 'instructor'
+      ? courseOperationsApiService.getMyTeachingAlerts()
+      : courseOperationsApiService.getMyAlerts())).data,
     retry: false,
   });
   const alerts = recordsFrom(query.data).slice(0, 3);
@@ -283,7 +291,7 @@ const AlertsPanel: React.FC = () => {
       <div className={styles.alertList}>
         {alerts.map((alert, index) => (
           <Link to="/my-operations" key={textFrom(alert, 'id', 'alertId') ?? index}>
-            <span>{textFrom(alert, 'title', 'message', 'type') ?? 'Learning update'}</span>
+            <span>{textFrom(alert, 'title', 'message', 'type') ?? (audience === 'instructor' ? 'Teaching update' : 'Learning update')}</span>
             <small>{textFrom(alert, 'relativeTime', 'createdAt', 'severity') ?? 'New'}</small>
             <i/>
           </Link>
@@ -293,19 +301,20 @@ const AlertsPanel: React.FC = () => {
   );
 };
 
-export const Dashboard: React.FC = () => (
-  <section className={styles.dashboard} aria-label="Student dashboard">
-    <ChatPanel/>
+export const Dashboard: React.FC<{audience?: DashboardAudience}> = ({audience = 'student'}) => (
+  <section className={styles.dashboard} aria-label={audience === 'instructor' ? 'Teaching dashboard' : 'Student dashboard'}>
+    <ChatPanel audience={audience}/>
     <div className={styles.mainColumn}>
       <CourseWorkPanel/>
-      <AdvisorTasksPanel/>
-      <ExamsPanel/>
+      {audience === 'instructor'
+        ? <section className={`${styles.panel} ${styles.instructorWorkPanel}`}><InstructorWorkComponent/></section>
+        : <><AdvisorTasksPanel/><ExamsPanel/></>}
     </div>
     <div className={styles.sideColumn}>
       <section className={`${styles.panel} ${styles.schedulePanel}`}>
         <LearningScheduleComponent/>
       </section>
-      <AlertsPanel/>
+      <AlertsPanel audience={audience}/>
     </div>
   </section>
 );

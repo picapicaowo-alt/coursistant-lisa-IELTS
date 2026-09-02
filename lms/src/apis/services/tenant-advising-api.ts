@@ -5,6 +5,7 @@ import {
   CancelStudentIntakeRequest,
   CreateStudentIntakeRequest,
   ReassignAdvisorRequest,
+  PatchStudentIntakeRequest,
   StudentIntakeResponse,
   TenantIntakeListParams,
   idempotent,
@@ -27,6 +28,22 @@ export class TenantAdvisingApiService {
     idempotencyKey: string,
   ): Promise<ApiResponse<StudentIntakeResponse>> {
     return this.apiClient.post('/v2/tenant/student-intakes', request, idempotent(idempotencyKey));
+  }
+
+  getStudentIntake(intakeId: number): Promise<ApiResponse<StudentIntakeResponse>> {
+    return this.apiClient.get(`/v2/tenant/student-intakes/${intakeId}`);
+  }
+
+  patchStudentIntake(
+    intakeId: number,
+    request: PatchStudentIntakeRequest,
+    idempotencyKey: string,
+  ): Promise<ApiResponse<StudentIntakeResponse>> {
+    return this.apiClient.patch(
+      `/v2/tenant/student-intakes/${intakeId}`,
+      request,
+      idempotent(idempotencyKey),
+    );
   }
 
   assignAdvisor(

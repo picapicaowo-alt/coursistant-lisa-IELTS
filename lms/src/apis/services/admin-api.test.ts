@@ -52,6 +52,21 @@ describe('AdminApiService', () => {
     expect(client.post).toHaveBeenCalledWith('/v2/tenant/managed-users/41/enable');
   });
 
+  it('serializes repeated levels and uses CAS-protected staff maintenance routes', async () => {
+    client.get.mockResolvedValue({status: 200, data: {items: []}});
+    client.patch.mockResolvedValue({status: 200, data: {}});
+
+    await service.listTenantUsers({role: 'USER', levels: ['ADVISOR', 'INSTRUCTOR_ADVISOR'], status: 'ACTIVE'});
+    await service.patchTenantManagedUser(41, {expectedAccountVersion: 2, firstName: 'Lisa'}, 'patch-41');
+    await service.getTenantManagedUserDisableBlockers(41);
+
+    const params = client.get.mock.calls[0][1].params as URLSearchParams;
+    expect(params.getAll('levels')).toEqual(['ADVISOR', 'INSTRUCTOR_ADVISOR']);
+    expect(params.get('role')).toBe('USER');
+    expect(client.patch).toHaveBeenCalledWith('/v2/tenant/managed-users/41', {expectedAccountVersion: 2, firstName: 'Lisa'}, {headers: {'Idempotency-Key': 'patch-41'}});
+    expect(client.get).toHaveBeenLastCalledWith('/v2/tenant/managed-users/41/disable-blockers');
+  });
+
   it('uses the audited system operation contracts', async () => {
     client.patch.mockResolvedValue({status: 200, data: {id: 41, tenantId: 2}});
     client.post.mockResolvedValue({status: 200, data: null});

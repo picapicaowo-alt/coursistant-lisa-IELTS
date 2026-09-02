@@ -112,7 +112,7 @@ export interface CreateMockExamListeningSectionRequest {
 }
 
 export interface CreateMockExamListeningPartRequest {
-  audioPath: string;
+  audioMediaId: number;
   label: string;
   sections: CreateMockExamListeningSectionRequest[];
   seq: number;
@@ -123,7 +123,9 @@ export interface CreateMockExamListeningRequest {
   totalMinutes: number;
 }
 
-export type CreateMockExamPassageQuestionRequest = CreateMockExamListeningSectionRequest;
+export interface CreateMockExamPassageQuestionRequest extends CreateMockExamListeningSectionRequest {
+  imageMediaId?: number;
+}
 
 export interface CreateMockExamPassageRequest {
   intro: string;
@@ -140,7 +142,7 @@ export interface CreateMockExamReadingRequest {
 }
 
 export interface CreateMockExamWritingTaskRequest {
-  imagePath?: string;
+  imageMediaId?: number;
   minWords: number;
   prompt: string;
   seq: number;
@@ -151,6 +153,18 @@ export interface CreateMockExamWritingTaskRequest {
 export interface CreateMockExamWritingRequest {
   tasks: CreateMockExamWritingTaskRequest[];
   totalMinutes: number;
+}
+
+export type MockExamMediaKind = 'LISTENING_AUDIO' | 'READING_IMAGE' | 'WRITING_IMAGE';
+
+export interface MockExamMediaRead {
+  mediaId: number;
+  kind: MockExamMediaKind;
+  originalFilename?: string;
+  contentType?: string;
+  sizeBytes?: number;
+  status?: string;
+  createdAt?: string;
 }
 
 /** Response payloads remain generic where the supplied OpenAPI has no schema. */

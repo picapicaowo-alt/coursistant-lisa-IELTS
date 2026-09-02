@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {Link} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -8,6 +8,7 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 
 const CounsellorDashboardPage: React.FC = () => {
+  const [activeMetric, setActiveMetric] = useState<'created' | 'assigned' | null>(null);
   const query = useQuery({
     queryKey: advisingQueryKeys.counsellorDashboard,
     queryFn: async () => unwrapData(await counsellorApiService.getDashboard(), 'counsellorDashboard'),
@@ -27,12 +28,20 @@ const CounsellorDashboardPage: React.FC = () => {
       {query.isPending ? <p className={styles.status}>Loading dashboard…</p> : null}
       {query.data ? (
         <section className={styles.stats} aria-label="Intake counts">
-          <article className={styles.stat}><strong>{query.data.createdCount}</strong><span>Created</span></article>
-          <article className={styles.stat}><strong>{query.data.assignedCount}</strong><span>Assigned</span></article>
-          <article className={styles.stat}><strong>{query.data.unassignedCount}</strong><span>Unassigned</span></article>
+          <button type="button" className={styles.statButton} aria-pressed={activeMetric === 'created'} onClick={() => setActiveMetric(current => current === 'created' ? null : 'created')}><strong>{query.data.createdCount}</strong><span>Created</span><small>About this count</small></button>
+          <button type="button" className={styles.statButton} aria-pressed={activeMetric === 'assigned'} onClick={() => setActiveMetric(current => current === 'assigned' ? null : 'assigned')}><strong>{query.data.assignedCount}</strong><span>Assigned</span><small>About handover</small></button>
+          <Link className={styles.statLink} to="/counsellor/intakes"><strong>{query.data.unassignedCount}</strong><span>Unassigned</span><small>Open queue →</small></Link>
         </section>
       ) : null}
-      <p className={styles.toolbar}><Link className={styles.link} to="/counsellor/intakes">Open unassigned queue</Link></p>
+      {activeMetric ? <section className={styles.dashboardNotice} aria-live="polite">
+        <strong>{activeMetric === 'created' ? 'Created is a lifetime intake count' : 'Assigned means the handover is complete'}</strong>
+        <p>{activeMetric === 'created' ? 'Cancelled records can remain in this count, so it may not equal Assigned plus Unassigned.' : 'The backend removes assigned intakes from Counsellor access immediately. Counsellors cannot open, edit, or delete those student records after handover; Tenant Admin manages reassignment.'}</p>
+      </section> : null}
+      <section className={styles.capabilityGrid} aria-label="Counsellor workflow">
+        <div><span>1</span><strong>Create the intake</strong><p>Create the Student account and admissions record together. The student sets a password through Forgot password.</p></div>
+        <div><span>2</span><strong>Complete the record</strong><p>Edit your open intake and add or remove Parent links before assignment.</p></div>
+        <div><span>3</span><strong>Hand over to an Advisor</strong><p>Select an eligible Advisor. Successful assignment immediately closes Counsellor access.</p></div>
+      </section>
     </main>
   );
 };

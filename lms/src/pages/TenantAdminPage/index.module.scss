@@ -190,9 +190,9 @@
 .thresholdGrid label,
 .auditFilters label {
   display: grid;
-  gap: .35rem;
-  color: t.$text-muted;
-  font-size: t.$fs-caption;
+  gap: t.$space-2;
+  color: t.$text;
+  font-size: t.$font-size-body;
   font-weight: t.$fw-semibold;
   min-width: 0;
 }
@@ -206,8 +206,8 @@
 .thresholdGrid input,
 .auditFilters input {
   width: 100%;
-  min-height: 44px;
-  padding: .55rem .7rem;
+  height: t.$control-height-lg;
+  padding: 0 t.$space-4;
   border: 1px solid t.$border;
   border-radius: t.$radius-control-sm;
   background: t.$card-bg;
@@ -216,7 +216,10 @@
 }
 
 .form textarea {
+  height: auto;
   min-height: 7rem;
+  padding-block: t.$space-3;
+  line-height: 1.55;
   resize: vertical;
 }
 
@@ -374,6 +377,11 @@ summary:focus-visible {
   margin-top: 1rem;
 }
 
+.subheading {
+  margin: .4rem 0 0;
+  font-size: 1rem;
+}
+
 .nameGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -491,6 +499,17 @@ summary:focus-visible {
   line-height: 1.5;
 }
 
+.srStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
 .inlineError {
   background: rgba(t.$danger, .1);
   color: t.$danger;
@@ -601,7 +620,7 @@ summary:focus-visible {
 
 .auditFilters {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: end;
   gap: .6rem;
   margin-top: 1rem;
@@ -700,8 +719,7 @@ summary:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .thresholdGrid,
-  .auditFilters {
+  .thresholdGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

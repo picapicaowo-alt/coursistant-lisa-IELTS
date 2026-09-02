@@ -16,7 +16,6 @@
 
 .header h1 { margin: .2rem 0; font-size: clamp(2rem, 4vw, t.$fs-h1); }
 .header p { margin: 0; color: t.$text-muted; }
-.eyebrow { color: t.$brand !important; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
 
 .coursePicker {
   display: grid;
@@ -97,6 +96,184 @@
   margin: 0;
 }
 
+.cardHeading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: t.$space-4;
+}
+
+.cardHeading > div {
+  display: grid;
+  gap: t.$space-1;
+}
+
+.cardHeading h2 {
+  font-size: t.$fs-card-title;
+  line-height: t.$line-height-subhead;
+}
+
+.cardHeading p {
+  max-width: t.$reading-max-width;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: t.$line-height-caption;
+}
+
+.countBadge,
+.versionBadge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  min-width: t.$control-height-sm;
+  min-height: t.$control-height-sm;
+  padding: 0 t.$space-2;
+  border-radius: t.$radius-pill;
+  background: t.$brand-subtle;
+  color: t.$brand;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.operationList,
+.availabilityList {
+  display: grid;
+  gap: t.$space-2;
+}
+
+.operationRow,
+.availabilityRow {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-3;
+  padding: t.$space-3;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  color: t.$text;
+  text-decoration: none;
+  transition: border-color t.$duration-fast t.$ease-out, background t.$duration-fast t.$ease-out;
+}
+
+a.operationRow:hover,
+a.operationRow:focus-visible {
+  border-color: t.$border-interactive;
+  background: t.$surface-brand-subtle;
+}
+
+.operationRow > span:first-child,
+.availabilityRow > span:nth-child(2) {
+  display: grid;
+  min-width: 0;
+  gap: t.$space-1;
+}
+
+.operationRow strong,
+.availabilityRow strong {
+  overflow-wrap: anywhere;
+  font-size: t.$fs-item-title;
+  line-height: t.$line-height-body;
+}
+
+.operationRow small,
+.availabilityRow small {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: t.$line-height-caption;
+}
+
+.availabilityRow {
+  justify-content: flex-start;
+}
+
+.availabilityIcon {
+  display: grid;
+  flex: 0 0 auto;
+  width: t.$control-height-sm;
+  height: t.$control-height-sm;
+  place-items: center;
+  border-radius: t.$radius-control-sm;
+  background: t.$brand-subtle;
+  color: t.$brand;
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-1;
+  margin-left: auto;
+}
+
+.rowActions button,
+.inlineAlert button {
+  display: inline-flex;
+  min-height: t.$control-height-sm;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-1;
+  padding: 0 t.$space-2;
+  border: 0;
+  border-radius: t.$radius-control-sm;
+  background: transparent;
+  color: t.$brand;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+
+.rowActions button:hover,
+.inlineAlert button:hover {
+  background: t.$brand-subtle;
+}
+
+.rowActions .textDanger {
+  color: t.$danger;
+}
+
+.exceptionNotice,
+.inlineAlert,
+.saveBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-3;
+  padding: t.$space-3;
+  border-radius: t.$radius-control;
+  background: t.$surface-subtle;
+}
+
+.exceptionNotice {
+  align-items: flex-start;
+  flex-direction: column;
+  border: 1px solid t.$border;
+  background: t.$feedback-info-surface;
+}
+
+.exceptionNotice span,
+.saveBar span {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: t.$line-height-caption;
+}
+
+.inlineAlert {
+  color: t.$danger;
+}
+
+.formMessage,
+.successMessage {
+  grid-column: 1 / -1;
+  font-size: t.$fs-caption;
+  line-height: t.$line-height-caption;
+}
+
+.formMessage { color: t.$danger; }
+.successMessage { color: t.$success; }
+
+.fullWidthCard { grid-column: 1 / -1; }
+
 .emptyPanel {
   border-style: dashed;
   background: t.$subcard-bg;
@@ -175,6 +352,10 @@
 .primary,
 .secondary,
 .danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-1;
   min-height: 2.6rem;
   padding: 0 .85rem;
   border-radius: t.$radius-control-sm;
@@ -200,4 +381,8 @@
   .row { align-items: stretch; flex-direction: column; }
   .form { grid-template-columns: 1fr; }
   .coursePicker { min-width: 0; }
+  .fullWidthCard { grid-column: auto; }
+  .availabilityRow { align-items: flex-start; flex-wrap: wrap; }
+  .rowActions { width: 100%; margin-left: 0; }
+  .saveBar { align-items: stretch; flex-direction: column; }
 }

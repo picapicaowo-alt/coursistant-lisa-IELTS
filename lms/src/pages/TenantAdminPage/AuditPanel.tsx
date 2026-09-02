@@ -5,6 +5,7 @@ import type {TenantAuditEventParams} from '@/apis';
 import {unwrapData} from '@/apis';
 import {adminApiService} from '@/apis/services/admin-api';
 import {getApiErrorMessage} from '@/utils/apiError';
+import {EnglishDateTimeInput} from '@/components/EnglishDateInput';
 import styles from './index.module.scss';
 
 const PAGE_SIZE = 20;
@@ -15,9 +16,11 @@ const dateTimeParam = (value: string) => value ? new Date(value).toISOString() :
 export const AuditPanel = () => {
   const [draft, setDraft] = useState<AuditDraft>(emptyDraft);
   const [filters, setFilters] = useState<TenantAuditEventParams>({page: 0, size: PAGE_SIZE});
+  const [filterFeedback, setFilterFeedback] = useState('');
   const audit = useQuery({queryKey: ['tenant', 'audit-events', filters], queryFn: async () => unwrapData(await adminApiService.listTenantAuditEvents(filters), 'tenantAuditEvents'), retry: false});
   const apply = (event: FormEvent) => {
     event.preventDefault();
+    setFilterFeedback('Filters applied.');
     setFilters({
       actorUserId: draft.actorUserId ? Number(draft.actorUserId) : undefined,
       targetUserId: draft.targetUserId ? Number(draft.targetUserId) : undefined,
@@ -29,6 +32,14 @@ export const AuditPanel = () => {
       size: PAGE_SIZE,
     });
   };
+  const clear = () => {
+    const alreadyClear = Object.values(draft).every(value => value === '')
+      && Object.keys(filters).every(key => key === 'page' || key === 'size');
+    setDraft(emptyDraft);
+    setFilters({page: 0, size: PAGE_SIZE});
+    setFilterFeedback('Filters cleared. Showing all governance events.');
+    if (alreadyClear) void audit.refetch();
+  };
   const page = filters.page ?? 0;
 
   return <section className={styles.widePanel} aria-labelledby="audit-title">
@@ -38,11 +49,12 @@ export const AuditPanel = () => {
       <label><span>Target user ID</span><input type="number" min="1" value={draft.targetUserId} onChange={event => setDraft(current => ({...current, targetUserId: event.target.value}))}/></label>
       <label><span>Action</span><input value={draft.action} onChange={event => setDraft(current => ({...current, action: event.target.value}))}/></label>
       <label><span>Resource type</span><input value={draft.resourceType} onChange={event => setDraft(current => ({...current, resourceType: event.target.value}))}/></label>
-      <label><span>From</span><input type="datetime-local" value={draft.from} onChange={event => setDraft(current => ({...current, from: event.target.value}))}/></label>
-      <label><span>To</span><input type="datetime-local" value={draft.to} onChange={event => setDraft(current => ({...current, to: event.target.value}))}/></label>
+      <label><span>From</span><EnglishDateTimeInput value={draft.from} onChangeValue={value => setDraft(current => ({...current, from: value}))}/></label>
+      <label><span>To</span><EnglishDateTimeInput value={draft.to} onChangeValue={value => setDraft(current => ({...current, to: value}))}/></label>
       <button className={styles.primaryButton}><Search size={17}/>Apply filters</button>
-      <button type="button" className={styles.secondaryButton} onClick={() => { setDraft(emptyDraft); setFilters({page: 0, size: PAGE_SIZE}); }}>Clear</button>
+      <button type="button" className={styles.secondaryButton} onClick={clear}>Clear filters</button>
     </form>
+    {filterFeedback ? <p className={styles.srStatus} role="status">{filterFeedback}</p> : null}
     {audit.isPending ? <p className={styles.status}>Loading audit events…</p> : null}
     {audit.isError ? <div className={styles.errorNotice} role="alert"><p>{getApiErrorMessage(audit.error, 'Audit events could not be loaded.')}</p><button type="button" onClick={() => void audit.refetch()}>Try again</button></div> : null}
     {!audit.isPending && !audit.isError && audit.data.items.length === 0 ? <p className={styles.empty}>No governance events match these filters.</p> : null}

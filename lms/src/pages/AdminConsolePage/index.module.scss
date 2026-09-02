@@ -1,21 +1,21 @@
-.page { min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem; overflow-y: auto; background: t.$page-bg; color: t.$text; }
-.pageHeader { max-width: t.$workspace-max-inline-size; margin: 0 auto 1.25rem; }
+.page { min-height: 100%; padding: 2rem clamp(1rem, 4vw, 3.5rem) 4rem; overflow-y: auto; background: t.$page-bg; color: t.$text; }
+.pageHeader { max-width: t.$workspace-max-width; margin: 0 auto 1.25rem; }
 .pageHeader h1 { margin: .2rem 0; font-size: clamp(2rem, 4vw, t.$fs-h1); font-weight: t.$fw-extrabold; }
 .pageHeader > div > p:last-child { color: t.$text-muted; }
 .eyebrow { color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
-.tabs { display: flex; max-width: t.$workspace-max-inline-size; margin: 0 auto 1rem; gap: .35rem; padding: .35rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
+.tabs { display: flex; max-width: t.$workspace-max-width; margin: 0 auto 1rem; gap: .35rem; padding: .35rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
 .tabs button { min-height: 2.5rem; padding: 0 1rem; border-radius: t.$radius-control-sm; color: t.$text-muted; font-weight: t.$fw-semibold; cursor: pointer; }
 .tabs .activeTab { background: t.$brand; color: t.$content-on-color; }
-.contentGrid { display: grid; max-width: t.$workspace-max-inline-size; margin: 0 auto; grid-template-columns: minmax(18rem, 25rem) minmax(0, 1fr); gap: t.$workspace-section-gap; align-items: start; }
+.contentGrid { display: grid; max-width: t.$workspace-max-width; margin: 0 auto; grid-template-columns: minmax(18rem, 25rem) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
 .card { padding: 1.35rem; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; box-shadow: t.$shadow-card; }
 .card h2 { font-size: t.$fs-card-title; font-weight: t.$fw-bold; }
 .cardHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 .cardHeader p { margin-top: .2rem; color: t.$text-muted; font-size: t.$fs-caption; }
 .cardHeader > span { min-width: 2rem; padding: .2rem .45rem; border-radius: t.$radius-pill; background: t.$brand-subtle; color: t.$brand; text-align: center; font-weight: t.$fw-bold; }
-.form { display: grid; gap: .8rem; margin-top: 1rem; }
-.form label, .inlineForm label, .search { display: grid; gap: .35rem; color: t.$text-muted; font-size: t.$fs-caption; font-weight: t.$fw-semibold; }
-.form input, .form select, .form textarea, .inlineForm input, .inlineForm select, .search input, .search select { width: 100%; min-height: 2.65rem; padding: .55rem .7rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$card-bg; color: t.$text; }
-.form textarea { min-height: 6rem; resize: vertical; font: inherit; }
+.form { display: grid; gap: t.$space-5; margin-top: t.$space-4; }
+.form label, .inlineForm label, .search { display: grid; gap: t.$space-2; color: t.$text; font-size: t.$font-size-body; font-weight: t.$fw-semibold; }
+.form input, .form select, .form textarea, .inlineForm input, .inlineForm select, .search input, .search select { width: 100%; height: t.$control-height-lg; padding: 0 t.$space-4; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$card-bg; color: t.$text; font: inherit; line-height: t.$line-height-body; }
+.form textarea { height: auto; min-height: 7rem; padding-block: t.$space-3; resize: vertical; line-height: 1.55; }
 .form input:focus-visible, .form select:focus-visible, .form textarea:focus-visible, .inlineForm input:focus-visible, .inlineForm select:focus-visible, .search input:focus-visible, .search select:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
 .primaryButton, .secondaryButton, .dangerButton { min-height: 2.5rem; padding: 0 .9rem; border-radius: t.$radius-control-sm; font-weight: t.$fw-semibold; cursor: pointer; }
 .primaryButton { border: 1px solid t.$brand; background: t.$brand; color: t.$content-on-color; }
@@ -37,13 +37,13 @@
 .details[open] + * { display: none; }
 .inlineForm { display: grid; gap: .55rem; margin-top: .65rem; }
 .status { padding: 2rem 1rem; color: t.$text-muted; text-align: center; }
-.message, .errorMessage { max-width: t.$workspace-max-inline-size; margin: 0 auto 1rem; padding: .75rem 1rem; border-radius: t.$radius-control; background: rgba(t.$success, .1); color: t.$success; }
+.message, .errorMessage { max-width: t.$workspace-max-width; margin: 0 auto 1rem; padding: .75rem 1rem; border-radius: t.$radius-control; background: t.$feedback-success-surface; color: t.$success; }
 .errorMessage { background: rgba(t.$danger, .1); color: t.$danger; }
 .confirmRow { display: flex; gap: .6rem; }
 .confirmStack { display: grid; gap: .65rem; padding: .75rem; border-radius: t.$radius-control-sm; background: rgba(t.$danger, .08); }
 .confirmStack p { margin: 0; color: t.$danger; font-size: t.$fs-caption; line-height: 1.45; }
 .operationDivider { border-top: 1px solid t.$border; margin: .25rem 0; }
-.operationsGrid { display: grid; max-width: t.$workspace-max-inline-size; margin: 0 auto; grid-template-columns: repeat(auto-fit, minmax(min(100%, t.$workspace-card-min-inline-size), 1fr)); gap: t.$workspace-section-gap; align-items: start; }
+.operationsGrid { display: grid; max-width: t.$workspace-max-width; margin: 0 auto; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
 .courseContext { display: grid; gap: .2rem; margin-top: 1rem; padding: .85rem; border: 1px solid rgba(t.$brand, .18); border-radius: t.$radius-control; background: t.$brand-subtle; }
 .courseContext > span { justify-self: start; padding: .15rem .5rem; border-radius: t.$radius-pill; background: t.$brand; color: t.$card-bg; font-size: t.$fs-logo; font-weight: t.$fw-bold; letter-spacing: .04em; }
 .courseContext strong { margin-top: .25rem; font-size: t.$fs-item-sub; }

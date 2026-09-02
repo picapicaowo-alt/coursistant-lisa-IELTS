@@ -2,7 +2,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {V2ApiClient} from '@/apis';
 import {TenantAdvisingApiService} from './tenant-advising-api';
 
-const client = {get: vi.fn(), post: vi.fn(), put: vi.fn()};
+const client = {get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn()};
 const service = new TenantAdvisingApiService(client as unknown as typeof V2ApiClient);
 
 describe('TenantAdvisingApiService', () => {
@@ -12,14 +12,19 @@ describe('TenantAdvisingApiService', () => {
     client.get.mockResolvedValue({status: 200, data: {items: []}});
     client.put.mockResolvedValue({status: 200, data: {}});
     client.post.mockResolvedValue({status: 200, data: {}});
+    client.patch.mockResolvedValue({status: 200, data: {}});
     await service.listStudentIntakes({page: 0, size: 20, assignmentStatus: 'ASSIGNED'});
+    await service.getStudentIntake(9);
     await service.createStudentIntake({firstName: 'New', lastName: 'Student', email: 'student@example.test', studentType: 'STANDARD', courseRequest: 'IELTS'}, 'create-1');
+    await service.patchStudentIntake(9, {expectedIntakeVersion: 1, firstName: 'Updated'}, 'patch-1');
     await service.reassignAdvisor(41, {advisorUserId: 90, expectedAssignmentVersion: 0, reason: 'Coverage'}, 'reassign-1');
     await service.cancelStudentIntake(9, {expectedIntakeVersion: 1, reason: 'Duplicate'}, 'cancel-1');
-    expect(client.get).toHaveBeenCalledWith(
+    expect(client.get).toHaveBeenNthCalledWith(1,
       '/v2/tenant/student-intakes',
       {params: {page: 0, size: 20, assignmentStatus: 'ASSIGNED'}},
     );
+    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/tenant/student-intakes/9');
+    expect(client.patch).toHaveBeenCalledWith('/v2/tenant/student-intakes/9', {expectedIntakeVersion: 1, firstName: 'Updated'}, {headers: {'Idempotency-Key': 'patch-1'}});
     expect(client.put).toHaveBeenCalledWith(
       '/v2/tenant/students/41/advisor',
       {advisorUserId: 90, expectedAssignmentVersion: 0, reason: 'Coverage'},

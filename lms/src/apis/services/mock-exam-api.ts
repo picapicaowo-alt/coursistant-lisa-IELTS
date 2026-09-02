@@ -9,6 +9,8 @@ import type {
   MockExamRead,
   ObserverMockExamDetail,
   MockExamTemplateSummary,
+  MockExamMediaKind,
+  MockExamMediaRead,
   SubmitMockExamListeningRequest,
   SubmitMockExamReadingRequest,
   SubmitMockExamWritingRequest,
@@ -151,6 +153,35 @@ export class MockExamApiService {
 
   createTenantWriting(templateId: number, versionId: number, request: CreateMockExamWritingRequest): Promise<ApiResponse<MockExamRead>> {
     return this.apiClient.post(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/writing`, request);
+  }
+
+  uploadTenantMedia(
+    templateId: number,
+    versionId: number,
+    kind: MockExamMediaKind,
+    file: File,
+    key: string,
+  ): Promise<ApiResponse<MockExamMediaRead>> {
+    const form = new FormData();
+    form.append('kind', kind);
+    form.append('file', file);
+    return this.apiClient.post(
+      `/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/media`,
+      form,
+      {...idempotent(key), headers: {'Idempotency-Key': key}},
+    );
+  }
+
+  listTenantMedia(templateId: number, versionId: number): Promise<ApiResponse<MockExamMediaRead[]>> {
+    return this.apiClient.get(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/media`);
+  }
+
+  previewTenantMedia(templateId: number, versionId: number, mediaId: number): Promise<Blob> {
+    return this.getMedia(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/media/${mediaId}/preview`);
+  }
+
+  deleteTenantMedia(templateId: number, versionId: number, mediaId: number): Promise<ApiResponse<void>> {
+    return this.apiClient.delete(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/media/${mediaId}`);
   }
 
   private async getMedia(url: string): Promise<Blob> {

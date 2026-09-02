@@ -60,6 +60,58 @@ export interface AvailabilityExceptionRequest {
   timezone?: string;
 }
 
+/** Current instructor availability returned by `/v2/me/teaching/availability`. */
+export interface TeachingAvailabilityResponse {
+  /** Some backend versions use `availabilityVersion`; reads accept both aliases. */
+  availabilityVersion?: number;
+  exceptions?: AvailabilityExceptionRequest[];
+  version?: number;
+  windows?: AvailabilityWindowRequest[];
+}
+
+export interface TeachingGradingItemResponse {
+  assignmentId: number;
+  courseCode?: string;
+  courseId: number;
+  dueAt?: string;
+  gradingDeepLink?: string;
+  status?: string;
+  studentFirstName?: string;
+  studentLastName?: string;
+  studentMiddleName?: string;
+  studentUserId: number;
+  submittedAt?: string;
+  title: string;
+  urgency?: string;
+}
+
+export interface TeachingStudentSupportResponse {
+  courseId: number;
+  courseTitle?: string;
+  deepLink?: string;
+  reasons?: string[];
+  studentFirstName?: string;
+  studentLastName?: string;
+  studentMiddleName?: string;
+  studentUserId: number;
+}
+
+export interface TeachingTodayClassResponse {
+  courseCode?: string;
+  courseId: number;
+  courseTitle?: string;
+  date?: string;
+  endTime?: string;
+  lectureNumber?: number;
+  location?: string;
+  occurrenceId?: number;
+  sessionId?: number;
+  startTime?: string;
+  status?: string;
+  studentCount?: number;
+  timezone?: string;
+}
+
 export interface ReplaceAvailabilityRequest {
   exceptions?: AvailabilityExceptionRequest[];
   expectedVersion?: number;

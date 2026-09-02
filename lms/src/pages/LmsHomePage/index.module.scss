@@ -33,13 +33,6 @@
   }
 }
 
-.wave {
-  width: 1.625rem;
-  height: 1.625rem;
-  margin-left: -.625rem;
-  object-fit: contain;
-}
-
 @media (max-width: t.$breakpoint-shell-mobile) {
   .dashboardPage {
     padding: t.$space-4;

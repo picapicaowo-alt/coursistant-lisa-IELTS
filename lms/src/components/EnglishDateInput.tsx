@@ -1,7 +1,9 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import type {InputHTMLAttributes} from 'react';
+import {CalendarDays, Clock3} from 'lucide-react';
 import {DateTimePickerPopover} from './DateTimePickerPopover';
 import type {DateTimePickerKind} from './DateTimePickerPopover';
+import styles from './EnglishDateInput.module.scss';
 
 type BaseProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type' | 'value' | 'onChange'> & {
   value: string;
@@ -144,9 +146,11 @@ const PickerInput = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [pickerOpen, setPickerOpen] = useState(false);
   const closePicker = useCallback(() => setPickerOpen(false), []);
+  const pickerLabel = kind === 'date' ? 'Open calendar' : kind === 'time' ? 'Open time picker' : 'Open date and time picker';
+  const PickerIcon = kind === 'time' ? Clock3 : CalendarDays;
 
   return (
-    <>
+    <span className={styles.field}>
       <input
         {...props}
         {...commonProps}
@@ -170,6 +174,27 @@ const PickerInput = ({
           onClick?.(event);
         }}
       />
+      <span
+        className={styles.trigger}
+        role="button"
+        tabIndex={props.disabled ? -1 : 0}
+        aria-disabled={props.disabled}
+        aria-label={pickerLabel}
+        aria-haspopup="dialog"
+        aria-expanded={pickerOpen}
+        onClick={props.disabled ? undefined : () => {
+          setPickerOpen(true);
+          inputRef.current?.focus();
+        }}
+        onKeyDown={event => {
+          if (props.disabled || (event.key !== 'Enter' && event.key !== ' ')) return;
+          event.preventDefault();
+          setPickerOpen(true);
+          inputRef.current?.focus();
+        }}
+      >
+        <PickerIcon aria-hidden="true" size={17}/>
+      </span>
       <DateTimePickerPopover
         anchorRef={inputRef}
         kind={kind}
@@ -178,7 +203,7 @@ const PickerInput = ({
         onChangeValue={onChangeValue}
         onClose={closePicker}
       />
-    </>
+    </span>
   );
 };
 

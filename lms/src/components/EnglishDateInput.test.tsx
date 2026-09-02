@@ -54,6 +54,14 @@ describe('English date inputs', () => {
     expect((screen.getByLabelText('Event date') as HTMLInputElement).value).toBe('08/17/2026');
   });
 
+  it('keeps a dedicated calendar button in addition to focus-to-open', () => {
+    render(<label>Start date<EnglishDateInput value="" onChangeValue={vi.fn()}/></label>);
+
+    fireEvent.click(screen.getByRole('button', {name: 'Open calendar'}));
+
+    expect(screen.getByRole('dialog', {name: 'Select date'})).toBeInTheDocument();
+  });
+
   it('sets both calendar date and time from the floating picker', () => {
     const Harness = () => {
       const [value, setValue] = useState('2026-08-03T10:19');

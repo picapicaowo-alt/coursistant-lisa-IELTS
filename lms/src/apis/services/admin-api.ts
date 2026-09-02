@@ -11,6 +11,8 @@ import {
   CreateManagedUserRequest,
   idempotent,
   ManagedUser,
+  ManagedUserDisableBlockersResponse,
+  PatchTenantManagedUserRequest,
   ReassignPrimaryInstructorRequest,
   TenantAuditEventParams,
   TenantAuditEventPage,
@@ -53,7 +55,15 @@ export class AdminApiService {
   }
 
   listTenantUsers(params: TenantUserDirectoryParams = {}): Promise<ApiResponse<TenantUserDirectoryPage>> {
-    return this.apiClient.get('/v2/tenant/users', {params});
+    if (!params.levels?.length) return this.apiClient.get('/v2/tenant/users', {params});
+
+    const search = new URLSearchParams();
+    Object.entries(params).forEach(([name, value]) => {
+      if (name === 'levels' || value == null || value === '') return;
+      search.append(name, String(value));
+    });
+    params.levels.forEach(level => search.append('levels', level));
+    return this.apiClient.get('/v2/tenant/users', {params: search});
   }
 
   getTenantUser(userId: number): Promise<ApiResponse<ManagedUser>> {
@@ -86,6 +96,14 @@ export class AdminApiService {
     return this.apiClient.post('/v2/tenant/managed-users', request, idempotent());
   }
 
+  patchTenantManagedUser(userId: number, request: PatchTenantManagedUserRequest, key: string): Promise<ApiResponse<ManagedUser>> {
+    return this.apiClient.patch(`/v2/tenant/managed-users/${userId}`, request, idempotent(key));
+  }
+
+  getTenantManagedUserDisableBlockers(userId: number): Promise<ApiResponse<ManagedUserDisableBlockersResponse>> {
+    return this.apiClient.get(`/v2/tenant/managed-users/${userId}/disable-blockers`);
+  }
+
   changeManagedUserRole(scope: 'system' | 'tenant', userId: number, request: ChangeManagedUserRoleRequest): Promise<ApiResponse<void>> {
     return this.apiClient.put(`/v2/${scope}/managed-users/${userId}/role`, request, idempotent());
   }
@@ -98,8 +116,8 @@ export class AdminApiService {
     return this.apiClient.post(`/v2/${scope}/managed-users/${userId}/disable`, undefined, idempotent());
   }
 
-  disableTenantManagedUser(userId: number): Promise<ApiResponse<void>> {
-    return this.apiClient.post(`/v2/tenant/managed-users/${userId}/disable`, undefined, idempotent());
+  disableTenantManagedUser(userId: number, key: string = crypto.randomUUID()): Promise<ApiResponse<void>> {
+    return this.apiClient.post(`/v2/tenant/managed-users/${userId}/disable`, undefined, idempotent(key));
   }
 
   enableTenantManagedUser(userId: number): Promise<ApiResponse<void>> {

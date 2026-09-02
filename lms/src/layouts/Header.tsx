@@ -4,7 +4,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import NotificationCenter from '../components/NotificationCenter';
-import {canAccessAdminConsole, canAccessCourseCatalogue} from '@/utils/roleCapabilities';
+import {canAccessAdminConsole, canAccessCourseCatalogue, isInstructorLevel} from '@/utils/roleCapabilities';
 import styles from './Header.module.scss';
 
 interface MenuItem {
@@ -14,7 +14,7 @@ interface MenuItem {
   path?: string;
 }
 
-const getWorkspaceLabel = (pathname: string): string => {
+const getWorkspaceLabel = (pathname: string, instructor: boolean): string => {
   if (pathname === '/') return 'Dashboard';
   if (pathname.startsWith('/course')) return 'Courses';
   if (pathname.startsWith('/calendar')) return 'Calendar';
@@ -24,7 +24,7 @@ const getWorkspaceLabel = (pathname: string): string => {
   if (pathname.startsWith('/advisor')) return 'Advisor operations';
   if (pathname.startsWith('/counsellor')) return 'Counsellor operations';
   if (pathname.startsWith('/my-plan')) return 'My plan';
-  if (pathname.startsWith('/my-operations')) return 'Learning operations';
+  if (pathname.startsWith('/my-operations')) return instructor ? 'Teaching operations' : 'Learning operations';
   if (pathname.startsWith('/profile')) return 'Profile';
   if (pathname.startsWith('/settings')) return 'Settings';
   if (pathname.startsWith('/admin')) return 'Administration';
@@ -48,6 +48,7 @@ const Header = () => {
   const canUseAdminConsole = user ? canAccessAdminConsole(user) : false;
   const isTenantAdmin = user?.role === 'TENANT_ADMIN';
   const canSearchCourses = user ? canAccessCourseCatalogue(user) && user.role === 'USER' : false;
+  const instructor = user ? isInstructorLevel(user) : false;
 
   useEffect(() => {
     if (!isProfileOpen) return;
@@ -109,7 +110,7 @@ const Header = () => {
       ) : (
         <div className={styles.workspaceContext}>
           <span>Workspace</span>
-          <strong>{getWorkspaceLabel(pathname)}</strong>
+          <strong>{getWorkspaceLabel(pathname, instructor)}</strong>
         </div>
       )}
 

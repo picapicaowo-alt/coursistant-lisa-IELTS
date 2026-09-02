@@ -398,6 +398,11 @@
   min-height: t.$dashboard-advisor-min-block-size;
 }
 
+.instructorWorkPanel {
+  min-height: 18rem;
+  padding: t.$space-5;
+}
+
 .taskList {
   display: grid;
   padding: .625rem 1.125rem;
@@ -641,7 +646,7 @@
 
 }
 
-@container dashboard-workspace (max-width: #{t.$breakpoint-dashboard-single}) {
+@media (max-width: #{t.$breakpoint-dashboard-single}) {
   .dashboard,
   .sideColumn {
     grid-template-columns: minmax(0, 1fr);

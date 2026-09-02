@@ -1,6 +1,6 @@
 .page {
   min-height: 100%;
-  padding: 2rem clamp(1rem, 4vw, 3.5rem) 4rem;
+  padding: t.$space-8 clamp(t.$space-4, 4vw, t.$space-12) t.$space-16;
   background: t.$page-bg;
   color: t.$text;
 }
@@ -10,8 +10,16 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1.25rem;
+}
+
+.headerActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: .65rem;
 }
 
 .header h1 {
@@ -20,24 +28,16 @@
   font-weight: t.$fw-extrabold;
 }
 
-.eyebrow {
-  color: t.$brand;
-  font-size: t.$fs-caption;
-  font-weight: t.$fw-semibold;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-}
-
 .lede,
 .muted {
   color: t.$text-muted;
-  font-size: t.$fs-caption;
-  line-height: 1.5;
+  font-size: t.$font-size-body;
+  line-height: 1.55;
 }
 
 .grid {
   display: grid;
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto;
   gap: 1.25rem;
 }
@@ -46,17 +46,123 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1.25rem;
 }
 
 .stat,
 .card {
-  padding: 1.35rem;
+  padding: clamp(t.$space-5, 3vw, t.$space-8);
   border: 1px solid t.$border;
   border-radius: t.$radius-card-lg;
   background: t.$card-bg;
   box-shadow: t.$shadow-card;
+}
+
+.page > .card {
+  max-width: t.$workspace-max-width;
+  margin: 0 auto t.$space-5;
+}
+
+.statButton,
+.statLink {
+  display: grid;
+  min-height: 8rem;
+  padding: 1.35rem;
+  align-content: center;
+  gap: .2rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+  color: t.$text;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.statButton:hover,
+.statLink:hover,
+.statButton[aria-pressed='true'] {
+  border-color: t.$brand;
+  box-shadow: t.$shadow-selected;
+  transform: translateY(-1px);
+}
+
+.statButton strong,
+.statLink strong {
+  font-size: t.$fs-doc-title;
+  font-weight: t.$fw-extrabold;
+}
+
+.statButton span,
+.statLink span {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+
+.statButton small,
+.statLink small {
+  margin-top: .45rem;
+  color: t.$brand;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.dashboardNotice,
+.capabilityGrid {
+  max-width: t.$workspace-max-width;
+  margin: 0 auto 1.25rem;
+}
+
+.dashboardNotice {
+  padding: 1rem 1.1rem;
+  border: 1px solid t.$border-interactive;
+  border-radius: t.$radius-control;
+  background: t.$brand-subtle;
+}
+
+.dashboardNotice p {
+  margin: .3rem 0 0;
+  color: t.$text-muted;
+  line-height: 1.55;
+}
+
+.capabilityGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.capabilityGrid > div {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: .35rem .7rem;
+  padding: 1.1rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card;
+  background: t.$card-bg;
+}
+
+.capabilityGrid > div > span {
+  display: grid;
+  grid-row: 1 / 3;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: t.$radius-pill;
+  background: t.$brand-subtle;
+  color: t.$brand;
+  font-weight: t.$fw-bold;
+}
+
+.capabilityGrid p {
+  margin: 0;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.5;
 }
 
 .stat strong {
@@ -77,7 +183,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1rem;
 }
 
@@ -86,14 +192,21 @@
   gap: .65rem;
 }
 
-.row {
+.row,
+.selectedRow {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: .85rem;
   border: 1px solid t.$border;
   border-radius: t.$radius-control;
+}
+
+.selectedRow {
+  border-color: t.$brand;
+  background: t.$brand-subtle;
+  box-shadow: t.$shadow-selected;
 }
 
 .identity {
@@ -105,28 +218,23 @@
 .actions {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: .5rem;
 }
 
 .form {
   display: grid;
-  gap: .8rem;
-  max-width: 44rem;
+  gap: t.$space-5;
+  max-width: t.$workspace-form-max-width;
 }
 
-.form label {
-  display: grid;
-  gap: .35rem;
-  color: t.$text-muted;
-  font-size: t.$fs-caption;
-  font-weight: t.$fw-semibold;
-}
-
+.form label,
 .pickerField {
   display: grid;
-  gap: .35rem;
-  color: t.$text-muted;
-  font-size: t.$fs-caption;
+  min-width: 0;
+  gap: t.$space-2;
+  color: t.$text;
+  font-size: t.$font-size-body;
   font-weight: t.$fw-semibold;
 }
 
@@ -134,13 +242,14 @@
 .form select,
 .form textarea {
   width: 100%;
-  min-height: 2.65rem;
-  padding: .55rem .7rem;
+  height: t.$control-height-lg;
+  padding: 0 t.$space-4;
   border: 1px solid t.$border;
   border-radius: t.$radius-control-sm;
   background: t.$card-bg;
   color: t.$text;
   font: inherit;
+  line-height: t.$line-height-body;
 }
 
 .advisorSearch > div {
@@ -167,7 +276,10 @@
 }
 
 .form textarea {
-  min-height: 6rem;
+  height: auto;
+  min-height: 7rem;
+  padding-block: t.$space-3;
+  line-height: 1.55;
   resize: vertical;
 }
 
@@ -183,12 +295,30 @@ a:focus-visible {
 .primary,
 .secondary,
 .danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
   min-height: 2.75rem;
   padding: 0 .9rem;
   border-radius: t.$radius-control-sm;
   font-weight: t.$fw-semibold;
   cursor: pointer;
   touch-action: manipulation;
+}
+
+.iconOnly {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  place-items: center;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  cursor: pointer;
 }
 
 .primary {
@@ -236,7 +366,7 @@ a:focus-visible {
 
 .status,
 .error {
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1rem;
   padding: .75rem 1rem;
   border-radius: t.$radius-control;
@@ -249,7 +379,7 @@ a:focus-visible {
 }
 
 .success {
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1rem;
   padding: .75rem 1rem;
   border-radius: t.$radius-control;
@@ -260,7 +390,7 @@ a:focus-visible {
 .tabs {
   display: flex;
   gap: .35rem;
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1rem;
   padding: .35rem;
   border: 1px solid t.$border;
@@ -269,6 +399,8 @@ a:focus-visible {
 }
 
 .tabs a {
+  display: inline-flex;
+  align-items: center;
   min-height: 2.75rem;
   padding: .55rem 1rem;
   border-radius: t.$radius-control-sm;
@@ -277,7 +409,7 @@ a:focus-visible {
   text-decoration: none;
 }
 
-.tabActive {
+.tabs a.tabActive {
   background: t.$brand;
   color: t.$content-on-color;
 }
@@ -311,21 +443,30 @@ a:focus-visible {
 
 .nested {
   display: grid;
-  gap: .75rem;
-  padding: .85rem;
-  border: 1px dashed t.$border;
+  gap: t.$space-4;
+  padding: t.$space-5;
+  border: 1px solid t.$border;
   border-radius: t.$radius-control;
   background: t.$subcard-bg;
 }
 
+.readonly {
+  display: grid;
+  grid-template-columns: minmax(8rem, .35fr) minmax(0, 1fr);
+  gap: t.$space-3 t.$space-6;
+  margin: 0;
+}
+
 .readonly dt {
   color: t.$text-muted;
-  font-size: t.$fs-caption;
+  font-size: t.$font-size-body;
   font-weight: t.$fw-semibold;
 }
 
 .readonly dd {
-  margin: 0 0 .75rem;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.55;
 }
 
 .primaryLink,
@@ -358,7 +499,7 @@ a:focus-visible {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: .7rem;
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1rem;
 }
 
@@ -389,13 +530,113 @@ a:focus-visible {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
   gap: 1rem;
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1rem;
 }
 
 .wideCard {
-  max-width: 82rem;
+  max-width: t.$workspace-max-width;
   margin: 0 auto 1rem;
+}
+
+.formColumns {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  max-width: none;
+}
+
+.formColumns label:nth-of-type(6),
+.formColumns label:nth-of-type(8),
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.intakeFilters {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1.8fr) repeat(2, minmax(9rem, .7fr)) auto auto;
+  align-items: end;
+  gap: .65rem;
+  max-width: t.$workspace-max-width;
+  margin: 0 auto 1rem;
+  padding: 1rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card;
+  background: t.$card-bg;
+  box-shadow: t.$shadow-card;
+}
+
+.intakeFilters label {
+  display: grid;
+  min-width: 0;
+  gap: .35rem;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.intakeFilters input,
+.intakeFilters select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: .55rem .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+}
+
+.filterSearch > div {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: .45rem;
+  padding-left: .7rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+}
+
+.filterSearch input {
+  min-width: 0;
+  border: 0;
+  outline: 0;
+}
+
+.managePanel {
+  margin-top: 1.25rem;
+  scroll-margin-top: 1rem;
+}
+
+.manageGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.manageGrid > section {
+  min-width: 0;
+  padding: 1rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  background: t.$subcard-bg;
+}
+
+.manageGrid h3 {
+  margin: 0 0 1rem;
+}
+
+@media (max-width: 980px) {
+  .intakeFilters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filterSearch {
+    grid-column: 1 / -1;
+  }
+
+  .manageGrid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .sectionHeading,
@@ -707,7 +948,7 @@ a:focus-visible {
   display: grid;
   gap: .2rem;
   padding: .8rem;
-  border-inline-start: 2px solid t.$brand;
+  border: 1px solid t.$border-interactive;
   border-radius: t.$radius-control-sm;
   background: t.$brand-subtle;
 }
@@ -724,7 +965,7 @@ a:focus-visible {
   gap: .65rem;
   margin-top: 1rem;
   padding: 1rem;
-  border-inline-start: 2px solid t.$brand;
+  border: 1px solid t.$border-default;
   border-radius: t.$radius-control;
   background: t.$subcard-bg;
 }
@@ -735,12 +976,290 @@ a:focus-visible {
   line-height: 1.5;
 }
 
+.versionBadge,
+.readOnlyBadge,
+.taskStatus {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: t.$control-height-sm;
+  padding: 0 t.$space-3;
+  border-radius: t.$radius-pill;
+  background: t.$surface-brand-subtle;
+  color: t.$action-primary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-semibold;
+  line-height: t.$line-height-caption;
+}
+
+.readOnlyBadge,
+.taskStatus {
+  background: t.$surface-muted;
+  color: t.$content-secondary;
+}
+
+.formSection {
+  display: grid;
+  gap: t.$space-5;
+  padding-block: t.$space-2 t.$space-6;
+  border-bottom: 1px solid t.$border-default;
+}
+
+.formSection:last-of-type {
+  border-bottom: 0;
+}
+
+.formSection > h3,
+.recordTitle h3,
+.recordTitle p {
+  margin: 0;
+}
+
+.formSection > h3 {
+  font-size: t.$font-size-subhead;
+  line-height: t.$line-height-subhead;
+}
+
+.formSection > p,
+.fieldHelp,
+.recordTitle p {
+  max-width: t.$reading-max-width;
+  margin: 0;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-regular;
+  line-height: 1.55;
+}
+
+.fieldHelp {
+  font-size: t.$font-size-caption;
+  line-height: t.$line-height-caption;
+}
+
+.formGrid,
+.recordGrid,
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$space-5;
+}
+
+.spanTwo {
+  grid-column: 1 / -1;
+}
+
+.recordGroup,
+.taskGroup {
+  display: grid;
+  gap: t.$space-5;
+  min-width: 0;
+  margin: 0;
+  padding: t.$space-5;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md;
+  background: t.$surface-subtle;
+}
+
+.recordGroup legend,
+.taskGroup legend {
+  padding: 0 t.$space-2;
+  color: t.$content-primary;
+  font-size: t.$font-size-body-lg;
+  font-weight: t.$fw-semibold;
+}
+
+.recordTitle {
+  display: grid;
+  gap: t.$space-2;
+}
+
+.recordActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: t.$space-2;
+}
+
+.textDanger {
+  width: fit-content;
+  min-height: t.$touch-target;
+  padding: 0 t.$space-3;
+  border: 0;
+  border-radius: t.$radius-sm;
+  background: transparent;
+  color: t.$feedback-danger;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+
+.textDanger:hover {
+  background: t.$feedback-danger-surface;
+}
+
+.formActions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: t.$space-3;
+  padding-top: t.$space-2;
+}
+
+.recordDisclosure,
+.revisionPanel {
+  overflow: clip;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md;
+  background: t.$surface-subtle;
+}
+
+.disclosureSummary,
+.revisionPanel > summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-4;
+  min-height: 4rem;
+  padding: t.$space-4 t.$space-5;
+  color: t.$content-primary;
+  cursor: pointer;
+  font-weight: t.$fw-semibold;
+}
+
+.disclosureSummary small {
+  color: t.$content-secondary;
+  font-weight: t.$fw-regular;
+}
+
+.disclosureBody,
+.revisionBody {
+  display: grid;
+  gap: t.$space-5;
+  padding: t.$space-5;
+  border-top: 1px solid t.$border-default;
+  background: t.$surface-raised;
+}
+
+.revisionPanel {
+  margin-top: t.$space-8;
+}
+
+.revisionList {
+  display: grid;
+  gap: t.$space-3;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.revisionItem {
+  display: grid;
+  gap: t.$space-2;
+  padding: t.$space-4;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+}
+
+.revisionMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: t.$space-2;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+}
+
+.snapshot {
+  display: grid;
+  gap: t.$space-3;
+  margin-top: t.$space-2;
+  padding: t.$space-4;
+  border-radius: t.$radius-sm;
+  background: t.$surface-muted;
+}
+
+.snapshot p,
+.snapshot ul {
+  margin: 0;
+}
+
+.snapshot ul {
+  padding-inline-start: t.$space-5;
+}
+
+.summaryItem {
+  display: grid;
+  gap: t.$space-1;
+  min-width: 0;
+  padding: t.$space-4;
+  border-radius: t.$radius-sm;
+  background: t.$surface-subtle;
+}
+
+.summaryItem dt {
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.summaryItem dd {
+  margin: 0;
+  line-height: 1.5;
+}
+
+.skillSummary,
+.checkpointList,
+.taskList {
+  display: grid;
+  gap: t.$space-4;
+}
+
+.skillCard,
+.checkpointCard,
+.taskCard {
+  display: grid;
+  gap: t.$space-3;
+  padding: t.$space-5;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md;
+  background: t.$surface-subtle;
+}
+
+.skillCard h3,
+.checkpointCard h3,
+.taskCard h4,
+.skillCard p,
+.checkpointCard p,
+.taskCard p {
+  margin: 0;
+}
+
+.taskCard {
+  background: t.$surface-raised;
+}
+
+.metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: t.$space-2;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+}
+
 @media (max-width: 800px) {
   .stats { grid-template-columns: 1fr; }
-  .header, .row, .toolbar, .inboxRow, .attachmentRow { align-items: stretch; flex-direction: column; }
+  .header, .headerActions, .row, .selectedRow, .toolbar, .inboxRow, .attachmentRow { align-items: stretch; flex-direction: column; }
   .tabs { flex-wrap: wrap; }
   .advisorStats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .advisorColumns, .inlineLookup { grid-template-columns: 1fr; }
+  .advisorColumns, .inlineLookup, .formColumns, .intakeFilters { grid-template-columns: 1fr; }
   .studentMark { display: none; }
   .primaryLink, .secondaryLink { width: 100%; }
+  .capabilityGrid { grid-template-columns: 1fr; }
+  .filterSearch, .formColumns label:nth-of-type(6), .formColumns label:nth-of-type(8), .fullWidth { grid-column: auto; }
+  .formGrid, .recordGrid, .summaryGrid { grid-template-columns: 1fr; }
+  .spanTwo { grid-column: auto; }
+  .readonly { grid-template-columns: 1fr; gap: t.$space-1; }
+  .readonly dd { margin-bottom: t.$space-3; }
+  .disclosureSummary { align-items: flex-start; flex-direction: column; }
 }

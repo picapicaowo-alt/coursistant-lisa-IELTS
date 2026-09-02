@@ -2,6 +2,9 @@ import {ADVISING_ERROR_CODES} from '@/apis';
 import {getApiErrorCode, getApiErrorMessage} from '@/utils/apiError';
 
 const CODE_COPY: Record<string, string> = {
+  INVALID_TOKEN: 'Your session has expired. Sign in again.',
+  FORBIDDEN: 'You do not have permission to use this feature.',
+  ACCESS_DENIED: 'You do not have permission to use this feature.',
   [ADVISING_ERROR_CODES.featureDisabled]: 'Writes are not enabled in this environment.',
   [ADVISING_ERROR_CODES.idempotencyMismatch]: 'Retry the same request body, or start a new action with a new key.',
   [ADVISING_ERROR_CODES.userAlreadyExists]: 'A user with this email already exists.',

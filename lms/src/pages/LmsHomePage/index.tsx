@@ -4,6 +4,7 @@ import styles from "./index.module.scss"
 import {Dashboard} from "@/pages/LmsHomePage/components/Dashboard";
 import {useRequiredAuth} from "@/contexts/RequiredAuthContext";
 import {getSignedInHomePath} from '@/utils/signedInHomePath';
+import {isInstructorLevel} from '@/utils/roleCapabilities';
 
 const LMSHome: React.FC = () => {
   const {user} = useRequiredAuth();
@@ -16,22 +17,22 @@ const LMSHome: React.FC = () => {
 
 const UserDashboard: React.FC = () => {
   const {user} = useRequiredAuth();
+  const instructor = isInstructorLevel(user);
   
   return (
     <section className={styles.dashboardPage} aria-labelledby="dashboard-title">
       <header className={styles.welcomeHeader}>
         <img
-          src={user.avatar || '/icons/figma-dashboard/avatar.png'}
+          src={user.avatar || '/icons/default_avatar.jpg'}
           alt=""
           onError={event => {
             event.currentTarget.onerror = null;
             event.currentTarget.src = '/icons/default_avatar.jpg';
           }}
         />
-        <h1 id="dashboard-title">Welcome back, {user.name || 'learner'}!</h1>
-        <img className={styles.wave} src="/icons/figma-dashboard/wave.png" alt=""/>
+        <h1 id="dashboard-title">Welcome back, {user.name || (instructor ? 'instructor' : 'learner')}!</h1>
       </header>
-      <Dashboard/>
+      <Dashboard audience={instructor ? 'instructor' : 'student'}/>
     </section>
   );
 };

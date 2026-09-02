@@ -1,12 +1,13 @@
-import {FormEvent, useState} from 'react';
+import {FormEvent, useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ChevronRight, RefreshCw, Search, UserPlus} from 'lucide-react';
-import type {ManagedUser, UserLevel} from '@/apis';
+import type {ManagedUser, PatchTenantManagedUserRequest, UserLevel} from '@/apis';
 import {unwrapData} from '@/apis';
 import {adminApiService} from '@/apis/services/admin-api';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
-import {getApiErrorMessage, isRecord} from '@/utils/apiError';
+import {getApiErrorCode, getApiErrorMessage, isRecord} from '@/utils/apiError';
 import {formatPersonName} from '@/utils/personName';
+import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import styles from './index.module.scss';
 
 const PAGE_SIZE = 20;
@@ -44,9 +45,20 @@ const getBlockers = (error: unknown): string[] => {
   return Array.isArray(blockers) ? blockers.filter((value): value is string => typeof value === 'string') : [];
 };
 
+const blockerCode = (blocker: string | {code?: string; type?: string}): string => {
+  if (typeof blocker === 'string') return blocker;
+  return typeof blocker.code === 'string' ? blocker.code : typeof blocker.type === 'string' ? blocker.type : 'RESPONSIBILITY_BLOCKER';
+};
+
+const blockerMessage = (blocker: string | {code?: string; type?: string; message?: string}): string | undefined => {
+  if (typeof blocker === 'string') return blockerGuidance[blocker];
+  return typeof blocker.message === 'string' ? blocker.message : blockerGuidance[blockerCode(blocker)];
+};
+
 export const DirectoryPanel = () => {
   const {user: currentUser} = useRequiredAuth();
   const queryClient = useQueryClient();
+  const idempotency = useIdempotencyCheckpoint();
   const [draftFilters, setDraftFilters] = useState<DirectoryFilters>(emptyFilters);
   const [filters, setFilters] = useState<DirectoryFilters>(emptyFilters);
   const [page, setPage] = useState(0);
@@ -55,6 +67,7 @@ export const DirectoryPanel = () => {
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [transitionLevel, setTransitionLevel] = useState<StaffLevel | ''>('');
   const [feedback, setFeedback] = useState<string>('');
+  const [editForm, setEditForm] = useState({firstName: '', middleName: '', lastName: '', email: '', phone: ''});
 
   const directory = useQuery({
     queryKey: ['tenant', 'users', filters, page, PAGE_SIZE],
@@ -74,6 +87,17 @@ export const DirectoryPanel = () => {
     enabled: selectedId !== null,
     retry: false,
   });
+
+  useEffect(() => {
+    if (!detail.data) return;
+    setEditForm({
+      firstName: detail.data.firstName ?? '',
+      middleName: detail.data.middleName ?? '',
+      lastName: detail.data.lastName ?? '',
+      email: detail.data.email,
+      phone: detail.data.phone ?? '',
+    });
+  }, [detail.data]);
 
   const refresh = async (message?: string) => {
     if (message) setFeedback(message);
@@ -97,6 +121,30 @@ export const DirectoryPanel = () => {
       setSelectedId(id);
       await refresh('Account created. The user can set their first password through Forgot password.');
     },
+  });
+  const patchAccount = useMutation({
+    mutationFn: async () => {
+      if (!selected || selected.accountVersion == null) throw new Error('The backend did not return accountVersion, so this account cannot be updated safely.');
+      const payload: PatchTenantManagedUserRequest = {expectedAccountVersion: selected.accountVersion};
+      const nextFirstName = editForm.firstName.trim();
+      const nextMiddleName = editForm.middleName.trim() || null;
+      const nextLastName = editForm.lastName.trim();
+      const nextEmail = editForm.email.trim().toLowerCase();
+      const nextPhone = editForm.phone.trim() || null;
+      if (nextFirstName !== (selected.firstName ?? '')) payload.firstName = nextFirstName;
+      if (nextMiddleName !== (selected.middleName ?? null)) payload.middleName = nextMiddleName;
+      if (nextLastName !== (selected.lastName ?? '')) payload.lastName = nextLastName;
+      if (nextEmail !== selected.email.toLowerCase()) payload.email = nextEmail;
+      if (nextPhone !== (selected.phone ?? null)) payload.phone = nextPhone;
+      if (Object.keys(payload).length === 1) throw new Error('Change at least one profile field before saving.');
+      const key = idempotency.keyFor(`tenant-patch-account-${selected.id}`, idempotencyFingerprint(payload));
+      return unwrapData(await adminApiService.patchTenantManagedUser(selected.id, payload, key), 'tenantPatchManagedUser');
+    },
+    onSuccess: async () => refresh('Account profile updated. If the email changed, the user must sign in again with the new email.'),
+  });
+  const disablePreview = useMutation({
+    mutationFn: async (id: number) => unwrapData(await adminApiService.getTenantManagedUserDisableBlockers(id), 'tenantGetManagedUserDisableBlockers'),
+    onSuccess: preview => setConfirmDisable(preview.canDisable),
   });
   const disable = useMutation({
     mutationFn: (id: number) => adminApiService.disableTenantManagedUser(id),
@@ -125,8 +173,17 @@ export const DirectoryPanel = () => {
   const selected = detail.data;
   const isSelf = selected?.id === currentUser.id;
   const targets = selected ? transitionTargets(selected) : [];
-  const operationError = create.error || disable.error || enable.error || changeRole.error;
-  const blockers = getBlockers(disable.error);
+  const operationError = create.error || patchAccount.error || disablePreview.error || disable.error || enable.error || changeRole.error;
+  const previewBlockers = disablePreview.data?.blockers ?? [];
+  const blockers = previewBlockers.length > 0 ? previewBlockers : getBlockers(disable.error);
+  const patchConflict = getApiErrorCode(patchAccount.error) === 'ACCOUNT_VERSION_CONFLICT';
+  const hasProfileChanges = Boolean(selected && (
+    editForm.firstName.trim() !== (selected.firstName ?? '')
+    || (editForm.middleName.trim() || null) !== (selected.middleName ?? null)
+    || editForm.lastName.trim() !== (selected.lastName ?? '')
+    || editForm.email.trim().toLowerCase() !== selected.email.toLowerCase()
+    || (editForm.phone.trim() || null) !== (selected.phone ?? null)
+  ));
 
   return (
     <div className={styles.directoryLayout}>
@@ -148,7 +205,7 @@ export const DirectoryPanel = () => {
         {!directory.isPending && !directory.isError && directory.data.items.length === 0 ? <p className={styles.empty}>No users match these filters.</p> : null}
         <div className={styles.recordList}>
           {directory.data?.items.map(account => (
-            <button type="button" className={selectedId === account.id ? styles.selectedRecord : styles.record} key={account.id} onClick={() => { setSelectedId(account.id); setConfirmDisable(false); setTransitionLevel(''); setFeedback(''); }}>
+            <button type="button" className={selectedId === account.id ? styles.selectedRecord : styles.record} key={account.id} onClick={() => { setSelectedId(account.id); setConfirmDisable(false); disablePreview.reset(); setTransitionLevel(''); setFeedback(''); }}>
               <span><strong>{formatPersonName(account, `User #${account.id}`)}</strong><small>{account.email}</small></span>
               <span className={styles.recordMeta}><em>{account.role === 'TENANT_ADMIN' ? 'TENANT ADMIN' : account.level}</em><small>{account.status}</small></span>
               <ChevronRight size={18}/>
@@ -178,14 +235,28 @@ export const DirectoryPanel = () => {
           {detail.isError ? <div className={styles.errorNotice} role="alert"><p>{getApiErrorMessage(detail.error, 'This account is unavailable.')}</p><button type="button" onClick={() => void detail.refetch()}>Try again</button></div> : null}
           {selected ? <>
             <dl className={styles.detailList}><dt>Name</dt><dd>{formatPersonName(selected, `User #${selected.id}`)}</dd><dt>Email</dt><dd>{selected.email}</dd><dt>Identity</dt><dd>{selected.role} / {selected.level}</dd><dt>Status</dt><dd>{selected.status}</dd></dl>
+            {selected.role === 'USER' && selected.level !== 'STUDENT' && selected.level !== 'PARENT' ? <form className={styles.form} onSubmit={event => { event.preventDefault(); patchAccount.mutate(); }}>
+              <h3 className={styles.subheading}>Correct staff profile</h3>
+              <div className={styles.nameGrid}>
+                <label><span>First name</span><input required maxLength={100} value={editForm.firstName} onChange={event => setEditForm(current => ({...current, firstName: event.target.value}))}/></label>
+                <label><span>Middle name</span><input maxLength={100} value={editForm.middleName} onChange={event => setEditForm(current => ({...current, middleName: event.target.value}))}/></label>
+                <label><span>Last name</span><input required maxLength={100} value={editForm.lastName} onChange={event => setEditForm(current => ({...current, lastName: event.target.value}))}/></label>
+              </div>
+              <label><span>Email</span><input required type="email" value={editForm.email} onChange={event => setEditForm(current => ({...current, email: event.target.value}))}/></label>
+              <label><span>Phone</span><input value={editForm.phone} onChange={event => setEditForm(current => ({...current, phone: event.target.value}))}/></label>
+              {editForm.email.trim().toLowerCase() !== selected.email.toLowerCase() ? <p className={styles.hint}>Changing email invalidates this user’s current sessions and tokens.</p> : null}
+              <button className={styles.secondaryButton} disabled={patchAccount.isPending || selected.accountVersion == null || !hasProfileChanges}>{patchAccount.isPending ? 'Saving…' : 'Save profile changes'}</button>
+              {selected.accountVersion == null ? <p className={styles.inlineError}>The current response has no accountVersion. Update is disabled to preserve CAS safety.</p> : null}
+              {patchConflict ? <div className={styles.confirmBox} role="alert"><p>Someone else changed this account. Your typed values are preserved. Load the latest account before deciding what to submit again.</p><button type="button" className={styles.secondaryButton} onClick={() => void detail.refetch()}>Load latest account</button></div> : null}
+            </form> : null}
             {isSelf ? <p className={styles.hint}>You cannot disable, enable, or change your own Tenant Admin identity.</p> : <div className={styles.governanceActions}>
               {targets.length > 0 ? <form className={styles.form} onSubmit={event => { event.preventDefault(); if (transitionLevel) changeRole.mutate({id: selected.id, level: transitionLevel}); }}><label><span>Convert identity</span><select required value={transitionLevel} onChange={event => setTransitionLevel(event.target.value as StaffLevel)}><option value="">Choose allowed target</option>{targets.map(level => <option value={level} key={level}>{level}</option>)}</select></label><button className={styles.secondaryButton} disabled={!transitionLevel || changeRole.isPending}>{changeRole.isPending ? 'Updating…' : 'Confirm identity change'}</button></form> : <p className={styles.hint}>This identity has no permitted conversion.</p>}
-              {selected.status === 'DISABLED' ? <button type="button" className={styles.primaryButton} disabled={enable.isPending} onClick={() => enable.mutate(selected.id)}>{enable.isPending ? 'Restoring…' : 'Restore login'}</button> : confirmDisable ? <div className={styles.confirmBox}><p>Disable this account? The backend will return any unresolved responsibility blockers.</p><div><button type="button" className={styles.dangerButton} disabled={disable.isPending} onClick={() => disable.mutate(selected.id)}>{disable.isPending ? 'Disabling…' : 'Confirm disable'}</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmDisable(false)}>Cancel</button></div></div> : <button type="button" className={styles.dangerLink} onClick={() => setConfirmDisable(true)}>Disable account</button>}
+              {selected.status === 'DISABLED' ? <button type="button" className={styles.primaryButton} disabled={enable.isPending} onClick={() => enable.mutate(selected.id)}>{enable.isPending ? 'Restoring…' : 'Restore login'}</button> : confirmDisable ? <div className={styles.confirmBox}><p>No current responsibility blockers were found. The backend will check again when you confirm.</p><div><button type="button" className={styles.dangerButton} disabled={disable.isPending} onClick={() => disable.mutate(selected.id)}>{disable.isPending ? 'Disabling…' : 'Confirm disable'}</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmDisable(false)}>Cancel</button></div></div> : <button type="button" className={styles.dangerLink} disabled={disablePreview.isPending} onClick={() => disablePreview.mutate(selected.id)}>{disablePreview.isPending ? 'Checking responsibilities…' : 'Check before disabling'}</button>}
             </div>}
           </> : null}
           {feedback ? <p className={styles.inlineSuccess} role="status">{feedback}</p> : null}
           {operationError && !create.error ? <p className={styles.inlineError} role="alert">{getApiErrorMessage(operationError, 'The account operation could not be completed.')}</p> : null}
-          {blockers.length > 0 ? <div className={styles.blockers} role="alert"><strong>Resolve these responsibilities, then retry:</strong><ul>{blockers.map(blocker => <li key={blocker}><code>{blocker}</code><span>{blockerGuidance[blocker] ?? 'Resolve this responsibility in its owning workflow.'}</span></li>)}</ul></div> : null}
+          {blockers.length > 0 ? <div className={styles.blockers} role="alert"><strong>Resolve these responsibilities, then check again:</strong><ul>{blockers.map((blocker, index) => { const code = blockerCode(blocker); return <li key={`${code}-${index}`}><code>{code}</code><span>{blockerMessage(blocker) ?? 'Resolve this responsibility in its owning workflow.'}</span></li>; })}</ul></div> : null}
         </section> : null}
       </aside>
     </div>

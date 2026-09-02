@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {unwrapData, type ManagedUser} from '@/apis';
 import {RecordSummaryList} from '@/components/RecordSummaryList';
+import {EnglishDateInput} from '@/components/EnglishDateInput';
 import {adminApiService} from '@/apis/services/admin-api';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
 import {notificationApiService} from '@/apis/services/notification-api';
@@ -60,7 +61,7 @@ export const AdminContractOperations: React.FC<{isSystemAdmin: boolean; users: M
 
       {isSystemAdmin ? <section className={styles.card}>
         <h2>Notification digest</h2><p className={styles.hint}>Run the digest for a selected date. Leave tenant blank for a system-wide run.</p>
-        <form className={styles.form} onSubmit={event => { event.preventDefault(); digestMutation.mutate(); }}><label><span>Digest date</span><input required type="date" value={digest.date} onChange={event => setDigest(current => ({...current, date: event.target.value}))}/></label><label><span>Tenant</span><select value={digest.tenantId} onChange={event => setDigest(current => ({...current, tenantId: event.target.value}))}><option value="">All tenants</option>{[...new Map(users.map(user => [user.tenantId, user.tenantId])).values()].map(tenantId => <option key={tenantId} value={tenantId}>Tenant #{tenantId}</option>)}</select></label><button className={styles.primaryButton} disabled={!digest.date || digestMutation.isPending}>Run digest</button></form>
+        <form className={styles.form} onSubmit={event => { event.preventDefault(); digestMutation.mutate(); }}><label><span>Digest date</span><EnglishDateInput required value={digest.date} onChangeValue={date => setDigest(current => ({...current, date}))}/></label><label><span>Tenant</span><select value={digest.tenantId} onChange={event => setDigest(current => ({...current, tenantId: event.target.value}))}><option value="">All tenants</option>{[...new Map(users.map(user => [user.tenantId, user.tenantId])).values()].map(tenantId => <option key={tenantId} value={tenantId}>Tenant #{tenantId}</option>)}</select></label><button className={styles.primaryButton} disabled={!digest.date || digestMutation.isPending}>Run digest</button></form>
       </section> : null}
     </>
   );
