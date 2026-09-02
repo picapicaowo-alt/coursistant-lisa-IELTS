@@ -1,37 +1,32 @@
 .dashboard {
   display: grid;
   width: 100%;
-  max-width: 75.375rem;
-  grid-template-columns: 21rem 1.4375rem minmax(31rem, 34.875rem) 1.1875rem 16.875rem;
-  gap: 0;
+  max-width: t.$workspace-max-inline-size;
+  grid-template-columns:
+    minmax(t.$dashboard-chat-min-inline-size, .82fr)
+    minmax(t.$dashboard-main-min-inline-size, 1.5fr)
+    minmax(t.$dashboard-side-min-inline-size, .72fr);
+  gap: t.$dashboard-column-gap;
   margin: 0;
   color: t.$content-primary;
 }
 
 .chatPanel {
-  grid-column: 1;
-}
-
-.mainColumn {
-  grid-column: 3;
-}
-
-.sideColumn {
-  grid-column: 5;
+  grid-column: auto;
 }
 
 .mainColumn {
   display: grid;
   min-width: 0;
   align-content: start;
-  gap: t.$space-5;
+  gap: t.$workspace-section-gap;
 }
 
 .sideColumn {
   display: grid;
   min-width: 0;
   align-content: start;
-  gap: 1.125rem;
+  gap: t.$workspace-section-gap;
 }
 
 .panel,
@@ -50,7 +45,7 @@
 .chatPanel {
   position: relative;
   display: flex;
-  height: 51.625rem;
+  min-height: t.$dashboard-chat-min-block-size;
   flex-direction: column;
   padding: 1.125rem 1rem 1rem;
   border: 0;
@@ -253,7 +248,7 @@
 }
 
 .courseWorkPanel {
-  height: 18.125rem;
+  min-height: t.$dashboard-course-min-block-size;
 }
 
 .courseFilterHeader {
@@ -400,7 +395,7 @@
 }
 
 .advisorPanel {
-  height: 14.125rem;
+  min-height: t.$dashboard-advisor-min-block-size;
 }
 
 .instructorWorkPanel {
@@ -472,7 +467,7 @@
 }
 
 .examsPanel {
-  height: 16.875rem;
+  min-height: t.$dashboard-exams-min-block-size;
 }
 
 .examGrid {
@@ -550,12 +545,12 @@
 }
 
 .schedulePanel {
-  height: 38rem;
+  min-height: t.$dashboard-schedule-min-block-size;
   padding: 0;
 }
 
 .alertsPanel {
-  height: 12.5rem;
+  min-height: t.$dashboard-alerts-min-block-size;
 }
 
 .alertHeader a {
@@ -632,10 +627,10 @@
   border: 0;
 }
 
-@media (max-width: 1280px) {
+@container dashboard-workspace (max-width: 68rem) {
   .dashboard {
     grid-template-columns: minmax(18rem, .78fr) minmax(31rem, 1.25fr);
-    gap: t.$space-5;
+    gap: t.$dashboard-column-gap;
   }
 
   .chatPanel,
@@ -649,19 +644,12 @@
     grid-template-columns: minmax(31rem, 1fr) minmax(16.875rem, .55fr);
   }
 
-  .chatPanel {
-    height: 51.625rem;
-  }
 }
 
-@media (max-width: 900px) {
+@media (max-width: #{t.$breakpoint-dashboard-single}) {
   .dashboard,
   .sideColumn {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .chatPanel {
-    height: 37rem;
   }
 
   .sideColumn {
@@ -669,9 +657,9 @@
   }
 }
 
-@media (max-width: 620px) {
+@container dashboard-workspace (max-width: #{t.$breakpoint-dashboard-compact}) {
   .chatPanel {
-    height: 34rem;
+    min-height: 34rem;
   }
 
   .chatHeader {
@@ -702,7 +690,6 @@
   .examsPanel,
   .schedulePanel,
   .alertsPanel {
-    height: auto;
     min-height: 15rem;
   }
 

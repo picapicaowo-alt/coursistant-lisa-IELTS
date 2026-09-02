@@ -66,8 +66,9 @@ export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: n
       if (!parent.parentUserId) {
         const fingerprint = idempotencyFingerprint(createRequest);
         const operation = `tenant-create-parent-${subjectId}`;
-        const key = idempotency.keyFor(operation, fingerprint);
-        await parentApiService.createOrReuseTenantParentLink(subjectId, createRequest, key);
+        // The tenant create-or-reuse operation does not declare Idempotency-Key
+        // in the consumed Parent OpenAPI contract.
+        await parentApiService.createOrReuseTenantParentLink(subjectId, createRequest);
         return {operation, fingerprint};
       }
       const request = {reason: parent.reason.trim() || undefined};

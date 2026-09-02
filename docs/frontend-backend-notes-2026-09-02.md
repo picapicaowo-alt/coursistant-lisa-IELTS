@@ -45,16 +45,16 @@ Please publish the exact request/response schemas, required `Idempotency-Key` op
 
 | Scope | Status | Evidence | Acceptance boundary |
 | --- | --- | --- | --- |
-| Backend Local live gate | Backend-reported pass | `35 PASS / 0 FAIL / 0 unexplained 5xx`; run `tausab-20260902T053702Z` | Reported by the supplied backend handoff; not independently rerun by the frontend task |
-| Backend complete verification | Backend-reported pass | `mvn clean verify`; Surefire `1178 / 0 / 0`; Failsafe `424 / 0 / 0` | Local backend contract and business verification only |
+| Tenant Admin backend Local gate | Backend-reported pass | `35 PASS / 0 FAIL`; complete `mvn clean verify` reported as `BUILD SUCCESS` | Reported by the supplied Tenant Admin handoff; not independently rerun by this frontend-only task |
+| Counselor Parent Link read | Backend-reported targeted pass | Controller/service, Parent OpenAPI, targeted tests, Local API smoke, and Course OpenAPI snapshot static Gate are `PASS` | The latest Counselor handoff explicitly marks full `mvn clean verify` as `FULL_VERIFY_DEFERRED`; `COUNSELLOR_PARENT_LINK_READ_GATE_PASS` has not been granted |
 | Frontend lint and types | Pass | `npm run lint:ci`; `npm run typecheck`; `npm run typecheck:production` | Current local frontend worktree |
-| Frontend unit/component tests | Pass | `npm run test:run`: 120 files, 497 tests | Mocked API behavior and component contracts |
+| Frontend unit/component tests | Pass | `npm run test:run`: 120 files, 498 tests | Mocked API behavior and component contracts |
 | Frontend production build | Pass | `npm run build` | Compile and bundle only |
-| Frontend browser E2E | Pass | `PLAYWRIGHT_PORT=4204 npm run test:e2e`: 19/19 passed without retries; the previously flaky quick-prompt capture also passed 10/10 repeated runs | Local browser flows with frontend fixtures/mocks |
+| Frontend browser E2E | Pass | `PLAYWRIGHT_PORT=4215 npm run test:e2e`: 22/22 passed without retries | Local role, responsive-shell, authoring, grading, Vocabulary, and cross-role workflow coverage with frontend fixtures/mocks |
 | Instructor dashboard and availability regression | Pass locally | Role E2E proves no Student-only dashboard requests; availability PUT preserves 2 weekly windows plus the existing date exception | Fixture-backed frontend contract validation; not evidence that the current Dev bundle has been updated |
 | Parent Link `401/403` frontend handling | Pass with stated test boundary | Error mapping tests, shared 401 recovery-decision tests, and Counselor Parent-link 403 panel tests | The refresh/session-expiry path is code-inspected rather than browser-integrated; no deployed backend response is proven |
-| Dev authenticated Instructor walkthrough | Current deployed defect confirmed | Signed-in `USER / INSTRUCTOR` walkthrough: dashboard Student-only regions returned 403; availability payload rendered as repeated `Record` rows | The local frontend fix is not deployed by this task; Dev must be retested after an authorized release |
+| Dev authenticated Instructor walkthrough | Pre-release defect confirmed | Signed-in `USER / INSTRUCTOR` walkthrough on the previous Dev bundle: dashboard Student-only regions returned 403; availability payload rendered as repeated `Record` rows | The local frontend fix is ready for Dev release and must be retested against the deployed revision |
 | Dev authenticated all-role integration | Partially verified | Instructor was exercised read-only; Parent Link `200/401/403` and the remaining role accounts were not independently signed in during this task | Requires valid role-specific login access and a deployed matching build |
 | Prod deployment and protected-flow acceptance | Not performed | No Prod change or authenticated Prod test in this task | Requires separate release authorization and acceptance |
 
-The Local Gate, frontend test suite, build, and local browser checks do not replace Dev or Prod authenticated acceptance. In particular, the deployed environment still needs targeted Parent Link checks for a valid Counselor, an expired/invalid token, and a signed-in user without permission.
+The Local Gate, frontend test suite, build, and local browser checks do not replace Dev or Prod authenticated acceptance. In particular, the deployed environment still needs targeted Parent Link checks for a valid Counselor, an expired/invalid token, and a signed-in user without permission. The backend's final Counselor Parent Link release gate also remains pending until its deferred complete Maven verification is rerun.

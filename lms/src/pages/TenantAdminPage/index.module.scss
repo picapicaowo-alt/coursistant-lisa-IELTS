@@ -620,7 +620,7 @@ summary:focus-visible {
 
 .auditFilters {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: end;
   gap: .6rem;
   margin-top: 1rem;
@@ -719,8 +719,7 @@ summary:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .thresholdGrid,
-  .auditFilters {
+  .thresholdGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

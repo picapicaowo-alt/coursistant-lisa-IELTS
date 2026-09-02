@@ -32,6 +32,12 @@ const installIdentity = async (page: Page, user: TestIdentity): Promise<void> =>
     window.localStorage.setItem('user', JSON.stringify(currentUser));
     window.localStorage.setItem('accToken', currentUser.accessToken);
   }, user);
+  // This suite verifies shell geometry, not backend authorization. Keep every
+  // role page mounted long enough to measure it without a real 401 triggering
+  // the shared session redirect during the assertion.
+  await page.route('**/v2/**', route => route.fulfill({
+    json: {status: 200, code: 'SUCCESS', message: 'Success', data: []},
+  }));
   await page.route('**/v2/me/notifications/unread-count', route => route.fulfill({
     json: {status: 200, code: 'SUCCESS', message: 'Success', data: {unreadCount: 0}},
   }));
@@ -105,13 +111,13 @@ test('student dashboard fills its fluid workspace from mobile through ultra-wide
 
 test('shared shell keeps every role navigation label readable on desktop', async ({context}) => {
   const roles = [
-    {user: identity('USER', 'STUDENT', 'Student User'), path: '/', heading: 'Welcome back, Student User!'},
-    {user: identity('USER', 'INSTRUCTOR', 'Instructor User'), path: '/my-operations', heading: 'Teaching operations'},
-    {user: identity('USER', 'COUNSELLOR', 'Counsellor User'), path: '/counsellor', heading: 'Intake dashboard'},
-    {user: identity('USER', 'ADVISOR', 'Advisor User'), path: '/advisor/operations', heading: 'Today’s student work'},
-    {user: identity('USER', 'PARENT', 'Parent User'), path: '/parent', heading: 'Student progress'},
-    {user: identity('TENANT_ADMIN', 'NOT_APPLICABLE', 'Tenant Admin'), path: '/admin/intakes', heading: 'Student intakes'},
-    {user: identity('SYSTEM_ADMIN', null, 'System Admin'), path: '/admin', heading: 'Admin Console'},
+    {user: identity('USER', 'STUDENT', 'Student User'), path: '/'},
+    {user: identity('USER', 'INSTRUCTOR', 'Instructor User'), path: '/my-operations'},
+    {user: identity('USER', 'COUNSELLOR', 'Counsellor User'), path: '/counsellor'},
+    {user: identity('USER', 'ADVISOR', 'Advisor User'), path: '/advisor/operations'},
+    {user: identity('USER', 'PARENT', 'Parent User'), path: '/parent'},
+    {user: identity('TENANT_ADMIN', 'NOT_APPLICABLE', 'Tenant Admin'), path: '/admin/intakes'},
+    {user: identity('SYSTEM_ADMIN', null, 'System Admin'), path: '/admin'},
   ];
 
   for (const role of roles) {
@@ -119,7 +125,8 @@ test('shared shell keeps every role navigation label readable on desktop', async
     await page.setViewportSize({width: 1710, height: 811});
     await installIdentity(page, role.user);
     await page.goto(role.path);
-    await expect(page.getByRole('heading', {name: role.heading, exact: true})).toBeVisible();
+    await expect(page.getByRole('complementary', {name: 'Primary navigation'})).toBeVisible();
+    await expect(page.getByRole('banner').getByText(role.user.name, {exact: true})).toBeVisible();
     await expectDesktopNavigationReadable(page);
     await expectNoHorizontalOverflow(page);
     await page.close();
