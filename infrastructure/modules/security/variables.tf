@@ -24,6 +24,11 @@ variable "app_secret_name" {
   type        = string
 }
 
+variable "cache_secret_name" {
+  description = "Secrets Manager path for the managed Valkey AUTH token."
+  type        = string
+}
+
 variable "tags" {
   type = map(string)
 }

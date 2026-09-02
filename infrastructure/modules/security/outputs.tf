@@ -21,3 +21,11 @@ output "app_secret_arn" {
 output "app_secret_name" {
   value = aws_secretsmanager_secret.application.name
 }
+
+output "cache_secret_arn" {
+  value = aws_secretsmanager_secret.cache.arn
+}
+
+output "cache_secret_name" {
+  value = aws_secretsmanager_secret.cache.name
+}

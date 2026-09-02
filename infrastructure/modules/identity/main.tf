@@ -55,7 +55,7 @@ data "aws_iam_policy_document" "backend_developers" {
     sid       = "InspectSecretMetadata"
     effect    = "Allow"
     actions   = ["secretsmanager:DescribeSecret", "secretsmanager:ListSecretVersionIds"]
-    resources = [var.openai_secret_arn, var.app_secret_arn]
+    resources = [var.openai_secret_arn, var.app_secret_arn, var.cache_secret_arn]
   }
 
   statement {
@@ -98,4 +98,71 @@ resource "aws_iam_group_policy" "backend_developers" {
   name   = "${var.name_prefix}-backend-deployment"
   group  = aws_iam_group.backend_developers.name
   policy = data.aws_iam_policy_document.backend_developers.json
+}
+
+resource "aws_iam_group" "frontend_developers" {
+  name = "${var.name_prefix}-frontend-developers"
+  path = "/coursistant/"
+}
+
+data "aws_iam_policy_document" "frontend_developers" {
+  #checkov:skip=CKV_AWS_356:CloudFront list APIs do not support resource scoping; mutating actions remain scoped to the pilot distribution.
+  statement {
+    sid    = "ListFrontendBucket"
+    effect = "Allow"
+    actions = [
+      "s3:GetBucketLocation",
+      "s3:ListBucket"
+    ]
+    resources = [var.frontend_bucket_arn]
+  }
+
+  statement {
+    sid    = "ManageFrontendObjects"
+    effect = "Allow"
+    actions = [
+      "s3:DeleteObject",
+      "s3:GetObject",
+      "s3:PutObject"
+    ]
+    resources = ["${var.frontend_bucket_arn}/*"]
+  }
+
+  statement {
+    sid    = "UseFrontendKmsKey"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+      "kms:Encrypt",
+      "kms:GenerateDataKey*",
+      "kms:ReEncrypt*"
+    ]
+    resources = [var.frontend_kms_key_arn]
+  }
+
+  statement {
+    sid       = "InvalidateFrontendDistribution"
+    effect    = "Allow"
+    actions   = ["cloudfront:CreateInvalidation"]
+    resources = [var.cloudfront_distribution_arn]
+  }
+
+  statement {
+    sid    = "InspectFrontendDistribution"
+    effect = "Allow"
+    actions = [
+      "cloudfront:GetDistribution",
+      "cloudfront:GetDistributionConfig",
+      "cloudfront:GetInvalidation",
+      "cloudfront:ListInvalidations"
+    ]
+    resources = [var.cloudfront_distribution_arn]
+  }
+}
+
+resource "aws_iam_group_policy" "frontend_developers" {
+  name   = "${var.name_prefix}-frontend-deployment"
+  group  = aws_iam_group.frontend_developers.name
+  policy = data.aws_iam_policy_document.frontend_developers.json
 }

@@ -160,3 +160,12 @@ resource "aws_secretsmanager_secret" "application" {
   recovery_window_in_days = 30
   tags                    = merge(var.tags, { Purpose = "application" })
 }
+
+resource "aws_secretsmanager_secret" "cache" {
+  #checkov:skip=CKV2_AWS_57:Rotation is coordinated through the cache module's write-only token version until the backend adopts an automatic rotation contract.
+  name                    = var.cache_secret_name
+  description             = "Valkey runtime authentication for ${var.name_prefix}; value is write-only and not stored in Terraform state"
+  kms_key_id              = aws_kms_key.application.arn
+  recovery_window_in_days = 30
+  tags                    = merge(var.tags, { Purpose = "cache" })
+}

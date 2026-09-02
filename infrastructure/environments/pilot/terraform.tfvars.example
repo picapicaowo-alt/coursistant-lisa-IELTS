@@ -19,8 +19,18 @@ max_size         = 2
 domain_name  = "api-cn.xlearnedu.com"
 enable_https = true
 
-# Add exact HTTPS origins only when direct browser-to-S3 uploads are required.
-cors_allowed_origins = []
+# The us-east-1 certificate is issued and the Namecheap validation CNAME is active.
+frontend_domain_name          = "app.xlearnedu.com"
+enable_frontend_custom_domain = true
+
+cache_engine_version          = "8.2"
+cache_node_type               = "cache.t4g.micro"
+cache_port                    = 6379
+cache_snapshot_retention_days = 1
+cache_auth_token_version       = 1
+
+# Exact origin for direct browser-to-S3 uploads.
+cors_allowed_origins = ["https://app.xlearnedu.com"]
 
 waf_rate_limit    = 2000
 monthly_budget_usd = 400

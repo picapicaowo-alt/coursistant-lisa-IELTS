@@ -104,10 +104,51 @@ variable "enable_https" {
   default     = true
 }
 
+variable "frontend_domain_name" {
+  description = "Product-neutral frontend hostname. DNS remains externally hosted at Namecheap."
+  type        = string
+  default     = "app.xlearnedu.com"
+}
+
+variable "enable_frontend_custom_domain" {
+  description = "Attach the us-east-1 ACM certificate to CloudFront only after external DNS validation completes."
+  type        = bool
+  default     = true
+}
+
+variable "cache_engine_version" {
+  description = "Valkey engine version for the pilot cache."
+  type        = string
+  default     = "8.2"
+}
+
+variable "cache_node_type" {
+  description = "Single-node pilot cache size; add replicas and Multi-AZ before production use."
+  type        = string
+  default     = "cache.t4g.micro"
+}
+
+variable "cache_port" {
+  description = "TLS port shared by the application egress policy and managed Valkey endpoint."
+  type        = number
+  default     = 6379
+}
+
+variable "cache_snapshot_retention_days" {
+  type    = number
+  default = 1
+}
+
+variable "cache_auth_token_version" {
+  description = "Increment for a coordinated write-only cache AUTH token rotation."
+  type        = number
+  default     = 1
+}
+
 variable "cors_allowed_origins" {
   description = "Exact browser origins allowed for direct S3 uploads. Empty disables S3 CORS."
   type        = list(string)
-  default     = []
+  default     = ["https://app.xlearnedu.com"]
 }
 
 variable "waf_rate_limit" {

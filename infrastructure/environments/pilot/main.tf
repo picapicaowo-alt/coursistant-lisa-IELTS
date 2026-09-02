@@ -19,6 +19,7 @@ module "security" {
   log_group_prefix   = local.log_group_prefix
   openai_secret_name = "/${var.project_name}/${var.environment}/openai"
   app_secret_name    = "/${var.project_name}/${var.environment}/application"
+  cache_secret_name  = "/${var.project_name}/${var.environment}/cache"
   tags               = local.common_tags
 }
 
@@ -45,6 +46,7 @@ module "compute" {
   name_prefix                         = local.name_prefix
   aws_region                          = var.aws_region
   vpc_id                              = module.network.vpc_id
+  vpc_cidr                            = module.network.vpc_cidr
   public_subnet_ids                   = module.network.public_subnet_ids
   private_subnet_ids                  = module.network.private_subnet_ids
   instance_type                       = var.instance_type
@@ -65,23 +67,45 @@ module "compute" {
   openai_secret_name                  = module.security.openai_secret_name
   app_secret_arn                      = module.security.app_secret_arn
   app_secret_name                     = module.security.app_secret_name
+  cache_secret_arn                    = module.security.cache_secret_arn
+  cache_port                          = var.cache_port
   waf_rate_limit                      = var.waf_rate_limit
   tags                                = local.common_tags
 
   depends_on = [module.network, module.storage]
 }
 
+module "frontend" {
+  source = "../../modules/frontend"
+
+  providers = {
+    aws           = aws
+    aws.us_east_1 = aws.us_east_1
+  }
+
+  name_prefix          = local.name_prefix
+  account_id           = data.aws_caller_identity.current.account_id
+  domain_name          = var.frontend_domain_name
+  enable_custom_domain = var.enable_frontend_custom_domain
+  waf_rate_limit       = var.waf_rate_limit
+  tags                 = local.common_tags
+}
+
 module "identity" {
   source = "../../modules/identity"
 
-  name_prefix          = local.name_prefix
-  aws_region           = var.aws_region
-  account_id           = data.aws_caller_identity.current.account_id
-  project_tag          = var.project_name
-  uploads_bucket_arn   = module.storage.uploads_bucket_arn
-  artifacts_bucket_arn = module.storage.artifacts_bucket_arn
-  openai_secret_arn    = module.security.openai_secret_arn
-  app_secret_arn       = module.security.app_secret_arn
+  name_prefix                 = local.name_prefix
+  aws_region                  = var.aws_region
+  account_id                  = data.aws_caller_identity.current.account_id
+  project_tag                 = var.project_name
+  uploads_bucket_arn          = module.storage.uploads_bucket_arn
+  artifacts_bucket_arn        = module.storage.artifacts_bucket_arn
+  openai_secret_arn           = module.security.openai_secret_arn
+  app_secret_arn              = module.security.app_secret_arn
+  cache_secret_arn            = module.security.cache_secret_arn
+  frontend_bucket_arn         = module.frontend.bucket_arn
+  frontend_kms_key_arn        = module.frontend.kms_key_arn
+  cloudfront_distribution_arn = module.frontend.distribution_arn
 }
 
 module "observability" {
@@ -100,4 +124,24 @@ module "observability" {
   tags                       = local.common_tags
 
   depends_on = [module.storage, module.compute]
+}
+
+module "cache" {
+  source = "../../modules/cache"
+
+  name_prefix                   = local.name_prefix
+  vpc_id                        = module.network.vpc_id
+  private_subnet_ids            = module.network.private_subnet_ids
+  application_security_group_id = module.compute.application_security_group_id
+  kms_key_arn                   = module.security.kms_key_arn
+  cache_secret_arn              = module.security.cache_secret_arn
+  notification_topic_arn        = module.observability.operations_topic_arn
+  engine_version                = var.cache_engine_version
+  node_type                     = var.cache_node_type
+  port                          = var.cache_port
+  snapshot_retention_days       = var.cache_snapshot_retention_days
+  auth_token_version            = var.cache_auth_token_version
+  tags                          = local.common_tags
+
+  depends_on = [module.network, module.compute, module.observability]
 }

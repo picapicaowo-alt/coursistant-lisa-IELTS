@@ -9,9 +9,11 @@ Terraform in this directory provisions the initial 300-person Coursistant IELTS 
 - Compute: `m7i.xlarge` launch template, 100 GiB encrypted gp3 root disk, Auto Scaling Group `1/1/2`, no public IP, no SSH ingress, Systems Manager access only.
 - Edge: public Application Load Balancer, AWS WAF managed protections and per-IP rate limiting. A Tokyo ACM certificate terminates HTTPS for `api-cn.xlearnedu.com`; HTTP redirects to HTTPS.
 - Storage: private versioned `uploads`, `artifacts`, and `audit` buckets. Application buckets use a customer-managed KMS key; the audit bucket supports ALB and CloudTrail delivery.
-- Secrets: Secrets Manager placeholders for OpenAI and application configuration. Terraform stores no secret value.
+- Cache: private single-node ElastiCache for Valkey 8.2 (`cache.t4g.micro`) with TLS, AUTH, customer-managed KMS encryption, snapshots, and alarms. Only the pilot application security group can enter port 6379.
+- Frontend: private versioned KMS S3 origin, CloudFront OAC, global WAF, access logs, security headers, and the issued `app.xlearnedu.com` ACM certificate. The bucket is never a public website origin.
+- Secrets: Secrets Manager containers for OpenAI, application configuration, and cache AUTH. The cache token uses Terraform write-only/ephemeral values and is not persisted in Terraform state or plan output.
 - Operations: CloudTrail, encrypted VPC Flow Logs and WAF logs, instance logs, alarms, dashboard, SNS topic, and a USD 400 monthly budget.
-- Access: instance role with only the S3/KMS/Secrets Manager permissions needed at runtime, plus a backend-developers IAM group. No IAM users or access keys are created.
+- Access: instance role with only the S3/KMS/Secrets Manager permissions needed at runtime, plus separate backend- and frontend-developers IAM groups. No IAM users or access keys are created.
 - Isolation guardrails: the provider rejects any account other than `658424472610`, and the pilot root rejects any region other than Tokyo. Existing us-west-2 services are outside this state and provider region.
 
 ## Repository layout
@@ -23,17 +25,19 @@ infrastructure/
 │   └── pilot/                 # Tokyo pilot root module and tfvars
 └── modules/
     ├── compute/
+    ├── cache/
+    ├── frontend/
     ├── identity/
     ├── network/
     ├── observability/
     ├── security/
-│   ├── tls/
+    ├── tls/
     └── storage/
 ```
 
 Environment roots consume modules. Application teams change reviewed variables in the environment root; shared module logic is changed only when the platform contract itself changes.
 
-The pilot TLS module manages the issued Tokyo ACM certificate for `api-cn.xlearnedu.com`. The `xlearnedu.com` zone remains externally hosted at Namecheap; its ACM validation and application-routing CNAMEs are recorded in the live delivery manifest. For a new externally hosted environment, apply once with `enable_https = false`, add only the emitted validation CNAME, wait for ACM `ISSUED`, and then enable HTTPS in a second reviewed apply.
+The pilot TLS module manages the issued Tokyo ACM certificate for `api-cn.xlearnedu.com`. The frontend module manages the issued `us-east-1` certificate required by CloudFront for `app.xlearnedu.com`. The `xlearnedu.com` zone remains externally hosted at Namecheap; all four active validation/routing CNAMEs are recorded in the live delivery manifest. New external hostnames use two reviewed applies: create the certificate/distribution first, add only the emitted validation CNAME, wait for ACM `ISSUED`, then attach the custom hostname and add its routing CNAME.
 
 ## One-time bootstrap
 
@@ -78,7 +82,7 @@ The apply job is manual and GitHub-environment gated. A later platform change ca
 
 ## Backend handoff
 
-Start with the live [DELIVERY_MANIFEST.md](docs/DELIVERY_MANIFEST.md), then use [BACKEND_HANDOFF.md](docs/BACKEND_HANDOFF.md) for the runtime contract. Terraform brings up a healthy placeholder on port 8080 so network and load-balancer acceptance can complete before backend artifacts exist. The backend team replaces that placeholder with its supervised service while preserving the `/health` contract. After a release, run `infrastructure/scripts/verify-pilot.sh` for read-only account, region, ASG, ALB, SSM, health, and CloudTrail checks.
+Start with the live [DELIVERY_MANIFEST.md](docs/DELIVERY_MANIFEST.md), then use [BACKEND_HANDOFF.md](docs/BACKEND_HANDOFF.md) for the runtime contract. Terraform brings up a healthy backend placeholder on port 8080 and publishes a neutral frontend verification page so both delivery paths can be accepted before application artifacts exist. The backend team replaces its placeholder with a supervised service while preserving `/health`; the frontend team uploads an immutable build and invalidates CloudFront. After either release, run `infrastructure/scripts/verify-pilot.sh` for account, network, ALB, SSM, cache, S3, CloudFront, public endpoints, and CloudTrail checks.
 
 Pilot-only Checkov suppressions and their production exit conditions are recorded in [SECURITY_EXCEPTIONS.md](docs/SECURITY_EXCEPTIONS.md).
 

@@ -10,6 +10,10 @@ variable "vpc_id" {
   type = string
 }
 
+variable "vpc_cidr" {
+  type = string
+}
+
 variable "public_subnet_ids" {
   type = list(string)
 }
@@ -92,6 +96,14 @@ variable "app_secret_arn" {
 
 variable "app_secret_name" {
   type = string
+}
+
+variable "cache_secret_arn" {
+  type = string
+}
+
+variable "cache_port" {
+  type = number
 }
 
 variable "waf_rate_limit" {

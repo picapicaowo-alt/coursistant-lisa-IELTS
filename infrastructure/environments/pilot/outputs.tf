@@ -54,3 +54,47 @@ output "operations_topic_arn" {
 output "cloudwatch_dashboard_name" {
   value = module.observability.cloudwatch_dashboard_name
 }
+
+output "cache_replication_group_id" {
+  value = module.cache.replication_group_id
+}
+
+output "cache_primary_endpoint" {
+  value = module.cache.primary_endpoint_address
+}
+
+output "cache_port" {
+  value = module.cache.port
+}
+
+output "cache_secret_name" {
+  value = module.security.cache_secret_name
+}
+
+output "frontend_url" {
+  value = var.enable_frontend_custom_domain ? "https://${var.frontend_domain_name}" : "https://${module.frontend.distribution_domain_name}"
+}
+
+output "frontend_bucket_name" {
+  value = module.frontend.bucket_name
+}
+
+output "frontend_distribution_id" {
+  value = module.frontend.distribution_id
+}
+
+output "frontend_distribution_domain_name" {
+  value = module.frontend.distribution_domain_name
+}
+
+output "frontend_certificate_arn" {
+  value = module.frontend.certificate_arn
+}
+
+output "frontend_certificate_dns_validation" {
+  value = module.frontend.certificate_dns_validation
+}
+
+output "frontend_developers_group_name" {
+  value = module.identity.frontend_developers_group_name
+}

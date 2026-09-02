@@ -76,6 +76,14 @@ resource "aws_security_group" "application" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  egress {
+    description = "Valkey TLS inside the pilot VPC"
+    from_port   = var.cache_port
+    to_port     = var.cache_port
+    protocol    = "tcp"
+    cidr_blocks = [var.vpc_cidr]
+  }
+
   tags = merge(var.tags, { Name = "${var.name_prefix}-application" })
 
   lifecycle {
@@ -138,7 +146,7 @@ data "aws_iam_policy_document" "runtime" {
     sid       = "ReadRuntimeSecrets"
     effect    = "Allow"
     actions   = ["secretsmanager:DescribeSecret", "secretsmanager:GetSecretValue"]
-    resources = [var.openai_secret_arn, var.app_secret_arn]
+    resources = [var.openai_secret_arn, var.app_secret_arn, var.cache_secret_arn]
   }
 
   statement {
