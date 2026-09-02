@@ -1,6 +1,7 @@
 .dashboardPage {
+  container: dashboard-workspace / inline-size;
   min-height: 100%;
-  padding: .1875rem 1.875rem 1rem 1.5rem;
+  padding: t.$space-1 t.$workspace-gutter-inline t.$workspace-gutter-block;
   background: t.$surface-page;
   color: t.$content-primary;
 }
@@ -8,8 +9,8 @@
 .welcomeHeader {
   display: flex;
   width: 100%;
-  max-width: 75.375rem;
-  height: 3.75rem;
+  max-width: t.$workspace-max-inline-size;
+  min-height: 3.75rem;
   align-items: center;
   gap: 1.3125rem;
   margin: 0 0 1.9375rem;
@@ -39,7 +40,7 @@
   object-fit: contain;
 }
 
-@media (max-width: 700px) {
+@media (max-width: t.$breakpoint-shell-mobile) {
   .dashboardPage {
     padding: t.$space-4;
   }

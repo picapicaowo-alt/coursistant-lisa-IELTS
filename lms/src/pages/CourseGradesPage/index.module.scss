@@ -1,6 +1,6 @@
 .page {
     min-height: 100%;
-    padding: 2rem clamp(1rem, 4vw, 3.75rem) 4rem;
+    padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem;
     background: t.$page-bg;
     color: t.$text;
 }
@@ -10,7 +10,7 @@
 .sections,
 .status,
 .error {
-    max-width: 1100px;
+    max-width: t.$workspace-readable-max-inline-size;
     margin-inline: auto;
 }
 

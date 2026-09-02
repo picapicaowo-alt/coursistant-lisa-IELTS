@@ -1,6 +1,6 @@
 .page {
   min-height: 100%;
-  padding: 2rem clamp(1rem, 4vw, 3.75rem) 3rem;
+  padding: t.$workspace-gutter-block t.$workspace-gutter-inline 3rem;
   background: t.$page-bg;
   color: t.$text;
 }
@@ -9,7 +9,7 @@
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  max-width: 920px;
+  max-width: t.$workspace-compact-max-inline-size;
   margin: 0 auto 1.5rem;
 
   h1 {
@@ -41,7 +41,7 @@
 }
 
 .card {
-  max-width: 920px;
+  max-width: t.$workspace-compact-max-inline-size;
   min-height: 220px;
   margin: 0 auto;
   padding: clamp(1.5rem, 4vw, 2.5rem);

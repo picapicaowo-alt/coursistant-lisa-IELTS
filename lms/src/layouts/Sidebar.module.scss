@@ -1,11 +1,11 @@
 .sidebar {
   display: flex;
-  width: t.$shell-sidebar-width;
-  min-width: t.$shell-sidebar-width;
+  width: t.$shell-sidebar-inline-size;
+  min-width: t.$shell-sidebar-inline-size;
   height: 100dvh;
   flex-direction: column;
   padding: t.$space-6 t.$space-4;
-  overflow: hidden;
+  overflow: visible;
   border-right: 0;
   background: t.$surface-navigation;
 }
@@ -37,7 +37,7 @@
 .desktopNavigation {
   min-height: 0;
   margin-top: 1.625rem;
-  overflow-x: hidden;
+  overflow-x: visible;
   overflow-y: auto;
   overscroll-behavior: contain;
 }
@@ -59,7 +59,7 @@
 .navigationItem {
   display: flex;
   width: 100%;
-  min-height: t.$control-height-sm;
+  min-height: t.$touch-target;
   align-items: center;
   gap: t.$space-4;
   padding: t.$space-2 t.$space-3;
@@ -75,9 +75,9 @@
 
   span {
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
   }
 
   &:hover {
@@ -102,7 +102,7 @@
   object-fit: contain;
 }
 
-@media (max-width: 700px) {
+@media (max-width: t.$breakpoint-shell-mobile) {
   .sidebar {
     position: fixed;
     z-index: 1100;

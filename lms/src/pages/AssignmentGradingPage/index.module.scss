@@ -1,6 +1,6 @@
 .page {
     min-height: 100%;
-    padding: 2rem clamp(1rem, 4vw, 3.75rem) 3rem;
+    padding: t.$workspace-gutter-block t.$workspace-gutter-inline 3rem;
     background: t.$page-bg;
     color: t.$text;
 }
@@ -9,7 +9,7 @@
 .metrics,
 .rosterCard,
 .readOnlyNotice {
-    width: min(1180px, 100%);
+    width: min(t.$workspace-record-max-inline-size, 100%);
     margin-inline: auto;
 }
 

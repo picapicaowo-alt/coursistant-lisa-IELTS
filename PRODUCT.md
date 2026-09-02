@@ -32,7 +32,7 @@ Students use the product to learn, review courses and study plans, sit assessmen
 
 ## Brand Commitments
 
-The product name is X-Learn. The visual authority for the implemented Student Dashboard is the accessible Figma file `qBAAByIXGNIpoOcilCYISR`, node `17:914` (`Dashborad/student`), a 1440×1024 frame inspected exactly after Dev-seat access. Its calm white operational canvas, softly tinted navigation, purple identity, HarmonyOS Sans TC typography, compact information density, and Student dashboard composition are binding. The redesign must be expressed as reusable semantic tokens and components rather than page-local color patches.
+The product name is X-Learn. The visual authority for the implemented Student Dashboard is the accessible Figma file `qBAAByIXGNIpoOcilCYISR`, node `17:914` (`Dashborad/student`), a 1440×1024 frame inspected exactly after Dev-seat access. Its calm white operational canvas, softly tinted navigation, purple identity, HarmonyOS Sans TC typography, compact information density, and Student dashboard composition are binding. Its literal frame dimensions are not a fixed browser-layout contract. The redesign must be expressed as reusable semantic tokens, fluid layout relationships, and shared components rather than page-local color or geometry patches.
 
 ## Evidence on Hand
 

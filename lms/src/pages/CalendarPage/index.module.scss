@@ -1,28 +1,28 @@
-.page { min-height: 100%; padding: 2rem clamp(1rem, 3.5vw, 3.5rem) 4rem; overflow-y: auto; background: t.$page-bg; color: t.$text; }
-.header { display: flex; max-width: 92rem; margin: 0 auto 1.25rem; align-items: flex-end; justify-content: space-between; gap: 1.5rem; }
+.page { min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem; overflow-y: auto; background: t.$page-bg; color: t.$text; }
+.header { display: flex; max-width: t.$workspace-max-inline-size; margin: 0 auto 1.25rem; align-items: flex-end; justify-content: space-between; gap: 1.5rem; }
 .header h1 { margin: .15rem 0; font-size: clamp(2rem, 4vw, t.$fs-h1); font-weight: t.$fw-extrabold; }
 .header > div:first-child > p:last-child { color: t.$text-muted; }
 .eyebrow { color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
 .viewSwitch { display: flex; gap: .25rem; padding: .3rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
 .viewSwitch button { min-height: 2.4rem; padding: 0 .9rem; border-radius: t.$radius-control-sm; color: t.$text-muted; font-weight: t.$fw-semibold; cursor: pointer; }
 .viewSwitch button[aria-pressed='true'] { background: t.$brand; color: t.$card-bg; }
-.toolbar { display: flex; max-width: 92rem; margin: 0 auto 1rem; align-items: center; justify-content: space-between; gap: 1rem; }
+.toolbar { display: flex; max-width: t.$workspace-max-inline-size; margin: 0 auto 1rem; align-items: center; justify-content: space-between; gap: 1rem; }
 .navigation { display: flex; align-items: center; gap: .45rem; }
 .navigation button { display: inline-grid; min-width: 2.5rem; min-height: 2.5rem; place-items: center; padding: 0 .7rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$card-bg; color: t.$text; font-weight: t.$fw-semibold; cursor: pointer; }
 .navigation h2 { margin-left: .6rem; font-size: t.$fs-card-title; font-weight: t.$fw-bold; }
 .timezone { display: inline-flex; align-items: center; gap: .4rem; color: t.$text-muted; font-size: t.$fs-caption; }
-.filters { display: flex; max-width: 92rem; margin: 0 auto 1rem; flex-wrap: wrap; gap: .5rem; }
+.filters { display: flex; max-width: t.$workspace-max-inline-size; margin: 0 auto 1rem; flex-wrap: wrap; gap: .5rem; }
 .filters label { display: inline-flex; min-height: 2.4rem; align-items: center; gap: .4rem; padding: .35rem .65rem; border: 1px solid t.$border; border-radius: t.$radius-pill; background: t.$card-bg; font-size: t.$fs-caption; font-weight: t.$fw-semibold; cursor: pointer; }
 .filters label > span { width: .65rem; height: .65rem; border-radius: 50%; background: var(--course-color); }
 .filters small { max-width: 12rem; overflow: hidden; color: t.$text-muted; font-weight: t.$fw-regular; text-overflow: ellipsis; white-space: nowrap; }
 .filters input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 .filters label:has(input:not(:checked)) { opacity: .5; }
-.partialWarning { max-width: 92rem; margin: 0 auto 1rem; padding: .75rem 1rem; border: 1px solid rgba(t.$warning, .35); border-radius: t.$radius-control; background: rgba(t.$warning, .08); color: t.$warning; font-size: t.$fs-caption; }
+.partialWarning { max-width: t.$workspace-max-inline-size; margin: 0 auto 1rem; padding: .75rem 1rem; border: 1px solid rgba(t.$warning, .35); border-radius: t.$radius-control; background: rgba(t.$warning, .08); color: t.$warning; font-size: t.$fs-caption; }
 .partialWarning summary { font-weight: t.$fw-semibold; cursor: pointer; }
 .partialWarning ul { margin: .6rem 0 0 1.1rem; }
-.status { display: grid; max-width: 92rem; min-height: 16rem; margin: 0 auto; place-items: center; align-content: center; gap: .75rem; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; color: t.$text-muted; }
+.status { display: grid; max-width: t.$workspace-max-inline-size; min-height: 16rem; margin: 0 auto; place-items: center; align-content: center; gap: .75rem; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; color: t.$text-muted; }
 .status button { min-height: 2.5rem; padding: 0 1rem; border-radius: t.$radius-control-sm; background: t.$brand; color: t.$card-bg; font-weight: t.$fw-semibold; }
-.monthGrid { display: grid; max-width: 92rem; margin: 0 auto; grid-template-columns: repeat(7, minmax(0, 1fr)); overflow: hidden; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$border; gap: 1px; box-shadow: t.$shadow-card; }
+.monthGrid { display: grid; max-width: t.$workspace-max-inline-size; margin: 0 auto; grid-template-columns: repeat(7, minmax(0, 1fr)); overflow: hidden; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$border; gap: 1px; box-shadow: t.$shadow-card; }
 .weekday { padding: .65rem; background: t.$subcard-bg; color: t.$text-muted; font-size: t.$fs-caption; font-weight: t.$fw-semibold; text-align: center; }
 .dayCell { min-width: 0; min-height: 8.5rem; padding: .55rem; background: t.$card-bg; }
 .dayCell[data-outside='true'] { background: t.$subcard-bg; color: t.$text-placeholder; }
@@ -33,7 +33,7 @@
 .calendarItem:hover, .calendarItem:focus-visible { background: t.$brand-subtle; }
 .calendarItem strong { color: var(--course-color); }
 .calendarItem span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.weekList { display: grid; max-width: 92rem; margin: 0 auto; overflow: hidden; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; box-shadow: t.$shadow-card; }
+.weekList { display: grid; max-width: t.$workspace-max-inline-size; margin: 0 auto; overflow: hidden; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; box-shadow: t.$shadow-card; }
 .weekDay { display: grid; grid-template-columns: 7rem minmax(0, 1fr); min-height: 6.5rem; }
 .weekDay + .weekDay { border-top: 1px solid t.$border; }
 .weekDay > header { padding: 1rem; background: t.$subcard-bg; }

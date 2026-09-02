@@ -1,5 +1,5 @@
-.page { min-height: 100%; padding: 2rem clamp(1rem, 4vw, 3.75rem) 5rem; background: t.$page-bg; color: t.$text; }
-.header, .card, .dangerCard, .confirmBar, .page > .error, .page > .success { max-width: 1150px; margin-inline: auto; }
+.page { min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline 5rem; background: t.$page-bg; color: t.$text; }
+.header, .card, .dangerCard, .confirmBar, .page > .error, .page > .success { max-width: t.$workspace-readable-max-inline-size; margin-inline: auto; }
 .header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; }
 .headerText { min-width: 0; flex: 1; }
 .header h1 { margin: .25rem 0 0; font-size: clamp(1.8rem, 4vw, t.$fs-h1); }
