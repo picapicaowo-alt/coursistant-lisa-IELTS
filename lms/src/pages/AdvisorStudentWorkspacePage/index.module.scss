@@ -3,7 +3,7 @@
 .back { display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; margin-bottom: t.$space-4; color: t.$content-secondary; text-decoration: none; }
 .studentSummary {
   @include workspace.grid;
-  grid-template-columns: minmax(5rem, 1.4fr) repeat(11, minmax(0, 1fr));
+  grid-template-columns: 6rem repeat(11, minmax(0, 1fr));
   align-items: center;
   padding: t.$workspace-panel-padding;
   margin-bottom: t.$space-6;
@@ -11,16 +11,16 @@
   border-radius: t.$radius-card-lg;
   background: t.$surface-raised;
 }
-.avatarLarge { grid-column: 1 / 3; grid-row: 1 / 3; align-self: start; display: grid; place-items: center; width: min(100%, 10rem); aspect-ratio: 1; border: t.$space-1 solid t.$border-default; border-radius: 50%; background: t.$brand-subtle; color: t.$action-primary; font-size: clamp(1.5rem, 3vw, 3rem); font-weight: t.$fw-bold; }
-.nameBlock { grid-column: 3 / 6; display: grid; gap: t.$space-1; overflow-wrap: anywhere; }
+.avatarLarge { grid-column: 1; grid-row: 1 / 3; align-self: start; display: grid; place-items: center; width: 6rem; aspect-ratio: 1; border: t.$space-1 solid t.$border-default; border-radius: 50%; background: t.$brand-subtle; color: t.$action-primary; font-size: clamp(1.5rem, 3vw, 3rem); font-weight: t.$fw-bold; }
+.nameBlock { grid-column: 2 / 5; display: grid; gap: t.$space-1; overflow-wrap: anywhere; }
 .nameBlock h1 { margin: 0; font-size: t.$workspace-title-size; font-weight: t.$fw-semibold; line-height: t.$line-height-title-1; }
 .nameBlock small { color: t.$content-secondary; }
-.metadata { grid-column: 6 / 11; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: t.$space-4; margin: 0; }
+.metadata { grid-column: 5 / 10; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: t.$space-4; margin: 0; }
 .metadata dt { font-size: t.$fs-caption; color: t.$content-secondary; margin-bottom: t.$space-1; }
 .metadata dd { margin: 0; font-weight: t.$fw-semibold; overflow-wrap: anywhere; }
-.messageBtn { grid-column: 11 / 13; justify-self: end; display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; padding: t.$space-2 t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; text-decoration: none; }
+.messageBtn { grid-column: 10 / 13; justify-self: end; display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; padding: t.$space-2 t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; text-decoration: none; }
 .messageBtn:hover { background: t.$surface-subtle; border-color: t.$action-primary; }
-.targetScoreCard { grid-column: 3 / 6; display: grid; gap: t.$space-5; }
+.targetScoreCard { grid-column: 2 / 5; display: grid; gap: t.$space-5; }
 .scoresLine { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: t.$space-3; align-items: center; }
 .scoresLine > div { display: grid; gap: t.$space-2; }
 .scoresLine span, .targetDate { color: t.$content-secondary; font-size: t.$fs-caption; }
@@ -28,8 +28,8 @@
 .scoresLine .targetValue { color: t.$action-primary; }
 .scoresLine .baselineValue { font-size: t.$font-size-body; font-weight: t.$fw-medium; line-height: 1.5; overflow-wrap: break-word; }
 .targetDate { display: flex; align-items: center; gap: t.$space-2; }
-.progress { grid-column: 6 / 8; display: grid; justify-items: center; }
-.skillCardsGrid { grid-column: 8 / 13; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: t.$space-3; align-self: stretch; border-left: 1px solid t.$border-default; padding-left: t.$space-5; }
+.progress { grid-column: 5 / 7; display: grid; justify-items: center; }
+.skillCardsGrid { grid-column: 7 / 13; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: t.$space-3; align-self: stretch; border-left: 1px solid t.$border-default; padding-left: t.$space-5; }
 .skillCard { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: t.$space-2; border-radius: t.$radius-lg; background: t.$surface-subtle; padding: t.$space-4 t.$space-2; overflow-wrap: anywhere; }
 .skillCard svg { color: t.$action-primary; margin-bottom: t.$space-2; }
 .skillCard span { font-size: t.$fs-caption; color: t.$content-secondary; }
@@ -43,17 +43,19 @@
 .intakeMain { @include workspace.region(8, 7); }
 .intakeSide { @include workspace.region(4, 5); }
 @media (max-width: 80rem) {
-  .avatarLarge { grid-column: 1 / 3; grid-row: 1; }
-  .nameBlock { grid-column: 3 / 7; }
+  .studentSummary { grid-template-columns: 6rem repeat(11, minmax(0, 1fr)); }
+  .avatarLarge { grid-column: 1; grid-row: 1; }
+  .nameBlock { grid-column: 2 / 7; }
   .metadata { grid-column: 7 / 13; }
-  .messageBtn { grid-column: 1 / 3; grid-row: 2; justify-self: start; }
-  .targetScoreCard { grid-column: 3 / 7; }
+  .messageBtn { grid-column: 1; grid-row: 2; justify-self: start; padding-inline: t.$space-3; }
+  .messageBtn span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
+  .targetScoreCard { grid-column: 2 / 7; }
   .progress { grid-column: 7 / 9; }
   .skillCardsGrid { grid-column: 9 / 13; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: t.$breakpoint-dashboard-single) {
   .studentSummary { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-  .avatarLarge { grid-column: 1 / 3; }
+  .avatarLarge { grid-column: 1 / 3; width: 5rem; }
   .nameBlock { grid-column: 3 / 10; }
   .messageBtn { grid-column: 10 / 13; grid-row: 1; justify-self: end; }
   .metadata { grid-column: 1 / -1; }
@@ -86,5 +88,11 @@
 
 .support { display: grid; gap: t.$workspace-section-gap; width: 100%; min-width: 0; > div { @include workspace.grid; > * { @include workspace.region(6, 6); } } }
 .profileForm { @include workspace.grid; > section, > details { @include workspace.region(6, 6); margin: 0; } > div, > p { grid-column: 1 / -1; } }
+
+@media (max-width: 22rem) {
+  .targetScoreCard, .progress { grid-column: 1 / -1; }
+  .progress { justify-self: center; min-width: 7rem; }
+  .skillCardsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 
 .planForm { @include workspace.grid; > section:first-child { @include workspace.region(4, 12); } > section:nth-child(2) { @include workspace.region(8, 12); } > div { grid-column: 1 / -1; } }

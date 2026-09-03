@@ -1,4 +1,5 @@
 import type {AdvisorActionTaskTarget} from './advisorWorkspace';
+import type {SessionDayOfWeek, SessionType} from './course';
 /** Advising contracts from docs/api/advising.openapi.yaml. */
 
 export type StudentType = 'VIP' | 'STANDARD';
@@ -379,11 +380,11 @@ export interface CompleteStudentCourseRequest {
 }
 
 export interface AdvisingSessionRequest {
-  type?: string;
-  dayOfWeek?: string;
-  startTime?: string;
-  endTime?: string;
-  location?: string;
+  type: SessionType;
+  dayOfWeek: SessionDayOfWeek;
+  startTime: string;
+  endTime: string;
+  location: string;
 }
 
 export interface CreateOneOnOneCourseRequest {
@@ -409,6 +410,15 @@ export interface ReplaceOneOnOneSessionsRequest {
   sessions?: AdvisingSessionRequest[];
 }
 
+export interface GroupCourseSchedulePreviewResponse {
+  sessionId?: number;
+  type?: string;
+  dayOfWeek?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+}
+
 export interface AdvisorStudentCourseResponse {
   courseId?: number;
   courseCode?: string;
@@ -431,7 +441,7 @@ export interface AdvisorStudentCourseResponse {
   lectureCompleted?: number;
   completionVersion?: number;
   completedAt?: string;
-  schedule?: unknown[];
+  schedule?: GroupCourseSchedulePreviewResponse[];
   instructors?: GroupCourseInstructorPreviewResponse[];
 }
 

@@ -42,7 +42,7 @@ async function fixture(page: Page, level: string, role = 'USER') {
 
 const cases = [
   {name: 'student', level: 'STUDENT', path: '/my-plan', title: 'Study plan'},
-  {name: 'advisor', level: 'ADVISOR', path: '/advisor/students', title: 'Students'},
+  {name: 'advisor', level: 'ADVISOR', path: '/advisor/students', title: 'Students List'},
   {name: 'instructor', level: 'INSTRUCTOR', path: '/my-operations', title: 'Teaching operations'},
   {name: 'combined-instructor-advisor', level: 'INSTRUCTOR_ADVISOR', path: '/my-operations', title: 'Teaching operations'},
   {name: 'counsellor', level: 'COUNSELLOR', path: '/counsellor', title: 'Intake dashboard'},
@@ -85,7 +85,7 @@ test('student list filters still use the contract and opens the registered stude
   await expect(page.getByRole('link', {name: 'Open Alexandra Chen'})).toBeVisible();
   await page.getByRole('searchbox', {name: 'Search students'}).fill('Lucas');
   await expect(page.getByRole('link', {name: 'Open Alexandra Chen'})).toHaveCount(0);
-  await expect(page.getByRole('link', {name: 'Open Lucas Tan'})).toHaveAttribute('href', '/advisor/students/302/intake');
+  await expect(page.getByRole('link', {name: 'Open Lucas Tan'})).toHaveAttribute('href', '/advisor/students/302/study-plan');
   await page.getByRole('searchbox', {name: 'Search students'}).fill('No match');
   await expect(page.getByText('No students match these filters.')).toBeVisible();
 });

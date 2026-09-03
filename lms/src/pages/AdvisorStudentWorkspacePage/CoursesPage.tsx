@@ -1,8 +1,11 @@
-import React, {useRef, useState} from 'react';
+import React, {useDeferredValue, useRef, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {Check, Plus, UserRound, UsersRound, X} from 'lucide-react';
-import {unwrapData, WEEKDAYS, type AdvisorStudentCourseResponse} from '@/apis';
+import {CalendarClock, Check, MapPin, Plus, UserRound, UsersRound, X} from 'lucide-react';
+import {ADVISING_ERROR_CODES, unwrapData, type AdvisorStudentCourseResponse, type AdvisingSessionRequest} from '@/apis';
+import {COURSE_SESSION_DAYS, COURSE_SESSION_TYPES} from '@/configs/courseSessions';
+import type {SessionDayOfWeek, SessionType} from '@/apis/types/course';
+import {ADVISOR_PAGE_SIZE} from '@/apis/types/advisorWorkspace';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
@@ -12,10 +15,22 @@ import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {getApiErrorCode} from '@/utils/apiError';
 import {formatPersonName} from '@/utils/personName';
 import {advisingErrorMessage} from '../advising/advisingErrors';
+import {formatCourseTime} from './courseTime';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import cStyles from './CoursesPage.module.scss';
 import {CourseSummaryDialog} from './CourseSummaryDialog';
+
+const scheduleLabel = (dayOfWeek?: string, startTime?: string, endTime?: string) => {
+  if (!dayOfWeek && !startTime) return null;
+  const day = dayOfWeek
+    ? dayOfWeek.charAt(0) + dayOfWeek.slice(1).toLowerCase()
+    : 'Weekly';
+  const time = startTime
+    ? `${formatCourseTime(startTime)}${endTime ? ` – ${formatCourseTime(endTime)}` : ''}`
+    : 'Time not provided';
+  return `${day} · ${time}`;
+};
 
 const CoursesPage: React.FC = () => {
   const {studentUserId} = useParams();
@@ -26,16 +41,20 @@ const CoursesPage: React.FC = () => {
 
   const [selectedCourse, setSelectedCourse] = useState<AdvisorStudentCourseResponse>();
   const [editorReveal, setEditorReveal] = useState(0);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [addMode, setAddMode] = useState<'GROUP' | 'ONE_ON_ONE'>('GROUP');
   const [groupCourseId, setGroupCourseId] = useState('');
   const [courseSearch, setCourseSearch] = useState('');
+  const deferredCourseSearch = useDeferredValue(courseSearch.trim());
   const [alignmentNotes, setAlignmentNotes] = useState('');
+  const [withdrawReasons, setWithdrawReasons] = useState<Record<number, string>>({});
   const [oneOnOne, setOneOnOne] = useState({
     title: '',
     instructorId: '',
     startDate: '',
     endDate: '',
-    dayOfWeek: 'MONDAY',
+    type: COURSE_SESSION_TYPES[0],
+    dayOfWeek: COURSE_SESSION_DAYS[0].value,
     startTime: '09:00',
     endTime: '10:00',
     location: '',
@@ -44,7 +63,8 @@ const CoursesPage: React.FC = () => {
     courseId: '',
     instructorId: '',
     expectedVersion: '',
-    dayOfWeek: 'MONDAY',
+    type: COURSE_SESSION_TYPES[0],
+    dayOfWeek: COURSE_SESSION_DAYS[0].value,
     startTime: '09:00',
     endTime: '10:00',
     location: '',
@@ -68,59 +88,93 @@ const CoursesPage: React.FC = () => {
 
   const courseOptions = useQuery({
     meta: {advisingStudentId: id},
-    queryKey: ['advisor', 'student-course-options', id, courseSearch],
-    queryFn: async () =>
-      unwrapData(
-        await advisorApiService.searchGroupCourseOptions(id, {q: courseSearch || undefined, page: 0, size: 20}),
-        'advisorGroupCourseOptions'
-      ),
-    enabled: Number.isInteger(id),
+    queryKey: ['advisor', 'student-course-options', id, deferredCourseSearch],
+    queryFn: async () => {
+      const result = unwrapData(
+        await advisorApiService.searchGroupCourseOptions(id, {
+          q: deferredCourseSearch || undefined,
+          page: 0,
+          size: ADVISOR_PAGE_SIZE,
+        }),
+        'advisorGroupCourseOptions',
+      );
+      // A malformed page is a load failure, not an empty catalogue.
+      if (!Array.isArray(result?.items)) throw new Error('Available courses returned an invalid page. Please retry.');
+      return result;
+    },
+    enabled: Number.isInteger(id) && isAddDialogOpen && addMode === 'GROUP',
     retry: false,
   });
+
+  const closeAddDialog = () => {
+    addDialogRef.current?.close();
+    setIsAddDialogOpen(false);
+  };
+
+  const openAddDialog = () => {
+    setAddMode('GROUP');
+    setCourseSearch('');
+    setGroupCourseId('');
+    linkGroup.reset();
+    createOneOnOne.reset();
+    setIsAddDialogOpen(true);
+    addDialogRef.current?.showModal();
+  };
 
   const refresh = () => queryClient.invalidateQueries({queryKey: ['advisor', 'student-courses', id]});
 
   const linkGroup = useMutation({
     meta: {advisingStudentId: id},
-    mutationFn: () =>
-      idempotency.run(
+    mutationFn: () => {
+      if (!selectedGroupCourse || plan.data?.plan?.studyPlanVersion == null ||
+          courseOptions.isError || courseOptions.isFetching || courseSearch.trim() !== deferredCourseSearch) {
+        throw new Error('Select an available course and reload the study plan before linking.');
+      }
+      return idempotency.run(
         'linkGroupCourse',
         [
           id,
           {
             courseId: Number(groupCourseId),
-            expectedStudyPlanVersion: plan.data?.plan.studyPlanVersion,
+            expectedStudyPlanVersion: plan.data?.plan?.studyPlanVersion,
             alignmentNotes: alignmentNotes || undefined,
           },
         ] satisfies Parameters<typeof advisorApiService.linkGroupCourse>,
         (key, args) => advisorApiService.linkGroupCourse(...args, key)
-      ),
+      );
+    },
     onSuccess: async () => {
       setGroupCourseId('');
       setAlignmentNotes('');
-      addDialogRef.current?.close();
+      closeAddDialog();
       await refresh();
     },
   });
 
   const createOneOnOne = useMutation({
     meta: {advisingStudentId: id},
-    mutationFn: () =>
-      idempotency.run(
+    mutationFn: () => {
+      if (plan.data?.plan?.studyPlanVersion == null || !oneOnOne.title.trim() ||
+          !Number(oneOnOne.instructorId) || !oneOnOne.startDate || !oneOnOne.endDate ||
+          oneOnOne.endDate < oneOnOne.startDate || !oneOnOne.startTime ||
+          !oneOnOne.endTime || oneOnOne.endTime <= oneOnOne.startTime) {
+        throw new Error('Check the study plan, instructor, term dates, and session times.');
+      }
+      return idempotency.run(
         'createOneOnOneCourse',
         [
           id,
           {
             title: oneOnOne.title,
             primaryInstructorUserId: Number(oneOnOne.instructorId),
-            expectedStudyPlanVersion: plan.data?.plan.studyPlanVersion,
+            expectedStudyPlanVersion: plan.data?.plan?.studyPlanVersion,
             termStartDate: oneOnOne.startDate,
             termEndDate: oneOnOne.endDate,
             location: oneOnOne.location || undefined,
             alignmentNotes: alignmentNotes || undefined,
             sessions: [
               {
-                type: 'ONE_ON_ONE',
+                type: oneOnOne.type,
                 dayOfWeek: oneOnOne.dayOfWeek,
                 startTime: oneOnOne.startTime,
                 endTime: oneOnOne.endTime,
@@ -130,19 +184,21 @@ const CoursesPage: React.FC = () => {
           },
         ] satisfies Parameters<typeof advisorApiService.createOneOnOneCourse>,
         (key, args) => advisorApiService.createOneOnOneCourse(...args, key)
-      ),
+      );
+    },
     onSuccess: async () => {
       setOneOnOne({
         title: '',
         instructorId: '',
         startDate: '',
         endDate: '',
-        dayOfWeek: 'MONDAY',
+        type: COURSE_SESSION_TYPES[0],
+        dayOfWeek: COURSE_SESSION_DAYS[0].value,
         startTime: '09:00',
         endTime: '10:00',
         location: '',
       });
-      addDialogRef.current?.close();
+      closeAddDialog();
       await refresh();
     },
   });
@@ -152,6 +208,9 @@ const CoursesPage: React.FC = () => {
     mutationFn: async ({action, course}: {action: 'ready' | 'publish' | 'reconfirm' | 'complete' | 'withdraw'; course: AdvisorStudentCourseResponse}) => {
       const courseId = course.courseId;
       if (courseId == null) throw new Error('Course response is missing courseId');
+      if (action === 'withdraw' && (!withdrawReasons[courseId]?.trim() || course.courseLinkVersion == null)) {
+        throw new Error('Provide a withdrawal reason and reload the current enrollment.');
+      }
       if (action === 'ready')
         return idempotency.run(
           'readyOneOnOneLaunch',
@@ -167,7 +226,7 @@ const CoursesPage: React.FC = () => {
       if (action === 'reconfirm')
         return idempotency.run(
           'reconfirmCourseLink',
-          [id, courseId, {expectedCourseLinkVersion: course.courseLinkVersion, expectedStudyPlanVersion: plan.data?.plan.studyPlanVersion}] satisfies Parameters<typeof advisorApiService.reconfirmCourseLink>,
+          [id, courseId, {expectedCourseLinkVersion: course.courseLinkVersion, expectedStudyPlanVersion: plan.data?.plan?.studyPlanVersion}] satisfies Parameters<typeof advisorApiService.reconfirmCourseLink>,
           (key, args) => advisorApiService.reconfirmCourseLink(...args, key)
         );
       if (action === 'complete')
@@ -178,7 +237,7 @@ const CoursesPage: React.FC = () => {
         );
       return idempotency.run(
         'withdrawGroupCourse',
-        [id, courseId, {expectedCourseLinkVersion: course.courseLinkVersion}] satisfies Parameters<typeof advisorApiService.withdrawGroupCourse>,
+        [id, courseId, {expectedCourseLinkVersion: course.courseLinkVersion, reason: withdrawReasons[courseId]?.trim()}] satisfies Parameters<typeof advisorApiService.withdrawGroupCourse>,
         (key, args) => advisorApiService.withdrawGroupCourse(...args, key)
       );
     },
@@ -187,8 +246,34 @@ const CoursesPage: React.FC = () => {
 
   const updateOneOnOne = useMutation({
     meta: {advisingStudentId: id},
-    mutationFn: (action: 'instructor' | 'sessions') =>
-      action === 'instructor'
+    mutationFn: (action: 'instructor' | 'sessions') => {
+      if (!Number(courseEdit.courseId) || !courseEdit.expectedVersion ||
+          (action === 'instructor' && !Number(courseEdit.instructorId))) {
+        throw new Error('Select a course with a current version and instructor.');
+      }
+      const original = courses.data?.find(course => String(course.courseId) === courseEdit.courseId);
+      if (original?.courseLaunchVersion !== Number(courseEdit.expectedVersion)) {
+        throw new Error('The course changed. Select it again before saving.');
+      }
+      const remainingSessions: AdvisingSessionRequest[] = [];
+      if (action === 'sessions') {
+        if (!Array.isArray(original.schedule)) {
+          throw new Error('The existing schedule was not returned. Reload it before making changes.');
+        }
+        if (!courseEdit.startTime || !courseEdit.endTime || courseEdit.endTime <= courseEdit.startTime) {
+          throw new Error('The session end time must be after the start time.');
+        }
+        // The API replaces the entire collection. Preserve all other sessions.
+        for (const session of original.schedule?.slice(1) ?? []) {
+          const type = COURSE_SESSION_TYPES.find(value => value === session.type);
+          const day = COURSE_SESSION_DAYS.find(value => value.value === session.dayOfWeek);
+          if (!type || !day || !session.startTime || !session.endTime || session.location == null) {
+            throw new Error('The full schedule could not be verified. Reload before editing.');
+          }
+          remainingSessions.push({type, dayOfWeek: day.value, startTime: session.startTime, endTime: session.endTime, location: session.location});
+        }
+      }
+      return action === 'instructor'
         ? idempotency.run(
             'reassignOneOnOneInstructor',
             [
@@ -210,17 +295,19 @@ const CoursesPage: React.FC = () => {
                 expectedCourseLaunchVersion: Number(courseEdit.expectedVersion),
                 sessions: [
                   {
-                    type: 'ONE_ON_ONE',
+                    type: courseEdit.type,
                     dayOfWeek: courseEdit.dayOfWeek,
                     startTime: courseEdit.startTime,
                     endTime: courseEdit.endTime,
-                    location: courseEdit.location || undefined,
+                    location: courseEdit.location,
                   },
+                  ...remainingSessions,
                 ],
               },
             ] satisfies Parameters<typeof advisorApiService.replaceOneOnOneSessions>,
             (key, args) => advisorApiService.replaceOneOnOneSessions(...args, key)
-          ),
+          );
+    },
     onSuccess: async response => {
       const updated = unwrapData(response, 'updateOneOnOneCourse');
       if (updated.courseLaunchVersion != null)
@@ -232,7 +319,6 @@ const CoursesPage: React.FC = () => {
   const error =
     plan.error ||
     courses.error ||
-    courseOptions.error ||
     linkGroup.error ||
     createOneOnOne.error ||
     transition.error ||
@@ -243,7 +329,7 @@ const CoursesPage: React.FC = () => {
   );
 
   const reloadVersions = async () => {
-    const [latestPlan, latestCourses] = await Promise.all([plan.refetch(), courses.refetch(), courseOptions.refetch()]);
+    const [latestPlan, latestCourses] = await Promise.all([plan.refetch(), courses.refetch()]);
     if (latestPlan.isError || latestCourses.isError) return;
     const selected = latestCourses.data?.find(course => String(course.courseId) === courseEdit.courseId);
     if (selected?.courseLaunchVersion != null)
@@ -254,7 +340,7 @@ const CoursesPage: React.FC = () => {
     updateOneOnOne.reset();
   };
 
-  const selectedGroupCourse = courseOptions.data?.items?.find(option => String(option.courseId) === groupCourseId);
+  const selectedGroupCourse = courseOptions.data?.items.find(option => String(option.courseId) === groupCourseId);
 
   return (
     <div className={styles.grid}>
@@ -276,7 +362,7 @@ const CoursesPage: React.FC = () => {
       {!plan.isPending && !plan.data ? (
         <div className={styles.emptyState}>
           <strong>A study plan is required before courses can be changed</strong>
-          <span>Create the student profile and study plan first; course search remains available for planning.</span>
+          <span>Create the student profile and study plan first. Available courses depend on this student’s study plan.</span>
           <div className={styles.actions}>
             <Link className={styles.secondaryLink} to={`/advisor/students/${id}/profile`}>
               Open profile
@@ -295,7 +381,7 @@ const CoursesPage: React.FC = () => {
           <button
             type="button"
             className={cStyles.addCourseBtn}
-            onClick={() => addDialogRef.current?.showModal()}
+            onClick={openAddDialog}
           >
             <Plus size={16} />
             <span>Add Course</span>
@@ -306,7 +392,14 @@ const CoursesPage: React.FC = () => {
         {courses.data?.length === 0 ? <p className={styles.status}>No course is linked to this study plan.</p> : null}
 
         <div className={styles.courseCardGrid}>
-          {(courses.data ?? []).map((course, index) => (
+          {(courses.data ?? []).map((course, index) => {
+            const primarySchedule = course.schedule?.[0];
+            const formattedSchedule = scheduleLabel(
+              primarySchedule?.dayOfWeek,
+              primarySchedule?.startTime,
+              primarySchedule?.endTime,
+            );
+            return (
             <CourseIdentityCard
               key={course.courseId ?? index}
               courseId={course.courseId ?? index}
@@ -327,6 +420,19 @@ const CoursesPage: React.FC = () => {
                 </>
               }
             >
+              <div className={cStyles.cardSchedule}>
+                <CalendarClock size={17} aria-hidden="true" />
+                <span>
+                  <small>Weekly schedule</small>
+                  <strong>{formattedSchedule || 'Not scheduled'}</strong>
+                </span>
+                {primarySchedule?.location ? (
+                  <span className={cStyles.scheduleLocation}>
+                    <MapPin size={14} aria-hidden="true" />
+                    {primarySchedule.location}
+                  </span>
+                ) : null}
+              </div>
               <div className={styles.actions}>
                 <button type="button" className={styles.primary} onClick={() => setSelectedCourse(course)}>View Course</button>
                 {!['COMPLETED', 'HIDDEN'].includes(course.lifecycleStatus ?? '') && course.status !== 'WITHDRAWN' ? (
@@ -342,6 +448,11 @@ const CoursesPage: React.FC = () => {
                             expectedVersion:
                               course.courseLaunchVersion == null ? '' : String(course.courseLaunchVersion),
                             instructorId: course.instructorUserId == null ? '' : String(course.instructorUserId),
+                            type: COURSE_SESSION_TYPES.find(type => type === primarySchedule?.type) ?? COURSE_SESSION_TYPES[0],
+                            dayOfWeek: COURSE_SESSION_DAYS.find(day => day.value === primarySchedule?.dayOfWeek)?.value ?? COURSE_SESSION_DAYS[0].value,
+                            startTime: primarySchedule?.startTime?.slice(0, 5) ?? '',
+                            endTime: primarySchedule?.endTime?.slice(0, 5) ?? '',
+                            location: primarySchedule?.location ?? '',
                           }));
                         }}
                       >
@@ -381,13 +492,17 @@ const CoursesPage: React.FC = () => {
                       Complete
                     </button>
                     {course.deliveryMode === 'GROUP' ? (
+                      <label>
+                        Reason for withdrawal
+                        <input maxLength={1000} value={withdrawReasons[course.courseId!] ?? ''} onChange={event => setWithdrawReasons(current => ({...current, [course.courseId!]: event.target.value}))} />
                       <button
-                        disabled={needsReload || transition.isPending || course.courseLinkVersion == null}
+                        disabled={needsReload || transition.isPending || course.courseLinkVersion == null || !withdrawReasons[course.courseId!]?.trim()}
                         className={styles.danger}
                         onClick={() => transition.mutate({action: 'withdraw', course})}
                       >
                         Withdraw
                       </button>
+                      </label>
                     ) : null}
                   </div></details>
                 ) : (
@@ -395,7 +510,8 @@ const CoursesPage: React.FC = () => {
                 )}
               </div>
             </CourseIdentityCard>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -434,13 +550,19 @@ const CoursesPage: React.FC = () => {
             Reassign instructor
           </button>
           <label>
+            Session type
+            <select value={courseEdit.type} onChange={event => setCourseEdit(current => ({...current, type: event.target.value as SessionType}))}>
+              {COURSE_SESSION_TYPES.map(type => <option key={type}>{type}</option>)}
+            </select>
+          </label>
+          <label>
             Day of week
             <select
               value={courseEdit.dayOfWeek}
-              onChange={event => setCourseEdit(current => ({...current, dayOfWeek: event.target.value}))}
+              onChange={event => setCourseEdit(current => ({...current, dayOfWeek: event.target.value as SessionDayOfWeek}))}
             >
-              {WEEKDAYS.map(day => (
-                <option key={day}>{day}</option>
+              {COURSE_SESSION_DAYS.map(day => (
+                <option key={day.value} value={day.value}>{day.label}</option>
               ))}
             </select>
           </label>
@@ -483,8 +605,14 @@ const CoursesPage: React.FC = () => {
         </div>
       </CollapsibleSection>
 
-      <dialog ref={addDialogRef} className={cStyles.dialog} aria-labelledby="add-course-title" onCancel={event => {if (linkGroup.isPending || createOneOnOne.isPending) event.preventDefault();}}>
-        <div className={cStyles.dialogHeader}><h2 id="add-course-title">Add Course</h2><button type="button" className={cStyles.closeBtn} onClick={() => addDialogRef.current?.close()} aria-label="Close add course" disabled={linkGroup.isPending || createOneOnOne.isPending}><X size={20}/></button></div>
+      <dialog
+        ref={addDialogRef}
+        className={cStyles.dialog}
+        aria-labelledby="add-course-title"
+        onClose={() => setIsAddDialogOpen(false)}
+        onCancel={event => {if (linkGroup.isPending || createOneOnOne.isPending) event.preventDefault();}}
+      >
+        <div className={cStyles.dialogHeader}><h2 id="add-course-title">Add Course</h2><button type="button" className={cStyles.closeBtn} onClick={closeAddDialog} aria-label="Close add course" disabled={linkGroup.isPending || createOneOnOne.isPending}><X size={20}/></button></div>
         <div className={cStyles.dialogBody}>
           <div className={cStyles.segmentGroup} aria-label="Course delivery mode">
             <button type="button" className={cStyles.segmentCard} aria-label="Join Group Course" aria-pressed={addMode === 'GROUP'} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => setAddMode('GROUP')}>
@@ -496,7 +624,15 @@ const CoursesPage: React.FC = () => {
               <span>Create a personalized course for this student.</span>
             </button>
           </div>
-          {courseOptions.isPending ? <p role="status">Loading available courses…</p> : null}
+          {addMode === 'GROUP' && courseOptions.isFetching ? <p role="status">Loading available courses…</p> : null}
+          {addMode === 'GROUP' && courseOptions.isError ? (
+            <div className={styles.error} role="alert">
+              <p>{getApiErrorCode(courseOptions.error) === ADVISING_ERROR_CODES.studyPlanNotFound
+                ? 'Create a study plan for this student before choosing an available group course.'
+                : advisingErrorMessage(courseOptions.error, 'Available courses could not be loaded. This does not mean there are no courses.')}</p>
+              <button type="button" className={styles.secondary} onClick={() => void courseOptions.refetch()} disabled={courseOptions.isFetching}>Retry course search</button>
+            </div>
+          ) : null}
           {error ? <p className={styles.error} role="alert">{advisingErrorMessage(error, 'Course planning could not be completed.')}</p> : null}
           {addMode === 'GROUP' ? <>
       <section aria-label="Link a group course">
@@ -513,19 +649,17 @@ const CoursesPage: React.FC = () => {
             <input
               maxLength={120}
               value={courseSearch}
-              onChange={event => setCourseSearch(event.target.value)}
+              onChange={event => {setCourseSearch(event.target.value); setGroupCourseId('');}}
               placeholder="Course code or title"
             />
           </label>
-          {courseSearch.trim().length > 0 && courseSearch.trim().length < 2 ? (
-            <p className={styles.muted}>Enter at least two characters.</p>
-          ) : null}
           <div className={cStyles.courseOptionsList}>
             {(courseOptions.data?.items ?? []).map((option, index) => (
               <button
                 type="button"
                 aria-pressed={String(option.courseId) === groupCourseId}
                 className={cStyles.optionRow}
+                disabled={option.courseId == null || courseOptions.isFetching || courseSearch.trim() !== deferredCourseSearch}
                 key={option.courseId ?? index}
                 onClick={() => setGroupCourseId(String(option.courseId ?? ''))}
               >
@@ -541,6 +675,15 @@ const CoursesPage: React.FC = () => {
               </button>
             ))}
           </div>
+          {courseOptions.isSuccess && !courseOptions.isFetching ? (
+            <p className={cStyles.optionCount} role="status">
+              {courseOptions.data.items.length
+                ? `Showing ${courseOptions.data.items.length} of ${courseOptions.data.total} available courses${courseOptions.data.total > courseOptions.data.items.length ? '. Search by code or title to find another course.' : '.'}`
+                : deferredCourseSearch
+                  ? 'No courses match this search. Clear the search to see available courses.'
+                  : 'No available group courses were returned for this student. Courses in Course management may not be eligible for this study plan.'}
+            </p>
+          ) : null}
           {selectedGroupCourse ? (
             <div className={styles.selectionSummary}>
               <span>Selected course</span>
@@ -551,7 +694,7 @@ const CoursesPage: React.FC = () => {
           ) : null}
           <label>
             Alignment notes
-            <textarea value={alignmentNotes} onChange={event => setAlignmentNotes(event.target.value)} />
+            <textarea maxLength={4000} value={alignmentNotes} onChange={event => setAlignmentNotes(event.target.value)} />
           </label>
         </form>
       </section>
@@ -596,13 +739,19 @@ const CoursesPage: React.FC = () => {
             />
           </label>
           <label>
+            Session type
+            <select value={oneOnOne.type} onChange={event => setOneOnOne(current => ({...current, type: event.target.value as SessionType}))}>
+              {COURSE_SESSION_TYPES.map(type => <option key={type}>{type}</option>)}
+            </select>
+          </label>
+          <label>
             Day of week
             <select
               value={oneOnOne.dayOfWeek}
-              onChange={event => setOneOnOne(current => ({...current, dayOfWeek: event.target.value}))}
+              onChange={event => setOneOnOne(current => ({...current, dayOfWeek: event.target.value as SessionDayOfWeek}))}
             >
-              {WEEKDAYS.map(day => (
-                <option key={day}>{day}</option>
+              {COURSE_SESSION_DAYS.map(day => (
+                <option key={day.value} value={day.value}>{day.label}</option>
               ))}
             </select>
           </label>
@@ -635,11 +784,11 @@ const CoursesPage: React.FC = () => {
           </>}
         </div>
         <footer className={cStyles.dialogFooter}>
-          <button type="button" className={cStyles.cancelBtn} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => addDialogRef.current?.close()}>Cancel</button>
+          <button type="button" className={cStyles.cancelBtn} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={closeAddDialog}>Cancel</button>
           {addMode === 'GROUP' ? (
-            <button type="submit" form="link-group-course" className={cStyles.enrollBtn} disabled={needsReload || !plan.data || !selectedGroupCourse || linkGroup.isPending}>{linkGroup.isPending ? 'Linking…' : 'Link selected course'}</button>
+            <button type="submit" form="link-group-course" className={cStyles.enrollBtn} disabled={needsReload || plan.data?.plan?.studyPlanVersion == null || !selectedGroupCourse || courseOptions.isFetching || linkGroup.isPending}>{linkGroup.isPending ? 'Linking…' : 'Link selected course'}</button>
           ) : (
-            <button type="submit" form="create-one-on-one-course" className={cStyles.enrollBtn} disabled={needsReload || !plan.data || createOneOnOne.isPending}>{createOneOnOne.isPending ? 'Creating…' : 'Create course'}</button>
+            <button type="submit" form="create-one-on-one-course" className={cStyles.enrollBtn} disabled={needsReload || plan.data?.plan?.studyPlanVersion == null || createOneOnOne.isPending}>{createOneOnOne.isPending ? 'Creating…' : 'Create course'}</button>
           )}
         </footer>
       </dialog>

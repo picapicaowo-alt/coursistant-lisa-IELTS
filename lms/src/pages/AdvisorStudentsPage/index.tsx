@@ -1,9 +1,8 @@
-import React, {useState} from 'react';
+import React, {useDeferredValue, useEffect, useState} from 'react';
 import {Link, generatePath} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {
   Search,
-  Calendar,
   MessageSquare,
   ChevronLeft,
   ChevronRight,
@@ -26,21 +25,33 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import listStyles from './index.module.scss';
+import {advisorPaginationItems} from './pagination';
 
 const AdvisorStudentsPage: React.FC = () => {
   const [page, setPage] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<AdvisorStudentFilters>({});
   const [selectedStudentIds, setSelectedStudentIds] = useState<number[]>([]);
+  const deferredSearch = useDeferredValue(searchTerm.trim());
+  const requestFilters: AdvisorStudentFilters = {
+    ...filters,
+    q: deferredSearch || undefined,
+  };
 
   const query = useQuery({
-    queryKey: [...advisingQueryKeys.advisorStudents(page, ADVISOR_PAGE_SIZE), filters],
+    queryKey: [...advisingQueryKeys.advisorStudents(page, ADVISOR_PAGE_SIZE), requestFilters],
     queryFn: async () =>
-      unwrapData(await advisorApiService.listStudents(page, ADVISOR_PAGE_SIZE, filters), 'listAdvisorStudents'),
+      unwrapData(await advisorApiService.listStudents(page, ADVISOR_PAGE_SIZE, requestFilters), 'listAdvisorStudents'),
   });
 
   const items = query.data?.items ?? [];
   const total = query.data?.total ?? 0;
   const pageCount = Math.max(1, Math.ceil(total / ADVISOR_PAGE_SIZE));
+  const paginationItems = advisorPaginationItems(page, pageCount);
+
+  useEffect(() => {
+    setSelectedStudentIds([]);
+  }, [page, deferredSearch, filters.risk, filters.studentType, filters.activeTaskType]);
 
   const toggleSelectAll = () => {
     if (selectedStudentIds.length === items.length) {
@@ -61,7 +72,7 @@ const AdvisorStudentsPage: React.FC = () => {
     <div className={listStyles.page}>
       <header className={listStyles.header}>
         <div>
-          <h1 aria-label="Students">Students</h1>
+          <h1>Students List</h1>
           <p className={listStyles.lede}>Manage and monitor all students assigned to you.</p>
         </div>
       </header>
@@ -78,9 +89,9 @@ const AdvisorStudentsPage: React.FC = () => {
                 placeholder="Search students…"
                 aria-label="Search students"
                 maxLength={100}
-                value={filters.q ?? ''}
+                value={searchTerm}
                 onChange={event => {
-                  setFilters(current => ({...current, q: event.target.value || undefined}));
+                  setSearchTerm(event.target.value);
                   setPage(0);
                 }}
               />
@@ -157,7 +168,7 @@ const AdvisorStudentsPage: React.FC = () => {
 
         {!query.isPending && !query.isError && items.length === 0 ? (
           <p className={styles.status}>
-            {Object.values(filters).some(Boolean)
+            {deferredSearch || Object.values(filters).some(Boolean)
               ? 'No students match these filters.'
               : 'No assigned students yet.'}
           </p>
@@ -178,11 +189,9 @@ const AdvisorStudentsPage: React.FC = () => {
                       aria-label="Select all students"
                     />
                   </th>
-                  <th scope="col">Students Name</th>
+                  <th scope="col">Student</th>
                   <th scope="col">Target Goal</th>
-                  <th scope="col">Current Level</th>
-                  <th scope="col">Risk Level</th>
-                  <th scope="col">Next Checkpoint</th>
+                  <th scope="col">Priority</th>
                   <th scope="col">Last Activity</th>
                   <th scope="col">Actions</th>
                 </tr>
@@ -216,17 +225,8 @@ const AdvisorStudentsPage: React.FC = () => {
                       <td data-label="Target goal" className={listStyles.targetScore}>
                         {student.targetGoal || 'Not set'}
                       </td>
-                      <td data-label="Current level">
-                        <span className={listStyles.levelCell}>Not available</span>
-                      </td>
-                      <td data-label="Risk level">
+                      <td data-label="Priority">
                         <AdvisingBadge value={student.highestPriority ?? student.riskStatus} kind={student.highestPriority ? "priority" : "risk"}/>
-                      </td>
-                      <td data-label="Next checkpoint">
-                        <span className={listStyles.checkpointCell}>
-                          <Calendar size={14} aria-hidden="true" />
-                          <span>{'Not available'}</span>
-                        </span>
                       </td>
                       <td data-label="Last activity" className={listStyles.activityCell}>
                         {student.lastActivityAt
@@ -238,7 +238,7 @@ const AdvisorStudentsPage: React.FC = () => {
                           <Link
                             className={listStyles.viewBtn}
                             aria-label={`Open ${name}`}
-                            to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdIntake, {
+                            to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdStudyPlan, {
                               studentUserId: String(student.studentUserId),
                             })}
                           >
@@ -280,16 +280,22 @@ const AdvisorStudentsPage: React.FC = () => {
             >
               <ChevronLeft size={14} aria-hidden="true" />
             </button>
-            {Array.from({length: pageCount}, (_, index) => (
-              <button
-                key={index}
-                type="button"
-                data-active={page === index ? 'true' : undefined}
-                onClick={() => setPage(index)}
-              >
-                {index + 1}
-              </button>
-            ))}
+            {paginationItems.map((item, index) =>
+              item === 'ellipsis' ? (
+                <span className={listStyles.ellipsis} aria-hidden="true" key={`ellipsis-${index}`}>…</span>
+              ) : (
+                <button
+                  key={item}
+                  type="button"
+                  aria-label={`Page ${item + 1}`}
+                  aria-current={page === item ? 'page' : undefined}
+                  data-active={page === item ? 'true' : undefined}
+                  onClick={() => setPage(item)}
+                >
+                  {item + 1}
+                </button>
+              ),
+            )}
             <button
               type="button"
               disabled={page + 1 >= pageCount}
