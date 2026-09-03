@@ -1,0 +1,707 @@
+@use '../../styles/workspace' as workspace;
+
+.page,
+.detailPage {
+  width: 100%;
+  min-width: 0;
+  min-height: 100%;
+  color: t.$content-primary;
+  background: t.$surface-dashboard-card;
+}
+
+.page {
+  display: grid;
+  align-content: start;
+  gap: t.$space-6;
+  padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16;
+}
+
+.pageHeader,
+.detailHeading,
+.panelHeader,
+.toolbar,
+.cardActions,
+.summaryBar,
+.statusHeading,
+.sessionActions,
+.scheduleSectionHeader,
+.sessionCardHeader {
+  display: flex;
+  align-items: center;
+}
+
+.pageHeader,
+.detailHeading,
+.panelHeader,
+.toolbar,
+.summaryBar,
+.statusHeading,
+.scheduleSectionHeader,
+.sessionCardHeader {
+  justify-content: space-between;
+}
+
+.pageHeader,
+.detailHeading {
+  gap: t.$space-6;
+}
+
+.pageHeader h1,
+.detailHeading h1 {
+  margin: 0 0 t.$space-1;
+  color: t.$content-ink;
+  font-size: t.$workspace-title-size;
+  font-weight: t.$fw-bold;
+  line-height: 1.15;
+  letter-spacing: -.025em;
+}
+
+.pageHeader p,
+.detailHeading p,
+.panelHeader p,
+.courseHeader p,
+.helper,
+.emptyState p,
+.scheduleSectionHeader p {
+  margin: 0;
+  color: t.$content-secondary;
+}
+
+.primaryButton,
+.secondaryButton,
+.softPrimaryButton,
+.outlinePrimaryButton,
+.ghostButton,
+.viewButton,
+.tab,
+.linkButton,
+.textAction,
+.plainAction,
+.searchSubmit {
+  min-height: t.$touch-target;
+  border-radius: t.$radius-sm;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+  transition: background-color t.$duration-fast t.$ease-out, border-color t.$duration-fast t.$ease-out, color t.$duration-fast t.$ease-out, transform t.$duration-fast t.$ease-out;
+}
+
+.primaryButton,
+.secondaryButton,
+.softPrimaryButton,
+.outlinePrimaryButton,
+.ghostButton,
+.linkButton,
+.textAction,
+.plainAction {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-2;
+  padding: 0 t.$space-4;
+  text-decoration: none;
+}
+
+.primaryButton {
+  border: 1px solid t.$action-primary;
+  background: t.$action-primary;
+  color: t.$content-on-color;
+}
+
+.primaryButton:hover:not(:disabled) { background: t.$action-primary-hover; transform: translateY(-1px); }
+.primaryButton:active:not(:disabled) { background: t.$action-primary-active; transform: none; }
+
+.secondaryButton,
+.linkButton {
+  border: 1px solid t.$border-default;
+  background: t.$surface-canvas;
+  color: t.$content-primary;
+}
+
+.secondaryButton:hover:not(:disabled),
+.linkButton:hover { border-color: t.$border-interactive; color: t.$action-primary; }
+
+.softPrimaryButton {
+  border: 1px solid transparent;
+  background: t.$surface-brand-subtle;
+  color: t.$action-primary;
+}
+
+.outlinePrimaryButton {
+  border: 1px solid t.$action-primary;
+  background: t.$surface-canvas;
+  color: t.$action-primary;
+}
+
+.outlinePrimaryButton:hover:not(:disabled),
+.softPrimaryButton:hover:not(:disabled) { background: t.$action-primary; color: t.$content-on-color; }
+
+.ghostButton,
+.textAction,
+.plainAction {
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+.ghostButton,
+.textAction { color: t.$action-primary; }
+.plainAction { color: t.$content-primary; }
+.ghostButton:hover:not(:disabled),
+.textAction:hover:not(:disabled),
+.plainAction:hover:not(:disabled) { background: t.$surface-brand-subtle; color: t.$action-primary; }
+
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.softPrimaryButton:disabled,
+.outlinePrimaryButton:disabled,
+.ghostButton:disabled { cursor: not-allowed; opacity: .55; transform: none; }
+
+.primaryButton:focus-visible,
+.secondaryButton:focus-visible,
+.softPrimaryButton:focus-visible,
+.outlinePrimaryButton:focus-visible,
+.ghostButton:focus-visible,
+.viewButton:focus-visible,
+.tab:focus-visible,
+.linkButton:focus-visible,
+.textAction:focus-visible,
+.plainAction:focus-visible,
+.createCourseCard:focus-visible,
+.field input:focus-visible,
+.field select:focus-visible,
+.searchControl:focus-within {
+  outline: 3px solid t.$focus-ring;
+  outline-offset: 2px;
+}
+
+.toolbar {
+  flex-wrap: wrap;
+  gap: t.$space-4;
+}
+
+.filters,
+.viewControls,
+.searchControl,
+.cardActionGroup,
+.instructor,
+.sessionActions > span {
+  display: flex;
+  align-items: center;
+}
+
+.filters {
+  flex: 1 1 40rem;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+}
+
+.searchControl {
+  width: min(100%, 23rem);
+  min-height: t.$control-height-md;
+  gap: t.$space-2;
+  padding: 0 t.$space-3;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-canvas;
+  color: t.$content-secondary;
+}
+
+.searchControl input {
+  min-width: 0;
+  flex: 1;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: t.$content-primary;
+  font: inherit;
+}
+
+.searchControl input::placeholder { color: t.$content-placeholder; }
+
+.searchSubmit {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: t.$control-height-md;
+  min-height: t.$control-height-md;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: t.$content-secondary;
+}
+
+.field {
+  display: grid;
+  gap: t.$space-2;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.field input,
+.field select {
+  min-height: t.$control-height-md;
+  min-width: 0;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-canvas;
+  color: t.$content-primary;
+  padding: 0 t.$space-3;
+  font: inherit;
+}
+
+.filterField {
+  display: flex;
+  min-height: t.$control-height-md;
+  align-items: center;
+  gap: t.$space-1;
+  padding-left: t.$space-3;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-canvas;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-regular;
+}
+
+.filterField select {
+  min-height: calc(#{t.$control-height-md} - 2px);
+  padding-left: t.$space-1;
+  border: 0;
+  font-weight: t.$fw-semibold;
+}
+
+.viewControls {
+  gap: t.$space-1;
+  margin-left: auto;
+  padding: t.$space-1;
+  border-radius: t.$radius-sm;
+  background: t.$surface-muted;
+}
+
+.viewButton {
+  display: grid;
+  width: 2.25rem;
+  min-height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: t.$content-secondary;
+}
+
+.viewButton[aria-pressed='true'] {
+  background: t.$surface-canvas;
+  color: t.$action-primary;
+  box-shadow: t.$shadow-sm;
+}
+
+.resultCount {
+  margin-left: t.$space-3;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  white-space: nowrap;
+}
+
+.createPanel,
+.panel,
+.readinessPanel,
+.courseCard,
+.summaryBar,
+.sessionCard,
+.editorPanel,
+.occurrenceTableWrap {
+  border: 1px solid t.$border-default;
+  background: t.$surface-canvas;
+}
+
+.createPanel {
+  overflow: hidden;
+  border-radius: t.$radius-md;
+}
+
+.createPanel:not([open]) { display: none; }
+
+.createPanel > summary {
+  display: flex;
+  min-height: 4rem;
+  align-items: center;
+  gap: t.$space-3;
+  padding: 0 t.$workspace-panel-padding;
+  list-style: none;
+  color: t.$content-primary;
+  font-size: t.$font-size-body-lg;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+
+.createPanel > summary::-webkit-details-marker { display: none; }
+.createPanel > summary svg { color: t.$action-primary; }
+.createMeta { margin-left: auto; color: t.$content-secondary; font-size: t.$font-size-body; font-weight: t.$fw-regular; }
+.createPanel[open] > summary { border-bottom: 1px solid t.$border-default; }
+
+.formGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$space-4;
+  padding: t.$workspace-panel-padding;
+}
+
+.formGrid > fieldset,
+.fieldWide,
+.formActions { grid-column: 1 / -1; }
+.formActions { display: flex; justify-content: flex-end; gap: t.$space-3; }
+
+.courseGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: t.$space-5;
+}
+
+.courseGrid[data-view='list'] { grid-template-columns: 1fr; }
+.courseGrid[data-view='list'] .courseCard { grid-template-columns: minmax(17rem, 1.6fr) repeat(2, minmax(10rem, 1fr)); align-items: center; }
+
+.courseCard {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-width: 0;
+  align-content: start;
+  gap: t.$space-4;
+  padding: t.$space-6;
+  border-radius: t.$radius-lg;
+}
+
+.courseHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: t.$space-1;
+  padding-bottom: t.$space-4;
+  border-bottom: 1px solid t.$border-default;
+}
+
+.courseTitleRow { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; margin-bottom: t.$space-3; }
+.courseHeader h2 { margin: 0; overflow-wrap: anywhere; color: t.$content-ink; font-size: t.$font-size-headline; font-weight: t.$fw-bold; line-height: t.$line-height-headline; }
+.courseCode { min-width: 0; overflow: hidden; color: t.$content-placeholder; font-size: t.$font-size-caption; text-overflow: ellipsis; white-space: nowrap; }
+.courseTitleRow .statusBadge { flex-shrink: 0; }
+.courseHeader { min-width: 0; }
+
+.statusBadge,
+.statusPill,
+.sessionType {
+  display: inline-flex;
+  width: fit-content;
+  min-height: 1.5rem;
+  align-items: center;
+  padding: 0 t.$space-2;
+  border-radius: t.$radius-xs;
+  background: t.$surface-muted;
+  color: t.$content-secondary;
+  font-size: t.$font-size-micro;
+  font-weight: t.$fw-bold;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statusBadge[data-state='READY'],
+.statusPill[data-state='SCHEDULED'] { background: t.$feedback-success-surface; color: t.$feedback-success; }
+.statusBadge[data-state='PUBLISHED'] { background: t.$surface-brand-subtle; color: t.$action-primary; }
+
+.factList,
+.detailFacts {
+  display: grid;
+  gap: t.$space-3;
+  margin: 0;
+}
+
+.factList div {
+  display: grid;
+  grid-template-columns: 1.25rem minmax(0, 1fr);
+  align-items: center;
+  gap: t.$space-2;
+}
+
+.factList dt { display: grid; place-items: center; color: t.$content-placeholder; }
+.factList dd { min-width: 0; margin: 0; overflow: hidden; color: t.$content-primary; font-weight: t.$fw-medium; text-overflow: ellipsis; white-space: nowrap; }
+
+.detailFacts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.detailFacts div { display: grid; gap: t.$space-1; }
+.detailFacts dt { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.detailFacts dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: t.$content-primary; font-weight: t.$fw-semibold; }
+
+.courseGrid[data-view='list'] .factList { grid-template-columns: 1fr; }
+.courseGrid[data-view='list'] .cardActions { border-top: 0; }
+
+.cardActions {
+  justify-content: space-between;
+  gap: t.$space-3;
+  min-width: 0;
+  padding-top: t.$space-4;
+  border-top: 1px solid t.$border-default;
+}
+
+.instructor { min-width: 0; gap: t.$space-2; color: t.$content-primary; font-size: t.$font-size-caption; }
+.instructor > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.instructorAvatar { display: grid; width: 1.75rem; height: 1.75rem; flex: 0 0 auto; place-items: center; border-radius: t.$radius-round; background: t.$surface-muted; color: t.$content-secondary; font-weight: t.$fw-bold; }
+.cardActionGroup { flex: 0 0 auto; gap: t.$space-2; color: t.$content-placeholder; }
+.linkButton { min-height: 2.25rem; padding: 0 t.$space-3; color: t.$action-primary; }
+
+.createCourseCard {
+  display: grid;
+  min-height: 100%;
+  place-content: center;
+  justify-items: center;
+  gap: t.$space-3;
+  padding: t.$space-8;
+  border: 1.5px dashed t.$border-strong;
+  border-radius: t.$radius-lg;
+  background: t.$surface-canvas;
+  color: t.$content-primary;
+  font: inherit;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color t.$duration-fast t.$ease-out, background-color t.$duration-fast t.$ease-out;
+}
+
+.createCourseCard:hover { border-color: t.$border-interactive; background: t.$surface-brand-tint; }
+.createCourseCard > span:last-child { color: t.$content-placeholder; font-size: t.$font-size-caption; }
+.createCourseIcon { display: grid; width: 3rem; height: 3rem; place-items: center; border: 1px solid t.$border-default; border-radius: t.$radius-round; background: t.$surface-subtle; color: t.$content-secondary; }
+
+.summaryBar {
+  gap: t.$space-5;
+  padding: t.$space-4 t.$space-5;
+  border-radius: t.$radius-md;
+}
+.summaryLead { display: flex; align-items: center; gap: t.$space-3; font-weight: t.$fw-semibold; }
+.summaryLead svg { color: t.$action-primary; }
+.summaryMetrics { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: t.$space-8; margin: 0; }
+.summaryMetrics div { display: flex; gap: t.$space-2; }
+.summaryMetrics dt { color: t.$content-secondary; }
+.summaryMetrics dd { margin: 0; color: t.$content-ink; font-weight: t.$fw-bold; font-variant-numeric: tabular-nums; }
+.summaryMetrics dd[data-tone='success'] { color: t.$feedback-success; }
+
+.emptyState { display: grid; justify-items: center; gap: t.$space-3; padding: t.$space-12 t.$space-6; text-align: center; }
+.emptyState svg { color: t.$action-primary; }
+.emptyState h2 { margin: 0; font-size: t.$font-size-subhead; }
+
+.detailPage { display: flex; flex-direction: column; }
+.courseIdentity { flex: 0 0 auto; padding: t.$space-6 t.$workspace-gutter-inline 0; border-bottom: 1px solid t.$border-default; background: t.$surface-canvas; }
+.detailHeading { align-items: flex-start; }
+.identityCopy { display: grid; min-width: 0; gap: t.$space-1; }
+.identityCopy > p { font-size: t.$font-size-body; }
+.headingMeta { display: flex; flex-wrap: wrap; align-items: center; gap: t.$space-2 t.$space-3; }
+.headingMeta h1 { margin: 0; font-size: t.$font-size-headline; }
+.headerActions { display: flex; flex: 0 0 auto; align-items: center; gap: t.$space-2; }
+
+.tabs {
+  display: flex;
+  gap: t.$space-6;
+  margin-top: t.$space-5;
+  overflow-x: auto;
+}
+
+.tab,
+.tabUnavailable {
+  position: relative;
+  display: inline-flex;
+  min-width: max-content;
+  min-height: 2.75rem;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+}
+
+.tab[aria-selected='true'] { color: t.$action-primary; }
+.tab[aria-selected='true']::after { content: ''; position: absolute; inset: auto 0 -1px; height: 2px; background: t.$action-primary; }
+.tabUnavailable { cursor: not-allowed; opacity: .62; }
+
+.detailBody {
+  display: grid;
+  align-content: start;
+  gap: t.$space-4;
+  min-height: 0;
+  flex: 1;
+  padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16;
+}
+
+.workspace { @include workspace.grid; }
+.mainColumn { @include workspace.region(8, 7); display: grid; align-content: start; gap: t.$space-6; }
+.sideColumn { @include workspace.region(4, 5); min-width: 0; }
+
+.panel,
+.readinessPanel,
+.editorPanel,
+.occurrenceTableWrap { padding: t.$space-6; border-radius: t.$radius-md; }
+.panel { display: grid; gap: t.$space-5; }
+.panelHeader { gap: t.$space-4; }
+.panelHeader h2,
+.statusHeading h2,
+.scheduleSectionHeader h2 { margin: 0; color: t.$content-primary; font-size: t.$font-size-body-lg; line-height: t.$line-height-subhead; }
+.panelHeader p { margin-top: t.$space-1; font-size: t.$font-size-caption; }
+.textAction { min-height: 2rem; justify-self: start; padding: 0; border-radius: t.$radius-xs; font-size: t.$font-size-body; }
+.textAction:hover:not(:disabled) { padding-inline: t.$space-2; margin-inline: calc(#{t.$space-2} * -1); }
+.mutedMeta { color: t.$content-secondary; font-size: t.$font-size-caption; }
+
+.scheduleSummaryRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: t.$space-5;
+  padding: t.$space-4;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-dashboard-card;
+}
+
+.sessionType { background: t.$surface-brand-subtle; color: t.$action-primary; }
+.sessionType[data-type='Tutorial'] { background: t.$type-orange-subtle; color: t.$type-orange; }
+.scheduleSummaryCopy,
+.scheduleSummaryCount,
+.handoffRow > span:last-child { display: grid; min-width: 0; gap: t.$space-1; }
+.scheduleSummaryCopy strong,
+.scheduleSummaryCount strong,
+.handoffRow strong { color: t.$content-primary; font-size: t.$font-size-body; }
+.scheduleSummaryCopy small,
+.scheduleSummaryCount small,
+.handoffRow small { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.scheduleSummaryCopy strong,
+.scheduleSummaryCopy small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.scheduleSummaryCount { justify-items: end; text-align: right; }
+.handoffRow { display: flex; align-items: center; gap: t.$space-3; }
+.fileIcon { display: grid; width: 2.5rem; height: 2.5rem; flex: 0 0 auto; place-items: center; border-radius: t.$radius-sm; background: t.$surface-brand-subtle; color: t.$action-primary; }
+
+.readinessPanel { position: sticky; top: t.$space-4; display: grid; gap: t.$space-5; }
+.statusHeading { gap: t.$space-3; }
+.readinessSummary { display: grid; grid-template-columns: auto 1fr; gap: t.$space-4; align-items: center; }
+.readinessMark { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: t.$radius-round; background: t.$surface-muted; color: t.$content-secondary; font-weight: t.$fw-bold; }
+.readinessMark[data-ready] { background: t.$feedback-success-surface; color: t.$feedback-success; }
+.readinessSummary strong,
+.readinessSummary span { display: block; }
+.readinessSummary span { margin-top: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.checkList,
+.blockerList { display: grid; gap: t.$space-3; margin: 0; padding: 0; list-style: none; }
+.checkList li,
+.blockerList li { display: grid; grid-template-columns: 1.125rem minmax(0, 1fr); gap: t.$space-2; align-items: start; color: t.$content-secondary; }
+.checkList li svg,
+.blockerList svg { margin-top: .125rem; color: t.$feedback-warning; }
+.checkList li[data-complete] { color: t.$content-primary; }
+.checkList li[data-complete] svg { padding: .125rem; border-radius: t.$radius-round; background: t.$feedback-success-surface; color: t.$feedback-success; }
+.readyNote { padding: t.$space-4; border-radius: t.$radius-sm; background: t.$surface-dashboard-card; color: t.$content-secondary; }
+.readyNote strong { display: block; margin-bottom: t.$space-2; color: t.$content-primary; font-size: t.$font-size-caption; text-transform: uppercase; }
+.readinessActions { display: grid; gap: t.$space-2; }
+
+.scheduleWorkspace { display: grid; gap: t.$space-8; }
+.scheduleSection { display: grid; gap: t.$space-5; }
+.scheduleSectionHeader { gap: t.$space-4; }
+.scheduleSectionHeader h2 { font-size: t.$font-size-subhead; }
+.scheduleSectionHeader p { margin-top: t.$space-1; font-size: t.$font-size-body; }
+.sessionGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-6; }
+.sessionCard { display: grid; gap: t.$space-5; padding: t.$space-6; border-radius: t.$radius-md; }
+.sessionState { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.sessionTime { display: grid; gap: t.$space-1; }
+.sessionTime h3 { margin: 0; color: t.$content-primary; font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+.sessionTime strong { color: t.$content-primary; font-size: t.$font-size-body; }
+.sessionMeta { display: grid; gap: t.$space-2; margin: 0; padding: 0; list-style: none; color: t.$content-secondary; }
+.sessionMeta li { display: flex; align-items: center; gap: t.$space-2; }
+.sessionMeta svg { flex: 0 0 auto; color: t.$content-placeholder; }
+.sessionActions { justify-content: space-between; gap: t.$space-3; padding-top: t.$space-3; border-top: 1px solid t.$border-default; color: t.$content-placeholder; }
+.sessionActions > span { gap: t.$space-2; }
+.sessionActions .textAction,
+.sessionActions .plainAction { min-height: 2rem; padding: 0; }
+
+.occurrenceTableWrap { display: grid; gap: t.$space-4; overflow-x: auto; }
+.occurrenceTable { width: 100%; border-collapse: collapse; font-size: t.$font-size-body; }
+.occurrenceTable th,
+.occurrenceTable td { padding: t.$space-3 t.$space-4; border-bottom: 1px solid t.$border-default; text-align: left; }
+.occurrenceTable th { background: t.$surface-dashboard-card; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.occurrenceTable th:first-child { border-radius: t.$radius-xs 0 0 t.$radius-xs; }
+.occurrenceTable th:last-child { border-radius: 0 t.$radius-xs t.$radius-xs 0; }
+.occurrenceTable tbody tr:last-child td { border-bottom: 0; }
+.occurrenceTable td { color: t.$content-primary; font-variant-numeric: tabular-nums; }
+.occurrenceTable td:first-child { font-weight: t.$fw-semibold; }
+
+.error,
+.notice {
+  margin: 0;
+  padding: t.$space-3 t.$space-4;
+  border-radius: t.$radius-sm;
+}
+.error { background: t.$feedback-danger-surface; color: t.$feedback-danger; }
+.notice { background: t.$feedback-warning-surface; color: t.$feedback-warning; }
+
+@media (max-width: 76rem) {
+  .courseGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .createCourseCard { min-height: 17rem; }
+}
+
+@media (max-width: t.$breakpoint-dashboard-single) {
+  .courseGrid[data-view='list'] .courseCard { grid-template-columns: 1fr; }
+  .courseGrid[data-view='list'] .cardActions { border-top: 1px solid t.$border-default; }
+  .summaryBar { align-items: flex-start; flex-direction: column; }
+  .summaryMetrics { justify-content: flex-start; }
+}
+
+@media (max-width: t.$breakpoint-shell-mobile) {
+  .pageHeader,
+  .detailHeading,
+  .scheduleSectionHeader { align-items: stretch; flex-direction: column; }
+  .pageHeader .primaryButton,
+  .headerActions,
+  .headerActions .primaryButton,
+  .headerActions .secondaryButton { width: 100%; }
+  .toolbar { align-items: stretch; }
+  .filters,
+  .searchControl { width: 100%; flex-basis: 100%; }
+  .filterField { flex: 1 1 9rem; }
+  .viewControls { width: 100%; margin-left: 0; }
+  .resultCount { margin-left: auto; }
+  .createMeta { display: none; }
+  .formGrid,
+  .detailFacts,
+  .courseGrid,
+  .sessionGrid,
+  .scheduleSummaryRow { grid-template-columns: 1fr; }
+  .formGrid > *,
+  .fieldWide,
+  .formActions { grid-column: 1; }
+  .formActions { flex-direction: column-reverse; }
+  .formActions button { width: 100%; }
+  .summaryMetrics { gap: t.$space-4 t.$space-6; }
+  .courseIdentity { padding-top: t.$space-4; }
+  .identityCopy > p { overflow-wrap: anywhere; }
+  .tabs { gap: t.$space-5; margin-top: t.$space-4; }
+  .tabUnavailable { display: none; }
+  .readinessPanel { position: static; }
+  .scheduleSummaryCount { justify-items: start; text-align: left; }
+  .occurrenceTable,
+  .occurrenceTable tbody,
+  .occurrenceTable tr,
+  .occurrenceTable td { display: block; }
+  .occurrenceTable thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .occurrenceTable tr { display: grid; grid-template-columns: 1fr 1fr; padding: t.$space-3 0; border-bottom: 1px solid t.$border-default; }
+  .occurrenceTable td { padding: t.$space-1 t.$space-2; border: 0; }
+  .occurrenceTable td::before { content: attr(data-label); display: block; color: t.$content-secondary; font-size: t.$font-size-caption; }
+}
+
+@media (max-width: 28rem) {
+  .filterField { flex-basis: 100%; }
+  .cardActions { align-items: flex-start; flex-direction: column; }
+  .cardActionGroup { width: 100%; justify-content: space-between; }
+  .linkButton { flex: 1; }
+  .occurrenceTable tr { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .primaryButton,
+  .secondaryButton,
+  .softPrimaryButton,
+  .outlinePrimaryButton,
+  .ghostButton,
+  .viewButton,
+  .tab,
+  .linkButton,
+  .textAction,
+  .plainAction,
+  .createCourseCard { transition: none; }
+}
