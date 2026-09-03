@@ -1,0 +1,265 @@
+.page {
+  height: 100%;
+  min-height: 0;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: t.$space-3 t.$workspace-gutter-inline;
+  container: counsellor / size;
+  color: t.$content-primary;
+  background: t.$surface-page;
+  font-size: t.$font-size-body;
+  line-height: t.$line-height-body;
+
+  :where(button, a, summary):focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+  ::selection { background: t.$surface-brand-subtle; color: t.$content-primary; }
+  h1, h2, h3, p, dl, dd { margin: 0; }
+  svg { flex-shrink: 0; }
+}
+
+// A bounded canvas keeps the complete workspace visible. These row dimensions
+// also drive the existing API page size through useDashboardSizing.
+.canvas {
+  --intake-row-px: 64;
+  --intake-heading-px: 32;
+  --advisor-page-size: 3;
+  height: 100%;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: t.$touch-target 4.5rem minmax(0, 1fr);
+  gap: t.$space-3;
+}
+.header, .panelHeader, .sectionLabel { display: flex; justify-content: space-between; align-items: center; gap: t.$space-2; min-width: 0; }
+.header h1 { font-size: t.$font-size-title-2; line-height: t.$line-height-title-2; font-weight: t.$fw-bold; }
+.compactCreateLabel { display: none; }
+.primary, .secondary, .iconButton, .rowAction, .textLink {
+  display: inline-flex; align-items: center; justify-content: center; gap: t.$space-2;
+  min-height: t.$touch-target; border-radius: t.$radius-control; font: inherit;
+  font-weight: t.$fw-semibold; text-decoration: none; cursor: pointer;
+  transition: background t.$duration-fast t.$ease-out, color t.$duration-fast t.$ease-out;
+}
+.primary, .secondary, .rowAction { min-inline-size: t.$touch-target; }
+.primary { padding: t.$space-2 t.$space-3; background: t.$action-primary; color: t.$content-on-color; border: 1px solid transparent; }
+.primary:hover { background: t.$action-primary-hover; }
+.secondary, .iconButton { padding: t.$space-2 t.$space-3; border: 1px solid t.$border-default; background: t.$surface-raised; color: t.$content-primary; }
+.secondary:hover, .iconButton:hover { background: t.$surface-subtle; }
+.iconButton { width: t.$touch-target; padding: 0; flex-shrink: 0; }
+.iconButton:disabled { opacity: .4; cursor: default; }
+.textLink, .rowAction { color: t.$action-primary; border-radius: t.$radius-xs; }
+.textLink:hover, .rowAction:hover, .headingLink:hover { text-decoration: underline; text-underline-offset: .2em; }
+.rowAction { white-space: nowrap; }
+.headingLink { color: inherit; text-decoration: none; }
+.muted { color: t.$content-secondary; }
+
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: t.$space-3; }
+.metric { position: relative; display: flex; align-items: center; justify-content: space-between; gap: t.$space-2; padding: t.$space-2 t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-card; background: t.$surface-raised; }
+.metricLabel { font-weight: t.$fw-medium; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.metricValue { display: flex; align-items: center; gap: t.$space-2; color: t.$content-primary; font-size: t.$font-size-title-2; line-height: t.$line-height-title-2; font-weight: t.$fw-bold; font-variant-numeric: tabular-nums; text-decoration: none; }
+a.metricValue::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+a.metricValue svg { color: t.$action-primary; }
+.metricHelp {
+  z-index: 2;
+  summary { display: flex; align-items: center; justify-content: center; width: t.$touch-target; height: t.$touch-target; border-radius: t.$radius-control; color: t.$content-secondary; cursor: pointer; list-style: none; }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { background: t.$surface-subtle; color: t.$action-primary; }
+  p { position: absolute; top: 100%; right: 0; width: min(19rem, calc(100vw - 3rem)); padding: t.$space-3; border-radius: t.$radius-control; background: t.$content-primary; color: t.$content-on-color; box-shadow: t.$shadow-popover; font-size: t.$font-size-caption; }
+}
+.contentGrid { min-height: 0; display: grid; grid-template-columns: minmax(0, 1.8fr) minmax(18rem, 1fr); grid-template-rows: minmax(0, 1fr) 7rem; grid-template-areas: 'intakes preview' 'advisors advisors'; gap: t.$space-3; }
+.panel { min-width: 0; min-height: 0; display: grid; grid-template-rows: t.$touch-target minmax(0, 1fr); border: 1px solid t.$border-default; border-radius: t.$radius-card; background: t.$surface-raised; }
+.intakesPanel { grid-area: intakes; }
+.previewPanel { grid-area: preview; }
+.advisorsPanel { grid-area: advisors; }
+.panelHeader { padding: 0 t.$space-3; border-bottom: 1px solid t.$border-default; }
+.panelHeader h2 { display: flex; align-items: center; gap: t.$space-2; min-width: 0; font-size: t.$font-size-body-lg; line-height: t.$line-height-body; font-weight: t.$fw-semibold; }
+.count { padding: 0 t.$space-2; border-radius: t.$radius-pill; background: t.$surface-brand-subtle; color: t.$action-primary; font-size: t.$font-size-caption; font-variant-numeric: tabular-nums; }
+.pagination { flex-shrink: 0; font-size: t.$font-size-caption; color: t.$content-secondary; font-variant-numeric: tabular-nums; }
+.pagination > div { display: flex; align-items: center; gap: t.$space-1; }
+.pagination .iconButton { border: 0; }
+.pageNumber { white-space: nowrap; }
+.tableContainer { min-height: 0; min-width: 0; }
+.table {
+  width: 100%; border-collapse: collapse; table-layout: fixed;
+  thead tr { height: calc(var(--intake-heading-px) * 1px); }
+  tbody tr { height: calc(var(--intake-row-px) * 1px); }
+  th { background: t.$surface-subtle; color: t.$content-secondary; font-size: t.$font-size-caption; font-weight: t.$fw-medium; text-align: left; }
+  th, td { padding: 0 t.$space-3; vertical-align: middle; }
+  th:first-child, td:first-child { width: 36%; }
+  th:last-child, td:last-child { width: 12%; }
+  td { border-top: 1px solid t.$border-default; }
+  tr[data-selected='true'] { background: t.$surface-status-active; }
+  tbody tr:hover { background: t.$surface-subtle; }
+  time { color: t.$content-secondary; font-size: t.$font-size-caption; font-variant-numeric: tabular-nums; }
+}
+.studentButton { display: grid; align-content: center; gap: t.$space-1; width: 100%; padding: 0; min-height: t.$touch-target; text-align: left; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.studentButton strong { font-weight: t.$fw-semibold; }
+.studentButton strong, .studentButton span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.studentButton[aria-pressed='true'] strong { color: t.$action-primary; }
+.studentButton span, .studentType { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+.studentType { display: block; }
+.badge, .neutralBadge { display: inline-flex; padding: 0 t.$space-2; border-radius: t.$radius-xs; font-size: t.$font-size-caption; line-height: t.$line-height-body; font-weight: t.$fw-medium; white-space: nowrap; }
+.badge { background: t.$surface-status-active; color: t.$action-primary; }
+.neutralBadge { background: t.$surface-muted; color: t.$content-secondary; }
+.badges { display: flex; flex-wrap: wrap; gap: t.$space-2; margin-top: t.$space-1; }
+.previewBody { display: flex; flex-direction: column; gap: t.$space-3; padding: t.$space-3; min-height: 0; overflow-wrap: anywhere; }
+.previewIdentity h3 { font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; line-height: t.$line-height-subhead; }
+.previewIdentity h3, .previewIdentity p { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.previewIdentity p { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.recordFields { display: grid; gap: t.$space-2; }
+.recordFields dt { font-size: t.$font-size-caption; color: t.$content-secondary; }
+.recordFields dd { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+.parentSummary { border-top: 1px solid t.$border-default; }
+.sectionLabel h3 { font-size: t.$font-size-caption; font-weight: t.$fw-semibold; }
+.parentSummary ul { padding: 0; margin: 0; list-style: none; }
+.parentSummary li strong { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.parentSummary li span { display: none; }
+.parentSummary > p { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.parentSummary .feedback { padding: 0; }
+.previewActions { display: flex; gap: t.$space-2; margin-top: auto; }
+.previewActions > a { flex: 1 1 auto; padding-inline: t.$space-2; white-space: nowrap; }
+.previewActions .compactParents, .compactStudentName, .actionLabelShort { display: none; }
+.compactParentError { display: none; color: t.$feedback-danger; font-size: t.$font-size-caption; }
+.timestamps { display: grid; gap: t.$space-1; font-size: t.$font-size-caption; color: t.$content-secondary; }
+.timestamps > div { display: flex; justify-content: space-between; gap: t.$space-2; }
+.timestamps dd { text-align: right; font-variant-numeric: tabular-nums; }
+.advisorList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none; padding: 0; margin: 0; min-height: 0; }
+.advisorList li { min-width: 0; display: flex; align-items: center; gap: t.$space-2; padding: t.$space-2 t.$space-3; }
+.advisorList li + li { border-left: 1px solid t.$border-default; }
+.advisorIcon { display: grid; place-items: center; width: t.$touch-target; height: t.$touch-target; flex-shrink: 0; border-radius: t.$radius-pill; background: t.$surface-muted; color: t.$content-secondary; }
+.advisorList li > div { display: grid; min-width: 0; }
+.advisorList strong, .advisorList span:not(.advisorIcon), .advisorList small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.advisorList strong { font-weight: t.$fw-semibold; }
+.advisorList span:not(.advisorIcon), .advisorList small { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+.feedback { padding: t.$space-3; color: t.$content-secondary; }
+.feedback[role='alert'] { color: t.$feedback-danger; }
+.feedback p + button { margin-top: t.$space-1; }
+.emptyState { display: grid; justify-items: start; align-content: start; gap: t.$space-2; padding: t.$space-3; color: t.$content-secondary; }
+.emptyState h3 { font-size: t.$font-size-body-lg; color: t.$content-primary; }
+.emptyState p { max-width: 45ch; }
+
+@container counsellor (height < 800px) {
+  .previewBody { gap: t.$space-2; }
+  .extendedField, .timestamps, .badges { display: none; }
+}
+@container counsellor (width < 1000px) {
+  .table th:nth-child(3), .table td[data-label='Created'] { display: none; }
+  .table th:first-child, .table td:first-child { width: 42%; }
+  .table th:last-child, .table td:last-child { width: 15%; }
+}
+@container counsellor (height < 650px) {
+  .canvas { grid-template-rows: t.$touch-target 3.5rem minmax(0, 1fr); gap: t.$space-2; }
+  .previewBody { padding: t.$space-2; gap: t.$space-1; }
+  .previewIdentity p { display: none; }
+  .recordFields dd { -webkit-line-clamp: 1; }
+}
+@container counsellor (height < 580px) {
+  .previewBody { justify-content: space-between; }
+  .parentSummary:not([data-error='true']), .previewActions .actionLabelFull, .previewActions svg { display: none; }
+  .previewActions .compactParents, .actionLabelShort { display: inline-flex; }
+  .parentSummary .sectionLabel { display: none; }
+  .previewBody[data-parent-error='true'] .recordFields { display: none; }
+}
+@container counsellor (width < 704px) {
+  .metricHelp p { width: 13rem; }
+  .metric:first-child .metricHelp p { left: 0; right: auto; }
+  .metric:nth-child(2) .metricHelp p { right: -3rem; }
+}
+@container counsellor (width < 704px) and (height >= 450px) {
+  .canvas { --intake-row-px: 52; --intake-heading-px: 0; --advisor-page-size: 1; grid-template-rows: t.$touch-target 3.5rem minmax(0, 1fr); gap: t.$space-2; }
+  .header h1 { font-size: t.$font-size-title-2; line-height: t.$line-height-title-2; }
+  .header .primary { font-size: t.$font-size-caption; }
+  .header .primary svg, .createLabel { display: none; }
+  .compactCreateLabel { display: inline; }
+  .metrics { gap: t.$space-2; }
+  .metric { padding: t.$space-1 t.$space-2; }
+  .metricValue { font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+  .metricValue svg { display: none; }
+  .metricHelp { position: absolute; right: 0; bottom: 0; }
+  .contentGrid { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 8.25rem 5.5rem; grid-template-areas: 'intakes' 'preview' 'advisors'; gap: t.$space-2; }
+  .panelHeader { padding-inline: t.$space-2; }
+  .panelHeader h2 { font-size: t.$font-size-body; }
+  .pageNumber { display: none; }
+  .table thead, .table td[data-label='Created'], .table td[data-label='Updated'], .studentType { display: none; }
+  .table th, .table td { padding-inline: t.$space-2; }
+  .table td:first-child { width: 55%; }
+  .table td:last-child { width: 18%; }
+  .rowAction svg { display: none; }
+  .previewBody { padding: t.$space-1 t.$space-2; gap: 0; }
+  .previewIdentity, .extendedField, .timestamps, .parentSummary:not([data-error='true']), .previewHeading, .recordFields dt, .previewActions .actionLabelFull, .previewActions svg { display: none; }
+  .compactStudentName { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .previewActions .compactParents, .actionLabelShort { display: inline-flex; }
+  .recordFields dd { -webkit-line-clamp: 1; }
+  .parentSummary .sectionLabel { display: none; }
+  .previewBody[data-parent-error='true'] .recordFields { display: none; }
+  .advisorList { grid-template-columns: minmax(0, 1fr); }
+  .advisorList li { padding: 0 t.$space-2; }
+  .advisorList small, .advisorIcon { display: none; }
+  .emptyState { padding: t.$space-2; }
+  .emptyState svg, .emptyState p { display: none; }
+  .previewPanel .emptyState p { display: block; }
+}
+// Very short windows use the horizontal space for all three operational panels.
+@container counsellor (width >= 600px) and (height < 450px) {
+  .canvas { --advisor-page-size: 1; --intake-row-px: 52; --intake-heading-px: 0; grid-template-rows: t.$touch-target t.$touch-target minmax(0, 1fr); gap: t.$space-1; }
+  .contentGrid { grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: minmax(0, 1fr); grid-template-areas: 'intakes preview advisors'; gap: t.$space-2; }
+  .metrics { gap: t.$space-2; }
+  .metric { padding: 0 t.$space-2; }
+  .metric > div { display: flex; align-items: center; gap: t.$space-2; }
+  .metricValue { font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+  .metricValue svg { display: none; }
+  .panelHeader { padding-inline: t.$space-1; gap: 0; }
+  .panelHeader h2 { font-size: t.$font-size-caption; }
+  .count, .pageNumber { display: none; }
+  .table thead, .table td:not(:first-child):not(:last-child) { display: none; }
+  .table td:first-child { width: 75%; padding-inline: t.$space-2; }
+  .table td:last-child { width: 25%; padding-inline: 0; }
+  .rowAction svg { display: none; }
+  .previewIdentity, .previewHeading, .recordFields dt { display: none; }
+  .compactStudentName { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .previewActions { gap: t.$space-1; flex-wrap: wrap; }
+  .previewActions > a { padding-inline: t.$space-1; font-size: t.$font-size-caption; }
+  .advisorList { grid-template-columns: minmax(0, 1fr); align-content: start; }
+  .advisorList li { padding: t.$space-2; }
+  .advisorIcon, .advisorList small { display: none; }
+  .emptyState svg, .emptyState p { display: none; }
+  .previewPanel .emptyState p { display: block; }
+}
+@container counsellor (width < 600px) and (height < 450px) {
+  .canvas { --intake-row-px: 44; --intake-heading-px: 0; --advisor-page-size: 1; grid-template-rows: t.$touch-target 3rem minmax(0, 1fr); gap: t.$space-1; }
+  .header h1 { font-size: t.$font-size-title-2; line-height: t.$line-height-title-2; }
+  .header .primary { font-size: t.$font-size-caption; padding-inline: t.$space-2; }
+  .header .primary svg, .createLabel { display: none; }
+  .compactCreateLabel { display: inline; }
+  .metrics { gap: t.$space-1; }
+  .metric { padding: 0 t.$space-2; }
+  .metricValue { font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+  .metricValue svg { display: none; }
+  .metricHelp { position: absolute; right: 0; bottom: 0; }
+  .contentGrid { grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) 6.5rem 5.5rem; grid-template-areas: 'intakes' 'preview' 'advisors'; gap: t.$space-1; }
+  .panelHeader { padding-inline: t.$space-1; }
+  .panelHeader h2 { font-size: t.$font-size-caption; }
+  .pageNumber { display: none; }
+  .table thead, .table td:not(:first-child):not(:last-child) { display: none; }
+  .table td:first-child { width: 80%; padding-inline: t.$space-2; }
+  .table td:last-child { width: 20%; padding-inline: 0; }
+  .rowAction svg { display: none; }
+  .studentButton { gap: 0; }
+  .previewPanel { grid-template-rows: 2rem minmax(0, 1fr); }
+  .previewBody { padding: t.$space-1; gap: 0; }
+  .previewIdentity, .previewHeading, .recordFields dt { display: none; }
+  .compactStudentName { display: block; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+  .previewActions { gap: t.$space-1; }
+  .previewActions > a { font-size: t.$font-size-caption; padding-inline: t.$space-1; }
+  .advisorList { grid-template-columns: minmax(0, 1fr); }
+  .advisorList li { padding: 0 t.$space-2; }
+  .advisorIcon, .advisorList small { display: none; }
+  .feedback, .emptyState { padding: t.$space-1; font-size: t.$font-size-caption; }
+  .emptyState svg, .emptyState p { display: none; }
+  .previewPanel .emptyState p { display: block; }
+}
+// Compact previews keep errors explicit and leave the existing record route
+// available for the full parent-link error and retry controls.
+@container counsellor (width < 704px) or (height < 450px) {
+  .parentSummary[data-error='true'] { display: none; }
+  .compactParentError { display: block; }
+}
+@media (max-width: 700px) { .page { padding: t.$space-2; } }
+@media (prefers-reduced-motion: reduce) { .page :where(a, button) { transition: none; } }

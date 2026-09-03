@@ -9,6 +9,7 @@ import {formatPersonName} from '@/utils/personName';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {getApiErrorCode, isNotFound} from '@/utils/apiError';
+import {parentLinkQueryKeys} from './queryKeys';
 
 type Scope = 'counsellor' | 'advisor' | 'tenant';
 
@@ -25,7 +26,7 @@ export const ParentLinksPanel = ({scope, subjectId, onUnavailable}: {scope: Scop
     lastName: '',
     reason: '',
   });
-  const queryKey = ['parent-links', scope, subjectId] as const;
+  const queryKey = parentLinkQueryKeys.subject(scope, subjectId);
   const links = useQuery({
     meta: scope === 'advisor' ? {advisingStudentId: subjectId} : undefined,
     queryKey,
