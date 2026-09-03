@@ -1,6 +1,6 @@
+@use '../../styles/workspace' as workspace;
 .journeyLayout {
-  display: grid;
-  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  @include workspace.grid;
   gap: 1.5rem;
   align-items: start;
   width: 100%;
@@ -9,20 +9,11 @@
 
 @media (max-width: 68rem) {
   .journeyLayout {
-    grid-template-columns: minmax(0, 1fr);
+    > * { grid-column: 1 / -1; }
   }
 }
 
-.journey {
-  display: flex;
-  flex-direction: column;
-  background: t.$surface-raised;
-  border: 1px solid t.$border;
-  border-radius: t.$radius-card-lg;
-  padding: 1.5rem;
-  box-shadow: 0 1px 3px transparent;
-  min-width: 0;
-}
+.journey { @include workspace.region(9, 12); display: flex; flex-direction: column; padding: t.$space-3 0; min-width: 0; }
 
 .header {
   display: flex;
@@ -45,9 +36,9 @@
   }
 
   .editBtn {
-    height: 2.15rem;
+    min-height: t.$touch-target;
     padding: 0 1rem;
-    border-radius: 8px;
+    border-radius: t.$radius-control;
     border: 1px solid t.$border;
     background: t.$surface-raised;
     color: t.$text;
@@ -67,16 +58,21 @@
 
 .phases {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-top: t.$space-10;
+  gap: t.$space-16 t.$space-4;
 }
 
 .phaseCard {
+  position: relative;
+  min-width: 0;
+  &::before { content: ""; position: absolute; top: -2.5rem; left: t.$space-4; width: calc(100% + 1rem); border-top: 2px dashed t.$border-default; }
+  &:nth-child(3n)::before, &:last-child::before { display: none; }
   display: flex;
   flex-direction: column;
   padding: 1.25rem;
   border: 1px solid t.$border;
-  border-radius: t.$radius-control;
+  border-radius: t.$radius-card-lg;
   background: t.$surface-raised;
   transition: all 0.15s ease;
 
@@ -87,7 +83,7 @@
 
   &[data-current='true'] {
     border-color: t.$brand;
-    box-shadow: 0 0 0 1px t.$brand;
+    box-shadow: t.$shadow-card;
   }
 
   .phaseBadgeRow {
@@ -186,11 +182,11 @@
 
   .phaseActionBtn {
     margin-top: 1rem;
-    height: 2.15rem;
+    min-height: t.$touch-target;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
+    border-radius: t.$radius-control;
     font-size: 0.8rem;
     font-weight: 500;
     cursor: pointer;
@@ -231,6 +227,7 @@
 
 // Right column Requests Card
 .requestsCard {
+  @include workspace.region(3, 12);
   display: flex;
   flex-direction: column;
   background: t.$surface-raised;
@@ -327,8 +324,8 @@
 
       button {
         flex: 1;
-        height: 2rem;
-        border-radius: 6px;
+        min-height: t.$touch-target;
+        border-radius: t.$radius-control;
         font-size: 0.775rem;
         font-weight: 500;
         cursor: pointer;
@@ -362,7 +359,7 @@
 // Checkpoint Tasks Modal Dialog
 .dialog {
   margin: auto;
-  width: min(calc(100vw - 2rem), 54rem);
+  width: min(calc(100% - 2rem), t.$workspace-task-max-inline-size);
   max-height: min(85dvh, 48rem);
   padding: 0;
   overflow: hidden;
@@ -370,9 +367,12 @@
   border-radius: t.$radius-card-lg;
   background: t.$surface-raised;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  &[open] { display: flex; flex-direction: column; }
+  > .dialogHeader, > .dialogToolbar { flex: 0 0 auto; }
+  > .tableWrap, > .taskDetail { min-height: 0; overflow: auto; }
 
   &::backdrop {
-    background: rgba(0, 0, 0, 0.4);
+    background: t.$surface-modal-backdrop;
     backdrop-filter: blur(4px);
   }
 }
@@ -396,7 +396,7 @@
     align-items: center;
     justify-content: center;
     width: 2rem;
-    height: 2rem;
+    min-height: t.$touch-target;
     border-radius: 50%;
     border: none;
     background: transparent;
@@ -452,9 +452,9 @@
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
-    height: 2.1rem;
+    min-height: t.$touch-target;
     padding: 0 0.85rem;
-    border-radius: 8px;
+    border-radius: t.$radius-control;
     background: t.$brand;
     color: t.$surface-raised;
     font-size: 0.8rem;
@@ -538,9 +538,9 @@
   gap: 0.4rem;
 
   button {
-    height: 1.85rem;
+    min-height: t.$touch-target;
     padding: 0 0.65rem;
-    border-radius: 6px;
+    border-radius: t.$radius-control;
     border: 1px solid t.$border;
     background: t.$surface-raised;
     color: t.$text-muted;
@@ -557,3 +557,17 @@
 .taskTitle {display:block; color:t.$text; font-size:t.$font-size-body;}
 .taskDescription {color:t.$text-muted; font-size:t.$fs-caption;}
 .tableEmpty {text-align:center; color:t.$text-muted; padding:2rem;}
+
+.phaseMarker { position: absolute; z-index: 1; top: -3.4rem; left: t.$space-4; display: grid; place-items: center; width: t.$space-8; height: t.$space-8; border: 3px solid t.$border-default; border-radius: 50%; background: t.$surface-raised; }
+.phaseMarker[data-state='completed'] { background: t.$action-primary; border-color: t.$action-primary; color: t.$content-on-color; }
+.phaseMarker[data-state='current'] { border-color: t.$action-primary; &::after { content: ''; width: 65%; height: 65%; border-radius: 50%; background: t.$action-primary; } }
+.phaseMetrics .metricLine:first-child { flex-direction: column; align-items: flex-start; gap: t.$space-2; margin-bottom: t.$space-4; strong { font-size: t.$font-size-headline; } }
+.decisionForm { display: grid; gap: t.$space-3; }
+.decisionForm label { display: grid; gap: t.$space-2; font-size: t.$fs-caption; }
+.decisionForm textarea { width: 100%; min-height: 5rem; border: 1px solid t.$border-default; border-radius: t.$radius-control; padding: t.$space-2; }
+.decisionForm p { color: t.$feedback-danger; font-size: t.$fs-caption; }
+.filterTabs { flex-wrap: wrap; }
+.filterTabs button { min-height: t.$touch-target; }
+@media (max-width: t.$breakpoint-shell-mobile) { .phases { grid-template-columns: minmax(0, 1fr); padding-top: 0; gap: t.$space-4; } .phaseMarker, .phaseCard::before { display: none; } .header { flex-wrap: wrap; } }
+
+.taskDetail { padding: t.$space-6; display: grid; gap: t.$space-4; max-height: 50dvh; overflow: auto; h3, p { margin: 0; } dd { margin: t.$space-1 0 t.$space-3; } button { min-height: t.$touch-target; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; padding: t.$space-2 t.$space-4; justify-self: start; } }

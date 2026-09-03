@@ -1,0 +1,10 @@
+.dialog { width: min(34rem, calc(100% - 2rem)); max-height: calc(100dvh - 2rem); overflow: auto; margin: auto; padding: t.$space-8; border: 1px solid t.$border-default; border-radius: t.$radius-lg; background: t.$surface-raised; color: t.$content-primary; text-align: center; }
+.dialog::backdrop { background: t.$modal-backdrop; }
+.dialog h2 { font-size: t.$font-size-headline; margin: t.$space-4 0; }
+.dialog p { line-height: t.$line-height-body; color: t.$content-secondary; }
+.dialog button { min-height: t.$touch-target; border: 1px solid t.$border-default; border-radius: t.$radius-control; padding: t.$space-2 t.$space-4; background: t.$surface-raised; color: t.$content-primary; }
+.dialog .close { display: grid; place-items: center; margin-left: auto; width: t.$touch-target; padding: 0; }
+.successIcon { color: t.$action-primary; margin: auto; }
+.actions { display: flex; justify-content: center; flex-wrap: wrap; gap: t.$space-3; margin-top: t.$space-6; }
+.actions .primary { background: t.$action-primary; color: t.$content-on-color; border-color: t.$action-primary; }
+.dialog .error { color: t.$feedback-danger; }

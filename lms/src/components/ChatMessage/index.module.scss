@@ -1,0 +1,7 @@
+.message {align-self:stretch; min-width:0; width:100%; color:t.$content-primary; padding:t.$space-4 0;}
+.message[data-sender='user'] {align-self:flex-end; width:fit-content; max-width:85%; padding:t.$space-3 t.$space-4; border-radius:t.$radius-lg; background:t.$surface-brand-subtle;}
+.content {white-space:pre-wrap; overflow-wrap:anywhere; line-height:t.$line-height-body;}
+.actions {display:flex; align-items:center; gap:t.$space-3; margin-top:t.$space-3; color:t.$content-secondary; font-size:t.$fs-caption;}
+.actions button {display:inline-flex; align-items:center; gap:t.$space-2; min-height:t.$touch-target; padding:t.$space-2; border:0; border-radius:t.$radius-control; color:inherit; background:transparent; cursor:pointer;}
+.actions button:hover {background:t.$surface-subtle;}
+.actions button:focus-visible {outline:2px solid t.$action-primary; outline-offset:2px;}

@@ -1,0 +1,67 @@
+.chatPanel {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  min-width: 0;
+  min-height: t.$dashboard-chat-min-block-size;
+  padding: t.$space-5 t.$space-4 t.$space-4;
+  border-radius: t.$radius-lg;
+  background: linear-gradient(145deg, t.$surface-assistant-start, t.$surface-assistant-end);
+}
+
+.chatHeader {
+  display: grid;
+  grid-template-columns: t.$touch-target minmax(0, 1fr) t.$touch-target;
+  align-items: center;
+
+  h2 { margin: 0; color: t.$content-primary; font-size: t.$font-size-headline; font-weight: t.$fw-semibold; line-height: t.$line-height-headline; text-align: center; }
+  button { display: grid; place-items: center; width: t.$touch-target; height: t.$touch-target; border: 0; border-radius: t.$radius-round; background: transparent; cursor: pointer; }
+  button:disabled { cursor: not-allowed; opacity: .55; }
+  button:hover:not(:disabled), button:focus-visible { background: t.$surface-raised; }
+  img { width: 1.125rem; height: 1.125rem; }
+}
+
+.chatIntro {
+  margin: t.$space-12 t.$space-1 0;
+  color: t.$content-ink;
+  p { margin: 0 0 t.$space-1; font-size: 1.5rem; line-height: 1.875rem; }
+  strong { font-size: 1.5rem; font-weight: t.$fw-medium; line-height: 2.125rem; }
+}
+
+.quickPrompts {
+  display: grid;
+  gap: t.$space-3;
+  margin: t.$space-6 t.$space-1 0;
+  button { min-height: t.$touch-target; padding: t.$space-3 t.$space-5; border: 0; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-ink; font-size: t.$font-size-body-lg; line-height: t.$line-height-body; text-align: left; cursor: pointer; }
+  button:hover, button:focus-visible { box-shadow: t.$shadow-selected; }
+}
+
+.composerArea { margin-top: auto; padding-top: t.$space-6; }
+.integrationStatus { margin: 0 0 t.$space-3; color: t.$content-secondary; font-size: t.$fs-caption; line-height: t.$line-height-caption; }
+.chatComposer {
+  display: grid;
+  grid-template-columns: t.$touch-target minmax(0, 1fr) t.$touch-target;
+  align-items: center;
+  gap: t.$space-2;
+  padding: t.$space-1;
+  border: 1px solid t.$action-secondary;
+  border-radius: t.$radius-lg;
+  background: t.$surface-raised;
+  box-shadow: t.$shadow-dashboard-card;
+  &:focus-within { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+  input { width: 100%; min-width: 0; border: 0; background: transparent; color: t.$content-primary; font-size: t.$font-size-body; }
+  // The containing composer provides one continuous keyboard focus indicator.
+  .chatPanel & input:focus, .chatPanel & input:focus-visible { outline: 0; box-shadow: none; border: 0; }
+  input::placeholder { color: t.$content-placeholder; }
+}
+.composerAdd, .sendButton { display: grid; place-items: center; width: t.$touch-target; height: t.$touch-target; border: 0; border-radius: t.$radius-sm; cursor: pointer; }
+.composerAdd { background: transparent; color: t.$content-secondary; font-size: 1.75rem; font-weight: 300; }
+.sendButton { background: t.$action-primary; img { width: 1.5rem; height: 1.5rem; } }
+.composerAdd:disabled, .sendButton:disabled { opacity: .45; cursor: not-allowed; }
+
+@media (max-width: t.$breakpoint-shell-mobile) {
+  .chatPanel { min-height: auto; }
+  .chatIntro { margin-top: t.$space-5; }
+  .quickPrompts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quickPrompts button { padding: t.$space-3; font-size: t.$font-size-body; }
+}

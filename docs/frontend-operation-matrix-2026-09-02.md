@@ -1,5 +1,7 @@
 # Frontend operation evidence matrix — 2026-09-02
 
+Updated 2026-09-03: ten previously transport-only reads now have explicit UI consumers (administrator/user detail, avatars, system exam sections/media). Assignment creation also now supplies required `weekId` and `learningType`; observer exam cards retain declared summaries. **417 wired entries, 4 alternate workflows, 10 excluded entries. These are contract entries, including duplicated routes across snapshots, not 431 live-tested endpoints.**
+
 Scope: the 11 checked-in OpenAPI snapshots; 431 operations. This is a source reachability audit, not proof of authenticated runtime success. Paths with parameterized service wrappers are candidate matches and were checked against their service implementations. UI evidence names actual calling pages, components or hooks; it does not assert that every response schema or business state has been accepted live.
 
 Status: **wired** = service and production consumer found; **transport / review** = service exists but no direct consumer was identified; **alternate workflow** = the page uses a collection projection or batch operation; **excluded** = explicitly Disabled or diagnostic endpoint. System-only functions are outside the supplied Tenant Admin account matrix.
@@ -149,7 +151,7 @@ Status: **wired** = service and production consumer found; **transport / review*
 | `adminAddDisabled` | `POST /v2/admins` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
 | `adminDeleteBatchDisabled` | `DELETE /v2/admins/batch` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
 | `adminDeleteDisabled` | `DELETE /v2/admins/{id}` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
-| `adminGetById` | `GET /v2/admins/{id}` | `apis/services/admin-api.ts#getAdmin` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
+| `adminGetById` | `GET /v2/admins/{id}` | `apis/services/admin-api.ts#getAdmin` | `pages/AdminConsolePage/components/AdminContractOperations.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
 | `adminUpdateDisabled` | `PUT /v2/admins/{id}` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
 | `systemManagedUserCreate` | `POST /v2/system/managed-users` | `apis/services/admin-api.ts#createManagedUser` | `pages/AdminConsolePage/index.tsx` | wired |
 | `systemManagedUserDisable` | `POST /v2/system/managed-users/{id}/disable` | `apis/services/admin-api.ts#disableManagedUser` | `pages/AdminConsolePage/index.tsx` | wired |
@@ -356,13 +358,13 @@ Status: **wired** = service and production consumer found; **transport / review*
 | `getStudentMockExamWriting` | `GET /v2/student/mock-exams/{studentMockExamId}/writing` | `apis/services/mock-exam-api.ts#getStudentSection` | `pages/MockExamSessionPage/index.tsx` | wired |
 | `getStudentMockExamWritingTaskImage` | `GET /v2/student/mock-exams/{studentMockExamId}/writing/tasks/{taskSeq}/image` | `apis/services/mock-exam-api.ts#getStudentWritingImage` | `pages/MockExamSessionPage/index.tsx` | wired |
 | `listSystemMockExams` | `GET /v2/system/mock-exams` | `apis/services/mock-exam-api.ts#getSystemExams` | `pages/MockExamsPage/index.tsx` | wired |
-| `getSystemMockExam` | `GET /v2/system/mock-exams/{testId}` | `apis/services/mock-exam-api.ts#getSystemExam` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
-| `getSystemMockExamListening` | `GET /v2/system/mock-exams/{testId}/listening` | `apis/services/mock-exam-api.ts#getSystemSection` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
-| `getSystemMockExamListeningPartAudio` | `GET /v2/system/mock-exams/{testId}/listening/parts/{partSeq}/audio` | `apis/services/mock-exam-api.ts#getSystemListeningAudio` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
-| `getSystemMockExamReading` | `GET /v2/system/mock-exams/{testId}/reading` | `apis/services/mock-exam-api.ts#getSystemSection` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
-| `getSystemMockExamReadingQuestionImage` | `GET /v2/system/mock-exams/{testId}/reading/passages/{passageSeq}/questions/{sortOrder}/image` | `apis/services/mock-exam-api.ts#getSystemReadingImage` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
-| `getSystemMockExamWriting` | `GET /v2/system/mock-exams/{testId}/writing` | `apis/services/mock-exam-api.ts#getSystemSection` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
-| `getSystemMockExamWritingTaskImage` | `GET /v2/system/mock-exams/{testId}/writing/tasks/{taskSeq}/image` | `apis/services/mock-exam-api.ts#getSystemWritingImage` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
+| `getSystemMockExam` | `GET /v2/system/mock-exams/{testId}` | `apis/services/mock-exam-api.ts#getSystemExam` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
+| `getSystemMockExamListening` | `GET /v2/system/mock-exams/{testId}/listening` | `apis/services/mock-exam-api.ts#getSystemSection` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
+| `getSystemMockExamListeningPartAudio` | `GET /v2/system/mock-exams/{testId}/listening/parts/{partSeq}/audio` | `apis/services/mock-exam-api.ts#getSystemListeningAudio` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
+| `getSystemMockExamReading` | `GET /v2/system/mock-exams/{testId}/reading` | `apis/services/mock-exam-api.ts#getSystemSection` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
+| `getSystemMockExamReadingQuestionImage` | `GET /v2/system/mock-exams/{testId}/reading/passages/{passageSeq}/questions/{sortOrder}/image` | `apis/services/mock-exam-api.ts#getSystemReadingImage` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
+| `getSystemMockExamWriting` | `GET /v2/system/mock-exams/{testId}/writing` | `apis/services/mock-exam-api.ts#getSystemSection` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
+| `getSystemMockExamWritingTaskImage` | `GET /v2/system/mock-exams/{testId}/writing/tasks/{taskSeq}/image` | `apis/services/mock-exam-api.ts#getSystemWritingImage` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
 | `listTenantMockExamTemplates` | `GET /v2/tenant/mock-exam-templates` | `apis/services/mock-exam-api.ts#listTenantTemplates` | `pages/MockExamsPage/index.tsx` | wired |
 | `createTenantMockExamTemplate` | `POST /v2/tenant/mock-exam-templates` | `apis/services/mock-exam-api.ts#createTenantTemplate` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx` | wired |
 | `getTenantMockExamTemplate` | `GET /v2/tenant/mock-exam-templates/{templateId}` | `apis/services/mock-exam-api.ts#getTenantTemplate` | `pages/MockExamsPage/StaffMockExamWorkspaces.tsx` | wired |
@@ -475,10 +477,10 @@ Status: **wired** = service and production consumer found; **transport / review*
 | `userAddDisabled` | `POST /v2/users` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
 | `userDeleteBatchDisabled` | `DELETE /v2/users/batch` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
 | `userDeleteDisabled` | `DELETE /v2/users/{id}` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
-| `userGetById` | `GET /v2/users/{id}` | `apis/services/admin-api.ts#getUser` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
+| `userGetById` | `GET /v2/users/{id}` | `apis/services/admin-api.ts#getUser` | `pages/AdminConsolePage/index.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
 | `userUpdateDisabled` | `PUT /v2/users/{id}` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
 | `userPasswordStatusDisabled` | `PATCH /v2/users/{id}/password-status` | — | Disabled operation or diagnostic greeting; no business UI. | excluded |
-| `userGetAvatar` | `GET /v2/users/{userId}/avatar` | `apis/services/profile-api.ts#getUserAvatar` | No direct page consumer identified; do not count as full functional acceptance. | transport / review |
+| `userGetAvatar` | `GET /v2/users/{userId}/avatar` | `apis/services/profile-api.ts#getUserAvatar` | `components/UserAvatar/index.tsx`; added in final review, fixture coverage is not live acceptance. | wired |
 ## vocabulary.openapi.yaml
 
 | Operation | HTTP path | Service | Production consumer / boundary | Status |

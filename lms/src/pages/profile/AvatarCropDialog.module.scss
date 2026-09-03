@@ -52,7 +52,7 @@
 .crop {
   position: relative;
   width: 100%;
-  aspect-ratio: 1;
+  aspect-ratio: 4 / 3;
   background: t.$surface-muted;
 }
 .zoom {

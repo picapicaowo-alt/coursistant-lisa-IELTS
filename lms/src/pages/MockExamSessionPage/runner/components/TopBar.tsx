@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 type TopBarProps = {
+  testTitle: string
   candidateId: string
   remainingSeconds: number
   paused: boolean
@@ -27,7 +28,7 @@ async function toggleFullscreen() {
   }
 }
 
-export function TopBar({ candidateId, remainingSeconds, paused }: TopBarProps) {
+export function TopBar({ testTitle, candidateId, remainingSeconds, paused }: TopBarProps) {
   const [fullscreen, setFullscreen] = useState(false)
 
   useEffect(() => {
@@ -44,18 +45,13 @@ export function TopBar({ candidateId, remainingSeconds, paused }: TopBarProps) {
   return (
     <header className="top-bar">
       <div className="top-bar__left">
+        <strong className="top-bar__title">{testTitle}</strong>
         <span className="top-bar__candidate">Candidate: {candidateId}</span>
-        <span className={`top-bar__timer ${paused ? 'is-paused' : ''}`}>
-          {paused ? 'Paused · ' : ''}
-          {formatMinutesLabel(remainingSeconds)}
-        </span>
       </div>
       <div className="top-bar__right">
-        <span className="icon-btn" title="Settings" aria-hidden="true">
-          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
-            <circle cx="12" cy="12" r="3" />
-            <path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4l1.4-1.4M17 7l1.4-1.4" />
-          </svg>
+        <span className={`top-bar__timer ${paused ? 'is-paused' : ''}`}>
+          {paused ? 'Paused · ' : ''}
+          {formatMinutesLabel(remainingSeconds)} remaining
         </span>
         <button
           type="button"

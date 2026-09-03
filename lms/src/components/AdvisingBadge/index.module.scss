@@ -1,0 +1,18 @@
+.badge {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 0.1875rem 0.625rem;
+  border-radius: t.$radius-pill;
+  background: t.$surface-muted;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-medium;
+  line-height: t.$line-height-caption;
+  white-space: nowrap;
+
+  &[data-value='HIGH'], &[data-value='NEEDS_ATTENTION'], &[data-value='RISK'] { background: t.$type-pink-subtle; color: t.$type-pink; }
+  &[data-value='MEDIUM'], &[data-value='AT_RISK'], &[data-value='IN_PROGRESS'], &[data-value='APPROVAL'], &[data-value='ONGOING'] { background: t.$type-orange-subtle; color: t.$type-orange; }
+  &[data-value='LOW'], &[data-value='ON_TRACK'], &[data-value='FOLLOW_UP'], &[data-value='RESOLVED'], &[data-value='PLANNING'] { background: t.$type-green-subtle; color: t.$type-green; }
+  &[data-value='REVIEW'] { background: t.$type-cyan-subtle; color: t.$type-cyan; }
+}

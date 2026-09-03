@@ -1,7 +1,7 @@
 import React, {FormEvent, useEffect, useRef, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {ChevronDown, ChevronUp, Search, X} from 'lucide-react';
+import {Plus, Search, X} from 'lucide-react';
 import {
   IntakeAssignmentStatus,
   IntakeLifecycleStatus,
@@ -21,6 +21,7 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
 import {getApiErrorCode} from '@/utils/apiError';
+import {CreateIntakeDialog} from './CreateIntakeDialog';
 
 const PAGE_SIZE = 20;
 
@@ -172,7 +173,7 @@ const TenantIntakesPage: React.FC = () => {
   });
 
   const busy = assign.isPending || reassign.isPending || cancel.isPending || patchIntake.isPending || createIntake.isPending;
-  const mutationError = assign.error || reassign.error || cancel.error || patchIntake.error || createIntake.error;
+  const mutationError = assign.error || reassign.error || cancel.error || patchIntake.error;
   const intakeConflict = getApiErrorCode(patchIntake.error || assign.error || cancel.error) === 'STUDENT_INTAKE_VERSION_CONFLICT';
   const hasIntakeChanges = Boolean(selected && (
     editForm.firstName.trim() !== (selected.firstName ?? '')
@@ -210,16 +211,13 @@ const TenantIntakesPage: React.FC = () => {
       <header className={styles.header}>
         <div><p className={styles.eyebrow}>Tenant admin</p><h1>Student intakes</h1><p className={styles.lede}>Search, correct, assign, reassign, or cancel intake records within the governance boundary.</p></div>
         <div className={styles.headerActions}>
-          <button type="button" className={createOpen ? styles.secondary : styles.primary} onClick={() => setCreateOpen(open => !open)} aria-expanded={createOpen}>{createOpen ? <ChevronUp size={17}/> : <ChevronDown size={17}/>} {createOpen ? 'Close create form' : 'Create student intake'}</button>
+          <button type="button" className={styles.primary} onClick={() => setCreateOpen(true)} aria-haspopup="dialog"><Plus size={17}/> Create student intake</button>
           <Link className={styles.secondaryLink} to="/admin">Back to governance</Link>
         </div>
       </header>
       {mutationError ? <p className={styles.error} role="alert">{advisingErrorMessage(mutationError, 'The operation failed.')}</p> : null}
 
-      {createOpen ? <section className={`${styles.card} ${styles.wideCard}`}>
-        <div className={styles.sectionHeading}><div><h2>Create student intake</h2><p className={styles.muted}>The student activates the account through Forgot password.</p></div><button type="button" className={styles.iconOnly} aria-label="Close create form" onClick={() => setCreateOpen(false)}><X size={18}/></button></div>
-        <form className={`${styles.form} ${styles.formColumns}`} onSubmit={event => { event.preventDefault(); createIntake.mutate(); }}><StudentIntakeFormFields value={createForm} onChange={setCreateForm}/><button className={`${styles.primary} ${styles.fullWidth}`} disabled={createIntake.isPending}>{createIntake.isPending ? 'Creating…' : 'Create intake'}</button></form>
-      </section> : null}
+      {createOpen ? <CreateIntakeDialog value={createForm} onChange={setCreateForm} onClose={() => setCreateOpen(false)} pending={createIntake.isPending} error={createIntake.isError ? advisingErrorMessage(createIntake.error, 'The intake could not be created. Your entries are preserved.') : undefined} onSubmit={event => {event.preventDefault(); createIntake.mutate();}}/> : null}
 
       <form className={styles.intakeFilters} onSubmit={applyFilters}>
         <label className={styles.filterSearch}><span>Search name, email, intake ID, student ID, or advisor</span><div><Search size={17}/><input value={draftFilters.q} onChange={event => setDraftFilters(current => ({...current, q: event.target.value}))} placeholder="Search intakes"/></div></label>

@@ -1,12 +1,12 @@
 // Variables
-:root {
-  --color-primary: t.$action-primary;
-  --color-text-primary: t.$content-primary;
-  --color-text-secondary: t.$content-secondary;
-  --color-text-disabled: t.$content-placeholder;
-  --color-border: t.$border-default;
-  --color-background: t.$surface-raised;
-  --color-background-hover: t.$surface-subtle;
+.settingsPageWrapper {
+  --color-primary: #{t.$action-primary};
+  --color-text-primary: #{t.$content-primary};
+  --color-text-secondary: #{t.$content-secondary};
+  --color-text-disabled: #{t.$content-placeholder};
+  --color-border: #{t.$border-default};
+  --color-background: #{t.$surface-raised};
+  --color-background-hover: #{t.$surface-subtle};
   
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
@@ -119,7 +119,7 @@
 .activeTab {
   color: var(--color-primary);
   border-bottom: var(--border-width) solid var(--color-primary);
-  font-weight: 100;
+  font-weight: t.$fw-semibold;
 }
 
 .tabDivider {
@@ -331,5 +331,9 @@
   margin: 0 0 0.5rem;
 }
 
-.successMessage { color: #166534; background: #f0fdf4; }
-.errorMessage { color: #b91c1c; background: #fef2f2; }
+.successMessage { color: t.$feedback-success; background: t.$feedback-success-surface; }
+.errorMessage { color: t.$feedback-danger; background: t.$feedback-danger-surface; }
+
+.tab { min-height: t.$touch-target; }
+.tab:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+@media (max-width: t.$breakpoint-shell-mobile) { .settingsPageWrapper { padding: t.$workspace-gutter-block t.$workspace-gutter-inline; } .tabsContainer { gap: t.$space-4; flex-wrap: wrap; } .generalSection { padding: t.$space-4; } .generalSubtitle { padding-right: 0; } .saveButton { position: static; align-self: flex-start; margin-bottom: t.$space-4; } }

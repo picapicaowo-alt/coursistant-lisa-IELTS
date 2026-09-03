@@ -17,3 +17,5 @@
 .assignmentDialog::backdrop {
   background: t.$modal-backdrop;
 }
+
+.dialogHeading { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; h2 { margin: 0; } button { display: grid; place-items: center; flex: 0 0 t.$touch-target; min-height: t.$touch-target; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; } }

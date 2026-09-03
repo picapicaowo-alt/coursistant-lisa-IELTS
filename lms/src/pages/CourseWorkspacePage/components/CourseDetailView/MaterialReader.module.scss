@@ -1,5 +1,6 @@
 .reader {
   min-width: 0;
+  width: 100%;
   padding: 1rem clamp(1rem, 2vw, 2rem) 2rem;
 }
 .reader > header {
@@ -132,3 +133,10 @@
     padding-inline: 1rem;
   }
 }
+
+.layout { position: relative; }
+.assistant { position: fixed; z-index: 3; right: clamp(1rem, 2vw, 2rem); bottom: t.$space-6; width: clamp(20rem, 29vw, 28rem); height: min(37.5rem, 70dvh); display: flex; flex-direction: column; min-width: 0; border: 1px solid t.$action-secondary; border-radius: t.$radius-lg; background: t.$surface-raised; box-shadow: t.$shadow-popover; padding: t.$space-3; }
+.assistant > header { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; }
+.assistant h2 { margin: 0; font-size: t.$font-size-subhead; }
+.assistant > header button { display: grid; place-items: center; width: t.$touch-target; min-height: t.$touch-target; }
+@media (max-width: t.$breakpoint-shell-mobile) { .assistant { position: fixed; inset: auto t.$space-3 t.$space-3; width: auto; height: min(36rem, 85dvh); } }

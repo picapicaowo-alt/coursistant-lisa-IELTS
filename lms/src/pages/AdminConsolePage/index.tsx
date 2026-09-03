@@ -87,11 +87,28 @@ const ManagedUserRow = ({
     String(account.tenantId),
   );
   const [confirmMove, setConfirmMove] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const detail = useQuery({
+    queryKey: ['admin', 'user-detail', systemScope, account.id],
+    queryFn: async () => unwrapData(await (systemScope ? adminApiService.getUser(account.id) : adminApiService.getTenantUser(account.id)), 'userDetail'),
+    enabled: detailsOpen,
+    retry: false,
+  });
   const immutableTenantIdentity =
     !systemScope && (account.level === "STUDENT" || account.level === "PARENT");
 
   return (
     <article className={styles.listRow}>
+      <details className={styles.identityDetails} onToggle={event => setDetailsOpen(event.currentTarget.open)}>
+        <summary>Account details</summary>
+        {detail.isPending ? <p role="status">Loading account details…</p> : detail.isError ? <p role="alert">Account details could not be loaded. <button type="button" onClick={() => void detail.refetch()}>Retry</button></p> : detail.data ? <dl>
+          <div><dt>Name</dt><dd>{formatPersonName(detail.data, detail.data.name || detail.data.email)}</dd></div>
+          <div><dt>Email</dt><dd>{detail.data.email}</dd></div>
+          <div><dt>Tenant</dt><dd>{detail.data.tenantId}</dd></div>
+          <div><dt>Account</dt><dd>{detail.data.role} · {detail.data.level}</dd></div>
+          <div><dt>Status</dt><dd>{detail.data.status}</dd></div>
+        </dl> : null}
+      </details>
       <div className={styles.rowIdentity}>
         <strong>
           {formatPersonName(account, account.name || account.email)}

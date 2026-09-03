@@ -1,3 +1,4 @@
+@use '../../styles/workspace' as workspace;
 .summary {
   display: flex;
   align-items: center;
@@ -46,7 +47,8 @@
 }
 .skills {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  > * { @include workspace.region(3, 6); }
   gap: 1rem;
 }
 .skills article {
@@ -185,6 +187,8 @@
   }
 }
 @media (max-width: 650px) {
+  .summary {gap:t.$space-3; margin-top:t.$space-4;}
+  .summary dd {font-size:t.$fs-caption; overflow-wrap:anywhere;}
   .insights {
     grid-template-columns: 1fr;
   }
@@ -194,6 +198,9 @@
   }
   .summary dl {
     flex-basis: 100%;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    min-width:0;
+    gap:t.$space-3;
     border-left: 0;
     padding-left: 0;
     border-top: 1px solid rgba(t.$white, 0.4);
@@ -201,6 +208,7 @@
   }
   .skills {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    > * {grid-column:span 1;}
   }
 }
 
@@ -221,7 +229,8 @@
 }
 .assessmentCards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  > * { @include workspace.region(4, 6); }
   gap: t.$space-4;
 }
 .assessmentCards article {

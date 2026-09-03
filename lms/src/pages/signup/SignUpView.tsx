@@ -1,5 +1,5 @@
 import {AuthShell, AuthHeading} from '@/components/AuthShell';
-import {FormEvent, useEffect, useState} from 'react';
+import {FormEvent, useEffect, useRef, useState} from 'react';
 import {Eye, EyeOff} from 'lucide-react';
 import {Link, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
@@ -10,13 +10,17 @@ import {useAuth} from '@/contexts/AuthContext';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {getApiErrorCode, isTransportOrServerFailure} from '@/utils/apiError';
 import {isValidPassword} from '@/utils/passwordRules';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import styles from './SignUpView.module.scss';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const VERIFICATION_CODE_PATTERN = /^\d{6}$/;
 
-type SignupField = 'firstName' | 'middleName' | 'lastName' | 'tenantId' | 'email' | 'password' | 'verificationCode';
+type SignupField = 'firstName' | 'middleName' | 'lastName' | 'tenantId' | 'email' | 'password' | 'confirmPassword' | 'verificationCode';
 type SignupFieldErrors = Partial<Record<SignupField, string>>;
+const SIGNUP_STEPS = ['account', 'profile', 'verify'] as const;
+type SignupStep = typeof SIGNUP_STEPS[number];
+const STEP_FIELDS: Record<SignupStep, SignupField[]> = {account: ['email', 'tenantId'], profile: ['firstName', 'middleName', 'lastName', 'password', 'confirmPassword'], verify: ['verificationCode']};
 
 const formatCountdown = (seconds: number) => {
   const minutes = Math.floor(seconds / 60);
@@ -30,12 +34,17 @@ export default function SignUpView() {
   const {t} = useTranslation('auth');
   const idempotency = useIdempotencyCheckpoint();
 
+  const [step, setStep] = useState<SignupStep>('account');
+  const form = useRef<HTMLFormElement>(null);
+  useEffect(() => {form.current?.querySelector('input')?.focus();}, [step]);
+
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
   const [tenantId, setTenantId] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [countdown, setCountdown] = useState(0);
@@ -74,6 +83,7 @@ export default function SignUpView() {
     else if (!EMAIL_PATTERN.test(email.trim())) errors.email = t('signupErrors.emailInvalid');
     if (!password) errors.password = t('signupErrors.passwordRequired');
     else if (!isValidPassword(password)) errors.password = t('signupErrors.passwordFormat');
+    if (!confirmPassword || confirmPassword !== password) errors.confirmPassword = t('signupErrors.passwordMismatch');
     if (!verificationCode.trim()) errors.verificationCode = t('signupErrors.verificationRequired');
     else if (!VERIFICATION_CODE_PATTERN.test(verificationCode.trim())) {
       errors.verificationCode = t('signupErrors.verificationCodeFormat');
@@ -115,10 +125,12 @@ export default function SignUpView() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const errors = validate();
+    const allErrors = validate();
+    const errors = step === 'verify' ? allErrors : Object.fromEntries(Object.entries(allErrors).filter(([field]) => STEP_FIELDS[step].includes(field as SignupField)));
     setFieldErrors(errors);
     setFormError('');
     if (Object.keys(errors).length > 0) return;
+    if (step !== 'verify') {setStep(step === 'account' ? 'profile' : 'verify'); return;}
 
     setIsSubmitting(true);
     const request = {
@@ -150,6 +162,7 @@ export default function SignUpView() {
     } catch (error) {
       const code = getApiErrorCode(error);
       if (code === AUTH_ERROR_CODES.invalidPasswordFormat) {
+        setStep('profile');
         setFieldErrors({password: t('signupErrors.passwordFormat')});
       } else if (code === AUTH_ERROR_CODES.invalidVerificationCode) {
         setFieldErrors({verificationCode: t('signupErrors.verificationFailed')});
@@ -175,7 +188,36 @@ export default function SignUpView() {
   return (
     <AuthShell>
       <AuthHeading title={t('signup.title')} subtitle={t('signup.subtitle')}/>
-          <form className={styles.form} onSubmit={handleSubmit} noValidate>
+          <ol className={styles.steps} aria-label={t('signup.registrationProgress')}>{SIGNUP_STEPS.map((item, index) => <li key={item} aria-current={step === item ? 'step' : undefined} data-complete={index < SIGNUP_STEPS.indexOf(step)}><span>{index + 1}</span>{t(`signup.steps.${item}`)}</li>)}</ol>
+          <form ref={form} className={styles.form} onSubmit={handleSubmit} noValidate>
+            {step === 'account' ? <>
+            <div className={styles.field}>
+              <label htmlFor="signup-email">{t('signup.emailLabel')}</label>
+              <input
+                id="signup-email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                value={email}
+                onChange={event => {
+                  setEmail(event.target.value);
+                  setNotice('');
+                  clearFieldError('email');
+                }}
+                placeholder={t('signup.emailPlaceholder')}
+                aria-invalid={Boolean(fieldErrors.email)}
+                aria-describedby={fieldErrors.email ? 'signup-email-error' : undefined}
+                className={fieldErrors.email ? styles.inputError : undefined}
+              />
+              {fieldErrors.email ? <p id="signup-email-error" className={styles.fieldError}>{fieldErrors.email}</p> : null}
+            </div>
+
+              <div className={styles.field}>
+                <label htmlFor="signup-tenant-id">{t('signup.tenantIdLabel')}</label>
+                <input id="signup-tenant-id" type="number" inputMode="numeric" min="1" value={tenantId} onChange={event => { setTenantId(event.target.value); clearFieldError('tenantId'); }} placeholder={t('signup.tenantIdPlaceholder')} aria-invalid={Boolean(fieldErrors.tenantId)} aria-describedby={fieldErrors.tenantId ? 'signup-tenant-id-error' : undefined} className={fieldErrors.tenantId ? styles.inputError : undefined}/>
+                {fieldErrors.tenantId ? <p id="signup-tenant-id-error" className={styles.fieldError}>{fieldErrors.tenantId}</p> : null}
+              </div>
+            </> : step === 'profile' ? <>
             <div className={styles.fieldRow}>
               <div className={styles.field}>
                 <label htmlFor="signup-first-name">{t('signup.firstNameLabel')}</label>
@@ -207,32 +249,7 @@ export default function SignUpView() {
                 <label htmlFor="signup-middle-name">{t('signup.middleNameLabel')}</label>
                 <input id="signup-middle-name" type="text" autoComplete="additional-name" value={middleName} onChange={event => setMiddleName(event.target.value)} placeholder={t('signup.middleNamePlaceholder')}/>
               </div>
-              <div className={styles.field}>
-                <label htmlFor="signup-tenant-id">{t('signup.tenantIdLabel')}</label>
-                <input id="signup-tenant-id" type="number" inputMode="numeric" min="1" value={tenantId} onChange={event => { setTenantId(event.target.value); clearFieldError('tenantId'); }} placeholder={t('signup.tenantIdPlaceholder')} aria-invalid={Boolean(fieldErrors.tenantId)} aria-describedby={fieldErrors.tenantId ? 'signup-tenant-id-error' : undefined} className={fieldErrors.tenantId ? styles.inputError : undefined}/>
-                {fieldErrors.tenantId ? <p id="signup-tenant-id-error" className={styles.fieldError}>{fieldErrors.tenantId}</p> : null}
-              </div>
-            </div>
 
-            <div className={styles.field}>
-              <label htmlFor="signup-email">{t('signup.emailLabel')}</label>
-              <input
-                id="signup-email"
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                value={email}
-                onChange={event => {
-                  setEmail(event.target.value);
-                  setNotice('');
-                  clearFieldError('email');
-                }}
-                placeholder={t('signup.emailPlaceholder')}
-                aria-invalid={Boolean(fieldErrors.email)}
-                aria-describedby={fieldErrors.email ? 'signup-email-error' : undefined}
-                className={fieldErrors.email ? styles.inputError : undefined}
-              />
-              {fieldErrors.email ? <p id="signup-email-error" className={styles.fieldError}>{fieldErrors.email}</p> : null}
             </div>
 
             <div className={styles.field}>
@@ -267,6 +284,13 @@ export default function SignUpView() {
             </div>
 
             <div className={styles.field}>
+              <label htmlFor="signup-confirm-password">{t('signup.confirmPasswordLabel')}</label>
+              <input id="signup-confirm-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={confirmPassword} onChange={event => {setConfirmPassword(event.target.value); clearFieldError('confirmPassword');}} aria-invalid={Boolean(fieldErrors.confirmPassword)} aria-describedby={fieldErrors.confirmPassword ? 'signup-confirm-password-help' : undefined}/>
+              {fieldErrors.confirmPassword ? <p id="signup-confirm-password-help" className={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
+            </div>
+            </> : <>
+              <p className={styles.helpText}>{t('signup.sentTo', {email})}</p>
+            <div className={styles.field}>
               <label htmlFor="signup-verification">{t('signup.verificationLabel')}</label>
               <div className={styles.verificationField}>
                 <input
@@ -297,6 +321,8 @@ export default function SignUpView() {
               {fieldErrors.verificationCode ? <p id="signup-verification-error" className={styles.fieldError}>{fieldErrors.verificationCode}</p> : null}
             </div>
 
+            </>}
+
             <div className={styles.messageArea} aria-live="polite">
               {notice ? <p className={styles.notice}>{notice}</p> : null}
               {formError ? <p role="alert" className={styles.formError}>{formError}</p> : null}
@@ -307,13 +333,14 @@ export default function SignUpView() {
               disabled={isSubmitting || isSendingCode}
               className={styles.submitButton}
             >
-              {isSubmitting ? t('signup.creatingAccount') : t('signup.continueButton')}
+              {isSubmitting ? t('signup.creatingAccount') : t(step === 'verify' ? 'signup.activateButton' : 'signup.continueButton')}
             </button>
+            {step !== 'account' ? <button type="button" className={styles.backButton} disabled={isSubmitting || isSendingCode} onClick={() => {setStep(step === 'verify' ? 'profile' : 'account'); setFormError('');}}>{t('signup.backButton')}</button> : null}
           </form>
 
           <p className={styles.signinPrompt}>
             {t('signup.alreadyRegistered')}{' '}
-            <Link to="/login">
+            <Link to={APP_ROUTE_PATHS.login}>
               {t('signup.signinLink')}
             </Link>
           </p>

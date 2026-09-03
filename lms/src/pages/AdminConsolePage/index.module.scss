@@ -6,7 +6,7 @@
 .tabs { display: flex; max-width: t.$workspace-max-width; margin: 0 auto 1rem; gap: .35rem; padding: .35rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
 .tabs button { min-height: 2.5rem; padding: 0 1rem; border-radius: t.$radius-control-sm; color: t.$text-muted; font-weight: t.$fw-semibold; cursor: pointer; }
 .tabs .activeTab { background: t.$brand; color: t.$content-on-color; }
-.contentGrid { display: grid; max-width: t.$workspace-max-width; margin: 0 auto; grid-template-columns: minmax(18rem, 25rem) minmax(0, 1fr); gap: 1.25rem; align-items: start; }
+.contentGrid { display: grid; max-width: t.$workspace-max-width; margin: 0 auto; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 1.25rem; align-items: start; }
 .card { padding: 1.35rem; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; box-shadow: t.$shadow-card; }
 .card h2 { font-size: t.$fs-card-title; font-weight: t.$fw-bold; }
 .cardHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
@@ -69,3 +69,16 @@
 
 @media (max-width: 900px) { .contentGrid, .operationsGrid { grid-template-columns: 1fr; } }
 @media (max-width: 600px) { .page { padding-top: 1rem; } .listRow, .courseMemberRow { flex-direction: column; } .details, .details[open], .roleChangeReview { width: 100%; max-width: none; } .tabs { flex-wrap: wrap; } .tabs button { flex: 1 1 8.5rem; } .memberSearch { grid-template-columns: 1fr; } .memberActions { width: 100%; } .memberActions button { width: 100%; } }
+.identityDetails { grid-column: 1 / -1; order: 2; width: 100%; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.identityDetails summary { width: fit-content; color: t.$action-primary; cursor: pointer; }
+.identityDetails dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-3; margin: t.$space-3 0 0; }
+.identityDetails dl > div { display: grid; gap: t.$space-1; }
+.identityDetails dd { margin: 0; color: t.$content-primary; overflow-wrap: anywhere; }
+@media (max-width: 700px) { .identityDetails dl { grid-template-columns: minmax(0, 1fr); } }
+
+.adminDirectoryWorkspace {display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:t.$space-5; margin-top:t.$space-4;}
+.adminDirectoryWorkspace > * {min-width:0;}
+.adminDirectoryList {display:flex; flex-direction:column; gap:t.$space-2;}
+.adminDirectoryList button {min-height:t.$touch-target; padding:t.$space-3; border:1px solid t.$border-default; border-radius:t.$radius-control; background:t.$surface-raised; text-align:left; overflow-wrap:anywhere; cursor:pointer;}
+.adminDirectoryList button[aria-pressed='true'] {background:t.$surface-brand-subtle; border-color:t.$action-primary; color:t.$action-primary;}
+@media(max-width:t.$breakpoint-shell-mobile) {.adminDirectoryWorkspace {grid-template-columns:1fr;}}

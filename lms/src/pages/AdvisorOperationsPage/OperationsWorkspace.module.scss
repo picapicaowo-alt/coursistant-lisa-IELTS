@@ -1,0 +1,4 @@
+@use '../../styles/workspace' as workspace;
+.grid { @include workspace.grid; }
+.primary { @include workspace.region(8, 7); }
+.secondary { @include workspace.region(4, 5); }

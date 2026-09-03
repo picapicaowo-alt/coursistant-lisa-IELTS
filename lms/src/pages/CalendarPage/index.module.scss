@@ -58,7 +58,7 @@
 .eventDialog h2 {font-size:t.$font-size-subhead; font-weight:t.$fw-semibold;}
 .eventDialog fieldset {border:0; padding:0; display:grid; gap:1rem;}
 .eventDialog label {display:grid; gap:.4rem; font-size:t.$font-size-body;}
-.eventDialog input {min-width:0; width:100%; min-height:2.5rem; padding:.55rem .75rem; border:1px solid t.$border; border-radius:t.$radius-control; font:inherit;}
+.eventDialog input {min-width:0; width:100%; min-height:2.5rem; border:1px solid t.$border; border-radius:t.$radius-control; font:inherit;}
 .dateFields {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem;}
 .eventDialog footer {display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:.5rem; margin-top:1.5rem;}
 .eventDialog button {min-height:2.5rem; padding:.5rem .75rem; border-radius:t.$radius-control; cursor:pointer;}
@@ -71,3 +71,16 @@
 .page :is(button,select,a,input):focus-visible, .eventDialog :is(button,input,a):focus-visible {outline:2px solid t.$brand; outline-offset:2px;}
 @media (max-width:1100px) {.calendarShell {grid-template-columns:minmax(0,1fr);} .eventRail {border-left:0; border-top:1px solid t.$border; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem;} .eventRail > :is(h2,p,fieldset) {grid-column:1/-1;} .railItem {margin:0;}}
 @media (max-width:700px) {.weekTimeGrid,.monthGrid {display:none;} .mobileAgenda {display:grid; padding:1rem; gap:1.25rem;} .mobileAgenda h3 {font-size:t.$font-size-body; margin:0 0 .5rem;} .mobileAgenda article > p {color:t.$text-muted; font-size:t.$fs-caption;} .mobileAgenda .calendarItem {margin-bottom:.4rem;} .eventRail {border-left:0; border-top:1px solid t.$border;} .categoryTabs {gap:.35rem;} .categoryTabs button {font-size:t.$font-size-body; padding:.5rem .7rem;} .toolbar {align-items:stretch;} .navigation {justify-content:space-between; flex:1;} .dateFields {grid-template-columns:minmax(0,1fr);} .page {padding-inline:1rem;} }
+
+.timeDay[aria-current='date'] strong { border-radius: t.$radius-pill; background: t.$action-primary; color: t.$content-on-color; }
+.currentTime { position: absolute; z-index: 2; left: 0; right: 0; border-top: 2px solid t.$action-primary; pointer-events: none; &::before { content: ''; position: absolute; left: 0; top: -.3rem; width: .5rem; height: .5rem; border-radius: 50%; background: t.$action-primary; } }
+
+.eventDialog {--event-anchor-enabled:1;}
+.eventDialog[data-anchored] {position:fixed; inset:auto; margin:0; left:var(--event-left); top:var(--event-top); width:min(26rem,calc(100vw - 2rem)); box-shadow:t.$shadow-popover;}
+.eventDialog[data-anchored]::backdrop {background:transparent;}
+@media(max-width:t.$breakpoint-shell-mobile) {.eventDialog {--event-anchor-enabled:0;}}
+
+.eventDialog label > input {padding:.55rem .75rem;}
+.eventDialog[data-anchored] .dateFields {grid-template-columns:1fr;}
+
+.eventDialog input {padding-block:.55rem; padding-left:.75rem;}

@@ -1,6 +1,8 @@
 import {ASSIGNMENT_GRADING_ROUTE} from './coursePaths';
 import {VOCABULARY_ROUTE_PATTERNS} from '@/pages/vocabulary/routes';
 
+export const STUDENT_PLAN_VIEWS = {overview: 'overview', tasks: 'tasks', learning: 'learning', messages: 'messages'} as const;
+
 export const STUDY_PLAN_QUERY_PARAMS = {checkpoint: 'checkpoint', task: 'task'} as const;
 
 /** The same paths register the router and validate backend-provided navigation. */
@@ -49,6 +51,9 @@ export const APP_ROUTE_PATHS = {
   counsellorIntakesIntakeIdAssign: '/counsellor/intakes/:intakeId/assign',
   advisorStudents: '/advisor/students',
   advisorOperations: '/advisor/operations',
+  advisorTasks: '/advisor/tasks',
+  advisorCourses: '/advisor/courses',
+  advisorSchedule: '/advisor/schedule',
   advisorMessages: '/advisor/messages',
   advisorStudentsStudentUserId: '/advisor/students/:studentUserId',
   advisorStudentsStudentUserIdIntake: '/advisor/students/:studentUserId/intake',
@@ -66,3 +71,5 @@ export const APP_ROUTE_PATHS = {
 } as const;
 
 export const REGISTERED_ROUTE_PATTERNS = [...Object.values(APP_ROUTE_PATHS), ASSIGNMENT_GRADING_ROUTE, ...Object.values(VOCABULARY_ROUTE_PATTERNS)];
+
+export const STUDENT_LEARNING_PATH = `${APP_ROUTE_PATHS.myPlan}?view=${STUDENT_PLAN_VIEWS.learning}`;

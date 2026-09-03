@@ -83,6 +83,7 @@ for (const width of [1440, 390]) {
     const tones = await Promise.all(courses.map(course => page.getByRole('article', {name: course.title}).evaluate(element => getComputedStyle(element).backgroundColor)));
     expect(new Set(tones)).toEqual(new Set(['rgb(255, 255, 255)']));
     await page.screenshot({path: testInfo.outputPath(`course-cards-${width}.png`), fullPage: true});
+    await page.locator('article').filter({has: page.getByRole('heading', {name: courses[1].title})}).getByText('Manage enrollment', {exact: true}).click();
     await page.getByRole('button', {name: 'Edit schedule'}).click();
     await expect(sectionTrigger(page, 'Update a one-to-one course').locator('..')).toHaveAttribute('open', '');
     await sectionTrigger(page, 'Update a one-to-one course').click();
@@ -120,9 +121,9 @@ for (const width of [1440, 390]) {
 test('intake keeps primary fields visible with native form validation', async ({page}) => {
   await installFixture(page, 'COUNSELLOR');
   await page.goto('/counsellor/intakes/new');
-  await expect(page.getByRole('region', {name: 'Student identity', exact: true})).toBeVisible();
+  await expect(page.getByRole('group', {name: 'Student identity', exact: true})).toBeVisible();
   await expect(page.locator('details[open]')).toHaveCount(0);
   await page.getByRole('button', {name: 'Create intake', exact: true}).click();
   await expect(page.getByLabel('First name *')).toBeFocused();
-  await expect(page.getByRole('region', {name: 'Learning context', exact: true})).toBeVisible();
+  await expect(page.getByRole('group', {name: 'Learning context', exact: true})).toBeVisible();
 });

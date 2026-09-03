@@ -108,7 +108,6 @@ const Sidebar: React.FC = () => {
     addItem({to: APP_ROUTE_PATHS.aibot, label: 'AI ChatBot', asset: '/icons/figma-dashboard/ai-chat.svg', active: pathname.startsWith('/aibot')});
     addItem({to: APP_ROUTE_PATHS.calendar, label: 'Calendar', asset: '/icons/figma-dashboard/calendar.svg', active: pathname.startsWith('/calendar')});
     addItem({to: VOCABULARY_PATHS.root, label: 'Vocabulary', icon: BookMarked, active: pathname.startsWith(VOCABULARY_PATHS.root)});
-    addItem({to: APP_ROUTE_PATHS.myOperations, label: 'Learning overview', icon: ChartNoAxesCombined, active: pathname === APP_ROUTE_PATHS.myOperations});
   }
   if (!student && counsellor) {
     addItem({to: APP_ROUTE_PATHS.counsellor, label: 'Dashboard', icon: LayoutDashboard, active: pathname === '/counsellor'});
@@ -118,6 +117,9 @@ const Sidebar: React.FC = () => {
     addItem({to: APP_ROUTE_PATHS.advisorOperations, label: advisorOnly ? 'Dashboard' : 'Advisor dashboard', icon: LayoutDashboard, active: pathname === APP_ROUTE_PATHS.advisorOperations});
     addItem({to: APP_ROUTE_PATHS.advisorStudents, label: 'Students', icon: UsersRound, active: pathname.startsWith('/advisor/students')});
     addItem({to: APP_ROUTE_PATHS.advisorMessages, label: 'Messages', icon: MessageSquare, active: pathname === APP_ROUTE_PATHS.advisorMessages});
+    addItem({to: APP_ROUTE_PATHS.advisorCourses, label: 'Course management', icon: BookOpen, active: pathname === APP_ROUTE_PATHS.advisorCourses || pathname.startsWith('/advisor/courses/')});
+    addItem({to: APP_ROUTE_PATHS.advisorTasks, label: 'Action tasks', icon: ClipboardList, active: pathname === APP_ROUTE_PATHS.advisorTasks});
+    addItem({to: APP_ROUTE_PATHS.advisorSchedule, label: 'Scheduling', icon: CalendarDays, active: pathname === APP_ROUTE_PATHS.advisorSchedule});
   }
   if (!student && instructor) {
     addItem({to: APP_ROUTE_PATHS.myOperations, label: 'Teaching operations', icon: ClipboardList, active: pathname === '/my-operations'});

@@ -1,14 +1,13 @@
-import {useEffect, useState} from 'react';
+import {lazy, Suspense, useEffect, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {Link} from 'react-router-dom';
 import type {CourseMaterial, CourseWeek} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
 import {assertFileBlob, saveBlob} from '@/utils/downloadBlob';
 import {getApiErrorMessage} from '@/utils/apiError';
-import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import styles from './MaterialReader.module.scss';
 
 import {embeddedVideoUrl} from './materialVideo';
+const CourseAssistant = lazy(() => import('@/components/ChatContent'));
 const safeLink = (value: string | null) => {
   try {
     const url = new URL(value ?? '');
@@ -128,6 +127,9 @@ export function MaterialReader({
   onClose: () => void;
   onDiscussion: () => void;
 }) {
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const assistantButton = useRef<HTMLButtonElement>(null);
+  const closeAssistant = () => {setAssistantOpen(false); assistantButton.current?.focus();};
   const materials = weeks.flatMap((week) => week.materials);
   const index = materials.findIndex((item) => item.id === materialId);
   const material = materials[index];
@@ -224,11 +226,12 @@ export function MaterialReader({
             <button type="button" onClick={onDiscussion}>
               Discussion
             </button>
-            <Link to={`${APP_ROUTE_PATHS.aibot}?courseId=${courseId}`}>
-              AI Course
-            </Link>
+            <button ref={assistantButton} type="button" aria-expanded={assistantOpen} aria-controls="course-assistant" onClick={() => setAssistantOpen(open => !open)}>AI Course</button>
           </footer>
         </div>
+        {assistantOpen ? <section id="course-assistant" className={styles.assistant} aria-label="Course AI assistant" onKeyDown={event => {if (event.key === 'Escape') closeAssistant();}}>
+          <Suspense fallback={<p role="status">Loading course assistant…</p>}><CourseAssistant isIntroTop={false} isDashboard={false} isWorkspace isCompact onClose={closeAssistant} courseId={courseId}/></Suspense>
+        </section> : null}
       </div>
     </section>
   );

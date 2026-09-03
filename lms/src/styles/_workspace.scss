@@ -1,0 +1,19 @@
+@use './tokens' as t;
+
+// Shared desktop composition; regions retain their hierarchy as the canvas narrows.
+@mixin grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: t.$workspace-section-gap;
+  width: 100%;
+  min-width: 0;
+  align-items: start;
+  > * { min-width: 0; }
+}
+
+@mixin region($desktop: 6, $tablet: 6) {
+  grid-column: span $desktop;
+  min-width: 0;
+  @media (max-width: t.$breakpoint-dashboard-single) { grid-column: span $tablet; }
+  @media (max-width: t.$breakpoint-shell-mobile) { grid-column: 1 / -1; }
+}

@@ -1,0 +1,108 @@
+[
+  {
+    "state": "student-plan",
+    "nodes": [
+      "100:456",
+      "445:3397"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/my-plan",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-plan",
+    "nodes": [
+      "100:456",
+      "445:3397"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/my-plan",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-advisor-tasks",
+    "nodes": [
+      "148:642"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/my-plan?view=tasks",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-advisor-tasks",
+    "nodes": [
+      "148:642"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/my-plan?view=tasks",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-checkpoint",
+    "nodes": [
+      "445:3823"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/my-plan?checkpoint=91",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-checkpoint",
+    "nodes": [
+      "445:3823"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/my-plan?checkpoint=91",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-task-detail",
+    "nodes": [
+      "464:3172"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/my-plan?checkpoint=91&task=101",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-task-detail",
+    "nodes": [
+      "464:3172"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/my-plan?checkpoint=91&task=101",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

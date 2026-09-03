@@ -29,5 +29,5 @@
 .inlineError { display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: t.$danger; }
 .inlineError button { min-height: 2.5rem; padding: 0 .8rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$card-bg; cursor: pointer; }
 .error { color: t.$danger; }
-.backLink:focus-visible, button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
+.backLink:focus-visible, .page button:focus-visible, .page a:focus-visible, .page input:focus-visible, .page select:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
 @media (max-width: 700px) { .page { padding-top: 1rem; } .header { flex-wrap: wrap; } .header .primaryButton { width: 100%; } .card { padding: 1rem; } .formGrid { grid-template-columns: 1fr; } .full { grid-column: auto; } .footer .primaryButton { width: 100%; } .groupSetList a { flex-wrap: wrap; } .groupState { width: calc(100% - 3.45rem); margin-left: 3.45rem; } }

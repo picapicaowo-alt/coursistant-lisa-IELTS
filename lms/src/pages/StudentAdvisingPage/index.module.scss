@@ -1,0 +1,21 @@
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-2;
+  margin-bottom: t.$space-6;
+  border-bottom: 1px solid t.$border-default;
+}
+.tabs button {
+  min-height: t.$touch-target;
+  padding: t.$space-3 t.$space-4;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: t.$content-secondary;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+.tabs button[aria-pressed='true'] { border-bottom-color: t.$action-primary; color: t.$action-primary; }
+.tabs button:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }

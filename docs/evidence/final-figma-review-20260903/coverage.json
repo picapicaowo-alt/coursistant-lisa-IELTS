@@ -1,0 +1,1435 @@
+[
+  {
+    "id": "17:914",
+    "name": "Dashborad/student",
+    "section": "dashborad",
+    "status": "parent-dashboard-scope",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": []
+  },
+  {
+    "id": "108:882",
+    "name": "Dashborad/student",
+    "section": "dashborad",
+    "status": "parent-dashboard-scope",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": []
+  },
+  {
+    "id": "466:3289",
+    "name": "Dashborad/student",
+    "section": "dashborad",
+    "status": "parent-dashboard-scope",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": []
+  },
+  {
+    "id": "82:357",
+    "name": "My courses/student",
+    "section": "dashborad",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-courses",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-courses-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-courses",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-courses-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "414:3326",
+    "name": "Study plan/student",
+    "section": "dashborad",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-course-outline",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-course-outline-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-course-outline",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-course-outline-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "498:4121",
+    "name": "Study plan/student",
+    "section": "dashborad",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-course-reader",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-course-reader-1440.png",
+        "note": "LINK material fixture; video-specific rendering is not established by this capture."
+      },
+      {
+        "state": "student-course-reader",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-course-reader-390.png",
+        "note": "LINK material fixture; video-specific rendering is not established by this capture."
+      }
+    ]
+  },
+  {
+    "id": "507:3365",
+    "name": "Study plan/student",
+    "section": "dashborad",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-course-ai",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-course-ai-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-course-ai",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-course-ai-390.png",
+        "note": ""
+      },
+      {
+        "state": "student-course-ai-response",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-course-ai-response-1440.png",
+        "note": "Synthetic response exercises the compact sidecar request path; populated response is supplemental, not the exact empty Figma state."
+      },
+      {
+        "state": "student-course-ai-response",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-course-ai-response-390.png",
+        "note": "Synthetic response exercises the compact sidecar request path; populated response is supplemental, not the exact empty Figma state."
+      }
+    ]
+  },
+  {
+    "id": "494:3386",
+    "name": "Study plan/student",
+    "section": "dashborad",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-course-assignments",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-course-assignments-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-course-assignments",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-course-assignments-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "496:3494",
+    "name": "Study plan/student",
+    "section": "dashborad",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-course-discussion",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-course-discussion-1440.png",
+        "note": "Empty discussion fixture; populated thread identity projection remains generic."
+      },
+      {
+        "state": "student-course-discussion",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-course-discussion-390.png",
+        "note": "Empty discussion fixture; populated thread identity projection remains generic."
+      }
+    ]
+  },
+  {
+    "id": "506:3609",
+    "name": "Study plan/student",
+    "section": "dashborad",
+    "status": "contract-boundary-not-captured",
+    "parityAccepted": false,
+    "reason": "Course notes are absent; no consumed course-note persistence operation was established. Announcements are a different resource.",
+    "evidence": []
+  },
+  {
+    "id": "493:3350",
+    "name": "Study plan/student",
+    "section": "dashborad",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-course-outline",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-course-outline-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-course-outline",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-course-outline-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "772:3458",
+    "name": "Dashborad/Advisor",
+    "section": "Advisor",
+    "status": "parent-dashboard-scope",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": []
+  },
+  {
+    "id": "792:11208",
+    "name": "Dashborad/Advisor",
+    "section": "Advisor",
+    "status": "parent-dashboard-scope",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": []
+  },
+  {
+    "id": "783:8276",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-students",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-students-1440.png",
+        "note": ""
+      },
+      {
+        "state": "advisor-students",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-students-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "810:15612",
+    "name": "messages/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-messages",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-messages-1440.png",
+        "note": ""
+      },
+      {
+        "state": "advisor-messages",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-messages-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "813:4672",
+    "name": "messages/Advisor",
+    "section": "Advisor",
+    "status": "contract-boundary-not-captured",
+    "parityAccepted": false,
+    "reason": "Advisor parent-message directory/thread is not implemented; current advising conversation operations are student scoped. A parent-recipient channel contract was not established.",
+    "evidence": []
+  },
+  {
+    "id": "791:10510",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-students-selected",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-students-selected-1440.png",
+        "note": "Selection checkboxes are present; no matching bulk mutation contract is established."
+      },
+      {
+        "state": "advisor-students-selected",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-students-selected-390.png",
+        "note": "Selection checkboxes are present; no matching bulk mutation contract is established."
+      }
+    ]
+  },
+  {
+    "id": "803:13456",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-student-journey",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-student-journey-1440.png",
+        "note": ""
+      },
+      {
+        "state": "advisor-student-journey",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-student-journey-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "813:4892",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-checkpoint-dialog",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-checkpoint-dialog-1440.png",
+        "note": ""
+      },
+      {
+        "state": "advisor-checkpoint-dialog",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-checkpoint-dialog-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "805:14271",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-student-courses",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-student-courses-1440.png",
+        "note": ""
+      },
+      {
+        "state": "advisor-student-courses",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-student-courses-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "818:7178",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-course-information",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-course-information-1440.png",
+        "note": "Information projection; Figma learning-material access remains a contract dependency."
+      },
+      {
+        "state": "advisor-course-information",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-course-information-390.png",
+        "note": "Information projection; Figma learning-material access remains a contract dependency."
+      }
+    ]
+  },
+  {
+    "id": "818:7815",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-course-schedule",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-course-schedule-1440.png",
+        "note": "Schedule projection; not a captured assignment tab."
+      },
+      {
+        "state": "advisor-course-schedule",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-course-schedule-390.png",
+        "note": "Schedule projection; not a captured assignment tab."
+      }
+    ]
+  },
+  {
+    "id": "815:5643",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-add-course",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-add-course-1440.png",
+        "note": ""
+      },
+      {
+        "state": "advisor-add-course",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-add-course-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "810:15017",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-exams",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-exams-1440.png",
+        "note": ""
+      },
+      {
+        "state": "advisor-exams",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-exams-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "816:6276",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-assign-exam",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-assign-exam-1440.png",
+        "note": "Assignment dialog is captured; Figma scheduling has no matching contract."
+      },
+      {
+        "state": "advisor-assign-exam",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-assign-exam-390.png",
+        "note": "Assignment dialog is captured; Figma scheduling has no matching contract."
+      }
+    ]
+  },
+  {
+    "id": "818:8771",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "advisor-exam-results",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/advisor-exam-results-1440.png",
+        "note": ""
+      },
+      {
+        "state": "advisor-exam-results",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/advisor-exam-results-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "819:9475",
+    "name": "student/Advisor",
+    "section": "Advisor",
+    "status": "contract-boundary-not-captured",
+    "parityAccepted": false,
+    "reason": "Advisor observer question-level read/edit is not supplied by the consumed observer projection (B09).",
+    "evidence": []
+  },
+  {
+    "id": "100:456",
+    "name": "Study plan/student",
+    "section": "Ungrouped",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-plan",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-plan-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-plan",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-plan-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "148:642",
+    "name": "Study plan/student",
+    "section": "Ungrouped",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-advisor-tasks",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-advisor-tasks-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-advisor-tasks",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-advisor-tasks-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "378:1714",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "profile-menu",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/profile-menu-1440.png",
+        "note": "Menu captured over Profile page; source reference shows Dashboard behind it."
+      },
+      {
+        "state": "profile-menu",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/profile-menu-390.png",
+        "note": "Menu captured over Profile page; source reference shows Dashboard behind it."
+      }
+    ]
+  },
+  {
+    "id": "406:2399",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "profile-menu",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/profile-menu-1440.png",
+        "note": "Menu captured over Profile page; source reference shows Dashboard behind it."
+      },
+      {
+        "state": "profile-menu",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/profile-menu-390.png",
+        "note": "Menu captured over Profile page; source reference shows Dashboard behind it."
+      }
+    ]
+  },
+  {
+    "id": "405:2345",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-profile",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-profile-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-profile",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-profile-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "410:2120",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-profile",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-profile-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-profile",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-profile-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "410:2408",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "profile-edit",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/profile-edit-1440.png",
+        "note": ""
+      },
+      {
+        "state": "profile-edit",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/profile-edit-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "408:2433",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "profile-crop",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/profile-crop-1440.png",
+        "note": ""
+      },
+      {
+        "state": "profile-crop",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/profile-crop-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "406:3008",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "settings-password-success",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/settings-password-success-1440.png",
+        "note": ""
+      },
+      {
+        "state": "settings-password-success",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/settings-password-success-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "408:1956",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "settings-password",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/settings-password-1440.png",
+        "note": ""
+      },
+      {
+        "state": "settings-password",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/settings-password-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "406:1914",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "profile-assessments",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/profile-assessments-1440.png",
+        "note": "One released assessment; scrolled multi-assessment state is not independently exercised."
+      },
+      {
+        "state": "profile-assessments",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/profile-assessments-390.png",
+        "note": "One released assessment; scrolled multi-assessment state is not independently exercised."
+      }
+    ]
+  },
+  {
+    "id": "399:1628",
+    "name": "Dashborad/student",
+    "section": "Profle",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "profile-assessments",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/profile-assessments-1440.png",
+        "note": "One released assessment; scrolled multi-assessment state is not independently exercised."
+      },
+      {
+        "state": "profile-assessments",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/profile-assessments-390.png",
+        "note": "One released assessment; scrolled multi-assessment state is not independently exercised."
+      }
+    ]
+  },
+  {
+    "id": "335:1033",
+    "name": "Calendar",
+    "section": "Calendar",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "calendar-week",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/calendar-week-1440.png",
+        "note": ""
+      },
+      {
+        "state": "calendar-week",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/calendar-week-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "375:1621",
+    "name": "Calendar",
+    "section": "Calendar",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "calendar-add-event",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/calendar-add-event-1440.png",
+        "note": ""
+      },
+      {
+        "state": "calendar-add-event",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/calendar-add-event-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "375:1956",
+    "name": "Calendar",
+    "section": "Calendar",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "calendar-date-time-picker",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/calendar-date-time-picker-1440.png",
+        "note": "One combined picker; reference relative-duration menu is not represented."
+      },
+      {
+        "state": "calendar-date-time-picker",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/calendar-date-time-picker-390.png",
+        "note": "One combined picker; reference relative-duration menu is not represented."
+      }
+    ]
+  },
+  {
+    "id": "375:2540",
+    "name": "Calendar",
+    "section": "Calendar",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "calendar-date-time-picker",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/calendar-date-time-picker-1440.png",
+        "note": "One combined picker; reference relative-duration menu is not represented."
+      },
+      {
+        "state": "calendar-date-time-picker",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/calendar-date-time-picker-390.png",
+        "note": "One combined picker; reference relative-duration menu is not represented."
+      }
+    ]
+  },
+  {
+    "id": "375:3392",
+    "name": "Calendar",
+    "section": "Calendar",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "calendar-course-detail",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/calendar-course-detail-1440.png",
+        "note": ""
+      },
+      {
+        "state": "calendar-course-detail",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/calendar-course-detail-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "375:3937",
+    "name": "Calendar",
+    "section": "Calendar",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "calendar-quiz-detail",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/calendar-quiz-detail-1440.png",
+        "note": "Course quiz detail; design shows a scheduled mock exam, not the same contract resource."
+      },
+      {
+        "state": "calendar-quiz-detail",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/calendar-quiz-detail-390.png",
+        "note": "Course quiz detail; design shows a scheduled mock exam, not the same contract resource."
+      }
+    ]
+  },
+  {
+    "id": "375:4466",
+    "name": "Calendar",
+    "section": "Calendar",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "calendar-assignment-detail",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/calendar-assignment-detail-1440.png",
+        "note": ""
+      },
+      {
+        "state": "calendar-assignment-detail",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/calendar-assignment-detail-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "365:1122",
+    "name": "Calendar",
+    "section": "Calendar",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "calendar-month",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/calendar-month-1440.png",
+        "note": ""
+      },
+      {
+        "state": "calendar-month",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/calendar-month-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "201:906",
+    "name": "AI ChatBot/student",
+    "section": "AI ChatBot",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "ai-empty",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/ai-empty-1440.png",
+        "note": ""
+      },
+      {
+        "state": "ai-empty",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/ai-empty-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "322:865",
+    "name": "AI ChatBot/student",
+    "section": "AI ChatBot",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "ai-conversation",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/ai-conversation-1440.png",
+        "note": ""
+      },
+      {
+        "state": "ai-conversation",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/ai-conversation-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "333:974",
+    "name": "AI ChatBot/student",
+    "section": "AI ChatBot",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "ai-long-conversation",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/ai-long-conversation-1440.png",
+        "note": "Two response turns; no chat history rail or jump navigator."
+      },
+      {
+        "state": "ai-long-conversation",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/ai-long-conversation-390.png",
+        "note": "Two response turns; no chat history rail or jump navigator."
+      }
+    ]
+  },
+  {
+    "id": "410:9227",
+    "name": "AI ChatBot/student",
+    "section": "AI ChatBot",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "ai-collapsed-navigation",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/ai-collapsed-navigation-1440.png",
+        "note": "Global navigation collapse; no persisted conversation-history contract."
+      },
+      {
+        "state": "ai-collapsed-navigation",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/ai-collapsed-navigation-390.png",
+        "note": "Global navigation collapse; no persisted conversation-history contract."
+      }
+    ]
+  },
+  {
+    "id": "163:698",
+    "name": "Exams/student",
+    "section": "Exams",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-exam-library",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-exam-library-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-exam-library",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-exam-library-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "423:3034",
+    "name": "Exams/student",
+    "section": "Exams",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-exam-library",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-exam-library-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-exam-library",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-exam-library-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "417:2798",
+    "name": "Exams/student",
+    "section": "Exams",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-writing-exam",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-writing-exam-1440.png",
+        "note": "Actual IELTS writing runner; question-based design is a different layout."
+      },
+      {
+        "state": "student-writing-exam",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-writing-exam-390.png",
+        "note": "Actual IELTS writing runner; question-based design is a different layout."
+      },
+      {
+        "state": "student-reading-questions",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-reading-questions-1440.png",
+        "note": "Real IELTS passage/questions runner; differs from the Figma question rail."
+      },
+      {
+        "state": "student-reading-questions",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-reading-questions-390.png",
+        "note": "Real IELTS passage/questions runner; differs from the Figma question rail."
+      }
+    ]
+  },
+  {
+    "id": "427:2930",
+    "name": "Exams/student",
+    "section": "Exams",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-reading-results",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-reading-results-1440.png",
+        "note": "Released per-question correctness is captured; no AI scoring, comments or Advisor-note operation is established."
+      },
+      {
+        "state": "student-reading-results",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-reading-results-390.png",
+        "note": "Released per-question correctness is captured; no AI scoring, comments or Advisor-note operation is established."
+      }
+    ]
+  },
+  {
+    "id": "427:3588",
+    "name": "Exams/student",
+    "section": "Exams",
+    "status": "contract-boundary-not-captured",
+    "parityAccepted": false,
+    "reason": "Per-question AI explanation/chat overlay has no consumed exam explanation operation. Course Study Support is a different capability.",
+    "evidence": []
+  },
+  {
+    "id": "427:2694",
+    "name": "Exams/student",
+    "section": "Exams",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-exam-complete",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-exam-complete-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-exam-complete",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-exam-complete-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "445:3397",
+    "name": "Study plan/student",
+    "section": "Study plan",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-plan",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-plan-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-plan",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-plan-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "445:3823",
+    "name": "Study plan/student",
+    "section": "Study plan",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-checkpoint",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-checkpoint-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-checkpoint",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-checkpoint-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "464:3172",
+    "name": "Study plan/student",
+    "section": "Study plan",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "student-task-detail",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/student-task-detail-1440.png",
+        "note": ""
+      },
+      {
+        "state": "student-task-detail",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/student-task-detail-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "430:2779",
+    "name": "Study plan/student",
+    "section": "Study plan",
+    "status": "contract-boundary-not-captured",
+    "parityAccepted": false,
+    "reason": "Task-linked quiz destination and task-to-question-resource relationship are not established by the consumed advising contract.",
+    "evidence": []
+  },
+  {
+    "id": "715:3994",
+    "name": "Log in",
+    "section": "Log in",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "auth-login",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-login-1440.png",
+        "note": ""
+      },
+      {
+        "state": "auth-login",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-login-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "730:4653",
+    "name": "Create an account",
+    "section": "Log in",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "auth-signup",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-signup-1440.png",
+        "note": ""
+      },
+      {
+        "state": "auth-signup",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-signup-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "731:4840",
+    "name": "Forgot password",
+    "section": "Log in",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "auth-reset-email",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-reset-email-1440.png",
+        "note": ""
+      },
+      {
+        "state": "auth-reset-email",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-reset-email-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "731:4886",
+    "name": "Verify email",
+    "section": "Log in",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "auth-reset-code",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-reset-code-1440.png",
+        "note": ""
+      },
+      {
+        "state": "auth-reset-code",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-reset-code-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "732:4924",
+    "name": "Verify email",
+    "section": "Log in",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "auth-reset-password",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-reset-password-1440.png",
+        "note": ""
+      },
+      {
+        "state": "auth-reset-password",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-reset-password-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "732:4973",
+    "name": "Verify email",
+    "section": "Log in",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "auth-reset-success",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-reset-success-1440.png",
+        "note": ""
+      },
+      {
+        "state": "auth-reset-success",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-reset-success-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "730:4753",
+    "name": "Sign with",
+    "section": "Log in",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "auth-signup-details",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-signup-details-1440.png",
+        "note": "Required structured names and tenant registration contract differ from the Figma activation form."
+      },
+      {
+        "state": "auth-signup-details",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-signup-details-390.png",
+        "note": "Required structured names and tenant registration contract differ from the Figma activation form."
+      },
+      {
+        "state": "auth-signup-verification",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-signup-verification-1440.png",
+        "note": "Verification code is contract-required; no legal-consent contract is consumed."
+      },
+      {
+        "state": "auth-signup-verification",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-signup-verification-390.png",
+        "note": "Verification code is contract-required; no legal-consent contract is consumed."
+      }
+    ]
+  },
+  {
+    "id": "729:3484",
+    "name": "Log in/Error",
+    "section": "Log in",
+    "status": "captured-different-or-partial",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": [
+      {
+        "state": "auth-login-error",
+        "width": 1440,
+        "path": "/tmp/xlearn-final-visual-review/auth-login-error-1440.png",
+        "note": ""
+      },
+      {
+        "state": "auth-login-error",
+        "width": 390,
+        "path": "/tmp/xlearn-final-visual-review/auth-login-error-390.png",
+        "note": ""
+      }
+    ]
+  },
+  {
+    "id": "774:7079",
+    "name": "UX Flow",
+    "section": "Ungrouped",
+    "status": "workflow-reference-excluded",
+    "parityAccepted": false,
+    "reason": "",
+    "evidence": []
+  }
+]

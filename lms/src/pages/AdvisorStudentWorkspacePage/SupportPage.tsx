@@ -259,11 +259,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
     }
   };
 
-  const conversationContent = (<WorkspaceSection
-        title="Conversation"
-        id="conversation"
-        meta={<span className={s.countBadge}>{conversationRows.length}</span>}
-      >
+  const conversationContent = (
         <div className={s.conversationCard}>
           <div className={s.messageStream} aria-label="Message history">
             {messages.isPending ? <p className={styles.status}>Loading conversation…</p> : null}
@@ -423,7 +419,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
             </div>
           </form>
         </div>
-      </WorkspaceSection>);
+      );
   if (conversationOnly) return <>{primaryError || fileError ? <p className={styles.error} role="alert">{advisingErrorMessage(primaryError || fileError, 'The conversation could not be loaded or updated.')} <button type="button" onClick={() => void messages.refetch()}>Retry conversation</button></p> : null}{conversationContent}</>;
 
   return (
@@ -434,7 +430,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
         </p>
       ) : null}
 
-      {conversationContent}
+      <WorkspaceSection title="Conversation" id="conversation" meta={<span className={s.countBadge}>{conversationRows.length}</span>}>{conversationContent}</WorkspaceSection>
 
 
       {/* Reports and attendance remain visible beside one another on desktop. */}

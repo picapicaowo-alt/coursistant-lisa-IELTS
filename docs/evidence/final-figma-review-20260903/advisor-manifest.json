@@ -1,0 +1,314 @@
+[
+  {
+    "state": "advisor-students",
+    "nodes": [
+      "783:8276"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-students",
+    "nodes": [
+      "783:8276"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-students-selected",
+    "nodes": [
+      "791:10510"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students",
+    "note": "Selection checkboxes are present; no matching bulk mutation contract is established.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-students-selected",
+    "nodes": [
+      "791:10510"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students",
+    "note": "Selection checkboxes are present; no matching bulk mutation contract is established.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-messages",
+    "nodes": [
+      "810:15612"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/messages?studentUserId=301",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-messages",
+    "nodes": [
+      "810:15612"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/messages?studentUserId=301",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-student-journey",
+    "nodes": [
+      "803:13456"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students/301/study-plan",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-student-journey",
+    "nodes": [
+      "803:13456"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students/301/study-plan",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-checkpoint-dialog",
+    "nodes": [
+      "813:4892"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students/301/study-plan",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-checkpoint-dialog",
+    "nodes": [
+      "813:4892"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students/301/study-plan",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-student-courses",
+    "nodes": [
+      "805:14271"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students/301/courses",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-student-courses",
+    "nodes": [
+      "805:14271"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students/301/courses",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-course-information",
+    "nodes": [
+      "818:7178"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students/301/courses",
+    "note": "Information projection; Figma learning-material access remains a contract dependency.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-course-information",
+    "nodes": [
+      "818:7178"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students/301/courses",
+    "note": "Information projection; Figma learning-material access remains a contract dependency.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-course-schedule",
+    "nodes": [
+      "818:7815"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students/301/courses",
+    "note": "Schedule projection; not a captured assignment tab.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-course-schedule",
+    "nodes": [
+      "818:7815"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students/301/courses",
+    "note": "Schedule projection; not a captured assignment tab.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-exams",
+    "nodes": [
+      "810:15017"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students/301/exams",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-exams",
+    "nodes": [
+      "810:15017"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students/301/exams",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-exam-results",
+    "nodes": [
+      "818:8771"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students/301/exams",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-exam-results",
+    "nodes": [
+      "818:8771"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students/301/exams",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-assign-exam",
+    "nodes": [
+      "816:6276"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/advisor/students/301/exams",
+    "note": "Assignment dialog is captured; Figma scheduling has no matching contract.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-assign-exam",
+    "nodes": [
+      "816:6276"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/advisor/students/301/exams",
+    "note": "Assignment dialog is captured; Figma scheduling has no matching contract.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-add-course",
+    "nodes": [
+      "815:5643"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4192/advisor/students/301/courses",
+    "note": "Mode icons, descriptions and selection markers are rendered; catalog card uses supplied title/code/capacity fields. No enrollment is submitted by this capture.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "advisor-add-course",
+    "nodes": [
+      "815:5643"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4192/advisor/students/301/courses",
+    "note": "Mode icons, descriptions and selection markers are rendered; catalog card uses supplied title/code/capacity fields. No enrollment is submitted by this capture.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

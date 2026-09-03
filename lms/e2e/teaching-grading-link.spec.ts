@@ -57,13 +57,14 @@ test('Advisor reads paginated conversations and searches instructors through Adv
     return route.fulfill({json: {status: 200, code: 'SUCCESS', data}});
   });
   await page.goto('/advisor/operations');
-  await openSection(page, 'Action tasks');
+  await page.getByRole('link', {name: 'Action tasks', exact: true}).first().click();
   await page.getByRole('button', {name: 'Details', exact: true}).click();
   await expect(page.getByRole('heading', {name: 'Review attendance details'})).toBeVisible();
-  await openSection(page, 'Student conversations');
-  await expect(page.getByRole('region', {name: 'Student conversations', exact: true}).getByText('First Student', {exact: true})).toBeVisible();
+  await page.getByRole('link', {name: 'Messages', exact: true}).first().click();
+  await expect(page.getByRole('complementary', {name: 'Student conversations', exact: true}).getByText('First Student', {exact: true})).toBeVisible();
   await page.getByRole('navigation', {name: 'Conversation pages'}).getByRole('button', {name: 'Next'}).click();
-  await expect(page.getByRole('region', {name: 'Student conversations', exact: true}).getByText('Second Student', {exact: true})).toBeVisible();
+  await expect(page.getByRole('complementary', {name: 'Student conversations', exact: true}).getByText('Second Student', {exact: true})).toBeVisible();
+  await page.getByRole('link', {name: 'Scheduling', exact: true}).first().click();
   await expect(page.getByRole('option', {name: 'Ivy Instructor · ivy@example.test'}).first()).toBeAttached();
   expect(requests.some(path => path.includes('/tenant/users'))).toBe(false);
   await page.screenshot({path: testInfo.outputPath('advisor-updated-operations.png'), fullPage: true});

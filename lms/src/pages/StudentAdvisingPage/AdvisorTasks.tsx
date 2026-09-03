@@ -16,7 +16,7 @@ export function AdvisorTasks({
   onCheckpoint,
 }: {
   plan?: StudyPlanAggregate;
-  onCheckpoint: (key: string) => void;
+  onCheckpoint: (key: string, taskId?: number) => void;
 }) {
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState('');
@@ -119,7 +119,7 @@ export function AdvisorTasks({
                 <button
                   type="button"
                   onClick={() =>
-                    onCheckpoint(studyPlanRecordKey(checkpoint!, selectedIndex))
+                    onCheckpoint(studyPlanRecordKey(checkpoint!, selectedIndex), task.id)
                   }
                 >
                   View task
@@ -158,7 +158,7 @@ export function AdvisorTasks({
                 type="button"
                 key={task.id ?? index}
                 className={styles.task}
-                onClick={() => onCheckpoint(key)}
+                onClick={() => onCheckpoint(key, task.id)}
               >
                 <strong>{task.title || 'Advisor task'}</strong>
                 <small>{formatPlanDate(task.dueDate)}</small>

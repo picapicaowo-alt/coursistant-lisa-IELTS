@@ -1,3 +1,4 @@
+@use '../../styles/workspace' as workspace;
 .tabs {
   display: flex;
   flex-wrap: wrap;
@@ -23,20 +24,6 @@
   outline: 2px solid t.$action-primary;
   outline-offset: 3px;
 }
-.learningGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: t.$workspace-section-gap;
-  align-items: start;
-}
-.learningGrid > :nth-child(2) {
-  grid-row: span 2;
-}
-@media (max-width: 900px) {
-  .learningGrid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .learningGrid > :nth-child(2) {
-    grid-row: auto;
-  }
-}
+.learningGrid { @include workspace.grid; }
+.studyPlan, .courses { @include workspace.region(8, 6); }
+.profile, .risk, .assignments, .attendance, .hours { @include workspace.region(4, 6); }

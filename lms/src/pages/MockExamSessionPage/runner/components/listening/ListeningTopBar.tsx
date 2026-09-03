@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { AudioPlayer } from './AudioPlayer'
 
 type ListeningTopBarProps = {
+  testTitle: string
   candidateId: string
   remainingSeconds: number
   paused: boolean
@@ -33,6 +34,7 @@ async function toggleFullscreen() {
 }
 
 export function ListeningTopBar({
+  testTitle,
   candidateId,
   remainingSeconds,
   paused,
@@ -57,6 +59,7 @@ export function ListeningTopBar({
   return (
     <header className="listening-top">
       <div className="listening-top__left">
+        <strong className="top-bar__title">{testTitle}</strong>
         <span className="listening-top__candidate">Candidate: {candidateId}</span>
         <span className={`listening-top__timer ${paused ? 'is-paused' : ''}`}>
           {paused ? 'Paused · ' : ''}

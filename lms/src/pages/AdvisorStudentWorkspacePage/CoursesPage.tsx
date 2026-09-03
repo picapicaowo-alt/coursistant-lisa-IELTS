@@ -1,12 +1,11 @@
 import React, {useRef, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {Plus, X} from 'lucide-react';
+import {Check, Plus, UserRound, UsersRound, X} from 'lucide-react';
 import {unwrapData, WEEKDAYS, type AdvisorStudentCourseResponse} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
-import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CourseIdentityCard} from '@/components/CourseIdentityCard';
 import {EnglishDateInput, EnglishTimeInput} from '@/components/EnglishDateInput';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
@@ -331,7 +330,7 @@ const CoursesPage: React.FC = () => {
               <div className={styles.actions}>
                 <button type="button" className={styles.primary} onClick={() => setSelectedCourse(course)}>View Course</button>
                 {!['COMPLETED', 'HIDDEN'].includes(course.lifecycleStatus ?? '') && course.status !== 'WITHDRAWN' ? (
-                  <>
+                  <details className={styles.lifecycleActions}><summary>Manage enrollment</summary><div>
                     {course.deliveryMode === 'ONE_ON_ONE' && course.courseId != null ? (
                       <button
                         className={styles.secondary}
@@ -390,7 +389,7 @@ const CoursesPage: React.FC = () => {
                         Withdraw
                       </button>
                     ) : null}
-                  </>
+                  </div></details>
                 ) : (
                   <span className={styles.readOnlyBadge}>{course.lifecycleStatus || course.status}</span>
                 )}
@@ -484,16 +483,25 @@ const CoursesPage: React.FC = () => {
         </div>
       </CollapsibleSection>
 
-      <dialog ref={addDialogRef} className={cStyles.dialog} aria-labelledby="add-course-title">
-        <div className={cStyles.dialogHeader}><h2 id="add-course-title">Add Course</h2><button type="button" className={cStyles.closeBtn} onClick={() => addDialogRef.current?.close()} aria-label="Close add course"><X size={20}/></button></div>
+      <dialog ref={addDialogRef} className={cStyles.dialog} aria-labelledby="add-course-title" onCancel={event => {if (linkGroup.isPending || createOneOnOne.isPending) event.preventDefault();}}>
+        <div className={cStyles.dialogHeader}><h2 id="add-course-title">Add Course</h2><button type="button" className={cStyles.closeBtn} onClick={() => addDialogRef.current?.close()} aria-label="Close add course" disabled={linkGroup.isPending || createOneOnOne.isPending}><X size={20}/></button></div>
         <div className={cStyles.dialogBody}>
-          <div className={cStyles.segmentGroup} aria-label="Course delivery mode"><button type="button" className={cStyles.segmentCard} aria-pressed={addMode === 'GROUP'} onClick={() => setAddMode('GROUP')}>Join Group Course</button><button type="button" className={cStyles.segmentCard} aria-pressed={addMode === 'ONE_ON_ONE'} onClick={() => setAddMode('ONE_ON_ONE')}>Create 1-on-1 Course</button></div>
+          <div className={cStyles.segmentGroup} aria-label="Course delivery mode">
+            <button type="button" className={cStyles.segmentCard} aria-label="Join Group Course" aria-pressed={addMode === 'GROUP'} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => setAddMode('GROUP')}>
+              <strong><UsersRound size={18} aria-hidden="true" />Join Group Course<span className={cStyles.selectionIndicator} aria-hidden="true" /></strong>
+              <span>Join an existing group course.</span>
+            </button>
+            <button type="button" className={cStyles.segmentCard} aria-label="Create 1-on-1 Course" aria-pressed={addMode === 'ONE_ON_ONE'} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => setAddMode('ONE_ON_ONE')}>
+              <strong><UserRound size={18} aria-hidden="true" />Create 1-on-1 Course<span className={cStyles.selectionIndicator} aria-hidden="true" /></strong>
+              <span>Create a personalized course for this student.</span>
+            </button>
+          </div>
           {courseOptions.isPending ? <p role="status">Loading available courses…</p> : null}
           {error ? <p className={styles.error} role="alert">{advisingErrorMessage(error, 'Course planning could not be completed.')}</p> : null}
           {addMode === 'GROUP' ? <>
-      <WorkspaceSection title="Link a group course">
-        <p className={styles.muted}>Current study plan version: {plan.data?.plan.studyPlanVersion ?? 'not available'}</p>
+      <section aria-label="Link a group course">
         <form
+          id="link-group-course"
           className={styles.form}
           onSubmit={event => {
             event.preventDefault();
@@ -512,16 +520,24 @@ const CoursesPage: React.FC = () => {
           {courseSearch.trim().length > 0 && courseSearch.trim().length < 2 ? (
             <p className={styles.muted}>Enter at least two characters.</p>
           ) : null}
-          <div className={styles.list}>
+          <div className={cStyles.courseOptionsList}>
             {(courseOptions.data?.items ?? []).map((option, index) => (
               <button
                 type="button"
                 aria-pressed={String(option.courseId) === groupCourseId}
-                className={String(option.courseId) === groupCourseId ? styles.selectedOption : styles.secondary}
+                className={cStyles.optionRow}
                 key={option.courseId ?? index}
                 onClick={() => setGroupCourseId(String(option.courseId ?? ''))}
               >
-                {option.courseCode || option.catalogCode || `Course #${option.courseId}`} · {option.title || 'Untitled'} · {option.remainingCapacity ?? '—'} places
+                <span className={cStyles.optionMain}>
+                  <strong>{option.title || 'Untitled course'}</strong>
+                  <span className={cStyles.optionMetaLine}>
+                    <span>{option.courseCode || option.catalogCode || `Course #${option.courseId}`}</span>
+                    {option.activeStudents != null && option.capacity != null ? <span><UsersRound size={16} aria-hidden="true" />{option.activeStudents} / {option.capacity} students</span> : null}
+                    {option.remainingCapacity != null ? <span>{option.remainingCapacity} places remaining</span> : null}
+                  </span>
+                </span>
+                <span className={cStyles.selectionIndicator} aria-hidden="true">{String(option.courseId) === groupCourseId ? <Check size={12} /> : null}</span>
               </button>
             ))}
           </div>
@@ -537,18 +553,13 @@ const CoursesPage: React.FC = () => {
             Alignment notes
             <textarea value={alignmentNotes} onChange={event => setAlignmentNotes(event.target.value)} />
           </label>
-          <button
-            className={styles.primary}
-            disabled={needsReload || !plan.data || !selectedGroupCourse || linkGroup.isPending}
-          >
-            Link selected course
-          </button>
         </form>
-      </WorkspaceSection>
+      </section>
 
           </> : <>
-      <WorkspaceSection title="Create a one-to-one course">
+      <section aria-label="Create a one-to-one course">
         <form
+          id="create-one-on-one-course"
           className={styles.form}
           onSubmit={event => {
             event.preventDefault();
@@ -618,14 +629,19 @@ const CoursesPage: React.FC = () => {
               onChange={event => setOneOnOne(current => ({...current, location: event.target.value}))}
             />
           </label>
-          <button className={styles.primary} disabled={needsReload || !plan.data || createOneOnOne.isPending}>
-            Create course
-          </button>
         </form>
-      </WorkspaceSection>
+      </section>
 
           </>}
         </div>
+        <footer className={cStyles.dialogFooter}>
+          <button type="button" className={cStyles.cancelBtn} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => addDialogRef.current?.close()}>Cancel</button>
+          {addMode === 'GROUP' ? (
+            <button type="submit" form="link-group-course" className={cStyles.enrollBtn} disabled={needsReload || !plan.data || !selectedGroupCourse || linkGroup.isPending}>{linkGroup.isPending ? 'Linking…' : 'Link selected course'}</button>
+          ) : (
+            <button type="submit" form="create-one-on-one-course" className={cStyles.enrollBtn} disabled={needsReload || !plan.data || createOneOnOne.isPending}>{createOneOnOne.isPending ? 'Creating…' : 'Create course'}</button>
+          )}
+        </footer>
       </dialog>
 
     </div>

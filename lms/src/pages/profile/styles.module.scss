@@ -25,7 +25,17 @@
 .visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
 @media (max-width: 720px) {
-  .profileCard { grid-template-columns: 1fr; margin-inline: 0; }
+  .profileCard { grid-template-columns:4rem minmax(0,1fr); gap:t.$space-3; margin-inline:0; padding:t.$space-4; }
+  .avatarColumn {gap:t.$space-2;}
+  .profileAvatar {width:4rem; height:4rem;}
+  .avatarColumn button {font-size:t.$fs-caption; padding:t.$space-2;}
+  .profileHeading {gap:t.$space-2;}
+  .profileHeading h1 {font-size:t.$font-size-subhead;}
+  .profileHeading button {font-size:t.$fs-caption; padding:t.$space-2;}
+  .profileDetails {display:contents;}
+  .profileHeading {grid-column:2; grid-row:1;}
+  .profileDetails > :not(.profileHeading) {grid-column:1/-1; margin-top:t.$space-2;}
+  .eyebrow {letter-spacing:normal;}
   .profileDetails { padding-top: 0; }
   .profileFacts { grid-template-columns: 1fr; }
 }

@@ -65,6 +65,7 @@ export const DirectoryPanel = () => {
   const [draftFilters, setDraftFilters] = useState<DirectoryFilters>(emptyFilters);
   const [filters, setFilters] = useState<DirectoryFilters>(emptyFilters);
   const [page, setPage] = useState(0);
+  const [directoryFeedback, setDirectoryFeedback] = useState('');
   const [editorReveal, setEditorReveal] = useState(0);
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const [createForm, setCreateForm] = useState({email: '', firstName: '', middleName: '', lastName: '', role: 'USER' as 'USER' | 'TENANT_ADMIN', level: 'COUNSELLOR' as StaffLevel});
@@ -182,8 +183,10 @@ export const DirectoryPanel = () => {
 
   const submitFilters = (event: FormEvent) => {
     event.preventDefault();
-    setPage(0);
-    setFilters({...draftFilters, q: draftFilters.q.trim()});
+    const next = {...draftFilters, q: draftFilters.q.trim()};
+    setDirectoryFeedback('');
+    if (page === 0 && Object.keys(next).every(key => next[key as keyof DirectoryFilters] === filters[key as keyof DirectoryFilters])) void directory.refetch();
+    else {setPage(0); setFilters(next);}
   };
   const selected = detail.data;
   const isSelf = selected?.id === currentUser.id;
@@ -203,22 +206,23 @@ export const DirectoryPanel = () => {
   return (
     <div className={styles.directoryLayout}>
       <WorkspaceSection title="User directory" headingId="directory-title" summary="Search and filter people in your tenant. Search covers names and email only.">
-        <div className={styles.panelHeading}>
-
-          <button type="button" className={styles.iconButton} aria-label="Refresh directory" onClick={() => void directory.refetch()}><RefreshCw size={18}/></button>
-        </div>
         <form className={styles.filterBar} onSubmit={submitFilters}>
           <label className={styles.searchField}><span>Search by name or email</span><div><Search size={17}/><input value={draftFilters.q} onChange={event => setDraftFilters(current => ({...current, q: event.target.value}))} placeholder="Name or email"/></div></label>
           <label><span>Account</span><select value={draftFilters.role} onChange={event => setDraftFilters(current => ({...current, role: event.target.value as DirectoryFilters['role']}))}><option value="">All</option><option value="USER">Staff and users</option><option value="TENANT_ADMIN">Tenant admins</option></select></label>
           <label><span>Identity</span><select value={draftFilters.level} onChange={event => setDraftFilters(current => ({...current, level: event.target.value as DirectoryFilters['level']}))}><option value="">All</option><option value="STUDENT">Student</option><option value="PARENT">Parent</option>{STAFF_LEVELS.map(level => <option value={level} key={level}>{level}</option>)}</select></label>
           <label><span>Status</span><select value={draftFilters.status} onChange={event => setDraftFilters(current => ({...current, status: event.target.value as DirectoryFilters['status']}))}><option value="">All</option><option value="ACTIVE">Active</option><option value="DISABLED">Disabled</option></select></label>
-          <button className={styles.primaryButton}>Apply filters</button>
+          <div className={styles.filterActions}>
+            <button className={styles.primaryButton} disabled={directory.isFetching}>Apply filters</button>
+            <button type="button" className={styles.secondaryButton} onClick={() => {setDraftFilters(emptyFilters); setFilters(emptyFilters); setPage(0); setDirectoryFeedback('Filters cleared.');}}>Clear filters</button>
+            <button type="button" className={styles.secondaryButton} disabled={directory.isFetching} onClick={() => {setDirectoryFeedback(''); void directory.refetch().then(result => {if (!result.isError) setDirectoryFeedback('Directory refreshed.');});}}><RefreshCw size={16} aria-hidden="true"/>{directory.isFetching ? 'Refreshing…' : 'Refresh directory'}</button>
+          </div>
         </form>
 
+        <p className={styles.directoryStatus} role="status" aria-live="polite">{directory.isFetching ? 'Updating directory…' : directory.isError ? '' : `${directory.data?.total ?? 0} users${directoryFeedback ? `. ${directoryFeedback}` : ''}`}</p>
         {directory.isPending ? <p className={styles.status} role="status">Loading directory…</p> : null}
         {directory.isError ? <div className={styles.errorNotice} role="alert"><p>{getApiErrorMessage(directory.error, 'The directory could not be loaded.')}</p><button type="button" onClick={() => void directory.refetch()}>Try again</button></div> : null}
         {!directory.isPending && !directory.isError && directory.data.items.length === 0 ? <p className={styles.empty}>No users match these filters.</p> : null}
-        <div className={styles.recordList}>
+        <div className={styles.recordList} aria-busy={directory.isFetching}>
           {directory.data?.items.map(account => (
             <button type="button" className={selectedId === account.id ? styles.selectedRecord : styles.record} key={account.id} onClick={() => { setEditorReveal(current => current + 1); initializedAccount.current = null; setSelectedId(account.id); setConflictReviewed(false); patchAccount.reset(); setConfirmDisable(false); disablePreview.reset(); setTransitionLevel(''); setFeedback(''); }}>
               <span><strong>{formatPersonName(account, `User #${account.id}`)}</strong><small>{account.email}</small></span>

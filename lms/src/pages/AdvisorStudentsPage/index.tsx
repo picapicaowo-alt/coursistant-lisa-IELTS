@@ -9,6 +9,9 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import {unwrapData} from '@/apis';
+import {AdvisingBadge} from '@/components/AdvisingBadge';
+import {RISK_LABELS} from '@/components/AdvisingBadge/labels';
+import {UserAvatar} from '@/components/UserAvatar';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {formatUtcTimestamp} from '@/utils/datetime';
@@ -23,12 +26,6 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import listStyles from './index.module.scss';
-
-const RISK_LABELS: Record<string, string> = {
-  ON_TRACK: 'On track',
-  AT_RISK: 'At risk',
-  NEEDS_ATTENTION: 'Needs attention',
-};
 
 const AdvisorStudentsPage: React.FC = () => {
   const [page, setPage] = useState(0);
@@ -59,23 +56,6 @@ const AdvisorStudentsPage: React.FC = () => {
     );
   };
 
-  const getRiskBadgeClass = (risk?: string) => {
-    switch (risk) {
-      case 'NEEDS_ATTENTION':
-        return listStyles.riskHigh;
-      case 'AT_RISK':
-        return listStyles.riskMedium;
-      case 'ON_TRACK':
-        return listStyles.riskLow;
-      default:
-        return listStyles.riskUnknown;
-    }
-  };
-
-  const getRiskLabel = (risk?: string) => {
-    if (!risk) return 'Not assessed';
-    return RISK_LABELS[risk] ?? risk;
-  };
 
   return (
     <div className={listStyles.page}>
@@ -148,6 +128,7 @@ const AdvisorStudentsPage: React.FC = () => {
             {/* Active Task Filter */}
             <select
               className={listStyles.filterSelect}
+              aria-label="Active task type"
               value={filters.activeTaskType ?? ''}
               onChange={event => {
                 setFilters(current => ({
@@ -160,7 +141,7 @@ const AdvisorStudentsPage: React.FC = () => {
               <option value="">All tasks</option>
               {ACTION_TASK_TYPES.map(type => (
                 <option key={type} value={type}>
-                  {type}
+                  {type.replace(/_/g, ' ').toLowerCase()}
                 </option>
               ))}
             </select>
@@ -209,10 +190,6 @@ const AdvisorStudentsPage: React.FC = () => {
               <tbody>
                 {items.map(student => {
                   const name = formatPersonName(student, `Student #${student.studentUserId}`);
-                  const initials = [student.firstName, student.lastName]
-                    .map(part => part?.charAt(0))
-                    .join('')
-                    .toUpperCase() || '#';
                   const isChecked = selectedStudentIds.includes(student.studentUserId);
                   const studentIdFormatted = `ID: ${student.studentUserId}`;
 
@@ -229,9 +206,7 @@ const AdvisorStudentsPage: React.FC = () => {
                       </td>
                       <th scope="row">
                         <div className={listStyles.studentCell}>
-                          <span className={listStyles.avatar} aria-hidden="true">
-                            {initials}
-                          </span>
+                          <UserAvatar userId={student.studentUserId} className={listStyles.avatar}/>
                           <div className={listStyles.nameCol}>
                             <strong>{name}</strong>
                             <small>{studentIdFormatted}</small>
@@ -245,9 +220,7 @@ const AdvisorStudentsPage: React.FC = () => {
                         <span className={listStyles.levelCell}>Not available</span>
                       </td>
                       <td data-label="Risk level">
-                        <span className={`${listStyles.riskBadge} ${getRiskBadgeClass(student.riskStatus)}`}>
-                          {getRiskLabel(student.riskStatus)}
-                        </span>
+                        <AdvisingBadge value={student.highestPriority ?? student.riskStatus} kind={student.highestPriority ? "priority" : "risk"}/>
                       </td>
                       <td data-label="Next checkpoint">
                         <span className={listStyles.checkpointCell}>
@@ -330,7 +303,7 @@ const AdvisorStudentsPage: React.FC = () => {
           <span>Lines per page: {ADVISOR_PAGE_SIZE}</span>
         </div>
 
-        {selectedStudentIds.length > 0 ? <div className={listStyles.floatingActions}>
+        {selectedStudentIds.length > 0 ? <div className={listStyles.floatingSelectionBar}>
         <span>{selectedStudentIds.length} selected</span>
         <button type="button" onClick={() => setSelectedStudentIds([])}>Clear selection</button>
       </div> : null}

@@ -1,0 +1,52 @@
+{
+  "recordedAtUtc": "2026-09-03T15:40:10.981886+00:00",
+  "baseline": [
+    {
+      "command": "npm run lint:ci",
+      "status": "passed",
+      "log": "/tmp/xlearn-lint-final.log",
+      "logSha256": "2d900f156a768698f121eabc98a3ebc543deb798c1759baf3078716ec44d8b63"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "log": "/tmp/xlearn-types-final.log",
+      "logSha256": "e7f565cee4d54f11dd1b6903002840f56cb07385faef58ac2dbf0631d4dc89f3"
+    },
+    {
+      "command": "npm run typecheck:production",
+      "status": "passed",
+      "log": "/tmp/xlearn-production-types-final.log",
+      "logSha256": "b0136c2504a8de0295909046dfb18484ecf9d4ea8775579d6543ef80b3ca96c7"
+    },
+    {
+      "command": "npm run test:run -- --maxWorkers=4",
+      "status": "passed",
+      "log": "/tmp/xlearn-unit-final.log",
+      "logSha256": "ed6cefe40a98e2a2de9994f9adee67c9258cbe1e2d753d4047f873a71674ef8b"
+    },
+    {
+      "command": "npm run build",
+      "status": "passed",
+      "log": "/tmp/xlearn-build-final.log",
+      "logSha256": "8c5a0c36985511d861205e0352999af3cde2afa691ebc10721774cfb1947cd23"
+    },
+    {
+      "command": "npm run test:e2e -- --workers=4 --retries=0",
+      "status": "passed",
+      "log": "/tmp/xlearn-e2e-final.log",
+      "logSha256": "8ef23403858500c6f1fa727a50b879bad1601622c0e049daaae7089212392a21"
+    }
+  ],
+  "unitFiles": 130,
+  "unitTests": 542,
+  "browserTests": 84,
+  "browserPort": 4187,
+  "browserFilters": null,
+  "browserRetries": 0,
+  "initialUnitAttempt": "An unconstrained run timed out starting six workers; a full rerun with maxWorkers=4 passed all 542 tests without changed assertions.",
+  "liveAllRoleAcceptance": false,
+  "deferredByUserForThisRelease": true,
+  "releaseTarget": "Dev 8085 only",
+  "auxiliaryServiceRetriesStopped": true
+}

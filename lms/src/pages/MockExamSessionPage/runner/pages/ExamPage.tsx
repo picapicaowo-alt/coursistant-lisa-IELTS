@@ -1,3 +1,4 @@
+import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { submitReading } from '../api/readings'
 import { ensureAttemptId } from '../api/tests'
@@ -45,6 +46,8 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
   const [highlightsByPassage, setHighlightsByPassage] = useState<Record<number, TextSpan[]>>({})
   const [notesByPassage, setNotesByPassage] = useState<Record<number, NoteItem[]>>({})
   const [submitting, setSubmitting] = useState(false)
+  const [submissionOpen, setSubmissionOpen] = useState(false)
+  const [submissionError, setSubmissionError] = useState('')
   const [reviewByQuestion, setReviewByQuestion] = useState<Record<
     number,
     { submitted: string; correct: boolean; blank: boolean }
@@ -137,6 +140,8 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
     }
 
     setSubmitting(true)
+    setSubmissionOpen(true)
+    setSubmissionError('')
     try {
       const attemptId = await ensureAttemptId(testId)
       const result = await submitReading(testId, {
@@ -160,7 +165,7 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
         totalQuestions: result.totalQuestions,
       })
     } catch (err) {
-      window.alert(err instanceof Error ? err.message : 'Submit failed')
+      setSubmissionError(err instanceof Error ? err.message : 'Submission failed.')
     } finally {
       setSubmitting(false)
     }
@@ -188,12 +193,10 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
     return () => window.clearInterval(id)
   }, [paused, scoreSummary])
 
-  const handleFinish = useCallback(async () => {
+  const handleFinish = useCallback(() => {
     if (submitting || scoreSummary) return
-    const ok = window.confirm('Finish this section and submit your answers?')
-    if (!ok) return
-    await submitSection()
-  }, [scoreSummary, submitSection, submitting])
+    setSubmissionOpen(true)
+  }, [scoreSummary, submitting])
 
   const handleExit = useCallback(() => {
     if (scoreSummary) {
@@ -267,7 +270,9 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
 
   return (
     <div className="exam-shell">
+      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(scoreSummary)} error={submissionError} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
       <TopBar
+        testTitle={testTitle}
         candidateId={candidateLabel}
         remainingSeconds={remainingSeconds}
         paused={paused}

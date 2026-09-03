@@ -109,10 +109,14 @@ export interface UpdateSubmissionReviewRequest {
  * and see their own `submissionStatus`; staff see drafts too and get no
  * status, since there is no single caller status to report.
  *
- * Assignments belong to the course, not to a week: nothing here references
- * one, and the list is ordered by due date.
+ * The consumed contract also describes Lecture context and learning category.
+ * Keep optional named fields when returned; the generic response schema does
+ * not yet define a safe shape for projecting the Lecture context.
  */
 export interface AssignmentSummary {
+  /** Optional category described by assignmentListSummaries. */
+  learningType?: string;
+  studentListGroup?: string;
   id: number;
   title: string;
   /** UTC instant. */
@@ -157,6 +161,8 @@ export type AssignmentListRead = unknown;
 export interface AssignmentDetail {
   id: number;
   courseId: number;
+  weekId?: number;
+  learningType?: AssignmentLearningType;
   title: string;
   description: string;
   pointsPossible?: number;
@@ -263,7 +269,12 @@ export interface SubmissionState {
   stagingFiles: StagingFile[];
 }
 
+export const ASSIGNMENT_LEARNING_TYPES = ['PRE_CLASS', 'HOMEWORK', 'PRACTICE'] as const;
+export type AssignmentLearningType = typeof ASSIGNMENT_LEARNING_TYPES[number];
+
 export interface CreateAssignmentPayload {
+  weekId: number;
+  learningType: AssignmentLearningType;
   title: string;
   description?: string;
   pointsPossible?: number;

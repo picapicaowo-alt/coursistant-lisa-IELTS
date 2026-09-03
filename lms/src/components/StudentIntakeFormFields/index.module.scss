@@ -24,6 +24,12 @@
   font-style: normal;
   font-weight: t.$fw-regular;
 }
-.section { grid-column: 1 / -1; }
+.section { grid-column: 1 / -1; min-width: 0; margin: 0; padding: t.$space-4 0 0; border: 0; border-top: 1px solid t.$border-default; }
+.section legend { padding: 0 t.$space-3 0 0; color: t.$content-primary; font-size: t.$font-size-subhead; font-weight: t.$fw-semibold; }
 .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-5; }
+.fields label { display: flex; flex-direction: column; min-width: 0; gap: t.$space-2; font-weight: t.$fw-medium; color: t.$content-primary; }
+.fields :is(input, select, textarea) { box-sizing: border-box; width: 100%; min-width: 0; min-height: t.$touch-target; padding: t.$space-3; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-primary; font: inherit; font-weight: t.$fw-regular; }
+.fields textarea { min-height: 6rem; resize: vertical; }
+.fields :is(input, select, textarea):focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+.fields :disabled { background: t.$surface-subtle; color: t.$content-secondary; }
 @media (max-width: 43.75rem) { .fields { grid-template-columns: minmax(0, 1fr); } }

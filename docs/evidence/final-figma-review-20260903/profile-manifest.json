@@ -1,0 +1,190 @@
+[
+  {
+    "state": "student-profile",
+    "nodes": [
+      "405:2345",
+      "410:2120"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-profile",
+    "nodes": [
+      "405:2345",
+      "410:2120"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "profile-menu",
+    "nodes": [
+      "378:1714",
+      "406:2399"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "Menu captured over Profile page; source reference shows Dashboard behind it.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "profile-menu",
+    "nodes": [
+      "378:1714",
+      "406:2399"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "Menu captured over Profile page; source reference shows Dashboard behind it.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "profile-edit",
+    "nodes": [
+      "410:2408"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "profile-edit",
+    "nodes": [
+      "410:2408"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "profile-crop",
+    "nodes": [
+      "408:2433"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "profile-crop",
+    "nodes": [
+      "408:2433"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "profile-assessments",
+    "nodes": [
+      "406:1914",
+      "399:1628"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "One released assessment; scrolled multi-assessment state is not independently exercised.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "profile-assessments",
+    "nodes": [
+      "406:1914",
+      "399:1628"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/profile",
+    "note": "One released assessment; scrolled multi-assessment state is not independently exercised.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "settings-password",
+    "nodes": [
+      "408:1956"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/settings",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "settings-password",
+    "nodes": [
+      "408:1956"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/settings",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "settings-password-success",
+    "nodes": [
+      "406:3008"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/settings",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "settings-password-success",
+    "nodes": [
+      "406:3008"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/settings",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

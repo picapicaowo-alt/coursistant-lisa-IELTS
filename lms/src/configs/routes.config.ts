@@ -1,3 +1,4 @@
+import {matchPath} from 'react-router-dom';
 import {APP_ROUTE_PATHS, STUDY_PLAN_QUERY_PARAMS} from './routePaths';
 import {VOCABULARY_PATHS, isVocabularySessionPath} from '@/pages/vocabulary/routes';
 
@@ -91,6 +92,7 @@ export const shouldShowAppShell = (pathname: string, search = ''): boolean => {
   // presentation; the existing Student route guard still owns authorization.
   if (pathname === APP_ROUTE_PATHS.myPlan && new URLSearchParams(search).get(STUDY_PLAN_QUERY_PARAMS.checkpoint)) return false;
   if (isVocabularySessionPath(pathname)) return false;
+  if (matchPath({path: APP_ROUTE_PATHS.courseCourseId, end: true}, pathname)) return false;
   if (pathname === '/') return true;
   return APP_SHELL_BASE_PATHS.some(
     base => base !== '/' && (pathname === base || pathname.startsWith(`${base}/`)),

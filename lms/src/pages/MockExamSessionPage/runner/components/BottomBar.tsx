@@ -1,5 +1,6 @@
 import { countAnswered } from '../data/reading'
 import type { PassageData } from '../data/types'
+import {AnswerSummary} from './AnswerSummary'
 
 type BottomBarProps = {
   passage: PassageData
@@ -65,6 +66,8 @@ export function BottomBar({
   return (
     <footer className="bottom-bar">
       <div className="bottom-bar__left">
+        <h2 className="exam-navigation-title">Reading</h2>
+        <AnswerSummary questionNumbers={passage.questionNumbers} answers={answers} reviewByQuestion={reviewByQuestion} />
         <div className="question-nav">
           <span className="question-nav__label">{passage.shortLabel}</span>
           {passage.questionNumbers.map((n) => (
@@ -74,13 +77,14 @@ export function BottomBar({
               className={chipClass(n, currentQuestion, answers, reviewByQuestion)}
               onClick={() => onJump(n)}
               aria-label={`Go to question ${n}`}
+              aria-current={currentQuestion === n ? 'step' : undefined}
             >
               {n}
             </button>
           ))}
         </div>
         <div className="bottom-bar__meta">
-          <span>{testTitle}</span>
+          <span className="exam-navigation-context">{testTitle}</span>
           {scoreSummary ? (
             <>
               <span className="bottom-bar__score">
@@ -117,7 +121,7 @@ export function BottomBar({
         <span className="bottom-bar__clock">{clockLabel}</span>
         <button
           type="button"
-          className="bar-btn"
+          className="bar-btn bar-btn--primary"
           onClick={onFinish}
           disabled={submitting || submitted}
         >

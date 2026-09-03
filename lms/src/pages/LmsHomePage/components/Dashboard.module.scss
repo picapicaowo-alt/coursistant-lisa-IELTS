@@ -29,8 +29,7 @@
   gap: t.$workspace-section-gap;
 }
 
-.panel,
-.chatPanel {
+.panel {
   min-width: 0;
   overflow: hidden;
   border: 1px solid t.$border-dashboard;
@@ -40,172 +39,6 @@
 
 .panel {
   box-shadow: t.$shadow-dashboard-card;
-}
-
-.chatPanel {
-  position: relative;
-  display: flex;
-  min-height: t.$dashboard-chat-min-block-size;
-  flex-direction: column;
-  padding: 1.125rem 1rem 1rem;
-  border: 0;
-  background: linear-gradient(145deg, t.$surface-assistant-start 0%, t.$surface-assistant-end 100%);
-}
-
-.chatHeader {
-  display: grid;
-  min-height: 2.25rem;
-  grid-template-columns: 2rem 1fr 2rem;
-  align-items: center;
-
-  > img {
-    width: 1.125rem;
-    height: 1.125rem;
-    justify-self: center;
-  }
-
-  h2 {
-    margin: 0;
-    color: t.$content-primary;
-    font-size: t.$font-size-headline;
-    font-weight: t.$fw-medium;
-    line-height: t.$line-height-headline;
-    text-align: center;
-  }
-
-  button {
-    position: relative;
-    display: grid;
-    width: 2rem;
-    height: 2rem;
-    place-items: center;
-    border: 0;
-    border-radius: t.$radius-round;
-    background: transparent;
-
-    img {
-      width: 1.125rem;
-      height: 1.125rem;
-    }
-
-    &:hover,
-    &:focus-visible {
-      background: t.$surface-raised;
-    }
-
-    &::after {
-      position: absolute;
-      inset: -.375rem;
-      content: '';
-    }
-  }
-}
-
-.chatIntro {
-  margin: 3.1875rem .25rem 0;
-  color: t.$content-ink;
-
-  p {
-    display: flex;
-    align-items: center;
-    gap: t.$space-2;
-    margin: 0 0 t.$space-1;
-    font-size: 1.5rem;
-    line-height: 1.875rem;
-
-    img {
-      width: 1.5rem;
-      height: 1.5rem;
-      object-fit: contain;
-    }
-  }
-
-  strong {
-    font-size: 1.5rem;
-    font-weight: t.$fw-medium;
-    line-height: 2.125rem;
-  }
-}
-
-.quickPrompts {
-  display: grid;
-  gap: .625rem;
-  margin: 1.75rem .25rem 0;
-
-  button {
-    min-height: 2.625rem;
-    padding: .625rem 1.25rem;
-    border: 0;
-    border-radius: .625rem;
-    background: t.$surface-raised;
-    color: t.$content-ink;
-    font-size: t.$font-size-body-lg;
-    line-height: t.$line-height-body;
-    text-align: left;
-    transition: box-shadow t.$duration-fast t.$ease-out, transform t.$duration-fast t.$ease-out;
-
-    &:hover,
-    &:focus-visible {
-      box-shadow: t.$shadow-selected;
-      transform: translateY(-1px);
-    }
-  }
-}
-
-.chatComposer {
-  display: grid;
-  min-height: 3.25rem;
-  grid-template-columns: 2rem minmax(0, 1fr) 2.25rem;
-  align-items: center;
-  gap: t.$space-2;
-  margin-top: auto;
-  padding: .3125rem .4375rem;
-  border: 1px solid t.$action-secondary;
-  border-radius: 1.125rem;
-  background: t.$surface-raised;
-  box-shadow: 0 2px 8px rgba(t.$action-primary, .08);
-
-  input {
-    width: 100%;
-    min-width: 0;
-    border: 0;
-    outline: 0;
-    background: transparent;
-    color: t.$content-primary;
-    font-size: t.$font-size-body;
-
-    &::placeholder {
-      color: t.$slate-300;
-    }
-  }
-}
-
-.composerAdd,
-.sendButton {
-  display: grid;
-  place-items: center;
-  border: 0;
-  border-radius: t.$radius-sm;
-}
-
-.composerAdd {
-  width: 2rem;
-  height: 2rem;
-  background: transparent;
-  color: t.$slate-400;
-  font-size: 1.75rem;
-  font-weight: 300;
-}
-
-.sendButton {
-  width: 2.25rem;
-  height: 2.25rem;
-  background: t.$action-primary;
-
-  img {
-    width: 1.5rem;
-    height: 1.5rem;
-  }
 }
 
 .panelHeader,
@@ -713,3 +546,12 @@
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.enrolledCourses { display: grid; padding: t.$space-4 t.$space-5; gap: t.$space-3; }
+.enrolledCourse { display: flex; align-items: center; justify-content: space-between; gap: t.$space-4; min-height: t.$touch-target; color: t.$content-primary; text-decoration: none; }
+.enrolledCourse > span:first-child { display: grid; min-width: 0; gap: t.$space-1; }
+.enrolledCourse strong { font-size: t.$font-size-body; overflow-wrap: anywhere; }
+.enrolledCourse small { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.enrolledCourse .outlineButton { flex-shrink: 0; }
+.enrolledCourse:hover strong { color: t.$action-primary; }
+.enrolledCourse:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }

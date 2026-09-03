@@ -17,7 +17,7 @@
 .primaryButton { border: 1px solid t.$brand; background: t.$brand; color: white; }
 .secondaryButton { border: 1px solid t.$border; background: t.$card-bg; color: t.$text; }
 .primaryButton:disabled, .rowActions button:disabled { cursor: not-allowed; opacity: .5; }
-.primaryButton:focus-visible, .secondaryButton:focus-visible, .rowActions button:focus-visible, .iconButton:focus-visible, .backLink:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
+.primaryButton:focus-visible, .secondaryButton:focus-visible, .rowActions button:focus-visible, .iconButton:focus-visible, .backLink:focus-visible, .page input:focus-visible, .page textarea:focus-visible, .page select:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
 .questionList { display: grid; gap: .65rem; margin: 0; padding: 0; list-style: none; }
 .questionList > li { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .85rem 0; border-top: 1px solid t.$border; }
 .questionList small { display: block; margin-top: .2rem; color: t.$text-muted; }
