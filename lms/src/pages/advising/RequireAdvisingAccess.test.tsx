@@ -36,11 +36,11 @@ describe('RequireAdvisingAccess', () => {
       <MemoryRouter initialEntries={['/advisor/students']}>
         <Routes>
           <Route path="/advisor/students" element={<RequireAdvisingAccess gate="advisor"><div>Advisor students</div></RequireAdvisingAccess>}/>
-          <Route path="/admin/intakes" element={<div>Tenant intake home</div>}/>
+          <Route path="/admin/dashboard" element={<div>Tenant dashboard</div>}/>
         </Routes>
       </MemoryRouter>,
     );
-    expect(screen.getByText('Tenant intake home')).toBeInTheDocument();
+    expect(screen.getByText('Tenant dashboard')).toBeInTheDocument();
     expect(screen.queryByText('Advisor students')).not.toBeInTheDocument();
   });
 });

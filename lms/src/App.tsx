@@ -64,6 +64,7 @@ const ParentPortalPage = lazy(() => import('./pages/ParentPortalPage'));
 const MockExamsPage = lazy(() => import('./pages/MockExamsPage'));
 const MockExamSessionPage = lazy(() => import('./pages/MockExamSessionPage'));
 const TenantIntakesPage = lazy(() => import('./pages/TenantIntakesPage'));
+const TenantDashboardPage = lazy(() => import('./pages/TenantDashboardPage'));
 const TenantStudentRecordPage = lazy(() => import('./pages/TenantStudentRecordPage'));
 const AdvisorCourseDeliveryPage = lazy(() => import('./pages/TenantCourseDeliveryPage'));
 const CourseOperationsPage = lazy(() => import('./pages/CourseOperationsPage'));
@@ -185,6 +186,7 @@ const App = () => {
               <Route path={VOCABULARY_ROUTE_PATTERNS.list} element={<RequireVocabularyStudent><VocabularyListPage/></RequireVocabularyStudent>}/>
               <Route path={VOCABULARY_ROUTE_PATTERNS.session} element={<RequireVocabularyStudent><VocabularySessionPage/></RequireVocabularyStudent>}/>
               <Route path={APP_ROUTE_PATHS.adminIntakes} element={<RequireAdvisingAccess gate="tenantAdmin"><TenantIntakesPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.adminDashboard} element={<RequireAdvisingAccess gate="tenantAdmin"><TenantDashboardPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.adminStudentsStudentUserId} element={<RequireAdvisingAccess gate="tenantAdmin"><TenantStudentRecordPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery} element={<RequireAdvisingAccess gate="advisor"><AdvisorCourseDeliveryPage/></RequireAdvisingAccess>}/>
               <Route path="*" element={<NotFoundPage/>}/>

@@ -20,7 +20,7 @@ const renderGate = () => render(
   <MemoryRouter initialEntries={['/vocabulary']}>
     <Routes>
       <Route path="/vocabulary" element={<RequireVocabularyStudent><p>Vocabulary content</p></RequireVocabularyStudent>}/>
-      <Route path="/admin/intakes" element={<p>Tenant intakes</p>}/>
+      <Route path="/admin/dashboard" element={<p>Tenant dashboard</p>}/>
     </Routes>
   </MemoryRouter>,
 );
@@ -40,6 +40,6 @@ describe('RequireVocabularyStudent', () => {
     renderGate();
 
     expect(screen.queryByText('Vocabulary content')).not.toBeInTheDocument();
-    expect(screen.getByText('Tenant intakes')).toBeInTheDocument();
+    expect(screen.getByText('Tenant dashboard')).toBeInTheDocument();
   });
 });

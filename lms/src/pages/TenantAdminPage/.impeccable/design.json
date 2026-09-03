@@ -1,0 +1,354 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-03T20:40:22Z",
+  "title": "Design System: X-Learn Tenant Administration",
+  "extensions": {
+    "colorMeta": {
+      "action-primary": {
+        "role": "primary",
+        "displayName": "Guiding Violet",
+        "canonical": "#4835EB",
+        "tonalRamp": [
+          "#2A3A8F",
+          "#3A4FBF",
+          "#4835EB",
+          "#566FE8",
+          "#7F9CF5",
+          "#C3DAFE",
+          "#E6E3FF",
+          "#EBE9FF"
+        ]
+      },
+      "action-primary-hover": {
+        "role": "primary",
+        "displayName": "Deep Interaction Violet",
+        "canonical": "#3A4FBF",
+        "tonalRamp": [
+          "#2A3A8F",
+          "#3A4FBF",
+          "#4835EB",
+          "#566FE8",
+          "#7F9CF5",
+          "#C3DAFE",
+          "#E6E3FF",
+          "#EBE9FF"
+        ]
+      },
+      "surface-canvas": {
+        "role": "neutral",
+        "displayName": "Open White Canvas",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#2D3748",
+          "#718096",
+          "#A0AEC0",
+          "#CBD5E0",
+          "#E2E8F0",
+          "#EDF2F7",
+          "#F8FAFC",
+          "#FFFFFF"
+        ]
+      },
+      "surface-subtle": {
+        "role": "neutral",
+        "displayName": "Cool Working Canvas",
+        "canonical": "#F8FAFC",
+        "tonalRamp": [
+          "#2D3748",
+          "#718096",
+          "#A0AEC0",
+          "#CBD5E0",
+          "#E2E8F0",
+          "#EDF2F7",
+          "#F8FAFC",
+          "#FFFFFF"
+        ]
+      },
+      "surface-muted": {
+        "role": "neutral",
+        "displayName": "Muted Slate Surface",
+        "canonical": "#EDF2F7",
+        "tonalRamp": [
+          "#2D3748",
+          "#718096",
+          "#A0AEC0",
+          "#CBD5E0",
+          "#E2E8F0",
+          "#EDF2F7",
+          "#F8FAFC",
+          "#FFFFFF"
+        ]
+      },
+      "surface-brand-subtle": {
+        "role": "primary",
+        "displayName": "Violet Mist",
+        "canonical": "#E6E3FF",
+        "tonalRamp": [
+          "#2A3A8F",
+          "#3A4FBF",
+          "#4835EB",
+          "#566FE8",
+          "#7F9CF5",
+          "#C3DAFE",
+          "#E6E3FF",
+          "#EBE9FF"
+        ]
+      },
+      "content-primary": {
+        "role": "neutral",
+        "displayName": "Ink Slate",
+        "canonical": "#2D3748",
+        "tonalRamp": [
+          "#2D3748",
+          "#718096",
+          "#A0AEC0",
+          "#CBD5E0",
+          "#E2E8F0",
+          "#EDF2F7",
+          "#F8FAFC",
+          "#FFFFFF"
+        ]
+      },
+      "content-secondary": {
+        "role": "neutral",
+        "displayName": "Operational Slate",
+        "canonical": "#5D6B7C",
+        "tonalRamp": [
+          "#2D3748",
+          "#718096",
+          "#A0AEC0",
+          "#CBD5E0",
+          "#E2E8F0",
+          "#EDF2F7",
+          "#F8FAFC",
+          "#FFFFFF"
+        ]
+      },
+      "content-placeholder": {
+        "role": "neutral",
+        "displayName": "Placeholder Slate",
+        "canonical": "#667085",
+        "tonalRamp": [
+          "#2D3748",
+          "#718096",
+          "#A0AEC0",
+          "#CBD5E0",
+          "#E2E8F0",
+          "#EDF2F7",
+          "#F8FAFC",
+          "#FFFFFF"
+        ]
+      },
+      "border-default": {
+        "role": "neutral",
+        "displayName": "Structure Line",
+        "canonical": "#E2E8F0",
+        "tonalRamp": [
+          "#2D3748",
+          "#718096",
+          "#A0AEC0",
+          "#CBD5E0",
+          "#E2E8F0",
+          "#EDF2F7",
+          "#F8FAFC",
+          "#FFFFFF"
+        ]
+      },
+      "border-strong": {
+        "role": "neutral",
+        "displayName": "Strong Structure Line",
+        "canonical": "#CBD5E0",
+        "tonalRamp": [
+          "#2D3748",
+          "#718096",
+          "#A0AEC0",
+          "#CBD5E0",
+          "#E2E8F0",
+          "#EDF2F7",
+          "#F8FAFC",
+          "#FFFFFF"
+        ]
+      },
+      "feedback-success": {
+        "role": "semantic",
+        "displayName": "Success",
+        "canonical": "#276749"
+      },
+      "feedback-warning": {
+        "role": "semantic",
+        "displayName": "Warning",
+        "canonical": "#9C4221"
+      },
+      "feedback-danger": {
+        "role": "semantic",
+        "displayName": "Danger",
+        "canonical": "#C53030"
+      },
+      "feedback-info": {
+        "role": "semantic",
+        "displayName": "Information",
+        "canonical": "#2B6CB0"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Page title",
+        "purpose": "The fluid tenant page heading."
+      },
+      "headline": {
+        "displayName": "Surface heading",
+        "purpose": "Dashboard, template, and section headings."
+      },
+      "title": {
+        "displayName": "Policy title",
+        "purpose": "Expandable governance policy-group titles."
+      },
+      "body": {
+        "displayName": "Working text",
+        "purpose": "Tenant records and primary controls."
+      },
+      "label": {
+        "displayName": "Field label",
+        "purpose": "Visible filter labels and supporting metadata."
+      }
+    },
+    "shadows": [
+      {
+        "name": "popover",
+        "value": "0 12px 32px rgba(45,55,72,.14)",
+        "purpose": "Existing shared token used by contextual drawers."
+      },
+      {
+        "name": "modal-backdrop",
+        "value": "rgb(45 55 72 / .45)",
+        "purpose": "Existing semantic backdrop color for native modal drawers; not a box shadow."
+      }
+    ],
+    "motion": [
+      {
+        "name": "tenant-control-state",
+        "value": "160ms",
+        "purpose": "Existing background and border-color transitions."
+      },
+      {
+        "name": "drawer-enter",
+        "value": "200ms ease-out",
+        "purpose": "Right-edge translation from 1.5rem to 0; removed with prefers-reduced-motion."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "header-wrap",
+        "value": "1150px"
+      },
+      {
+        "name": "dashboard-pair-collapse",
+        "value": "1100px"
+      },
+      {
+        "name": "mock-workspace-stack",
+        "value": "850px"
+      },
+      {
+        "name": "phone-records",
+        "value": "700px"
+      },
+      {
+        "name": "dashboard-actions-stack",
+        "value": "480px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Existing tenant primary action, with hover, focus, and disabled treatment.",
+      "html": "<button class=\"ds-primary\" type=\"button\">Create account</button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:.65rem 1.1rem;border-radius:var(--xl-radius-sm,.625rem);font:600 1rem var(--xl-font-family, 'HarmonyOS Sans TC', Inter, ui-sans-serif, system-ui, sans-serif);cursor:pointer;transition:background .16s,border-color .16s;border:1px solid var(--xl-action-primary,#4835EB);background:var(--xl-action-primary,#4835EB);color:var(--xl-content-on-color,#FFFFFF)}.ds-primary:hover{background:var(--xl-action-primary-hover,#3A4FBF)}.ds-primary:focus-visible{outline:2px solid var(--xl-action-primary,#4835EB);outline-offset:3px}.ds-primary:disabled{opacity:.55;cursor:not-allowed}"
+    },
+    {
+      "name": "Secondary action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "White outlined secondary control; this specimen does not perform a route action.",
+      "html": "<button class=\"ds-secondary\" type=\"button\">Cancel</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:2.75rem;padding:.65rem 1.1rem;border-radius:var(--xl-radius-sm,.625rem);font:600 1rem var(--xl-font-family, 'HarmonyOS Sans TC', Inter, ui-sans-serif, system-ui, sans-serif);cursor:pointer;transition:background .16s,border-color .16s;border:1px solid var(--xl-border-default,#E2E8F0);background:var(--xl-surface-canvas,#FFFFFF);color:var(--xl-content-primary,#2D3748)}.ds-secondary:hover{background:var(--xl-surface-subtle,#F8FAFC);border-color:var(--xl-border-strong,#CBD5E0)}.ds-secondary:focus-visible{outline:2px solid var(--xl-action-primary,#4835EB);outline-offset:3px}.ds-secondary:disabled{opacity:.55;cursor:not-allowed}"
+    },
+    {
+      "name": "Directory search",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "The actual visible label, placeholder, search-icon position, and tenant field geometry.",
+      "html": "<label class=\"ds-search\"><span>Search by name or email</span><div class=\"ds-search-field\"><svg class=\"ds-search-icon\" xmlns=\"http://www.w3.org/2000/svg\" width=\"17\" height=\"17\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><circle cx=\"11\" cy=\"11\" r=\"8\"/><path d=\"m21 21-4.3-4.3\"/></svg><input class=\"ds-search-input\" placeholder=\"Name or email\" /></div></label>",
+      "css": ".ds-search{display:flex;flex-direction:column;gap:.5rem;max-width:26rem;color:var(--xl-content-secondary,#5D6B7C);font:400 .875rem var(--xl-font-family, 'HarmonyOS Sans TC', Inter, ui-sans-serif, system-ui, sans-serif)}.ds-search>span{font-weight:500}.ds-search-field{position:relative}.ds-search-icon{position:absolute;left:.9rem;top:50%;transform:translateY(-50%)}.ds-search-input{width:100%;min-width:0;min-height:2.875rem;padding:.65rem .85rem .65rem 2.6rem;border:1px solid var(--xl-border-default,#E2E8F0);border-radius:var(--xl-radius-sm,.625rem);background:var(--xl-surface-canvas,#FFFFFF);color:var(--xl-content-primary,#2D3748);font:inherit;caret-color:var(--xl-action-primary,#4835EB)}.ds-search-input::placeholder{color:var(--xl-content-placeholder,#667085)}.ds-search-input:focus-visible{outline:2px solid var(--xl-action-primary,#4835EB);outline-offset:3px}"
+    },
+    {
+      "name": "Governance section navigation",
+      "kind": "nav",
+      "refersTo": "governance-navigation",
+      "description": "Four underline-selected sections; the same navigation reflows to a two-by-two phone grid.",
+      "html": "<nav class=\"ds-governance\" aria-label=\"Tenant governance sections\"><button class=\"ds-governance-tab\" type=\"button\" aria-current=\"page\">People</button><button class=\"ds-governance-tab\" type=\"button\">Course ownership</button><button class=\"ds-governance-tab\" type=\"button\">Alert rules</button><button class=\"ds-governance-tab\" type=\"button\">Audit</button></nav>",
+      "css": ".ds-governance{display:flex;gap:2rem;overflow-x:auto;font-family:var(--xl-font-family, 'HarmonyOS Sans TC', Inter, ui-sans-serif, system-ui, sans-serif)}.ds-governance-tab{display:inline-flex;align-items:center;flex-shrink:0;background:transparent;border:0;border-bottom:2px solid transparent;border-radius:0;padding:1rem 0;color:var(--xl-content-secondary,#5D6B7C);font:600 1rem var(--xl-font-family, 'HarmonyOS Sans TC', Inter, ui-sans-serif, system-ui, sans-serif);cursor:pointer}.ds-governance-tab[aria-current=page]{color:var(--xl-action-primary,#4835EB);border-color:var(--xl-action-primary,#4835EB)}.ds-governance-tab:focus-visible{outline:2px solid var(--xl-action-primary,#4835EB);outline-offset:3px}@media(max-width:700px){.ds-governance{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 1.25rem;overflow:visible}.ds-governance-tab{justify-content:center;min-height:2.75rem;padding:.5rem 0}}"
+    },
+    {
+      "name": "Record status badge",
+      "kind": "chip",
+      "refersTo": "badge-neutral",
+      "description": "Compact text-labeled lifecycle states; SAVED uses the existing success surface, DRAFT the warning surface.",
+      "html": "<div class=\"ds-badges\"><span class=\"ds-badge ds-badge-saved\">Saved</span><span class=\"ds-badge ds-badge-draft\">Draft</span></div>",
+      "css": ".ds-badges{display:flex;flex-wrap:wrap;gap:.5rem}.ds-badge{display:inline-flex;align-items:center;gap:.4rem;border-radius:.4rem;padding:.2rem .65rem;background:var(--xl-surface-muted,#EDF2F7);color:var(--xl-content-secondary,#5D6B7C);font:600 .875rem var(--xl-font-family, 'HarmonyOS Sans TC', Inter, ui-sans-serif, system-ui, sans-serif);white-space:nowrap}.ds-badge-saved{color:var(--xl-feedback-success,#276749);background:rgba(72,187,120,.1)}.ds-badge-draft{color:var(--xl-feedback-warning,#9C4221);background:rgba(237,137,54,.1)}"
+    },
+    {
+      "name": "Dashboard metric",
+      "kind": "card",
+      "refersTo": "dashboard-metric",
+      "description": "The actual unavailable-count state; no sample statistic is supplied.",
+      "html": "<article class=\"ds-metric\"><div class=\"ds-metric-top\"><span class=\"ds-metric-icon\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"23\" height=\"23\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\"/><circle cx=\"9\" cy=\"7\" r=\"4\"/><path d=\"M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75\"/></svg></span></div><span class=\"ds-metric-label\">Total users</span><strong class=\"ds-metric-value\">—</strong><small class=\"ds-metric-unavailable\">Count unavailable</small></article>",
+      "css": ".ds-metric{display:flex;flex-direction:column;min-width:0;padding:1.5rem;border:1px solid var(--xl-border-default,#E2E8F0);border-radius:var(--xl-radius-md,.9375rem);background:var(--xl-surface-canvas,#FFFFFF);color:var(--xl-content-primary,#2D3748);font:400 1rem var(--xl-font-family, 'HarmonyOS Sans TC', Inter, ui-sans-serif, system-ui, sans-serif)}.ds-metric-top{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:1.25rem}.ds-metric-icon{display:inline-flex;align-items:center;justify-content:center;width:2.75rem;height:2.75rem;border-radius:var(--xl-radius-sm,.625rem);background:rgba(230,227,255,.65);color:var(--xl-action-primary,#4835EB)}.ds-metric-label{font-size:.875rem;color:var(--xl-content-secondary,#5D6B7C)}.ds-metric-value{display:block;font-size:2.6rem;font-weight:700;line-height:1.2;margin-top:.5rem;font-variant-numeric:tabular-nums}.ds-metric-unavailable{font-size:.875rem}@media(max-width:480px){.ds-metric{padding:1rem}}"
+    },
+    {
+      "name": "Policy summary",
+      "kind": "custom",
+      "refersTo": "policy-group",
+      "description": "Native disclosure with the real unavailable-system-default message and per-group unsaved marker.",
+      "html": "<details class=\"ds-policy\"><summary class=\"ds-policy-summary\"><span class=\"ds-policy-copy\"><strong>Learning inactivity</strong><small>System default values unavailable until the policy is saved.</small></span><span class=\"ds-policy-meta\"><span class=\"ds-policy-unsaved\">Unsaved changes</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"18\" height=\"18\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"/></svg></span></summary><p class=\"ds-policy-detail\">Override values are not used in the current mode.</p></details>",
+      "css": ".ds-policy{border:1px solid var(--xl-border-default,#E2E8F0);border-radius:var(--xl-radius-md,.9375rem);background:var(--xl-surface-canvas,#FFFFFF);color:var(--xl-content-primary,#2D3748);font:400 1rem var(--xl-font-family, 'HarmonyOS Sans TC', Inter, ui-sans-serif, system-ui, sans-serif)}.ds-policy-summary{display:flex;justify-content:space-between;align-items:center;gap:1.5rem;padding:1.5rem;cursor:pointer;list-style:none}.ds-policy-summary::-webkit-details-marker{display:none}.ds-policy-copy strong,.ds-policy-copy small{display:block}.ds-policy-copy strong{font-size:1.125rem;font-weight:600}.ds-policy-copy small{margin-top:.5rem;color:var(--xl-content-secondary,#5D6B7C);line-height:1.6}.ds-policy-meta{display:flex;align-items:center;gap:1.25rem;font-size:.875rem;color:var(--xl-content-secondary,#5D6B7C);white-space:nowrap}.ds-policy-unsaved{color:var(--xl-feedback-warning,#9C4221)}.ds-policy-detail{margin:0;padding:0 1.5rem 1.25rem;font-size:.875rem;color:var(--xl-content-secondary,#5D6B7C)}.ds-policy-summary:focus-visible{outline:2px solid var(--xl-action-primary,#4835EB);outline-offset:3px}@media(max-width:700px){.ds-policy-summary{padding:1.25rem;flex-wrap:wrap;gap:.75rem}.ds-policy-meta{justify-content:space-between;width:100%}}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Calm Learning Desk",
+    "overview": "Tenant Administration extends the existing X-Learn operational workspace: calm, precise enterprise operations with compact information density, clear record hierarchy, and a visible next action. Cool-gray working space, white outlined surfaces, inherited HarmonyOS Sans TC typography, and violet wayfinding express the supplied Tenant Admin frames without creating a separate brand.\n\nThis is an Operate surface. Scanability, honest state, and record continuity outrank spectacle. Dashboard summaries lead into governance, intakes, and assessment records; contextual drawers and explicit draft states preserve the surrounding task.",
+    "keyCharacteristics": [
+      "Cool-gray canvas and white outlined working surfaces.",
+      "One violet action voice with semantic, text-labeled state.",
+      "Wide desktop records with deliberate phone reflow.",
+      "Context-preserving drawers and honest server-versus-local state."
+    ],
+    "rules": [
+      {
+        "name": "The One Violet Voice Rule",
+        "body": "Violet means selected, actionable, or focused. Do not use it as ambient decoration across whole screens.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat-Until-Meaningful Rule",
+        "body": "A surface earns elevation through hierarchy or temporary overlay behavior. Prefer a border or tonal change for ordinary grouping.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do reuse the current semantic tokens and preserve the supplied Tenant Admin composition.",
+      "Do keep loading, unavailable, error, empty, unsaved, and saved states visibly distinct.",
+      "Do preserve mobile record labels, visible focus, and explicit secondary-filter disclosure.",
+      "Do keep screenshot fidelity, frontend contract behavior, and authenticated live acceptance separate."
+    ],
+    "donts": [
+      "Don't infer learning activity from active accounts or count published versions as published templates.",
+      "Don't fabricate people photographs, statistics, recent-login dates, or portal versions.",
+      "Don't invent arbitrary alert rules, Speaking authoring, or saved-section editing.",
+      "Don't promote this route-scoped composition into new global design rules."
+    ]
+  }
+}

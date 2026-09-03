@@ -1,0 +1,191 @@
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: t.$space-6;
+  margin-bottom: t.$space-8;
+}
+.metric {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid t.$border-default;
+  background: t.$surface-canvas;
+  border-radius: t.$radius-md;
+  padding: t.$space-6;
+  min-width: 0;
+}
+
+.metricTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-3;
+  margin-bottom: t.$space-5;
+  @media (max-width: 700px) {
+    flex-direction: column;
+    align-items: flex-start;
+    min-height: 5.25rem;
+  }
+}
+.metricTop > span:last-child {
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  text-align: right;
+}
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: t.$radius-sm;
+  background: rgba(t.$surface-brand-subtle, 0.65);
+  color: t.$action-primary;
+  flex-shrink: 0;
+}
+.metric > a {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+  text-decoration: none;
+  @media (max-width: 700px) { min-height: 2.75rem; }
+}
+.metric > a:hover {
+  color: t.$action-primary;
+}
+.metric > strong {
+  display: block;
+  font-size: 2.6rem;
+  font-weight: t.$fw-bold;
+  line-height: 1.2;
+  margin-top: t.$space-2;
+  font-variant-numeric: tabular-nums;
+}
+.overview {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: start;
+  gap: t.$space-6;
+}
+.activity {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: t.$space-5;
+}
+.activity li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: t.$space-4;
+}
+.activity time {
+  max-width: 8rem;
+  text-align: right;
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+  line-height: 1.5;
+}
+.actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$space-4;
+}
+.actions a {
+  display: grid;
+  justify-items: start;
+  gap: t.$space-3;
+  padding: t.$space-5;
+  background: t.$surface-subtle;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  text-decoration: none;
+  color: t.$content-primary;
+  transition: border-color 0.16s;
+}
+.actions a:hover {
+  border-color: t.$action-primary;
+}
+.actions strong {
+  font-weight: t.$fw-semibold;
+  line-height: 1.4;
+}
+.actions small {
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: 1.5;
+}
+.pipeline {
+  margin-top: t.$space-8;
+}
+.pipelineBar {
+  height: 2.5rem;
+  display: flex;
+  overflow: hidden;
+  border-radius: t.$radius-sm;
+  background: t.$surface-muted;
+}
+.pipelineBar span {
+  flex-basis: 0;
+}
+.pipelineBar [data-part='assigned'] {
+  background: t.$action-primary;
+}
+.pipelineBar [data-part='unassigned'] {
+  background: t.$border-strong;
+}
+.legend {
+  display: flex;
+  justify-content: space-between;
+  margin-top: t.$space-4;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+}
+.legend span {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+}
+.legend i {
+  width: 0.65rem;
+  height: 0.65rem;
+  background: t.$action-primary;
+  border-radius: 0.2rem;
+}
+.legend span:last-child i {
+  background: t.$border-strong;
+}
+@media (max-width: 1100px) {
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .overview {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .metrics {
+    gap: t.$space-3;
+  }
+  .metric {
+    padding: t.$space-4;
+  }
+  .metricTop {
+    flex-wrap: wrap;
+  }
+  .metricTop > span:last-child {
+    text-align: left;
+  }
+  .actions {
+    grid-template-columns: 1fr;
+  }
+  .activity li {
+    flex-wrap: wrap;
+  }
+  .activity time {
+    max-width: none;
+    margin-left: 3.25rem;
+  }
+}

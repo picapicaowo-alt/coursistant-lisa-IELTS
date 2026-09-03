@@ -16,8 +16,8 @@ describe('getSignedInHomePath', () => {
     expect(getSignedInHomePath({role: 'USER', level: 'STUDENT'})).toBe('/');
   });
 
-  it('sends tenant admins to intake operations', () => {
-    expect(getSignedInHomePath({role: 'TENANT_ADMIN', level: 'NOT_APPLICABLE'})).toBe('/admin/intakes');
+  it('sends tenant admins to their administration overview', () => {
+    expect(getSignedInHomePath({role: 'TENANT_ADMIN', level: 'NOT_APPLICABLE'})).toBe('/admin/dashboard');
   });
 
   it('sends system admins to the authorized course catalogue', () => {
@@ -26,7 +26,7 @@ describe('getSignedInHomePath', () => {
 
   it('keeps unsupported account combinations on a non-business profile route', () => {
     expect(getSignedInHomePath({role: 'ADMIN', level: null})).toBe('/profile');
-    expect(getSignedInHomePath({role: 'TENANT_ADMIN', level: 'STUDENT'})).toBe('/admin/intakes');
+    expect(getSignedInHomePath({role: 'TENANT_ADMIN', level: 'STUDENT'})).toBe('/admin/dashboard');
     expect(getSignedInHomePath({role: 'USER', level: 'NOT_APPLICABLE'})).toBe('/profile');
   });
 

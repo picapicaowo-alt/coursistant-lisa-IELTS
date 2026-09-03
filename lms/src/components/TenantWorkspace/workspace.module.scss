@@ -1,0 +1,734 @@
+.page {
+  position: relative;
+  min-height: 100%;
+  padding: clamp(1.5rem, 3.3vw, 3.5rem) clamp(1rem, 3.3vw, 3.5rem) t.$space-16;
+  background: t.$surface-subtle;
+  color: t.$content-primary;
+  font-size: t.$font-size-body-lg;
+  --tenant-gap: #{t.$space-8};
+  ::selection {
+    background: t.$surface-brand-subtle;
+  }
+}
+.page *,
+.drawer * {
+  box-sizing: border-box;
+}
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: t.$space-8;
+  margin-bottom: t.$space-10;
+}
+.pageHeader h1 {
+  margin: 0;
+  font-size: clamp(1.75rem, 2.35vw, 2.5rem);
+  line-height: 1.2;
+  font-weight: t.$fw-bold;
+  text-wrap: balance;
+}
+.pageHeader p {
+  margin: t.$space-3 0 0;
+  color: t.$content-secondary;
+  line-height: 1.6;
+  max-width: 72ch;
+}
+.headerActions,
+.actions,
+.filterActions,
+.formFooter {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+}
+.headerActions {
+  flex-shrink: 0;
+}
+.quickLinks {
+  display: flex;
+  gap: t.$space-4;
+}
+.quickLinks a {
+  width: 13rem;
+  padding: t.$space-5;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md;
+  background: t.$surface-canvas;
+  color: t.$content-primary;
+  text-decoration: none;
+  transition: border-color 0.16s;
+}
+.quickLinks a:hover {
+  border-color: t.$border-interactive;
+}
+.quickLinks strong,
+.quickLinks small {
+  display: block;
+}
+.quickLinks small {
+  color: t.$content-secondary;
+  margin-top: t.$space-2;
+  line-height: 1.5;
+}
+.tabs {
+  display: flex;
+  gap: t.$space-8;
+  overflow-x: auto;
+  margin-bottom: t.$space-8;
+  scrollbar-width: thin;
+}
+.tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-2;
+  flex-shrink: 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  padding: t.$space-4 0;
+  color: t.$content-secondary;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+.tabs button.activeTab {
+  color: t.$action-primary;
+  border-color: t.$action-primary;
+}
+.surface {
+  min-width: 0;
+  padding: clamp(1rem, 2vw, 2rem);
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md;
+  background: t.$surface-canvas;
+}
+.sectionHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-4;
+  margin-bottom: t.$space-6;
+}
+.sectionHeading h2,
+.surface h2 {
+  font-size: t.$font-size-headline;
+  line-height: 1.4;
+  margin: 0;
+  font-weight: t.$fw-bold;
+}
+.primaryButton,
+.secondaryButton,
+.dangerButton,
+.iconButton,
+.textButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-2;
+  min-height: 2.75rem;
+  border-radius: t.$radius-sm;
+  padding: 0.65rem 1.1rem;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+  text-decoration: none;
+  transition:
+    background 0.16s,
+    border-color 0.16s;
+}
+.primaryButton {
+  border: 1px solid t.$action-primary;
+  background: t.$action-primary;
+  color: t.$content-on-color;
+}
+.primaryButton:hover {
+  background: t.$action-primary-hover;
+}
+.secondaryButton {
+  border: 1px solid t.$border-default;
+  background: t.$surface-canvas;
+  color: t.$content-primary;
+}
+.secondaryButton:hover {
+  background: t.$surface-subtle;
+  border-color: t.$border-strong;
+}
+.textButton {
+  border: 0;
+  background: transparent;
+  color: t.$action-primary;
+  padding-inline: 0.25rem;
+}
+.textButton:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.dangerButton {
+  background: t.$feedback-danger-surface;
+  border: 1px solid transparent;
+  color: t.$feedback-danger;
+}
+.dangerLink {
+  @extend .textButton;
+  color: t.$feedback-danger;
+}
+.iconButton {
+  width: 2.75rem;
+  padding: 0.6rem;
+  border: 1px solid t.$border-default;
+  background: t.$surface-canvas;
+  color: t.$content-secondary;
+  flex-shrink: 0;
+}
+.page button:disabled,
+.drawer button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.page :focus-visible,
+.drawer :focus-visible {
+  outline: 2px solid t.$action-primary;
+  outline-offset: 3px;
+}
+.filterBar {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+  margin-bottom: t.$space-4;
+}
+.mobileFilterToggle {
+  display: none;
+}
+.secondaryFilters {
+  display: contents;
+}
+.directoryFilterActions {
+  order: 1;
+}
+.directorySecondaryActions {
+  order: 2;
+}
+.filterBar label,
+.form label {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-2;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  min-width: 0;
+}
+.filterBar label > span,
+.form label > span {
+  font-weight: t.$fw-medium;
+}
+.filterBar input,
+.filterBar select,
+.form input:not([type="checkbox"]):not([type="radio"]),
+.form select,
+.form textarea {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-canvas;
+  color: t.$content-primary;
+  min-height: 2.875rem;
+  padding: 0.65rem 0.85rem;
+  font: inherit;
+  caret-color: t.$action-primary;
+}
+.filterBar input::placeholder,
+.form input::placeholder,
+.form textarea::placeholder {
+  color: t.$content-placeholder;
+}
+.filterBar select {
+  min-width: 8.5rem;
+}
+.searchField {
+  flex: 1 1 16rem;
+  max-width: 26rem;
+}
+.searchField > div {
+  position: relative;
+}
+.searchField > div > svg {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.searchField > div > input {
+  padding-left: 2.6rem;
+}
+.tableWrap {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: t.$border-strong transparent;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: t.$font-size-body-lg;
+}
+.table th {
+  padding: t.$space-4 t.$space-3;
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+  font-weight: t.$fw-semibold;
+  white-space: nowrap;
+}
+.table td {
+  padding: t.$space-5 t.$space-3;
+  vertical-align: middle;
+  line-height: 1.5;
+}
+.table tbody tr + tr {
+  border-top: 1px solid rgba(t.$border-default, 0.5);
+}
+.table tbody tr:hover {
+  background: t.$surface-subtle;
+}
+.table td:first-child,
+.table th:first-child {
+  padding-left: 0;
+}
+.table td:last-child,
+.table th:last-child {
+  padding-right: 0;
+}
+.table td small {
+  display: block;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  margin-top: 0.2rem;
+}
+.person {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+  min-width: 0;
+  text-align: left;
+}
+.person > span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.person strong,
+.person small {
+  display: block;
+}
+.person strong {
+  font-weight: t.$fw-semibold;
+  color: t.$content-primary;
+}
+.person small {
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: 1.4;
+}
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: t.$surface-muted;
+}
+.personButton {
+  display: block;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 0.4rem;
+  padding: 0.2rem 0.65rem;
+  background: t.$surface-muted;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-semibold;
+  white-space: nowrap;
+}
+.badge[data-tone="TENANT_ADMIN"],
+.badge[data-tone="ASSIGNED"] {
+  color: t.$action-primary;
+  background: rgba(t.$surface-brand-subtle, 0.6);
+}
+.badge[data-tone="COUNSELLOR"],
+.badge[data-tone="OPEN"],
+.badge[data-tone="PUBLISHED"],
+.badge[data-tone="SAVED"] {
+  color: t.$feedback-success;
+  background: t.$feedback-success-surface;
+}
+.badge[data-tone="ADVISOR"],
+.badge[data-tone="DRAFT"] {
+  color: t.$feedback-warning;
+  background: t.$feedback-warning-surface;
+}
+.badge[data-tone="INSTRUCTOR"],
+.badge[data-tone="INSTRUCTOR_ADVISOR"],
+.badge[data-tone="UNASSIGNED"] {
+  color: t.$feedback-danger;
+  background: t.$feedback-danger-surface;
+}
+.badge[data-tone="STUDENT"] {
+  color: t.$feedback-info;
+  background: t.$feedback-info-surface;
+}
+.accountStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+.accountStatus::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: t.$content-secondary;
+}
+.accountStatus[data-active="true"]::before {
+  background: t.$feedback-success;
+}
+.muted,
+.hint {
+  color: t.$content-secondary;
+  line-height: 1.6;
+}
+.hint {
+  font-size: t.$font-size-body;
+}
+.directoryStatus {
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+  min-height: 1.4em;
+}
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+  margin-top: t.$space-6;
+  padding-top: t.$space-4;
+  border-top: 1px solid t.$border-default;
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+}
+.pagination button {
+  @extend .secondaryButton;
+}
+.status,
+.empty {
+  padding: t.$space-8 t.$space-4;
+  color: t.$content-secondary;
+  text-align: center;
+  line-height: 1.6;
+}
+.errorNotice,
+.inlineError {
+  color: t.$feedback-danger;
+  padding: t.$space-4;
+  border-radius: t.$radius-sm;
+  background: t.$feedback-danger-surface;
+  line-height: 1.6;
+}
+.inlineSuccess {
+  color: t.$feedback-success;
+  padding: t.$space-4;
+  background: t.$feedback-success-surface;
+  border-radius: t.$radius-sm;
+}
+.form {
+  display: grid;
+  gap: t.$space-5;
+  min-width: 0;
+}
+.form textarea {
+  resize: vertical;
+  min-height: 7rem;
+  line-height: 1.6;
+}
+.form input:disabled {
+  background: t.$surface-subtle;
+}
+.nameGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: t.$space-3;
+}
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$space-5;
+}
+.formFooter {
+  justify-content: space-between;
+  border-top: 1px solid t.$border-default;
+  padding-top: t.$space-5;
+  margin-top: t.$space-3;
+}
+.formFooter > span {
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+}
+.pickerField {
+  display: grid;
+  gap: t.$space-2;
+  font-size: t.$font-size-body;
+}
+.detailList {
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  gap: t.$space-4;
+  font-size: t.$font-size-body;
+  margin: 0 0 t.$space-6;
+}
+.detailList dt {
+  color: t.$content-secondary;
+}
+.detailList dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-weight: t.$fw-medium;
+}
+.governanceActions {
+  display: grid;
+  gap: t.$space-5;
+  margin-top: t.$space-6;
+  padding-top: t.$space-6;
+  border-top: 1px solid t.$border-default;
+}
+.confirmBox,
+.blockers {
+  background: t.$surface-subtle;
+  padding: t.$space-5;
+  border-radius: t.$radius-sm;
+  margin-top: t.$space-4;
+  line-height: 1.6;
+}
+.confirmBox > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+}
+.blockers li > span {
+  display: block;
+}
+.subheading {
+  margin: t.$space-4 0 0;
+  font-size: t.$font-size-subhead;
+}
+.drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  margin: 0;
+  width: min(42rem, 100vw);
+  max-width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+  border: 0;
+  padding: 0;
+  color: t.$content-primary;
+  background: t.$surface-canvas;
+  box-shadow: t.$shadow-popover;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+.drawer::backdrop {
+  background: t.$surface-modal-backdrop;
+}
+.drawer[open] {
+  animation: drawerEnter 0.2s ease-out;
+}
+.drawerHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: t.$space-5;
+  padding: t.$space-8;
+  border-bottom: 1px solid t.$border-default;
+}
+.drawerHeader h2 {
+  margin: 0;
+  font-size: t.$font-size-headline;
+}
+.drawerHeader p {
+  color: t.$content-secondary;
+  margin: t.$space-2 0 0;
+  line-height: 1.5;
+}
+.drawerBody {
+  padding: t.$space-8;
+  display: grid;
+  gap: t.$space-6;
+}
+.srOnly,
+.srStatus {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@keyframes drawerEnter {
+  from {
+    transform: translateX(1.5rem);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .drawer[open] {
+    animation: none;
+  }
+}
+@media (max-width: 1150px) {
+  .pageHeader {
+    flex-wrap: wrap;
+  }
+  .quickLinks {
+    width: 100%;
+  }
+  .quickLinks a {
+    flex: 1;
+  }
+}
+@media (max-width: 700px) {
+  .governanceHeader {
+    gap: t.$space-3;
+    margin-bottom: t.$space-3;
+    p,
+    .quickLinks small {
+      display: none;
+    }
+    .quickLinks {
+      gap: t.$space-3;
+    }
+    .quickLinks a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 2.75rem;
+      padding: t.$space-2;
+      font-size: t.$font-size-body;
+    }
+  }
+  .mobileFilterToggle {
+    display: inline-flex;
+  }
+  .secondaryFilters[data-open="false"] {
+    display: none;
+  }
+  .secondaryFilters > label {
+    flex: 1 1 9rem;
+  }
+  .secondaryFilters > form {
+    margin-top: t.$space-4;
+  }
+  .tabs[aria-label="Tenant governance sections"] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 t.$space-5;
+    overflow: visible;
+    margin-bottom: t.$space-5;
+    button {
+      justify-content: center;
+      min-height: 2.75rem;
+      padding: t.$space-2 0;
+    }
+  }
+  .page {
+    padding: t.$space-6 t.$space-4 t.$space-10;
+  }
+  .pageHeader {
+    gap: t.$space-5;
+    margin-bottom: t.$space-6;
+  }
+  .pageHeader.governanceHeader {
+    gap: t.$space-3;
+    margin-bottom: t.$space-3;
+  }
+  .headerActions {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+  .tabs {
+    gap: t.$space-6;
+  }
+  .filterBar > label {
+    flex: 1 1 9rem;
+  }
+  .searchField {
+    max-width: none;
+    flex-basis: 100% !important;
+  }
+  .filterActions {
+    width: 100%;
+  }
+  .directoryFilterActions {
+    width: auto;
+  }
+  .directoryHeading {
+    justify-content: flex-end;
+    margin-bottom: t.$space-4;
+    > .hint {
+      display: none;
+    }
+    button {
+      white-space: nowrap;
+    }
+  }
+  .table,
+  .table tbody,
+  .table tr,
+  .table td {
+    display: block;
+  }
+  .table thead {
+    display: none;
+  }
+  .table tr {
+    padding: t.$space-4 0;
+  }
+  .table td {
+    display: flex;
+    justify-content: space-between;
+    gap: t.$space-4;
+    padding: t.$space-2 0;
+  }
+  .table td[data-label]::before {
+    content: attr(data-label);
+    color: t.$content-secondary;
+    font-size: t.$font-size-body;
+  }
+  .table td:first-child {
+    margin-bottom: t.$space-2;
+  }
+  .drawerHeader,
+  .drawerBody {
+    padding: t.$space-5;
+  }
+  .nameGrid,
+  .fieldGrid {
+    grid-template-columns: 1fr;
+  }
+}

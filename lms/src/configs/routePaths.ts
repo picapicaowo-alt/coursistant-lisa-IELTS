@@ -44,6 +44,7 @@ export const APP_ROUTE_PATHS = {
   aibot: '/aibot',
   settings: '/settings',
   admin: '/admin',
+  adminDashboard: '/admin/dashboard',
   counsellor: '/counsellor',
   counsellorIntakes: '/counsellor/intakes',
   counsellorIntakesNew: '/counsellor/intakes/new',

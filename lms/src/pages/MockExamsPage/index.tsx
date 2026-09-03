@@ -5,7 +5,8 @@ import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {StudentMockExamLibrary} from './StudentMockExamLibrary';
-import {AdvisorWorkspace, InstructorWorkspace, SystemWorkspace, TenantWorkspace} from './StaffMockExamWorkspaces';
+import {AdvisorWorkspace, InstructorWorkspace, SystemWorkspace} from './StaffMockExamWorkspaces';
+import {TenantWorkspace} from './tenant/TenantWorkspace';
 import studentStyles from './index.module.scss';
 import styles from '../advising/advising.module.scss';
 
