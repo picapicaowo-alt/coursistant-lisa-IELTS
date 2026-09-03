@@ -49,8 +49,8 @@
 | Production strict TypeScript | 通过 |
 | Vitest | 132 files / 548 tests 通过 |
 | Production build | 通过 |
-| Visual + interaction E2E（含临时逐帧捕获） | 106 tests 通过 |
-| 永久 E2E baseline | 93 tests 通过 |
+| 最新合并基线上的逐帧捕获 | 13 scenarios 通过 |
+| 永久 E2E baseline | 95 tests 通过 |
 | Impeccable mechanical detector | 42 个本轮 TSX/SCSS 目标，0 finding |
 | Figma references | 69/69 fresh exports；58 frontend states × desktop/mobile |
 
