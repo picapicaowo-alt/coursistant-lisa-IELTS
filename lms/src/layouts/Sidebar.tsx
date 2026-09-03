@@ -9,6 +9,7 @@ import {
   GraduationCap,
   LayoutDashboard,
   Menu,
+  MessageSquare,
   Settings,
   Sparkles,
   UsersRound,
@@ -68,7 +69,7 @@ const STANDARD_ICONS: Record<string, LucideIcon> = {
 const Sidebar: React.FC = () => {
   const {t} = useTranslation();
   const {user} = useRequiredAuth();
-  const {pathname} = useLocation();
+  const {pathname, hash} = useLocation();
   const [isMoreOpen, setIsMoreOpen] = React.useState(false);
   const selectedSidebarIndex = getSidebarIndex(pathname);
   const isUserAccount = user.role === 'USER';
@@ -108,8 +109,9 @@ const Sidebar: React.FC = () => {
     addItem({to: '/counsellor/intakes', label: 'Unassigned intakes', icon: ClipboardList, active: pathname.startsWith('/counsellor/intakes')});
   }
   if (!student && advisor) {
-    addItem({to: '/advisor/operations', label: 'Operations', icon: ClipboardList, active: pathname.startsWith('/advisor/operations')});
+    addItem({to: '/advisor/operations', label: advisorOnly ? 'Dashboard' : 'Advisor dashboard', icon: LayoutDashboard, active: pathname.startsWith('/advisor/operations') && hash !== '#conversations'});
     addItem({to: '/advisor/students', label: 'Students', icon: UsersRound, active: pathname.startsWith('/advisor/students')});
+    addItem({to: '/advisor/operations#conversations', label: 'Messages', icon: MessageSquare, active: pathname.startsWith('/advisor/operations') && hash === '#conversations'});
   }
   if (!student && instructor) {
     addItem({to: '/my-operations', label: 'Teaching operations', icon: ClipboardList, active: pathname === '/my-operations'});
@@ -150,7 +152,7 @@ const Sidebar: React.FC = () => {
 
   React.useEffect(() => {
     setIsMoreOpen(false);
-  }, [pathname]);
+  }, [pathname, hash]);
 
   return (
     <aside className={styles.sidebar} aria-label="Primary navigation">

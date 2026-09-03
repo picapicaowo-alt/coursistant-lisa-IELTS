@@ -13,7 +13,7 @@
   justify-content: space-between;
   gap: t.$space-4;
   min-height: t.$touch-target;
-  padding: t.$space-5 t.$space-6;
+  padding: t.$space-5 t.$workspace-panel-padding;
   list-style: none;
   cursor: pointer;
   border-radius: inherit;
@@ -30,7 +30,7 @@
 .titleRow h2, .titleRow h3, .titleRow h4 {
   margin: 0;
   font-size: t.$font-size-subhead;
-  font-weight: t.$fw-semibold;
+  font-weight: t.$fw-bold;
   line-height: t.$line-height-subhead;
   overflow-wrap: anywhere;
 }
@@ -56,7 +56,7 @@
 .chevron { flex-shrink: 0; color: t.$content-secondary; transition: transform t.$duration-standard t.$ease-out; }
 .section[open] > .summary { border-radius: t.$radius-md t.$radius-md 0 0; }
 .section[open] > .summary .chevron { transform: rotate(180deg); }
-.body { display: grid; gap: t.$space-5; padding: t.$space-6; border-top: 1px solid t.$border-default; min-width: 0; }
+.body { display: grid; gap: t.$space-5; padding: t.$workspace-panel-padding; border-top: 1px solid t.$border-default; min-width: 0; }
 .body > p { margin: 0; max-width: t.$reading-max-width; }
 .body .section { background: t.$surface-subtle; }
 .body .section > .summary { padding: t.$space-4; }

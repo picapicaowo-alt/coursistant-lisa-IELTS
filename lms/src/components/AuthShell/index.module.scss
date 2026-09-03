@@ -1,0 +1,47 @@
+.page {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 100dvh;
+  gap: t.$space-6;
+  padding: clamp(1rem, 2vw, 1.75rem);
+  color: t.$content-primary;
+  background: t.$surface-canvas;
+}
+.formPanel { display: flex; flex-direction: column; min-width: 0; }
+.formContent {
+  width: min(100%, 28rem);
+  margin: auto;
+  padding-block: clamp(2rem, 5vh, 4rem);
+}
+.heading {
+  text-align: center;
+  margin-bottom: clamp(2rem, 5vh, 3.5rem);
+  img { width: clamp(3rem, 5.5vw, 5rem); aspect-ratio: 1; object-fit: contain; margin: 0 auto t.$space-6; }
+  h1 { font-size: t.$workspace-title-size; line-height: t.$line-height-title-1; font-weight: t.$fw-bold; margin: 0 0 t.$space-2; }
+  p { color: t.$content-secondary; font-size: t.$font-size-body; line-height: t.$line-height-body; margin: 0; }
+}
+.help { font-size: t.$font-size-caption; margin: t.$space-6 t.$space-5 0; }
+.visualPanel {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2rem, 4vw, 5rem);
+  border-radius: t.$radius-auth-panel;
+  background: t.$action-primary url('/icons/figma-auth/pattern.svg') center / 76% auto repeat-y;
+}
+.artwork {
+  width: 100%;
+  // Cap only the decorative artwork, never the page canvas or form columns.
+  max-width: 48rem;
+  padding-bottom: 12%;
+  > p { max-width: 23ch; margin: 0 0 t.$space-6; color: t.$content-on-color; font-size: clamp(1.25rem, 2.25vw, 2rem); font-weight: t.$fw-bold; line-height: 1.25; }
+}
+.productPreview { position: relative; }
+.dashboard { display: block; width: 100%; border-radius: t.$radius-md; }
+.goal { position: absolute; width: 52%; right: -3%; bottom: -10%; border-radius: t.$radius-md; box-shadow: t.$shadow-card; }
+@media (max-width: 56rem) {
+  .page { grid-template-columns: minmax(0, 1fr); padding: t.$space-5; }
+  .visualPanel { display: none; }
+  .help { text-align: center; margin-inline: 0; }
+}

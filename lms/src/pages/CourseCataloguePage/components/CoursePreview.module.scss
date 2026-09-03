@@ -5,10 +5,12 @@
 .courseItem {
     display: flex;
     flex-direction: column;
-    background-color: t.$card-bg;
+    background-color: var(--course-surface);
     border: 1px solid t.$border;
     border-radius: t.$radius-card-lg;
-    padding: 1.25rem;
+    padding: t.$workspace-panel-padding;
+    min-width: 0;
+    gap: t.$space-4;
     box-shadow: t.$shadow-card;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
 
@@ -23,7 +25,7 @@
     justify-content: space-between;
     align-items: flex-start;
     min-height: t.$control-size;
-    margin-bottom: 0.75rem;
+
 }
 
 .instructorInfo {
@@ -63,14 +65,16 @@
     // Pushes the meta row to the bottom so cards line up even when a course
     // has no sessions to show.
     flex: 1;
-    gap: 1.5rem;
+    gap: t.$space-4;
 }
 
 .courseTitle {
+    margin: 0;
+    overflow-wrap: anywhere;
     font-size: t.$fs-course-name;
     font-weight: t.$fw-bold;
-    color: t.$text;
-    line-height: 1.3;
+    color: var(--course-ink);
+    line-height: t.$line-height-headline;
 }
 
 .courseMeta {
@@ -102,6 +106,8 @@
 }
 
 .courseFooter {
+
+    flex-wrap: wrap;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -115,7 +121,8 @@
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    padding: 0.55rem 1.1rem;
+    padding: t.$space-2 t.$space-4;
+    min-height: t.$touch-target;
     border-radius: t.$radius-control;
     background-color: t.$subcard-bg;
     color: t.$text;
@@ -138,8 +145,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: t.$touch-target;
+    height: t.$touch-target;
     border-radius: t.$radius-control-sm;
     color: t.$text-muted;
     font-size: 1.1rem;
@@ -161,7 +168,7 @@
     padding: 0.35rem;
     display: flex;
     flex-direction: column;
-    background-color: t.$card-bg;
+    background-color: var(--course-surface);
     border: 1px solid t.$border;
     border-radius: t.$radius-control;
     box-shadow: 0 8px 24px rgba(t.$text, 0.12);

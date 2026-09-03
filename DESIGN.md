@@ -116,7 +116,7 @@ components:
 
 X-Learn is a quiet operational workspace where students and staff can see their role, current record, and next action without visual noise. A white page canvas, softly tinted navigation, and cool dashboard cards keep the workspace open while violet remains reserved for direction, selection, and decisive action. The story is not “school software decorated with cards,” but one dependable desk connecting learning activity, advising, assessment, and follow-up.
 
-This is an **Operate** system. Scanability, honest state, and record continuity outrank spectacle. Warmth comes from spacious grouping, rounded working surfaces, restrained assistant tints, human profile cues, and concise copy. MockLab is a deliberate compatibility world: its serif exam-paper voice and navy palette signal examination mode without redefining the rest of X-Learn.
+This is an **Operate** system. Scanability, honest state, and record continuity outrank spectacle. Warmth comes from spacious grouping, rounded working surfaces, restrained assistant tints, human profile cues, and concise copy. The exam library uses the same typography, violet actions and category tints. Exam-runner timing controls retain their task-specific layout.
 
 The visual authority for the Student Dashboard is the accessible Figma file `qBAAByIXGNIpoOcilCYISR`, node `17:914` (`Dashborad/student`), a 1440×1024 frame inspected exactly after Dev-seat access. The normative tokens and desktop composition below were verified from that node and the implemented dashboard. Any later Figma discrepancy must be resolved in the token layer, never with a page-local patch.
 
@@ -165,7 +165,7 @@ The Figma palette remains intact at the primitive layer; accessibility correctio
 
 **Display and body font:** HarmonyOS Sans TC with Inter and native UI sans fallbacks.
 
-HarmonyOS Sans TC is the Figma face, but no font binary is shipped in the repository. The fallback order is therefore part of the implementation contract: HarmonyOS Sans TC → Inter → platform UI sans. Do not claim pixel-identical Figma typography unless a licensed, checked-in font asset is added and verified. MockLab alone uses Georgia/Times for its exam masthead and paper-like headings.
+HarmonyOS Sans TC is the Figma face, but no font binary is shipped in the repository. The fallback order is therefore part of the implementation contract: HarmonyOS Sans TC → Inter → platform UI sans. Do not claim pixel-identical Figma typography unless a licensed, checked-in font asset is added and verified.
 
 ### Hierarchy
 
@@ -175,15 +175,15 @@ HarmonyOS Sans TC is the Figma face, but no font binary is shipped in the reposi
 - **Body:** controls, records, instructions, and ordinary reading copy.
 - **Label:** metadata, eyebrow text, helper copy, and compact navigation captions; uppercase only for deliberate eyebrows and exam kickers.
 
-Use weights 400/500/600/700 for regular, medium, semibold, and bold. Keep operational prose readable and sentence-cased; reserve wide tracking for the X-Learn wordmark, eyebrows, and MockLab’s examination-room kicker.
+Use weights 400/500/600/700 for regular, medium, semibold, and bold. Keep operational prose readable and sentence-cased; reserve wide tracking for the X-Learn wordmark, eyebrows, and meaningful category labels.
 
 **The Fallback Is Real Rule.** Test wrapping and truncation with the fallback stack; do not tune layouts to a locally installed HarmonyOS font alone.
 
 ## Layout
 
-The app shell owns the viewport. In the authoritative 1440×1024 Student Dashboard frame, the desktop sidebar is exactly 180px and the header is exactly 88px. Dashboard content begins at x=204 and uses three exact columns: 336px New Chat, 558px main work, and 270px schedule/alerts, separated by 23px then 19px gutters. The resulting 1206px dashboard grid is the desktop reference composition, not a proportional approximation.
+The app shell owns the viewport. Figma dimensions describe the reference frame, not a fixed browser canvas. The navigation rail uses `clamp(11.25rem, 12.5vw, 15rem)`; page gutters use `clamp(1rem, 3.3vw, 4rem)`. Every outer heading, toolbar and record collection shares the same fluid alignment boundary. Limit the reading measure of prose and form fields where helpful, not the entire operational page.
 
-Responsive dashboard transitions are fixed at 1280px, 900px, and 620px. At 1280px and below, New Chat and the main work column form two fluid columns while the former right rail spans both and becomes a wide/narrow two-column row. At 900px and below, every dashboard region becomes one column in source order. At 620px and below, panels become content-height, assignment/task metadata is progressively removed from the visual grid, and exams stack one per row. Preserve the underlying labels and destinations when compacting.
+Cards use auto-fill or auto-fit grids with `minmax(min(100%, minimum), 1fr)`; the viewport can always become narrower than a card's preferred minimum. Dense student tables become labeled cards when their container is narrow. The task workspace follows Figma's 5:3 master/detail ratio, switches to a full-width detail on narrow containers, and leaves the normal shell only for a selected checkpoint. Browser back and explicit Back remain available.
 
 At 700px and below, the sidebar becomes a fixed bottom navigation with safe-area padding and the header compresses to 4.75rem. Main content reserves the same bottom height so actions and records are never hidden. Header metadata progressively collapses: the “Workspace” eyebrow and email disappear first; the account name may disappear below 430px.
 
@@ -212,7 +212,7 @@ Depth is restrained and structural. Borders and tonal layering do most of the wo
 
 The system uses gently curved geometry: 5px for tiny details, 10px for compact controls and navigation, 15px for standard inputs/cards, 20px for prominent surfaces and overlays, and full pills/circles for avatars, status chips, and compact filters. Borders are usually 1px and neutral; dashed borders indicate placeholders or intentionally empty drop zones, not decoration.
 
-Large gradients are rare and purposeful: the profile cover signals identity, assistant tints distinguish AI workspaces, and MockLab’s navy paper family signals exam mode. Do not introduce a new silhouette, corner scale, or gradient family within a page.
+Large gradients are rare and purposeful: the profile cover signals identity, assistant tints distinguish AI workspaces, and the focused task surface distinguishes task reading from navigation. Do not introduce a new silhouette, corner scale, or gradient family within a page.
 
 ## Components
 
@@ -225,7 +225,7 @@ Large gradients are rare and purposeful: the profile cover signals identity, ass
 ### Cards / Containers
 
 - Standard cards use Working White, a neutral 1px border, 15px or 20px corners, and 16–24px internal padding.
-- Use subtle fills for nested records instead of stacking shadows. Assistant cards may use the established cool tint; exam cards use only the `exam-*` compatibility family.
+- Use subtle fills for nested records instead of stacking shadows. Assistant cards may use the established cool tint; exam-library cards use the same neutral surfaces and section-category colors.
 - Loading, empty, error, and partial-data states occupy the same structural region as successful content so the layout does not jump or misrepresent absence.
 
 ### Inputs / Fields
@@ -278,3 +278,18 @@ MockLab may use its `exam-*` navy, paper wash, serif typography, and examination
 The checked-in review set covers desktop and mobile rendering for login, signup, dashboard, courses, calendar, AI Workplace, MockLab, profile, and study plan, plus the mobile More panel. It demonstrates responsive composition and representative loading/error/empty states, not exhaustive role, browser, keyboard, screen-reader, zoom, localization, or real-data acceptance.
 
 The review routes use mock fixtures. Several screenshots intentionally show unavailable or “No preview fixture” responses; these are honest state evidence, not backend defects proven by this frontend review. Screenshot success does not prove authenticated business workflows, contract completeness, persistence, authorization, or Dev/Prod behavior. Validate those separately against the intended real environment and role account. Figma node `17:914` was inspected exactly and is authoritative for the Student Dashboard; that exact inspection does not imply that unrelated role frames or every component variant were part of this dashboard review.
+
+## Figma source coverage, September 2 implementation
+
+- `464:3172`, Study plan/student: focused checkpoint table and task detail. User link `464:3317` is its cursor annotation, not a separate screen.
+- `783:8276` / `791:10510`, student/Advisor: student information panel, compact filters, avatar/name hierarchy, risk pills and row actions. Unsupported columns and bulk actions are omitted.
+- `772:3458`, Dashborad/Advisor: Dashboard → Students → Messages order, workload summary, task/conversation grouping. Only contracted data is rendered.
+- `82:357`, My courses/student: card hierarchy, teacher identity, footer actions, category tints. The user's explicit colored-card request applies those tints to stable course identities across roles.
+- `163:698`, Exams/student: section/state filters and card library. Unsupported aggregate progress, duration and score values are not fabricated.
+- Instructor, Counsellor, Parent, Tenant Admin and System Admin surfaces inherit these semantic roles and responsive rules when no matching frame is available. Their functional contract boundaries remain authoritative.
+
+All long sections remain independently collapsible and initially closed. History remains a read-only view of the actual returned revision payload; it does not simulate missing historical data.
+
+## Figma authority and authentication/detail frames
+
+Figma composition and interaction models take precedence over earlier generic requests for folded sections or colored backgrounds. Source 715:3994 governs authentication: centered left form and a rounded violet product illustration on the right; below the readable two-column threshold only the form remains. The original dashboard and goal artwork are stored locally in `lms/public/icons/figma-auth/`. Source 803:13456 governs the Advisor student summary, skill metrics and underline navigation; source 813:4892 governs the centered task dialog. Learning journey phases are visible cards; long edit forms retain independent disclosure and version-protected saving. Missing server fields are omitted or marked unavailable, never filled with Figma sample data.

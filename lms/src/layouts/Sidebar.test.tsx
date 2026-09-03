@@ -62,7 +62,7 @@ describe('Sidebar role navigation', () => {
     const {container} = render(<MemoryRouter><Sidebar/></MemoryRouter>);
 
     expect(container.querySelector('a[href="/"]')).not.toBeInTheDocument();
-    expect(screen.getAllByRole('link', {name: 'Operations'}).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', {name: 'Advisor dashboard'}).length).toBeGreaterThan(0);
     expect(screen.getAllByRole('link', {name: 'Teaching operations'}).length).toBeGreaterThan(0);
   });
 });

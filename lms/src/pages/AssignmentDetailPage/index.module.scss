@@ -29,7 +29,7 @@
 
     h1 {
         margin-top: 0.35rem;
-        font-size: clamp(1.75rem, 4vw, t.$fs-h1);
+        font-size: t.$workspace-title-size; line-height: t.$line-height-title-1;
         font-weight: t.$fw-extrabold;
         line-height: 1.2;
     }

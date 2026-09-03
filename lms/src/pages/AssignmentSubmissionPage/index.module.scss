@@ -2,7 +2,7 @@
 .header, .versionList, .card, .error { max-width: t.$workspace-task-max-inline-size; margin-inline: auto; }
 .header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; }
 .headerText { min-width: 0; flex: 1; }
-.header h1 { margin: .25rem 0 0; font-size: clamp(1.8rem, 4vw, t.$fs-h1); }
+.header h1 { margin: .25rem 0 0; font-size: t.$workspace-title-size; line-height: t.$line-height-title-1; }
 .headerText > p:last-child { margin: .3rem 0 0; color: t.$text-muted; }
 .eyebrow { margin: 0; color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; text-transform: uppercase; letter-spacing: .08em; }
 .backLink { display: inline-grid; place-items: center; flex: 0 0 t.$control-size; width: t.$control-size; height: t.$control-size; border-radius: t.$radius-control; background: t.$neutral-fill; color: t.$text; }

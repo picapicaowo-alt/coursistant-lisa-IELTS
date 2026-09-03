@@ -1,13 +1,15 @@
+.pageTitle { margin: 0 0 t.$space-6; font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1; }
+
 .pageContainer {
     min-height: calc(100dvh - t.$shell-header-height);
-    padding: t.$space-6;
+    padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16;
     display: flex;
     justify-content: center;
 }
 
 .contentContainer {
     width: 100%;
-    max-width: 75rem;
+    min-width: 0;
 }
 
 .tabsContainer {
@@ -99,7 +101,7 @@
 
 .courseGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
     gap: t.$space-6;
     margin-bottom: t.$space-8;
     

@@ -1,3 +1,4 @@
+import {AuthShell, AuthHeading} from '@/components/AuthShell';
 import React, {useEffect, useState} from 'react';
 import {Eye, EyeOff} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
@@ -105,20 +106,8 @@ const LoginPage: React.FC = () => {
   const passwordError = getFieldError('password');
 
   return (
-    <main className={styles.page}>
-      <div className={styles.shell}>
-        <div className={styles.visualPanel} aria-hidden="true">
-          <img src="/icons/login/login-img-xlearn.png" alt=""/>
-        </div>
-
-        <section className={styles.formPanel}>
-          <div className={styles.brandMark} aria-label="X-Learn">
-            <img src="/icons/coursistant_icon_ver2.png" alt=""/>
-            <span>X—LEARN</span>
-          </div>
-          <h1>{t('login.title')}</h1>
-          <p className={styles.subtitle}>{t('login.subtitle')}</p>
-
+    <AuthShell>
+      <AuthHeading title={t('login.title')} subtitle={t('login.subtitle')}/>
           <form className={styles.form} onSubmit={handleSubmit}>
             <div className={styles.field}>
               <label htmlFor="login-email">{t('login.emailLabel')}</label>
@@ -185,9 +174,7 @@ const LoginPage: React.FC = () => {
               {t('login.signUp')}
             </a>
           </p>
-        </section>
-      </div>
-    </main>
+    </AuthShell>
   );
 };
 

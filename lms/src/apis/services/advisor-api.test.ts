@@ -80,8 +80,8 @@ describe('AdvisorApiService', () => {
     expect(client.post).toHaveBeenNthCalledWith(
       3,
       '/v2/student/study-plan/tasks/9/start',
-      {expectedVersion: 0},
-      {headers: {'Idempotency-Key': 'task-9'}},
+      undefined,
+      {headers: {'Idempotency-Key': 'task-9'}, params: {expectedVersion: 0}},
     );
     expect(client.post).toHaveBeenNthCalledWith(
       4,

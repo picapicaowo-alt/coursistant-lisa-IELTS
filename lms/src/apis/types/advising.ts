@@ -272,7 +272,7 @@ export interface AdvisorTaskResponse {
 }
 
 export interface CompleteAdvisorTaskRequest {
-  expectedVersion?: number;
+  expectedVersion: number;
   submissionText?: string;
   fileObjectKey?: string;
 }

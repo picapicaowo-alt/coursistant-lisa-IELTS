@@ -8,3 +8,11 @@
  */
 export const formatCourseName = (courseCode: string | null | undefined, title: string): string =>
   courseCode ? `[${courseCode}]${title}` : title;
+
+const COURSE_TONES = ['sky', 'indigo', 'violet'] as const;
+
+/** Identity color stays stable across roles, filters and sorting. */
+export function getCourseIdentityTone(courseId: string | number) {
+  const hash = Array.from(String(courseId)).reduce((value, char) => (value * 31 + char.charCodeAt(0)) >>> 0, 0);
+  return COURSE_TONES[hash % COURSE_TONES.length];
+}

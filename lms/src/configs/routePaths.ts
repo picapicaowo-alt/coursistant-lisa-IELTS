@@ -1,6 +1,8 @@
 import {ASSIGNMENT_GRADING_ROUTE} from './coursePaths';
 import {VOCABULARY_ROUTE_PATTERNS} from '@/pages/vocabulary/routes';
 
+export const STUDY_PLAN_QUERY_PARAMS = {checkpoint: 'checkpoint', task: 'task'} as const;
+
 /** The same paths register the router and validate backend-provided navigation. */
 export const APP_ROUTE_PATHS = {
   login: '/login',

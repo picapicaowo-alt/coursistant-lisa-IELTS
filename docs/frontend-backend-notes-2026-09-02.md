@@ -73,3 +73,21 @@ Confirmed against the supplied Advisor Markdown and canonical `docs/api/advising
 This diagnosis is based on the supplied contracts and current frontend code. Snapshot rendering is verified with browser fixtures, not a live protected history response. No backend changes, Profile history simulation, restore operation or deployment is included.
 
 Follow-up frontend validation: lint, normal/production TypeScript, production build and `git diff --check` pass; 128 test files / 533 unit tests and 38 Chromium E2E tests pass. The new browser scenario verifies nested historical content, missing snapshots, version 0, server pagination and preservation of an unsaved current-plan draft, with no mutations or speculative Profile-history requests. Screenshots: [desktop](ui-review-2026-09-02/advisor-plan-history-desktop.png), [mobile](ui-review-2026-09-02/advisor-plan-history-mobile.png). Profile history remains an unresolved backend-contract dependency.
+
+
+## 8. Figma student task detail attachments
+
+Figma `464:3172` (parent of the supplied cursor layer `464:3317`) shows a downloadable task attachment. `AdvisorTaskResponse` currently exposes `submissionFileObjectKey`, but no instructor task attachment metadata or authenticated preview/download endpoint is defined for student study-plan tasks. The frontend therefore renders the real task description, submission requirement, submission text, and advisor feedback; it does not fabricate a file or turn an opaque storage key into a URL. Backend handoff: provide attachment metadata and scoped authenticated file operations before adding this design element.
+
+During implementation, `studentStartAdvisorTask` was corrected to pass its required `expectedVersion` in the query string, as specified by the consumed OpenAPI; `studentCompleteAdvisorTask` continues to send its required version and optional submission text in JSON. Missing versions leave tasks read-only.
+
+
+## 9. Authenticated Dev grading queue fails for both supplied Instructor fixtures
+
+Observed through the public frontend API boundary after successful login: `GET /v2/me/teaching/grading-items` returns HTTP 500 with `code: INTERNAL_SERVER_ERROR` and `message: Internal server error` for both Instructor fixtures. The same sessions successfully read today-classes, availability, schedule-requests and students-needing-support. Expected: the `TeachingGradingItemResponse[]` envelope documented in the supplied course contract. The frontend has a registered assignment grading route and a tested destination adapter, but the live Week 1 queue-to-grading flow cannot be accepted until the queue read succeeds. Failed queue loading now shows an unavailable count instead of a false zero. No external service was inspected or changed.
+
+Historical study-plan revision reads succeed for the assigned Advisor; the observed revision snapshot only includes version metadata and checkpoint count. Full previous strategy/checkpoint/task content requires the backend to include that snapshot content. No Profile historical-read endpoint exists in the supplied contract.
+
+## 10. Parent conversation and notification GET response envelopes
+
+Authenticated Dev returns conversation data as `{items, nextBeforeId, hasMore}` and notifications as `{items, page, size, total}`. The supplied Parent OpenAPI leaves these GET response schemas unspecified. Frontend array-only typing caused a `getNextPageParam` / `flatMap` crash when switching away from Messages and silently hid notifications. The frontend now consumes these observed envelopes, respects the next cursor, prevents repeated cursors, and paginates notifications; array responses remain compatible. Please specify both GET response envelopes in the Parent OpenAPI. No new endpoint was introduced.

@@ -5,7 +5,8 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {courseApiService} from "@/apis/services/course-api";
 import {CourseSession, CourseState} from "@/apis";
-import {formatCourseName} from "@/utils/course";
+import toneStyles from "@/styles/courseIdentity.module.scss";
+import {getCourseIdentityTone, formatCourseName} from "@/utils/course";
 
 interface CoursePreviewProps {
   id: number;
@@ -114,7 +115,8 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
   const firstSession = sessions?.[0];
 
   return (
-    <div className={styles.courseItem}>
+    <article className={`${styles.courseItem} ${toneStyles[getCourseIdentityTone(id)]}`}>
+      <h2 className={styles.courseTitle}>{formatCourseName(courseCode, title)}</h2>
       <div className={styles.courseHeader}>
         {instructorName && (
           <div className={styles.instructorInfo}>
@@ -130,7 +132,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
       </div>
 
       <div className={styles.courseContent}>
-        <div className={styles.courseTitle}>{formatCourseName(courseCode, title)}</div>
+
 
         {/* Only render the meta row once there is something real to put in it.
             An empty "Class Time" label would read as "no classes scheduled". */}
@@ -219,6 +221,6 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
       {(archive.isError || unarchive.isError || remove.isError) && (
         <p className={styles.error} role="alert">{remove.isError ? 'This course could not be deleted. Courses with enrolments or coursework must be retained.' : archive.isError ? t("card.archiveFailed") : 'The course could not be restored.'}</p>
       )}
-    </div>
+    </article>
   );
 };

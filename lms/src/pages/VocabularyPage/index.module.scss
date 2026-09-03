@@ -1,16 +1,16 @@
 .page {
   min-height: 100%;
-  padding: 2rem clamp(1rem, 3vw, 3.5rem) 3.5rem;
+  padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16;
   background: t.$page-bg;
   color: t.$text;
 }
 
 .hero {
-  min-height: 15rem;
-  padding: clamp(1.5rem, 4vw, 3.5rem);
+  min-height: 0;
+  padding: t.$workspace-panel-padding;
   border-radius: t.$radius-card-lg;
-  background: t.$text;
-  color: t.$card-bg;
+  background: t.$surface-brand-subtle;
+  color: t.$content-primary;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -32,23 +32,23 @@
 
   h1 {
     margin: 0.65rem 0 0.75rem;
-    font-size: clamp(2.4rem, 6vw, 4.8rem);
-    line-height: 0.95;
-    letter-spacing: -0.055em;
+    font-size: t.$workspace-title-size;
+    line-height: t.$line-height-title-1;
+    letter-spacing: normal;
   }
 
   p {
     max-width: 42rem;
     margin: 0;
-    color: rgba(t.$card-bg, 0.72);
-    font-size: 1.02rem;
+    color: t.$content-secondary;
+    font-size: t.$font-size-body;
     line-height: 1.65;
   }
 }
 
 .eyebrow,
 .kicker {
-  color: t.$brand-subtle;
+  color: t.$action-primary;
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
@@ -60,7 +60,7 @@
 
 .heroMark {
   z-index: 1;
-  width: 9.5rem;
+  width: clamp(4rem, 10vw, 7rem);
   aspect-ratio: 1;
   border: 1px solid rgba(t.$card-bg, 0.18);
   border-radius: 50%;
@@ -70,12 +70,12 @@
   justify-items: center;
   flex: 0 0 auto;
 
-  svg {width: 2.4rem; height: 2.4rem; color: t.$brand-subtle;}
+  svg {width: 2.4rem; height: 2.4rem; color: t.$action-primary;}
   span {margin-top: 0.5rem; text-align: center; font-size: 0.72rem; font-weight: t.$fw-bold; letter-spacing: 0.12em; text-transform: uppercase;}
 }
 
 .continueCard {
-  margin: -1.25rem clamp(1rem, 3vw, 2.5rem) 0;
+  margin: t.$space-5 0 0;
   padding: 1.3rem 1.5rem;
   border: 1px solid t.$border;
   border-radius: t.$radius-card;
@@ -121,7 +121,7 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 1rem;
-  h2 {margin: 0.25rem 0 0; font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -0.035em;}
+  h2 {margin: 0.25rem 0 0; font-size: t.$font-size-headline; line-height: t.$line-height-headline; letter-spacing: -0.035em;}
   .kicker {color: t.$brand;}
 }
 

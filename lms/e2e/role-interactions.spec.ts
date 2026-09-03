@@ -72,7 +72,7 @@ test('student can enter both learning products but not advisor operations', asyn
   }));
 
   await page.goto('/mock-exams');
-  await expect(page.getByRole('heading', {name: 'Choose a paper. Enter exam mode.'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Exams'})).toBeVisible();
   await expect(page.getByRole('link', {name: /Listening/})).toHaveAttribute('href', '/mock-exams/71/listening');
   await expect(page.getByRole('link', {name: 'Exams'})).toBeVisible();
 
@@ -273,6 +273,18 @@ test('advisor profile and study-plan editors explain record semantics and progre
 
   await page.goto('/advisor/students/301/study-plan');
   await expect(page.locator('details[open]')).toHaveCount(0);
+  await expect(page.getByRole('heading', {name: 'Learning journey'})).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('advisor-learning-journey.png'), fullPage: true});
+  await page.getByRole('button', {name: 'View phase 1', exact: true}).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  const dialogBox = await page.getByRole('dialog').boundingBox();
+  expect(dialogBox!.x).toBeGreaterThan(0);
+  expect(dialogBox!.y).toBeGreaterThan(0);
+  await expect(page.getByRole('dialog').getByText('Complete the week 1 diagnostic')).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('advisor-phase-dialog.png'), fullPage: true});
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', {name: 'View phase 1', exact: true})).toBeFocused();
+  await page.getByRole('button', {name: 'Edit study plan', exact: true}).click();
   await openSection(page, 'Checkpoints and tasks');
   await openSection(page, 'Complete the first diagnostic');
   await expect(page.locator('summary[aria-label="Review progress"]').locator('..')).not.toHaveAttribute('open');
@@ -301,9 +313,10 @@ test('student advising view presents profile, plan, and tasks with scannable hie
   await openSection(page, 'Study plan');
   await expect(page.getByRole('heading', {name: /Checkpoint 1/})).toBeVisible();
   await openSection(page, 'Checkpoint 1: Complete the first diagnostic');
-  await openSection(page, 'Complete the week 1 diagnostic');
-  await expect(page.getByText('not started', {exact: true})).toBeVisible();
-  await expect(page.getByRole('button', {name: 'Complete'})).toBeVisible();
+  await page.getByRole('button', {name: 'View tasks'}).click();
+  await page.getByRole('button', {name: 'View Complete the week 1 diagnostic', exact: true}).click();
+  await expect(page.getByRole('complementary').getByText('Not started', {exact: true})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Complete task', exact: true})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('student-advising-polished.png'), fullPage: true});
 });
 

@@ -4,6 +4,8 @@ import type {
   MarkParentConversationReadRequest,
   ParentAcademicRead,
   ParentConversationMessageResponse,
+  ParentConversationMessagePage,
+  ParentNotificationPage,
   ParentCreateScheduleRequest,
   ParentLinkedStudentPage,
   ParentLinkRequest,
@@ -116,7 +118,7 @@ export class ParentApiService {
     return this.apiClient.post(`/v2/parent/students/${studentUserId}/schedule-requests`, request, idempotent(key));
   }
 
-  listNotifications(page = 0, size = 20): Promise<ApiResponse<ParentNotification[]>> {
+  listNotifications(page = 0, size = 20): Promise<ApiResponse<ParentNotificationPage | ParentNotification[]>> {
     return this.apiClient.get('/v2/parent/notifications', {params: {page, size}});
   }
 
@@ -132,7 +134,7 @@ export class ParentApiService {
     return this.apiClient.patch('/v2/parent/notifications/read-all', undefined, idempotent(key));
   }
 
-  listConversationMessages(studentUserId: number, beforeId?: number): Promise<ApiResponse<ParentConversationMessageResponse[]>> {
+  listConversationMessages(studentUserId: number, beforeId?: number): Promise<ApiResponse<ParentConversationMessagePage | ParentConversationMessageResponse[]>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/conversation/messages`, {params: {beforeId}});
   }
 

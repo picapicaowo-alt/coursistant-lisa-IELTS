@@ -96,3 +96,12 @@ export interface ParentReportDetail {
  * supplied OpenAPI. Keep that boundary honest instead of inventing fields.
  */
 export type ParentAcademicRead = unknown;
+
+/** Observed Dev pagination envelope; the supplied OpenAPI leaves this GET schema open. */
+export interface ParentConversationMessagePage {
+  items: ParentConversationMessageResponse[];
+  nextBeforeId?: number | null;
+  hasMore?: boolean;
+}
+
+export type ParentNotificationPage = AdvisingPage<ParentNotification>;

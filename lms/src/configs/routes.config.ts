@@ -1,3 +1,4 @@
+import {APP_ROUTE_PATHS, STUDY_PLAN_QUERY_PARAMS} from './routePaths';
 import {VOCABULARY_PATHS, isVocabularySessionPath} from '@/pages/vocabulary/routes';
 
 export interface SidebarConfig {
@@ -85,7 +86,10 @@ const APP_SHELL_BASE_PATHS = [
   '/create',
 ];
 
-export const shouldShowAppShell = (pathname: string): boolean => {
+export const shouldShowAppShell = (pathname: string, search = ''): boolean => {
+  // Figma's focused checkpoint view has its own Back navigation. This is only
+  // presentation; the existing Student route guard still owns authorization.
+  if (pathname === APP_ROUTE_PATHS.myPlan && new URLSearchParams(search).get(STUDY_PLAN_QUERY_PARAMS.checkpoint)) return false;
   if (isVocabularySessionPath(pathname)) return false;
   if (pathname === '/') return true;
   return APP_SHELL_BASE_PATHS.some(

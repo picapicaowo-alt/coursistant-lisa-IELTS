@@ -1,3 +1,4 @@
+import layout from './index.module.scss';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {getApiErrorCode} from '@/utils/apiError';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
@@ -106,13 +107,13 @@ const SupportPage: React.FC = () => {
   };
 
   return (
-    <div className={styles.grid}>
+    <div className={layout.support}>
       {primaryError ? <p className={styles.error} role="alert">{advisingErrorMessage(primaryError, 'Student support information could not be loaded.')}</p> : null}
 
-      <CollapsibleSection title="Conversation" id="conversation" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
+      <CollapsibleSection title="Conversation" id="conversation" meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
 
         {messages.isPending ? <p className={styles.status}>Loading conversation…</p> : null}
-        {!messages.isPending && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No messages yet</strong><span>Start the conversation below. File actions appear on messages that have attachments.</span></div> : null}
+        {!messages.isPending && !messages.isError && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No messages yet</strong><span>Start the conversation below. File actions appear on messages that have attachments.</span></div> : null}
         <div className={styles.messageList}>
           {conversationRows.map((message, index) => (
             <article className={styles.messageRow} key={message.messageId ?? index}>
@@ -143,22 +144,22 @@ const SupportPage: React.FC = () => {
       </CollapsibleSection>
 
       <div className={styles.advisorColumns}>
-        <CollapsibleSection title="Reports" className={styles.disclosureLayout}>
+        <CollapsibleSection title="Reports">
 
           {studentReports.isPending ? <p className={styles.status}>Loading reports…</p> : null}
-          {!studentReports.isPending && contractItems(studentReports.data).length === 0 ? <div className={styles.emptyState}><strong>No published reports</strong><span>Reports become visible here after publication.</span></div> : null}
+          {!studentReports.isPending && !studentReports.isError && contractItems(studentReports.data).length === 0 ? <div className={styles.emptyState}><strong>No published reports</strong><span>Reports become visible here after publication.</span></div> : null}
           {contractItems(studentReports.data).length > 0 ? <div className={styles.compactResult}><RecordSummaryList value={studentReports.data}/></div> : null}
           <AdvisingPagination label="Student report pages" page={reportPage} total={contractRecordNumber(studentReports.data, 'total') ?? 0} onPage={setReportPage}/>
         </CollapsibleSection>
-        <CollapsibleSection title="Learning history" className={styles.disclosureLayout}>
+        <CollapsibleSection title="Learning history">
 
           {attendance.isPending ? <p className={styles.status}>Loading attendance…</p> : null}
-          {!attendance.isPending && contractItems(attendance.data).length === 0 ? <div className={styles.emptyState}><strong>No attendance records</strong><span>Recorded course attendance will appear here.</span></div> : null}
+          {!attendance.isPending && !attendance.isError && contractItems(attendance.data).length === 0 ? <div className={styles.emptyState}><strong>No attendance records</strong><span>Recorded course attendance will appear here.</span></div> : null}
           {contractItems(attendance.data).length > 0 ? <div className={styles.compactResult}><RecordSummaryList value={attendance.data}/></div> : null}
         </CollapsibleSection>
       </div>
 
-      <CollapsibleSection title="Course hours &amp; reports" id="course-support" className={styles.disclosureLayout}>
+      <CollapsibleSection title="Course hours &amp; reports" id="course-support">
 
         {(courses.data?.length ?? 0) === 0 ? <div className={styles.emptyState}><strong>No linked courses</strong><span>Link or create a course before managing hours and course reports.</span><Link className={styles.secondaryLink} to={`/advisor/students/${id}/courses`}>Open courses</Link></div> : (
           <label className={styles.coursePicker}>Course<select value={selectedCourseId} onChange={event => setSelectedCourseId(event.target.value)}><option value="">Select a course</option>{(courses.data ?? []).map((item, index) => <option key={item.courseId ?? index} value={item.courseId}>{item.title || item.courseCode || `Course #${item.courseId}`}</option>)}</select></label>
@@ -179,14 +180,13 @@ const SupportPage: React.FC = () => {
             <h3>Published course reports</h3>
             <AdvisingPagination label="Course report pages" page={courseReportPage} total={contractRecordNumber(courseReports.data, 'total') ?? 0} onPage={setCourseReportPage}/>
             {courseReports.isError ? <p className={styles.error}>{advisingErrorMessage(courseReports.error, 'Course reports could not be loaded.')}</p> : null}
-            {!courseReports.isPending && contractItems(courseReports.data).length === 0 ? <div className={styles.emptyState}><strong>No published course reports</strong><span>Published reports for this course will appear here.</span></div> : null}
+            {!courseReports.isPending && !courseReports.isError && contractItems(courseReports.data).length === 0 ? <div className={styles.emptyState}><strong>No published course reports</strong><span>Published reports for this course will appear here.</span></div> : null}
             {contractItems(courseReports.data).length > 0 ? <div className={styles.compactResult}><RecordSummaryList value={courseReports.data}/></div> : null}
           </div>
         </div> : null}
       </CollapsibleSection>
 
-      <details className={styles.card}>
-        <summary className={styles.detailsSummary}>Advanced record lookup</summary>
+      <CollapsibleSection title="Advanced record lookup">
         <p className={styles.muted}>Use backend record identifiers only when handling a specific task, occurrence, or report.</p>
         <div className={styles.advisorColumns}>
           <form className={styles.form} onSubmit={event => { event.preventDefault(); taskFeedback.mutate(); }}>
@@ -204,9 +204,9 @@ const SupportPage: React.FC = () => {
             {reportDetail.data !== undefined ? <div className={styles.compactResult}><RecordSummaryList value={reportDetail.data}/></div> : null}
           </div>
         </div>
-      </details>
+      </CollapsibleSection>
 
-      {hub.data !== undefined ? <details className={styles.card}><summary className={styles.detailsSummary}>Student support summary</summary><div className={styles.compactResult}><RecordSummaryList value={hub.data}/></div></details> : null}
+      {hub.data !== undefined ? <CollapsibleSection title="Student support summary"><div className={styles.compactResult}><RecordSummaryList value={hub.data}/></div></CollapsibleSection> : null}
     </div>
   );
 };
