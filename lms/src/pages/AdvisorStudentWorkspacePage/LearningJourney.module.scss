@@ -7,12 +7,6 @@
   margin-bottom: 2rem;
 }
 
-@media (max-width: 68rem) {
-  .journeyLayout {
-    > * { grid-column: 1 / -1; }
-  }
-}
-
 .journey { @include workspace.region(9, 12); display: flex; flex-direction: column; padding: t.$space-3 0; min-width: 0; }
 
 .header {
@@ -66,6 +60,7 @@
 .phaseCard {
   position: relative;
   min-width: 0;
+  overflow-wrap: anywhere;
   &::before { content: ""; position: absolute; top: -2.5rem; left: t.$space-4; width: calc(100% + 1rem); border-top: 2px dashed t.$border-default; }
   &:nth-child(3n)::before, &:last-child::before { display: none; }
   display: flex;
@@ -78,7 +73,7 @@
 
   &:hover {
     border-color: t.$border-strong;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    box-shadow: t.$shadow-card;
   }
 
   &[data-current='true'] {
@@ -92,6 +87,9 @@
     justify-content: space-between;
     gap: 0.5rem;
     margin-bottom: 0.85rem;
+    padding-bottom: t.$space-3;
+    border-bottom: 1px dashed t.$border-default;
+    flex-wrap: wrap;
 
     .phaseNumber {
       font-size: 0.725rem;
@@ -99,6 +97,9 @@
       letter-spacing: 0.05em;
       color: t.$text-muted;
       text-transform: uppercase;
+      border: 1px solid currentColor;
+      border-radius: t.$radius-control;
+      padding: t.$space-1 t.$space-2;
     }
 
     .statusPill {
@@ -108,12 +109,10 @@
       font-weight: 600;
 
       &[data-status='completed'] {
-        background: t.$feedback-success-surface;
-        color: t.$feedback-success;
+        color: t.$content-primary;
       }
       &[data-status='current'] {
-        background: t.$brand-subtle;
-        color: t.$brand;
+        color: t.$content-primary;
       }
       &[data-status='locked'] {
         background: t.$surface-subtle;
@@ -366,7 +365,7 @@
   border: none;
   border-radius: t.$radius-card-lg;
   background: t.$surface-raised;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  box-shadow: t.$shadow-popover;
   &[open] { display: flex; flex-direction: column; }
   > .dialogHeader, > .dialogToolbar { flex: 0 0 auto; }
   > .tableWrap, > .taskDetail { min-height: 0; overflow: auto; }
@@ -571,3 +570,13 @@
 @media (max-width: t.$breakpoint-shell-mobile) { .phases { grid-template-columns: minmax(0, 1fr); padding-top: 0; gap: t.$space-4; } .phaseMarker, .phaseCard::before { display: none; } .header { flex-wrap: wrap; } }
 
 .taskDetail { padding: t.$space-6; display: grid; gap: t.$space-4; max-height: 50dvh; overflow: auto; h3, p { margin: 0; } dd { margin: t.$space-1 0 t.$space-3; } button { min-height: t.$touch-target; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; padding: t.$space-2 t.$space-4; justify-self: start; } }
+
+.phaseCard[data-state='completed'] .phaseNumber { color: t.$feedback-success; }
+.phaseCard[data-state='current'] .phaseNumber { color: t.$action-primary; }
+.requestsCard { background: t.$surface-subtle; overflow-wrap: anywhere; }
+.requestsCard .headerGroup { flex-wrap: wrap; }
+.requestsCard .requestItem { background: t.$surface-raised; }
+.journeyLayout :is(button, a):focus-visible { outline: 3px solid t.$focus-ring; outline-offset: 2px; }
+@media (max-width: 68rem) {
+  .journey, .requestsCard { grid-column: 1 / -1; }
+}

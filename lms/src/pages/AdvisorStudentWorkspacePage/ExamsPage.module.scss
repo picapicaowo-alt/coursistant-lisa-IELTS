@@ -1,21 +1,58 @@
-.container {
-  display: grid;
-  gap: t.$space-6;
-  min-width: 0;
-}
-.assignmentDialog {
-  width: min(40rem, calc(100vw - 2rem));
-  max-height: calc(100dvh - 2rem);
-  margin: auto;
-  padding: t.$space-6;
-  overflow-y: auto;
-  border: 1px solid t.$border-default;
-  border-radius: t.$radius-lg;
-  background: t.$surface-raised;
-  color: t.$content-primary;
-}
-.assignmentDialog::backdrop {
-  background: t.$modal-backdrop;
-}
+.container,
+.examCollection { display: grid; gap: t.$space-5; min-width: 0; width: 100%; }
 
-.dialogHeading { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; h2 { margin: 0; } button { display: grid; place-items: center; flex: 0 0 t.$touch-target; min-height: t.$touch-target; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; } }
+.examsHeader { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: t.$space-4; }
+.examsHeader h2 { margin: 0; color: t.$content-primary; font-size: t.$font-size-subhead; font-weight: t.$fw-semibold; }
+.examsHeader p { margin: t.$space-1 0 0; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.assignButton { display: inline-flex; min-height: t.$touch-target; align-items: center; justify-content: center; gap: t.$space-2; padding: 0 t.$space-5; border: 1px solid t.$action-primary; border-radius: t.$radius-control; background: t.$action-primary; color: t.$content-on-color; font: inherit; font-weight: t.$fw-medium; cursor: pointer; transition: background t.$duration-fast t.$ease-out, transform t.$duration-fast t.$ease-out; }
+.assignButton:hover { background: t.$action-primary-hover; transform: translateY(-1px); }
+.assignButton:focus-visible { outline: 3px solid t.$focus-ring; outline-offset: 2px; }
+
+.assignmentDialog { width: min(44rem, calc(100vw - 2rem)); max-height: min(88dvh, 46rem); margin: auto; padding: 0; overflow: hidden; border: 0; border-radius: t.$radius-lg; background: t.$surface-raised; color: t.$content-primary; box-shadow: t.$shadow-popover; }
+.assignmentDialog[open] { display: grid; grid-template-rows: minmax(0, 1fr); }
+.assignmentDialog::backdrop { background: t.$modal-backdrop; backdrop-filter: blur(3px); }
+.assignmentForm { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; min-height: 0; }
+.dialogHeading { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; padding: t.$space-5 t.$space-6; border-bottom: 1px solid t.$border-default; }
+.dialogHeading h2 { margin: 0; font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+.dialogHeading button { display: grid; flex: 0 0 t.$touch-target; min-height: t.$touch-target; place-items: center; border: 0; border-radius: t.$radius-control; background: transparent; color: t.$content-secondary; cursor: pointer; }
+.dialogHeading button:hover { background: t.$surface-muted; color: t.$content-primary; }
+.dialogBody { min-height: 0; overflow-y: auto; padding: t.$space-6; }
+.dialogIntro { margin: 0 0 t.$space-5; color: t.$content-secondary; line-height: 1.5; }
+.fieldGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-5; }
+.fieldGrid > fieldset[data-compact] { min-width: 0; gap: t.$space-2; }
+.fieldGrid > fieldset[data-compact] > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.fieldGrid > fieldset[data-compact] summary { cursor: pointer; color: t.$content-secondary; font-size: t.$font-size-caption; padding: t.$space-2 0; }
+.fieldGrid > label,
+.fieldGrid > div { display: grid; align-content: start; gap: t.$space-2; min-width: 0; color: t.$content-primary; font-weight: t.$fw-medium; }
+.selectShell { position: relative; display: flex; align-items: center; min-width: 0; }
+.selectShell > svg { position: absolute; left: t.$space-3; z-index: 1; color: t.$content-secondary; pointer-events: none; }
+.selectShell select { width: 100%; min-width: 0; min-height: t.$control-height-lg; padding: 0 t.$space-4 0 t.$space-10; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-primary; font: inherit; }
+.sectionPicker { margin: t.$space-6 0 0; padding: 0; border: 0; }
+.sectionPicker legend { margin-bottom: t.$space-3; color: t.$content-primary; font-weight: t.$fw-medium; }
+.sectionPicker > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: t.$space-3; }
+.sectionPicker label { display: flex; min-height: t.$touch-target; align-items: center; gap: t.$space-2; padding: 0 t.$space-3; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; cursor: pointer; }
+.sectionPicker label:has(input:checked) { border-color: t.$action-primary; background: t.$surface-brand-subtle; color: t.$action-primary; }
+.sectionPicker input { width: 1rem; height: 1rem; accent-color: t.$action-primary; }
+.contractNote { margin: t.$space-5 0 0; padding: t.$space-3 t.$space-4; border-radius: t.$radius-control; background: t.$surface-dashboard-card; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: 1.5; }
+.dialogFooter { display: flex; align-items: center; justify-content: flex-end; gap: t.$space-3; padding: t.$space-5 t.$space-6; border-top: 1px solid t.$border-default; background: t.$surface-raised; }
+.dialogFooter button { min-height: t.$touch-target; padding: 0 t.$space-5; border-radius: t.$radius-control; font: inherit; font-weight: t.$fw-medium; cursor: pointer; }
+.cancelButton { border: 1px solid t.$border-default; background: t.$surface-raised; color: t.$content-primary; }
+.createButton { border: 1px solid t.$action-primary; background: t.$action-primary; color: t.$content-on-color; }
+.createButton:hover:not(:disabled) { background: t.$action-primary-hover; }
+.dialogFooter button:disabled { cursor: not-allowed; opacity: .5; }
+.dialogHeading button:focus-visible,
+.dialogFooter button:focus-visible,
+.selectShell select:focus-visible,
+.sectionPicker input:focus-visible { outline: 3px solid t.$focus-ring; outline-offset: 2px; }
+
+@media (max-width: 43.75rem) {
+  .examsHeader { align-items: stretch; flex-direction: column; }
+  .assignButton { width: 100%; }
+  .assignmentDialog { width: calc(100vw - 1rem); max-height: calc(100dvh - 1rem); }
+  .dialogHeading,
+  .dialogBody,
+  .dialogFooter { padding-inline: t.$space-4; }
+  .fieldGrid { grid-template-columns: minmax(0, 1fr); }
+  .sectionPicker > div { grid-template-columns: minmax(0, 1fr); }
+  .dialogFooter button { flex: 1; padding-inline: t.$space-3; }
+}

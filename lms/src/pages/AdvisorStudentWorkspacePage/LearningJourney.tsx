@@ -83,7 +83,8 @@ interface PendingRequestItem {
   version?: number;
 }
 
-  const rawPendingRequests = (scheduleRequests.data?.items ?? []).filter(r => !r.status || r.status === 'PENDING');
+  // Unknown states must not expose approval actions.
+  const rawPendingRequests = (scheduleRequests.data?.items ?? []).filter(r => r.status === 'PENDING');
   const pendingRequests: PendingRequestItem[] = rawPendingRequests.filter(r => r.id != null).map(r => ({
     id: r.id!, courseTitle: r.courseId ? `Course #${r.courseId}` : 'Schedule request',
     requestedDate: r.proposedOccurrenceDate || 'Not supplied',
@@ -118,6 +119,7 @@ interface PendingRequestItem {
                 key={item.id ?? index}
                 className={styles.phaseCard}
                 data-current={isCurrent ? 'true' : undefined}
+                data-state={isCompleted ? 'completed' : isCurrent ? 'current' : 'planned'}
               >
                 <span className={styles.phaseMarker} data-state={isCompleted ? 'completed' : isCurrent ? 'current' : 'planned'} aria-hidden="true">{isCompleted ? <Check size={18}/> : null}</span>
                 <div className={styles.phaseBadgeRow}>
@@ -157,7 +159,7 @@ interface PendingRequestItem {
                   type="button"
                   className={styles.phaseActionBtn}
                   data-variant={isCurrent ? 'primary' : isCompleted ? 'secondary' : 'outline'}
-                  onClick={() => {setSelectedTask(null); setSelected(index);}}
+                  onClick={() => {setSelectedTask(null); setTaskFilter('ALL'); setSelected(index);}}
                   aria-label={`View phase ${index + 1}`}
                 >
                   View details →
