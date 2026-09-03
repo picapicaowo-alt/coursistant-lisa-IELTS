@@ -1,4 +1,5 @@
 import type {AdvisingPage} from './advising';
+import type {ScheduleRequestType} from './courseOperations';
 
 /** Contracts declared by docs/api/parent.openapi.yaml. */
 export interface CreateOrReuseParentLinkRequest {
@@ -29,7 +30,7 @@ export type ParentLinkedStudentPage = AdvisingPage<ParentStudentLinkResponse>;
 export interface ParentCreateScheduleRequest {
   courseId: number;
   occurrenceId: number;
-  requestType: string;
+  requestType: ScheduleRequestType;
   reason?: string;
   proposedOccurrenceDate?: string;
   proposedStartTime?: string;
@@ -82,7 +83,7 @@ export interface ParentNotification {
 
 export interface ParentReportDetail {
   reportId?: number;
-  reportType?: string;
+  reportType?: 'MID_TERM' | 'FINAL';
   overallSummary?: string;
   strengths?: string;
   weaknesses?: string;

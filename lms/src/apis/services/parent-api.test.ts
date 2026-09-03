@@ -45,12 +45,12 @@ describe('ParentApiService', () => {
 
   it('sends parent schedule and conversation writes through their scoped routes', async () => {
     client.post.mockResolvedValue({status: 201, data: {}});
-    await service.createScheduleRequest(41, {courseId: 3, occurrenceId: 9, requestType: 'RESCHEDULE'}, 'schedule-1');
+    await service.createScheduleRequest(41, {courseId: 3, occurrenceId: 9, requestType: 'SCHEDULE_CHANGE'}, 'schedule-1');
     await service.markConversationRead(41, {messageId: 8}, 'read-8');
     expect(client.post).toHaveBeenNthCalledWith(
       1,
       '/v2/parent/students/41/schedule-requests',
-      {courseId: 3, occurrenceId: 9, requestType: 'RESCHEDULE'},
+      {courseId: 3, occurrenceId: 9, requestType: 'SCHEDULE_CHANGE'},
       {headers: {'Idempotency-Key': 'schedule-1'}},
     );
     expect(client.post).toHaveBeenNthCalledWith(

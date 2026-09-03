@@ -6,6 +6,10 @@ import { parentApiService } from "@/apis/services/parent-api";
 import { advisingErrorMessage } from "../advising/advisingErrors";
 import styles from "./index.module.scss";
 import advisingStyles from "../advising/advising.module.scss";
+import {type ParentLearningTab} from '@/configs/parentNavigation';
+import {ParentCourseList} from './ParentCourseList';
+import {ParentStudyPlan} from './ParentStudyPlan';
+import {ParentLearningProfile} from './ParentLearningProfile';
 
 const LEARNING_SECTIONS = [
   {
@@ -46,18 +50,17 @@ const LEARNING_SECTIONS = [
 ] as const;
 
 export function ParentAcademicSections({
-  value,
-  learning,
   studentUserId,
+  tab,
 }: {
-  value: unknown;
-  learning: boolean;
   studentUserId: number;
+  tab: ParentLearningTab;
 }) {
+  const visibleKeys = tab === 'plan' ? ['studyPlan', 'profile', 'risk'] : tab === 'courses' ? ['courses', 'assignments'] : ['attendance', 'hours'];
+  const sections = visibleKeys.flatMap(key => LEARNING_SECTIONS.filter(section => section.key === key));
   // Independent reads preserve the other academic sections if one service fails.
   const results = useQueries({
-    queries: learning
-      ? LEARNING_SECTIONS.map((section) => ({
+    queries: sections.map((section) => ({
           queryKey: ["parent", studentUserId, "learning", section.key],
           queryFn: async () =>
             unwrapData(
@@ -65,21 +68,31 @@ export function ParentAcademicSections({
               `parent-${section.key}`,
             ),
           retry: false,
-        }))
-      : [],
+        })),
   });
-  if (!learning)
-    return (
-      <WorkspaceSection title="Academic overview">
-        <RecordSummaryList
-          value={value}
-          emptyMessage="No academic updates are available yet."
-        />
+  const resultFor = (key: typeof LEARNING_SECTIONS[number]['key']) => results[sections.findIndex(section => section.key === key)];
+  const renderError = (title: string, result: typeof results[number]) => <div role="alert" className={advisingStyles.conflictNotice}>
+    <p>{advisingErrorMessage(result.error, `${title} could not be loaded.`)}</p>
+    <button className={advisingStyles.secondary} type="button" onClick={() => void result.refetch()}>Retry</button>
+  </div>;
+
+  if (tab === 'plan') {
+    const studyPlan = resultFor('studyPlan');
+    const profile = resultFor('profile');
+    const risk = resultFor('risk');
+    return <div className={styles.learningGrid}>
+      <WorkspaceSection title="Study plan" className={styles.studyPlan}>
+        {studyPlan.isPending ? <p role="status">Loading study plan…</p> : studyPlan.isError ? renderError('Study plan', studyPlan) : <ParentStudyPlan value={studyPlan.data}/>}
       </WorkspaceSection>
-    );
+      <WorkspaceSection title="Learning profile" className={styles.learningProfile}>
+        {profile.isPending ? <p role="status">Loading learning profile…</p> : profile.isError ? renderError('Learning profile', profile) : <ParentLearningProfile value={profile.data} risk={risk.data}/>}
+        {risk.isPending ? <p role="status" className={styles.meta}>Loading learning status…</p> : risk.isError ? renderError('Learning status', risk) : null}
+      </WorkspaceSection>
+    </div>;
+  }
   return (
     <div className={styles.learningGrid}>
-      {LEARNING_SECTIONS.map(({ key, title }, index) => {
+      {sections.map(({ key, title }, index) => {
         const result = results[index];
         return (
           <WorkspaceSection key={key} title={title} className={styles[key]}>
@@ -97,7 +110,7 @@ export function ParentAcademicSections({
                   Retry
                 </button>
               </div>
-            ) : (
+            ) : key === 'courses' ? <ParentCourseList value={result.data}/> : (
               <RecordSummaryList
                 value={result.data}
                 emptyMessage="No updates are available yet."

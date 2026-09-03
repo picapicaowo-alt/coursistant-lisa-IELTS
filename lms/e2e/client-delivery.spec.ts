@@ -86,6 +86,7 @@ test("parent sees later linked students, nested academic data and independent le
   ).toHaveValue("301");
   expect(linkedPages).toEqual([0, 1]);
   await expect(page.getByText("Draft an introduction")).toBeVisible();
+  await page.getByRole("link", { name: "Attendance & hours", exact: true }).click();
   await expect(
     page
       .getByRole("region", { name: "Course hours" })
@@ -187,7 +188,7 @@ test("parent report pagination and attachment failures preserve student boundari
     .getByRole("button", { name: "Next" })
     .click();
   await expect(page.getByText("Earlier learning report")).toBeVisible();
-  await page.getByRole("button", { name: "Messages", exact: true }).click();
+  await page.getByRole("link", { name: "Messages", exact: true }).click();
   await page.getByRole("button", { name: "Download", exact: true }).click();
   await expect(page.getByRole("alert")).toContainText(/attachment/i);
   await page

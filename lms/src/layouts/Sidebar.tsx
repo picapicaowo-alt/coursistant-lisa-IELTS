@@ -42,6 +42,12 @@ import {
 import {VOCABULARY_PATHS} from '@/pages/vocabulary/routes';
 import styles from './Sidebar.module.scss';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {getParentArea, getParentSection, parentHref, PARENT_AREAS, PARENT_SECTIONS, type ParentArea} from '@/configs/parentNavigation';
+
+const PARENT_ICONS: Record<ParentArea, LucideIcon> = {
+  dashboard: ChartNoAxesCombined, learning: BookOpen, schedule: CalendarDays,
+  reports: ClipboardList, exams: GraduationCap, messages: MessageSquare,
+};
 
 interface NavigationItemProps {
   to: string;
@@ -72,7 +78,7 @@ const STANDARD_ICONS: Record<string, LucideIcon> = {
 const Sidebar: React.FC = () => {
   const {t} = useTranslation();
   const {user} = useRequiredAuth();
-  const {pathname, hash} = useLocation();
+  const {pathname, hash, search} = useLocation();
   const [collapsed, setCollapsed] = React.useState(false);
   const [isMoreOpen, setIsMoreOpen] = React.useState(false);
   const selectedSidebarIndex = getSidebarIndex(pathname);
@@ -125,7 +131,12 @@ const Sidebar: React.FC = () => {
     addItem({to: APP_ROUTE_PATHS.myOperations, label: 'Teaching operations', icon: ClipboardList, active: pathname === '/my-operations'});
   }
   if (!student && parent) {
-    addItem({to: APP_ROUTE_PATHS.parent, label: 'Student progress', icon: ChartNoAxesCombined, active: pathname.startsWith('/parent')});
+    const params = new URLSearchParams(search);
+    const area = getParentArea(getParentSection(params));
+    PARENT_AREAS.forEach(id => addItem({
+      to: parentHref(id, params), label: PARENT_SECTIONS[id].label, icon: PARENT_ICONS[id],
+      active: pathname === APP_ROUTE_PATHS.parent && area === id,
+    }));
   }
   if (!student && canAccessStandaloneMockExams(user)) {
     addItem({to: APP_ROUTE_PATHS.mockExams, label: 'Mock exams', icon: GraduationCap, active: pathname.startsWith('/mock-exams')});
@@ -168,7 +179,7 @@ const Sidebar: React.FC = () => {
 
   React.useEffect(() => {
     setIsMoreOpen(false);
-  }, [pathname, hash]);
+  }, [pathname, hash, search]);
 
   return (
     <aside className={styles.sidebar} data-collapsed={collapsed || undefined} aria-label="Primary navigation">
