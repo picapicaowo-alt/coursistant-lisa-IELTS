@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom";
 import {useTranslation} from "react-i18next";
 import styles from "./PageHeader.module.scss";
 import {useCourseWorkspaceStore} from "../stores/useCourseWorkspaceStore";
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 
 interface PageHeaderProps {
   canEditCourse?: boolean;
@@ -35,7 +36,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
           className={styles.cancelButton}
           onClick={() => {
             if (workspaceMode === "edit") setWorkspaceMode("view");
-            if (workspaceMode === "create") navigate("/course");
+            if (workspaceMode === "create") navigate(APP_ROUTE_PATHS.course);
           }}
         >
           {t("addContent.cancelButton")}
@@ -59,9 +60,9 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     <div className={styles.workspaceHeader}>
       <button
         className={styles.backButton}
-        onClick={() => navigate("/")}
-        aria-label={t("detail.backToDashboard")}
-        title={t("detail.backToDashboard")}
+        onClick={() => navigate(APP_ROUTE_PATHS.course)}
+        aria-label={t("detail.backToCourses")}
+        title={t("detail.backToCourses")}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
