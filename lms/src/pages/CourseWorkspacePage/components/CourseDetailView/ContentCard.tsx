@@ -25,11 +25,11 @@ const zipFilename = (week: CourseWeek) => {
  * description field; it holds materials. So the card lists those instead of
  * leaving the space blank or padding it with text the course never wrote.
  */
-export const ContentCard: React.FC<{week: CourseWeek | null}> = ({week}) => (
-  <ContentCardBody week={week}/>
+export const ContentCard: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: number) => void}> = ({week, onOpenMaterial}) => (
+  <ContentCardBody week={week} onOpenMaterial={onOpenMaterial}/>
 );
 
-const ContentCardBody: React.FC<{week: CourseWeek | null}> = ({week}) => {
+const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: number) => void}> = ({week, onOpenMaterial}) => {
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -126,7 +126,7 @@ const ContentCardBody: React.FC<{week: CourseWeek | null}> = ({week}) => {
                   <span className={styles.materialIcon} aria-hidden="true">
                     {material.materialType === 'LINK' ? 'LINK' : (material.extension ?? 'file').toUpperCase()}
                   </span>
-                  <span className={styles.materialName} title={material.displayName}>{material.displayName}</span>
+                  {onOpenMaterial ? <button type="button" className={styles.materialName} onClick={() => onOpenMaterial(material.id)}>{material.displayName}</button> : <span className={styles.materialName} title={material.displayName}>{material.displayName}</span>}
                   {material.materialType === 'FILE' && material.sizeBytes !== null ? (
                     <span className={styles.materialMeta}>{formatSize(material.sizeBytes)}</span>
                   ) : null}

@@ -1,11 +1,12 @@
 // @ts-nocheck — legacy chat bundle; quarantined until chat migration (PROJECT_STANDARDS.md §13).
 import styles from '../sections/chat/chat-main-component/styles.module.scss';
+import workspaceStyles from '../pages/aibot/StudySupportWorkspace.module.scss';
 import {useState, useRef, useEffect, forwardRef, useImperativeHandle, useCallback} from 'react';
 import {FileText, Paperclip, X} from 'lucide-react';
 import TypingText from "../utils/typing-text";
 import {renderMessageText} from '@/utils/render-message-text';
 import {useAuth} from '@/contexts/AuthContext.js';
-import {useNavigate} from 'react-router-dom';
+import {useNavigate, useSearchParams} from 'react-router-dom';
 import {useAiExamLockdown} from '@/hooks/useAiExamLockdown';
 import {loadActiveChatCourses} from '@/utils/chatCourses';
 import DynamicThinking from '@/components/DynamicThinking/DynamicThinking';
@@ -25,6 +26,7 @@ const STUDY_SUPPORT_THINKING_STEPS = [
 
 interface Props {
   isIntroTop: boolean,
+  isWorkspace?: boolean,
   isSummary?: false,
   isDashboard: boolean,
   isPopup?: false,
@@ -44,6 +46,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
       handoffRef.current = !!sessionStorage.getItem('pendingChat');
     }
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const {user} = useAuth();
     const chatAuthHeaders = () => ({
       Authorization: `Bearer ${user.accessToken}`,
@@ -70,7 +73,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     const [isCoursesFetched, setIsCoursesFetched] = useState(false);
     const [courseFetchFailed, setCourseFetchFailed] = useState(false);
     const [selectedCourseId, setSelectedCourseId] = useState(() => {
-      const v = localStorage.getItem('selectedCourseId');
+      const v = searchParams.get('courseId') || localStorage.getItem('selectedCourseId');
       return v ? Number(v) : 0;
     });
     const fetchCourses = async () => {
@@ -98,8 +101,8 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
         fetchCourses();
       }
     }, [user?.accessToken, user?.id]);
-    const currentCourseName =
-      (selectedCourseId === 0 ? 'All Courses' : (courses.find(c => Number(c.id) === Number(selectedCourseId))?.name)) || 'All Courses';
+    const selectedCourse = courses.find(course => Number(course.id) === Number(selectedCourseId));
+    const currentCourseName = selectedCourseId === 0 ? 'All Courses' : selectedCourse?.title || selectedCourse?.name || `Course ${selectedCourseId}`;
     const relevantCourseIds = selectedCourseId === 0
       ? courses.map(course => Number(course.id))
       : [selectedCourseId];
@@ -116,7 +119,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
       || examLockdown.status === 'error';
     const lockedCourseNames = courses
       .filter(course => examLockdown.lockedCourseIds.includes(Number(course.id)))
-      .map(course => course.name || `Course ${course.id}`)
+      .map(course => course.title || course.name || `Course ${course.id}`)
       .join(', ');
     const examLockdownMessage = courseFetchFailed
       ? 'Study Support is temporarily unavailable because your course list could not be verified.'
@@ -375,7 +378,8 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
           </>
         )}
         {/*  Main Content */}
-        <div className={`flex flex-col p-2 ${props.isDashboard ? 'h-[90%]' : props.isSummary ? 'h-[87%]' : 'h-[95%]'}`}>
+        <div className={props.isWorkspace ? workspaceStyles.content : `flex flex-col p-2 ${props.isDashboard ? 'h-[90%]' : props.isSummary ? 'h-[87%]' : 'h-[95%]'}`}>
+          {props.isWorkspace ? <div className={workspaceStyles.toolbar}><button type="button" onClick={handleNewChat}>+ New chat</button></div> : null}
           <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4" ref={containerRef}>
             {isStudySupportUnavailable ? (
               <div
@@ -411,7 +415,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                     </div>
                   </div>
                 </div>
-              ) : (
+              ) : props.isWorkspace ? <div className={workspaceStyles.welcome}><img src="/icons/figma-ai/assistant.svg" alt=""/><h2>Your personal <span>learning assistant</span></h2></div> : (
                 <div
                   className={`flex-1 flex flex-col items-start text-left mb-8 ml-3 ${props.isIntroTop ? 'justify-start' : 'justify-end'
                   }`}
@@ -471,7 +475,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                 disabled={!isCoursesFetched}
                 style={{width: 150}}
               >
-                <img className={styles.chatCourseIcon} src="/icons/ai_course.png" alt="ai-course"/>
+                <img className={styles.chatCourseIcon} src="/icons/ai_course.png" alt=""/>
                 <p style={{
                   maxWidth: 110,
                   overflow: 'hidden',
@@ -506,9 +510,9 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                       key={c.id}
                       onClick={() => handleSelectCourse(c.id)}
                       style={menuItemStyle(Number(selectedCourseId) === Number(c.id))}
-                      title={c.name}
+                      title={c.title || c.name}
                     >
-                      {c.name || `Course ${c.id}`}
+                      {c.title || c.name || `Course ${c.id}`}
                     </button>
                   ))}
                 </div>
@@ -581,7 +585,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                 disabled={isStudySupportUnavailable || isLoading || (!input.trim() && !selectedFile)}
               >
                 Send
-                <img src="/icons/chat/send-star.png" alt="send-star"/>
+                <img src="/icons/chat/send-star.png" alt=""/>
               </button>
             </div>
           </div>

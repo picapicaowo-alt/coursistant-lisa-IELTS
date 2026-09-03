@@ -1,0 +1,72 @@
+.dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
+  margin: auto;
+  padding: 1.25rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-modal;
+  background: t.$surface-raised;
+  color: t.$text;
+  box-shadow: t.$shadow-lg;
+}
+.dialog::backdrop {
+  background: t.$surface-modal-backdrop;
+}
+.dialog header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+.dialog h2 {
+  font-size: t.$font-size-subhead;
+  font-weight: t.$fw-semibold;
+}
+.dialog button {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+  cursor: pointer;
+}
+.dialog footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.dialog .primary {
+  background: t.$brand;
+  color: t.$content-on-color;
+  border-color: t.$brand;
+}
+.dialog :disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.dialog :is(button, input):focus-visible {
+  outline: 2px solid t.$brand;
+  outline-offset: 3px;
+}
+.crop {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: t.$surface-muted;
+}
+.zoom {
+  display: grid;
+  gap: 0.5rem;
+  font-size: t.$fs-caption;
+  margin-top: 1rem;
+}
+.zoom input {
+  accent-color: t.$brand;
+  width: 100%;
+}
+.dialog [role='alert'] {
+  color: t.$feedback-danger;
+  font-size: t.$fs-caption;
+  margin: 0.75rem 0;
+}

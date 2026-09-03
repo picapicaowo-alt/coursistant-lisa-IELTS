@@ -1,17 +1,17 @@
-.card {
-  align-self: start;
-  border-radius: t.$radius-md;
-  border-color: transparent;
-  background: var(--course-surface);
+.card { align-self: start; background: t.$surface-raised; border-color: t.$border-default; border-radius: t.$radius-lg; }
+.card h3 { color: t.$content-primary; font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+.identity { display: grid; gap: t.$space-3; margin-top: t.$space-2; color: t.$content-primary; }
+.code { font-size: t.$font-size-caption; }
+.metadata { display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-4; font-size: t.$font-size-caption; line-height: t.$line-height-caption; color: t.$content-secondary; }
 
-  > summary { align-items: flex-start; border-radius: t.$radius-md; min-height: 8rem; background: var(--course-surface); }
-  &[open] > summary { align-items: flex-start; border-radius: t.$radius-md t.$radius-md 0 0; }
-  > summary:hover { background: var(--course-surface); filter: brightness(.985); }
-  > summary h3 { color: var(--course-ink); font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
-  > summary svg { color: var(--course-ink); }
-  > summary > div > span { -webkit-line-clamp: unset; overflow: visible; }
-  > div { background: t.$surface-raised; border: 1px solid t.$border-default; border-radius: 0 0 t.$radius-md t.$radius-md; }
-}
-.identity { display: grid; gap: t.$space-3; margin-top: t.$space-2; color: var(--course-ink); }
-.code { font-size: t.$font-size-body; font-weight: t.$fw-semibold; letter-spacing: .02em; }
-.metadata { display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-4; font-size: t.$font-size-caption; line-height: t.$line-height-caption; color: var(--course-ink); }
+.identityCard { display: flex; flex-direction: column; gap: t.$space-4; padding: t.$space-6; min-width: 0; border: 1px solid t.$border-default; height: 100%; }
+.identityCard h3 { margin: 0; font-size: t.$fs-course-name; line-height: 1.35; overflow-wrap: anywhere; }
+.instructor { display: flex; align-items: center; gap: t.$space-3; }
+.instructor > span { display: grid; place-items: center; width: t.$touch-target; height: t.$touch-target; border: 1px solid t.$border-default; background: t.$surface-muted; border-radius: t.$radius-pill; }
+.instructor > div { display: grid; gap: t.$space-1; }
+.instructor strong { font-weight: t.$fw-medium; }
+.instructor small { color: t.$content-secondary; }
+.progress { display: grid; gap: t.$space-2; margin-top: auto; padding-top: t.$space-4; font-size: t.$font-size-caption; color: t.$content-secondary; }
+.progress strong { color: t.$content-primary; font-weight: t.$fw-medium; }
+.progress progress { height: t.$space-2; width: 100%; accent-color: t.$feedback-success; }
+.identityCard footer { border-top: 1px dashed t.$border-default; padding-top: t.$space-4; }

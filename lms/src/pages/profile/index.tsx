@@ -1,5 +1,7 @@
-import {useRef, useState} from 'react';
+import {UserAvatar} from '@/components/UserAvatar';
+import {useEffect, useRef, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {AvatarCropDialog} from './AvatarCropDialog';
 import styles from './styles.module.scss';
 import type {ProfileResponse} from '@/apis';
 import {unwrapData} from '@/apis';
@@ -8,6 +10,9 @@ import {useAuth} from '@/contexts/AuthContext';
 import {getApiErrorMessage} from '@/utils/apiError';
 import {normalizeAvatarUrl} from '@/utils/avatarUrl';
 import {formatPersonName} from '@/utils/personName';
+import {isStudentAccount} from '@/utils/roleCapabilities';
+import {useLearningProfile} from './useLearningProfile';
+import {LearningProfileDetails, LearningProfileSummary} from './LearningProfile';
 
 interface StatusMessage {
   kind: 'success' | 'error';
@@ -16,6 +21,9 @@ interface StatusMessage {
 
 const ProfilePage = () => {
   const [editing, setEditing] = useState(false);
+  const editDialog = useRef<HTMLDialogElement>(null);
+  const [cropFile, setCropFile] = useState<File>();
+  useEffect(() => {if (editing) editDialog.current?.showModal();}, [editing]);
   const [firstName, setFirstName] = useState('');
   const [middleName, setMiddleName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -23,7 +31,9 @@ const ProfilePage = () => {
   const [status, setStatus] = useState<StatusMessage | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
-  const {updateProfile} = useAuth();
+  const {updateProfile, user} = useAuth();
+  const isStudent = Boolean(user && isStudentAccount(user));
+  const learningProfile = useLearningProfile(isStudent);
 
   const profileQuery = useQuery({
     queryKey: ['my-profile'],
@@ -58,6 +68,7 @@ const ProfilePage = () => {
     onSuccess: data => {
       commitProfile(data);
       setStatus({kind: 'success', text: 'Avatar updated.'});
+      setCropFile(undefined);
     },
     onError: error => setStatus({kind: 'error', text: getApiErrorMessage(error, 'Could not upload avatar.')}),
   });
@@ -85,21 +96,13 @@ const ProfilePage = () => {
 
   const profile = profileQuery.data;
   if (!profile) return <main className={styles.profilePage}>Could not load profile.</main>;
-  const avatar = normalizeAvatarUrl(profile.avatarUrl) || '/icons/default_avatar.jpg';
+  const avatar = normalizeAvatarUrl(profile.avatarUrl);
 
   return (
     <main className={styles.profilePage}>
-      <div className={styles.profileCover}/>
       <section className={styles.profileCard} aria-labelledby="profile-title">
         <div className={styles.avatarColumn}>
-          <img
-            src={avatar}
-            alt="Profile avatar"
-            className={styles.profileAvatar}
-            onError={event => {
-              event.currentTarget.src = '/icons/default_avatar.jpg';
-            }}
-          />
+          <UserAvatar src={avatar} alt="Profile avatar" className={styles.profileAvatar}/>
           <input
             ref={fileInputRef}
             className={styles.visuallyHidden}
@@ -107,7 +110,7 @@ const ProfilePage = () => {
             accept="image/png,image/jpeg,image/webp"
             onChange={event => {
               const file = event.target.files?.[0];
-              if (file) uploadAvatar.mutate(file);
+              if (file) {uploadAvatar.reset(); setCropFile(file);}
               event.target.value = '';
             }}
           />
@@ -134,7 +137,7 @@ const ProfilePage = () => {
         <div className={styles.profileDetails}>
           <div className={styles.profileHeading}>
             <div>
-              <p className={styles.eyebrow}>PROFILE</p>
+              <p className={styles.eyebrow}>{isStudent ? `Student ID: ${profile.userId}` : profile.role}</p>
               <h1 id="profile-title">{formatPersonName(profile)}</h1>
             </div>
             {!editing ? (
@@ -160,8 +163,20 @@ const ProfilePage = () => {
             </p>
           ) : null}
 
-          {editing ? (
-            <form
+          {learningProfile.data ? <LearningProfileSummary profile={learningProfile.data}/> : (
+            <dl className={styles.profileFacts}>
+              <div><dt>Email</dt><dd>{profile.email}</dd></div>
+              <div><dt>Account role</dt><dd>{profile.role}</dd></div>
+              <div><dt>Level</dt><dd>{profile.level || 'Not applicable'}</dd></div>
+              <div><dt>Email notifications</dt><dd>{profile.emailNotifications ? 'Enabled' : 'Disabled'}</dd></div>
+            </dl>
+          )}
+        </div>
+      </section>
+      {isStudent && learningProfile.isPending ? <p role="status">Loading learning profile…</p> : null}
+      {isStudent && learningProfile.isError ? <p role="alert">Learning profile could not be loaded. <button type="button" className={styles.secondaryButton} onClick={() => void learningProfile.refetch()}>Retry</button></p> : null}
+      {learningProfile.data ? <LearningProfileDetails profile={learningProfile.data}/> : null}
+      {editing ? <dialog ref={editDialog} className={styles.editDialog} aria-labelledby="edit-profile-title" onClose={() => setEditing(false)} onCancel={event => {if (updateName.isPending) event.preventDefault();}}><h2 id="edit-profile-title">Edit Profile</h2>            <form
               className={styles.profileForm}
               onSubmit={event => {
                 event.preventDefault();
@@ -189,16 +204,8 @@ const ProfilePage = () => {
                 </button>
               </div>
             </form>
-          ) : (
-            <dl className={styles.profileFacts}>
-              <div><dt>Email</dt><dd>{profile.email}</dd></div>
-              <div><dt>Account role</dt><dd>{profile.role}</dd></div>
-              <div><dt>Level</dt><dd>{profile.level || 'Not applicable'}</dd></div>
-              <div><dt>Email notifications</dt><dd>{profile.emailNotifications ? 'Enabled' : 'Disabled'}</dd></div>
-            </dl>
-          )}
-        </div>
-      </section>
+</dialog> : null}
+      {cropFile ? <AvatarCropDialog file={cropFile} pending={uploadAvatar.isPending} error={uploadAvatar.isError ? getApiErrorMessage(uploadAvatar.error, 'The photo could not be uploaded.') : undefined} onSave={file => uploadAvatar.mutate(file)} onClose={() => setCropFile(undefined)}/> : null}
     </main>
   );
 };

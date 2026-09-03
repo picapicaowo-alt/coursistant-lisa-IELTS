@@ -1,12 +1,13 @@
+import {UserAvatar} from '@/components/UserAvatar';
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './CoursePreview.module.scss';
-import {useNavigate} from "react-router-dom";
+import {useNavigate, generatePath} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {courseApiService} from "@/apis/services/course-api";
-import {CourseSession, CourseState} from "@/apis";
-import toneStyles from "@/styles/courseIdentity.module.scss";
-import {getCourseIdentityTone, formatCourseName} from "@/utils/course";
+import {CourseSession, CourseState, type CourseProgressResponse} from "@/apis";
+import {AssignmentProgress} from '@/components/AssignmentProgress';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 
 interface CoursePreviewProps {
   id: number;
@@ -21,6 +22,10 @@ interface CoursePreviewProps {
   showOperations: boolean;
   showDelivery?: boolean;
   avatarUrl?: string;
+  progress?: CourseProgressResponse;
+  progressLoading?: boolean;
+  progressFailed?: boolean;
+  showProgress?: boolean;
 }
 
 const DAY_LABEL: Record<CourseSession['dayOfWeek'], string> = {
@@ -54,7 +59,8 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
                                                               canManage,
                                                               showOperations,
                                                               showDelivery = false,
-                                                              avatarUrl = '/icons/default_avatar.jpg'
+                                                              avatarUrl,
+                                                              progress, progressLoading, progressFailed, showProgress = true,
                                                             }) => {
   const navigate = useNavigate();
   const {t} = useTranslation("course");
@@ -63,7 +69,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
   const [confirmDelete, setConfirmDelete] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const {data: sessions} = useQuery({
+  const {data: sessions, isPending: schedulePending, isError: scheduleError, refetch: retrySchedule} = useQuery({
     queryKey: ['course-sessions', id],
     queryFn: async () => (await courseApiService.getCourseSessions(id)).data ?? [],
     staleTime: 5 * 60 * 1000,
@@ -115,16 +121,15 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
   const firstSession = sessions?.[0];
 
   return (
-    <article className={`${styles.courseItem} ${toneStyles[getCourseIdentityTone(id)]}`}>
-      <h2 className={styles.courseTitle}>{formatCourseName(courseCode, title)}</h2>
+    <article className={styles.courseItem}>
       <div className={styles.courseHeader}>
-        {instructorName && (
+        {(
           <div className={styles.instructorInfo}>
             <div className={styles.avatarContainer}>
-              <img src={avatarUrl} alt="" className={styles.avatar}/>
+              <UserAvatar src={avatarUrl} className={styles.avatar}/>
             </div>
             <div>
-              <div className={styles.instructorName}>{instructorName}</div>
+              <div className={styles.instructorName}>{instructorName || 'Instructor not assigned'}</div>
               <div className={styles.instructorRole}>{t("card.instructor")}</div>
             </div>
           </div>
@@ -132,44 +137,29 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
       </div>
 
       <div className={styles.courseContent}>
-
-
-        {/* Only render the meta row once there is something real to put in it.
-            An empty "Class Time" label would read as "no classes scheduled". */}
-        {firstSession && (
-          <div className={styles.courseMeta}>
-            <div className={styles.metaItem}>
-              <span className={styles.metaLabel}>{t("card.classTime")}</span>
-              <span className={styles.metaValue}>
-                {DAY_LABEL[firstSession.dayOfWeek]} {toClockTime(firstSession.startTime)}
-              </span>
-            </div>
-            {firstSession.location && (
-              <div className={styles.metaItem}>
-                <span className={styles.metaLabel}>{t("card.classroom")}</span>
-                <span className={styles.metaValue}>{firstSession.location}</span>
-              </div>
-            )}
-          </div>
-        )}
+        <h2 className={styles.courseTitle}>{title || courseCode}</h2>
+        <div className={styles.badges}><span className={styles.courseState}>{state}</span><span className={styles.courseCode}>{courseCode}</span></div>
+        {showProgress ? <div className={styles.progressUnavailable}><AssignmentProgress progress={progress} loading={progressLoading} failed={progressFailed}/></div> : null}
       </div>
-
       <div className={styles.courseFooter}>
+        <div className={styles.scheduleSummary}><img src="/icons/figma-dashboard/calendar.svg" alt=""/><div><span>Weekly class</span>
+          {scheduleError ? <button type="button" onClick={() => void retrySchedule()}>Retry schedule</button> : firstSession ? <><strong>{DAY_LABEL[firstSession.dayOfWeek]} {toClockTime(firstSession.startTime)}</strong>{firstSession.location ? <small>{firstSession.location}</small> : null}</> : <strong>{state === 'Archived' ? 'Archived course' : schedulePending ? 'Loading…' : 'No schedule published'}</strong>}
+        </div></div>
         <button
           type="button"
           className={styles.viewDetails}
-          onClick={() => navigate(`/course/${id}`)}
+          onClick={() => navigate(generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(id)}))}
         >
           {t("card.viewDetails")}
           <span aria-hidden="true">›</span>
         </button>
         {showOperations ? (
-          <button type="button" className={styles.viewDetails} onClick={() => navigate(`/course/${id}/operations`)}>
+          <button type="button" className={styles.viewDetails} onClick={() => navigate(generatePath(APP_ROUTE_PATHS.courseCourseIdOperations, {courseId: String(id)}))}>
             Course operations
           </button>
         ) : null}
         {showDelivery ? (
-          <button type="button" className={styles.viewDetails} onClick={() => navigate(`/advisor/courses/${id}/delivery`)}>
+          <button type="button" className={styles.viewDetails} onClick={() => navigate(generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(id)}))}>
             Delivery setup
           </button>
         ) : null}

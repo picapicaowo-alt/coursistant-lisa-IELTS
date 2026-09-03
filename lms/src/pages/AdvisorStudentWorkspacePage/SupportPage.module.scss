@@ -1,0 +1,580 @@
+.supportWorkspace {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.mainGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 68rem) {
+  .mainGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: t.$white;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control; // 10px canonical
+  padding: 1.25rem 1.5rem;
+  box-shadow: none;
+  min-width: 0;
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid t.$border-default;
+
+  .headerTitleGroup {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    h2,
+    h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.4;
+      font-weight: t.$fw-semibold;
+      color: t.$content-primary;
+    }
+  }
+}
+
+.countBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.45rem;
+  border-radius: t.$radius-pill;
+  background: t.$surface-brand-subtle;
+  color: t.$action-primary;
+  font-size: 0.75rem;
+  font-weight: t.$fw-semibold;
+}
+
+// ----------------------------------------------------------------- Chat / Messaging
+.conversationCard {
+  min-height: 38rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.messageStream {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  overflow-y: auto;
+  max-height: 30rem;
+  padding: 0.5rem 0.25rem 0.5rem 0;
+  margin-bottom: 1rem;
+}
+
+.loadOlderButton {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  background: t.$surface-subtle;
+  color: t.$content-secondary;
+  font-size: 0.8rem;
+  font-weight: t.$fw-medium;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: t.$surface-muted;
+    color: t.$content-primary;
+  }
+}
+
+.messageItem {
+  display: flex;
+  flex-direction: column;
+  max-width: 82%;
+  padding: 0.85rem 1.1rem;
+  border-radius: t.$radius-control;
+  font-size: 0.875rem;
+  line-height: 1.45;
+  word-break: break-word;
+
+  p {
+    margin: 0.25rem 0 0.4rem;
+    color: t.$content-primary;
+    white-space: pre-wrap;
+  }
+}
+
+.studentMessage {
+  align-self: flex-start;
+  background: t.$surface-subtle;
+  border: 1px solid t.$border-default;
+}
+
+.advisorMessage {
+  align-self: flex-end;
+  background: t.$brand-subtle;
+  border: 1px solid t.$brand-subtle;
+
+  .messageSender {
+    color: t.$action-primary-hover;
+  }
+}
+
+.messageMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: t.$content-secondary;
+
+  .messageSender {
+    font-weight: t.$fw-semibold;
+  }
+
+  .messageTime {
+    color: t.$content-placeholder;
+  }
+}
+
+.attachmentList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.attachmentRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.45rem 0.65rem;
+  background: t.$white;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  font-size: 0.8rem;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: t.$content-primary;
+  }
+
+  .attachmentActions {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    flex-shrink: 0;
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.2rem 0.5rem;
+      font-size: 0.75rem;
+      border: 1px solid t.$border-default;
+      border-radius: 6px;
+      background: t.$white;
+      color: t.$content-primary;
+      cursor: pointer;
+
+      &:hover {
+        background: t.$surface-subtle;
+        border-color: t.$border-strong;
+      }
+    }
+  }
+}
+
+.markReadButton {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.75rem;
+  color: t.$action-primary;
+  cursor: pointer;
+  text-decoration: underline;
+
+  &:hover {
+    color: t.$action-primary-hover;
+  }
+}
+
+// ----------------------------------------------------------------- Composer
+.composer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid t.$border-default;
+}
+
+.composerTextarea {
+  width: 100%;
+  min-height: 4.75rem;
+  padding: 0.75rem;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  background: t.$white;
+  color: t.$content-primary;
+  font-family: inherit;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s ease;
+
+  &:focus {
+    border-color: t.$brand;
+  }
+
+  &::placeholder {
+    color: t.$content-placeholder;
+  }
+}
+
+.composerActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.fileInputWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+
+  input[type='file'] {
+    display: none;
+  }
+
+  .attachButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 0.85rem;
+    height: 2rem;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-control;
+    background: t.$white;
+    color: t.$content-primary;
+    font-size: 0.8rem;
+    font-weight: t.$fw-medium;
+    cursor: pointer;
+
+    &:hover {
+      background: t.$surface-subtle;
+    }
+  }
+}
+
+.selectedFiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  width: 100%;
+
+  .fileTag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.5rem;
+    background: t.$surface-subtle;
+    border: 1px solid t.$border-default;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    color: t.$content-primary;
+
+    button {
+      background: none;
+      border: none;
+      color: t.$content-secondary;
+      font-size: 0.9rem;
+      cursor: pointer;
+      line-height: 1;
+
+      &:hover {
+        color: t.$feedback-danger;
+      }
+    }
+  }
+}
+
+.sendButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2rem;
+  padding: 0 1.1rem;
+  border: 1px solid t.$brand;
+  border-radius: t.$radius-control;
+  background: t.$brand;
+  color: t.$white;
+  font-size: 0.85rem;
+  font-weight: t.$fw-medium;
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: t.$action-secondary;
+    border-color: t.$action-secondary;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ----------------------------------------------------------------- Side Column Cards
+.sideColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  min-width: 0;
+}
+
+.coursePickerLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+  font-weight: t.$fw-medium;
+  color: t.$content-primary;
+
+  select {
+    width: 100%;
+    height: 2.5rem;
+    padding: 0 0.75rem;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-control;
+    background: t.$white;
+    color: t.$content-primary;
+    font: inherit;
+    font-size: 0.875rem;
+    outline: none;
+
+    &:focus {
+      border-color: t.$brand;
+    }
+  }
+}
+
+.hoursWidget {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  .hourStat {
+    display: flex;
+    flex-direction: column;
+    padding: 0.75rem 1rem;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-control;
+    background: t.$surface-subtle;
+
+    strong {
+      font-size: 1.25rem;
+      font-weight: t.$fw-bold;
+      color: t.$content-primary;
+    }
+
+    span {
+      font-size: 0.75rem;
+      color: t.$content-secondary;
+    }
+  }
+}
+
+.formGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    font-size: 0.8rem;
+    font-weight: t.$fw-medium;
+    color: t.$content-primary;
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid t.$border-default;
+      border-radius: t.$radius-control;
+      background: t.$white;
+      color: t.$content-primary;
+      font: inherit;
+      font-size: 0.85rem;
+      padding: 0.5rem 0.75rem;
+      outline: none;
+
+      &:focus {
+        border-color: t.$brand;
+      }
+    }
+
+    input {
+      height: 2.35rem;
+    }
+
+    textarea {
+      min-height: 3.5rem;
+      resize: vertical;
+    }
+  }
+
+  .versionText {
+    margin: 0;
+    font-size: 0.75rem;
+    color: t.$content-placeholder;
+  }
+}
+
+.reportItemRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border-bottom: 1px solid t.$border-default;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .rowHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+
+    strong {
+      font-size: 0.85rem;
+      font-weight: t.$fw-semibold;
+      color: t.$content-primary;
+    }
+
+    small {
+      font-size: 0.75rem;
+      color: t.$content-placeholder;
+    }
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: t.$content-secondary;
+    line-height: 1.4;
+  }
+}
+
+.emptyBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem 1rem;
+  color: t.$content-secondary;
+  background: t.$surface-subtle;
+  border: 1px dashed t.$border-default;
+  border-radius: t.$radius-control;
+
+  strong {
+    font-size: 0.9rem;
+    color: t.$content-primary;
+    margin-bottom: 0.25rem;
+  }
+
+  span {
+    font-size: 0.8rem;
+  }
+}
+
+// ----------------------------------------------------------------- Secondary Tools Section
+.secondarySection {
+  margin-top: 1rem;
+
+  details {
+    background: t.$white;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-control;
+    padding: 0.85rem 1.25rem;
+
+    summary {
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: t.$fw-semibold;
+      color: t.$content-secondary;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      &:hover {
+        color: t.$content-primary;
+      }
+    }
+
+    .advancedContent {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid t.$border-default;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.5rem;
+
+      @media (max-width: 48rem) {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+  }
+}
+
+.publishedReports {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid t.$border;
+}
+.reportsTitle {
+  margin: 0 0 0.5rem;
+  font-size: t.$font-size-body;
+  color: t.$text;
+}

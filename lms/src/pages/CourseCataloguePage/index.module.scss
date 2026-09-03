@@ -16,12 +16,11 @@
     display: flex;
     align-items: center;
     gap: t.$space-2;
-    padding: t.$space-3;
+    padding: 0;
     margin-bottom: t.$space-6;
-    border: 1px solid t.$border-default;
-    border-radius: t.$radius-md;
-    background: t.$surface-raised;
-    box-shadow: t.$shadow-sm;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
 }
 
 .tab {
@@ -40,21 +39,7 @@
         background-color: t.$surface-subtle;
     }
     
-    &.active {
-        color: t.$action-primary;
-        
-        &::after {
-            content: "";
-            position: absolute;
-            bottom: calc(t.$space-2 * -1);
-            left: 50%;
-            transform: translateX(-50%);
-            width: 24px;
-            height: 3px;
-            background-color: t.$action-primary;
-            border-radius: 2px;
-        }
-    }
+    &.active { color: t.$content-primary; background: t.$surface-muted; }
 }
 
 .tabLabel {
@@ -215,3 +200,10 @@
     color: t.$text-muted;
     font-size: t.$fs-label;
 }
+
+.courseList { display: grid; grid-template-columns: minmax(0, 1fr); gap: t.$space-5; margin-bottom: t.$space-8; }
+.viewToggle { display: flex; flex-shrink: 0; padding: t.$space-1; background: t.$surface-subtle; border-radius: t.$radius-sm; }
+.viewToggle button { display: grid; width: t.$touch-target; height: t.$touch-target; place-items: center; border: 0; border-radius: t.$radius-xs; background: transparent; }
+.viewToggle button[aria-pressed='true'] { background: t.$surface-muted; }
+.viewToggle img { width: t.$space-6; height: t.$space-6; }
+.pageNumbers { flex-wrap: wrap; }

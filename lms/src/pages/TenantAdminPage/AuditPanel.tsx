@@ -1,4 +1,4 @@
-import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {WorkspaceSection as CollapsibleSection} from '@/components/WorkspaceSection';
 import {FormEvent, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {RefreshCw, Search} from 'lucide-react';

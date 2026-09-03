@@ -1,8 +1,8 @@
 .page {
     min-height: calc(100vh - 110px);
     padding: t.$workspace-gutter-block t.$workspace-gutter-inline;
-    background: #eef4fb;
-    color: #1f2a3d;
+    background: t.$surface-page;
+    color: t.$text;
 }
 
 .focusedPage {
@@ -15,7 +15,7 @@
 
     h1 {
         margin: 0.2rem 0 0.35rem;
-        color: #192338;
+        color: t.$text;
         font-size: clamp(2rem, 3vw, 3rem);
         font-weight: 600;
         line-height: 1.12;
@@ -23,14 +23,14 @@
 
     > p:last-child {
         margin: 0;
-        color: #60708e;
+        color: t.$text-muted;
         font-size: 1rem;
     }
 }
 
 .eyebrow {
     margin: 0;
-    color: #58709b;
+    color: t.$text-muted;
     font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.12em;
@@ -57,10 +57,10 @@
     overflow: hidden;
     flex-direction: column;
     padding: 1.65rem;
-    border: 1px solid #c8d7ef;
+    border: 1px solid t.$border;
     border-radius: 1.5rem;
     background: t.$surface-raised;
-    box-shadow: 0 18px 50px rgb(56 81 120 / 0.07);
+    box-shadow: none;
 }
 
 .toolCard[hidden] {
@@ -78,7 +78,7 @@
 
     h2 {
         margin: 0 0 0.35rem;
-        color: #192338;
+        color: t.$text;
         font-size: 1.5rem;
         font-weight: 600;
     }
@@ -94,11 +94,11 @@
     height: 2.5rem;
     flex: 0 0 auto;
     padding: 0;
-    border: 1px solid #cbdaf2;
+    border: 1px solid t.$border;
     border-radius: 0.75rem;
     margin-left: auto;
-    background: #f8faff;
-    color: #52698e;
+    background: t.$surface-subtle;
+    color: t.$text-muted;
     cursor: pointer;
     place-items: center;
     transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
@@ -109,13 +109,13 @@
     }
 
     &:hover {
-        border-color: #8ba8e0;
-        background: #eef4ff;
-        color: #2f58b5;
+        border-color: t.$brand;
+        background: t.$brand-subtle;
+        color: t.$brand;
     }
 
     &:focus-visible {
-        outline: 3px solid #1d4ed8;
+        outline: 3px solid t.$brand;
         outline-offset: 2px;
     }
 }
@@ -132,13 +132,13 @@
 }
 
 .studyIcon {
-    background: #dcecff;
-    color: #285dc8;
+    background: t.$brand-subtle;
+    color: t.$brand;
 }
 
 .workflowIcon {
-    background: #eee1ff;
-    color: #7441c5;
+    background: t.$brand-subtle;
+    color: t.$brand;
 }
 
 .badge,
@@ -152,26 +152,26 @@
 }
 
 .studyBadge {
-    background: #e1f1ff;
-    color: #2c5bc7;
+    background: t.$brand-subtle;
+    color: t.$brand;
 }
 
 .workflowBadge {
-    background: #f0e5ff;
-    color: #7040bc;
+    background: t.$brand-subtle;
+    color: t.$brand;
 }
 
 .toolDescription {
     min-height: 3rem;
     margin: 1.35rem 0 0;
-    color: #60708e;
+    color: t.$text-muted;
     line-height: 1.55;
 }
 
 .divider {
     height: 1px;
     margin: 1rem 0 1.1rem;
-    background: #dbe4f2;
+    background: t.$border;
 }
 
 .studyChat {
@@ -187,7 +187,7 @@
 .loading {
     display: grid;
     min-height: 26rem;
-    color: #60708e;
+    color: t.$text-muted;
     place-items: center;
 }
 
@@ -197,25 +197,25 @@
 
     p {
         margin: 0 0 0.1rem;
-        color: #60708e;
+        color: t.$text-muted;
         font-size: 0.85rem;
     }
 
     button {
         width: 100%;
         padding: 0.75rem 0.9rem;
-        border: 1px solid #cbdaf2;
+        border: 1px solid t.$border;
         border-radius: 0.75rem;
-        background: #f8faff;
-        color: #34496c;
+        background: t.$surface-subtle;
+        color: t.$text;
         cursor: pointer;
         font: inherit;
         text-align: left;
         transition: border-color 150ms ease, background 150ms ease, transform 150ms ease;
 
         &:hover:not(:disabled) {
-            border-color: #8ba8e0;
-            background: #f1f5ff;
+            border-color: t.$brand;
+            background: t.$brand-subtle;
             transform: translateY(-1px);
         }
 
@@ -232,16 +232,16 @@
     margin-top: 1.1rem;
     padding: 1rem;
     overflow-y: auto;
-    border: 1px solid #d4def0;
+    border: 1px solid t.$border;
     border-radius: 1rem;
-    background: #fbfcff;
+    background: t.$surface-raised;
     scrollbar-gutter: stable;
 }
 
 .rolePill {
     margin-bottom: 0.85rem;
-    background: #f0e5ff;
-    color: #7040bc;
+    background: t.$brand-subtle;
+    color: t.$brand;
 }
 
 .message {
@@ -260,17 +260,17 @@
 }
 
 .agentMessage {
-    border: 1px solid #dce5f3;
+    border: 1px solid t.$border;
     border-bottom-left-radius: 0.25rem;
     background: t.$surface-raised;
-    color: #2f405d;
+    color: t.$text;
     white-space: normal;
 }
 
 .userMessage {
     margin-left: auto;
     border-bottom-right-radius: 0.25rem;
-    background: #465fe0;
+    background: t.$brand;
     color: t.$content-on-color;
 }
 
@@ -287,11 +287,11 @@
 .deadlineModal {
     width: min(100%, 34rem);
     padding: 1.4rem;
-    border: 1px solid #d9e2f1;
+    border: 1px solid t.$border;
     border-radius: 1.15rem;
     background: t.$surface-raised;
     box-shadow: 0 24px 70px rgb(20 38 70 / 0.24);
-    color: #263650;
+    color: t.$text;
 }
 
 .modalHeader {
@@ -301,7 +301,7 @@
 
     h3 {
         margin: 0.15rem 0 0;
-        color: #192338;
+        color: t.$text;
         font-size: 1.25rem;
         line-height: 1.25;
     }
@@ -313,15 +313,15 @@
     height: 2.65rem;
     flex: 0 0 auto;
     border-radius: 50%;
-    background: #fff1cc;
-    color: #8b5a00;
+    background: t.$feedback-warning-surface;
+    color: t.$feedback-warning;
     font-size: 1.2rem;
     font-weight: 800;
     place-items: center;
 }
 
 .modalEyebrow {
-    color: #7b5a0c;
+    color: t.$feedback-warning;
     font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.09em;
@@ -333,10 +333,10 @@
     margin: 1.15rem 0 0;
     padding: 0.9rem;
     overflow-y: auto;
-    border: 1px solid #dbe4f1;
+    border: 1px solid t.$border;
     border-radius: 0.8rem;
-    background: #f8faff;
-    color: #2f405d;
+    background: t.$surface-subtle;
+    color: t.$text;
     line-height: 1.55;
     overflow-wrap: anywhere;
 }
@@ -356,8 +356,8 @@
     margin: 0.75rem 0 0;
     padding: 0.7rem 0.8rem;
     border-radius: 0.65rem;
-    background: #fff0f0;
-    color: #a12c2c;
+    background: t.$feedback-danger-surface;
+    color: t.$feedback-danger;
     font-size: 0.86rem;
     line-height: 1.4;
 }
@@ -371,10 +371,10 @@
     button {
         min-width: 6rem;
         padding: 0.65rem 1rem;
-        border: 1px solid #b6c4da;
+        border: 1px solid t.$border-strong;
         border-radius: 0.65rem;
         background: t.$surface-raised;
-        color: #34445d;
+        color: t.$text;
         cursor: pointer;
         font: inherit;
         font-weight: 600;
@@ -386,8 +386,8 @@
     }
 
     .allowButton {
-        border-color: #465fe0;
-        background: #465fe0;
+        border-color: t.$brand;
+        background: t.$brand;
         color: t.$content-on-color;
     }
 }
@@ -442,7 +442,7 @@
         padding: 0.55rem 1rem;
         border: 0;
         border-radius: 0.7rem;
-        background: #465fe0;
+        background: t.$brand;
         color: t.$content-on-color;
         cursor: pointer;
         font: inherit;
@@ -458,7 +458,7 @@
 .quickPrompts button:focus-visible,
 .modalActions button:focus-visible,
 .workflowInput button:focus-visible {
-    outline: 3px solid #1d4ed8;
+    outline: 3px solid t.$brand;
     outline-offset: 2px;
 }
 
@@ -512,3 +512,14 @@
         justify-content: flex-end;
     }
 }
+
+.srOnly {position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%);}
+.toolTabs {display:flex; gap:.75rem; margin:0 auto 1rem; max-width:t.$workspace-max-inline-size;}
+.toolTabs button {min-height:2.5rem; padding:.5rem 1rem; border-radius:t.$radius-control; color:t.$text; cursor:pointer;}
+.toolTabs button[aria-pressed='true'] {background:t.$neutral-fill;}
+.toolTabs button:focus-visible {outline:2px solid t.$brand; outline-offset:3px;}
+.focusedWorkspace {max-width:64rem; margin:auto;}
+.assistantWorkspace {height:calc(100dvh - 12rem); min-height:32rem; max-height:64rem; width:100%;}
+.assistantWorkspace[hidden] {display:none;}
+.assistantWorkspace > div {height:100%;}
+@media(max-width:700px) {.assistantWorkspace {height:calc(100dvh - 14rem); min-height:28rem;}}

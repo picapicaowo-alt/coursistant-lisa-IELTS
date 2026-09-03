@@ -1,5 +1,4 @@
 import {expect, test, type Page} from '@playwright/test';
-import {openSection} from './disclosure-helpers';
 
 const response = (data: unknown) => ({status: 200, code: 'SUCCESS', data});
 const titles = ['Build vocabulary range', 'Practise academic paraphrasing', 'Review recurring grammar patterns', 'Write a timed response', 'Reflect on advisor feedback', 'Prepare the next draft'];
@@ -35,9 +34,7 @@ test('Figma task workspace preserves drafts, uses versioned mutations, and suppo
   const {writes} = await fixture(page);
   await page.setViewportSize({width: 1600, height: 1040});
   await page.goto('/my-plan');
-  await openSection(page, 'Study plan');
-  await openSection(page, 'Checkpoint 1: Build vocabulary range');
-  await page.getByRole('button', {name: 'View tasks'}).click();
+  await page.getByRole('region', {name: 'Learning Journey', exact: true}).getByRole('button', {name: /Build vocabulary range/}).click();
   await expect(page).toHaveURL(/checkpoint=91/);
   const firstView = page.getByRole('button', {name: 'View Build vocabulary range', exact: true});
   await firstView.click();
@@ -96,7 +93,7 @@ test('stale task and checkpoint links recover without routing to a missing scree
   await expect(page.getByText('This checkpoint is no longer in your current study plan.')).toBeVisible();
   await page.getByRole('button', {name: 'Back to study plan'}).click();
   await expect(page).toHaveURL(/\/my-plan$/);
-  await expect(page.getByRole('heading', {name: 'Learning profile'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'My Learning Goal'})).toBeVisible();
 });
 
 test('checkpoint layout reflows across viewport sizes without fixed page widths', async ({page}) => {

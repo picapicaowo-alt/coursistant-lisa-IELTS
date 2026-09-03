@@ -59,6 +59,7 @@ test('parent can request absence, read exam results, load older messages, and re
   await page.setViewportSize({width: 390, height: 844});
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({path: testInfo.outputPath('parent-results-mobile.png'), fullPage: true});
+  await page.getByRole('button', {name: 'Close results', exact: true}).click();
   await page.getByRole('button', {name: 'Messages', exact: true}).click();
   await openSection(page, 'Conversation');
   await expect(page.getByText('This week’s learning update')).toBeVisible();

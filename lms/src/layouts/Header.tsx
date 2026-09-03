@@ -1,9 +1,11 @@
+import {UserAvatar} from '@/components/UserAvatar';
 import {useEffect, useRef, useState} from 'react';
 import {ChevronDown, LogOut, Settings, ShieldCheck, UserRound, type LucideIcon} from 'lucide-react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import NotificationCenter from '../components/NotificationCenter';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {canAccessAdminConsole, canAccessCourseCatalogue, isInstructorLevel} from '@/utils/roleCapabilities';
 import styles from './Header.module.scss';
 
@@ -20,6 +22,8 @@ const getWorkspaceLabel = (pathname: string, instructor: boolean): string => {
   if (pathname.startsWith('/calendar')) return 'Calendar';
   if (pathname.startsWith('/aibot')) return 'AI Workplace';
   if (pathname.startsWith('/mock-exams')) return 'Mock exams';
+  if (pathname === APP_ROUTE_PATHS.advisorMessages) return 'Messages';
+  if (pathname === APP_ROUTE_PATHS.advisorOperations) return 'Dashboard';
   if (pathname.startsWith('/advisor/students')) return 'Students';
   if (pathname.startsWith('/advisor')) return 'Advisor operations';
   if (pathname.startsWith('/counsellor')) return 'Counsellor operations';
@@ -42,9 +46,9 @@ const Header = () => {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const name = user?.name;
+  const name = user?.name || 'Your profile';
   const email = user?.email;
-  const profileImage = user?.avatar || '/icons/default_avatar.jpg';
+  const profileImage = user?.avatar;
   const canUseAdminConsole = user ? canAccessAdminConsole(user) : false;
   const isTenantAdmin = user?.role === 'TENANT_ADMIN';
   const canSearchCourses = user ? canAccessCourseCatalogue(user) && user.role === 'USER' : false;
@@ -117,15 +121,7 @@ const Header = () => {
       <div className={styles.accountActions}>
         {user?.role === 'USER' ? <NotificationCenter identity={user ?? undefined}/> : null}
         <div className={styles.profile} ref={menuRef}>
-          <img
-            className={styles.avatar}
-            src={profileImage}
-            alt=""
-            onError={event => {
-              event.currentTarget.onerror = null;
-              event.currentTarget.src = '/icons/default_avatar.jpg';
-            }}
-          />
+          <UserAvatar className={styles.avatar} src={profileImage}/>
           <div className={styles.profileCopy}>
             <strong>{name}</strong>
             <span>{email}</span>

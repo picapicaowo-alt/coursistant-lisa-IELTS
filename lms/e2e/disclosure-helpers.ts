@@ -4,6 +4,7 @@ export const sectionTrigger = (page: Page, title: string) => page.locator(`summa
 
 export async function openSection(page: Page, title: string) {
   const trigger = sectionTrigger(page, title);
-  await expect(trigger).toBeVisible();
-  if (!await trigger.evaluate(element => element.parentElement?.hasAttribute('open'))) await trigger.click();
+  const region = page.getByRole('region', {name: title, exact: true}).first();
+  await expect(trigger.or(region).first()).toBeVisible();
+  if (await trigger.count() > 0 && !await trigger.evaluate(element => element.parentElement?.hasAttribute('open'))) await trigger.click();
 }

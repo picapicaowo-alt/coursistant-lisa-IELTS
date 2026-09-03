@@ -1,0 +1,134 @@
+.reader {
+  min-width: 0;
+  padding: 1rem clamp(1rem, 2vw, 2rem) 2rem;
+}
+.reader > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid t.$border;
+}
+.reader :is(button, a) {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: t.$radius-control;
+  color: t.$text;
+  cursor: pointer;
+  text-decoration: none;
+}
+.reader .primary {
+  display: inline-flex;
+  align-items: center;
+  background: t.$brand;
+  color: t.$content-on-color;
+}
+.layout {
+  display: grid;
+  grid-template-columns: minmax(14rem, 25%) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.5rem);
+}
+.layout > aside {
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  padding: 1rem;
+  align-self: start;
+  max-height: calc(100dvh - 15rem);
+  overflow: auto;
+}
+.layout aside h2 {
+  font-size: t.$font-size-subhead;
+  font-weight: t.$fw-semibold;
+  margin-bottom: 1.25rem;
+}
+.layout aside h3 {
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-medium;
+  padding: 0.75rem 0;
+  border-top: 1px solid t.$border;
+}
+.layout aside ul {
+  list-style: none;
+  padding: 0;
+}
+.layout aside button {
+  width: 100%;
+  display: grid;
+  gap: 0.3rem;
+  text-align: left;
+  font-size: t.$fs-caption;
+}
+.layout aside small {
+  color: t.$text-muted;
+}
+.layout aside [aria-current='true'] {
+  background: t.$surface-detail-panel;
+  color: t.$brand;
+}
+.content {
+  min-width: 0;
+}
+.content h1 {
+  font-size: clamp(1.4rem, 2vw, 1.8rem);
+  font-weight: t.$fw-semibold;
+  margin-bottom: 1.5rem;
+}
+.video {
+  width: 100%;
+  aspect-ratio: 16/9;
+  border: 0;
+  border-radius: t.$radius-card-lg;
+}
+.preview :is(video, img) {
+  width: 100%;
+  max-height: 70dvh;
+  object-fit: contain;
+  border-radius: t.$radius-control;
+}
+.preview audio {
+  width: 100%;
+  margin: 2rem 0;
+}
+.preview iframe {
+  width: 100%;
+  height: 65dvh;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control;
+}
+.preview p,
+.linkResource p {
+  color: t.$text-muted;
+  line-height: 1.6;
+}
+.preview [role='alert'] {
+  color: t.$feedback-danger;
+}
+.preview .download {
+  margin-top: 1rem;
+  border: 1px solid t.$border;
+}
+.content footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+.content footer > * {
+  border: 1px solid t.$border;
+}
+.reader :is(button, a):focus-visible {
+  outline: 2px solid t.$brand;
+  outline-offset: 3px;
+}
+@media (max-width: 760px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .layout > aside {
+    max-height: 16rem;
+  }
+  .reader {
+    padding-inline: 1rem;
+  }
+}

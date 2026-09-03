@@ -1,0 +1,242 @@
+[
+  {
+    "file": "courses-390.png",
+    "source": "test-results/figma-parity-course-cards--30fa6-gress-and-discussion-writes-chromium/courses-390.png",
+    "width": 390,
+    "sha256": "ccffc6ae986b62cbc95894708467d697fdf91857cda38772353b7d64530106ec"
+  },
+  {
+    "file": "courses-1440.png",
+    "source": "test-results/figma-parity-course-cards--30fa6-gress-and-discussion-writes-chromium/courses-1440.png",
+    "width": 1440,
+    "sha256": "667ea1491f168bfa02f946a66dd461a2b4ed3d477082b705678e578d20a97fea"
+  },
+  {
+    "file": "course-outline-390.png",
+    "source": "test-results/figma-parity-course-cards--30fa6-gress-and-discussion-writes-chromium/course-outline-390.png",
+    "width": 390,
+    "sha256": "1980cb267b1feaad229dfbc5016cca2306fec212c5e52934d6377c5482302282"
+  },
+  {
+    "file": "course-outline-1440.png",
+    "source": "test-results/figma-parity-course-cards--30fa6-gress-and-discussion-writes-chromium/course-outline-1440.png",
+    "width": 1440,
+    "sha256": "648fa1a577c0157df48b1b6ac4e9b5291b98644cc5eacd05cc3345dc64ae29e0"
+  },
+  {
+    "file": "course-reader-390.png",
+    "source": "test-results/figma-parity-course-cards--30fa6-gress-and-discussion-writes-chromium/course-reader-390.png",
+    "width": 390,
+    "sha256": "6ac0d316d879ddfb4ef63530cede82e4fcc3b60908f45ea418d22001f01317d8"
+  },
+  {
+    "file": "course-reader-1440.png",
+    "source": "test-results/figma-parity-course-cards--30fa6-gress-and-discussion-writes-chromium/course-reader-1440.png",
+    "width": 1440,
+    "sha256": "4e668dabb1dd9ace2adf7bb071e835589a485b4adbf779f6ed3138bfca7e889c"
+  },
+  {
+    "file": "advisor-tasks-390.png",
+    "source": "test-results/figma-parity-tasks-use-act-bf562-s-and-open-their-checkpoint-chromium/advisor-tasks-390.png",
+    "width": 390,
+    "sha256": "d973d6fc2adda47a858554e5dd18a5f53ba4e06f9f564eb1d6a250d73e02e401"
+  },
+  {
+    "file": "advisor-tasks-1440.png",
+    "source": "test-results/figma-parity-tasks-use-act-bf562-s-and-open-their-checkpoint-chromium/advisor-tasks-1440.png",
+    "width": 1440,
+    "sha256": "641761dc6b46143b7fcbca8b5dd82e0ff14d0a114b6801bcd89130d29807eba4"
+  },
+  {
+    "file": "advisor-messages-390.png",
+    "source": "test-results/figma-parity-advisor-messa-16a88--and-conversation-workspace-chromium/advisor-messages-390.png",
+    "width": 390,
+    "sha256": "0866edeb8362215aa7b0c8f22a01faf6961ff05e87055016a0eba4240f17074f"
+  },
+  {
+    "file": "advisor-messages-1440.png",
+    "source": "test-results/figma-parity-advisor-messa-16a88--and-conversation-workspace-chromium/advisor-messages-1440.png",
+    "width": 1440,
+    "sha256": "1ebe95a3e889cd8043a39ef0a1c9437cd2a05b0ec27366288c30cc837c78b3f2"
+  },
+  {
+    "file": "advisor-dashboard-390.png",
+    "source": "test-results/figma-parity-advisor-dashb-0c497-kspaces-at-both-breakpoints-chromium/advisor-dashboard-390.png",
+    "width": 390,
+    "sha256": "6c127cf2c708c05e7ed0457bc786f974cc90711f0cc564a7d212a162bbaca38d"
+  },
+  {
+    "file": "advisor-dashboard-1440.png",
+    "source": "test-results/figma-parity-advisor-dashb-0c497-kspaces-at-both-breakpoints-chromium/advisor-dashboard-1440.png",
+    "width": 1440,
+    "sha256": "03204ff55aa568934e4d13b3f75971a99fcee5b56c5cfad7a5e43e4a881a6166"
+  },
+  {
+    "file": "advisor-students-390.png",
+    "source": "test-results/figma-parity-advisor-dashb-0c497-kspaces-at-both-breakpoints-chromium/advisor-students-390.png",
+    "width": 390,
+    "sha256": "78f1560dd745355a0ee7d0144b9836d358e5fbcd8ae14bd95b451a908a46bf2e"
+  },
+  {
+    "file": "advisor-students-1440.png",
+    "source": "test-results/figma-parity-advisor-dashb-0c497-kspaces-at-both-breakpoints-chromium/advisor-students-1440.png",
+    "width": 1440,
+    "sha256": "2a3b08d53ed45adf1da42ded7607918e298835413038ae3718fcc361cae916a3"
+  },
+  {
+    "file": "calendar-week-390.png",
+    "source": "test-results/figma-parity-calendar-reta-26a32-s-when-creating-and-editing-chromium/calendar-week-390.png",
+    "width": 390,
+    "sha256": "661cebd88f99d6c306208eabd2b6b2775999908aaaa34956e09c0814ed32854d"
+  },
+  {
+    "file": "calendar-week-1440.png",
+    "source": "test-results/figma-parity-calendar-reta-26a32-s-when-creating-and-editing-chromium/calendar-week-1440.png",
+    "width": 1440,
+    "sha256": "a1dce461527e48f0f132cde3fec6b3fb2abcbcc22c6a632433b283d056482a5d"
+  },
+  {
+    "file": "calendar-month-390.png",
+    "source": "test-results/figma-parity-calendar-reta-26a32-s-when-creating-and-editing-chromium/calendar-month-390.png",
+    "width": 390,
+    "sha256": "3f572c141fddae4fa7afc6f8f39f33ad3edf0dbf8b0f6018f63ef08abe791db1"
+  },
+  {
+    "file": "calendar-month-1440.png",
+    "source": "test-results/figma-parity-calendar-reta-26a32-s-when-creating-and-editing-chromium/calendar-month-1440.png",
+    "width": 1440,
+    "sha256": "72b4c76e33597f8ab2324e972581e9277a2bff57677104b030897f1f6c21dca1"
+  },
+  {
+    "file": "student-ai-390.png",
+    "source": "test-results/figma-parity-student-AI-pr-b8ce3-se-aware-learning-workspace-chromium/student-ai-390.png",
+    "width": 390,
+    "sha256": "eb6e67077a12aef32cd8be5a6e08c535b6abfd9330427135a516adef84f9e08c"
+  },
+  {
+    "file": "student-ai-1440.png",
+    "source": "test-results/figma-parity-student-AI-pr-b8ce3-se-aware-learning-workspace-chromium/student-ai-1440.png",
+    "width": 1440,
+    "sha256": "f575658e50705d6aef04cfeb8287fcd23c7f90e212e7b87cf7d8d79cac69b2fe"
+  },
+  {
+    "file": "profile-assessments-390.png",
+    "source": "test-results/figma-parity-profile-uses--17ac2-ps-before-uploading-a-photo-chromium/profile-assessments-390.png",
+    "width": 390,
+    "sha256": "7aa9a5e8148145abfc69a7e663c9e53fb50df0c34d1ee4517337c961c511d455"
+  },
+  {
+    "file": "profile-assessments-1440.png",
+    "source": "test-results/figma-parity-profile-uses--17ac2-ps-before-uploading-a-photo-chromium/profile-assessments-1440.png",
+    "width": 1440,
+    "sha256": "88789390f73e60147a4bf1f60786fb7887cd71b7d51c5f15d01dccb37dbd133e"
+  },
+  {
+    "file": "advisor-support-390.png",
+    "source": "test-results/all-role-responsive-adviso-e48b4--content-without-disclosure-chromium/advisor-support-390.png",
+    "width": 390,
+    "sha256": "89ff87a6ec67eab18bea43ccd0f4ed152249d464f2d920b980329bcb6bed8b54"
+  },
+  {
+    "file": "advisor-support-1440.png",
+    "source": "test-results/all-role-responsive-adviso-e48b4--content-without-disclosure-chromium/advisor-support-1440.png",
+    "width": 1440,
+    "sha256": "4ae7e42e828240742f840892b7aa45afc6d8e6361cb374ebd795e4f34f8bb702"
+  },
+  {
+    "file": "student-390.png",
+    "source": "test-results/all-role-responsive-studen-21ee8--and-fits-responsive-widths-chromium/student-390.png",
+    "width": 390,
+    "sha256": "fe4430f8e6b2808ab2ac6c047f220814170ec2fc8adf6c78059487dc4abef584"
+  },
+  {
+    "file": "student-1440.png",
+    "source": "test-results/all-role-responsive-studen-21ee8--and-fits-responsive-widths-chromium/student-1440.png",
+    "width": 1440,
+    "sha256": "62255146ff942dc80e5410899fb86095a20d9869151f7ee92fcf3701c2025934"
+  },
+  {
+    "file": "instructor-390.png",
+    "source": "test-results/all-role-responsive-instru-963d7--and-fits-responsive-widths-chromium/instructor-390.png",
+    "width": 390,
+    "sha256": "f36d33f86d7421a69e65051968698752bed9a11a8bf3f1ff7eef780475a48903"
+  },
+  {
+    "file": "instructor-1440.png",
+    "source": "test-results/all-role-responsive-instru-963d7--and-fits-responsive-widths-chromium/instructor-1440.png",
+    "width": 1440,
+    "sha256": "fe9473f8fd40fd77cd3cf32174f931b0900cfdcef6ebd808d58e1f9eb338abf4"
+  },
+  {
+    "file": "combined-instructor-advisor-390.png",
+    "source": "test-results/all-role-responsive-combin-6880b--and-fits-responsive-widths-chromium/combined-instructor-advisor-390.png",
+    "width": 390,
+    "sha256": "05ca6217303f16f2cb0ad8c2fb5bc53c1714dc937cc82d7f768e2387e05dde48"
+  },
+  {
+    "file": "combined-instructor-advisor-1440.png",
+    "source": "test-results/all-role-responsive-combin-6880b--and-fits-responsive-widths-chromium/combined-instructor-advisor-1440.png",
+    "width": 1440,
+    "sha256": "72bf59dffffc23959dc6cfef53d087189fe3367032ad8f9ac47c65fab4d3cb3a"
+  },
+  {
+    "file": "counsellor-390.png",
+    "source": "test-results/all-role-responsive-counse-56786--and-fits-responsive-widths-chromium/counsellor-390.png",
+    "width": 390,
+    "sha256": "fc3acf3472b44a342efb7be52972021c52ced145a8ed0941e88b42c2ca27761e"
+  },
+  {
+    "file": "counsellor-1440.png",
+    "source": "test-results/all-role-responsive-counse-56786--and-fits-responsive-widths-chromium/counsellor-1440.png",
+    "width": 1440,
+    "sha256": "5ccf82ae831f04a058b05455667be4e1867074562e3e332b3f0d5f16b83b928b"
+  },
+  {
+    "file": "parent-390.png",
+    "source": "test-results/all-role-responsive-parent-5cafb--and-fits-responsive-widths-chromium/parent-390.png",
+    "width": 390,
+    "sha256": "49ab34420220de4d2bd8fa31b7e9638e0c093d325aa4236d080e0babc2882e8d"
+  },
+  {
+    "file": "parent-1440.png",
+    "source": "test-results/all-role-responsive-parent-5cafb--and-fits-responsive-widths-chromium/parent-1440.png",
+    "width": 1440,
+    "sha256": "5d04ecdbaee326d8f395c3cba126085ddff9765d5412dc29d992ba09bf5e73a5"
+  },
+  {
+    "file": "tenant-admin-390.png",
+    "source": "test-results/all-role-responsive-tenant-45b7b--and-fits-responsive-widths-chromium/tenant-admin-390.png",
+    "width": 390,
+    "sha256": "a856ae8c8e4cce9659a15728f563084db1d35cc8d384c7d95659fca49d6d3dd2"
+  },
+  {
+    "file": "tenant-admin-1440.png",
+    "source": "test-results/all-role-responsive-tenant-45b7b--and-fits-responsive-widths-chromium/tenant-admin-1440.png",
+    "width": 1440,
+    "sha256": "4f0ac1bd6ab20c5e5814bdbe3683f81141b17f57acceef8fa79be4e645e90f6f"
+  },
+  {
+    "file": "system-admin-390.png",
+    "source": "test-results/all-role-responsive-system-47a49--and-fits-responsive-widths-chromium/system-admin-390.png",
+    "width": 390,
+    "sha256": "a0b721bf47a4c486c6fa8df7ad311fde63dc397f3b1a985b8347db9847844d42"
+  },
+  {
+    "file": "system-admin-1440.png",
+    "source": "test-results/all-role-responsive-system-47a49--and-fits-responsive-widths-chromium/system-admin-1440.png",
+    "width": 1440,
+    "sha256": "0c9c28bcd8670b6e4a139a8cd127d2f73462baf6f384e3e5970801f59f55ab61"
+  },
+  {
+    "file": "student-exams-390.png",
+    "source": "test-results/all-role-responsive-studen-9e655--and-fits-responsive-widths-chromium/student-exams-390.png",
+    "width": 390,
+    "sha256": "1acde372fe03caf72343164cb009c170cdfb95bfb1801065d87f7f51a282bd8e"
+  },
+  {
+    "file": "student-exams-1440.png",
+    "source": "test-results/all-role-responsive-studen-9e655--and-fits-responsive-widths-chromium/student-exams-1440.png",
+    "width": 1440,
+    "sha256": "61d3863fe4eb39a162d1ef514e22679eafa27a1fbd29425d899ea81281197224"
+  }
+]

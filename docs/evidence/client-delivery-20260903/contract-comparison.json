@@ -1,0 +1,53 @@
+{
+  "operationCount": 431,
+  "pathCount": 337,
+  "serviceCalls": 382,
+  "unmatched": [],
+  "manualResolution": [
+    {
+      "file": "advisor-api.ts",
+      "method": "get",
+      "path": "url"
+    },
+    {
+      "file": "advisor-api.ts",
+      "method": "get",
+      "path": "url"
+    },
+    {
+      "file": "advisor-api.ts",
+      "method": "get",
+      "path": "url"
+    },
+    {
+      "file": "advisor-api.ts",
+      "method": "get",
+      "path": "url"
+    },
+    {
+      "file": "advisor-api.ts",
+      "method": "get",
+      "path": "url"
+    },
+    {
+      "file": "mock-exam-api.ts",
+      "method": "get",
+      "path": "url"
+    }
+  ],
+  "scope": "Direct literal/template v1/v2 call sites; six dynamic GET sites separately reviewed against scoped conversation and exam-media paths.",
+  "liveOpenApiStatus": 500,
+  "contracts": {
+    "advising.openapi.yaml": "16afdb1f492e9e929b3303c90d28ab3a005e1e42d79d7c381108023ee30e9981",
+    "assignment.openapi.yaml": "70ac0f1c739f988063f176f1051d4d5262b67f1b9f9aa4c36fe979cf6ba11c85",
+    "auth.openapi.yaml": "2ff5e615ceebbf402f9d3dd31aee3ea08b8647f4582dfb0cdaede3b1db2425ef",
+    "counsellor.openapi.yaml": "9a654c2fff2417883224d61855479207896372a9c5b30696a6308835a707889e",
+    "course.openapi.yaml": "41b033e4a1df275108025dd06c16ecf5de192b406c76850494dc5f0476ef1e06",
+    "mockexam.openapi.yaml": "c268fa56e6bf267e86564a20efbb16b53ad2f8c0c5ad10a58a12d3c9fc943a61",
+    "notification.openapi.yaml": "a919d624f68ddbdb680d2443f66c1bb9536264afda7458ac9a1b5126d41d23ae",
+    "parent.openapi.yaml": "33561dd58a0f2ee6d532a85eaa91301ac279aa891b8f3f4f2f2f6d809384e61d",
+    "quiz.openapi.yaml": "9343be7af3ac0ba01656591aec32a167873e97f5977284993a283110cd258801",
+    "user.openapi.yaml": "d19dfdf2ea5830f9c137aa6360c894e0b44f7c33954a31412e7338907875511f",
+    "vocabulary.openapi.yaml": "0ce07b6b7bded0fb6b4f44343037d987ba15923d1b8ed3ece2897b016fa57f89"
+  }
+}

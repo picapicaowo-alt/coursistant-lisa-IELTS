@@ -5,18 +5,17 @@
 .courseItem {
     display: flex;
     flex-direction: column;
-    background-color: var(--course-surface);
+    background-color: t.$surface-raised;
     border: 1px solid t.$border;
     border-radius: t.$radius-card-lg;
     padding: t.$workspace-panel-padding;
     min-width: 0;
     gap: t.$space-4;
-    box-shadow: t.$shadow-card;
+    box-shadow: none;
     transition: box-shadow 0.2s ease, transform 0.2s ease;
 
     &:hover {
-        box-shadow: 0 4px 16px rgba(t.$text, 0.1);
-        transform: translateY(-2px);
+        border-color: t.$border-strong;
     }
 }
 
@@ -73,7 +72,7 @@
     overflow-wrap: anywhere;
     font-size: t.$fs-course-name;
     font-weight: t.$fw-bold;
-    color: var(--course-ink);
+    color: t.$content-primary;
     line-height: t.$line-height-headline;
 }
 
@@ -124,9 +123,9 @@
     padding: t.$space-2 t.$space-4;
     min-height: t.$touch-target;
     border-radius: t.$radius-control;
-    background-color: t.$subcard-bg;
-    color: t.$text;
-    font-size: t.$fs-caption;
+    background-color: t.$action-primary;
+    color: t.$content-on-color;
+    font-size: t.$font-size-body;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.15s, color 0.15s;
@@ -168,7 +167,7 @@
     padding: 0.35rem;
     display: flex;
     flex-direction: column;
-    background-color: var(--course-surface);
+    background-color: t.$surface-raised;
     border: 1px solid t.$border;
     border-radius: t.$radius-control;
     box-shadow: 0 8px 24px rgba(t.$text, 0.12);
@@ -227,3 +226,15 @@
     font-size: t.$fs-caption;
     color: t.$danger;
 }
+
+.courseState { display: inline-flex; width: fit-content; padding: t.$space-1 t.$space-2; border-radius: t.$radius-xs; background: t.$surface-brand-subtle; color: t.$action-primary; font-size: t.$font-size-caption; }
+.progressUnavailable { display: grid; gap: t.$space-2; margin-top: t.$space-6; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.scheduleSummary { display: flex; flex: 1 1 9rem; align-items: center; gap: t.$space-2; min-width: 0; }
+.scheduleSummary img { width: t.$space-6; height: t.$space-6; }
+.scheduleSummary > div { display: grid; min-width: 0; gap: t.$space-1; font-size: t.$font-size-caption; }
+.scheduleSummary span, .scheduleSummary small { color: t.$content-secondary; }
+.scheduleSummary strong { font-weight: t.$fw-medium; overflow-wrap: anywhere; }
+.courseFooter { margin-inline: calc(-1 * t.$workspace-panel-padding); padding: t.$space-5 t.$workspace-panel-padding 0; }
+
+.badges {display:flex; align-items:center; flex-wrap:wrap; gap:t.$space-2;}
+.courseCode {font-size:t.$fs-caption; color:t.$content-secondary;}

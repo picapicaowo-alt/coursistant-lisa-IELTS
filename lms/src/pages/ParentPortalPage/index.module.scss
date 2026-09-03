@@ -1,0 +1,42 @@
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-2 t.$space-6;
+  border-bottom: 1px dashed t.$border-default;
+  margin-block: t.$space-3 t.$space-6;
+}
+.tabs button {
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-1;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+}
+.tabs button[aria-current="page"] {
+  border-bottom-color: t.$action-primary;
+  color: t.$action-primary;
+  font-weight: t.$fw-semibold;
+}
+.tabs button:focus-visible {
+  outline: 2px solid t.$action-primary;
+  outline-offset: 3px;
+}
+.learningGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$workspace-section-gap;
+  align-items: start;
+}
+.learningGrid > :nth-child(2) {
+  grid-row: span 2;
+}
+@media (max-width: 900px) {
+  .learningGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .learningGrid > :nth-child(2) {
+    grid-row: auto;
+  }
+}

@@ -1,54 +1,73 @@
-.page { min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem; overflow-y: auto; background: t.$page-bg; color: t.$text; }
-.header { display: flex; max-width: t.$workspace-max-inline-size; margin: 0 auto 1.25rem; align-items: flex-end; justify-content: space-between; gap: 1.5rem; }
-.header h1 { margin: .15rem 0; font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1; font-weight: t.$fw-extrabold; }
-.header > div:first-child > p:last-child { color: t.$text-muted; }
-.eyebrow { color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
-.viewSwitch { display: flex; gap: .25rem; padding: .3rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
-.viewSwitch button { min-height: 2.4rem; padding: 0 .9rem; border-radius: t.$radius-control-sm; color: t.$text-muted; font-weight: t.$fw-semibold; cursor: pointer; }
-.viewSwitch button[aria-pressed='true'] { background: t.$brand; color: t.$card-bg; }
-.toolbar { display: flex; max-width: t.$workspace-max-inline-size; margin: 0 auto 1rem; align-items: center; justify-content: space-between; gap: 1rem; }
-.navigation { display: flex; align-items: center; gap: .45rem; }
-.navigation button { display: inline-grid; min-width: 2.5rem; min-height: 2.5rem; place-items: center; padding: 0 .7rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$card-bg; color: t.$text; font-weight: t.$fw-semibold; cursor: pointer; }
-.navigation h2 { margin-left: .6rem; font-size: t.$fs-card-title; font-weight: t.$fw-bold; }
-.timezone { display: inline-flex; align-items: center; gap: .4rem; color: t.$text-muted; font-size: t.$fs-caption; }
-.filters { display: flex; max-width: t.$workspace-max-inline-size; margin: 0 auto 1rem; flex-wrap: wrap; gap: .5rem; }
-.filters label { display: inline-flex; min-height: 2.4rem; align-items: center; gap: .4rem; padding: .35rem .65rem; border: 1px solid t.$border; border-radius: t.$radius-pill; background: t.$card-bg; font-size: t.$fs-caption; font-weight: t.$fw-semibold; cursor: pointer; }
-.filters label > span { width: .65rem; height: .65rem; border-radius: 50%; background: var(--course-color); }
-.filters small { max-width: 12rem; overflow: hidden; color: t.$text-muted; font-weight: t.$fw-regular; text-overflow: ellipsis; white-space: nowrap; }
-.filters input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.filters label:has(input:not(:checked)) { opacity: .5; }
-.partialWarning { max-width: t.$workspace-max-inline-size; margin: 0 auto 1rem; padding: .75rem 1rem; border: 1px solid rgba(t.$warning, .35); border-radius: t.$radius-control; background: rgba(t.$warning, .08); color: t.$warning; font-size: t.$fs-caption; }
-.partialWarning summary { font-weight: t.$fw-semibold; cursor: pointer; }
-.partialWarning ul { margin: .6rem 0 0 1.1rem; }
-.status { display: grid; max-width: t.$workspace-max-inline-size; min-height: 16rem; margin: 0 auto; place-items: center; align-content: center; gap: .75rem; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; color: t.$text-muted; }
-.status button { min-height: 2.5rem; padding: 0 1rem; border-radius: t.$radius-control-sm; background: t.$brand; color: t.$card-bg; font-weight: t.$fw-semibold; }
-.monthGrid { display: grid; max-width: t.$workspace-max-inline-size; margin: 0 auto; grid-template-columns: repeat(7, minmax(0, 1fr)); overflow: hidden; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$border; gap: 1px; box-shadow: t.$shadow-card; }
-.weekday { padding: .65rem; background: t.$subcard-bg; color: t.$text-muted; font-size: t.$fs-caption; font-weight: t.$fw-semibold; text-align: center; }
-.dayCell { min-width: 0; min-height: 8.5rem; padding: .55rem; background: t.$card-bg; }
-.dayCell[data-outside='true'] { background: t.$subcard-bg; color: t.$text-placeholder; }
-.dayCell > time { display: inline-grid; width: 1.75rem; height: 1.75rem; place-items: center; border-radius: 50%; font-size: t.$fs-caption; font-weight: t.$fw-semibold; }
-.dayItems { display: grid; gap: .28rem; margin-top: .3rem; }
-.calendarItem { position: relative; display: grid; min-width: 0; grid-template-columns: auto minmax(0, 1fr); gap: .35rem; padding: .28rem .4rem .28rem .65rem; border-radius: .35rem; background: t.$subcard-bg; color: t.$text; font-size: .68rem; text-decoration: none; }
-.calendarItem::before, .weekItem::before { position: absolute; inset-block: .25rem; inset-inline-start: 0; width: 3px; border-radius: t.$radius-round; background: var(--course-color); content: ''; }
-.calendarItem:hover, .calendarItem:focus-visible { background: t.$brand-subtle; }
-.calendarItem strong { color: var(--course-color); }
-.calendarItem span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.weekList { display: grid; max-width: t.$workspace-max-inline-size; margin: 0 auto; overflow: hidden; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; box-shadow: t.$shadow-card; }
-.weekDay { display: grid; grid-template-columns: 7rem minmax(0, 1fr); min-height: 6.5rem; }
-.weekDay + .weekDay { border-top: 1px solid t.$border; }
-.weekDay > header { padding: 1rem; background: t.$subcard-bg; }
-.weekDay time { display: grid; gap: .2rem; }
-.weekDay time span, .weekDay > div > p { color: t.$text-muted; font-size: t.$fs-caption; }
-.weekDay > div { display: grid; align-content: start; gap: .5rem; padding: .75rem; }
-.weekItem { position: relative; display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: .75rem; padding: .75rem .75rem .75rem 1rem; border-radius: t.$radius-control-sm; background: t.$subcard-bg; color: t.$text; text-decoration: none; }
-.weekItem:hover, .weekItem:focus-visible { background: t.$brand-subtle; }
-.itemTime { color: var(--course-color); font-size: t.$fs-caption; font-weight: t.$fw-semibold; }
-.itemBody { display: grid; gap: .25rem; }
-.itemBody small { display: flex; align-items: center; gap: .35rem; color: t.$text-muted; }
-[data-color='cyan'] { --course-color: #{t.$type-cyan}; }
-[data-color='green'] { --course-color: #{t.$type-green}; }
-[data-color='orange'] { --course-color: #{t.$type-orange}; }
-[data-color='pink'] { --course-color: #{t.$type-pink}; }
-[data-color='brand'] { --course-color: #{t.$brand}; }
-.page button:focus-visible, .filters label:has(input:focus-visible), .partialWarning summary:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
-@media (max-width: 800px) { .header, .toolbar { align-items: stretch; flex-direction: column; } .navigation { flex-wrap: wrap; } .navigation h2 { width: 100%; margin: .5rem 0 0; } .monthGrid { display: block; border: 0; background: transparent; box-shadow: none; } .weekday { display: none; } .dayCell { min-height: auto; margin-bottom: .65rem; border: 1px solid t.$border; border-radius: t.$radius-control; } .dayCell[data-outside='true']:not(:has(.calendarItem)) { display: none; } .weekDay { grid-template-columns: 5rem minmax(0, 1fr); } .weekItem { grid-template-columns: 1fr; gap: .25rem; } }
+.page {padding:t.$workspace-gutter-block t.$workspace-gutter-inline 2rem; min-width:0; color:t.$text;}
+.visuallyHidden {position:absolute; width:1px; height:1px; padding:0; overflow:hidden; clip-path:inset(50%); white-space:nowrap;}
+.categoryTabs {display:flex; flex-wrap:wrap; gap:.75rem; margin:0 auto 1.5rem; max-width:t.$workspace-max-inline-size;}
+.categoryTabs button {min-height:2.5rem; padding:.5rem 1.15rem; border-radius:t.$radius-control; font-size:t.$font-size-subhead; cursor:pointer;}
+.categoryTabs [aria-pressed='true'] {background:t.$neutral-fill;}
+.calendarShell {display:grid; grid-template-columns:minmax(0,1fr) minmax(13rem,24%); max-width:t.$workspace-max-inline-size; margin:auto; border:1px solid t.$border; border-radius:t.$radius-card-lg; overflow:hidden;}
+.calendarMain {min-width:0;}
+.toolbar {display:flex; justify-content:space-between; align-items:center; gap:.75rem; flex-wrap:wrap; padding:1rem; border-bottom:1px solid t.$border;}
+.navigation {display:flex; align-items:center; padding:0 .15rem; background:t.$surface-detail-panel; border-radius:t.$radius-control;}
+.navigation h2 {font-size:t.$font-size-body; font-weight:t.$fw-semibold;}
+.navigation button {display:grid; place-items:center; min-height:2.5rem; width:2rem; color:t.$text-muted; cursor:pointer;}
+.viewSwitch {display:flex; flex-wrap:wrap; align-items:center; gap:.5rem;}
+.viewSwitch :is(button,select) {min-height:2.5rem; padding:.4rem .75rem; border:1px solid t.$border; border-radius:t.$radius-control; cursor:pointer; color:t.$text; background:t.$surface-raised;}
+.page .primary {display:inline-flex; justify-content:center; align-items:center; min-height:2.5rem; padding:.5rem .85rem; background:t.$brand; color:t.$content-on-color; border-radius:t.$radius-control; text-decoration:none;}
+.weekTimeGrid {display:grid; grid-template-columns:3rem repeat(var(--day-count,7),minmax(0,1fr)); --day-height:72rem;}
+.timeHeading {display:flex; align-items:center; justify-content:center; font-size:t.$fs-caption; color:t.$text-muted;}
+.timeDay {display:grid; justify-items:center; gap:.3rem; padding:.75rem .25rem; border-left:1px dashed t.$border; font-size:t.$fs-caption; font-weight:t.$fw-regular;}
+.hourRail {display:grid; grid-template-rows:repeat(24,1fr); height:var(--day-height); font-size:.65rem; color:t.$text-muted; text-align:center;}
+.hourRail span {padding-top:.2rem;}
+.timeColumn {position:relative; height:var(--day-height); border-left:1px dashed t.$border; background:repeating-linear-gradient(to bottom, t.$border 0, t.$border 1px, transparent 1px, transparent calc(var(--day-height) / 24));}
+.timedEvent {position:absolute; top:var(--event-top); left:var(--event-left); width:var(--event-width); height:var(--event-height); min-height:1.75rem; padding:1px; overflow:hidden;}
+.calendarItem {display:flex; flex-direction:column; gap:.2rem; width:100%; min-width:0; min-height:2rem; border-radius:t.$radius-xs; background:var(--event-surface); border-left:3px solid var(--event-color); padding:.4rem .45rem; color:t.$text; text-align:left; font:inherit; font-size:t.$fs-caption; cursor:pointer; overflow:hidden;}
+.calendarItem strong {font-weight:t.$fw-medium; overflow:hidden; text-overflow:ellipsis; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical;}
+.calendarItem span {font-size:.68rem; color:t.$text-muted;}
+.timedEvent .calendarItem {height:100%; font-size:.7rem; padding:.15rem .25rem;}
+.timedEvent .calendarItem span {font-size:.62rem;}
+.untimed {display:grid; align-content:start; gap:t.$space-1; padding:t.$space-1; border-left:1px dashed t.$border;}
+.untimedLabel {font-size:t.$fs-caption; color:t.$text-muted; align-self:center; text-align:center;}
+.timetableViewport {display:grid; grid-template-columns:inherit; grid-column:1/-1; max-height:min(65dvh,40rem); overflow-y:auto; overscroll-behavior:contain;}
+.timetableViewport:focus-visible {outline:2px solid t.$brand; outline-offset:-2px;}
+.calendarItem[data-color='brand'] {--event-surface:#{t.$brand-subtle}; --event-color:#{t.$brand};}
+.calendarItem[data-color='cyan'] {--event-surface:#{t.$type-cyan-subtle}; --event-color:#{t.$type-cyan};}
+.calendarItem[data-color='pink'] {--event-surface:#{t.$type-pink-subtle}; --event-color:#{t.$type-pink};}
+.calendarItem[data-color='neutral'] {--event-surface:#{t.$neutral-fill}; --event-color:#{t.$text};}
+.monthGrid {display:grid; grid-template-columns:repeat(7,minmax(0,1fr));}
+.weekday {padding:.75rem; text-align:center; font-size:t.$fs-caption; color:t.$text-muted;}
+.dayCell {min-width:0; min-height:8.5rem; border-top:1px dashed t.$border; border-left:1px dashed t.$border; padding:.5rem;}
+.dayCell[data-outside='true'] {background:t.$surface-subtle; color:t.$text-muted;}
+.dayCell time {font-size:t.$fs-caption;}
+.dayItems {display:grid; gap:.3rem; margin-top:.5rem;}
+.eventRail {padding:1rem; border-left:1px solid t.$border; min-width:0;}
+.eventRail h2 {font-size:t.$font-size-body; font-weight:t.$fw-semibold;}
+.timezone {font-size:t.$fs-caption; color:t.$text-muted; margin:.5rem 0 1rem; line-height:1.5;}
+.railItem {border:1px solid t.$border; border-radius:t.$radius-control; padding:.35rem; margin-bottom:.65rem;}
+.railItem small {display:block; font-size:.68rem; color:t.$text-muted; margin:.35rem; overflow-wrap:anywhere;}
+.railItem .calendarItem {background:t.$surface-raised;}
+.courseFilters {display:grid; gap:.65rem; border:0; border-top:1px dashed t.$border; padding-top:1rem; margin-top:1.5rem;}
+.courseFilters legend {font-size:t.$fs-caption; font-weight:t.$fw-semibold; margin-bottom:.5rem;}
+.courseFilters label {display:flex; gap:.5rem; align-items:flex-start; font-size:t.$fs-caption;}
+.courseFilters input {accent-color:t.$brand; margin-top:.15rem;}
+.empty, .status {padding:1rem; color:t.$text-muted; font-size:t.$font-size-body;}
+.warning {padding:.75rem 1rem; color:t.$feedback-danger; font-size:t.$fs-caption; background:t.$feedback-danger-surface;}
+.warning button {text-decoration:underline; cursor:pointer;}
+.mobileAgenda {display:none;}
+.eventDialog {width:min(36rem,calc(100% - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; border:1px solid t.$border; border-radius:t.$radius-modal; padding:1.5rem; color:t.$text; background:t.$surface-raised; box-shadow:t.$shadow-lg; margin:auto;}
+.eventDialog::backdrop {background:t.$surface-modal-backdrop;}
+.eventDialog header {display:flex; justify-content:space-between; align-items:center; gap:1rem; margin-bottom:1.25rem;}
+.eventDialog h2 {font-size:t.$font-size-subhead; font-weight:t.$fw-semibold;}
+.eventDialog fieldset {border:0; padding:0; display:grid; gap:1rem;}
+.eventDialog label {display:grid; gap:.4rem; font-size:t.$font-size-body;}
+.eventDialog input {min-width:0; width:100%; min-height:2.5rem; padding:.55rem .75rem; border:1px solid t.$border; border-radius:t.$radius-control; font:inherit;}
+.dateFields {display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:1rem;}
+.eventDialog footer {display:flex; align-items:center; justify-content:flex-end; flex-wrap:wrap; gap:.5rem; margin-top:1.5rem;}
+.eventDialog button {min-height:2.5rem; padding:.5rem .75rem; border-radius:t.$radius-control; cursor:pointer;}
+.eventDialog :disabled {opacity:.55; cursor:not-allowed;}
+.eventDialog [role='alert'] {color:t.$feedback-danger; font-size:t.$fs-caption; padding:.5rem 0;}
+.eventFacts {display:grid; gap:1rem;}
+.eventFacts dt {font-size:t.$fs-caption; color:t.$text-muted; margin-bottom:.25rem;}
+.eventFacts dd {margin:0; overflow-wrap:anywhere;}
+.deleteConfirm {padding:1rem; margin-top:1rem; border:1px solid t.$feedback-danger; border-radius:t.$radius-control; color:t.$feedback-danger;}
+.page :is(button,select,a,input):focus-visible, .eventDialog :is(button,input,a):focus-visible {outline:2px solid t.$brand; outline-offset:2px;}
+@media (max-width:1100px) {.calendarShell {grid-template-columns:minmax(0,1fr);} .eventRail {border-left:0; border-top:1px solid t.$border; display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem;} .eventRail > :is(h2,p,fieldset) {grid-column:1/-1;} .railItem {margin:0;}}
+@media (max-width:700px) {.weekTimeGrid,.monthGrid {display:none;} .mobileAgenda {display:grid; padding:1rem; gap:1.25rem;} .mobileAgenda h3 {font-size:t.$font-size-body; margin:0 0 .5rem;} .mobileAgenda article > p {color:t.$text-muted; font-size:t.$fs-caption;} .mobileAgenda .calendarItem {margin-bottom:.4rem;} .eventRail {border-left:0; border-top:1px solid t.$border;} .categoryTabs {gap:.35rem;} .categoryTabs button {font-size:t.$font-size-body; padding:.5rem .7rem;} .toolbar {align-items:stretch;} .navigation {justify-content:space-between; flex:1;} .dateFields {grid-template-columns:minmax(0,1fr);} .page {padding-inline:1rem;} }

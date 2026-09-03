@@ -1,6 +1,4 @@
 import {
-  AdminTenant,
-  AdminTenantPayload,
   AdminDirectoryQuery,
   AdminDirectoryRead,
   ApiResponse,
@@ -32,22 +30,6 @@ export class AdminApiService {
 
   constructor(apiClient?: typeof V2ApiClient) {
     if (apiClient) this.apiClient = apiClient;
-  }
-
-  listTenants(): Promise<ApiResponse<AdminTenant[]>> {
-    return this.apiClient.get('/v2/admin/tenants');
-  }
-
-  createTenant(request: AdminTenantPayload): Promise<ApiResponse<AdminTenant>> {
-    return this.apiClient.post('/v2/admin/tenants', request, idempotent());
-  }
-
-  updateTenant(tenantId: number, request: Partial<AdminTenantPayload>): Promise<ApiResponse<AdminTenant>> {
-    return this.apiClient.patch(`/v2/admin/tenants/${tenantId}`, request, idempotent());
-  }
-
-  deleteTenant(tenantId: number): Promise<ApiResponse<void>> {
-    return this.apiClient.delete(`/v2/admin/tenants/${tenantId}`, idempotent());
   }
 
   listUsers(): Promise<ApiResponse<ManagedUser[]>> {

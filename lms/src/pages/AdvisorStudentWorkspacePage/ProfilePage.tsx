@@ -1,3 +1,4 @@
+import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {getApiErrorCode} from '@/utils/apiError';
 import React, {FormEvent, useEffect, useRef, useState} from 'react';
@@ -184,7 +185,7 @@ const AdvisorStudentProfilePage: React.FC = () => {
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, save.error instanceof Error ? save.error.message : 'Profile could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Profile saved.</p> : null}
       <form className={styles.form} onSubmit={onSubmit}>
-        <CollapsibleSection title="Student context" headingLevel={3} summary={form.academicBackground || 'Background, contact and baseline assessment'}>
+        <WorkspaceSection title="Student context" headingLevel={3} summary={form.academicBackground || 'Background, contact and baseline assessment'}>
           <p>Summarize information that helps future planning. Leave optional fields blank when the information is not yet known.</p>
           <div className={styles.formGrid}>
             <label><span>Contact phone</span><input value={form.contactPhone} onChange={event => setForm(current => ({...current, contactPhone: event.target.value}))}/></label>
@@ -192,8 +193,8 @@ const AdvisorStudentProfilePage: React.FC = () => {
             <label><span>Prior test experience</span><textarea value={form.priorTestExperience} onChange={event => setForm(current => ({...current, priorTestExperience: event.target.value}))}/></label>
             <label><span>Baseline assessment</span><textarea value={form.baselineAssessment} onChange={event => setForm(current => ({...current, baselineAssessment: event.target.value}))}/></label>
           </div>
-        </CollapsibleSection>
-        <CollapsibleSection title="Primary target" headingLevel={3} summary={[form.targetMetric, form.targetValue, form.targetDate].filter(Boolean).join(' · ') || 'Set a goal and target date'}>
+        </WorkspaceSection>
+        <WorkspaceSection title="Primary target" headingLevel={3} summary={[form.targetMetric, form.targetValue, form.targetDate].filter(Boolean).join(' · ') || 'Set a goal and target date'}>
           <p>Define the overall outcome. Individual skills and their current-to-target gaps are recorded in the next section.</p>
           <div className={styles.formGrid}>
             <label className={styles.spanTwo}><span>Target goal</span><input value={form.targetGoal} onChange={event => setForm(current => ({...current, targetGoal: event.target.value}))}/></label>
@@ -202,8 +203,8 @@ const AdvisorStudentProfilePage: React.FC = () => {
             <label><span>Target date</span><EnglishDateInput value={form.targetDate} onChangeValue={targetDate => setForm(current => ({...current, targetDate}))}/></label>
             <label className={styles.spanTwo}><span>Advisor interpretation</span><textarea value={form.advisorInterpretation} onChange={event => setForm(current => ({...current, advisorInterpretation: event.target.value}))}/></label>
           </div>
-        </CollapsibleSection>
-        <CollapsibleSection title="Measured skills" headingLevel={3} summary={`${form.skills.length} measured ${form.skills.length === 1 ? 'skill' : 'skills'}`}>
+        </WorkspaceSection>
+        <WorkspaceSection title="Measured skills" headingLevel={3} summary={`${form.skills.length} measured ${form.skills.length === 1 ? 'skill' : 'skills'}`}>
           <p>Use one skill per measurable area. The code is a stable record identifier; the display name is the label people will understand.</p>
           {form.skills.map((skill, index) => (
             <CollapsibleSection key={`${skill.position}-${index}`} title={skill.displayName || `Skill ${index + 1}`} headingLevel={4} revealKey={addedSkill === index ? index + 1 : undefined} summary={[skill.scale, skill.currentValue ? `Current ${skill.currentValue}` : '', skill.targetValue ? `Target ${skill.targetValue}` : ''].filter(Boolean).join(' · ') || 'Add a name and measurement'}>
@@ -219,7 +220,7 @@ const AdvisorStudentProfilePage: React.FC = () => {
             </CollapsibleSection>
           ))}
           <button type="button" className={styles.secondary} onClick={() => { setAddedSkill(form.skills.length); setForm(current => ({...current, skills: [...current.skills, emptySkill(current.skills.length + 1)]})); }}>Add another skill</button>
-        </CollapsibleSection>
+        </WorkspaceSection>
         <CollapsibleSection title="Private advisor notes" headingLevel={3} summary={'Visible to Advisors only'}>
           <p>This field stays in the Advisor view. Students and Tenant Admins do not receive it.</p>
           <label><span>Private notes</span><textarea value={form.advisorPrivateNotes} onChange={event => setForm(current => ({...current, advisorPrivateNotes: event.target.value}))}/></label>

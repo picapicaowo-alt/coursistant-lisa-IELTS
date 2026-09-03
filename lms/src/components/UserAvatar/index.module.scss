@@ -1,0 +1,10 @@
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  object-fit: cover;
+  border-radius: t.$radius-pill;
+  color: t.$content-secondary;
+  background: t.$surface-muted;
+}

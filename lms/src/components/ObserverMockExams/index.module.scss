@@ -13,3 +13,16 @@
 .detail dl > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: t.$space-2; }
 .detail dd { margin: 0; font-variant-numeric: tabular-nums; }
 .paging { display: flex; align-items: center; justify-content: space-between; gap: t.$space-2; }
+
+.paperGrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr)); gap:t.$space-4; }
+.workspace .record { display:flex; flex-direction:column; align-items:center; text-align:center; justify-content:center; gap:t.$space-5; min-height:14rem; border-radius:t.$radius-lg; padding:t.$space-6; }
+.record > svg { color:t.$action-primary; }
+.record > strong { font-size:t.$font-size-subhead; }
+.record > span { border:1px solid t.$border-default; width:100%; border-radius:t.$radius-control; padding:t.$space-2; }
+.resultDialog { width:min(48rem,calc(100vw - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; margin:auto; padding:t.$space-6; border:1px solid t.$border-default; border-radius:t.$radius-lg; background:t.$surface-raised; color:t.$content-primary; }
+.resultDialog::backdrop { background:rgba(t.$content-primary,.35); }
+.resultDialog .close { display:grid; place-items:center; margin-left:auto; padding:t.$space-2; }
+.resultDialog .detail { background:t.$surface-raised; padding:t.$space-4 0; }
+.resultDialog .detail dl { grid-template-columns:repeat(auto-fit,minmax(9rem,1fr)); }
+.resultDialog .detail dl > div { display:grid; justify-content:start; padding:t.$space-4; border:1px solid t.$border-default; border-radius:t.$radius-control; }
+.resultDialog .detail dd { font-size:t.$font-size-subhead; color:t.$action-primary; }
