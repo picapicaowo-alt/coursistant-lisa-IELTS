@@ -14,6 +14,7 @@ import {isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import layout from './index.module.scss';
 import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
 
 const emptyTask = (position: number): AdvisorTaskRequest => ({
@@ -49,7 +50,7 @@ const emptyForm: PlanFormState = {
 const AdvisorStudentStudyPlanPage: React.FC = () => {
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const checkpointTarget = Number(searchParams.get('checkpointId'));
   const taskTarget = Number(searchParams.get('advisorTaskId'));
   const queryClient = useQueryClient();
@@ -84,7 +85,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
     // The draft keeps the version the user reviewed; background refetches must not advance its write token.
     initialized.current = true;
     setReviewedVersion(plan.studyPlanVersion);
-    setReviewedProfileVersion(planQuery.data?.profileContext.currentProfileVersion ?? plan.basedOnProfileVersion);
+    setReviewedProfileVersion(planQuery.data?.profileContext?.currentProfileVersion ?? plan.basedOnProfileVersion);
     setForm({
       strategySummary: plan.strategySummary ?? '',
       startDate: plan.startDate ?? '',
@@ -208,16 +209,16 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
       {missing || isEditing ? <WorkspaceSectionHeader
         title={missing ? 'Create study plan' : 'Study plan'}
         description="Turn the student's target into a dated strategy, then break it into checkpoints and concrete tasks."
-        meta={!missing ? <span className={styles.versionBadge}>Version {planQuery.data?.plan.studyPlanVersion}</span> : undefined}
+        meta={!missing ? <span className={styles.versionBadge}>Version {planQuery.data?.plan?.studyPlanVersion}</span> : undefined}
       /> : null}
-      {planQuery.data?.plan.profileChangedSincePlanUpdate ? (
+      {planQuery.data?.plan?.profileChangedSincePlanUpdate ? (
         <p className={styles.warn} role="status">The profile changed after this plan. Saving will require the current profile version.</p>
       ) : null}
       {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your edits are preserved. Reload the latest record and review before saving again.</p><button type="button" className={styles.secondary} onClick={() => void planQuery.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.plan.studyPlanVersion); setReviewedProfileVersion(result.data.profileContext.currentProfileVersion ?? result.data.plan.basedOnProfileVersion); setReloadRequired(false);}})}>Load latest record</button></div> : null}
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'Study plan could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Study plan saved.</p> : null}
-      {!missing && !isEditing && planQuery.data?.plan ? <LearningJourney plan={planQuery.data.plan} studentUserId={id} checkpointTarget={checkpointTarget} taskTarget={taskTarget} onEdit={() => setIsEditing(true)}/> : null}
-      {missing || isEditing ? <form className={styles.form} onSubmit={(event: FormEvent) => { event.preventDefault(); save.mutate(); }}>
+      {!missing && !isEditing && planQuery.data?.plan ? <LearningJourney plan={planQuery.data.plan} studentUserId={id} checkpointTarget={checkpointTarget} taskTarget={taskTarget} onEdit={(checkpointId, taskId) => {if (checkpointId || taskId) {const next = new URLSearchParams(searchParams); if (checkpointId) next.set('checkpointId', String(checkpointId)); if (taskId) next.set('advisorTaskId', String(taskId)); setSearchParams(next);} setIsEditing(true);}}/> : null}
+      {missing || isEditing ? <form className={`${styles.form} ${layout.planForm}`} onSubmit={(event: FormEvent) => { event.preventDefault(); save.mutate(); }}>
         <WorkspaceSection title="Plan direction" headingLevel={3} summary={form.strategySummary || 'Set the strategy and plan dates'}>
           <p>Keep the strategy concise enough to scan, while making the start and end dates explicit.</p>
           <div className={styles.formGrid}>

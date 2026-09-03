@@ -1,36 +1,7 @@
 import {expect, test, type Page} from '@playwright/test';
 import path from 'node:path';
 
-const reply = (data: unknown) => ({status: 200, code: 'SUCCESS', data});
-const course = {id: 71, courseCode: 'WR101', title: 'Academic Writing Studio', state: 'Active', description: 'Build clear, well-supported arguments through guided practice and feedback.', termStartDate: '2026-09-01', termEndDate: '2026-12-01', primaryInstructor: {userId: 51, name: 'Ivy Lee'}, role: 'Student', permissions: {}};
-const material = {id: 121, weekId: 81, displayName: 'Academic writing guide', materialType: 'LINK', linkUrl: 'https://example.test/writing-guide', previewAvailable: false};
-const profile = {studentUserId: 301, targetGoal: 'Communicate confidently in academic English', baselineAssessment: 'Initial diagnostic completed', targetMetric: 'Writing', targetValue: '6.5', targetDate: '2026-10-12', skills: [{skillCode: 'WR', displayName: 'Writing', scale: 'IELTS', currentValue: '5.5', targetValue: '6.5'}]};
-const ownProfile = {userId: 301, firstName: 'Alex', lastName: 'Chen', email: 'review@example.test', role: 'USER', level: 'STUDENT', avatarUrl: null, phone: '', emailNotifications: true};
-const tasks = [{id: 101, title: 'Write a timed response', description: 'Use a clear claim and supporting examples.', status: 'NOT_STARTED', dueDate: '2026-09-07', version: 1}, {id: 102, title: 'Review advisor feedback', status: 'COMPLETED', dueDate: '2026-09-02', advisorFeedback: 'Your examples support the argument. Make the introduction more concise.', version: 1}];
-async function fixture(page: Page, level = 'STUDENT', courseRole = 'Student') {
-  await page.addInitScript(user => {localStorage.setItem('user', JSON.stringify(user)); localStorage.setItem('accToken', user.accessToken);}, {...ownProfile, name: 'Alex Chen', id: level === 'ADVISOR' ? 801 : 301, level, accessToken: 'isolated-figma-fixture'});
-  await page.route('**/v2/**', route => {
-    const url = new URL(route.request().url());
-    const endpoint = url.pathname.replace(/^\/api/, '');
-    let data: unknown = [];
-    if (endpoint === '/v2/me/courses') data = {items: [{...course, role: courseRole, courseRole}], total: 1, page: 0, size: 100};
-    else if (endpoint === '/v2/courses/71') data = course;
-    else if (endpoint === '/v2/courses/71/weeks') data = [{id: 81, title: 'Building an argument', state: 'Published', materials: [material]}];
-    else if (endpoint === '/v2/me/progress') data = {courses: [{courseId: 71, totalAssignmentCount: 10, completedAssignmentCount: 4}]};
-    else if (endpoint === '/v2/student/profile') data = profile;
-    else if (endpoint === '/v2/student/study-plan') data = {studentUserId: 301, profileContext: {}, plan: {strategySummary: 'Weekly practice and reflection.', checkpoints: [{id: 91, description: 'Build the foundations', tasks}]}};
-    else if (endpoint === '/v2/me/profile') data = ownProfile;
-    else if (endpoint.endsWith('/unread-count')) data = {unreadCount: 0};
-    else if (endpoint === '/v2/courses/71/my-grades') data = [{assignmentId: 111, assignmentTitle: 'First academic essay', released: true, gradeDisplay: '16 / 20', pointsPossible: 20, dueAtUtc: '2026-09-01T12:00:00Z'}];
-    else if (endpoint === '/v2/advisor/instructors' || endpoint === '/v2/advisor/courses' || endpoint === '/v2/advisor/action-tasks') data = {items: [], total: 0, page: 0, size: 20};
-    else if (endpoint === '/v2/advisor/dashboard') data = {assignedStudentCount: 1, onTrackCount: 0, atRiskCount: 1, needsAttentionCount: 0, pendingApprovalCount: 0, overdueFollowUpCount: 0};
-    else if (endpoint === '/v2/advisor/students') data = {items: [{...profile, firstName: 'Alex', lastName: 'Chen', riskStatus: 'AT_RISK'}], total: 1, page: 0, size: 20};
-    else if (endpoint === '/v2/advisor/conversations') data = {items: [{studentUserId: 301, studentFirstName: 'Alex', studentLastName: 'Chen', unreadCount: 1, latestPreview: 'Could you review my introduction?'}], total: 1, page: 0, size: 20};
-    else if (endpoint.endsWith('/hub')) data = {...profile, firstName: 'Alex', lastName: 'Chen'};
-    else if (endpoint.endsWith('/conversation/messages')) data = [{messageId: 901, senderUserId: 301, body: 'Could you review my introduction?', createdAt: '2026-09-03T12:00:00Z'}];
-    return route.fulfill({json: reply(data)});
-  });
-}
+import {reply, course, material, ownProfile, tasks, fixture} from './workspace-fixtures';
 async function capture(page: Page, outputPath: (name: string) => string, name: string) {
   for (const width of [390, 1440]) {
     await page.setViewportSize({width, height: 1000});
@@ -41,6 +12,7 @@ async function capture(page: Page, outputPath: (name: string) => string, name: s
 
 test('course cards and material reader preserve real progress and discussion writes', async ({page}, info) => {
   await fixture(page);
+  await page.route('**/v2/courses/71/assignments/summaries', route => route.fulfill({json: reply([{id: 111, title: 'Timed essay', learningType: 'PRACTICE', submissionType: 'Individual', dueAtLocal: '2026-09-10T10:00:00', timezone: 'UTC'}, {id: 112, title: 'Read and reflect', learningType: 'PRE_CLASS', submissionType: 'Individual', dueAtLocal: '2026-09-11T10:00:00', timezone: 'UTC'}])}));
   await page.goto('/course');
   await expect(page.getByText('40%', {exact: true})).toBeVisible();
   await capture(page, info.outputPath.bind(info), 'courses');
@@ -52,6 +24,11 @@ test('course cards and material reader preserve real progress and discussion wri
   await page.goto('/course/71');
   await expect(page.getByRole('heading', {level: 1})).toContainText(course.title);
   await capture(page, info.outputPath.bind(info), 'course-outline');
+  await page.getByRole('button', {name: 'Assignments', exact: true}).click();
+  await page.getByLabel('Learning type').selectOption('PRACTICE');
+  await expect(page.getByRole('link', {name: /Timed essay/})).toBeVisible();
+  await expect(page.getByRole('link', {name: /Read and reflect/})).toHaveCount(0);
+  await page.getByRole('button', {name: 'Courses', exact: true}).click();
   await page.getByRole('link', {name: 'Open learning materials'}).click();
   await page.getByRole('button', {name: material.displayName, exact: true}).click();
   await expect(page).toHaveURL(/materialId=121/);

@@ -12,6 +12,7 @@ import {isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import layout from './index.module.scss';
 import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
 
 const emptySkill = (position: number): ProfileSkillRequest => ({
@@ -184,7 +185,7 @@ const AdvisorStudentProfilePage: React.FC = () => {
       {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your edits are preserved. Reload the latest record and review before saving again.</p><button type="button" className={styles.secondary} onClick={() => void query.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.profileVersion); setReloadRequired(false);}})}>Load latest record</button></div> : null}
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, save.error instanceof Error ? save.error.message : 'Profile could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Profile saved.</p> : null}
-      <form className={styles.form} onSubmit={onSubmit}>
+      <form className={`${styles.form} ${layout.profileForm}`} onSubmit={onSubmit}>
         <WorkspaceSection title="Student context" headingLevel={3} summary={form.academicBackground || 'Background, contact and baseline assessment'}>
           <p>Summarize information that helps future planning. Leave optional fields blank when the information is not yet known.</p>
           <div className={styles.formGrid}>

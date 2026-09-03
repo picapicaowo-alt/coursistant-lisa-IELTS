@@ -1,368 +1,90 @@
-.workspace {
-  min-width: 0;
-  width: 100%;
-}
-
-.back {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin-bottom: 1.25rem;
-  color: t.$text-muted;
-  font-size: 0.875rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: color 0.15s ease;
-
-  &:hover {
-    color: t.$brand;
-  }
-}
-
+@use '../../styles/workspace' as workspace;
+.workspace { min-width: 0; width: 100%; }
+.back { display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; margin-bottom: t.$space-4; color: t.$content-secondary; text-decoration: none; }
 .studentSummary {
-  display: flex;
-  flex-direction: column;
-  background: t.$surface-raised;
-  border: 1px solid t.$border;
+  @include workspace.grid;
+  grid-template-columns: minmax(5rem, 1.4fr) repeat(11, minmax(0, 1fr));
+  align-items: center;
+  padding: t.$workspace-panel-padding;
+  margin-bottom: t.$space-6;
+  border: 1px solid t.$border-default;
   border-radius: t.$radius-card-lg;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px transparent;
-}
-
-.identityRow {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 1.25rem;
-  margin-bottom: 1.5rem;
-}
-
-.identityLeft {
-  display: flex;
-  align-items: center;
-  gap: 1.25rem;
-  min-width: 0;
-
-  .avatarLarge {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 4.25rem;
-    height: 4.25rem;
-    border-radius: 50%;
-    background: t.$brand-subtle;
-    color: t.$brand;
-    font-size: 1.5rem;
-    font-weight: 700;
-    flex-shrink: 0;
-  }
-
-  .nameBlock {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-
-    h1 {
-      margin: 0;
-      font-size: clamp(1.35rem, 2vw, 1.6rem);
-      line-height: 1.25;
-      font-weight: 700;
-      color: t.$text;
-    }
-
-    .idText {
-      font-size: 0.825rem;
-      color: t.$text-muted;
-      font-weight: 500;
-    }
-
-    .badgesRow {
-      display: flex;
-      align-items: center;
-      gap: 0.65rem;
-      flex-wrap: wrap;
-      margin-top: 0.15rem;
-
-      .statusPill {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.35rem;
-        padding: 0.15rem 0.65rem;
-        border-radius: 9999px;
-        background: t.$feedback-success-surface;
-        color: t.$feedback-success;
-        font-size: 0.75rem;
-        font-weight: 600;
-
-        .greenDot {
-          width: 0.45rem;
-          height: 0.45rem;
-          border-radius: 50%;
-          background: t.$type-green;
-        }
-      }
-
-      .metaText {
-        font-size: 0.775rem;
-        color: t.$text-muted;
-
-        strong {
-          color: t.$text;
-          font-weight: 600;
-        }
-      }
-    }
-  }
-}
-
-.messageBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  height: 2.25rem;
-  padding: 0 1.15rem;
-  border-radius: t.$radius-control;
   background: t.$surface-raised;
-  border: 1px solid t.$border;
-  color: t.$text;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-decoration: none;
-  transition: all 0.15s ease;
-
-  &:hover {
-    background: t.$surface-subtle;
-    border-color: t.$border-strong;
-    color: t.$brand;
-  }
+}
+.avatarLarge { grid-column: 1 / 3; grid-row: 1 / 3; align-self: start; display: grid; place-items: center; width: min(100%, 10rem); aspect-ratio: 1; border: t.$space-1 solid t.$border-default; border-radius: 50%; background: t.$brand-subtle; color: t.$action-primary; font-size: clamp(1.5rem, 3vw, 3rem); font-weight: t.$fw-bold; }
+.nameBlock { grid-column: 3 / 6; display: grid; gap: t.$space-1; overflow-wrap: anywhere; }
+.nameBlock h1 { margin: 0; font-size: t.$workspace-title-size; font-weight: t.$fw-semibold; line-height: t.$line-height-title-1; }
+.nameBlock small { color: t.$content-secondary; }
+.metadata { grid-column: 6 / 11; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: t.$space-4; margin: 0; }
+.metadata dt { font-size: t.$fs-caption; color: t.$content-secondary; margin-bottom: t.$space-1; }
+.metadata dd { margin: 0; font-weight: t.$fw-semibold; overflow-wrap: anywhere; }
+.messageBtn { grid-column: 11 / 13; justify-self: end; display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; padding: t.$space-2 t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; text-decoration: none; }
+.messageBtn:hover { background: t.$surface-subtle; border-color: t.$action-primary; }
+.targetScoreCard { grid-column: 3 / 6; display: grid; gap: t.$space-5; }
+.scoresLine { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: t.$space-3; align-items: center; }
+.scoresLine > div { display: grid; gap: t.$space-2; }
+.scoresLine span, .targetDate { color: t.$content-secondary; font-size: t.$fs-caption; }
+.scoresLine strong { font-size: clamp(1.15rem, 1.8vw, 2rem); line-height: 1.25; overflow-wrap: anywhere; }
+.scoresLine .targetValue { color: t.$action-primary; }
+.scoresLine .baselineValue { font-size: t.$font-size-body; font-weight: t.$fw-medium; line-height: 1.5; overflow-wrap: break-word; }
+.targetDate { display: flex; align-items: center; gap: t.$space-2; }
+.progress { grid-column: 6 / 8; display: grid; justify-items: center; }
+.skillCardsGrid { grid-column: 8 / 13; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: t.$space-3; align-self: stretch; border-left: 1px solid t.$border-default; padding-left: t.$space-5; }
+.skillCard { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: t.$space-2; border-radius: t.$radius-lg; background: t.$surface-subtle; padding: t.$space-4 t.$space-2; overflow-wrap: anywhere; }
+.skillCard svg { color: t.$action-primary; margin-bottom: t.$space-2; }
+.skillCard span { font-size: t.$fs-caption; color: t.$content-secondary; }
+.skillCard strong { font-size: t.$font-size-headline; }
+.skillEmpty { grid-column: 1 / -1; align-self: center; color: t.$content-secondary; }
+.tabs { display: flex; gap: t.$space-6; border-bottom: 1px dashed t.$border-default; margin-bottom: t.$space-6; overflow-x: auto; }
+.tabs a { display: inline-flex; align-items: center; min-height: t.$touch-target; padding: t.$space-3 0; border-bottom: 3px solid transparent; color: t.$content-secondary; text-decoration: none; white-space: nowrap; }
+.tabs a[aria-current='page'] { color: t.$action-primary; border-bottom-color: t.$action-primary; }
+.tabs a:nth-child(4) { margin-left: auto; }
+.intakeGrid { @include workspace.grid; }
+.intakeMain { @include workspace.region(8, 7); }
+.intakeSide { @include workspace.region(4, 5); }
+@media (max-width: 80rem) {
+  .avatarLarge { grid-column: 1 / 3; grid-row: 1; }
+  .nameBlock { grid-column: 3 / 7; }
+  .metadata { grid-column: 7 / 13; }
+  .messageBtn { grid-column: 1 / 3; grid-row: 2; justify-self: start; }
+  .targetScoreCard { grid-column: 3 / 7; }
+  .progress { grid-column: 7 / 9; }
+  .skillCardsGrid { grid-column: 9 / 13; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: t.$breakpoint-dashboard-single) {
+  .studentSummary { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .avatarLarge { grid-column: 1 / 3; }
+  .nameBlock { grid-column: 3 / 10; }
+  .messageBtn { grid-column: 10 / 13; grid-row: 1; justify-self: end; }
+  .metadata { grid-column: 1 / -1; }
+  .targetScoreCard { grid-column: 1 / 6; }
+  .progress { grid-column: 6 / 9; }
+  .skillCardsGrid { grid-column: 9 / 13; }
+}
+@media (max-width: t.$breakpoint-shell-mobile) {
+  .back { margin-bottom:t.$space-2; }
+  .studentSummary { gap:t.$space-3; padding:t.$space-4; margin-bottom:t.$space-4; }
+  .avatarLarge { grid-column:1/3; width:3rem; }
+  .nameBlock { grid-column:3/11; }
+  .nameBlock h1 { font-size:t.$font-size-subhead; }
+  .nameBlock small { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+  .messageBtn { grid-column:11/13; grid-row:1; padding:t.$space-2; }
+  .messageBtn span { position:absolute; width:1px; height:1px; clip-path:inset(50%); overflow:hidden; }
+  .metadata { grid-column:1/-1; gap:t.$space-2; }
+  .metadata dd { font-size:t.$fs-caption; }
+  .targetScoreCard { grid-column:1/9; gap:t.$space-3; }
+  .scoresLine { gap:t.$space-2; }
+  .scoresLine > div { gap:t.$space-1; }
+  .progress { grid-column:9/13; }
+  .skillCardsGrid { grid-column:1/-1; grid-template-columns:repeat(4,minmax(0,1fr)); gap:t.$space-2; border:0; padding:0; }
+  .skillCard { gap:t.$space-1; padding:t.$space-3 t.$space-1; border-radius:t.$radius-control; }
+  .skillCard svg { width:1.25rem; height:1.25rem; margin:0; }
+  .skillCard span { font-size:t.$font-size-caption; }
+  .skillCard strong { font-size:t.$font-size-subhead; }
+  .tabs { gap:t.$space-4; }
 }
 
-.metricsRow {
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  gap: 2rem;
-  align-items: center;
-  padding-top: 1.25rem;
-  border-top: 1px solid t.$neutral-fill;
-}
+.support { display: grid; gap: t.$workspace-section-gap; width: 100%; min-width: 0; > div { @include workspace.grid; > * { @include workspace.region(6, 6); } } }
+.profileForm { @include workspace.grid; > section, > details { @include workspace.region(6, 6); margin: 0; } > div, > p { grid-column: 1 / -1; } }
 
-@media (max-width: 68rem) {
-  .metricsRow {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 44rem) {
-  .metricsRow {
-    grid-template-columns: 1fr;
-    gap: 1.25rem;
-  }
-}
-
-.targetScoreCard {
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-  min-width: 14rem;
-
-  .scoresLine {
-    display: flex;
-    align-items: baseline;
-    gap: 0.75rem;
-
-    .scoreItem {
-      display: flex;
-      flex-direction: column;
-      gap: 0.15rem;
-
-      span {
-        font-size: 0.75rem;
-        color: t.$text-muted;
-      }
-
-      strong {
-        font-size: 1.5rem;
-        line-height: 1.1;
-        font-weight: 700;
-        color: t.$text;
-      }
-    }
-
-    .arrowIcon {
-      font-size: 1.25rem;
-      color: t.$text-placeholder;
-      font-weight: 300;
-    }
-  }
-
-  .targetDate {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.775rem;
-    color: t.$text-muted;
-
-    svg {
-      color: t.$text-placeholder;
-    }
-  }
-}
-
-.progressCircleCard {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 0 1.5rem;
-  border-left: 1px solid t.$neutral-fill;
-  border-right: 1px solid t.$neutral-fill;
-
-  .gaugeWrapper {
-    position: relative;
-    width: 4rem;
-    height: 4rem;
-
-    svg {
-      width: 100%;
-      height: 100%;
-      transform: rotate(-90deg);
-    }
-  }
-
-  .progressLabel {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-
-    strong {
-      font-size: 1.15rem;
-      font-weight: 700;
-      color: t.$text;
-    }
-
-    span {
-      font-size: 0.75rem;
-      color: t.$text-muted;
-      white-space: nowrap;
-    }
-  }
-}
-
-@media (max-width: 68rem) {
-  .progressCircleCard {
-    border-right: none;
-  }
-}
-
-@media (max-width: 44rem) {
-  .progressCircleCard {
-    border-left: none;
-    border-right: none;
-    padding: 0;
-  }
-}
-
-.skillCardsGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr));
-  gap: 0.65rem;
-
-  .skillCard {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.65rem 0.85rem;
-    border-radius: t.$radius-control;
-    background: t.$surface-subtle;
-    border: 1px solid t.$neutral-fill;
-
-    .skillHeader {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-      font-size: 0.725rem;
-      color: t.$text-muted;
-      font-weight: 500;
-
-      svg {
-        color: t.$brand;
-      }
-    }
-
-    .skillScore {
-      display: flex;
-      align-items: baseline;
-      gap: 0.3rem;
-
-      strong {
-        font-size: 1.2rem;
-        line-height: 1.1;
-        font-weight: 700;
-        color: t.$text;
-      }
-
-      .trendUp {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: t.$feedback-success;
-      }
-
-      .trendDown {
-        font-size: 0.75rem;
-        font-weight: 600;
-        color: t.$feedback-danger;
-      }
-    }
-  }
-}
-
-.tabs {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  border-bottom: 1px solid t.$border;
-  margin-bottom: 1.75rem;
-  overflow-x: auto;
-
-  a {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.75rem 0.25rem;
-    border-bottom: 2px solid transparent;
-    color: t.$text-muted;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    white-space: nowrap;
-    transition: all 0.15s ease;
-
-    &:hover {
-      color: t.$text;
-    }
-
-    &[aria-current='page'] {
-      color: t.$brand;
-      font-weight: 600;
-      border-bottom-color: t.$brand;
-    }
-  }
-}
-
-.support {
-  display: grid;
-  gap: 1.5rem;
-  min-width: 0;
-
-  > div {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.5rem;
-  }
-}
-
-@media (max-width: 56rem) {
-  .support > div {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
+.planForm { @include workspace.grid; > section:first-child { @include workspace.region(4, 12); } > section:nth-child(2) { @include workspace.region(8, 12); } > div { grid-column: 1 / -1; } }

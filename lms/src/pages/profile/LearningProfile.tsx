@@ -1,4 +1,5 @@
 import {useState} from 'react';
+import {SkillIcon} from '@/components/SkillIcon';
 import {ReleasedAssessments} from './ReleasedAssessments';
 import {type StudentFacingProfileResponse} from '@/apis';
 import {RecordSummaryList} from '@/components/RecordSummaryList';
@@ -69,10 +70,10 @@ export function LearningProfileDetails({
       <div className={styles.skills}>
         {[...(profile.skills ?? [])]
           .sort((a, b) => (a.position ?? 0) - (b.position ?? 0))
-          .map((skill, index) => (
-            <article key={skill.skillCode ?? index}>
+          .map((skill, index) => {
+            return <article key={skill.skillCode ?? index}>
               <span className={styles.skillSymbol} aria-hidden="true">
-                {(skill.displayName || skill.skillCode || '').slice(0, 1)}
+                <SkillIcon code={skill.skillCode}/>
               </span>
               <h2>{skill.displayName || skill.skillCode}</h2>
               <strong>{skill.currentValue || 'Not assessed'}</strong>
@@ -80,8 +81,8 @@ export function LearningProfileDetails({
                 {skill.scale}{' '}
                 {skill.targetValue ? `· Target ${skill.targetValue}` : ''}
               </small>
-            </article>
-          ))}
+            </article>;
+          })}
       </div>
       {(profile.skills?.length ?? 0) === 0 ? (
         <p className={styles.empty}>

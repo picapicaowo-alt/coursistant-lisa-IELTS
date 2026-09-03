@@ -1,0 +1,186 @@
+[
+  {
+    "state": "calendar-week",
+    "nodes": [
+      "335:1033"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-week",
+    "nodes": [
+      "335:1033"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-course-detail",
+    "nodes": [
+      "375:3392"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-course-detail",
+    "nodes": [
+      "375:3392"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-assignment-detail",
+    "nodes": [
+      "375:4466"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-assignment-detail",
+    "nodes": [
+      "375:4466"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-quiz-detail",
+    "nodes": [
+      "375:3937"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "Course quiz detail; design shows a scheduled mock exam, not the same contract resource.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-quiz-detail",
+    "nodes": [
+      "375:3937"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "Course quiz detail; design shows a scheduled mock exam, not the same contract resource.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-month",
+    "nodes": [
+      "365:1122"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-month",
+    "nodes": [
+      "365:1122"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-add-event",
+    "nodes": [
+      "375:1621"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-add-event",
+    "nodes": [
+      "375:1621"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-date-time-picker",
+    "nodes": [
+      "375:1956",
+      "375:2540"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "One combined picker; reference relative-duration menu is not represented.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "calendar-date-time-picker",
+    "nodes": [
+      "375:1956",
+      "375:2540"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/calendar",
+    "note": "One combined picker; reference relative-duration menu is not represented.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

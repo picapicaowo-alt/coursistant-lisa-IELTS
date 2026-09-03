@@ -45,6 +45,9 @@ const copy: Record<string, string> = {
   'signup.tenantIdLabel': 'Institution ID',
   'signup.emailLabel': 'Email',
   'signup.passwordLabel': 'Password',
+  'signup.confirmPasswordLabel': 'Confirm password',
+  'signup.activateButton': 'Activate account',
+  'signupErrors.passwordMismatch': 'Passwords must match.',
   'signup.verificationLabel': 'Verification code',
   'signup.firstNamePlaceholder': 'Enter first name',
   'signup.middleNamePlaceholder': 'Enter middle name',
@@ -122,11 +125,15 @@ const renderSignup = () => render(
 
 const fillRegistration = async () => {
   const user = userEvent.setup();
+  await user.type(screen.getByLabelText('Institution ID'), '1');
+  await user.type(screen.getByLabelText('Email'), 'student@example.com');
+  await user.click(screen.getByRole('button', {name: 'Continue'}));
   await user.type(screen.getByLabelText('First name'), 'Student');
   await user.type(screen.getByLabelText('Last name'), 'One');
-  await user.type(screen.getByLabelText('Institution ID'), '1');
-  await user.type(screen.getByLabelText('Email'), ' Student@Example.com ');
+
   await user.type(screen.getByLabelText('Password'), 'Passw0rd1');
+  await user.type(screen.getByLabelText('Confirm password'), 'Passw0rd1');
+  await user.click(screen.getByRole('button', {name: 'Continue'}));
   await user.type(screen.getByLabelText('Verification code'), '123456');
   return user;
 };
@@ -147,7 +154,7 @@ describe('SignUpView', () => {
     expect(mocks.sendVerification).toHaveBeenCalledWith('student@example.com', expect.any(String));
     expect(await screen.findByText('Code sent.')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', {name: 'Continue'}));
+    await user.click(screen.getByRole('button', {name: 'Activate account'}));
 
     expect(mocks.register).toHaveBeenCalledWith(
       {
@@ -168,12 +175,12 @@ describe('SignUpView', () => {
   it('blocks a password that the backend would reject', async () => {
     renderSignup();
     const user = userEvent.setup();
-    await user.type(screen.getByLabelText('First name'), 'Student');
-    await user.type(screen.getByLabelText('Last name'), 'One');
     await user.type(screen.getByLabelText('Institution ID'), '1');
     await user.type(screen.getByLabelText('Email'), 'student@example.com');
+    await user.click(screen.getByRole('button', {name: 'Continue'}));
+    await user.type(screen.getByLabelText('First name'), 'Student');
+    await user.type(screen.getByLabelText('Last name'), 'One');
     await user.type(screen.getByLabelText('Password'), 'passwordonly');
-    await user.type(screen.getByLabelText('Verification code'), '123456');
 
     await user.click(screen.getByRole('button', {name: 'Continue'}));
 
@@ -189,8 +196,24 @@ describe('SignUpView', () => {
     renderSignup();
     const user = await fillRegistration();
 
-    await user.click(screen.getByRole('button', {name: 'Continue'}));
+    await user.click(screen.getByRole('button', {name: 'Activate account'}));
 
     expect(await screen.findByText('Code is incorrect.')).toBeInTheDocument();
   });
+  it('keeps a confirmation mismatch in the password step without registering', async () => {
+    renderSignup();
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText('Institution ID'), '1');
+    await user.type(screen.getByLabelText('Email'), 'student@example.com');
+    await user.click(screen.getByRole('button', {name: 'Continue'}));
+    await user.type(screen.getByLabelText('First name'), 'Student');
+    await user.type(screen.getByLabelText('Last name'), 'One');
+    await user.type(screen.getByLabelText('Password'), 'Passw0rd1');
+    await user.type(screen.getByLabelText('Confirm password'), 'Different2');
+    await user.click(screen.getByRole('button', {name: 'Continue'}));
+    expect(screen.getByText('Passwords must match.')).toBeVisible();
+    expect(screen.queryByLabelText('Verification code')).not.toBeInTheDocument();
+    expect(mocks.register).not.toHaveBeenCalled();
+  });
+
 });

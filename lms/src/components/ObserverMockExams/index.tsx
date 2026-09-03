@@ -4,20 +4,10 @@ import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {getApiErrorMessage} from '@/utils/apiError';
+import {normalizeStudentExams} from '@/utils/mockExamSummary';
 import styles from './index.module.scss';
 
 const PAGE_SIZE = 20;
-
-const records = (value: unknown): Array<{id: number; title: string}> => {
-  const items = Array.isArray(value) ? value : value && typeof value === 'object' && 'items' in value ? value.items : [];
-  if (!Array.isArray(items)) return [];
-  return items.flatMap((item: unknown) => {
-    if (!item || typeof item !== 'object') return [];
-    const id = 'studentMockExamId' in item ? item.studentMockExamId : 'id' in item ? item.id : undefined;
-    if (typeof id !== 'number') return [];
-    return [{id, title: 'title' in item && typeof item.title === 'string' ? item.title : `Mock exam #${id}`}];
-  });
-};
 
 /** Observer detail stays in the current role; it never links to a student attempt. */
 export const ObserverMockExams = ({scope, studentUserId}: {scope: 'advisor' | 'parent'; studentUserId: number}) => {
@@ -37,7 +27,7 @@ export const ObserverMockExams = ({scope, studentUserId}: {scope: 'advisor' | 'p
     enabled: selectedId != null,
     retry: false,
   });
-  const allRows = records(list.data);
+  const allRows = normalizeStudentExams(list.data);
   const rows = allRows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const exam = detail.data;
   useEffect(() => {if (selectedId != null) dialog.current?.showModal();}, [selectedId]);
@@ -45,7 +35,12 @@ export const ObserverMockExams = ({scope, studentUserId}: {scope: 'advisor' | 'p
     {list.isPending ? <p role="status">Loading assigned papers…</p> : null}
     {list.isError ? <div role="alert"><p>{getApiErrorMessage(list.error, 'Assigned papers could not be loaded.')}</p><button onClick={() => void list.refetch()}>Retry</button></div> : null}
     {list.isSuccess && rows.length === 0 ? <p>No assigned mock exams.</p> : null}
-    <div className={styles.paperGrid}>{rows.map(row => <button className={styles.record} aria-expanded={selectedId === row.id} key={row.id} onClick={() => setSelectedId(current => current === row.id ? null : row.id)}><ClipboardCheck size={28} aria-hidden="true"/><strong>{row.title}</strong><span>{selectedId === row.id ? 'Hide results' : 'View results'}</span></button>)}</div>
+    <div className={styles.paperGrid}>{rows.map(row => <article className={styles.record} key={row.id}>
+      <header><ClipboardCheck size={28} aria-hidden="true"/><span className={styles.status}>{(row.attemptStatus || row.status).replace(/_/g, ' ')}</span></header>
+      <h3>{row.title}</h3>
+      <dl>{row.sections.map(section => <div key={section}><dt>{section}</dt><dd>{row.results[section] || 'No result yet'}</dd></div>)}</dl>
+      <button type="button" aria-label={`${row.title} View results`} onClick={() => setSelectedId(row.id)}>View results</button>
+    </article>)}</div>
     {selectedId != null ? <dialog ref={dialog} className={styles.resultDialog} aria-label="Mock exam results" onClose={() => setSelectedId(null)}><button type="button" className={styles.close} aria-label="Close results" onClick={() => setSelectedId(null)}><X size={20}/></button><section className={styles.detail} aria-label="Mock exam results">
       {detail.isPending ? <p role="status">Loading results…</p> : null}
       {detail.isError ? <div role="alert"><p>{getApiErrorMessage(detail.error, 'Results are not available.')}</p><button onClick={() => void detail.refetch()}>Retry results</button></div> : null}

@@ -3,9 +3,6 @@
 .workspace button:hover { border-color: t.$action-primary; }
 .workspace button:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
 .workspace button:disabled { opacity: .5; cursor: default; }
-.record { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: t.$space-3; text-align: left; overflow-wrap: anywhere; }
-.record[aria-expanded='true'] { background: t.$surface-brand-subtle; }
-.record span { font-size: t.$font-size-caption; color: t.$action-primary; }
 .detail { padding: t.$space-4; background: t.$surface-subtle; border-radius: t.$radius-control; }
 .detail h3 { font-weight: t.$fw-semibold; }
 .detail h3, .detail p { margin: 0 0 t.$space-3; }
@@ -15,10 +12,15 @@
 .paging { display: flex; align-items: center; justify-content: space-between; gap: t.$space-2; }
 
 .paperGrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,16rem),1fr)); gap:t.$space-4; }
-.workspace .record { display:flex; flex-direction:column; align-items:center; text-align:center; justify-content:center; gap:t.$space-5; min-height:14rem; border-radius:t.$radius-lg; padding:t.$space-6; }
-.record > svg { color:t.$action-primary; }
-.record > strong { font-size:t.$font-size-subhead; }
-.record > span { border:1px solid t.$border-default; width:100%; border-radius:t.$radius-control; padding:t.$space-2; }
+.record { display:flex; flex-direction:column; gap:t.$space-4; min-width:0; border:1px solid t.$border-default; border-radius:t.$radius-card-lg; padding:t.$space-5; }
+.record header { display:flex; align-items:center; justify-content:space-between; gap:t.$space-3; color:t.$action-primary; }
+.record h3 { margin:0; font-size:t.$font-size-subhead; font-weight:t.$fw-semibold; overflow-wrap:anywhere; }
+.status { padding:t.$space-1 t.$space-2; border-radius:t.$radius-control; background:t.$surface-brand-subtle; font-size:t.$fs-caption; }
+.record dl { display:grid; gap:t.$space-3; margin:0 0 t.$space-3; }
+.record dl > div { display:flex; justify-content:space-between; gap:t.$space-3; }
+.record dt { text-transform:capitalize; color:t.$content-secondary; }
+.record dd { margin:0; font-variant-numeric:tabular-nums; }
+.record button { margin-top:auto; width:100%; color:t.$action-primary; }
 .resultDialog { width:min(48rem,calc(100vw - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; margin:auto; padding:t.$space-6; border:1px solid t.$border-default; border-radius:t.$radius-lg; background:t.$surface-raised; color:t.$content-primary; }
 .resultDialog::backdrop { background:rgba(t.$content-primary,.35); }
 .resultDialog .close { display:grid; place-items:center; margin-left:auto; padding:t.$space-2; }

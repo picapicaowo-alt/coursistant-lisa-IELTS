@@ -583,3 +583,5 @@
 .overviewCounts dd { margin: 0; font-weight: t.$fw-semibold; }
 @media (max-width: 1000px) { .learningHeader, .learningBody { grid-template-columns: minmax(0, 1fr); gap: t.$space-5; } }
 @media (max-width: 600px) { .unitHeader { padding: t.$space-4; gap: t.$space-2; } }
+.assignmentFilter { display: flex; align-items: center; gap: t.$space-3; padding: t.$space-3 t.$space-5; color: t.$content-secondary; font-size: t.$fs-caption; }
+.assignmentFilter select { min-height: t.$touch-target; min-width: 0; padding: t.$space-2 t.$space-3; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; background: t.$surface-raised; }

@@ -26,6 +26,8 @@ export const AdminContractOperations: React.FC<{
   users: ManagedUser[];
 }> = ({ isSystemAdmin, users }) => {
   const queryClient = useQueryClient();
+  const [selectedAdminId, setSelectedAdminId] = useState<number>();
+  const adminDetail = useQuery({queryKey: ["admin", "directory-detail", selectedAdminId], queryFn: async () => unwrapData(await adminApiService.getAdmin(selectedAdminId!), "adminDetail"), enabled: isSystemAdmin && selectedAdminId != null, retry: false});
   const [adminSearch, setAdminSearch] = useState("");
   const [submittedAdminSearch, setSubmittedAdminSearch] = useState("");
   const [digest, setDigest] = useState({ date: "", tenantId: "" });
@@ -107,6 +109,14 @@ export const AdminContractOperations: React.FC<{
       queryClient.invalidateQueries({ queryKey: ["tenant", "alert-rules"] }),
   });
 
+  const directoryRecord = asRecord(directory.data);
+  const directoryItems = Array.isArray(directory.data) ? directory.data : Array.isArray(directoryRecord?.items) ? directoryRecord.items : [];
+  const administratorRows = directoryItems.flatMap(value => {
+    const row = asRecord(value);
+    const id = numberValue(row, 'id', 'adminId');
+    return id == null ? [] : [{id, label: typeof row?.email === 'string' ? row.email : `Administrator #${id}`}];
+  });
+
   return (
     <>
       {isSystemAdmin ? (
@@ -116,7 +126,8 @@ export const AdminContractOperations: React.FC<{
             className={styles.form}
             onSubmit={(event) => {
               event.preventDefault();
-              setSubmittedAdminSearch(adminSearch.trim());
+              if (submittedAdminSearch === adminSearch.trim()) void directory.refetch();
+              else {setSelectedAdminId(undefined); setSubmittedAdminSearch(adminSearch.trim());}
             }}
           >
             <label>
@@ -140,10 +151,14 @@ export const AdminContractOperations: React.FC<{
               </button>
             </p>
           ) : (
-            <RecordSummaryList
-              value={directory.data}
-              emptyMessage="No administrators match this search."
-            />
+            <div className={styles.adminDirectoryWorkspace}>
+              <div className={styles.adminDirectoryList} aria-label="Administrators">
+                {administratorRows.length ? administratorRows.map(row => <button type="button" key={row.id} aria-pressed={selectedAdminId === row.id} onClick={() => setSelectedAdminId(row.id)}>{row.label}</button>) : <p>No administrators match this search.</p>}
+              </div>
+              <section aria-label="Administrator details">
+                {selectedAdminId != null ? adminDetail.isPending ? <p role="status">Loading administrator…</p> : adminDetail.isError ? <p role="alert">Administrator details could not be loaded. <button type="button" onClick={() => void adminDetail.refetch()}>Retry details</button></p> : <RecordSummaryList value={adminDetail.data} emptyMessage="No additional details are available."/> : <p>Select an administrator to view their account details.</p>}
+              </section>
+            </div>
           )}
         </section>
       ) : null}

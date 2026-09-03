@@ -1,3 +1,4 @@
+@use '../../styles/workspace' as workspace;
 .overview {
   display: grid;
   gap: t.$space-6;
@@ -20,18 +21,19 @@
 }
 .summary {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: t.$space-5;
+  @include workspace.grid;
+  > * { @include workspace.region(6, 12); }
 }
 .goal {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(7rem, .6fr);
   gap: t.$space-4;
   padding: t.$space-6;
   border-radius: t.$radius-lg;
-  background: t.$action-primary;
+  background: linear-gradient(115deg, t.$profile-gradient-start, t.$action-primary);
   color: t.$content-on-color;
 }
+.goal > h2, .goal > p { grid-column: 1 / -1; }
 .goal h2 {
   margin: 0;
   font-size: t.$font-size-headline;
@@ -59,22 +61,7 @@
 .goal small {
   font-size: t.$font-size-caption;
 }
-.progress {
-  display: grid;
-  gap: t.$space-2;
-  margin-top: auto;
-}
-.progress > span {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: t.$space-2;
-}
-.progress progress {
-  width: 100%;
-  height: t.$space-2;
-  accent-color: t.$content-on-color;
-}
+.progress { grid-column: 2; grid-row: 3 / 5; align-self: center; display: grid; justify-items: center; gap: t.$space-2; text-align: center; }
 .skill {
   display: grid;
   gap: t.$space-2;
@@ -101,7 +88,9 @@
 }
 .journey {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  @include workspace.grid;
+  > :first-child { @include workspace.region(8, 12); }
+  > :last-child { @include workspace.region(4, 12); }
   gap: t.$space-5;
 }
 .checkpoint {
@@ -367,3 +356,9 @@
     grid-column: 1;
   }
 }
+
+.skill { grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); align-items: center; column-gap: t.$space-4; }
+.skill > div { grid-column: 2; grid-row: 1; }
+.skill meter { grid-column: 2; grid-row: 2; }
+.skill > small { grid-column: 1; grid-row: 2; }
+@media (max-width: t.$breakpoint-shell-mobile) { .goal { grid-template-columns: minmax(0, 1fr); } .goal > * { grid-column: 1; } .progress { grid-row: auto; } }

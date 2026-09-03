@@ -1,0 +1,18 @@
+{
+  "applicationStates": 56,
+  "mainScreenshots": 112,
+  "mappedFigmaNodes": 59,
+  "parityAcceptedNodes": 0,
+  "statusCounts": {
+    "parent-dashboard-scope": 5,
+    "captured-different-or-partial": 59,
+    "contract-boundary-not-captured": 5,
+    "workflow-reference-excluded": 1
+  },
+  "widthOverflow": [],
+  "brokenImages": [],
+  "lastBuildEntryHtmlSha256": "3b510d79a2d8c708740d3460bc44fc4542712ca3fcdf269f932ce7f7892babc7",
+  "frontendOnly": true,
+  "allApiRequestsIntercepted": true,
+  "authenticatedBusinessAcceptance": false
+}

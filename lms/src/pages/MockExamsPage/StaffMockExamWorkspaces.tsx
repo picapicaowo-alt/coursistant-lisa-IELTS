@@ -81,17 +81,15 @@ function nestedRecords(value: unknown, key: string): RuntimeRecord[] {
 
 type MediaState = { loading?: boolean; url?: string; error?: string };
 
-function TenantSectionMedia({
-  templateId,
-  versionId,
-  section,
-  value,
-}: {
-  templateId: number;
-  versionId: number;
-  section: Section;
-  value: unknown;
-}) {
+type SectionMediaProps = {section: Section; value: unknown} & (
+  {scope?: 'tenant'; templateId: number; versionId: number} | {scope: 'system'; testId: number}
+);
+
+function ExamSectionMedia(props: SectionMediaProps) {
+  const {section, value} = props;
+  const audio = (seq: number) => props.scope === 'system' ? mockExamApiService.getSystemListeningAudio(props.testId, seq) : mockExamApiService.getTenantListeningAudio(props.templateId, props.versionId, seq);
+  const readingImage = (passage: number, question: number) => props.scope === 'system' ? mockExamApiService.getSystemReadingImage(props.testId, passage, question) : mockExamApiService.getTenantReadingImage(props.templateId, props.versionId, passage, question);
+  const writingImage = (seq: number) => props.scope === 'system' ? mockExamApiService.getSystemWritingImage(props.testId, seq) : mockExamApiService.getTenantWritingImage(props.templateId, props.versionId, seq);
   const [media, setMedia] = useState<Record<string, MediaState>>({});
   const objectUrls = useRef(new Set<string>());
 
@@ -123,65 +121,25 @@ function TenantSectionMedia({
     }
   };
 
-  const items =
-    section === "listening"
-      ? nestedRecords(value, "parts").map((part, index) => ({
-          key: `listening-${runtimeNumber(part, "seq") ?? index + 1}`,
-          label: runtimeString(part, "label") || `Listening part ${index + 1}`,
-          type: "audio" as const,
-          load: () =>
-            mockExamApiService.getTenantListeningAudio(
-              templateId,
-              versionId,
-              runtimeNumber(part, "seq") ?? index + 1,
-            ),
-        }))
-      : section === "reading"
-        ? nestedRecords(value, "passages").flatMap((passage, passageIndex) => {
-            const passageSeq =
-              runtimeNumber(passage, "seq") ?? passageIndex + 1;
-            return nestedRecords(passage, "questions").map(
-              (question, questionIndex) => {
-                const sortOrder =
-                  runtimeNumber(question, "sortOrder") ?? questionIndex + 1;
-                return {
-                  key: `reading-${passageSeq}-${sortOrder}`,
-                  label:
-                    runtimeString(question, "title") ||
-                    `Passage ${passageSeq}, question group ${sortOrder}`,
-                  type: "image" as const,
-                  load: () =>
-                    mockExamApiService.getTenantReadingImage(
-                      templateId,
-                      versionId,
-                      passageSeq,
-                      sortOrder,
-                    ),
-                };
-              },
-            );
-          })
-        : nestedRecords(value, "tasks")
-            .filter(
-              (task) =>
-                task.hasImage === true ||
-                Boolean(runtimeString(task, "imageSrc")),
-            )
-            .map((task, index) => {
-              const taskSeq = runtimeNumber(task, "seq") ?? index + 1;
-              return {
-                key: `writing-${taskSeq}`,
-                label:
-                  runtimeString(task, "title") || `Writing task ${taskSeq}`,
-                type: "image" as const,
-                load: () =>
-                  mockExamApiService.getTenantWritingImage(
-                    templateId,
-                    versionId,
-                    taskSeq,
-                  ),
-              };
-            });
+  // Only server-provided sequence identifiers address protected media.
+  const items = section === 'listening'
+    ? nestedRecords(value, 'parts').flatMap(part => {
+      const seq = runtimeNumber(part, 'seq');
+      return seq == null || part.hasAudio === false ? [] : [{key: `listening-${seq}`, label: runtimeString(part, 'label') || `Listening part ${seq}`, type: 'audio' as const, load: () => audio(seq)}];
+    })
+    : section === 'reading'
+      ? nestedRecords(value, 'passages').flatMap(passage => {
+        const passageSeq = runtimeNumber(passage, 'seq');
+        if (passageSeq == null) return [];
+        return nestedRecords(passage, 'questions').flatMap(question => {
+          const sortOrder = runtimeNumber(question, 'sortOrder');
+          return sortOrder == null || !(question.hasImage === true || runtimeString(question, 'imageSrc')) ? [] : [{key: `reading-${passageSeq}-${sortOrder}`, label: runtimeString(question, 'title') || `Passage ${passageSeq}, question group ${sortOrder}`, type: 'image' as const, load: () => readingImage(passageSeq, sortOrder)}];
+        });
+      })
+      : nestedRecords(value, 'tasks').flatMap(task => {
+        const seq = runtimeNumber(task, 'seq');
+        return seq == null || !(task.hasImage === true || runtimeString(task, 'imageSrc')) ? [] : [{key: `writing-${seq}`, label: runtimeString(task, 'title') || `Writing task ${seq}`, type: 'image' as const, load: () => writingImage(seq)}];
+      });
 
   if (!items.length) return null;
 
@@ -192,7 +150,7 @@ function TenantSectionMedia({
     >
       <div>
         <h4>Protected media</h4>
-        <p>Preview uploaded files and choose the media for this section.</p>
+        <p>Preview the available media for this section.</p>
       </div>
       <div className={styles.mediaList}>
         {items.map((item) => {
@@ -756,7 +714,7 @@ function TenantSectionComposer({
                 value={sectionDetail.data}
                 emptyMessage={`No readable ${SECTION_META[section].label} content was returned.`}
               />
-              <TenantSectionMedia
+              <ExamSectionMedia
                 templateId={templateId}
                 versionId={versionId}
                 section={section}
@@ -1671,29 +1629,27 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
   );
 }
 
-export function SystemWorkspace({ value }: { value: unknown }) {
+export function SystemWorkspace({value}: {value: unknown}) {
   const rows = runtimeItems(value);
-  return (
-    <div className={styles.workspace}>
-      <section className={styles.hero}>
-        <div>
-          <h1>Mock exam operations</h1>
-          <p>
-            Review mock exam activity across tenants and track papers that need
-            attention.
-          </p>
-        </div>
-        <div className={styles.metric}>
-          <strong>{rows.length}</strong>
-          <span>visible records</span>
-        </div>
-      </section>
-      <WorkspaceSection title="Exam records">
-        <RecordSummaryList
-          value={value}
-          emptyMessage="No system mock-exam records are available."
-        />
-      </WorkspaceSection>
+  const [selectedId, setSelectedId] = useState<number>();
+  const [section, setSection] = useState<Section>('listening');
+  const detail = useQuery({queryKey: ['mock-exams', 'system-detail', selectedId], queryFn: async () => unwrapData(await mockExamApiService.getSystemExam(selectedId!), 'systemMockExam'), enabled: selectedId != null, retry: false});
+  const content = useQuery({queryKey: ['mock-exams', 'system-section', selectedId, section], queryFn: async () => unwrapData(await mockExamApiService.getSystemSection(selectedId!, section), 'systemMockExamSection'), enabled: selectedId != null && detail.isSuccess, retry: false});
+  return <div className={styles.workspace}>
+    <section className={styles.hero}><div><h1>Mock exam operations</h1><p>Review exam records and their Listening, Reading and Writing content.</p></div></section>
+    <div className={styles.twoColumn}>
+      <WorkspaceSection title="Exam records"><div className={styles.recordList}>{rows.length ? rows.map(row => {
+        const id = runtimeNumber(row, 'testId', 'id');
+        return <button key={id ?? recordLabel(row, 'Exam')} type="button" className={styles.recordButton} disabled={id == null} aria-pressed={selectedId === id} onClick={() => {if (id != null) setSelectedId(id);}}><strong>{recordLabel(row, id == null ? 'Exam record' : `Exam #${id}`)}</strong><span>{runtimeString(row, 'status', 'state') || 'View record'}</span></button>;
+      }) : <p>No exam records are available.</p>}</div></WorkspaceSection>
+      <WorkspaceSection title="Exam content">{selectedId == null ? <p>Select an exam to review its content.</p> : <>
+        {detail.isPending ? <p role="status">Loading exam…</p> : null}
+        {detail.isError ? <p role="alert">Exam could not be loaded. <button type="button" onClick={() => void detail.refetch()}>Retry</button></p> : null}
+        <div className={styles.sectionTabs} aria-label="Exam section">{(Object.keys(SECTION_META) as Section[]).map(key => <button key={key} type="button" aria-pressed={section === key} onClick={() => setSection(key)}>{SECTION_META[key].label}</button>)}</div>
+        {content.isPending ? <p role="status">Loading section…</p> : null}
+        {content.isError ? <p role="alert">This section could not be loaded. <button type="button" onClick={() => void content.refetch()}>Retry section</button></p> : null}
+        {content.isSuccess ? <><RecordSummaryList value={content.data} emptyMessage="No content in this section."/><ExamSectionMedia key={`${selectedId}-${section}`} scope="system" testId={selectedId} section={section} value={content.data}/></> : null}
+      </>}</WorkspaceSection>
     </div>
-  );
+  </div>;
 }

@@ -173,7 +173,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: end;
   gap: .6rem;
-  margin-top: 1rem;
+  margin-top: 0;
   padding: .85rem;
   border-radius: t.$radius-control;
   background: t.$subcard-bg;
@@ -789,3 +789,12 @@ summary:focus-visible {
     grid-template-columns: auto minmax(0, 1fr);
   }
 }
+
+.filterActions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-2;
+}
+.filterActions > button { gap: t.$space-2; }
+.directoryStatus { margin: 0; color: t.$content-secondary; font-size: t.$font-size-caption; }

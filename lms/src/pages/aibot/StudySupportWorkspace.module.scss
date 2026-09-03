@@ -2,7 +2,9 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  max-width: 54rem;
+  max-width: t.$workspace-compact-max-inline-size;
+  width: 100%;
+  min-height: 0;
   margin: auto;
   padding: 0.5rem;
 }
@@ -25,7 +27,7 @@
   align-items: center;
   text-align: center;
   gap: 1.5rem;
-  flex: 1;
+  flex: 0;
   padding: 2rem 0;
 }
 .welcome img {
@@ -45,3 +47,31 @@
   outline: 2px solid t.$brand;
   outline-offset: 3px;
 }
+
+.messageArea { display: flex; flex: 1; flex-direction: column; gap: t.$space-3; min-height: 0; overflow-y: auto; padding: t.$space-4; }
+.content[data-empty] { justify-content: center; position: relative; padding-block: clamp(1rem,5dvh,3rem); }
+.content[data-empty] .toolbar { position: absolute; top: t.$space-2; right: t.$space-2; }
+.content[data-empty] .messageArea { flex: 0 1 auto; overflow-y: auto; }
+.content[data-empty] .welcome { padding: t.$space-6 0; }
+@media (max-width: t.$breakpoint-shell-mobile) { .welcome img { width: 4rem; height: 4rem; } .content[data-empty] { justify-content: flex-start; } }
+
+.content[data-compact] {padding:0; max-width:none;}
+.compactHeader {display:grid; grid-template-columns:t.$touch-target minmax(0,1fr) t.$touch-target t.$touch-target; align-items:center; flex-shrink:0; gap:t.$space-1;}
+.compactHeader h2 {text-align:center; font-size:t.$font-size-headline; font-weight:t.$fw-semibold; margin:0;}
+.compactHeader button {display:grid; place-items:center; width:t.$touch-target; height:t.$touch-target; border:0; background:transparent; color:t.$content-secondary; cursor:pointer; font-size:t.$font-size-headline;}
+.compactHeader button:disabled {opacity:.5; cursor:not-allowed;}
+.compactHeader img {width:1rem;}
+.compactPrompts {display:grid; gap:t.$space-3; margin-top:t.$space-5;}
+.compactPrompts button {padding:t.$space-3 t.$space-5; min-height:t.$touch-target; border:0; border-radius:t.$radius-control; color:t.$content-ink; background:t.$surface-subtle; text-align:left; cursor:pointer;}
+.compactComposer {display:grid; grid-template-columns:2rem minmax(0,1fr) 2.5rem; gap:t.$space-2; align-items:center; border:1px solid t.$action-secondary; border-radius:t.$radius-lg; padding:t.$space-2; flex-shrink:0;}
+.compactComposer > input:not([type='file']) {width:100%; min-width:0; padding:0; border:0; outline:0; background:transparent;}
+.compactComposer:focus-within {outline:2px solid t.$action-primary; outline-offset:2px;}
+.compactComposer button {display:grid; place-items:center; min-height:2.5rem; border:0; border-radius:t.$radius-control; cursor:pointer;}
+.compactAttach {background:transparent; color:t.$content-placeholder; font-size:t.$font-size-headline;}
+.compactSend {background:t.$action-primary;}
+.compactSend img {width:1.5rem;}
+.compactComposer button:disabled {opacity:.45; cursor:not-allowed;}
+.compactAttachment {grid-column:1/-1; display:flex; align-items:center; gap:t.$space-2; min-width:0; font-size:t.$fs-caption;}
+.compactAttachment span {overflow:hidden; white-space:nowrap; text-overflow:ellipsis; flex:1;}
+.compactAttachment button {color:t.$content-secondary; background:t.$surface-subtle;}
+.compactHeader button:focus-visible, .compactPrompts button:focus-visible, .compactComposer button:focus-visible {outline:2px solid t.$action-primary; outline-offset:2px;}

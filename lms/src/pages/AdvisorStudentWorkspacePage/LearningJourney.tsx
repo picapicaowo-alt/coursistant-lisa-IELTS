@@ -1,10 +1,11 @@
 import React, {useEffect, useId, useMemo, useRef, useState} from 'react';
-import {X, Plus, Calendar} from 'lucide-react';
+import {X, Plus, Calendar, Check} from 'lucide-react';
 import {useQuery} from '@tanstack/react-query';
 import {Link} from 'react-router-dom';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {ScheduleRequestActions} from './ScheduleRequestActions';
 import {unwrapData} from '@/apis';
-import type {StudyPlanAggregate} from '@/apis';
+import type {StudyPlanAggregate, AdvisorTaskResponse} from '@/apis';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
 import {TASK_STATUS, formatPlanDate} from '@/utils/studyPlan';
 import styles from './LearningJourney.module.scss';
@@ -18,7 +19,7 @@ export function LearningJourney({
 }: {
   plan: StudyPlanAggregate;
   studentUserId?: number;
-  onEdit: () => void;
+  onEdit: (checkpointId?: number, taskId?: number) => void;
   checkpointTarget: number;
   taskTarget: number;
 }) {
@@ -27,6 +28,7 @@ export function LearningJourney({
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED'>('ALL');
   const dialog = useRef<HTMLDialogElement>(null);
   const titleId = useId();
+  const [selectedTask, setSelectedTask] = useState<AdvisorTaskResponse | null>(null);
   const checkpoint = selected == null ? undefined : checkpoints[selected];
 
   const scheduleRequests = useQuery({
@@ -75,8 +77,6 @@ export function LearningJourney({
 interface PendingRequestItem {
   id: number;
   courseTitle: string;
-  currentDate: string;
-  currentTime: string;
   requestedDate: string;
   requestedTime: string;
   reason: string;
@@ -86,7 +86,6 @@ interface PendingRequestItem {
   const rawPendingRequests = (scheduleRequests.data?.items ?? []).filter(r => !r.status || r.status === 'PENDING');
   const pendingRequests: PendingRequestItem[] = rawPendingRequests.filter(r => r.id != null).map(r => ({
     id: r.id!, courseTitle: r.courseId ? `Course #${r.courseId}` : 'Schedule request',
-    currentDate: 'Not supplied', currentTime: '',
     requestedDate: r.proposedOccurrenceDate || 'Not supplied',
     requestedTime: [r.proposedStartTime, r.proposedEndTime].filter(Boolean).join(' – '),
     reason: r.reason || 'No reason supplied', version: r.version,
@@ -101,7 +100,7 @@ interface PendingRequestItem {
             <h2 id="learning-journey-title">Learning Journey</h2>
             <p>{plan.strategySummary || 'Target-driven milestone progression'}</p>
           </div>
-          <button type="button" className={styles.editBtn} onClick={onEdit}>
+          <button type="button" className={styles.editBtn} onClick={() => onEdit()}>
             Edit study plan
           </button>
         </header>
@@ -120,6 +119,7 @@ interface PendingRequestItem {
                 className={styles.phaseCard}
                 data-current={isCurrent ? 'true' : undefined}
               >
+                <span className={styles.phaseMarker} data-state={isCompleted ? 'completed' : isCurrent ? 'current' : 'planned'} aria-hidden="true">{isCompleted ? <Check size={18}/> : null}</span>
                 <div className={styles.phaseBadgeRow}>
                   <span className={styles.phaseNumber}>Phase {String(index + 1).padStart(2, '0')}</span>
                   <span
@@ -157,7 +157,7 @@ interface PendingRequestItem {
                   type="button"
                   className={styles.phaseActionBtn}
                   data-variant={isCurrent ? 'primary' : isCompleted ? 'secondary' : 'outline'}
-                  onClick={() => setSelected(index)}
+                  onClick={() => {setSelectedTask(null); setSelected(index);}}
                   aria-label={`View phase ${index + 1}`}
                 >
                   View details →
@@ -178,7 +178,7 @@ interface PendingRequestItem {
                 type="button"
                 className={styles.phaseActionBtn}
                 data-variant="primary"
-                onClick={onEdit}
+                onClick={() => onEdit()}
               >
                 + Create Checkpoint
               </button>
@@ -192,7 +192,7 @@ interface PendingRequestItem {
         <header className={styles.requestsHeader}>
           <div className={styles.headerGroup}>
             <h3>Requests</h3>
-            <span className={styles.pendingBadge}>{pendingRequests.length} Pending</span>
+            <span className={styles.pendingBadge}>{pendingRequests.length} Pending{(scheduleRequests.data?.total ?? 0) > (scheduleRequests.data?.items?.length ?? 0) ? ' on this page' : ''}</span>
           </div>
         </header>
 
@@ -207,9 +207,6 @@ interface PendingRequestItem {
 
               <div className={styles.reqDetails}>
                 <div>
-                  Current: <strong>{req.currentDate} · {req.currentTime}</strong>
-                </div>
-                <div>
                   Requested: <strong>{req.requestedDate} · {req.requestedTime}</strong>
                 </div>
                 <div>
@@ -217,10 +214,11 @@ interface PendingRequestItem {
                 </div>
               </div>
 
-              <div className={styles.reqActions}><Link to={`${APP_ROUTE_PATHS.advisorOperations}?studentUserId=${studentUserId}#schedule-requests`}>Review request</Link></div>
+              <ScheduleRequestActions requestId={req.id} version={req.version} onReload={async () => {const result = await scheduleRequests.refetch(); return !result.isError && Boolean(result.data?.items?.some(item => item.id === req.id && item.version != null));}}/>
             </div>
           ))}
         </div>
+        <Link to={`${APP_ROUTE_PATHS.advisorSchedule}?studentUserId=${studentUserId}`}>View all schedule requests</Link>
       </section>
 
       {/* Checkpoint Tasks Modal Dialog (Figma Top-Right Frame) */}
@@ -287,6 +285,13 @@ interface PendingRequestItem {
           </button>
         </div>
 
+        {selectedTask != null ? <section className={styles.taskDetail} aria-label="Task details">
+          <button type="button" onClick={() => setSelectedTask(null)}>Back to all tasks</button>
+          <h3>{selectedTask.title || 'Advisor task'}</h3>
+          <p>{selectedTask.description || 'No description supplied.'}</p>
+          <dl><dt>Deadline</dt><dd>{formatPlanDate(selectedTask.dueDate)}</dd><dt>Submission requirement</dt><dd>{selectedTask.submissionRequirement || 'No additional requirement.'}</dd></dl>
+          <button type="button" onClick={() => {dialog.current?.close(); onEdit(checkpoint?.id, selectedTask.id);}}>Edit task</button>
+        </section> :
         <div className={styles.tableWrap}>
           <table>
             <thead>
@@ -329,10 +334,7 @@ interface PendingRequestItem {
                       <div className={styles.dialogActions}>
                         <button
                           type="button"
-                          onClick={() => {
-                            dialog.current?.close();
-                            onEdit();
-                          }}
+                          onClick={() => setSelectedTask(task)}
                         >
                           View
                         </button>
@@ -352,6 +354,7 @@ interface PendingRequestItem {
             </tbody>
           </table>
         </div>
+        }
       </dialog>
     </div>
   );

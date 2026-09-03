@@ -129,3 +129,8 @@
   overflow: hidden;
   clip: rect(0, 0, 0, 0);
 }
+
+.steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: t.$space-2; list-style: none; padding: 0; margin: 0 0 t.$space-6; }
+.steps li { display: grid; gap: t.$space-2; justify-items: center; text-align: center; font-size: t.$fs-caption; color: t.$content-secondary; }
+.steps span { display: grid; place-items: center; width: t.$space-8; height: t.$space-8; border: 1px solid t.$border-default; border-radius: 50%; }
+.steps [aria-current='step'] { color: t.$action-primary; span { background: t.$action-primary; border-color: t.$action-primary; color: t.$content-on-color; } }

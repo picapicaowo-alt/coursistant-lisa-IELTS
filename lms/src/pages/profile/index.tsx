@@ -191,8 +191,9 @@ const ProfilePage = () => {
               <input id="profile-last-name" value={lastName} onChange={event => setLastName(event.target.value)} required maxLength={100}/>
               <label htmlFor="profile-phone">Phone</label>
               <input id="profile-phone" value={phone} onChange={event => setPhone(event.target.value)} maxLength={64} autoComplete="tel"/>
+              {status?.kind === 'error' ? <p role="alert" className={styles.profileError}>{status.text}</p> : null}
               <div className={styles.profileActions}>
-                <button type="button" className={styles.secondaryButton} onClick={() => setEditing(false)}>
+                <button type="button" className={styles.secondaryButton} disabled={updateName.isPending} onClick={() => setEditing(false)}>
                   Cancel
                 </button>
                 <button

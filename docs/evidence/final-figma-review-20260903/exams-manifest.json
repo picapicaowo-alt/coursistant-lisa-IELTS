@@ -1,0 +1,130 @@
+[
+  {
+    "state": "student-exam-library",
+    "nodes": [
+      "163:698",
+      "423:3034"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4192/mock-exams",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-exam-library",
+    "nodes": [
+      "163:698",
+      "423:3034"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4192/mock-exams",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-writing-exam",
+    "nodes": [
+      "417:2798"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4192/mock-exams/77/writing",
+    "note": "Actual IELTS writing prompts with the new desktop navigation rail; no AI scoring or comments are represented.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-writing-exam",
+    "nodes": [
+      "417:2798"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4192/mock-exams/77/writing",
+    "note": "Actual IELTS writing prompts with the new desktop navigation rail; no AI scoring or comments are represented.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-exam-confirm",
+    "nodes": [],
+    "width": 1440,
+    "url": "http://127.0.0.1:4192/mock-exams/77/writing",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-exam-confirm",
+    "nodes": [],
+    "width": 390,
+    "url": "http://127.0.0.1:4192/mock-exams/77/writing",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-exam-complete",
+    "nodes": [
+      "427:2694"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4192/mock-exams/77/writing",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-exam-complete",
+    "nodes": [
+      "427:2694"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4192/mock-exams/77/writing",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-writing-results",
+    "nodes": [
+      "427:2930"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4192/mock-exams/77/writing",
+    "note": "Writing submission receipt shows word/character counts and read-only answers; no AI score/comments contract is established.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-writing-results",
+    "nodes": [
+      "427:2930"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4192/mock-exams/77/writing",
+    "note": "Writing submission receipt shows word/character counts and read-only answers; no AI score/comments contract is established.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

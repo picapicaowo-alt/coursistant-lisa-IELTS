@@ -3,6 +3,13 @@
   gap: t.$space-4;
   margin-top: t.$space-8;
 }
+.steps { display: flex; justify-content: space-between; gap: t.$space-3; list-style: none; padding: 0; margin: t.$space-6 0 0; color: t.$content-secondary; font-size: t.$fs-caption; }
+.steps li { display: flex; align-items: center; gap: t.$space-2; }
+.steps span { display: grid; place-items: center; flex-shrink: 0; width: 1.75rem; height: 1.75rem; border: 1px solid t.$border-default; border-radius: 50%; }
+.steps [aria-current='step'] { color: t.$action-primary; font-weight: t.$fw-semibold; }
+.steps [aria-current='step'] span, .steps [data-complete='true'] span { color: t.$content-on-color; background: t.$action-primary; border-color: t.$action-primary; }
+.backButton { min-height: t.$touch-target; border: 0; background: transparent; color: t.$content-secondary; cursor: pointer; }
+.backButton:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
 
 .fieldRow {
   display: grid;

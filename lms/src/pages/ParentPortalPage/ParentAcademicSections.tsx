@@ -82,7 +82,7 @@ export function ParentAcademicSections({
       {LEARNING_SECTIONS.map(({ key, title }, index) => {
         const result = results[index];
         return (
-          <WorkspaceSection key={key} title={title}>
+          <WorkspaceSection key={key} title={title} className={styles[key]}>
             {result.isPending ? (
               <p role="status">Loading {title.toLowerCase()}…</p>
             ) : result.isError ? (

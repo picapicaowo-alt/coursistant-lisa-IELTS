@@ -112,6 +112,8 @@ test('dashboard quick prompt hands structured context to Study Support', async (
   await page.goto('/');
 
   await page.getByRole('button', {name: 'Explain a concept'}).click();
+  await expect(page.getByRole('textbox', {name: 'Ask the learning assistant'})).toHaveValue('Explain a concept');
+  await page.getByRole('button', {name: 'Send message', exact: true}).click();
   await expect(page).toHaveURL('/aibot');
 
   await expect.poll(() => pendingChat).toBeDefined();

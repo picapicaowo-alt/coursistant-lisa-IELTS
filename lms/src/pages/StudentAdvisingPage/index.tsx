@@ -1,6 +1,9 @@
 import {WorkspaceSection as CollapsibleSection} from '@/components/WorkspaceSection';
 import {PlanOverview} from './PlanOverview';
-import React, {useState} from 'react';
+import React, {lazy, Suspense, useState} from 'react';
+import {STUDENT_PLAN_VIEWS} from '@/configs/routePaths';
+import pageStyles from './index.module.scss';
+const MyOperationsPage = lazy(() => import('../MyOperationsPage'));
 import {useSearchParams} from 'react-router-dom';
 import {CheckpointWorkspace} from './CheckpointWorkspace';
 import checkpointStyles from './CheckpointWorkspace.module.scss';
@@ -20,6 +23,9 @@ import styles from '../advising/advising.module.scss';
 const StudentAdvisingPage: React.FC = () => {
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
+  const view = searchParams.get('view');
+  const showLearning = view === STUDENT_PLAN_VIEWS.learning;
+  const showMessages = view === STUDENT_PLAN_VIEWS.messages;
   const idempotency = useIdempotencyCheckpoint();
   const [taskSubmissions, setTaskSubmissions] = useState<Record<number, string>>({});
   const [message, setMessage] = useState('');
@@ -49,7 +55,7 @@ const StudentAdvisingPage: React.FC = () => {
     mutationFn: ({action, taskId, version}: TaskAction) =>
       action === 'start'
         ? idempotency.run('student-start-task', [taskId, {expectedVersion: version}] satisfies Parameters<typeof advisorApiService.startOwnAdvisorTask>, (key, args) => advisorApiService.startOwnAdvisorTask(...args, key))
-        : idempotency.run('student-complete-task', [taskId, {expectedVersion: version, submissionText: taskSubmissions[taskId] ?? plan.data?.plan.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []).find(task => task.id === taskId)?.submissionText}] satisfies Parameters<typeof advisorApiService.completeOwnAdvisorTask>, (key, args) => advisorApiService.completeOwnAdvisorTask(...args, key)),
+        : idempotency.run('student-complete-task', [taskId, {expectedVersion: version, submissionText: taskSubmissions[taskId] ?? plan.data?.plan?.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []).find(task => task.id === taskId)?.submissionText}] satisfies Parameters<typeof advisorApiService.completeOwnAdvisorTask>, (key, args) => advisorApiService.completeOwnAdvisorTask(...args, key)),
     onSuccess: async () => queryClient.invalidateQueries({queryKey: advisingQueryKeys.studentStudyPlan}),
   });
   const messageMutation = useMutation({
@@ -81,8 +87,8 @@ const StudentAdvisingPage: React.FC = () => {
   };
   const conversationRows = conversation.data?.pages.flat() ?? [];
   const checkpointKey = searchParams.get(STUDY_PLAN_PARAMS.checkpoint);
-  const checkpointIndex = plan.data?.plan.checkpoints?.findIndex((checkpoint, index) => studyPlanRecordKey(checkpoint, index) === checkpointKey) ?? -1;
-  const checkpoint = checkpointIndex >= 0 ? plan.data?.plan.checkpoints?.[checkpointIndex] : undefined;
+  const checkpointIndex = plan.data?.plan?.checkpoints?.findIndex((checkpoint, index) => studyPlanRecordKey(checkpoint, index) === checkpointKey) ?? -1;
+  const checkpoint = checkpointIndex >= 0 ? plan.data?.plan?.checkpoints?.[checkpointIndex] : undefined;
   const backToPlan = () => {
     const next = new URLSearchParams(searchParams);
     next.delete(STUDY_PLAN_PARAMS.checkpoint);
@@ -90,10 +96,11 @@ const StudentAdvisingPage: React.FC = () => {
     setSearchParams(next);
     if (!taskMutation.isPending) taskMutation.reset();
   };
-  const openCheckpoint = (key: string) => {
+  const openCheckpoint = (key: string, taskId?: number) => {
     const next = new URLSearchParams(searchParams);
     next.set(STUDY_PLAN_PARAMS.checkpoint, key);
-    next.delete(STUDY_PLAN_PARAMS.task);
+    if (taskId != null) next.set(STUDY_PLAN_PARAMS.task, String(taskId));
+    else next.delete(STUDY_PLAN_PARAMS.task);
     setSearchParams(next);
   };
 
@@ -117,12 +124,18 @@ const StudentAdvisingPage: React.FC = () => {
           <p className={styles.lede}>Your goals, checkpoints, and next steps.</p>
         </div>
       </header>
+      <nav className={pageStyles.tabs} aria-label="Study plan views">
+        {[[STUDENT_PLAN_VIEWS.overview, 'Overview'], ['tasks', 'Advisor Tasks'], [STUDENT_PLAN_VIEWS.learning, 'Learning overview'], [STUDENT_PLAN_VIEWS.messages, 'Advisor messages']].map(([key, label]) => <button type="button" key={key} aria-pressed={key === (view || STUDENT_PLAN_VIEWS.overview)} onClick={() => { const next = new URLSearchParams(searchParams); next.set('view', key); setSearchParams(next); }}>{label}</button>)}
+      </nav>
+      {showLearning ? <Suspense fallback={<p role="status">Loading learning overview…</p>}><MyOperationsPage embedded/></Suspense> : null}
+      {!showLearning && !showMessages ? <>
       {profile.isPending || plan.isPending ? <p role="status">Loading your learning plan…</p> : null}
       {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')} <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
       {plan.isError && !isNotFound(plan.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, 'Study plan could not be loaded.')} <button type="button" onClick={() => void plan.refetch()}>Retry plan</button></p> : null}
       {!profile.isPending && !plan.isPending && (!profile.isError || isNotFound(profile.error)) && (!plan.isError || isNotFound(plan.error)) ? <PlanOverview profile={profile.data} plan={plan.data?.plan} onCheckpoint={openCheckpoint}/> : null}
       {taskMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskMutation.error, 'The task could not be updated.')}</p> : null}
-      <CollapsibleSection title="Advisor conversation" className={styles.disclosureLayout} summary="Ask questions, share context, or attach supporting files." meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
+      </> : null}
+      {showMessages ? <CollapsibleSection title="Advisor conversation" className={styles.disclosureLayout} summary="Ask questions, share context, or attach supporting files." meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
 
         {messageMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(messageMutation.error, 'Message could not be sent.')}</p> : null}
         {conversation.isPending ? <p className={styles.status}>Loading messages…</p> : null}
@@ -144,7 +157,7 @@ const StudentAdvisingPage: React.FC = () => {
           {messageFiles.length > 0 ? <div className={styles.selectedFiles}>{messageFiles.map((file, index) => <span key={`${file.name}-${file.lastModified}-${index}`}>{file.name}<button type="button" aria-label={`Remove ${file.name}`} onClick={() => setMessageFiles(current => current.filter((_, fileIndex) => fileIndex !== index))}>×</button></span>)}</div> : null}
           <button className={styles.primary} disabled={(!message.trim() && messageFiles.length === 0) || messageMutation.isPending}>Send message</button>
         </form>
-      </CollapsibleSection>
+      </CollapsibleSection> : null}
     </div>
   );
 };

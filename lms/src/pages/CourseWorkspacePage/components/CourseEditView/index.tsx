@@ -27,8 +27,9 @@ interface CourseEditViewProps {
  *    in the PRD, which gives a student per-item scores and no course total,
  *    and no endpoint stores a weight (B-3).
  *  - "Homework / Problem Set". Creating an assignment is possible, but this
- *    card files assignments under the week being edited and the API has no
- *    such relationship — an assignment belongs to the course (S-7).
+ *    card needs the Lecture projection described by the current assignment
+ *    contract. Its generic summary schema does not define that shape; the
+ *    shared course Assignments tab remains the available entry point.
  *
  * The block editor behind "Course Content" is also not built. A week holds
  * materials, not rich text; there is no document to edit and no field to save

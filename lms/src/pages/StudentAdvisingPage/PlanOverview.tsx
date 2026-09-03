@@ -1,4 +1,5 @@
 import {useSearchParams} from 'react-router-dom';
+import {ProgressRing} from '@/components/ProgressRing';
 import {AdvisorTasks} from './AdvisorTasks';
 import type {StudentFacingProfileResponse, StudyPlanAggregate} from '@/apis';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
@@ -13,7 +14,7 @@ export function PlanOverview({
 }: {
   profile?: StudentFacingProfileResponse;
   plan?: StudyPlanAggregate;
-  onCheckpoint: (key: string) => void;
+  onCheckpoint: (key: string, taskId?: number) => void;
 }) {
   const [params, setParams] = useSearchParams();
   const view = params.get('view') === 'tasks' ? 'tasks' : 'overview';
@@ -39,22 +40,7 @@ export function PlanOverview({
     : null;
   return (
     <div className={styles.overview}>
-      <nav className={styles.tabs} aria-label="Study plan views">
-        <button
-          type="button"
-          aria-pressed={view === 'overview'}
-          onClick={() => setView('overview')}
-        >
-          Overview
-        </button>
-        <button
-          type="button"
-          aria-pressed={view === 'tasks'}
-          onClick={() => setView('tasks')}
-        >
-          Advisor Tasks
-        </button>
-      </nav>
+
       {view === 'overview' ? (
         <>
           <div className={styles.summary}>
@@ -76,24 +62,7 @@ export function PlanOverview({
                   <strong>{profile?.targetValue || 'Not set'}</strong>
                 </div>
               </div>
-              <div className={styles.progress}>
-                <span>
-                  Advisor task progress{' '}
-                  <strong>
-                    {progress == null ? 'Not available' : `${progress}%`}
-                  </strong>
-                </span>
-                {progress != null ? (
-                  <progress
-                    aria-label="Advisor task completion"
-                    value={completed}
-                    max={tasks.length}
-                  />
-                ) : null}
-                <small>
-                  {completed} of {tasks.length} tasks completed
-                </small>
-              </div>
+              <div className={styles.progress}><ProgressRing value={progress} label="Advisor task completion" inverse/><small>{completed} of {tasks.length} tasks completed</small></div>
               <small>
                 Target date ·{' '}
                 {profile?.targetDate
@@ -216,7 +185,7 @@ export function PlanOverview({
                     type="button"
                     className={styles.task}
                     key={task.id ?? index}
-                    onClick={() => onCheckpoint(checkpointKey)}
+                    onClick={() => onCheckpoint(checkpointKey, task.id)}
                   >
                     <strong>
                       {task.title || task.description || 'Advisor task'}

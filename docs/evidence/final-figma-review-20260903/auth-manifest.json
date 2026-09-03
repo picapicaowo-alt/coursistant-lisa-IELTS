@@ -1,0 +1,236 @@
+[
+  {
+    "state": "auth-login",
+    "nodes": [
+      "715:3994"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/login",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-login",
+    "nodes": [
+      "715:3994"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/login",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-login-error",
+    "nodes": [
+      "729:3484"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/login",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-login-error",
+    "nodes": [
+      "729:3484"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/login",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-signup",
+    "nodes": [
+      "730:4653"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/signup",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-signup",
+    "nodes": [
+      "730:4653"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/signup",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-signup-details",
+    "nodes": [
+      "730:4753"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/signup",
+    "note": "Required structured names and tenant registration contract differ from the Figma activation form.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1073,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-signup-details",
+    "nodes": [
+      "730:4753"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/signup",
+    "note": "Required structured names and tenant registration contract differ from the Figma activation form.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 1133,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-signup-verification",
+    "nodes": [
+      "730:4753"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/signup",
+    "note": "Verification code is contract-required; no legal-consent contract is consumed.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-signup-verification",
+    "nodes": [
+      "730:4753"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/signup",
+    "note": "Verification code is contract-required; no legal-consent contract is consumed.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-reset-email",
+    "nodes": [
+      "731:4840"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/forgotpassword",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-reset-email",
+    "nodes": [
+      "731:4840"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/forgotpassword",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-reset-code",
+    "nodes": [
+      "731:4886"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/forgotpassword",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-reset-code",
+    "nodes": [
+      "731:4886"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/forgotpassword",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-reset-password",
+    "nodes": [
+      "732:4924"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/forgotpassword",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-reset-password",
+    "nodes": [
+      "732:4924"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/forgotpassword",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-reset-success",
+    "nodes": [
+      "732:4973"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/forgotpassword",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "auth-reset-success",
+    "nodes": [
+      "732:4973"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/forgotpassword",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

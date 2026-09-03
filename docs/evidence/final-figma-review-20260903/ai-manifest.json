@@ -1,0 +1,106 @@
+[
+  {
+    "state": "ai-empty",
+    "nodes": [
+      "201:906"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/aibot?courseId=71",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "ai-empty",
+    "nodes": [
+      "201:906"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/aibot?courseId=71",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "ai-conversation",
+    "nodes": [
+      "322:865"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/aibot?courseId=71",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "ai-conversation",
+    "nodes": [
+      "322:865"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/aibot?courseId=71",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "ai-collapsed-navigation",
+    "nodes": [
+      "410:9227"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/aibot?courseId=71",
+    "note": "Global navigation collapse; no persisted conversation-history contract.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "ai-collapsed-navigation",
+    "nodes": [
+      "410:9227"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/aibot?courseId=71",
+    "note": "Global navigation collapse; no persisted conversation-history contract.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "ai-long-conversation",
+    "nodes": [
+      "333:974"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/aibot?courseId=71",
+    "note": "Two response turns; no chat history rail or jump navigator.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "ai-long-conversation",
+    "nodes": [
+      "333:974"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/aibot?courseId=71",
+    "note": "Two response turns; no chat history rail or jump navigator.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

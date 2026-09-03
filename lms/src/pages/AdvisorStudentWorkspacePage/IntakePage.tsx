@@ -6,6 +6,7 @@ import {advisorApiService} from '@/apis/services/advisor-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import layout from './index.module.scss';
 import {formatPersonName} from '@/utils/personName';
 import {ParentLinksPanel} from '@/components/ParentLinksPanel';
 import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
@@ -27,8 +28,8 @@ const AdvisorStudentIntakePage: React.FC = () => {
   const intake = query.data;
 
   return (
-    <>
-    <section className={styles.card}>
+    <div className={layout.intakeGrid}>
+    <section className={`${styles.card} ${layout.intakeMain}`}>
       <WorkspaceSectionHeader
         title="Counsellor intake"
         description="The intake captures the student's starting context at handover. It is read-only for Advisors."
@@ -44,8 +45,8 @@ const AdvisorStudentIntakePage: React.FC = () => {
         <dt>Assignment</dt><dd>{intake.assignmentStatus} · version {intake.assignmentVersion ?? '—'}</dd>
       </dl>
     </section>
-    <ParentLinksPanel scope="advisor" subjectId={id}/>
-    </>
+    <div className={layout.intakeSide}><ParentLinksPanel scope="advisor" subjectId={id}/></div>
+    </div>
   );
 };
 

@@ -1,8 +1,9 @@
-import React from "react";
+import React, {useState} from "react";
 import styles from "./index.module.scss";
 import {AssignmentSummary} from "@/apis";
 import {formatDeadline} from "@/utils/datetime";
-import {Link} from 'react-router-dom';
+import {generatePath, Link} from 'react-router-dom';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 
 interface AssignmentsCardProps {
   courseId: number;
@@ -11,36 +12,32 @@ interface AssignmentsCardProps {
   canCreate?: boolean;
 }
 
-/**
- * The Homework / Problem Set card.
- *
- * The design gives every row a coloured content-type badge — Assignments, In
- * Class ICE — and puts a type filter in the header. Those types are a Figma
- * concept with no counterpart in the API: an assignment carries a submission
- * type of Individual or Group and nothing else, so there is no type to filter
- * by and no colour to assign. Rows show what the payload has, and the header
- * dropdown is left out rather than offering a filter that cannot filter
- * (open-decisions.md S-5).
- */
-export const AssignmentsCard: React.FC<AssignmentsCardProps> = ({courseId, assignments, failed, canCreate = false}) => (
+/** Category choices come from the returned summaries, so the filter never invents content. */
+export const AssignmentsCard: React.FC<AssignmentsCardProps> = ({courseId, assignments, failed, canCreate = false}) => {
+  const [learningType, setLearningType] = useState('');
+  const categories = Array.from(new Set(assignments.flatMap(item => item.learningType ? [item.learningType] : [])));
+  const visibleAssignments = learningType ? assignments.filter(item => item.learningType === learningType) : assignments;
+  return (
   <section className={styles.card}>
     <div className={styles.cardHeader}>
       <h2 className={styles.cardTitle}>Homework / Problem Set</h2>
-      {canCreate ? <Link to={`/course/${courseId}/assignments/new`} className={styles.addButton}>Add new</Link> : null}
+      {canCreate ? <Link to={generatePath(APP_ROUTE_PATHS.courseCourseIdAssignmentsNew, {courseId: String(courseId)})} className={styles.addButton}>Add new</Link> : null}
     </div>
 
+    {categories.length ? <label className={styles.assignmentFilter}>Learning type<select value={learningType} onChange={event => setLearningType(event.target.value)}><option value="">All types</option>{categories.map(category => <option key={category} value={category}>{category.replace(/_/g, ' ')}</option>)}</select></label> : null}
     {failed ? (
       <p className={styles.cardEmpty} role="alert">Couldn&apos;t load assignments.</p>
-    ) : assignments.length === 0 ? (
+    ) : visibleAssignments.length === 0 ? (
       <p className={styles.cardEmpty}>No assignments in this course yet.</p>
     ) : (
       <ul className={styles.rowList}>
-        {assignments.map((assignment) => (
+        {visibleAssignments.map((assignment) => (
           <li key={assignment.id} className={styles.row}>
             <Link
-              to={`/course/${courseId}/assignments/${assignment.id}`}
+              to={generatePath(APP_ROUTE_PATHS.courseCourseIdAssignmentsAssignmentId, {courseId: String(courseId), assignmentId: String(assignment.id)})}
               className={styles.rowLink}
             >
+              {assignment.learningType ? <span className={styles.groupBadge}>{assignment.learningType.replace(/_/g, ' ')}</span> : null}
               {assignment.submissionType === 'Group' && (
                 <span className={styles.groupBadge}>Group</span>
               )}
@@ -55,3 +52,4 @@ export const AssignmentsCard: React.FC<AssignmentsCardProps> = ({courseId, assig
     )}
   </section>
 );
+};

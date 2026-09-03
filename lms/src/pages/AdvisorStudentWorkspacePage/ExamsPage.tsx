@@ -1,4 +1,5 @@
 import {useRef, useState} from 'react';
+import {X} from 'lucide-react';
 import {useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -82,6 +83,7 @@ export default function AdvisorStudentExamsPage() {
         ref={dialog}
         className={exStyles.assignmentDialog}
         aria-labelledby="assign-exam-title"
+        onCancel={event => {if (assign.isPending) event.preventDefault();}}
       >
         <form
           className={styles.form}
@@ -90,7 +92,7 @@ export default function AdvisorStudentExamsPage() {
             assign.mutate();
           }}
         >
-          <h2 id="assign-exam-title">Assign a mock exam</h2>
+          <div className={exStyles.dialogHeading}><h2 id="assign-exam-title">Assign a mock exam</h2><button type="button" aria-label="Close assign exam" disabled={assign.isPending} onClick={() => dialog.current?.close()}><X size={20}/></button></div>
           <p>Choose a published paper and its sections for this student.</p>
           {templates.isPending ? <p role="status">Loading papers…</p> : null}
           {templates.isError ? (
@@ -158,6 +160,7 @@ export default function AdvisorStudentExamsPage() {
             <button
               type="button"
               className={styles.secondary}
+              disabled={assign.isPending}
               onClick={() => dialog.current?.close()}
             >
               Cancel

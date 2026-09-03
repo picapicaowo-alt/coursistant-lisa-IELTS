@@ -84,7 +84,7 @@ export const CourseDetailView: React.FC<CourseDetailViewProps> = ({canCreateAssi
         </div>
         <aside className={styles.learningRail} aria-label="Learning information">
           {canViewOwnGrades ? <GradesCard courseId={course.id}/> : <section className={styles.card}><h2 className={styles.cardTitle}>Course Overview</h2><dl className={styles.overviewCounts}><div><dt>Learning units</dt><dd>{weeks.length}</dd></div><div><dt>Assignments</dt><dd>{assignmentsFailed ? 'Unavailable' : assignments.length}</dd></div><div><dt>Quizzes</dt><dd>{quizzesFailed ? 'Unavailable' : quizzes.length}</dd></div></dl></section>}
-          <section className={styles.card}><h2 className={styles.cardTitle}>Learning Resources</h2><p className={styles.cardEmpty}>Find your course materials, assignment feedback, and class schedule in the sections above.</p></section>
+          {canViewOwnGrades ? <section className={styles.card}><h2 className={styles.cardTitle}>Assignment progress</h2><AssignmentProgress progress={studentProgress.data?.courses?.find(item => item.courseId === course.id)} loading={studentProgress.isFetching} failed={studentProgress.isError}/></section> : null}
         </aside>
       </div>
     </div>

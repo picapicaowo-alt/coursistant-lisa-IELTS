@@ -41,7 +41,7 @@ export function StudyPlanHistory({studentUserId}: {studentUserId: number}) {
     count={query.data?.total}
   >
     {query.isPending ? <p role="status">Loading version history…</p> : query.isError ? <div role="alert"><p>{advisingErrorMessage(query.error, 'Version history could not be loaded.')}</p><button type="button" className={shared.secondary} onClick={() => void query.refetch()}>Retry history</button></div> : <>
-      {query.data?.items.length === 0 ? <p>No saved revisions were returned.</p> : null}
+      {query.data?.items?.length === 0 ? <p>No saved revisions were returned.</p> : null}
       {(query.data?.items ?? []).map((revision, index) => {
         const hasSnapshot = revision.snapshot != null && Object.keys(revision.snapshot).length > 0;
         const action = revision.action === 'STUDY_PLAN_CREATED' ? 'Plan created' : revision.action === 'STUDY_PLAN_UPDATED' ? 'Plan updated' : 'Plan saved';

@@ -1,3 +1,4 @@
+import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { submitListening } from '../api/listenings'
 import { ensureAttemptId } from '../api/tests'
@@ -33,6 +34,8 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
   const [currentQuestion, setCurrentQuestion] = useState(firstQuestion)
   const [clockLabel, setClockLabel] = useState(() => formatClock(new Date()))
   const [submitting, setSubmitting] = useState(false)
+  const [submissionOpen, setSubmissionOpen] = useState(false)
+  const [submissionError, setSubmissionError] = useState('')
   const [reviewByQuestion, setReviewByQuestion] = useState<Record<
     number,
     { submitted: string; correct: boolean; blank: boolean }
@@ -181,6 +184,8 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
     }
 
     setSubmitting(true)
+    setSubmissionOpen(true)
+    setSubmissionError('')
     try {
       const attemptId = await ensureAttemptId(testId)
       const result = await submitListening(testId, {
@@ -204,7 +209,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
         totalQuestions: result.totalQuestions,
       })
     } catch (err) {
-      window.alert(err instanceof Error ? err.message : 'Submit failed')
+      setSubmissionError(err instanceof Error ? err.message : 'Submission failed.')
     } finally {
       setSubmitting(false)
     }
@@ -232,12 +237,10 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
     return () => window.clearInterval(id)
   }, [paused, scoreSummary])
 
-  const handleFinish = useCallback(async () => {
+  const handleFinish = useCallback(() => {
     if (submitting || scoreSummary) return
-    const ok = window.confirm('Finish this section and submit your answers?')
-    if (!ok) return
-    await submitSection()
-  }, [scoreSummary, submitSection, submitting])
+    setSubmissionOpen(true)
+  }, [scoreSummary, submitting])
 
   const handleExit = useCallback(() => {
     if (scoreSummary) {
@@ -260,7 +263,9 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
 
   return (
     <div className="exam-shell listening-shell">
+      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(scoreSummary)} error={submissionError} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
       <ListeningTopBar
+        testTitle={testTitle}
         candidateId={candidateLabel}
         remainingSeconds={remainingSeconds}
         paused={paused}

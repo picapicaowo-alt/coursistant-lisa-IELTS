@@ -1,0 +1,46 @@
+{
+  "previewPort": 4192,
+  "viewports": [
+    [
+      1440,
+      1024
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "requests": "isolated frontend fixtures",
+  "runs": [
+    {
+      "scope": "all nine capture groups before final targeted corrections",
+      "result": "9 passed",
+      "seconds": 16.2
+    },
+    {
+      "scope": "profile geometry and mobile Copy/Latest controls",
+      "result": "2 passed",
+      "seconds": 11.0
+    },
+    {
+      "scope": "composer shrink correction",
+      "result": "1 passed",
+      "seconds": 4.8
+    },
+    {
+      "scope": "calendar anchoring, profile/crop, opaque sidecar",
+      "result": "3 passed",
+      "seconds": 7.5
+    },
+    {
+      "scope": "compact sidecar prompt/send/reset and calendar field stacking",
+      "result": "2 passed",
+      "seconds": 15.7
+    },
+    {
+      "scope": "final calendar date control insets, desktop and phone",
+      "result": "1 passed",
+      "seconds": 8.1
+    }
+  ]
+}

@@ -1,3 +1,4 @@
+@use '../../styles/workspace' as workspace;
 .pageTitle { margin: 0 0 t.$space-6; font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1; }
 
 .pageContainer {
@@ -86,12 +87,13 @@
 
 .courseGrid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr));
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    > * { @include workspace.region(4, 6); }
     gap: t.$space-6;
     margin-bottom: t.$space-8;
     
     @media (max-width: 768px) {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
     }
 }
 

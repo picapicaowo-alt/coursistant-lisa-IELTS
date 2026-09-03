@@ -1,3 +1,4 @@
+import {SkillIcon} from '@/components/SkillIcon';
 import React from 'react';
 import {generatePath, Link, NavLink, Outlet, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
@@ -5,12 +6,11 @@ import {
   ArrowLeft,
   MessageSquare,
   Calendar,
-  BookOpen,
-  Edit3,
-  Mic,
-  Headphones,
 } from 'lucide-react';
 import {unwrapData} from '@/apis';
+import {UserAvatar} from '@/components/UserAvatar';
+import {ProgressRing} from '@/components/ProgressRing';
+import {TASK_STATUS, formatPlanDate} from '@/utils/studyPlan';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {isNotFound} from '@/utils/apiError';
@@ -42,8 +42,17 @@ const AdvisorStudentLayout: React.FC = () => {
     retry: false,
   });
 
+  const plan = useQuery({
+    meta: {advisingStudentId: id},
+    queryKey: advisingQueryKeys.advisorStudyPlan(id),
+    queryFn: async () => unwrapData(await advisorApiService.getStudyPlan(id), 'getStudyPlan'),
+    enabled: Boolean(intake.data),
+    retry: false,
+  });
+  const tasks = plan.data?.plan?.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []) ?? [];
+  const completion = tasks.length ? tasks.filter(task => task.status === TASK_STATUS.completed).length / tasks.length * 100 : null;
+
   const name = formatPersonName(intake.data, `Student #${id}`);
-  const initials = [intake.data?.firstName, intake.data?.lastName].filter(Boolean).map(part => part!.slice(0, 1)).join('') || '#';
   const studentIdFormatted = `ID: ${id}`;
 
   if (intake.isError && isNotFound(intake.error)) {
@@ -53,14 +62,6 @@ const AdvisorStudentLayout: React.FC = () => {
       </div>
     );
   }
-
-  // Skills display
-  const skillIcons: Record<string, React.ReactNode> = {
-    READING: <BookOpen size={12} aria-hidden="true" />,
-    WRITING: <Edit3 size={12} aria-hidden="true" />,
-    SPEAKING: <Mic size={12} aria-hidden="true" />,
-    LISTENING: <Headphones size={12} aria-hidden="true" />,
-  };
 
   const skills = profile.data?.skills ?? [];
 
@@ -73,70 +74,38 @@ const AdvisorStudentLayout: React.FC = () => {
 
       {/* Figma Student Profile Header Card */}
       <header className={layout.studentSummary} aria-label="Student profile summary">
-        <div className={layout.identityRow}>
-          <div className={layout.identityLeft}>
-            <div className={layout.avatarLarge} aria-hidden="true">
-              {initials}
-            </div>
-            <div className={layout.nameBlock}>
-              <h1>{name}</h1>
-              <span className={layout.idText}>Student {studentIdFormatted}</span>
-              <div className={layout.badgesRow}><span className={layout.metaText}>{intake.data?.email}</span><span className={layout.metaText}>{intake.data?.studentType}</span></div>
-            </div>
-          </div>
-
-          <Link
-            className={layout.messageBtn}
-            to={`${generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdSupport, {studentUserId: String(id)})}#conversation`}
-          >
-            <MessageSquare size={15} aria-hidden="true" />
-            <span>Message</span>
-          </Link>
+        <UserAvatar userId={intake.data ? id : undefined} className={layout.avatarLarge}/>
+        <div className={layout.nameBlock}>
+          <h1>{name}</h1>
+          <span>Student {studentIdFormatted}</span>
+          <small>{intake.data?.email}</small>
         </div>
-
-        {/* Lower Metrics Band */}
-        <div className={layout.metricsRow}>
-          {/* Target Score */}
-          <div className={layout.targetScoreCard}>
-            <div className={layout.scoresLine}>
-              <div className={layout.scoreItem}>
-                <span>Baseline assessment</span>
-                <strong>{profile.data?.baselineAssessment || 'Not assessed'}</strong>
-              </div>
-              <span className={layout.arrowIcon} aria-hidden="true">→</span>
-              <div className={layout.scoreItem}>
-                <span>{profile.data?.targetMetric || 'Learning goal'}</span>
-                <strong>{profile.data?.targetValue || profile.data?.targetGoal || 'Not set'}</strong>
-              </div>
+        <dl className={layout.metadata}>
+          <div><dt>Student type</dt><dd>{intake.data?.studentType || 'Not supplied'}</dd></div>
+          <div><dt>Active courses</dt><dd>{intake.data?.activeCourseCount ?? '—'}</dd></div>
+          <div><dt>Pending requests</dt><dd>{intake.data?.pendingRequestCount ?? '—'}</dd></div>
+        </dl>
+        <Link className={layout.messageBtn} to={`${APP_ROUTE_PATHS.advisorMessages}?studentUserId=${id}`}>
+          <MessageSquare size={20} aria-hidden="true" /><span>Message</span>
+        </Link>
+        <div className={layout.targetScoreCard}>
+          <div className={layout.scoresLine}>
+            <div><span>Baseline assessment</span><strong className={layout.baselineValue}>{profile.data?.baselineAssessment || 'Not assessed'}</strong></div>
+            <span aria-hidden="true">→</span>
+            <div><span>{profile.data?.targetMetric || 'Learning goal'}</span><strong className={layout.targetValue}>{profile.data?.targetValue || profile.data?.targetGoal || 'Not set'}</strong></div>
+          </div>
+          <span className={layout.targetDate}><Calendar size={20} aria-hidden="true" />Target date · {profile.data?.targetDate ? formatPlanDate(profile.data.targetDate) : 'Not set'}</span>
+        </div>
+        <div className={layout.progress}><ProgressRing value={completion} label="Advisor task completion" /></div>
+        <div className={layout.skillCardsGrid}>
+          {skills.map((skill, index) => (
+            <div className={layout.skillCard} key={skill.skillCode ?? index}>
+              <SkillIcon code={skill.skillCode} size={28}/>
+              <span>{skill.displayName || skill.skillCode} Current</span>
+              <strong>{skill.currentValue || '—'}</strong>
             </div>
-
-            <span className={layout.targetDate}>
-              <Calendar size={13} aria-hidden="true" />
-              <span>Target Date: {profile.data?.targetDate || 'Not set'}</span>
-            </span>
-          </div>
-
-          {/* 4 Skill Subscore Cards */}
-          <div className={layout.skillCardsGrid}>
-            {skills.map((skill, index) => {
-              const code = (skill.skillCode || '').toUpperCase();
-              const icon = skillIcons[code] || <BookOpen size={12} />;
-              const score = skill.currentValue || '—';
-
-              return (
-                <div className={layout.skillCard} key={skill.skillCode ?? index}>
-                  <div className={layout.skillHeader}>
-                    {icon}
-                    <span>{skill.displayName || skill.skillCode} Current</span>
-                  </div>
-                  <div className={layout.skillScore}>
-                    <strong>{score}</strong>
-
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          ))}
+          {!skills.length ? <p className={layout.skillEmpty}>{profile.isPending ? 'Loading assessments…' : 'No skill assessments yet.'}</p> : null}
         </div>
       </header>
 
@@ -161,6 +130,12 @@ const AdvisorStudentLayout: React.FC = () => {
           Courses
         </NavLink>
         <NavLink
+          to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdExams, {studentUserId: String(id)})}
+          className={({isActive}) => (isActive ? styles.tabActive : '')}
+        >
+          Exams
+        </NavLink>
+        <NavLink
           to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdSupport, {studentUserId: String(id)})}
           className={({isActive}) => (isActive ? styles.tabActive : '')}
         >
@@ -178,12 +153,7 @@ const AdvisorStudentLayout: React.FC = () => {
         >
           Intake
         </NavLink>
-        <NavLink
-          to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdExams, {studentUserId: String(id)})}
-          className={({isActive}) => (isActive ? styles.tabActive : '')}
-        >
-          Exams
-        </NavLink>
+
       </nav>
 
       {intake.isPending ? <p role="status">Loading student workspace…</p> : intake.isError ? null : <Outlet key={id} />}

@@ -1,0 +1,54 @@
+[
+  {
+    "state": "student-reading-questions",
+    "nodes": [
+      "417:2798"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/mock-exams/77/reading",
+    "note": "IELTS passage/questions with the desktop 9+3 question rail and true 2 answered/1 unanswered counts.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-reading-questions",
+    "nodes": [
+      "417:2798"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/mock-exams/77/reading",
+    "note": "IELTS passage/questions with the desktop 9+3 question rail and true 2 answered/1 unanswered counts.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-reading-results",
+    "nodes": [
+      "427:2930"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/mock-exams/77/reading",
+    "note": "Released per-question correctness is captured; no AI scoring, comments or Advisor-note operation is established.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-reading-results",
+    "nodes": [
+      "427:2930"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/mock-exams/77/reading",
+    "note": "Released per-question correctness is captured; no AI scoring, comments or Advisor-note operation is established.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

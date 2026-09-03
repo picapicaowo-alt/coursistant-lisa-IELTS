@@ -1,0 +1,21 @@
+.body { gap: t.$space-3; padding: t.$space-4; }
+.weekNavigation { display: grid; grid-template-columns: 1.75rem minmax(0, 1fr) 1.75rem; align-items: center; border: 1px solid t.$border-default; border-radius: t.$radius-sm; }
+.weekNavigation span { font-size: t.$font-size-caption; text-align: center; }
+.weekNavigation button { display: grid; height: 2rem; place-items: center; border: 0; background: transparent; color: t.$content-secondary; cursor: pointer; }
+.days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: t.$space-1; }
+.days > div { display: grid; justify-items: center; gap: t.$space-2; }
+.days span { font-size: t.$font-size-caption; }
+.days button { position: relative; display: grid; place-items: center; width: 100%; min-height: 2rem; border: 0; border-radius: t.$radius-sm; background: transparent; color: t.$content-primary; font-size: t.$font-size-caption; cursor: pointer; }
+.days button[aria-current='date'], .days button[aria-pressed='true'] { background: t.$action-primary; color: t.$content-on-color; }
+.days button[data-event]::after { position: absolute; bottom: .125rem; width: .1875rem; height: .1875rem; border-radius: t.$radius-round; background: currentColor; content: ''; }
+.timeline { border-top: 1px dashed t.$border-default; padding-top: t.$space-4; }
+.timeline a { position: relative; display: flex; align-items: start; gap: t.$space-3; padding: 0 0 t.$space-5; color: t.$content-primary; text-decoration: none; }
+.timeline a:not(:last-child)::before { position: absolute; left: .25rem; top: .5rem; bottom: 0; border-left: 1px dashed t.$action-secondary; content: ''; }
+.timeline i { width: .5rem; height: .5rem; margin-top: .25rem; border-radius: t.$radius-round; background: t.$action-primary; flex: 0 0 auto; }
+.timeline a > div { display: grid; min-width: 0; gap: t.$space-1; overflow-wrap: anywhere; }
+.timeline strong { font-size: t.$font-size-body; }
+.timeline small, .timeline span { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.status { margin: t.$space-3 0; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+.status button { border: 0; background: transparent; color: t.$action-primary; text-decoration: underline; cursor: pointer; }
+.manage { display: flex; align-items: center; justify-content: space-between; gap: t.$space-2; color: t.$action-primary; font-size: t.$font-size-caption; text-decoration: none; }
+@media (max-width: 760px) { .days button, .weekNavigation button { min-height: t.$touch-target; } }

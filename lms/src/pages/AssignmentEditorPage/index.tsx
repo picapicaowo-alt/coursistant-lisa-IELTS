@@ -2,8 +2,8 @@ import {ChangeEvent, FormEvent, useRef, useState} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, CalendarClock, CheckCircle2, Eye, FileText, Trash2, Upload, UsersRound, X} from 'lucide-react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
-import type {ApiResponse, AssignmentDetail, AssignmentSubmissionType, CreateAssignmentPayload, PatchAssignmentPayload} from '@/apis';
-import {unwrapData} from '@/apis';
+import type {ApiResponse, AssignmentDetail, AssignmentLearningType, AssignmentSubmissionType, CreateAssignmentPayload, PatchAssignmentPayload} from '@/apis';
+import {ASSIGNMENT_LEARNING_TYPES, unwrapData} from '@/apis';
 import {assignmentApiService} from '@/apis/services/assignment-api';
 import {courseApiService} from '@/apis/services/course-api';
 import {EnglishDateTimeInput} from '@/components/EnglishDateInput';
@@ -31,10 +31,15 @@ interface AssignmentEditorFormProps {
   assignment?: AssignmentDetail;
 }
 
+type EditorPayload = Omit<CreateAssignmentPayload, 'weekId' | 'learningType'> & Partial<Pick<CreateAssignmentPayload, 'weekId' | 'learningType'>>;
+const LEARNING_LABELS: Record<AssignmentLearningType, string> = {PRE_CLASS: 'Pre-class', HOMEWORK: 'Homework', PRACTICE: 'Practice'};
+
 export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFormProps) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState(assignment?.title ?? '');
+  const [weekId, setWeekId] = useState(assignment?.weekId == null ? '' : String(assignment.weekId));
+  const [learningType, setLearningType] = useState<AssignmentLearningType | ''>(assignment?.learningType ?? '');
   const [description, setDescription] = useState(assignment?.description ?? '');
   const [dueAt, setDueAt] = useState(toCourseLocalDateTimeInput(assignment?.dueAtLocal));
   const [lateUntil, setLateUntil] = useState(toCourseLocalDateTimeInput(assignment?.lateUntilLocal));
@@ -67,6 +72,8 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
   const [deletingAttachmentId, setDeletingAttachmentId] = useState<number | null>(null);
   const savingRef = useRef(false);
   const idempotency = useIdempotencyCheckpoint();
+
+  const weeksQuery = useQuery({queryKey: ['course-weeks', courseId], queryFn: async () => unwrapData(await courseApiService.getCourseWeeks(courseId), 'assignmentLectures')});
 
   const groupSetsQuery = useQuery({
     queryKey: ['course-group-sets', courseId],
@@ -155,12 +162,20 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
     }
   };
 
-  const buildPayload = (): CreateAssignmentPayload | null => {
+  const buildPayload = (publish: boolean): EditorPayload | null => {
     const cleanTitle = title.trim();
     const normalizedDueAt = normalizeCourseLocalDateTime(dueAt);
     const normalizedLateUntil = lateUntil ? normalizeCourseLocalDateTime(lateUntil) : undefined;
     if (!cleanTitle || !normalizedDueAt) {
       setError('Assignment name and due time are required.');
+      return null;
+    }
+    if ((!checkpointAssignment || publish) && (!weekId || !learningType)) {
+      setError('Select a lecture and learning category for this assignment.');
+      return null;
+    }
+    if (weekId && Number(weekId) !== checkpointAssignment?.weekId && !weeksQuery.data?.some(week => week.id === Number(weekId))) {
+      setError('Select a lecture from this course.');
       return null;
     }
     if (lateUntil && !normalizedLateUntil) {
@@ -189,6 +204,8 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
     }
 
     return {
+      ...(weekId ? {weekId: Number(weekId)} : {}),
+      ...(learningType ? {learningType} : {}),
       title: cleanTitle,
       description: description.trim(),
       pointsPossible: points,
@@ -210,7 +227,7 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
   const persist = async (publish: boolean) => {
     if (savingRef.current) return;
 
-    const payload = buildPayload();
+    const payload = buildPayload(publish);
     if (!payload) return;
 
     savingRef.current = true;
@@ -257,7 +274,12 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
           return;
         }
         const recordRequest: PatchAssignmentPayload = {
-          ...payload,
+          // Locked structure is omitted from unrelated edits; sending an unchanged
+          // submission type can otherwise make a valid title/deadline edit fail.
+          ...Object.fromEntries(Object.entries(payload).filter(([key, value]) => {
+            const previous = key === 'dueAt' ? normalizeCourseLocalDateTime(saved!.dueAtLocal) : key === 'lateUntil' ? normalizeCourseLocalDateTime(saved!.lateUntilLocal) : saved![key as keyof AssignmentDetail];
+            return JSON.stringify(value) !== JSON.stringify(previous);
+          })),
           expectedVersion,
           ...(checkpointAssignment?.lateUntilLocal && !lateUntil ? {clearLateUntil: true} : {}),
           ...(confirmShortenDueDate ? {confirmShortenDueDate: true} : {}),
@@ -266,9 +288,10 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
         recordKey = idempotency.keyFor(recordOperation, idempotencyFingerprint(recordRequest));
         response = await assignmentApiService.patchAssignment(courseId, saved.id, recordRequest, recordKey);
       } else {
+        if (payload.weekId == null || !payload.learningType) throw new Error('Select a lecture and learning category.');
         recordOperation = `assignment-create-${courseId}`;
         recordKey = idempotency.keyFor(recordOperation, idempotencyFingerprint(payload));
-        response = await assignmentApiService.createAssignment(courseId, payload, recordKey);
+        response = await assignmentApiService.createAssignment(courseId, {...payload, weekId: payload.weekId, learningType: payload.learningType}, recordKey);
       }
       saved = unwrapData(response, checkpointAssignment ? 'patchAssignment' : 'createAssignment');
       idempotency.complete(recordOperation, recordKey);
@@ -383,6 +406,24 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
           </label>
 
           <label className={styles.field}>
+            <span>Lecture</span>
+            <select value={weekId} onChange={event => setWeekId(event.target.value)} disabled={isSaving || weeksQuery.isPending} required={!checkpointAssignment}>
+              <option value="">Select a lecture</option>
+              {weekId && !weeksQuery.data?.some(week => String(week.id) === weekId) ? <option value={weekId}>Current lecture</option> : null}
+              {(weeksQuery.data ?? []).map(week => <option key={week.id} value={week.id}>{week.title}</option>)}
+            </select>
+            {weeksQuery.isError ? <span role="alert">Lectures could not be loaded. <button type="button" onClick={() => void weeksQuery.refetch()}>Retry</button></span> : null}
+            {!weeksQuery.isPending && !weeksQuery.isError && !weeksQuery.data?.length ? <small>Add a lecture in the course workspace first.</small> : null}
+          </label>
+          <label className={styles.field}>
+            <span>Learning category</span>
+            <select value={learningType} onChange={event => setLearningType(event.target.value as AssignmentLearningType | '')} disabled={isSaving} required={!checkpointAssignment}>
+              <option value="">Select a category</option>
+              {ASSIGNMENT_LEARNING_TYPES.map(value => <option key={value} value={value}>{LEARNING_LABELS[value]}</option>)}
+            </select>
+          </label>
+
+          <label className={styles.field}>
             <span><CalendarClock size={16}/> Due time</span>
             <EnglishDateTimeInput value={dueAt} onChangeValue={setDueAt}/>
           </label>
@@ -396,6 +437,7 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
             <span><FileText size={16}/> Submission type</span>
             <select
               value={submissionType}
+              disabled={isSaving || assignment?.canEditStructure === false}
               onChange={event => setSubmissionType(event.target.value as AssignmentSubmissionType)}
             >
               <option value="Individual">Individual</option>
@@ -410,7 +452,7 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
                 aria-label="Group set"
                 value={groupSetId}
                 onChange={event => setGroupSetId(event.target.value)}
-                disabled={groupSetsQuery.isPending}
+                disabled={isSaving || groupSetsQuery.isPending || assignment?.canEditStructure === false}
               >
                 <option value="">
                   {groupSetsQuery.isPending

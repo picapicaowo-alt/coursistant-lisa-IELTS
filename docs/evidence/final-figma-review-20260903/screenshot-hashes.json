@@ -1,0 +1,506 @@
+[
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-add-course-1440.png",
+    "sha256": "4a4700fa939ed5b7c17c9ef2772f1356cb19ad5f4dd54b52bdf811a21032ccdc"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-add-course-390.png",
+    "sha256": "d2b50d10e057761667689bddf82e10ac55c8bfd1d8e428e9f3855fbe29c6513c"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-assign-exam-1440.png",
+    "sha256": "2cab830811eb079cd9f53c2d00faff5a6b3c6bd0080bc130160a255f8754a00e"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-assign-exam-390.png",
+    "sha256": "3b9ffa2c475a82e5a3fa904158942a3a13943427d271071e8fca7823fd5bef39"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-checkpoint-dialog-1440.png",
+    "sha256": "91dd7368f07cf81ec50fe36af61c257666a59e01ebece4a27c8b94508f1e004a"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-checkpoint-dialog-390.png",
+    "sha256": "890106d85c56aaee83a2e2b74b0fc53308f72aab54a5b931cf9059cf36a9756e"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-course-information-1440.png",
+    "sha256": "af410dae742a56e4f4832a586569f0b20b9f9955bf601e1a08881f04cac54e3e"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-course-information-390.png",
+    "sha256": "d0574c70c506a26cf32642dbd1f796c49598cb117dfbbd86e98de6bd6763952a"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-course-schedule-1440.png",
+    "sha256": "fda842e110712ea9864fa7bbe67d8fe7cee3325c48abfd65cdd0dd29b5c246de"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-course-schedule-390.png",
+    "sha256": "58cf487f824b6d764ed681680b17c94b2eab61322ef2f497203beb2414db9ce6"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-exam-results-1440.png",
+    "sha256": "bdae5dcdef4d14ec49f39d7c02c7db7de5c042abfb18822d6b6cc66e570faa07"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-exam-results-390.png",
+    "sha256": "fa301b82aeced2af9d568007e6d54d5bc2156d511797fd039adc193edd0e2e88"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-exams-1440.png",
+    "sha256": "e527995be2c0862c7a6563f2f98ca582010eee65aa5948c97e554ad0afe66af6"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-exams-390.png",
+    "sha256": "80e2cfb616e167042813a28ef37fee2078dad0d34d6de916def990e9642bec7a"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-messages-1440.png",
+    "sha256": "8f4adc96fbf76f0fdb7eb30605f2314559d2da6fd439b7dd5ca1b957ce976f02"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-messages-390.png",
+    "sha256": "cea39d21b02ca18a4a4c0a87399d4ed85135278d928cbabde207fafa3d837ac6"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-student-courses-1440.png",
+    "sha256": "ce6ccc29e309067fa2998c70e5c4503e988ffa4b005641ca8d72a6dfab6e8463"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-student-courses-390.png",
+    "sha256": "8d85b565a5216273e01ff47528488ed64090450a56c8001226900959b417a753"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-student-journey-1440.png",
+    "sha256": "030731820a642b00688b7e4e753d79c62c0a2b7d5575db761fe67b9d0d047644"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-student-journey-390.png",
+    "sha256": "2888c279d7c39e92fb4af8c7f1090812941cb5858874490724ac620b66c48e7c"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-students-1440.png",
+    "sha256": "e48a619fd330790ad8c571ddc56eff9591e97ac4dbac9a075cd9870750497e6a"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-students-390.png",
+    "sha256": "cc6961286d8d062b34144e588dc478b81dbdfff7793e4f3566b65591de56cfb2"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-students-selected-1440.png",
+    "sha256": "1f92c3099f438d0bd48bbd8f8e9ef314adebe4e678fc7ec4c9d2122978f994a0"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/advisor-students-selected-390.png",
+    "sha256": "96f03b6ae8da2ae80c9c965977058f71dd02e39c1045f0eeb595c5ddc52dc3e8"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-collapsed-navigation-1440.png",
+    "sha256": "2fed6c97cf4efdbd80f0da972ebd37e131022ed4b2657ff729bd2ad4998978bd"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-collapsed-navigation-390.png",
+    "sha256": "7fa51db37d4c466a8eee7507adf50a515a53f0dfa7b74a317020690f2073fd19"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-conversation-1440.png",
+    "sha256": "24c281d39997afd63fa43fc5ea26cd8e27686314a2fe8632bb9346f1ba70294f"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-conversation-390.png",
+    "sha256": "7fa51db37d4c466a8eee7507adf50a515a53f0dfa7b74a317020690f2073fd19"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-empty-1440.png",
+    "sha256": "bb54f82b6e4c8b4f12b61ce50ac08c5d0397d7cd5fc69b8802c7be3ac6c3ec3c"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-empty-390.png",
+    "sha256": "b43e73713ab426699cb9b5697c2aae77e94601cc157dfc440f8494a1e50a9bbc"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-long-conversation-1440.png",
+    "sha256": "44b582bd52123f73b32136de9bfdf2a302572d6adc1fbac08d167315f6664a5b"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-long-conversation-390.png",
+    "sha256": "d1466ea5b4e137f31ebf51584c99072411a150a3a2b6aa04161b0c20b8a38420"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/ai-phone-copy-latest-proof.png",
+    "sha256": "54bf6df9f651a15e79e089b0c954ba3e22bb142defea11c802ccc6e5f5cb52ce"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-login-1440.png",
+    "sha256": "96df4b572c469a6d9477e0cd727af36d8fea70289fb104a3930ba3a2b88a52b7"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-login-390.png",
+    "sha256": "b683dafd0bc1f2765955eaab488f2bede2b3e2d63f1687683fd0647e8e6e7968"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-login-error-1440.png",
+    "sha256": "99acd3207cb72f500f34ac77efbf148258eae952609f7ca014d79ae04f9d1e51"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-login-error-390.png",
+    "sha256": "3fa0286764dd80738f9eedf7e4a6fa1e95c3d62fb2522c1e7ede80a6aa0fda2a"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-reset-code-1440.png",
+    "sha256": "7668b3f825510ea75ceec68734f0cf2649d632400af17b5f36609ad59bd89b4c"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-reset-code-390.png",
+    "sha256": "18454740a318d6001cb731edb9b9f1c48afa58a9ad1b3f01a3ce272ae053ac76"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-reset-email-1440.png",
+    "sha256": "8544692f057795d50e99fb928aac544462d3e06294d6a94b77f956b349f35228"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-reset-email-390.png",
+    "sha256": "bccabe3f678c331ba89076336dc3a80333a4f00bc5e67d3f065d0a90fc86376f"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-reset-password-1440.png",
+    "sha256": "53400286354d6d24b71250558af8921c9e9f6aceaa93e61d49fd173b04bcffa1"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-reset-password-390.png",
+    "sha256": "3dc120be3236f18b7e3fee2c2619d96bf056e4d714866f6522b2fbf8c81114aa"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-reset-success-1440.png",
+    "sha256": "b905db76c2ec21ddd4400fcb086c46757779e6555a7b2d509dac943b6d937f21"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-reset-success-390.png",
+    "sha256": "240c9a8bf5a8b7aea6e8f58984bf81f886f3b67cfdd6476a5ddc64c56d24804b"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-signup-1440.png",
+    "sha256": "83e51af72318d032cb43a16b512f38b37785f86a52089c8dd525f1181b40e9c6"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-signup-390.png",
+    "sha256": "c9aa1b7e655d9096fc61b124fb807b6c7ea8e817a614a8dbd6c450f36ea65da9"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-signup-details-1440.png",
+    "sha256": "70bacf878cd5433a1bf8dcf1553e639427ea1d81b36dde295454f30d749fda81"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-signup-details-390.png",
+    "sha256": "eb2110c93cee8ceb8c08d5b3c1f2263672f8b5afc95eccdf9ff303e2ded04edc"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-signup-verification-1440.png",
+    "sha256": "550b9b86cb67b90e0b254fa6dc8fe07df1f80cbdaf506135e318a973edf20114"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/auth-signup-verification-390.png",
+    "sha256": "7f1f1eefa7a5b8942f7fcf75b0085e3b77a0e80092ff0c59047b2a5f79a2b99d"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-add-event-1440.png",
+    "sha256": "ac549dbd1f96c04bf158de1c9aff68fa776f75366f0e598699a3d323e0f6710f"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-add-event-390.png",
+    "sha256": "374edd125018f016bb0f03ab0d8d17190130fde878693c69d656324992958dd2"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-assignment-detail-1440.png",
+    "sha256": "a8a170661e1f156e62b5161533b78ed6b493ae90ba67ad1a4ed4025afe8bc0d3"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-assignment-detail-390.png",
+    "sha256": "6549d5800f3f077c2b37702089ee8da04df0837dcdb435ae50757ea633574dc8"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-course-detail-1440.png",
+    "sha256": "945f3e02fedfe7037c8977cc25f04e2c992cde7f1abe0e7fe24787566f5775e8"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-course-detail-390.png",
+    "sha256": "1239fa7b3273e377be128b921326ad3cad9e9cb05e11a61616fce1f625ae9cb5"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-date-time-picker-1440.png",
+    "sha256": "5dafe32896ab7c6d5da3f311bd1e7f0b4e57aa669eee74124e5859311df1ad26"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-date-time-picker-390.png",
+    "sha256": "a7c787fca07fb91b8498d24c101bfc273898b0129be44bf1d2ed53a5293c4522"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-month-1440.png",
+    "sha256": "3bfcd006af39a7107778228a5dc9446c921222796cf91fcc971902d8af51812f"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-month-390.png",
+    "sha256": "df4359dab8a65f81e571e1506c6418cd986df7d22bce8192f306edf0066463be"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-quiz-detail-1440.png",
+    "sha256": "dd43c8f971e0183a5b3f40643c58df0a672dd7d34d61be92c0d9805c41dcbc87"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-quiz-detail-390.png",
+    "sha256": "8c4447f2971b3ad2a28979c3d3751144549d46eb985998a689b2ad7be6cd1501"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-week-1440.png",
+    "sha256": "f24f16f521f3e92bb6b267d693f8594d3e9bafd364573423451c6d16d8651100"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/calendar-week-390.png",
+    "sha256": "84400259a627ae61a583e883eb2e096534982bd4d0e1c0a5ff6be7c0ae9e9d79"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/profile-assessments-1440.png",
+    "sha256": "d6815b3ebcea2dfbe0f5c2206706fa0d7976ce988ca93d3833eb476fa53a8f1c"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/profile-assessments-390.png",
+    "sha256": "73b358bc9e9998f41bd269cbf29124d5f30950b074d7952463b2656824545936"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/profile-crop-1440.png",
+    "sha256": "941058880beee87124c34aaedc736885f560f2be6a46136c7df530d22f57d6aa"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/profile-crop-390.png",
+    "sha256": "5479ee602d5409cd0557df1b2b57a18b0dd01c4979cb712bc6aa281d7a26ef61"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/profile-edit-1440.png",
+    "sha256": "467ebe2d2da307966d329479461f2fc7ba3fc24c82c96e3519415353914c49e6"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/profile-edit-390.png",
+    "sha256": "41b9b0855bddfebe505dc5335bfc83f798c223a573703548db180df00e883835"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/profile-menu-1440.png",
+    "sha256": "f9255d7150fa4b317b8b20f70e89761e6e5a3bb166dc9b4df77d70121e196daf"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/profile-menu-390.png",
+    "sha256": "c9272271c25e4ec4c3b6b8d31bab62854b5886616ebf59dbdb65b71154e93447"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/settings-password-1440.png",
+    "sha256": "31446a0cc7ec5da004b4dc12c971bf0a5b702adbdfc09451ae2b7c085b1919a3"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/settings-password-390.png",
+    "sha256": "159c4248d9752cb522b1ce6f0cb956f91f56aa6cfbe389984946b6bc332af3ad"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/settings-password-success-1440.png",
+    "sha256": "2fe60a5cde159fa3a24562f9c74e672ab92b1323bb2520bc502ef36a9d55fbf9"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/settings-password-success-390.png",
+    "sha256": "1b547e6794822ecac8dee053ac86795aff1115ef89efa97dcd7000bcff61bc24"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-advisor-tasks-1440.png",
+    "sha256": "def4448c9bf9e81bb9356e72e7e3d461a86340b2c132bec92aea601068947a17"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-advisor-tasks-390.png",
+    "sha256": "58e6772d36bbe589876ea4d40cead6a98ff93f90f7e687d9e4e16238a988e9a2"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-checkpoint-1440.png",
+    "sha256": "8b0da83773c35878e7e2e57580e6d273a655db7c53af869c0163a2a7412051ba"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-checkpoint-390.png",
+    "sha256": "4be6ced0e311724dabcc60748956e340df3684c3d5521be5538f98f881a9462e"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-ai-1440.png",
+    "sha256": "15d58ddf71d418da8fe9c33ffb5656674d56f36285bbc24a8801d8e39b396c5c"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-ai-390.png",
+    "sha256": "83f816017ec57a5074d2820572a7540a7e72906ca7f5ece83b635e1922c01e75"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-ai-response-1440.png",
+    "sha256": "1d5430962c128ce23ae379f81d6001a495d159b06a4fb24fdbd27426b1345afd"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-ai-response-390.png",
+    "sha256": "60b27cf881a5f6782ac2ffd058183bf71758c4c320b6b7950b62ada7821b1f4d"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-assignments-1440.png",
+    "sha256": "8f489de5796a84f840a17b81f570b2c683ae3cc3ea2dc6cb8fc788b08840c0e3"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-assignments-390.png",
+    "sha256": "c01a96f40e659d5c5a96f7b3fcf9b22ab8da589657a14ea12e80cbd0e9e6bb38"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-discussion-1440.png",
+    "sha256": "74858b4c1b7808190025afa9577eee586fe471b6370c0fa7186e35652e9602fe"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-discussion-390.png",
+    "sha256": "e2921402995d365405bceec3732e742586203431eb09f83a15e3e4ae73fe593f"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-outline-1440.png",
+    "sha256": "167131bd2d7e325638f23fc0348a1ef060cb42a4b91f79f4217c413a10f4448c"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-outline-390.png",
+    "sha256": "ff38233149277c39c3477b41161010fe7e81142a7777e88c687d9f48161529a1"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-reader-1440.png",
+    "sha256": "8a9cb781a4a166c3f86ec338d47f4e221bf309d97880c34b2d31d1a157f46ce2"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-course-reader-390.png",
+    "sha256": "046c5de8bb2e0a742b8875178332f8b4e2d6125a64053101663e61f3b66a032e"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-courses-1440.png",
+    "sha256": "0ff6bdaf779be5ec8bfb3b055f984162d2f5fa8e6dac7d4fd4d29f7cc26d7c5c"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-courses-390.png",
+    "sha256": "91edd73cba58d3089f575a9cd50f23fad0844ab896b5480bdcef1d790c755785"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-exam-complete-1440.png",
+    "sha256": "bde6013947f97ae60ea2914f384ae4fd29a753f2476c99a54ed81fa5b898c7f2"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-exam-complete-390.png",
+    "sha256": "2cad89671202d68b33fa496e7c72cbd10cc1f989513e4a64499c359b2c47ec95"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-exam-confirm-1440.png",
+    "sha256": "6d1b7ec83016bb4cc6dbe5c0ed5ce42365400d187db2d1902a91138302e21176"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-exam-confirm-390.png",
+    "sha256": "d2d6cd652c1a532a798dc2d9dd732a0cba579d5a1e2e41984c1106eaa19eef1b"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-exam-library-1440.png",
+    "sha256": "9e2a7cd75a0a03b88284d1418df5c8380f6ea72adc83448ed4ede5e6cc1de6a0"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-exam-library-390.png",
+    "sha256": "13708e86df3a93ac07c06c6edde466dc41bf578ee756536b714d6a3f7652f16a"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-listening-1000-controls-proof.png",
+    "sha256": "ca4241ff39ed53fb8863f992c9b921d0e9c00e76f7c54d981abf9fd57e5b5bcb"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-listening-1000-proof.png",
+    "sha256": "ca4241ff39ed53fb8863f992c9b921d0e9c00e76f7c54d981abf9fd57e5b5bcb"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-plan-1440.png",
+    "sha256": "a41fe06d59548a1b01efdfd0f2c5c5046fd301aa114e8dda71469857106d0290"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-plan-390.png",
+    "sha256": "66d5b7bfad51ca9f5e2fc4aaeadff29c9218e4192d5207c6bb8fbf3986056e2d"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-profile-1440.png",
+    "sha256": "a4acb4878ed2bba1f601fe27865175e6be3fb48f322f4af64f8afbfe8de589e7"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-profile-390.png",
+    "sha256": "73b358bc9e9998f41bd269cbf29124d5f30950b074d7952463b2656824545936"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-reading-questions-1440.png",
+    "sha256": "e772adf4bb551398d1ed8d801e9c2a9611b968bcbc95ca73691fe21b0e1a5471"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-reading-questions-390.png",
+    "sha256": "3322b26e9929edf6a16015723dd4c868fedf819c8df4e3ec6f9c510e370be3fc"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-reading-questions-mobile-controls-proof.png",
+    "sha256": "b747d9f351ca5f91528b4e69fc21ae1efebaa9a98a65da12d54c4131a3691a13"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-reading-results-1440.png",
+    "sha256": "57fb77e21ef98f390e548fb36f8f48b7ffff026c46979185c679bb6a3064ad02"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-reading-results-390.png",
+    "sha256": "6ab4666362da4d753c2aeadc7c4b4bc91c11423ab963ed7e00c3786d515c4115"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-reading-results-mobile-controls-proof.png",
+    "sha256": "bdee716bdba299bfe9f14424589875e7062e0e8924552928581287127045ce47"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-task-detail-1440.png",
+    "sha256": "6f45726928c5e964c53dad528e75d831ffcf945257f6444a8c5554d86d41d917"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-task-detail-390.png",
+    "sha256": "38ba0068bf3cd22c74089bc7f8796af9c1088a214def0681687d508e47af2592"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-writing-exam-1440.png",
+    "sha256": "81aed0173c4566c8b4fe9066d9ea245167c78ac30a6e848c8918a9119d14ffa7"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-writing-exam-390.png",
+    "sha256": "788186c6658ed3d3f506e4c121831158d134c7f4ffd039467a9d63a4d7abc92d"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-writing-results-1440.png",
+    "sha256": "2e8f88a2fc81e372747c859bdc8d88499133e28f1c32a3ad06c49f65a0abd6ac"
+  },
+  {
+    "path": "/tmp/xlearn-final-visual-review/student-writing-results-390.png",
+    "sha256": "ec814c2e90311fc984772cce9baaeba557afa82783ff69767e007d03143e3264"
+  },
+  {
+    "path": "/tmp/xlearn-final-dashboard/advisor-1440.png",
+    "sha256": "a58ca090f07180a25c5606dfe74f7ca64eb6040b40ad9b3f2085bb05e4f7e1bf"
+  },
+  {
+    "path": "/tmp/xlearn-final-dashboard/advisor-1920.png",
+    "sha256": "0d0b3d24bc3d18374cee5522d4eec3102251c200c680af6251c525073fbdf975"
+  },
+  {
+    "path": "/tmp/xlearn-final-dashboard/advisor-390.png",
+    "sha256": "9ca2d543046c41a11bd4a5a78d01a8f9bc9b3612e83fa7306a636961f95bb44b"
+  },
+  {
+    "path": "/tmp/xlearn-final-dashboard/advisor-768.png",
+    "sha256": "52aaaaf6117bd7623cc296deadd5485d9a7638ceb0cbb7f01fbac620a4499803"
+  },
+  {
+    "path": "/tmp/xlearn-final-dashboard/student-1440.png",
+    "sha256": "0f831f31714449782d1f8e131d8e49b8353538e2123fed359c77817611148c95"
+  },
+  {
+    "path": "/tmp/xlearn-final-dashboard/student-1920.png",
+    "sha256": "014890075e61708b2dfd92dfcc2f8bcc77c602bd951f16b0c42bf899dc5f1775"
+  },
+  {
+    "path": "/tmp/xlearn-final-dashboard/student-390.png",
+    "sha256": "654b2374ad7e8be3e4d87dd1d3b354714baf519e4c3998f50fddbd5e8f9ddaf4"
+  }
+]

@@ -13,7 +13,7 @@ const api = vi.hoisted(() => ({
   uploadAttachments: vi.fn(),
   publishAssignment: vi.fn(),
 }));
-const courseApi = vi.hoisted(() => ({listGroupSets: vi.fn()}));
+const courseApi = vi.hoisted(() => ({listGroupSets: vi.fn(), getCourseWeeks: vi.fn()}));
 
 vi.mock('@/apis/services/assignment-api', () => ({assignmentApiService: api}));
 vi.mock('@/apis/services/course-api', () => ({courseApiService: courseApi}));
@@ -40,6 +40,7 @@ import {AssignmentEditorForm} from './index';
 const draft: AssignmentDetail = {
   id: 88,
   courseId: 31,
+  weekId: 8, learningType: 'HOMEWORK',
   title: 'Recovery assignment',
   description: '',
   pointsPossible: 100,
@@ -80,12 +81,15 @@ const fillRequiredFields = async () => {
   const user = userEvent.setup();
   await user.type(screen.getByLabelText('Assignment name'), 'Recovery assignment');
   fireEvent.change(screen.getByLabelText('Due time'), {target: {value: '2026-08-30T10:00'}});
+  await user.selectOptions(await screen.findByLabelText('Lecture'), '8');
+  await user.selectOptions(screen.getByLabelText('Learning category'), 'HOMEWORK');
   return user;
 };
 
 describe('AssignmentEditorForm recovery workflow', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    courseApi.getCourseWeeks.mockResolvedValue(response([{id: 8, title: 'Argument structure'}]));
     api.createAssignment.mockResolvedValue(response(draft));
     api.patchAssignment.mockResolvedValue(response(draft));
     api.previewDueDateChange.mockResolvedValue(response({
@@ -141,7 +145,7 @@ describe('AssignmentEditorForm recovery workflow', () => {
     expect(api.patchAssignment).toHaveBeenCalledWith(
       31,
       88,
-      expect.objectContaining({title: 'Recovery assignment'}),
+      expect.objectContaining({expectedVersion: 3}),
       expect.any(String),
     );
   });
@@ -212,7 +216,7 @@ describe('AssignmentEditorForm recovery workflow', () => {
 
     await waitFor(() => expect(api.createAssignment).toHaveBeenCalledWith(
       31,
-      expect.objectContaining({dueAt: '2026-08-30T10:00:00'}),
+      expect.objectContaining({weekId: 8, learningType: 'HOMEWORK', dueAt: '2026-08-30T10:00:00'}),
       expect.any(String),
     ));
     const request = api.createAssignment.mock.calls[0][1];
@@ -237,4 +241,19 @@ describe('AssignmentEditorForm recovery workflow', () => {
       expect.any(String),
     );
   });
+  it('sends only changed fields for a structurally locked assignment', async () => {
+    renderEditor({...draft, canEditStructure: false});
+    const user = userEvent.setup();
+    expect(screen.getByLabelText('Submission type')).toBeDisabled();
+    await user.clear(screen.getByLabelText('Assignment name'));
+    await user.type(screen.getByLabelText('Assignment name'), 'Updated instructions');
+    fireEvent.submit(screen.getByRole('button', {name: 'Save changes'}).closest('form')!);
+    await waitFor(() => expect(api.patchAssignment).toHaveBeenCalled());
+    const request = api.patchAssignment.mock.calls[0][2];
+    expect(request).toMatchObject({title: 'Updated instructions', expectedVersion: 3});
+    expect(request).not.toHaveProperty('submissionType');
+    expect(request).not.toHaveProperty('weekId');
+    expect(request).not.toHaveProperty('learningType');
+  });
+
 });

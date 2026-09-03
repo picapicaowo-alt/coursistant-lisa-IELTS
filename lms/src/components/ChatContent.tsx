@@ -2,7 +2,9 @@
 import styles from '../sections/chat/chat-main-component/styles.module.scss';
 import workspaceStyles from '../pages/aibot/StudySupportWorkspace.module.scss';
 import {useState, useRef, useEffect, forwardRef, useImperativeHandle, useCallback} from 'react';
-import {FileText, Paperclip, X} from 'lucide-react';
+import {FileText, Paperclip, X, ArrowDown} from 'lucide-react';
+import {prompts} from '@/components/DashboardAssistant/prompts';
+import {ChatMessage} from '@/components/ChatMessage';
 import TypingText from "../utils/typing-text";
 import {renderMessageText} from '@/utils/render-message-text';
 import {useAuth} from '@/contexts/AuthContext.js';
@@ -26,7 +28,10 @@ const STUDY_SUPPORT_THINKING_STEPS = [
 
 interface Props {
   isIntroTop: boolean,
+  courseId?: number,
   isWorkspace?: boolean,
+  isCompact?: boolean,
+  onClose?: () => void,
   isSummary?: false,
   isDashboard: boolean,
   isPopup?: false,
@@ -73,7 +78,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     const [isCoursesFetched, setIsCoursesFetched] = useState(false);
     const [courseFetchFailed, setCourseFetchFailed] = useState(false);
     const [selectedCourseId, setSelectedCourseId] = useState(() => {
-      const v = searchParams.get('courseId') || localStorage.getItem('selectedCourseId');
+      const v = props.courseId || searchParams.get('courseId') || localStorage.getItem('selectedCourseId');
       return v ? Number(v) : 0;
     });
     const fetchCourses = async () => {
@@ -85,7 +90,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
         setIsCoursesFetched(true);
         
         const has = list.some(c => Number(c.id) === Number(selectedCourseId));
-        if (!has && list.length) {
+        if (!props.courseId && !has && list.length) {
           setSelectedCourseId(Number(list[0].id));
           localStorage.setItem('selectedCourseId', String(list[0].id));
         }
@@ -152,6 +157,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     const [input, setInput] = useState('');
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const compactInput = useRef<HTMLInputElement>(null);
 
     const scrollChatToBottom = useCallback((behavior: ScrollBehavior = 'smooth') => {
       const container = containerRef.current;
@@ -160,8 +166,8 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     }, []);
     
     useEffect(() => {
-      scrollChatToBottom();
-    }, [messages, scrollChatToBottom]);
+      if (!isUserScrolled) scrollChatToBottom();
+    }, [messages, scrollChatToBottom, isUserScrolled]);
     
     // Auto scroll to bottom when user is not scrolling
     useEffect(() => {
@@ -378,9 +384,9 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
           </>
         )}
         {/*  Main Content */}
-        <div className={props.isWorkspace ? workspaceStyles.content : `flex flex-col p-2 ${props.isDashboard ? 'h-[90%]' : props.isSummary ? 'h-[87%]' : 'h-[95%]'}`}>
-          {props.isWorkspace ? <div className={workspaceStyles.toolbar}><button type="button" onClick={handleNewChat}>+ New chat</button></div> : null}
-          <div className="flex flex-1 flex-col gap-3 overflow-y-auto p-4" ref={containerRef}>
+        <div data-compact={props.isCompact || undefined} data-empty={!props.isCompact && props.isWorkspace && messages.length === 0 && !isStudySupportUnavailable || undefined} className={props.isWorkspace ? workspaceStyles.content : `flex flex-col p-2 ${props.isDashboard ? 'h-[90%]' : props.isSummary ? 'h-[87%]' : 'h-[95%]'}`}>
+          {props.isCompact ? <header className={workspaceStyles.compactHeader}><button type="button" disabled aria-label="Chat history coming soon"><img src="/icons/figma-dashboard/menu.svg" alt=""/></button><h2>New Chat</h2><button type="button" aria-label="Start a new chat" onClick={handleNewChat}>+</button><button type="button" aria-label="Close course assistant" onClick={props.onClose}><X size={18}/></button></header> : props.isWorkspace ? <div className={workspaceStyles.toolbar}><button type="button" onClick={handleNewChat}>+ New chat</button></div> : null}
+          <div className={props.isWorkspace ? workspaceStyles.messageArea : "flex flex-1 flex-col gap-3 overflow-y-auto p-4"} ref={containerRef} onScroll={event => {const element = event.currentTarget; setIsUserScrolled(element.scrollHeight - element.scrollTop - element.clientHeight > 100);}}>
             {isStudySupportUnavailable ? (
               <div
                 id="study-support-lockdown-message"
@@ -400,7 +406,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                 ) : null}
               </div>
             ) : messages.length === 0 ? (
-              props.isSummary ? (
+              props.isCompact ? <div className={workspaceStyles.compactPrompts}>{prompts.student.map(prompt => <button type="button" key={prompt} onClick={() => {setInput(prompt); compactInput.current?.focus();}}>{prompt}</button>)}</div> : props.isSummary ? (
                 <div className="flex-1 flex flex-col justify-start mb-8 ml-3">
                   <div
                     className="cursor-pointer hover:bg-[#EDF2F7] transition-all duration-300 flex items-center p-4 border border-[rgba(226,232,240,1)] rounded-xl  bg-transparent max-w-xl">
@@ -415,7 +421,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                     </div>
                   </div>
                 </div>
-              ) : props.isWorkspace ? <div className={workspaceStyles.welcome}><img src="/icons/figma-ai/assistant.svg" alt=""/><h2>Your personal <span>learning assistant</span></h2></div> : (
+              ) : props.isWorkspace ? <div className={workspaceStyles.welcome}><img src="/icons/figma-ai/chat-mark.svg" alt=""/><h2>Your personal <span>learning assistant</span></h2></div> : (
                 <div
                   className={`flex-1 flex flex-col items-start text-left mb-8 ml-3 ${props.isIntroTop ? 'justify-start' : 'justify-end'
                   }`}
@@ -430,11 +436,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
               // {/* Chat messages area (scrollable) */}
               <>
                 {messages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`max-w-[70%] px-4 py-2 rounded-xl text-base whitespace-pre-wrap break-words ${msg.sender === 'user' ? 'self-end bg-blue-100' : 'self-start bg-[rgb(203,209,241)]'
-                    }`}
-                  >
+                  <ChatMessage key={index} user={msg.sender === 'user'} text={msg.text} pending={isWriting && index === messages.length - 1 && msg.sender !== 'user'}>
                     {msg.attachmentName ? (
                       <span className={styles.messageAttachment}>
                         <FileText aria-hidden="true"/>
@@ -449,7 +451,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                         {renderMessageText(msg.text)}
                       </div>
                     )}
-                  </div>
+                  </ChatMessage>
                 ))}
                 
                 {isLoading ? (
@@ -462,8 +464,15 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
               </>
             )}
           </div>
+          {isUserScrolled && messages.length > 0 ? <button type="button" className={styles.latestMessage} onClick={() => scrollChatToBottom()}><ArrowDown size={16}/>Latest response</button> : null}
           {/* Input area */}
-          <div className={styles.chatInputContainer}>
+          {props.isCompact ? <div className={workspaceStyles.compactComposer}>
+            {selectedFile ? <div className={workspaceStyles.compactAttachment}><FileText size={16}/><span>{selectedFile.name}</span><button type="button" aria-label={`Remove ${selectedFile.name}`} onClick={() => setSelectedFile(null)}><X size={16}/></button></div> : null}
+            <input ref={fileInputRef} type="file" className={styles.visuallyHidden} accept=".pdf,.doc,.docx,.txt,.md,image/*" aria-label="Choose a file for Study Support" onChange={event => setSelectedFile(event.target.files?.[0] ?? null)}/>
+            <button type="button" className={workspaceStyles.compactAttach} aria-label="Attach a file" disabled={isStudySupportUnavailable || isLoading} onClick={() => fileInputRef.current?.click()}>+</button>
+            <input ref={compactInput} aria-label="Ask Study Support" placeholder="Ask me anything…" value={input} onChange={event => setInput(event.target.value)} disabled={isStudySupportUnavailable || isLoading} onKeyDown={event => {if (event.key === 'Enter' && !event.nativeEvent.isComposing) {event.preventDefault(); handleSendClick();}}}/>
+            <button type="button" className={workspaceStyles.compactSend} aria-label="Send" disabled={isStudySupportUnavailable || isLoading || (!input.trim() && !selectedFile)} onClick={handleSendClick}><img src="/icons/figma-dashboard/send.svg" alt=""/></button>
+          </div> : <div className={styles.chatInputContainer}>
             <div ref={courseBoxRef} style={{position: 'relative', display: 'inline-block'}}>
               <button
                 type="button"
@@ -472,7 +481,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                 aria-haspopup="listbox"
                 aria-expanded={isCourseOpen}
                 title={currentCourseName}
-                disabled={!isCoursesFetched}
+                disabled={!isCoursesFetched || Boolean(props.courseId)}
                 style={{width: 150}}
               >
                 <img className={styles.chatCourseIcon} src="/icons/ai_course.png" alt=""/>
@@ -588,7 +597,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                 <img src="/icons/chat/send-star.png" alt=""/>
               </button>
             </div>
-          </div>
+          </div>}
         </div>
       </>
     );

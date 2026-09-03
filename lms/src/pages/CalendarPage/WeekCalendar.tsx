@@ -1,4 +1,4 @@
-import {useLayoutEffect, useRef, type CSSProperties, type ReactNode} from 'react';
+import {useLayoutEffect, useEffect, useState, useRef, type CSSProperties, type ReactNode} from 'react';
 import {format} from 'date-fns';
 import type {CalendarItem} from './calendarData';
 import styles from './index.module.scss';
@@ -12,6 +12,10 @@ export function WeekCalendar({
   byDate: Map<string, CalendarItem[]>;
   renderItem: (item: CalendarItem) => ReactNode;
 }) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {const timer = window.setInterval(() => setNow(new Date()), 60_000); return () => window.clearInterval(timer);}, []);
+  const today = format(now, 'yyyy-MM-dd');
+  const minutesNow = now.getHours() * 60 + now.getMinutes();
   const viewport = useRef<HTMLDivElement>(null);
   const hourRail = useRef<HTMLDivElement>(null);
   const dateKey = days.map(day => format(day, 'yyyy-MM-dd')).join(',');
@@ -36,7 +40,7 @@ export function WeekCalendar({
     >
       <div className={styles.timeHeading}>Time</div>
       {days.map((day) => (
-        <header key={format(day, 'yyyy-MM-dd')} className={styles.timeDay}>
+        <header key={format(day, 'yyyy-MM-dd')} className={styles.timeDay} aria-current={format(day, 'yyyy-MM-dd') === today ? 'date' : undefined}>
           <span>{format(day, 'EEE')}</span>
           <strong>{format(day, 'd')}</strong>
         </header>
@@ -62,6 +66,7 @@ export function WeekCalendar({
             key={date}
             aria-label={format(day, 'EEEE MMMM d')}
           >
+            {date === today ? <div className={styles.currentTime} style={{top: `${minutesNow / MINUTES_IN_DAY * 100}%`}} aria-label={`Current time ${format(now, 'HH:mm')}`}/> : null}
             {layoutDay(entries).map(({item, start, end, lane, lanes}) => (
               <div
                 className={styles.timedEvent}

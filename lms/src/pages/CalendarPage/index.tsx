@@ -1,10 +1,11 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {addDays, addMonths, addWeeks, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMonth, max, min, parseISO, startOfDay, endOfDay, startOfMonth, startOfWeek} from 'date-fns';
 import {ChevronLeft, ChevronRight} from 'lucide-react';
 import {Link} from 'react-router-dom';
 import {loadCalendarWindow, type CalendarItem} from './calendarData';
 import {usePersonalEvents, type PersonalEventView} from './personalEvents';
+import {useAnchoredEventDialog} from './useAnchoredEventDialog';
 import {PersonalEventEditor} from './PersonalEventEditor';
 import {WeekCalendar} from './WeekCalendar';
 import styles from './index.module.scss';
@@ -15,6 +16,7 @@ const CATEGORIES = [{id: 'all', label: 'All Events'}, {id: 'courses', label: 'Co
 const color = (item: CalendarItem) => item.kind === 'Personal' ? 'neutral' : item.kind === 'Assignment' || item.kind === 'Quiz' ? 'cyan' : item.kind === 'Event' ? 'pink' : 'brand';
 
 const CalendarPage = () => {
+  const eventAnchor = useRef<HTMLElement>();
   const [view, setView] = useState<CalendarView>('week');
   const [category, setCategory] = useState<Category>('all');
   const [cursor, setCursor] = useState(() => new Date());
@@ -47,12 +49,12 @@ const CalendarPage = () => {
   const byDate = useMemo(() => {const grouped = new Map<string, CalendarItem[]>(); visibleItems.forEach(item => grouped.set(item.date, [...grouped.get(item.date) ?? [], item])); return grouped;}, [visibleItems]);
   const toggleCourse = (id: number) => setHiddenCourseIds(current => {const next = new Set(current); if (next.has(id)) next.delete(id); else next.add(id); return next;});
   const move = (direction: -1 | 1) => setCursor(current => view === 'month' ? addMonths(current, direction) : view === 'day' ? addDays(current, direction) : addWeeks(current, direction));
-  const eventButton = (item: CalendarItem) => <button type="button" key={item.id} className={styles.calendarItem} data-color={color(item)} onClick={() => setSelected(item)} title={`${item.title} · ${item.date} ${item.startTime ?? ''} · ${item.timezone}`}><strong>{item.title}</strong><span>{item.startTime ?? 'All day'}{item.endTime ? ` – ${item.endTime}` : ''}</span></button>;
+  const eventButton = (item: CalendarItem) => <button type="button" key={item.id} className={styles.calendarItem} data-color={color(item)} onClick={event => {eventAnchor.current = event.currentTarget; setSelected(item);}} title={`${item.title} · ${item.date} ${item.startTime ?? ''} · ${item.timezone}`}><strong>{item.title}</strong><span>{item.startTime ?? 'All day'}{item.endTime ? ` – ${item.endTime}` : ''}</span></button>;
   return <main className={styles.page}>
     <h1 className={styles.visuallyHidden}>Calendar</h1>
     <nav className={styles.categoryTabs} aria-label="Calendar categories">{CATEGORIES.map(item => <button type="button" key={item.id} aria-pressed={category === item.id} onClick={() => setCategory(item.id)}>{item.label}</button>)}</nav>
     <div className={styles.calendarShell}><div className={styles.calendarMain}>
-      <header className={styles.toolbar}><div className={styles.navigation}><button type="button" onClick={() => move(-1)} aria-label={`Previous ${view}`}><ChevronLeft size={18}/></button><h2>{view === 'month' ? format(cursor, 'MMMM yyyy') : view === 'day' ? format(cursor, 'MMMM d, yyyy') : `${format(range.start, 'MMM d')} – ${format(range.end, 'MMM d, yyyy')}`}</h2><button type="button" onClick={() => move(1)} aria-label={`Next ${view}`}><ChevronRight size={18}/></button></div><div className={styles.viewSwitch}><button type="button" onClick={() => setCursor(new Date())}>Today</button><label><span className={styles.visuallyHidden}>Calendar view</span><select value={view} onChange={event => setView(event.target.value as CalendarView)}><option value="day">Day</option><option value="week">Week</option><option value="month">Month</option></select></label><button type="button" className={styles.primary} onClick={() => setEditor({event: null})}>+ Add event</button></div></header>
+      <header className={styles.toolbar}><div className={styles.navigation}><button type="button" onClick={() => move(-1)} aria-label={`Previous ${view}`}><ChevronLeft size={18}/></button><h2>{view === 'month' ? format(cursor, 'MMMM yyyy') : view === 'day' ? format(cursor, 'MMMM d, yyyy') : `${format(range.start, 'MMM d')} – ${format(range.end, 'MMM d, yyyy')}`}</h2><button type="button" onClick={() => move(1)} aria-label={`Next ${view}`}><ChevronRight size={18}/></button></div><div className={styles.viewSwitch}><button type="button" onClick={() => setCursor(new Date())}>Today</button><label><span className={styles.visuallyHidden}>Calendar view</span><select value={view} onChange={event => setView(event.target.value as CalendarView)}><option value="day">Day</option><option value="week">Week</option><option value="month">Month</option></select></label><button type="button" className={styles.primary} onClick={event => {eventAnchor.current = event.currentTarget; setEditor({event: null});}}>+ Add event</button></div></header>
       {calendar.isPending || personal.isPending ? <p className={styles.status} role="status">Loading calendar…</p> : null}
       {calendar.isError ? <p className={styles.warning} role="alert">Course calendar could not be loaded. <button type="button" onClick={() => void calendar.refetch()}>Retry courses</button></p> : null}
       {personal.isError ? <p className={styles.warning} role="alert">Personal events could not be loaded. <button type="button" onClick={() => void personal.refetch()}>Retry personal events</button></p> : null}
@@ -66,14 +68,13 @@ const CalendarPage = () => {
     </div><aside className={styles.eventRail}><h2>Events in view</h2><p className={styles.timezone}>Times shown in each event’s timezone.</p>{visibleItems.length ? visibleItems.map(item => <div className={styles.railItem} key={item.id}>{eventButton(item)}<small>{item.date} · {item.timezone}</small></div>) : !calendar.isPending && !personal.isPending && !calendar.isError && !personal.isError ? <p className={styles.empty}>No events in this view.</p> : null}
       {calendar.data?.courses.length ? <fieldset className={styles.courseFilters}><legend>Courses</legend>{calendar.data.courses.map(course => <label key={course.id}><input type="checkbox" checked={!hiddenCourseIds.has(course.id)} onChange={() => toggleCourse(course.id)}/>{course.title || course.courseCode}</label>)}</fieldset> : null}
     </aside></div>
-    {selected ? <EventDetails item={selected} onClose={() => setSelected(undefined)} onEdit={() => {const event = personal.data?.items.find(event => event.id === selected.sourceId); if (event) {setEditor({event}); setSelected(undefined);}}}/> : null}
-    {editor ? <PersonalEventEditor selected={editor.event} onClose={() => setEditor(null)}/> : null}
+    {selected ? <EventDetails anchor={eventAnchor.current} item={selected} onClose={() => setSelected(undefined)} onEdit={() => {const event = personal.data?.items.find(event => event.id === selected.sourceId); if (event) {setEditor({event}); setSelected(undefined);}}}/> : null}
+    {editor ? <PersonalEventEditor anchor={eventAnchor.current} selected={editor.event} onClose={() => setEditor(null)}/> : null}
   </main>;
 };
 
-function EventDetails({item, onClose, onEdit}: {item: CalendarItem; onClose: () => void; onEdit: () => void}) {
-  const dialog = useRef<HTMLDialogElement>(null);
-  useEffect(() => {dialog.current?.showModal();}, []);
+function EventDetails({item, onClose, onEdit, anchor}: {anchor?: HTMLElement; item: CalendarItem; onClose: () => void; onEdit: () => void}) {
+  const dialog = useAnchoredEventDialog(anchor);
   return <dialog ref={dialog} className={styles.eventDialog} aria-labelledby="event-details-title" onClose={onClose}><header><h2 id="event-details-title">{item.title}</h2><button type="button" aria-label="Close event details" onClick={onClose}>×</button></header><dl className={styles.eventFacts}><div><dt>Date</dt><dd>{item.date}</dd></div><div><dt>Time</dt><dd>{item.startTime ?? 'All day'}{item.endTime ? ` – ${item.endTime}` : ''} · {item.timezone}</dd></div>{item.courseTitle ? <div><dt>Course</dt><dd>{item.courseTitle}</dd></div> : null}{item.location ? <div><dt>Location</dt><dd>{item.location}</dd></div> : null}<div><dt>Category</dt><dd>{item.kind}</dd></div></dl><footer>{item.path ? <Link className={styles.primary} to={item.path}>View {item.kind.toLowerCase()}</Link> : null}{item.kind === 'Personal' ? <button type="button" className={styles.primary} onClick={onEdit}>Edit event</button> : null}<button type="button" onClick={onClose}>Close</button></footer></dialog>;
 }
 export default CalendarPage;

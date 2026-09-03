@@ -1,3 +1,4 @@
+@use '../../styles/workspace' as workspace;
 .page {
   min-height: 100%;
   padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem;
@@ -63,14 +64,19 @@
 .tabs button:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
 
 .grid {
+  width: 100%;
+  min-width: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  > * { @include workspace.region(6, 6); }
   gap: t.$workspace-section-gap;
   max-width: t.$workspace-max-inline-size;
   margin: 0 auto;
 }
 
 .workspace {
+  width: 100%;
+  min-width: 0;
   display: grid;
   gap: t.$workspace-section-gap;
   max-width: t.$workspace-max-inline-size;
@@ -310,7 +316,8 @@ a.operationRow:focus-visible {
 
 .form {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  > * { @include workspace.region(6, 6); }
   gap: .75rem;
   max-width: 52rem;
   margin-top: .5rem;
@@ -377,12 +384,15 @@ a.operationRow:focus-visible {
 
 @media (max-width: 800px) {
   .header { align-items: stretch; flex-direction: column; }
-  .grid { grid-template-columns: 1fr; }
   .row { align-items: stretch; flex-direction: column; }
   .form { grid-template-columns: 1fr; }
   .coursePicker { min-width: 0; }
-  .fullWidthCard { grid-column: auto; }
   .availabilityRow { align-items: flex-start; flex-wrap: wrap; }
   .rowActions { width: 100%; margin-left: 0; }
   .saveBar { align-items: stretch; flex-direction: column; }
 }
+
+.embedded { min-width: 0; width: 100%; }
+
+.grid > .primaryRegion { @include workspace.region(8, 12); }
+.grid > .supportRegion { @include workspace.region(4, 6); }

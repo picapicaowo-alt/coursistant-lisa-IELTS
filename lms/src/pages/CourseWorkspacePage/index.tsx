@@ -1,5 +1,5 @@
 import React, {Suspense} from 'react';
-import {useParams} from 'react-router-dom';
+import {useParams, useSearchParams} from 'react-router-dom';
 import styles from './index.module.scss';
 import {PageHeader} from "./components/PageHeader";
 import {PageBody} from "./components/PageBody";
@@ -18,6 +18,8 @@ const CourseWorkspacePage: React.FC = () => {
 
 const Container: React.FC = () => {
   useCourseEdit();
+  const [searchParams] = useSearchParams();
+  const readingMaterial = Number(searchParams.get('materialId')) > 0;
   const workspaceMode = useCourseWorkspaceStore(state => state.workspaceMode);
   const setWorkspaceMode = useCourseWorkspaceStore(state => state.setWorkspaceMode);
   const setRole = useCourseWorkspaceStore(state => state.setRole);
@@ -63,7 +65,7 @@ const Container: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      {workspaceMode !== "detailWorkspace" && (
+      {workspaceMode !== "detailWorkspace" && !readingMaterial && (
         <PageHeader
           canEditCourse={access.canEditCourse}
           canManageMaterials={access.canUploadMaterials}

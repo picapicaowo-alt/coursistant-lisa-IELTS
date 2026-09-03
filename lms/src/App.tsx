@@ -48,6 +48,9 @@ const CounsellorIntakeFormPage = lazy(() => import('./pages/CounsellorIntakeForm
 const CounsellorAssignAdvisorPage = lazy(() => import('./pages/CounsellorAssignAdvisorPage'));
 const AdvisorStudentsPage = lazy(() => import('./pages/AdvisorStudentsPage'));
 const AdvisorOperationsPage = lazy(() => import('./pages/AdvisorOperationsPage'));
+const AdvisorTasksPage = lazy(() => import('./pages/AdvisorOperationsPage/AdvisorTasksPage'));
+const AdvisorCoursesPage = lazy(() => import('./pages/AdvisorOperationsPage/AdvisorCoursesPage'));
+const AdvisorSchedulePage = lazy(() => import('./pages/AdvisorOperationsPage/AdvisorSchedulePage'));
 const AdvisorMessagesPage = lazy(() => import('@/pages/AdvisorMessagesPage'));
 const AdvisorStudentLayout = lazy(() => import('./pages/AdvisorStudentWorkspacePage'));
 const AdvisorStudentIntakePage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/IntakePage'));
@@ -162,6 +165,9 @@ const App = () => {
               <Route path={APP_ROUTE_PATHS.counsellorIntakesIntakeIdAssign} element={<RequireAdvisingAccess gate="counsellor"><CounsellorAssignAdvisorPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.advisorStudents} element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentsPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.advisorOperations} element={<RequireAdvisingAccess gate="advisor"><AdvisorOperationsPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.advisorTasks} element={<RequireAdvisingAccess gate="advisor"><AdvisorTasksPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.advisorCourses} element={<RequireAdvisingAccess gate="advisor"><AdvisorCoursesPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.advisorSchedule} element={<RequireAdvisingAccess gate="advisor"><AdvisorSchedulePage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.advisorMessages} element={<RequireAdvisingAccess gate="advisor"><AdvisorMessagesPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserId} element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentLayout/></RequireAdvisingAccess>}>
                 <Route index element={<Navigate to="intake" replace/>}/>

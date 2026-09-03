@@ -1,4 +1,5 @@
 import type { ListeningPart } from '../../data/listening/types'
+import {AnswerSummary} from '../AnswerSummary'
 
 type ListeningBottomBarProps = {
   parts: ListeningPart[]
@@ -70,6 +71,8 @@ export function ListeningBottomBar({
   return (
     <footer className="bottom-bar">
       <div className="bottom-bar__left">
+        <h2 className="exam-navigation-title">Listening</h2>
+        <AnswerSummary questionNumbers={questionNumbers} answers={answers} reviewByQuestion={reviewByQuestion} />
         <div className="question-nav">
           <span className="question-nav__label">{currentPart?.label ?? 'Part'}</span>
           {questionNumbers.map((n) => (
@@ -79,13 +82,14 @@ export function ListeningBottomBar({
               className={chipClass(n, currentQuestion, answers, reviewByQuestion)}
               onClick={() => onJump(n)}
               aria-label={`Go to question ${n}`}
+              aria-current={currentQuestion === n ? 'step' : undefined}
             >
               {n}
             </button>
           ))}
         </div>
         <div className="bottom-bar__meta">
-          <span>{testTitle}</span>
+          <span className="exam-navigation-context">{testTitle}</span>
           {scoreSummary ? (
             <>
               <span className="bottom-bar__score">
@@ -122,7 +126,7 @@ export function ListeningBottomBar({
         <span className="bottom-bar__clock">{clockLabel}</span>
         <button
           type="button"
-          className="bar-btn"
+          className="bar-btn bar-btn--primary"
           onClick={onFinish}
           disabled={submitting || submitted}
         >

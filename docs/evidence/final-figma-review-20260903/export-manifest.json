@@ -1,0 +1,1775 @@
+{
+  "sourceName": "x-learning (Copy).zip",
+  "sha256": "3067e46e07983cb5dd6cf8efd21d853d11a3d060ac0e95553d30184f200ad00f",
+  "fileCount": 352,
+  "kinds": {
+    ".svg": 238,
+    ".png": 114
+  },
+  "emptyFiles": [
+    "Study plan/vuesax/linear/video-square-1.svg",
+    "Study plan/vuesax/linear/video-square-2.svg"
+  ],
+  "files": [
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/linear/note-text.svg",
+      "bytes": 827,
+      "sha256": "00fb6e9028a68b0c84e1199928fec1feb5c95f905c4729ae561bdeb374b48b3f"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2.svg",
+      "bytes": 738,
+      "sha256": "7d5578f3b99adf24753fb578ebaf456cd99357fa9a63be93d9b535a4ac41291f"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2.png",
+      "bytes": 595,
+      "sha256": "79ca8d5cd5be4ee632d2b4264efd58dfd4539c00963e80a9feb937ef5610852d"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/vuesax/bold/send.svg",
+      "bytes": 541,
+      "sha256": "3b4f3c4575dc47cda6ccad9fd05d123728a6a42f13c94fa5ecd6346704494c20"
+    },
+    {
+      "path": "Dashborad/menu.png",
+      "bytes": 205,
+      "sha256": "aea0557b2f1b0952f3ee085784e952c875b5016ca13605796c448f56a53b6d46"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square.svg",
+      "bytes": 812,
+      "sha256": "8cc46bf05a9500332977b311f269f947280fa6ad0d816f68020f96761c2ca9b8"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/vuesax/bold/document-text.svg",
+      "bytes": 717,
+      "sha256": "19bcb6dbe446304d3428a37236fe4cf6961a29f18afa8a898dfb9a49a22b2b89"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-1.svg",
+      "bytes": 1197,
+      "sha256": "3332f466e72de6af4311f69e6e17a440023d9a665316fc64a4ff6dd15ae0b39d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/archive-book.svg",
+      "bytes": 1160,
+      "sha256": "3421af6cf918782579ce2fc719135b286c4fed7b2ad19d05659ad6a3550cd408"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-2.svg",
+      "bytes": 1007,
+      "sha256": "1566a22892dcc2ba279661bb49d1fd2823dd2a6601cde66190fb9c2312b7944d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/vuesax/bold/clipboard-text.svg",
+      "bytes": 1058,
+      "sha256": "80ee67b4139c9b0ed05e73f8b18f1c108c5f89f3dd876daaded6740f2c034e04"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-3.svg",
+      "bytes": 1007,
+      "sha256": "1566a22892dcc2ba279661bb49d1fd2823dd2a6601cde66190fb9c2312b7944d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/linear/calendar.svg",
+      "bytes": 1376,
+      "sha256": "c365360bb30275dfea661e6364b6f191d3daf47e88992b5b226a1bab1d209b68"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-1.svg",
+      "bytes": 769,
+      "sha256": "3035110002dbc95f3dc3aecad97dd7346da9e6e2a96039bf76b181c08d7fb7e2"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-1.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/menu-1.png",
+      "bytes": 205,
+      "sha256": "aea0557b2f1b0952f3ee085784e952c875b5016ca13605796c448f56a53b6d46"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-4.svg",
+      "bytes": 812,
+      "sha256": "8cc46bf05a9500332977b311f269f947280fa6ad0d816f68020f96761c2ca9b8"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-5.svg",
+      "bytes": 1235,
+      "sha256": "cc2577cbe14cd085bd2cd03c160040b842362d1b1046f9d77fca5bd46287b47c"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/archive-book-1.svg",
+      "bytes": 1184,
+      "sha256": "75cf20934f35e87e2537501f06a123dadc438aed4903b476fd6687c96c4ff881"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-6.svg",
+      "bytes": 1007,
+      "sha256": "36c693dc6d04b2c7e4cf6e688ad6ce9035c5d133bde1afce0d3383682b474b2d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-7.svg",
+      "bytes": 1007,
+      "sha256": "36c693dc6d04b2c7e4cf6e688ad6ce9035c5d133bde1afce0d3383682b474b2d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/linear/login.svg",
+      "bytes": 564,
+      "sha256": "21984a233ed11159ae5cc9d8b706b6778c741896d255fad01b7e263969b96e20"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/linear/login.png",
+      "bytes": 324,
+      "sha256": "45189d00ac384e4df85e7eab0e8f653eb95b66025eb1c5f8d0ad3b7004c35485"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-2.svg",
+      "bytes": 788,
+      "sha256": "ab8e398ff6fed11517a3c088200f1e624299aa3f201d6f20621e38f0033b901c"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-2.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/menu-2.png",
+      "bytes": 205,
+      "sha256": "aea0557b2f1b0952f3ee085784e952c875b5016ca13605796c448f56a53b6d46"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-8.svg",
+      "bytes": 812,
+      "sha256": "8cc46bf05a9500332977b311f269f947280fa6ad0d816f68020f96761c2ca9b8"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-9.svg",
+      "bytes": 1235,
+      "sha256": "cc2577cbe14cd085bd2cd03c160040b842362d1b1046f9d77fca5bd46287b47c"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/archive-book-2.svg",
+      "bytes": 1184,
+      "sha256": "75cf20934f35e87e2537501f06a123dadc438aed4903b476fd6687c96c4ff881"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-10.svg",
+      "bytes": 1007,
+      "sha256": "36c693dc6d04b2c7e4cf6e688ad6ce9035c5d133bde1afce0d3383682b474b2d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-11.svg",
+      "bytes": 1007,
+      "sha256": "36c693dc6d04b2c7e4cf6e688ad6ce9035c5d133bde1afce0d3383682b474b2d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-12.svg",
+      "bytes": 1001,
+      "sha256": "65b881da5e9dbed4b28c2a05f2e0b8ef8c18aa42f95e636e629b5e8ea389157b"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-13.svg",
+      "bytes": 1007,
+      "sha256": "7a909ce1dcd75c93a02541d22b2bcdc5008967d4536533a4610af8e52ee21bef"
+    },
+    {
+      "path": "My courses/vuesax/linear/edit-2.svg",
+      "bytes": 765,
+      "sha256": "92fca6ac8d5f98e0dbd00d6a1d83a447bc155bbac340e8b990319416d6279a5a"
+    },
+    {
+      "path": "My courses/vuesax/linear/edit-2.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "My courses/vuesax/linear/vuesax/linear/tick-circle.svg",
+      "bytes": 516,
+      "sha256": "fd79d722b43a8505342b3f5c2de077ec16c08f36682d8dff38a0df928ccf1473"
+    },
+    {
+      "path": "My courses/vuesax/linear/vuesax/linear/tick-circle.png",
+      "bytes": 331,
+      "sha256": "831500b2a28fa88db0b90fb708c5d6f3dff78002c05b8f5897569ad35cdaff94"
+    },
+    {
+      "path": "My courses/vuesax/linear/vuesax/linear/calendar.svg",
+      "bytes": 1399,
+      "sha256": "8f1b2648932c81f120e3c2bec37d3ed32f63efe5314267784c8e28567aa8c2bd"
+    },
+    {
+      "path": "My courses/vuesax/linear/row-vertical.svg",
+      "bytes": 922,
+      "sha256": "047de728ad59ee8dc7a1147e7402f221047bcf2b0f75c9d392a5768891e0de47"
+    },
+    {
+      "path": "My courses/vuesax/linear/vuesax/bold/vuesax/bold/element-3.svg",
+      "bytes": 793,
+      "sha256": "e0e7264d3a023d0906d9962416e4637b377f0b782e4344fe4659a6cffa475d77"
+    },
+    {
+      "path": "My courses/vuesax/linear/vuesax/linear/row-vertical.svg",
+      "bytes": 549,
+      "sha256": "4befd1703c6a53c7618b8eedf0ee40a9d5fe7e78eb69bae42ebd0624313771b3"
+    },
+    {
+      "path": "My courses/vuesax/linear/vuesax/linear/row-vertical.png",
+      "bytes": 428,
+      "sha256": "1842690cd33c4cde1e21133dfb0a8792d6431adc3ab481b7df7b75fe96535fcf"
+    },
+    {
+      "path": "Study plan/vuesax/linear/video-square.svg",
+      "bytes": 675,
+      "sha256": "e58649fe3572ad07d3454064514b86e06649850d67cb7121c0a46de0d58f3d4c"
+    },
+    {
+      "path": "Study plan/vuesax/linear/video-square.png",
+      "bytes": 605,
+      "sha256": "7c0a1c076b853f22298499bce367715739b69daee08e64ba1a74e5be7c6c2aa7"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock.svg",
+      "bytes": 592,
+      "sha256": "8ba48547d6c507346609ecfef3028a6939fbe5f19249f07d5837c38ec118db12"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock.png",
+      "bytes": 536,
+      "sha256": "29205773cacb478d9253df0ed61bf36b1adf76c3e25a1f300ef6cf81106faffa"
+    },
+    {
+      "path": "Study plan/vuesax/bold/vuesax/bold/note-2.svg",
+      "bytes": 1500,
+      "sha256": "94363da092f268ba29b50d231451e037417b53ac0ff51fb14659b636d461d6b9"
+    },
+    {
+      "path": "Study plan/vuesax/linear/vuesax/linear/book.svg",
+      "bytes": 1058,
+      "sha256": "3f1f34e8c358f6d6c17710c0482a070ba76ebdd56271facb4634f5af28d4b171"
+    },
+    {
+      "path": "Study plan/vuesax/linear/vuesax/linear/book.png",
+      "bytes": 579,
+      "sha256": "d771f4e20ba8c436d0788fbb0f4844be77447aa72731ebcb3d48bd95a1850563"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-1.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-2.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-3.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-4.svg",
+      "bytes": 152,
+      "sha256": "b9b8c8f1bd30c6e87e43a1354d6c24ab963afb467d94ce8e2c4ddc261a2d64a4"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-5.svg",
+      "bytes": 152,
+      "sha256": "b9b8c8f1bd30c6e87e43a1354d6c24ab963afb467d94ce8e2c4ddc261a2d64a4"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-6.svg",
+      "bytes": 152,
+      "sha256": "b9b8c8f1bd30c6e87e43a1354d6c24ab963afb467d94ce8e2c4ddc261a2d64a4"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-7.svg",
+      "bytes": 152,
+      "sha256": "b9b8c8f1bd30c6e87e43a1354d6c24ab963afb467d94ce8e2c4ddc261a2d64a4"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-8.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-9.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right.svg",
+      "bytes": 316,
+      "sha256": "69add20e3c6ea7e80f059acb93c54cdc4a14c48f7b2df70d5458f802a0805786"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right.png",
+      "bytes": 217,
+      "sha256": "aa515fdd8cda6c68f74cb17822688661e192eb2b0fb4756f79203f11484742b1"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-10.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-11.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-12.svg",
+      "bytes": 152,
+      "sha256": "b9b8c8f1bd30c6e87e43a1354d6c24ab963afb467d94ce8e2c4ddc261a2d64a4"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-13.svg",
+      "bytes": 152,
+      "sha256": "b9b8c8f1bd30c6e87e43a1354d6c24ab963afb467d94ce8e2c4ddc261a2d64a4"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-14.svg",
+      "bytes": 152,
+      "sha256": "b9b8c8f1bd30c6e87e43a1354d6c24ab963afb467d94ce8e2c4ddc261a2d64a4"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-15.svg",
+      "bytes": 152,
+      "sha256": "b9b8c8f1bd30c6e87e43a1354d6c24ab963afb467d94ce8e2c4ddc261a2d64a4"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-16.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-17.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-1.svg",
+      "bytes": 316,
+      "sha256": "69add20e3c6ea7e80f059acb93c54cdc4a14c48f7b2df70d5458f802a0805786"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-1.png",
+      "bytes": 217,
+      "sha256": "aa515fdd8cda6c68f74cb17822688661e192eb2b0fb4756f79203f11484742b1"
+    },
+    {
+      "path": "Study plan/menu.png",
+      "bytes": 205,
+      "sha256": "aea0557b2f1b0952f3ee085784e952c875b5016ca13605796c448f56a53b6d46"
+    },
+    {
+      "path": "Study plan/vuesax/linear/vuesax/linear/note-text.svg",
+      "bytes": 895,
+      "sha256": "26f847055d5c020e53e50c0fc7c9fa8cfec8cc6547f9bdf58b3a720277b1eec9"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock-1.svg",
+      "bytes": 546,
+      "sha256": "1db9ad338349b0092bdfd2a50ee813124f069dd24b5932238f12cdd9df232b9f"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock-1.png",
+      "bytes": 536,
+      "sha256": "29205773cacb478d9253df0ed61bf36b1adf76c3e25a1f300ef6cf81106faffa"
+    },
+    {
+      "path": "Study plan/vuesax/linear/vuesax/linear/document-download.svg",
+      "bytes": 606,
+      "sha256": "09d358d45373914d39a725a2c7568b414913819c14b63780e9998fc0ad42b657"
+    },
+    {
+      "path": "Study plan/vuesax/linear/vuesax/linear/document-download.png",
+      "bytes": 670,
+      "sha256": "66d055d95ce3faaa96e97591e87bdd7cea3f6abe4e2fb4c94589b93e8b634aa2"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock-2.svg",
+      "bytes": 546,
+      "sha256": "1db9ad338349b0092bdfd2a50ee813124f069dd24b5932238f12cdd9df232b9f"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock-2.png",
+      "bytes": 536,
+      "sha256": "29205773cacb478d9253df0ed61bf36b1adf76c3e25a1f300ef6cf81106faffa"
+    },
+    {
+      "path": "Study plan/vuesax/linear/video-square-1.svg",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Study plan/vuesax/linear/video-square-1.png",
+      "bytes": 159,
+      "sha256": "06c8edc17122b1dbff43fb2435dc6cd438094aa7fdf5438491a801d8e70cf9f6"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock-3.svg",
+      "bytes": 546,
+      "sha256": "1db9ad338349b0092bdfd2a50ee813124f069dd24b5932238f12cdd9df232b9f"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock-3.png",
+      "bytes": 536,
+      "sha256": "29205773cacb478d9253df0ed61bf36b1adf76c3e25a1f300ef6cf81106faffa"
+    },
+    {
+      "path": "Study plan/vuesax/linear/video-square-2.svg",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "Study plan/vuesax/linear/video-square-2.png",
+      "bytes": 159,
+      "sha256": "06c8edc17122b1dbff43fb2435dc6cd438094aa7fdf5438491a801d8e70cf9f6"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock-4.svg",
+      "bytes": 592,
+      "sha256": "8ba48547d6c507346609ecfef3028a6939fbe5f19249f07d5837c38ec118db12"
+    },
+    {
+      "path": "Study plan/vuesax/linear/clock-4.png",
+      "bytes": 536,
+      "sha256": "29205773cacb478d9253df0ed61bf36b1adf76c3e25a1f300ef6cf81106faffa"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-18.svg",
+      "bytes": 529,
+      "sha256": "47369c8001c77c237707e6efaeb5be86bf67a3244f4f2ada896d87772907513f"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/linear/people.svg",
+      "bytes": 1760,
+      "sha256": "00ea731b70523e0f6467f79d22ff68e7cb36c98d0ebad056bba756a41aba4c13"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/sms-tracking.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "Dashborad/menu-3.png",
+      "bytes": 205,
+      "sha256": "aea0557b2f1b0952f3ee085784e952c875b5016ca13605796c448f56a53b6d46"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/linear/arrow-up.svg",
+      "bytes": 398,
+      "sha256": "2d4191ddb65f11a9d89520d875cc059749f633575a08dcbe1e3d37c4e0ac0ce0"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/linear/arrow-up.png",
+      "bytes": 290,
+      "sha256": "291acc1b49e6346a778b9b4e7d62a3afc4bde6ca19434f9c94c8c01a90d4981d"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/vuesax/bold/tick-square.svg",
+      "bytes": 523,
+      "sha256": "dfc06912905c51e5bd746f9620a5e0c32f227f4f1accfbaee7e90ad5aa8bce71"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/sms-tracking-1.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "Dashborad/menu-4.png",
+      "bytes": 205,
+      "sha256": "aea0557b2f1b0952f3ee085784e952c875b5016ca13605796c448f56a53b6d46"
+    },
+    {
+      "path": "student/vuesax/bold/people.svg",
+      "bytes": 1472,
+      "sha256": "d8b91dd2003c5c037aef55b1266ee0ed8456a3c7820a5e14ba440014147c252d"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/linear/vuesax/linear/message.svg",
+      "bytes": 754,
+      "sha256": "c6c1bdb4e96e5ce57b5d6a12e2d96c56a00f5f81f3a664fdf00a3e6d8024cda1"
+    },
+    {
+      "path": "student/vuesax/linear/vuesax/linear/message.png",
+      "bytes": 591,
+      "sha256": "d5ebd9da285d15b9b0bf1697207602966f9e50a7acff13b463834afd6b3201eb"
+    },
+    {
+      "path": "messages/vuesax/bold/vuesax/bold/sms.svg",
+      "bytes": 514,
+      "sha256": "0b819daac050eb3278b3f81f65623253d3dd985ad99ee66970e69610f8d5aa14"
+    },
+    {
+      "path": "student/vuesax/bold/people-1.svg",
+      "bytes": 1472,
+      "sha256": "d8b91dd2003c5c037aef55b1266ee0ed8456a3c7820a5e14ba440014147c252d"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-1.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/people-2.svg",
+      "bytes": 1512,
+      "sha256": "e4a4637cd2aded0ebd74640da90fdd9b00f17f40df4a6f8dad0d44140f59cd08"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-2.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/tick-circle.svg",
+      "bytes": 529,
+      "sha256": "47369c8001c77c237707e6efaeb5be86bf67a3244f4f2ada896d87772907513f"
+    },
+    {
+      "path": "student/vuesax/bold/microphone.svg",
+      "bytes": 1406,
+      "sha256": "6e9de1a0e735b3a123b18a00561cf9959208fa3b77558e3674e3f223f946da7a"
+    },
+    {
+      "path": "student/vuesax/bold/people-3.svg",
+      "bytes": 1512,
+      "sha256": "e4a4637cd2aded0ebd74640da90fdd9b00f17f40df4a6f8dad0d44140f59cd08"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-3.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/tick-circle-1.svg",
+      "bytes": 529,
+      "sha256": "47369c8001c77c237707e6efaeb5be86bf67a3244f4f2ada896d87772907513f"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-1.svg",
+      "bytes": 1406,
+      "sha256": "6e9de1a0e735b3a123b18a00561cf9959208fa3b77558e3674e3f223f946da7a"
+    },
+    {
+      "path": "student/vuesax/linear/add.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "student/vuesax/bold/people-4.svg",
+      "bytes": 1603,
+      "sha256": "a7ba98e896438272f770906cf9734230f418b15880147fa9a6e5e109bbf3164e"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-4.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-2.svg",
+      "bytes": 1362,
+      "sha256": "dde514c816fad3df01a5288b40a393f69555baab93ddcd29ed658ffd3c920232"
+    },
+    {
+      "path": "student/vuesax/linear/add-1.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add-1.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "student/vuesax/bold/people-5.svg",
+      "bytes": 1603,
+      "sha256": "a7ba98e896438272f770906cf9734230f418b15880147fa9a6e5e109bbf3164e"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-5.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-3.svg",
+      "bytes": 1362,
+      "sha256": "dde514c816fad3df01a5288b40a393f69555baab93ddcd29ed658ffd3c920232"
+    },
+    {
+      "path": "student/vuesax/linear/add-2.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add-2.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "student/vuesax/bold/tick-circle-2.svg",
+      "bytes": 529,
+      "sha256": "47369c8001c77c237707e6efaeb5be86bf67a3244f4f2ada896d87772907513f"
+    },
+    {
+      "path": "student/vuesax/bold/people-6.svg",
+      "bytes": 1603,
+      "sha256": "a7ba98e896438272f770906cf9734230f418b15880147fa9a6e5e109bbf3164e"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-6.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-4.svg",
+      "bytes": 1362,
+      "sha256": "dde514c816fad3df01a5288b40a393f69555baab93ddcd29ed658ffd3c920232"
+    },
+    {
+      "path": "student/vuesax/linear/add-3.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add-3.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "student/vuesax/linear/video-square.svg",
+      "bytes": 688,
+      "sha256": "3996b446779457d4e8c48c9f6be4ab7b607157ab9a56b8eb15e4a81ccae9e46f"
+    },
+    {
+      "path": "student/vuesax/linear/video-square.png",
+      "bytes": 605,
+      "sha256": "7c0a1c076b853f22298499bce367715739b69daee08e64ba1a74e5be7c6c2aa7"
+    },
+    {
+      "path": "student/vuesax/bold/tick-circle-3.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "student/vuesax/bold/tick-circle-4.svg",
+      "bytes": 516,
+      "sha256": "3eaead5e77499c6b4041fb0a09924c4ab7335fc60317ef51fda301c884d7f08c"
+    },
+    {
+      "path": "student/vuesax/bold/people-7.svg",
+      "bytes": 1603,
+      "sha256": "a7ba98e896438272f770906cf9734230f418b15880147fa9a6e5e109bbf3164e"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-7.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-5.svg",
+      "bytes": 1362,
+      "sha256": "dde514c816fad3df01a5288b40a393f69555baab93ddcd29ed658ffd3c920232"
+    },
+    {
+      "path": "student/vuesax/linear/add-4.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add-4.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "student/vuesax/linear/vuesax/linear/profile-2user.svg",
+      "bytes": 1126,
+      "sha256": "2f8a3c225a7ab849b0a8caa3d5372ee9c8d700b535695205751eec3dfc7b19b2"
+    },
+    {
+      "path": "student/vuesax/linear/vuesax/linear/profile-2user.png",
+      "bytes": 890,
+      "sha256": "f1ae2566a69ec42ccd6c79e2c32e61273a2194ed88bca82ef93acfd1bb2ba667"
+    },
+    {
+      "path": "student/vuesax/linear/vuesax/linear/profile.svg",
+      "bytes": 678,
+      "sha256": "0335506aeb76e3a26d58ff0ff8e99ea39f6480747b3b1fe41fe10bcc9216f3d2"
+    },
+    {
+      "path": "student/vuesax/linear/vuesax/linear/profile.png",
+      "bytes": 728,
+      "sha256": "f07c9205aaa6d945a65c7e9d0b3b26d39288f666bc8aeb961ecf4c1270986516"
+    },
+    {
+      "path": "student/vuesax/linear/vuesax/linear/profile-circle.svg",
+      "bytes": 997,
+      "sha256": "83e8d9442b3dbaeae6472e7e1a3fa108cb8e41e0d75d5637de1d9e4c1a6e3f7a"
+    },
+    {
+      "path": "student/vuesax/linear/vuesax/linear/profile-circle.png",
+      "bytes": 930,
+      "sha256": "7cc5ade0b240d344cb8d18922b9461157f588df71bf7b001f21a5bacbb449f04"
+    },
+    {
+      "path": "student/vuesax/bold/tick-circle-5.svg",
+      "bytes": 588,
+      "sha256": "3c1cadaa1dc187311b21fe7e2fbe261bbd3edb83ca8c3183b09e91e25709740b"
+    },
+    {
+      "path": "student/vuesax/bold/people-8.svg",
+      "bytes": 1603,
+      "sha256": "a7ba98e896438272f770906cf9734230f418b15880147fa9a6e5e109bbf3164e"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-8.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-6.svg",
+      "bytes": 1362,
+      "sha256": "dde514c816fad3df01a5288b40a393f69555baab93ddcd29ed658ffd3c920232"
+    },
+    {
+      "path": "student/vuesax/linear/add-5.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add-5.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "student/vuesax/bold/people-9.svg",
+      "bytes": 1603,
+      "sha256": "a7ba98e896438272f770906cf9734230f418b15880147fa9a6e5e109bbf3164e"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-9.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-7.svg",
+      "bytes": 1362,
+      "sha256": "dde514c816fad3df01a5288b40a393f69555baab93ddcd29ed658ffd3c920232"
+    },
+    {
+      "path": "student/vuesax/linear/add-6.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add-6.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "student/vuesax/linear/calendar.svg",
+      "bytes": 1486,
+      "sha256": "3fd6fd5352e8485d51a05bf47c5ae0a1eb6fbf0c7dac3cb7519c686aa0ace25d"
+    },
+    {
+      "path": "student/vuesax/linear/calendar-1.svg",
+      "bytes": 1486,
+      "sha256": "3fd6fd5352e8485d51a05bf47c5ae0a1eb6fbf0c7dac3cb7519c686aa0ace25d"
+    },
+    {
+      "path": "student/vuesax/bold/people-10.svg",
+      "bytes": 1603,
+      "sha256": "a7ba98e896438272f770906cf9734230f418b15880147fa9a6e5e109bbf3164e"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-10.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-8.svg",
+      "bytes": 1362,
+      "sha256": "dde514c816fad3df01a5288b40a393f69555baab93ddcd29ed658ffd3c920232"
+    },
+    {
+      "path": "student/vuesax/linear/add-7.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add-7.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "student/vuesax/bold/people-11.svg",
+      "bytes": 1512,
+      "sha256": "e4a4637cd2aded0ebd74640da90fdd9b00f17f40df4a6f8dad0d44140f59cd08"
+    },
+    {
+      "path": "student/vuesax/linear/sms-tracking-11.svg",
+      "bytes": 725,
+      "sha256": "60f3495b074520478c2f32d732ee701f307cb55c529cd1ef51a9d69a539e8326"
+    },
+    {
+      "path": "student/vuesax/bold/microphone-9.svg",
+      "bytes": 1406,
+      "sha256": "6e9de1a0e735b3a123b18a00561cf9959208fa3b77558e3674e3f223f946da7a"
+    },
+    {
+      "path": "student/vuesax/linear/add-8.svg",
+      "bytes": 307,
+      "sha256": "a6d4a4d3f920f2ab6be0e951f0dd04d8b998c3f99f32701e3b61f85216d80c50"
+    },
+    {
+      "path": "student/vuesax/linear/add-8.png",
+      "bytes": 227,
+      "sha256": "d283640aca0cb610048357f41da7f90a147e89c0b1c5975ad491e700bbb3bad2"
+    },
+    {
+      "path": "Study plan/vuesax/bold/vuesax/bold/note.svg",
+      "bytes": 1821,
+      "sha256": "4c22af199b4c644fe2c8184c02d2d8fe642fe37fe7da821c3bf869a452b86d88"
+    },
+    {
+      "path": "Study plan/vuesax/linear/edit-2.svg",
+      "bytes": 825,
+      "sha256": "5dcd95b1188f497f3899b567211d385877421c16bd6656638eb4610944762f02"
+    },
+    {
+      "path": "Study plan/vuesax/linear/edit-2.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-19.svg",
+      "bytes": 529,
+      "sha256": "47369c8001c77c237707e6efaeb5be86bf67a3244f4f2ada896d87772907513f"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-2.svg",
+      "bytes": 404,
+      "sha256": "85abd5f0ff42fa47f030fd8420edd12d745fe3a9a6d62c43ed203302ba808fdb"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-2.png",
+      "bytes": 299,
+      "sha256": "d87ef36fe6a6e3dbcb84d271536af16ba06d5a23ac0edc115d65afb5a2824c31"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-3.svg",
+      "bytes": 404,
+      "sha256": "85abd5f0ff42fa47f030fd8420edd12d745fe3a9a6d62c43ed203302ba808fdb"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-3.png",
+      "bytes": 299,
+      "sha256": "d87ef36fe6a6e3dbcb84d271536af16ba06d5a23ac0edc115d65afb5a2824c31"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-4.svg",
+      "bytes": 404,
+      "sha256": "85abd5f0ff42fa47f030fd8420edd12d745fe3a9a6d62c43ed203302ba808fdb"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-4.png",
+      "bytes": 299,
+      "sha256": "d87ef36fe6a6e3dbcb84d271536af16ba06d5a23ac0edc115d65afb5a2824c31"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-5.svg",
+      "bytes": 404,
+      "sha256": "85abd5f0ff42fa47f030fd8420edd12d745fe3a9a6d62c43ed203302ba808fdb"
+    },
+    {
+      "path": "Study plan/vuesax/linear/arrow-right-5.png",
+      "bytes": 299,
+      "sha256": "d87ef36fe6a6e3dbcb84d271536af16ba06d5a23ac0edc115d65afb5a2824c31"
+    },
+    {
+      "path": "Study plan/vuesax/bold/danger.svg",
+      "bytes": 1527,
+      "sha256": "01ba25d342885dfcc5c615f217c1f0425d4bf3d60fe0fa275071de9e4f831d2d"
+    },
+    {
+      "path": "Study plan/vuesax/linear/edit-2-1.svg",
+      "bytes": 815,
+      "sha256": "e9f5c2e63b234edcb647b7e4c97d910aa538cc95f7d9581ffd0cce4c09b0a1c4"
+    },
+    {
+      "path": "Study plan/vuesax/linear/edit-2-1.png",
+      "bytes": 595,
+      "sha256": "79ca8d5cd5be4ee632d2b4264efd58dfd4539c00963e80a9feb937ef5610852d"
+    },
+    {
+      "path": "Frame 1.png",
+      "bytes": 2730,
+      "sha256": "9c0cbb6f369e98b183e50c5d0581ebab01808dcb78d7b4ad604f83567c5c0ea6"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-3.svg",
+      "bytes": 790,
+      "sha256": "a9f8c25098f0ef54d509fb743285789edd5f8384958e83a92a49cf9c457e501e"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-3.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/menu-5.png",
+      "bytes": 205,
+      "sha256": "aea0557b2f1b0952f3ee085784e952c875b5016ca13605796c448f56a53b6d46"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-14.svg",
+      "bytes": 812,
+      "sha256": "8cc46bf05a9500332977b311f269f947280fa6ad0d816f68020f96761c2ca9b8"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-15.svg",
+      "bytes": 1357,
+      "sha256": "85a44fba66689b931026d6a02452dbe81795fa03f19b881b72c1d137742a4a40"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/archive-book-3.svg",
+      "bytes": 1284,
+      "sha256": "f24cfe7d1052a53e609caaf9f344355bc5ebf34bc183aa4d7a3519485e8edf04"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-16.svg",
+      "bytes": 1122,
+      "sha256": "608b405d8ac8b04c66a63c3cb46819b9054f89039f9b1dfc0c44297aadb6acc6"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-17.svg",
+      "bytes": 1122,
+      "sha256": "608b405d8ac8b04c66a63c3cb46819b9054f89039f9b1dfc0c44297aadb6acc6"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-4.svg",
+      "bytes": 790,
+      "sha256": "a9f8c25098f0ef54d509fb743285789edd5f8384958e83a92a49cf9c457e501e"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-4.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/menu-6.png",
+      "bytes": 205,
+      "sha256": "aea0557b2f1b0952f3ee085784e952c875b5016ca13605796c448f56a53b6d46"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-18.svg",
+      "bytes": 812,
+      "sha256": "8cc46bf05a9500332977b311f269f947280fa6ad0d816f68020f96761c2ca9b8"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-19.svg",
+      "bytes": 1357,
+      "sha256": "85a44fba66689b931026d6a02452dbe81795fa03f19b881b72c1d137742a4a40"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/archive-book-4.svg",
+      "bytes": 1284,
+      "sha256": "f24cfe7d1052a53e609caaf9f344355bc5ebf34bc183aa4d7a3519485e8edf04"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-20.svg",
+      "bytes": 1122,
+      "sha256": "608b405d8ac8b04c66a63c3cb46819b9054f89039f9b1dfc0c44297aadb6acc6"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-21.svg",
+      "bytes": 1122,
+      "sha256": "608b405d8ac8b04c66a63c3cb46819b9054f89039f9b1dfc0c44297aadb6acc6"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-5.svg",
+      "bytes": 821,
+      "sha256": "ae4f98975cd8d063825a55b900417a5a11b53bbeb34fc1517569e33ca3c6c92b"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-5.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush.svg",
+      "bytes": 1792,
+      "sha256": "4e6ca23450b5052e58f93a0506b3e0298c22dd1c134d2d9b9b85fc57b6209f3b"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush.png",
+      "bytes": 688,
+      "sha256": "65294c8418215f54d0b4d64784478994b81037b31844b913b4b373f054e93ff6"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/microphone.svg",
+      "bytes": 1341,
+      "sha256": "65ac2fbc77514914b0f4de17dba29745a60a4ca02b6d8a74ce894b0fb9fbd3ca"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-6.svg",
+      "bytes": 850,
+      "sha256": "86b5d02a69a0de4ff98583b0ee43e249056726ad7eaadcba8988da6fefe13802"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-6.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-1.svg",
+      "bytes": 1804,
+      "sha256": "abc7587eaa958e7db996b3b067cff6b49fbc85abdd9b90e92e17f832ed533c5f"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-1.png",
+      "bytes": 688,
+      "sha256": "65294c8418215f54d0b4d64784478994b81037b31844b913b4b373f054e93ff6"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/microphone-1.svg",
+      "bytes": 1182,
+      "sha256": "f6ea331cc1594f65e742d30886afeec06a2d1076ca469f4e8b47a1efba431a60"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-7.svg",
+      "bytes": 850,
+      "sha256": "86b5d02a69a0de4ff98583b0ee43e249056726ad7eaadcba8988da6fefe13802"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-7.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-2.svg",
+      "bytes": 1804,
+      "sha256": "9291c9407176a6a35abcea46a7b2b573e6697562aa40bfe66ca0a0c322824e27"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-2.png",
+      "bytes": 688,
+      "sha256": "65294c8418215f54d0b4d64784478994b81037b31844b913b4b373f054e93ff6"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/microphone-2.svg",
+      "bytes": 1182,
+      "sha256": "f6ea331cc1594f65e742d30886afeec06a2d1076ca469f4e8b47a1efba431a60"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-8.svg",
+      "bytes": 840,
+      "sha256": "acdba7771040d4d78760e757243ef314684e2ec5a28e5d2b56eb791b6fec0e4c"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-8.png",
+      "bytes": 681,
+      "sha256": "5291c8c1c15eaeb0af5d292ae58667ea6fc6a357b24de32df597fe6ed3913c91"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-3.svg",
+      "bytes": 1804,
+      "sha256": "8ff11971cd851641d6b021b1ed164685f81fa89a33caeb22e7458bc7da09211b"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-3.png",
+      "bytes": 688,
+      "sha256": "65294c8418215f54d0b4d64784478994b81037b31844b913b4b373f054e93ff6"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/microphone-3.svg",
+      "bytes": 1228,
+      "sha256": "3f7d0929e400118a1d0e246fa66e221f04bc46c292f0eafc13f0b8a605a83580"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-9.svg",
+      "bytes": 821,
+      "sha256": "ae4f98975cd8d063825a55b900417a5a11b53bbeb34fc1517569e33ca3c6c92b"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-9.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/tick-square.svg",
+      "bytes": 732,
+      "sha256": "e7d455aaed70c59f73abeaa5f06fa9e0a2962f4e0dfc6ef0fea77b4008e98f1d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-10.svg",
+      "bytes": 840,
+      "sha256": "acdba7771040d4d78760e757243ef314684e2ec5a28e5d2b56eb791b6fec0e4c"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-10.png",
+      "bytes": 681,
+      "sha256": "5291c8c1c15eaeb0af5d292ae58667ea6fc6a357b24de32df597fe6ed3913c91"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-11.svg",
+      "bytes": 850,
+      "sha256": "86b5d02a69a0de4ff98583b0ee43e249056726ad7eaadcba8988da6fefe13802"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-11.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-4.svg",
+      "bytes": 1804,
+      "sha256": "ab62c472a5bdff510324bc51c5dd28ad3121852e7cc5c8b53167f731c4ecc01a"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-4.png",
+      "bytes": 688,
+      "sha256": "65294c8418215f54d0b4d64784478994b81037b31844b913b4b373f054e93ff6"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/microphone-4.svg",
+      "bytes": 1182,
+      "sha256": "f6ea331cc1594f65e742d30886afeec06a2d1076ca469f4e8b47a1efba431a60"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-22.svg",
+      "bytes": 1153,
+      "sha256": "2ed736abd4493cbf50606d388949a2ff805e45ce656bd683246b9b3ace8a7c9d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-23.svg",
+      "bytes": 812,
+      "sha256": "8cc46bf05a9500332977b311f269f947280fa6ad0d816f68020f96761c2ca9b8"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-24.svg",
+      "bytes": 1395,
+      "sha256": "e3295b35b5513d5411d351c18c6661c78df5fc4a1b8e2a0489c583cd8c6db0fb"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/archive-book-5.svg",
+      "bytes": 1308,
+      "sha256": "b155b0c5555c28042fcac54f17926118a701b336cb47a0c8690b9ddfb3dd3dea"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-5.svg",
+      "bytes": 1804,
+      "sha256": "eefbc8ae81efbb0b7929fd03e49dd6e280dd8d87c1a4878bbb9dd665c9d27ed6"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/brush-5.png",
+      "bytes": 688,
+      "sha256": "65294c8418215f54d0b4d64784478994b81037b31844b913b4b373f054e93ff6"
+    },
+    {
+      "path": "Dashborad/vuesax/bold/microphone-5.svg",
+      "bytes": 1182,
+      "sha256": "f6ea331cc1594f65e742d30886afeec06a2d1076ca469f4e8b47a1efba431a60"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-25.svg",
+      "bytes": 1153,
+      "sha256": "2ed736abd4493cbf50606d388949a2ff805e45ce656bd683246b9b3ace8a7c9d"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-26.svg",
+      "bytes": 812,
+      "sha256": "8cc46bf05a9500332977b311f269f947280fa6ad0d816f68020f96761c2ca9b8"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/task-square-27.svg",
+      "bytes": 1395,
+      "sha256": "e3295b35b5513d5411d351c18c6661c78df5fc4a1b8e2a0489c583cd8c6db0fb"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/vuesax/bold/archive-book-6.svg",
+      "bytes": 1308,
+      "sha256": "b155b0c5555c28042fcac54f17926118a701b336cb47a0c8690b9ddfb3dd3dea"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-12.svg",
+      "bytes": 850,
+      "sha256": "c24832e15437acb2fca9e5f64f6f8d3016a383136d38a1bb7552505c69e47d6f"
+    },
+    {
+      "path": "Dashborad/vuesax/linear/edit-2-12.png",
+      "bytes": 681,
+      "sha256": "5291c8c1c15eaeb0af5d292ae58667ea6fc6a357b24de32df597fe6ed3913c91"
+    },
+    {
+      "path": "vuesax/bold/vuesax/bold/calendar.svg",
+      "bytes": 3134,
+      "sha256": "8681bc046a78dd095e6e4bc29e518432e87a667fcadae98d789fea510069fe8c"
+    },
+    {
+      "path": "vuesax/linear/edit-2.svg",
+      "bytes": 790,
+      "sha256": "a9f8c25098f0ef54d509fb743285789edd5f8384958e83a92a49cf9c457e501e"
+    },
+    {
+      "path": "vuesax/linear/edit-2.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "vuesax/linear/edit-2-1.svg",
+      "bytes": 840,
+      "sha256": "acdba7771040d4d78760e757243ef314684e2ec5a28e5d2b56eb791b6fec0e4c"
+    },
+    {
+      "path": "vuesax/linear/edit-2-1.png",
+      "bytes": 681,
+      "sha256": "5291c8c1c15eaeb0af5d292ae58667ea6fc6a357b24de32df597fe6ed3913c91"
+    },
+    {
+      "path": "vuesax/linear/document.svg",
+      "bytes": 454,
+      "sha256": "eb32b67401fc1acc562f12e788e2ef49f849b8e1f83d9cde5344d5b328f51044"
+    },
+    {
+      "path": "vuesax/linear/document.png",
+      "bytes": 526,
+      "sha256": "879a3a8c80d6d4a64b1ce773ac25ef5194c8a60cdd05458515fac3a33b12c7a7"
+    },
+    {
+      "path": "vuesax/linear/profile-2user.svg",
+      "bytes": 1182,
+      "sha256": "d5a2b2a98d1bcf669eb6449c9d096fb4d35085b1c3d1277c5f11d2f8a1a662f8"
+    },
+    {
+      "path": "vuesax/linear/profile-2user.png",
+      "bytes": 725,
+      "sha256": "792c248fe33a03e8315110da2520bbdbecc469c3b7a45f872731088d2ad1b836"
+    },
+    {
+      "path": "vuesax/linear/edit-2-2.svg",
+      "bytes": 850,
+      "sha256": "86b5d02a69a0de4ff98583b0ee43e249056726ad7eaadcba8988da6fefe13802"
+    },
+    {
+      "path": "vuesax/linear/edit-2-2.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "vuesax/linear/document-1.svg",
+      "bytes": 454,
+      "sha256": "eb32b67401fc1acc562f12e788e2ef49f849b8e1f83d9cde5344d5b328f51044"
+    },
+    {
+      "path": "vuesax/linear/document-1.png",
+      "bytes": 526,
+      "sha256": "879a3a8c80d6d4a64b1ce773ac25ef5194c8a60cdd05458515fac3a33b12c7a7"
+    },
+    {
+      "path": "vuesax/linear/profile-2user-1.svg",
+      "bytes": 1182,
+      "sha256": "d5a2b2a98d1bcf669eb6449c9d096fb4d35085b1c3d1277c5f11d2f8a1a662f8"
+    },
+    {
+      "path": "vuesax/linear/profile-2user-1.png",
+      "bytes": 725,
+      "sha256": "792c248fe33a03e8315110da2520bbdbecc469c3b7a45f872731088d2ad1b836"
+    },
+    {
+      "path": "vuesax/linear/edit-2-3.svg",
+      "bytes": 850,
+      "sha256": "86b5d02a69a0de4ff98583b0ee43e249056726ad7eaadcba8988da6fefe13802"
+    },
+    {
+      "path": "vuesax/linear/edit-2-3.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "vuesax/linear/document-2.svg",
+      "bytes": 454,
+      "sha256": "eb32b67401fc1acc562f12e788e2ef49f849b8e1f83d9cde5344d5b328f51044"
+    },
+    {
+      "path": "vuesax/linear/document-2.png",
+      "bytes": 526,
+      "sha256": "879a3a8c80d6d4a64b1ce773ac25ef5194c8a60cdd05458515fac3a33b12c7a7"
+    },
+    {
+      "path": "vuesax/linear/profile-2user-2.svg",
+      "bytes": 1182,
+      "sha256": "d5a2b2a98d1bcf669eb6449c9d096fb4d35085b1c3d1277c5f11d2f8a1a662f8"
+    },
+    {
+      "path": "vuesax/linear/profile-2user-2.png",
+      "bytes": 725,
+      "sha256": "792c248fe33a03e8315110da2520bbdbecc469c3b7a45f872731088d2ad1b836"
+    },
+    {
+      "path": "vuesax/linear/edit-2-4.svg",
+      "bytes": 850,
+      "sha256": "86b5d02a69a0de4ff98583b0ee43e249056726ad7eaadcba8988da6fefe13802"
+    },
+    {
+      "path": "vuesax/linear/edit-2-4.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "vuesax/linear/edit-2-5.svg",
+      "bytes": 850,
+      "sha256": "c24832e15437acb2fca9e5f64f6f8d3016a383136d38a1bb7552505c69e47d6f"
+    },
+    {
+      "path": "vuesax/linear/edit-2-5.png",
+      "bytes": 681,
+      "sha256": "5291c8c1c15eaeb0af5d292ae58667ea6fc6a357b24de32df597fe6ed3913c91"
+    },
+    {
+      "path": "vuesax/linear/edit-2-6.svg",
+      "bytes": 850,
+      "sha256": "c24832e15437acb2fca9e5f64f6f8d3016a383136d38a1bb7552505c69e47d6f"
+    },
+    {
+      "path": "vuesax/linear/edit-2-6.png",
+      "bytes": 681,
+      "sha256": "5291c8c1c15eaeb0af5d292ae58667ea6fc6a357b24de32df597fe6ed3913c91"
+    },
+    {
+      "path": "vuesax/linear/vuesax/linear/clock.svg",
+      "bytes": 476,
+      "sha256": "cf94951a4ffbc5ba9a7b1e011281f69184631a71bdf65610b1ed596eff390f0e"
+    },
+    {
+      "path": "vuesax/linear/vuesax/linear/clock.png",
+      "bytes": 795,
+      "sha256": "34626be8a3efb9e7308d4b7879ec55a4341ada600d5b1c244ad1008f11137916"
+    },
+    {
+      "path": "vuesax/linear/task-square.svg",
+      "bytes": 1590,
+      "sha256": "c73dced74adb8c81257d10d67ca5c14a053b4608be240dc054cf1373cb7f9a98"
+    },
+    {
+      "path": "vuesax/linear/vuesax/bold/archive-book.svg",
+      "bytes": 1532,
+      "sha256": "4ea3a8ff80aeb09263c3db7cde4801e99b9b24dbf377466f75b3ea91315811be"
+    },
+    {
+      "path": "vuesax/linear/edit-2-7.svg",
+      "bytes": 821,
+      "sha256": "ae4f98975cd8d063825a55b900417a5a11b53bbeb34fc1517569e33ca3c6c92b"
+    },
+    {
+      "path": "vuesax/linear/edit-2-7.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2.svg",
+      "bytes": 790,
+      "sha256": "a9f8c25098f0ef54d509fb743285789edd5f8384958e83a92a49cf9c457e501e"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down.svg",
+      "bytes": 312,
+      "sha256": "0def542e442881e473469533e72fc8d3e819b1a8876c5ec8817573370a935ffc"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down.png",
+      "bytes": 277,
+      "sha256": "b199bff3fffd3cf9c650df3a63d7fcfb6cd70ec2fcab51e5033c17e989e28921"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-1.svg",
+      "bytes": 721,
+      "sha256": "3cb38336bd3a7704217d44e9118876d83a1e4341fe4da8a7e786260bafb57a3b"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-1.png",
+      "bytes": 419,
+      "sha256": "915e02873a642761f18271aa11a3ae9e3653fa97e3fad1c4dff16ccc0a971174"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/search-normal.svg",
+      "bytes": 607,
+      "sha256": "01c445b73a2af3f1626716899d4b3c56aee3361981db7fea7aa41ce0cc622a27"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/search-normal.png",
+      "bytes": 432,
+      "sha256": "66c3d28114c067134fafba7d1beee1d6e05fac3932c8a26ce79f286619018542"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-2.svg",
+      "bytes": 821,
+      "sha256": "ae4f98975cd8d063825a55b900417a5a11b53bbeb34fc1517569e33ca3c6c92b"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-2.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/grid-4.svg",
+      "bytes": 378,
+      "sha256": "c077827fce8819ffde7933a3163df8edf18fa11a0d12317237c7292c4d6cb0e6"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/grid-4.png",
+      "bytes": 508,
+      "sha256": "74e4fff945e6f52a1387d8bf2209334fc726ceda778a10cfc01084260f55c43b"
+    },
+    {
+      "path": "AI ChatBot/edit.png",
+      "bytes": 585,
+      "sha256": "02e6e9b79a1cb455fc18975fe3cc62579bc279cd16475e4faccbaa0faafae174"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/more.svg",
+      "bytes": 431,
+      "sha256": "bd9e098e87fe68ba00c0d07d659a83439a3f0a0450d17e0d442f248dd6369315"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/more.png",
+      "bytes": 174,
+      "sha256": "12c5fa4ec8494941ed7ac1ea38b82acd1937bb5d616e20402d4ba714f8cf41ec"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-1.svg",
+      "bytes": 312,
+      "sha256": "e405c089dc72d05a8eba6b59786134f3b4e5226bbe2e775241175812be06e7f6"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-1.png",
+      "bytes": 277,
+      "sha256": "b199bff3fffd3cf9c650df3a63d7fcfb6cd70ec2fcab51e5033c17e989e28921"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/refresh-2.svg",
+      "bytes": 380,
+      "sha256": "3090c7a4f0239ca5e7ac63c82301e6fe64cb2491f2da372ff9cb203851538399"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/refresh-2.png",
+      "bytes": 588,
+      "sha256": "b4b9c46165e8415cb81c6d798deefa994d43a8d0ff1d84dbc0051f3b7013e330"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export.svg",
+      "bytes": 542,
+      "sha256": "4de2659f54661110815de3e7b2320a60f127bcbd2481fc769fbe23218280928c"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export.png",
+      "bytes": 527,
+      "sha256": "0c2a31c1a5ecbbd95910bce3844e85cac9b9fd84fac19fec9fa17548494e5598"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/export.svg",
+      "bytes": 676,
+      "sha256": "9dfa26d759fe325995cc370b6c310c4ab8ed00ed5ecdab5f057fd4762165b66f"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/export.png",
+      "bytes": 575,
+      "sha256": "986de250e396a54343afd376e652a67b5dfd2eccd9695b4d9ebe359b697de174"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/setting-2.svg",
+      "bytes": 1311,
+      "sha256": "913bc3c7fa2fb86a60a2a3b41416ac8a2484181cc1df3917776d9ab14063ea33"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/setting-2.png",
+      "bytes": 920,
+      "sha256": "47fd74318bc3d6c05fac720013fd708dd99885ea123cc2fe5734f3b513914d70"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-2.svg",
+      "bytes": 312,
+      "sha256": "e405c089dc72d05a8eba6b59786134f3b4e5226bbe2e775241175812be06e7f6"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-2.png",
+      "bytes": 277,
+      "sha256": "b199bff3fffd3cf9c650df3a63d7fcfb6cd70ec2fcab51e5033c17e989e28921"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-3.svg",
+      "bytes": 722,
+      "sha256": "15a16c937511b40c9f16c4df0e39142b6ebafb46eeb6daa72027ff7cba169ec8"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-3.png",
+      "bytes": 419,
+      "sha256": "915e02873a642761f18271aa11a3ae9e3653fa97e3fad1c4dff16ccc0a971174"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export-1.svg",
+      "bytes": 542,
+      "sha256": "4de2659f54661110815de3e7b2320a60f127bcbd2481fc769fbe23218280928c"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export-1.png",
+      "bytes": 527,
+      "sha256": "0c2a31c1a5ecbbd95910bce3844e85cac9b9fd84fac19fec9fa17548494e5598"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export-2.svg",
+      "bytes": 542,
+      "sha256": "4de2659f54661110815de3e7b2320a60f127bcbd2481fc769fbe23218280928c"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export-2.png",
+      "bytes": 527,
+      "sha256": "0c2a31c1a5ecbbd95910bce3844e85cac9b9fd84fac19fec9fa17548494e5598"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-4.svg",
+      "bytes": 840,
+      "sha256": "acdba7771040d4d78760e757243ef314684e2ec5a28e5d2b56eb791b6fec0e4c"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-4.png",
+      "bytes": 681,
+      "sha256": "5291c8c1c15eaeb0af5d292ae58667ea6fc6a357b24de32df597fe6ed3913c91"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/grid-4-1.svg",
+      "bytes": 378,
+      "sha256": "c077827fce8819ffde7933a3163df8edf18fa11a0d12317237c7292c4d6cb0e6"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/grid-4-1.png",
+      "bytes": 508,
+      "sha256": "74e4fff945e6f52a1387d8bf2209334fc726ceda778a10cfc01084260f55c43b"
+    },
+    {
+      "path": "AI ChatBot/edit-1.png",
+      "bytes": 585,
+      "sha256": "02e6e9b79a1cb455fc18975fe3cc62579bc279cd16475e4faccbaa0faafae174"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-3.svg",
+      "bytes": 312,
+      "sha256": "e405c089dc72d05a8eba6b59786134f3b4e5226bbe2e775241175812be06e7f6"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-3.png",
+      "bytes": 277,
+      "sha256": "b199bff3fffd3cf9c650df3a63d7fcfb6cd70ec2fcab51e5033c17e989e28921"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-4.svg",
+      "bytes": 1678,
+      "sha256": "72e5db9a67f6835e5257edafa91cc9e50d7403d9284c5337d604556744293b1f"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-4.png",
+      "bytes": 334,
+      "sha256": "833b1bb02e50dcd31f3d3b27ffbefc5c7c419fc8cd2c303b40a2ce94530b7550"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export-3.svg",
+      "bytes": 542,
+      "sha256": "4de2659f54661110815de3e7b2320a60f127bcbd2481fc769fbe23218280928c"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export-3.png",
+      "bytes": 527,
+      "sha256": "0c2a31c1a5ecbbd95910bce3844e85cac9b9fd84fac19fec9fa17548494e5598"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export-4.svg",
+      "bytes": 542,
+      "sha256": "4de2659f54661110815de3e7b2320a60f127bcbd2481fc769fbe23218280928c"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/export-4.png",
+      "bytes": 527,
+      "sha256": "0c2a31c1a5ecbbd95910bce3844e85cac9b9fd84fac19fec9fa17548494e5598"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-5.svg",
+      "bytes": 850,
+      "sha256": "86b5d02a69a0de4ff98583b0ee43e249056726ad7eaadcba8988da6fefe13802"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-5.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/grid-4-2.svg",
+      "bytes": 378,
+      "sha256": "c077827fce8819ffde7933a3163df8edf18fa11a0d12317237c7292c4d6cb0e6"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/grid-4-2.png",
+      "bytes": 508,
+      "sha256": "74e4fff945e6f52a1387d8bf2209334fc726ceda778a10cfc01084260f55c43b"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-5.svg",
+      "bytes": 312,
+      "sha256": "e405c089dc72d05a8eba6b59786134f3b4e5226bbe2e775241175812be06e7f6"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-5.png",
+      "bytes": 277,
+      "sha256": "b199bff3fffd3cf9c650df3a63d7fcfb6cd70ec2fcab51e5033c17e989e28921"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-6.svg",
+      "bytes": 312,
+      "sha256": "e405c089dc72d05a8eba6b59786134f3b4e5226bbe2e775241175812be06e7f6"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/arrow-down-6.png",
+      "bytes": 277,
+      "sha256": "b199bff3fffd3cf9c650df3a63d7fcfb6cd70ec2fcab51e5033c17e989e28921"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-6.svg",
+      "bytes": 723,
+      "sha256": "0bdc65454ffecb3b39a74bfce3954ccee40c2a46baf4dac9cbfef5b978fdb606"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/edit-2-6.png",
+      "bytes": 419,
+      "sha256": "915e02873a642761f18271aa11a3ae9e3653fa97e3fad1c4dff16ccc0a971174"
+    },
+    {
+      "path": "AI ChatBot/vuesax/outline/vuesax/outline/paperclip-2.svg",
+      "bytes": 1168,
+      "sha256": "3ccbed87b14fef9a5c6296d1e4fe7e4b991bb247f75bd4e7e7d9f054e1a90e35"
+    },
+    {
+      "path": "AI ChatBot/vuesax/linear/vuesax/linear/global-search.svg",
+      "bytes": 1261,
+      "sha256": "cd12d2b586dbbfc1f15df8321ceba42caf82a722793ad6b571c22b91d3bd31e9"
+    },
+    {
+      "path": "Exams/vuesax/bold/vuesax/bold/edit-2.svg",
+      "bytes": 1472,
+      "sha256": "d2caf3d458ca99a93aeeb2938686be52b1d895aa01327c7d12061c13677103a9"
+    },
+    {
+      "path": "Exams/vuesax/bold/vuesax/bold/video-circle.svg",
+      "bytes": 389,
+      "sha256": "e9f582800bec760cb3ea3df002d6382f6821e09bb34f7ae61971c26d59e3a5de"
+    },
+    {
+      "path": "Exams/vuesax/bold/tick-circle.svg",
+      "bytes": 572,
+      "sha256": "dd08e83cf3cd2b52e27b749b02f738f32d0887b35bb760c9e4c86d25e1ca800f"
+    },
+    {
+      "path": "Exams/vuesax/bold/tick-circle-1.svg",
+      "bytes": 572,
+      "sha256": "dd08e83cf3cd2b52e27b749b02f738f32d0887b35bb760c9e4c86d25e1ca800f"
+    },
+    {
+      "path": "Exams/vuesax/bold/tick-circle-2.svg",
+      "bytes": 572,
+      "sha256": "dd08e83cf3cd2b52e27b749b02f738f32d0887b35bb760c9e4c86d25e1ca800f"
+    },
+    {
+      "path": "Exams/vuesax/bold/tick-circle-3.svg",
+      "bytes": 572,
+      "sha256": "dd08e83cf3cd2b52e27b749b02f738f32d0887b35bb760c9e4c86d25e1ca800f"
+    },
+    {
+      "path": "Study plan/vuesax/linear/edit-2-2.svg",
+      "bytes": 765,
+      "sha256": "92fca6ac8d5f98e0dbd00d6a1d83a447bc155bbac340e8b990319416d6279a5a"
+    },
+    {
+      "path": "Study plan/vuesax/linear/edit-2-2.png",
+      "bytes": 679,
+      "sha256": "66fffe6afa33ffbe3732876fde0f87ab304702e864ce16d3078e5260a43bd297"
+    },
+    {
+      "path": "Study plan/vuesax/bold/danger-1.svg",
+      "bytes": 1618,
+      "sha256": "fc1f1c41282e00b8a172b0862f6f88217c998ec719a66a80a36a5e8ea5311620"
+    },
+    {
+      "path": "Study plan/vuesax/bold/tick-circle-20.svg",
+      "bytes": 529,
+      "sha256": "47369c8001c77c237707e6efaeb5be86bf67a3244f4f2ada896d87772907513f"
+    },
+    {
+      "path": "Study plan/vuesax/bold/microphone.svg",
+      "bytes": 1422,
+      "sha256": "e69200123c8ab76d5a51278787c285eaa7f2ab86d18e9ec476e71b0571797b49"
+    },
+    {
+      "path": "Study plan/vuesax/linear/vuesax/linear/lock.svg",
+      "bytes": 911,
+      "sha256": "7e5d3cdc3553970dabf1d587ecfa356278906144baead4e9d76648e45fd98d86"
+    },
+    {
+      "path": "Study plan/vuesax/linear/vuesax/linear/lock.png",
+      "bytes": 1256,
+      "sha256": "2966fc5bcbda0a39ffe4f7a8b11b4d54306d308cfc5b5516b7c790efecbf5a69"
+    },
+    {
+      "path": "vuesax/linear/arrow-left.svg",
+      "bytes": 393,
+      "sha256": "4462b3057d57a470d872df62c3bd78bbc70a7b06ec151cad7e4602c36ddbfe33"
+    },
+    {
+      "path": "vuesax/linear/arrow-left.png",
+      "bytes": 308,
+      "sha256": "399c3c2612b16382032f663e74719ccbacd17237fe12aa8eecde52fdc0b3b551"
+    },
+    {
+      "path": "vuesax/linear/arrow-left-1.svg",
+      "bytes": 393,
+      "sha256": "4462b3057d57a470d872df62c3bd78bbc70a7b06ec151cad7e4602c36ddbfe33"
+    },
+    {
+      "path": "vuesax/linear/arrow-left-1.png",
+      "bytes": 308,
+      "sha256": "399c3c2612b16382032f663e74719ccbacd17237fe12aa8eecde52fdc0b3b551"
+    },
+    {
+      "path": "vuesax/linear/arrow-left-2.svg",
+      "bytes": 393,
+      "sha256": "4462b3057d57a470d872df62c3bd78bbc70a7b06ec151cad7e4602c36ddbfe33"
+    },
+    {
+      "path": "vuesax/linear/arrow-left-2.png",
+      "bytes": 308,
+      "sha256": "399c3c2612b16382032f663e74719ccbacd17237fe12aa8eecde52fdc0b3b551"
+    }
+  ]
+}

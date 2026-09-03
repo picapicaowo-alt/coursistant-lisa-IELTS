@@ -1,118 +1,16 @@
-﻿.contentArea {
-    flex: 1;
-    display: flex;
-    gap: 1.5rem;
-    min-width: 0;
-    overflow: visible;
-    padding: 0;
-    transition: gap 0.3s ease;
-}
-
-.contentArea.withHiddenSidebar {
-    gap: 0;
+.contentArea {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  padding: 0;
+  > * { flex: 1; min-width: 0; }
 }
 
 .unavailable {
-    margin: 2rem auto;
-    max-width: 32rem;
-    color: t.$content-secondary;
-}
-
-.sidebar {
-    width: 400px;
-    min-width: 320px;
-    background: white;
-    border-radius: 1rem;
-    border: 1px solid t.$border-default;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.sidebar.hidden {
-    width: 0;
-    min-width: 0;
-    opacity: 0;
-    transform: translateX(-100%);
-    margin-right: 0;
-    border: none;
-    box-shadow: none;
-    overflow: hidden;
-}
-
-.rightColumn {
-    flex: 1;
-    position: relative;
-    height: 100%;
-    background: white;
-    border-radius: 1rem;
-    border: 1px solid t.$border-default;
-    overflow-x: hidden;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-    box-sizing: border-box;
-}
-
-.panelContainer {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-}
-
-.panelContainer .panel:nth-child(2) {
-    left: 100%;
-}
-
-.panelContainer.withHiddenSidebar .panel:nth-child(1) {
-    transform: translateX(-100%);
-}
-
-.panelContainer.withHiddenSidebar .panel:nth-child(2) {
-    transform: translateX(-100%);
-}
-
-.panel {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    box-sizing: border-box;
-}
-
-.panel.hidden {
-    transform: translateX(100%);
-    opacity: 0;
-}
-
-.detailWorkspace {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-.workspaceHeader {
-    width: 100%;
-    height: 4.5rem;
-    margin-left: 1.5rem;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: center;
-    background-color: transparent;
-}
-
-.workspaceContent {
-    width: 100%;
-    flex: 1;
-    overflow: hidden;
+  margin: 2rem auto;
+  max-width: 32rem;
+  color: t.$content-secondary;
 }

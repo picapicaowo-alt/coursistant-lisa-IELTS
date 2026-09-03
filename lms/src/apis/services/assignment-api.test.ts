@@ -228,7 +228,7 @@ describe('AssignmentApiService 8081 routes', () => {
     client.post.mockResolvedValue({status: 200, data: {id: 9}});
 
     await service.createAssignment(4, {
-      title: 'Local deadline',
+      title: 'Local deadline', weekId: 8, learningType: 'HOMEWORK',
       dueAt: '2026-09-20T23:59',
       lateUntil: '2026-09-22T23:59:00',
     }, 'create-local-deadline');
@@ -236,7 +236,7 @@ describe('AssignmentApiService 8081 routes', () => {
     expect(client.post).toHaveBeenCalledWith(
       '/v2/courses/4/assignments',
       {
-        title: 'Local deadline',
+        title: 'Local deadline', weekId: 8, learningType: 'HOMEWORK',
         dueAt: '2026-09-20T23:59:00',
         lateUntil: '2026-09-22T23:59:00',
       },
@@ -250,7 +250,7 @@ describe('AssignmentApiService 8081 routes', () => {
     '2026-09-20T23:59:00.123',
     '2026-02-29T23:59:00',
   ])('does not send an invalid assignment deadline: %s', async dueAt => {
-    await expect(service.createAssignment(4, {title: 'Invalid deadline', dueAt})).rejects.toThrow(
+    await expect(service.createAssignment(4, {title: 'Invalid deadline', dueAt, weekId: 8, learningType: 'HOMEWORK'})).rejects.toThrow(
       'dueAt must be a valid course-local date-time',
     );
     expect(client.post).not.toHaveBeenCalled();

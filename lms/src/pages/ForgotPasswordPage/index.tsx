@@ -41,6 +41,7 @@ const ForgotPasswordPage = () => {
 
   return (
     <AuthShell>
+      <ol className={styles.steps} aria-label="Password reset progress">{(['email', 'code', 'password', 'complete'] as const).map((item, index) => <li key={item} aria-current={step === item ? 'step' : undefined}><span>{index + 1}</span>{['Email', 'Verification', 'New password', 'Complete'][index]}</li>)}</ol>
             {step === 'email' ? (
               <>
                 <Link to="/login" className={styles.backLink}>{t('forgotPassword.backToLogin')}</Link>
@@ -56,6 +57,8 @@ const ForgotPasswordPage = () => {
                     <span className={styles.srOnly}>{t('login.emailLabel')}</span>
                     <input
                       id="reset-email"
+                      aria-invalid={Boolean(error)}
+                      aria-describedby={error ? 'reset-error' : undefined}
                       type="email"
                       value={email}
                       onChange={event => {
@@ -67,7 +70,7 @@ const ForgotPasswordPage = () => {
                       autoComplete="email"
                     />
                   </label>
-                  {error ? <p className={styles.error} role="alert">{error}</p> : null}
+                  {error ? <p id="reset-error" className={styles.error} role="alert">{error}</p> : null}
                   <button type="submit" className={styles.primaryButton} disabled={isSubmitting}>
                     {isSubmitting ? t('forgotPassword.loading') : t('forgotPassword.resetButton')}
                   </button>
@@ -107,7 +110,7 @@ const ForgotPasswordPage = () => {
                     />
                   ))}
                 </div>
-                {error ? <p className={styles.error} role="alert">{error}</p> : null}
+                {error ? <p id="reset-error" className={styles.error} role="alert">{error}</p> : null}
                 <button type="submit" className={styles.primaryButton} disabled={isSubmitting}>
                   {t('forgotPassword.verifyButton')}
                 </button>
@@ -159,7 +162,7 @@ const ForgotPasswordPage = () => {
                     required
                   />
                 </label>
-                {error ? <p className={styles.error} role="alert">{error}</p> : null}
+                {error ? <p id="reset-error" className={styles.error} role="alert">{error}</p> : null}
                 <button type="submit" className={styles.primaryButton} disabled={isSubmitting}>
                   {isSubmitting ? t('forgotPassword.loading') : t('forgotPassword.resetPasswordButton')}
                 </button>

@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useState} from 'react';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {unwrapData, type PersonalEventRequest} from '@/apis';
 import {courseOperationsApiService as api} from '@/apis/services/course-operations-api';
@@ -6,6 +6,7 @@ import {EnglishDateTimeInput} from '@/components/EnglishDateInput';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {getApiErrorMessage} from '@/utils/apiError';
 import {personalEventView, type PersonalEventView} from './personalEvents';
+import {useAnchoredEventDialog} from './useAnchoredEventDialog';
 import styles from './index.module.scss';
 
 const wholeSeconds = (value?: string) =>
@@ -13,11 +14,13 @@ const wholeSeconds = (value?: string) =>
 export function PersonalEventEditor({
   selected,
   onClose,
+  anchor,
 }: {
+  anchor?: HTMLElement;
   selected: PersonalEventView | null;
   onClose: () => void;
 }) {
-  const dialog = useRef<HTMLDialogElement>(null);
+  const dialog = useAnchoredEventDialog(anchor);
   const [current, setCurrent] = useState(selected);
   const [loading, setLoading] = useState(Boolean(selected));
   const [readError, setReadError] = useState<unknown>();
@@ -33,9 +36,7 @@ export function PersonalEventEditor({
   );
   const client = useQueryClient();
   const checkpoint = useIdempotencyCheckpoint();
-  useEffect(() => {
-    dialog.current?.showModal();
-  }, []);
+
   useEffect(() => {
     if (!selected) return;
     let cancelled = false;

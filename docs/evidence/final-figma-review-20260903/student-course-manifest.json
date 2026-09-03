@@ -1,0 +1,186 @@
+[
+  {
+    "state": "student-courses",
+    "nodes": [
+      "82:357"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/course",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-courses",
+    "nodes": [
+      "82:357"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/course",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-outline",
+    "nodes": [
+      "414:3326",
+      "493:3350"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/course/71",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-outline",
+    "nodes": [
+      "414:3326",
+      "493:3350"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/course/71",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-assignments",
+    "nodes": [
+      "494:3386"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/course/71",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-assignments",
+    "nodes": [
+      "494:3386"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/course/71",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-reader",
+    "nodes": [
+      "498:4121"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/course/71?materialId=121",
+    "note": "LINK material fixture; video-specific rendering is not established by this capture.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-reader",
+    "nodes": [
+      "498:4121"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/course/71?materialId=121",
+    "note": "LINK material fixture; video-specific rendering is not established by this capture.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-ai",
+    "nodes": [
+      "507:3365"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/course/71?materialId=121",
+    "note": "",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-ai",
+    "nodes": [
+      "507:3365"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/course/71?materialId=121",
+    "note": "",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-ai-response",
+    "nodes": [
+      "507:3365"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/course/71?materialId=121",
+    "note": "Synthetic response exercises the compact sidecar request path; populated response is supplemental, not the exact empty Figma state.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-ai-response",
+    "nodes": [
+      "507:3365"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/course/71?materialId=121",
+    "note": "Synthetic response exercises the compact sidecar request path; populated response is supplemental, not the exact empty Figma state.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-discussion",
+    "nodes": [
+      "496:3494"
+    ],
+    "width": 1440,
+    "url": "http://127.0.0.1:4187/course/71",
+    "note": "Empty discussion fixture; populated thread identity projection remains generic.",
+    "scrollWidth": 1440,
+    "viewport": 1440,
+    "documentHeight": 1024,
+    "brokenImages": []
+  },
+  {
+    "state": "student-course-discussion",
+    "nodes": [
+      "496:3494"
+    ],
+    "width": 390,
+    "url": "http://127.0.0.1:4187/course/71",
+    "note": "Empty discussion fixture; populated thread identity projection remains generic.",
+    "scrollWidth": 390,
+    "viewport": 390,
+    "documentHeight": 844,
+    "brokenImages": []
+  }
+]

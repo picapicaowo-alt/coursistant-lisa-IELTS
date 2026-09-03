@@ -1,3 +1,4 @@
+import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { submitWriting, writingTaskImageUrl } from '../api/writings'
 import { ensureAttemptId } from '../api/tests'
@@ -31,6 +32,8 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
   const [paused, setPaused] = useState(false)
   const [clockLabel, setClockLabel] = useState(() => formatClock(new Date()))
   const [submitting, setSubmitting] = useState(false)
+  const [submissionOpen, setSubmissionOpen] = useState(false)
+  const [submissionError, setSubmissionError] = useState('')
   const [result, setResult] = useState<WritingSubmissionResult | null>(null)
   const timeUpTriggered = useRef(false)
   const submitSectionRef = useRef<() => Promise<void>>(async () => {})
@@ -63,6 +66,8 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
     if (submitting || result) return
 
     setSubmitting(true)
+    setSubmissionOpen(true)
+    setSubmissionError('')
     try {
       const attemptId = await ensureAttemptId(testId)
       const saved = await submitWriting(testId, {
@@ -74,7 +79,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
       })
       setResult(saved)
     } catch (err) {
-      window.alert(err instanceof Error ? err.message : 'Submit failed')
+      setSubmissionError(err instanceof Error ? err.message : 'Submission failed.')
     } finally {
       setSubmitting(false)
     }
@@ -102,12 +107,10 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
     return () => window.clearInterval(id)
   }, [paused, result])
 
-  const handleFinish = useCallback(async () => {
+  const handleFinish = useCallback(() => {
     if (submitting || result) return
-    const ok = window.confirm('Finish this section and submit your essays?')
-    if (!ok) return
-    await submitSection()
-  }, [result, submitSection, submitting])
+    setSubmissionOpen(true)
+  }, [result, submitting])
 
   const handleExit = useCallback(() => {
     if (result) {
@@ -124,7 +127,8 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
 
   return (
     <div className="exam-shell writing-shell">
-      <TopBar candidateId={candidateLabel} remainingSeconds={remainingSeconds} paused={paused} />
+      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(result)} error={submissionError} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
+      <TopBar testTitle={testTitle} candidateId={candidateLabel} remainingSeconds={remainingSeconds} paused={paused} />
       <main className="writing-main">
         <aside className="writing-prompt">
           <div className="writing-prompt__inner">
@@ -176,6 +180,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
       </main>
       <footer className="bottom-bar writing-bottom">
         <div className="bottom-bar__left">
+          <h2 className="exam-navigation-title">Writing</h2>
           <div className="question-nav">
             <span className="question-nav__label">Tasks</span>
             {tasks.map((t) => {
@@ -187,6 +192,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
                   type="button"
                   className={`q-chip writing-task-chip ${answered ? 'is-answered' : ''} ${active ? 'is-active' : ''}`}
                   onClick={() => setCurrentSeq(t.seq)}
+                  aria-current={active ? 'step' : undefined}
                 >
                   Task {t.seq}
                 </button>
@@ -202,7 +208,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
           <span className="bottom-bar__clock">{clockLabel}</span>
           <button
             type="button"
-            className="bar-btn"
+            className="bar-btn bar-btn--primary"
             onClick={() => void handleFinish()}
             disabled={submitting || Boolean(result)}
           >

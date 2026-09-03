@@ -68,6 +68,7 @@
 }
 
 .chatInputContainer {
+    flex-shrink: 0;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -262,3 +263,6 @@
     outline: 3px solid #1d4ed8;
     outline-offset: 2px;
 }
+
+.latestMessage {align-self:center; display:inline-flex; align-items:center; gap:t.$space-2; padding:t.$space-2 t.$space-4; min-height:t.$touch-target; border:1px solid t.$border-default; border-radius:t.$radius-pill; color:t.$action-primary; background:t.$surface-raised; cursor:pointer;}
+.latestMessage:focus-visible {outline:2px solid t.$action-primary; outline-offset:2px;}
