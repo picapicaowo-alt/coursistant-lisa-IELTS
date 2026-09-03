@@ -61,6 +61,10 @@ One early browser run used the previous static build; that stale-artifact run wa
 
 ## Acceptance limits and existing risk
 
+Post-deployment authenticated read-only acceptance of merged revision 73f61ae confirmed two real owned courses, course 341 delivery configuration and recurring sessions. Its occurrence read instead surfaced "Course does not exist", including after Retry, despite successful course/config/session reads. The browser request path matches the consumed listSessionOccurrences contract; the native HTTP status/domain code was not captured and must not be inferred. No business records were written.
+
+The follow-up frontend gracefully hides the dated-occurrence workspace and generation controls when that independent read fails, keeps the recurring schedule visible, and offers a compact contextual unavailable notice with a retry. Recovery restores the panel. This is frontend degradation handling, not a claim that the backend endpoint was repaired or absent. The underlying course 341 occurrence-read inconsistency remains a backend integration handoff.
+
 Mocked browser acceptance is not authenticated Dev business-flow acceptance. No real course, schedule or publication record was created or altered during these checks. Actual Advisor occurrence permissions, instructor availability enforcement and end-to-end live writes still require an authorized account and suitable course fixture. Unsupported or denied states remain read only and recoverable.
 
 Existing main-branch dependency audit reports 5 moderate affected packages (0 high/critical); production-only reports 3 affected packages representing two underlying advisories: @tiptap/core and @xmldom/xmldom through speech-rule-engine. This release does not modify dependencies. A dedicated compatibility-reviewed dependency upgrade remains separate; no claim of zero dependency vulnerabilities or demonstrated application exploitability is made.

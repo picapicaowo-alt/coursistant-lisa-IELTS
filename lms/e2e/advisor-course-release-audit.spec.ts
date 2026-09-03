@@ -1,6 +1,31 @@
 import {expect, test, type Page} from '@playwright/test';
 import {fixture, reply} from './workspace-fixtures';
 
+test('release audit: unavailable occurrence reads hide the dated workspace without hiding recurring sessions', async ({page}, info) => {
+  await setupCourse(page);
+  let unavailable = true;
+  await page.route('**/v2/courses/71/session-occurrences?*', route => route.fulfill(unavailable
+    ? {status: 500, json: {code: 'INTERNAL_ERROR', message: 'Course does not exist'}}
+    : {json: reply([{occurrenceId: 99, occurrenceDate: '2030-09-04', startTime: '14:00', endTime: '15:30', location: 'Room 302', status: 'SCHEDULED'}])}));
+  await page.goto('/advisor/courses/71/delivery?view=schedule');
+  await expect(page.getByRole('alert')).toContainText('Dated occurrences are currently unavailable');
+  await expect(page.getByRole('region', {name: 'Recurring sessions'}).getByRole('article')).toHaveCount(1);
+  await expect(page.getByRole('heading', {name: 'Course occurrences', exact: true})).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Generate dates'})).toHaveCount(0);
+  await expect(page.getByText('Course does not exist', {exact: true})).toHaveCount(0);
+  for (const width of [1440, 390]) {
+    await page.setViewportSize({width, height: 1000});
+    const geometry = await page.getByRole('main').evaluate(main => ({available: main.clientWidth, content: main.scrollWidth}));
+    expect(geometry.content).toBeLessThanOrEqual(geometry.available);
+    await page.screenshot({path: info.outputPath(`unavailable-occurrences-${width}.png`), fullPage: true, animations: 'disabled'});
+  }
+  unavailable = false;
+  await page.getByRole('button', {name: 'Retry dated schedule'}).click();
+  await expect(page.getByRole('heading', {name: 'Course occurrences', exact: true})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Generate dates'})).toBeEnabled();
+  await expect(page.getByRole('cell', {name: 'SCHEDULED'})).toBeVisible();
+});
+
 test('release audit: failed schedule writes retry idempotently and block launch across tabs', async ({page}) => {
   await setupCourse(page);
   const keys: string[] = [];

@@ -73,7 +73,8 @@ export function OwnerCourseSchedule({courseId, course, readOnly}: {courseId: num
     onSuccess: async () => {setGenerationOpen(false); await refreshSchedule();},
   });
   const busy = create.isPending || update.isPending || generate.isPending;
-  const error = sessions.error || occurrences.error || create.error || update.error || generate.error;
+  // Occurrence reads can fail independently of a successfully loaded course and weekly schedule.
+  const error = sessions.error || create.error || update.error || generate.error;
   const visibleOccurrences = showAllOccurrences ? occurrences.data : occurrences.data?.slice(0, 8);
 
   return <div className={styles.scheduleWorkspace}>
@@ -106,19 +107,19 @@ export function OwnerCourseSchedule({courseId, course, readOnly}: {courseId: num
       </form>
     </section> : null}
 
-    {!readOnly && generationOpen ? <section className={styles.editorPanel} aria-labelledby="generate-occurrences-title">
+    {!readOnly && !occurrences.isError && generationOpen ? <section className={styles.editorPanel} aria-labelledby="generate-occurrences-title">
       <header className={styles.panelHeader}><div><h2 id="generate-occurrences-title">Generate dated occurrences</h2><p>Create calendar dates after the recurring pattern is complete.</p></div></header>
       <form className={styles.formGrid} onSubmit={event => {event.preventDefault(); if (canWrite && !busy) generate.mutate();}}><label className={styles.field}>Generate from<EnglishDateInput required value={range.from} onChangeValue={from => setRange(current => ({...current, from}))} /></label><label className={styles.field}>Generate through<EnglishDateInput required value={range.to} onChangeValue={to => setRange(current => ({...current, to}))} /></label><div className={styles.formActions}><button type="button" className={styles.secondaryButton} onClick={() => setGenerationOpen(false)}>Cancel</button><button type="submit" className={styles.primaryButton} disabled={!canWrite || busy || !range.from || !range.to || range.to < range.from || !sessions.data?.length}>{generate.isPending ? 'Generating…' : 'Generate occurrences'}</button></div></form>
     </section> : null}
 
-    <section className={styles.occurrenceTableWrap} aria-labelledby="upcoming-occurrences-title">
+    {occurrences.isError ? <div className={styles.notice} role="alert">Dated occurrences are currently unavailable for this course. <button type="button" className={styles.ghostButton} disabled={occurrences.isFetching} onClick={() => void occurrences.refetch()}>Retry dated schedule</button></div> : <section className={styles.occurrenceTableWrap} aria-labelledby="upcoming-occurrences-title">
       <header className={styles.panelHeader}><div><h2 id="upcoming-occurrences-title">Course occurrences</h2></div>{!readOnly ? <button type="button" className={styles.secondaryButton} disabled={busy || !occurrences.isSuccess || !sessions.data?.length} onClick={() => {setRange(termRange); setGenerationOpen(true);}}>Generate dates</button> : null}</header>
       {occurrences.isPending ? <p role="status" className={styles.helper}>Loading course occurrences…</p> : null}
       {visibleOccurrences?.length ? <table className={styles.occurrenceTable}><thead><tr><th>Date</th><th>Time</th><th>Location</th><th>Status</th></tr></thead><tbody>{visibleOccurrences.map(item => {
         return <tr key={item.id}><td data-label="Date">{shortDate(item.date)}</td><td data-label="Time">{formatCourseTime(item.startTime)}{item.endTime ? `–${formatCourseTime(item.endTime)}` : ''}</td><td data-label="Location">{item.location || 'Not provided'}</td><td data-label="Status"><span className={styles.statusPill} data-state={item.status}>{item.status?.replace(/_/g, ' ') || 'Not provided'}</span></td></tr>;
       })}</tbody></table> : !occurrences.isPending && !occurrences.isError ? <p className={styles.helper}>No occurrences were returned for this period.</p> : null}
       {occurrences.data && occurrences.data.length > 8 ? <button type="button" className={styles.textAction} onClick={() => setShowAllOccurrences(current => !current)}>{showAllOccurrences ? 'Show fewer occurrences' : `View all ${occurrences.data.length} occurrences`}<ArrowRight size={15} aria-hidden="true" /></button> : null}
-    </section>
-    {error ? <p role="alert" className={styles.error}>{advisingErrorMessage(error, 'The course schedule could not be loaded or updated.')} {sessions.isError || occurrences.isError ? <button type="button" className={styles.ghostButton} onClick={() => void Promise.all([sessions.refetch(), occurrences.refetch()])}>Retry</button> : 'Your input is preserved. Review the form and submit again to retry.'}</p> : null}
+    </section>}
+    {error ? <p role="alert" className={styles.error}>{advisingErrorMessage(error, 'The course schedule could not be loaded or updated.')} {sessions.isError ? <button type="button" className={styles.ghostButton} onClick={() => void sessions.refetch()}>Retry</button> : 'Your input is preserved. Review the form and submit again to retry.'}</p> : null}
   </div>;
 }
