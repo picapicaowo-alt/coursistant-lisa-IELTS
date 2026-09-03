@@ -22,7 +22,7 @@
 
     h1 {
         margin: .2rem 0 0;
-        font-size: clamp(1.9rem, 4vw, t.$fs-h1);
+        font-size: t.$workspace-title-size; line-height: t.$line-height-title-1;
         font-weight: t.$fw-extrabold;
     }
 }

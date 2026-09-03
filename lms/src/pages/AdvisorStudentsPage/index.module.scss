@@ -1,0 +1,46 @@
+.panel { container: students / inline-size; min-width: 0; padding: t.$workspace-panel-padding; border: 1px solid t.$border-default; border-radius: t.$radius-lg; background: t.$surface-raised; }
+.panelHeading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: t.$space-3; margin-bottom: t.$space-5; }
+.panelHeading h2 { margin: 0; font-size: t.$font-size-headline; line-height: t.$line-height-headline; font-weight: t.$fw-bold; }
+.panelHeading > span { color: t.$content-secondary; font-size: t.$font-size-caption; font-variant-numeric: tabular-nums; }
+.filters { grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: t.$space-4; max-width: none; margin-bottom: t.$space-6; }
+.filters label { font-size: t.$font-size-caption; }
+.filters input, .filters select { height: t.$touch-target; font-size: t.$font-size-body; padding-inline: t.$space-3; }
+.table { width: 100%; border-collapse: separate; border-spacing: 0; text-align: left; table-layout: fixed; }
+.table th, .table td { padding: t.$space-5 t.$space-3; border-bottom: 1px solid t.$border-default; overflow-wrap: anywhere; font-size: t.$font-size-body; font-weight: t.$fw-regular; vertical-align: middle; }
+.table thead th { padding-block: t.$space-3; background: t.$surface-dashboard-card; color: t.$content-secondary; font-size: t.$font-size-caption; font-weight: t.$fw-medium; }
+.table thead th:first-child { width: 32%; border-radius: t.$radius-sm 0 0 t.$radius-sm; }
+.table thead th:nth-child(2) { width: 23%; }
+.table thead th:nth-child(3) { width: 15%; }
+.table thead th:nth-child(4) { width: 20%; }
+.table thead th:last-child { width: 10%; border-radius: 0 t.$radius-sm t.$radius-sm 0; }
+.table tr:last-child :is(th, td) { border-bottom: 0; }
+.table tbody tr:hover { background: t.$surface-subtle; }
+.studentIdentity { display: flex; min-width: 0; align-items: center; gap: t.$space-3; }
+.studentIdentity > div { display: grid; min-width: 0; gap: t.$space-1; }
+.studentIdentity strong { font-weight: t.$fw-semibold; }
+.studentIdentity span:not(.avatar), .studentIdentity small { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+.avatar { display: grid; place-items: center; flex: 0 0 auto; width: t.$touch-target; height: t.$touch-target; border-radius: t.$radius-pill; background: t.$surface-brand-subtle; color: t.$action-primary; font-weight: t.$fw-semibold; }
+.risk { display: inline-flex; padding: t.$space-1 t.$space-2; border-radius: t.$radius-xs; background: t.$surface-muted; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+.risk[data-status='ON_TRACK'] { background: t.$surface-status-complete; color: t.$feedback-success; }
+.risk[data-status='AT_RISK'] { background: t.$feedback-warning-surface; color: t.$feedback-warning; }
+.risk[data-status='NEEDS_ATTENTION'] { background: t.$feedback-danger-surface; color: t.$feedback-danger; }
+.open { display: inline-flex; align-items: center; justify-content: center; gap: t.$space-2; min-height: t.$touch-target; padding-inline: t.$space-3; border-radius: t.$radius-sm; background: t.$surface-detail-panel; color: t.$content-primary; font-size: t.$font-size-body; font-weight: t.$fw-medium; }
+.open:hover { background: t.$action-primary; color: t.$content-on-color; }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@container students (max-width: 54rem) {
+  .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .table, .table tbody { display: block; }
+  .table thead { display: none; }
+  .table tbody { display: grid; gap: t.$space-5; }
+  .table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-4; padding: t.$space-5; border: 1px solid t.$border-default; border-radius: t.$radius-md; }
+  .table tbody th, .table tbody td { display: block; padding: 0; border: 0; }
+  .table tbody th { grid-column: 1 / -1; }
+  .table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; }
+  .action { align-self: end; justify-self: end; }
+}
+@container students (max-width: 27rem) {
+  .filters { grid-template-columns: minmax(0, 1fr); }
+  .table tbody tr { padding: t.$space-4; grid-template-columns: minmax(0, 1fr); }
+  .action { justify-self: stretch; }
+  .open { width: 100%; }
+}

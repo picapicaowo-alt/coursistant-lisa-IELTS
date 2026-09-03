@@ -1,4 +1,4 @@
-.page {min-height: 100%; padding: 2rem clamp(1rem, 3vw, 3.5rem) 3.5rem; background: t.$page-bg; color: t.$text;}
+.page {min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16; background: t.$page-bg; color: t.$text;}
 .backLink {width: fit-content; margin-bottom: 1.25rem; color: t.$text-muted; display: inline-flex; align-items: center; gap: 0.45rem; text-decoration: none; font-size: t.$fs-caption; font-weight: t.$fw-semibold; &:hover {color: t.$brand;} &:focus-visible {outline: 3px solid t.$brand; outline-offset: 3px;}}
 .overview {
   padding: clamp(1.5rem, 4vw, 3rem);
@@ -9,14 +9,14 @@
   justify-content: space-between;
   gap: 2rem;
 
-  h1 {margin: 0.9rem 0 0.65rem; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.045em;}
+  h1 {margin: 0.9rem 0 0.65rem; font-size: t.$workspace-title-size; line-height: t.$line-height-title-1;}
   p {max-width: 45rem; margin: 0; color: t.$text-muted; line-height: 1.65;}
 }
 .overviewCopy {min-width: 0;}
 .tags {display: flex; flex-wrap: wrap; gap: 0.45rem; span {padding: 0.35rem 0.65rem; border-radius: t.$radius-pill; background: t.$brand-subtle; color: t.$brand; font-size: 0.7rem; font-weight: t.$fw-bold;}}
 .facts {margin-top: 1.5rem; display: flex; flex-wrap: wrap; gap: 1rem; color: t.$text-muted; font-size: t.$fs-caption; span {display: inline-flex; align-items: center; gap: 0.4rem;} svg {color: t.$brand;}}
 .kicker {color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-bold; letter-spacing: 0.08em; text-transform: uppercase;}
-.modeSection {margin: 2rem 0 1rem; display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; h2 {margin: 0.25rem 0 0; font-size: clamp(1.6rem, 3vw, 2.2rem); letter-spacing: -0.03em;}}
+.modeSection {margin: 2rem 0 1rem; display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; h2 {margin: 0.25rem 0 0; font-size: t.$font-size-headline; line-height: t.$line-height-headline;}}
 .modeControls {width: min(100%, 34rem); display: grid; justify-items: end; gap: 0.55rem;}
 .segmented {padding: 0.3rem; border: 1px solid t.$border; border-radius: t.$radius-card; background: t.$card-bg; display: flex; gap: 0.25rem;
   button {min-width: 10.5rem; min-height: 3.5rem; padding: 0.6rem 0.8rem; border: 0; border-radius: t.$radius-control; background: transparent; color: t.$text-muted; display: flex; align-items: center; gap: 0.65rem; text-align: left; cursor: pointer;}
@@ -44,7 +44,7 @@
 .progressTrack {height: 0.38rem; border-radius: t.$radius-pill; background: t.$neutral-fill; overflow: hidden; span {display: block; height: 100%; border-radius: inherit; background: t.$brand;}}
 .unitStats {margin: 0; display: flex; gap: 1.2rem; div {min-width: 5rem;} dt {color: t.$text-muted; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.06em;} dd {margin: 0.2rem 0 0; font-weight: t.$fw-bold;}}
 .unitActions {min-width: 15rem;}
-.startButton, .resumeButton {min-height: 2.9rem; padding: 0 1rem; border: 0; border-radius: t.$radius-control; background: t.$text; color: t.$card-bg; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: t.$fw-semibold; cursor: pointer; &:hover {background: t.$brand;} &:disabled {opacity: 0.58; cursor: wait;}}
+.startButton, .resumeButton {min-height: 2.9rem; padding: 0 1rem; border: 0; border-radius: t.$radius-control; background: t.$action-primary; color: t.$content-on-color; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: t.$fw-semibold; cursor: pointer; &:hover {background: t.$brand;} &:disabled {opacity: 0.58; cursor: wait;}}
 .startButton {width: 100%;}
 .activeSession {padding: 0.8rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$subcard-bg;}
 .activeSessionCopy {strong {display: block; margin-top: 0.35rem;} p {max-width: 24rem; margin: 0.3rem 0 0; color: t.$text-muted; font-size: 0.72rem; line-height: 1.45;}}

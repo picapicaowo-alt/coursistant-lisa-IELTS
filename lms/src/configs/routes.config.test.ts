@@ -26,3 +26,11 @@ describe("app shell routing", () => {
     expect(shouldShowAppShell("/my-operations")).toBe(true);
   });
 });
+
+// Figma checkpoint details deliberately use the full viewport, at any width.
+it('hides navigation only for the focused student checkpoint view', () => {
+  expect(shouldShowAppShell('/my-plan')).toBe(true);
+  expect(shouldShowAppShell('/my-plan', '?checkpoint=91&task=101')).toBe(false);
+  expect(shouldShowAppShell('/my-plan', '?checkpoint=')).toBe(true);
+  expect(shouldShowAppShell('/advisor/students', '?checkpoint=91')).toBe(true);
+});

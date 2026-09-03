@@ -9,12 +9,12 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 1rem;
+  gap: t.$workspace-section-gap;
   max-width: t.$workspace-max-inline-size;
   margin: 0 auto 1rem;
 }
 
-.header h1 { margin: .2rem 0; font-size: clamp(2rem, 4vw, t.$fs-h1); }
+.header h1 { margin: .2rem 0; font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1; }
 .header p { margin: 0; color: t.$text-muted; }
 
 .coursePicker {
@@ -64,15 +64,15 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
+  gap: t.$workspace-section-gap;
   max-width: t.$workspace-max-inline-size;
   margin: 0 auto;
 }
 
 .workspace {
   display: grid;
-  gap: 1rem;
+  gap: t.$workspace-section-gap;
   max-width: t.$workspace-max-inline-size;
   margin: 0 auto;
 }
@@ -83,7 +83,7 @@
   align-content: start;
   gap: .85rem;
   min-width: 0;
-  padding: 1.2rem;
+  padding: t.$workspace-panel-padding;
   border: 1px solid t.$border;
   border-radius: t.$radius-card-lg;
   background: t.$card-bg;
@@ -310,7 +310,7 @@ a.operationRow:focus-visible {
 
 .form {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 26rem), 1fr));
   gap: .75rem;
   max-width: 52rem;
   margin-top: .5rem;

@@ -10,7 +10,8 @@
 .tabs,
 .directoryLayout,
 .widePanel {
-  width: min(100%, t.$workspace-max-width);
+  width: 100%;
+  min-width: 0;
   margin-inline: auto;
 }
 
@@ -18,7 +19,8 @@
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 2rem;
+  gap: t.$space-6;
+  flex-wrap: wrap;
   margin-bottom: 1.25rem;
 }
 
@@ -30,9 +32,9 @@
 }
 
 .pageHeader h1 {
-  font-size: clamp(2rem, 4vw, t.$fs-h1);
-  line-height: 1.1;
-  letter-spacing: -.025em;
+  font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1;
+  line-height: t.$line-height-title-1;
+  letter-spacing: normal;
 }
 
 .pageHeader > div:first-child > p {
@@ -44,7 +46,8 @@
 
 .quickLinks {
   display: flex;
-  gap: .65rem;
+  gap: t.$space-3;
+  flex-wrap: wrap;
 }
 
 .quickLinks a {
@@ -52,8 +55,9 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: center;
   gap: .65rem;
-  min-width: 12.5rem;
-  min-height: 58px;
+  min-width: 0;
+  flex: 1 1 12rem;
+  min-height: t.$control-height-lg;
   padding: .65rem .8rem;
   border: 1px solid t.$border;
   border-radius: t.$radius-control;
@@ -125,7 +129,7 @@
 .primaryPanel,
 .secondaryPanel,
 .widePanel {
-  padding: 1.25rem;
+  padding: t.$workspace-panel-padding;
   border: 1px solid t.$border;
   border-radius: t.$radius-card-lg;
   background: t.$card-bg;

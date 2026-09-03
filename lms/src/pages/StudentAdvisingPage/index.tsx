@@ -1,5 +1,9 @@
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import React, {useState} from 'react';
+import {useSearchParams} from 'react-router-dom';
+import {CheckpointWorkspace} from './CheckpointWorkspace';
+import checkpointStyles from './CheckpointWorkspace.module.scss';
+import {STUDY_PLAN_PARAMS, studyPlanRecordKey, type TaskAction} from './studyPlanView';
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {sendStableMessage} from '@/utils/sendStableMessage';
@@ -15,6 +19,7 @@ import {formatPersonName} from '@/utils/personName';
 
 const StudentAdvisingPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const [searchParams, setSearchParams] = useSearchParams();
   const idempotency = useIdempotencyCheckpoint();
   const [taskSubmissions, setTaskSubmissions] = useState<Record<number, string>>({});
   const [message, setMessage] = useState('');
@@ -41,10 +46,10 @@ const StudentAdvisingPage: React.FC = () => {
     retry: false,
   });
   const taskMutation = useMutation({
-    mutationFn: ({action, taskId, version}: {action: 'start' | 'complete'; taskId: number; version?: number}) =>
+    mutationFn: ({action, taskId, version}: TaskAction) =>
       action === 'start'
         ? idempotency.run('student-start-task', [taskId, {expectedVersion: version}] satisfies Parameters<typeof advisorApiService.startOwnAdvisorTask>, (key, args) => advisorApiService.startOwnAdvisorTask(...args, key))
-        : idempotency.run('student-complete-task', [taskId, {expectedVersion: version, submissionText: taskSubmissions[taskId] || undefined}] satisfies Parameters<typeof advisorApiService.completeOwnAdvisorTask>, (key, args) => advisorApiService.completeOwnAdvisorTask(...args, key)),
+        : idempotency.run('student-complete-task', [taskId, {expectedVersion: version, submissionText: taskSubmissions[taskId] ?? plan.data?.plan.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []).find(task => task.id === taskId)?.submissionText}] satisfies Parameters<typeof advisorApiService.completeOwnAdvisorTask>, (key, args) => advisorApiService.completeOwnAdvisorTask(...args, key)),
     onSuccess: async () => queryClient.invalidateQueries({queryKey: advisingQueryKeys.studentStudyPlan}),
   });
   const messageMutation = useMutation({
@@ -75,13 +80,41 @@ const StudentAdvisingPage: React.FC = () => {
     }
   };
   const conversationRows = conversation.data?.pages.flat() ?? [];
+  const checkpointKey = searchParams.get(STUDY_PLAN_PARAMS.checkpoint);
+  const checkpointIndex = plan.data?.plan.checkpoints?.findIndex((checkpoint, index) => studyPlanRecordKey(checkpoint, index) === checkpointKey) ?? -1;
+  const checkpoint = checkpointIndex >= 0 ? plan.data?.plan.checkpoints?.[checkpointIndex] : undefined;
+  const backToPlan = () => {
+    const next = new URLSearchParams(searchParams);
+    next.delete(STUDY_PLAN_PARAMS.checkpoint);
+    next.delete(STUDY_PLAN_PARAMS.task);
+    setSearchParams(next);
+    if (!taskMutation.isPending) taskMutation.reset();
+  };
+  const openCheckpoint = (key: string) => {
+    const next = new URLSearchParams(searchParams);
+    next.set(STUDY_PLAN_PARAMS.checkpoint, key);
+    next.delete(STUDY_PLAN_PARAMS.task);
+    setSearchParams(next);
+  };
+
+  if (checkpointKey) return <div className={checkpointStyles.page}>
+    {checkpoint ? <CheckpointWorkspace key={checkpointKey} checkpoint={checkpoint} index={checkpointIndex} onBack={backToPlan}
+      submissions={taskSubmissions} onSubmission={(taskId, value) => setTaskSubmissions(current => ({...current, [taskId]: value}))}
+      onAction={action => taskMutation.mutate(action)} isPending={taskMutation.isPending} actionTaskId={taskMutation.variables?.taskId} onClearError={() => {if (!taskMutation.isPending) taskMutation.reset();}}
+      error={taskMutation.isError ? advisingErrorMessage(taskMutation.error, 'The task could not be updated. Please try again.') : undefined}/>
+      : <section className={styles.editorPage}><button type="button" className={styles.secondary} onClick={backToPlan}>Back to study plan</button>
+        {plan.isPending ? <p className={styles.status}>Loading checkpoint…</p> : <p className={plan.isError ? styles.error : styles.status} role={plan.isError ? 'alert' : undefined}>{plan.isError ? advisingErrorMessage(plan.error, 'The study plan could not be loaded.') : 'This checkpoint is no longer in your current study plan.'}</p>}
+        {plan.isError ? <button type="button" className={styles.secondary} onClick={() => void plan.refetch()}>Try again</button> : null}
+      </section>}
+  </div>;
+
 
   return (
     <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <h1>My advising record</h1>
-          <p className={styles.lede}>Review the profile and plan maintained by your Advisor, complete assigned tasks, and keep the conversation in one place.</p>
+          <h1>Study plan</h1>
+          <p className={styles.lede}>Your goals, checkpoints, and next steps.</p>
         </div>
       </header>
       <CollapsibleSection title="Learning profile" className={styles.disclosureLayout} summary="Your current goal and the skills being measured." meta={<span className={styles.readOnlyBadge}>Read only</span>}>
@@ -116,25 +149,7 @@ const StudentAdvisingPage: React.FC = () => {
             {(plan.data.plan.checkpoints ?? []).map((checkpoint, checkpointIndex) => (
               <CollapsibleSection key={checkpoint.id ?? checkpoint.position} title={`Checkpoint ${checkpointIndex + 1}: ${checkpoint.description}`} headingLevel={3} summary={checkpoint.goal}>
                 <div className={styles.metaRow}><span>Due {checkpoint.dueDate || 'date not set'}</span><span>{(checkpoint.tasks ?? []).length} task{(checkpoint.tasks ?? []).length === 1 ? '' : 's'}</span></div>
-                <div className={styles.taskList}>{(checkpoint.tasks ?? []).map(task => (
-                  <CollapsibleSection key={task.id ?? task.position} title={task.title || 'Advisor task'} headingLevel={4} summary={(task.status || 'NOT_STARTED').replace(/_/g, ' ').toLowerCase()}>
-                    {task.description ? <p>{task.description}</p> : null}
-                    {task.dueDate ? <div className={styles.metaRow}><span>Due {task.dueDate}</span></div> : null}
-                    {task.id != null && task.status !== 'COMPLETED' ? (
-                      <>
-                        <label className={styles.form}>
-                          <span>Submission note</span>
-                          <textarea value={taskSubmissions[task.id] ?? ''} onChange={event => setTaskSubmissions(current => ({...current, [task.id!]: event.target.value}))}/>
-                        </label>
-                        <div className={styles.actions}>
-                          <button type="button" className={styles.secondary} onClick={() => taskMutation.mutate({action: 'start', taskId: task.id!, version: task.version})}>Start</button>
-                          <button type="button" className={styles.primary} onClick={() => taskMutation.mutate({action: 'complete', taskId: task.id!, version: task.version})}>Complete</button>
-                        </div>
-                      </>
-                    ) : null}
-                    {task.advisorFeedback ? <p><strong>Advisor feedback:</strong> {task.advisorFeedback}</p> : null}
-                  </CollapsibleSection>
-                ))}</div>
+                <button type="button" className={styles.primary} onClick={() => openCheckpoint(studyPlanRecordKey(checkpoint, checkpointIndex))}>View tasks</button>
               </CollapsibleSection>
             ))}
           </div>

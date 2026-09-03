@@ -48,6 +48,8 @@ $surface-muted: $slate-100;
 $surface-brand-subtle: #E6E3FF;
 $surface-navigation: #F9F9F9;
 $surface-dashboard-card: #F3F4F8;
+// Figma Study plan/student: selected rows and the task detail surface.
+$surface-detail-panel: #F4F4F4;
 $surface-assistant-start: #F6F9FF;
 $surface-assistant-end: #F1EFFF;
 
@@ -96,18 +98,21 @@ $type-fuchsia-subtle: #EECAFF;
 $type-indigo: #0000FF;
 $type-indigo-subtle: #D5E9FF;
 
+$surface-status-active: $violet-50;
+$surface-status-complete: $type-green-subtle;
+
 // Product-surface roles used across workspaces.
 $surface-toolbar: #F1F5F9;
 $surface-brand-tint: #F0F7FF;
 $surface-profile-accent: #67D8CB;
 $border-chart: #E8EDF5;
 
-// Stable course identities, drawn from xLearn's blue and violet palette.
-$course-sky-surface: #EDF6FF;
+// Stable course identities use Figma course-category surfaces; identity is not status.
+$course-sky-surface: $type-cyan-subtle;
 $course-sky-ink: #245B91;
-$course-indigo-surface: #EDF0FF;
-$course-indigo-ink: #354BA5;
-$course-violet-surface: #F2EEFF;
+$course-indigo-surface: $type-green-subtle;
+$course-indigo-ink: $green-700;
+$course-violet-surface: $type-fuchsia-subtle;
 $course-violet-ink: #574292;
 
 // ---------------------------------------------------------------- Typography
@@ -118,6 +123,8 @@ $font-family: 'HarmonyOS Sans TC', 'Inter', ui-sans-serif, system-ui, -apple-sys
 
 $font-size-title-1: 2rem;
 $font-size-title-2: 1.75rem;
+$font-size-title-compact: 1.25rem;
+$line-height-title-compact: 1.5rem;
 $font-size-headline: 1.375rem;
 $font-size-subhead: 1.125rem;
 $font-size-body-lg: 1rem;
@@ -151,11 +158,13 @@ $space-10: 2.5rem;
 $space-12: 3rem;
 $space-16: 4rem;
 
-$shell-sidebar-inline-size: clamp(14.25rem, 14vw, 16rem);
+$shell-sidebar-inline-size: clamp(11.25rem, 12.5vw, 15rem);
 $shell-header-height: 5.5rem;
-$workspace-gutter-inline: clamp(1rem, 2.4vw, 3.5rem);
+$workspace-gutter-inline: clamp(1rem, 3.3vw, 4rem);
 $workspace-gutter-block: clamp(1rem, 2.2vw, 2rem);
-$workspace-section-gap: clamp(1rem, 1.5vw, 1.5rem);
+$workspace-section-gap: clamp(1rem, 1.8vw, 1.5rem);
+$workspace-title-size: clamp($font-size-title-2, 2.2vw, $font-size-title-1);
+$workspace-panel-padding: clamp($space-4, 2vw, $space-6);
 $workspace-max-inline-size: none;
 $workspace-compact-max-inline-size: 58rem;
 $workspace-task-max-inline-size: 66rem;
@@ -179,8 +188,8 @@ $breakpoint-dashboard-single: 65rem;
 $breakpoint-dashboard-compact: 38.75rem;
 $content-max-width: $workspace-editorial-max-inline-size;
 $shell-sidebar-width: $shell-sidebar-inline-size;
-$workspace-max-width: 82rem;
-$workspace-form-max-width: 68rem;
+$workspace-max-width: $workspace-max-inline-size;
+$workspace-form-max-width: 68rem; // Reading/editing measure only, never the page alignment boundary.
 $reading-max-width: 72ch;
 $control-height-sm: 2.25rem;
 $control-height-md: 2.75rem;
@@ -249,7 +258,7 @@ $radius-control: $radius-sm;
 $radius-control-sm: $radius-sm;
 $radius-pill: $radius-round;
 $control-size: $touch-target;
-$shadow-card: $shadow-lg;
+$shadow-card: $shadow-dashboard-card;
 $modal-backdrop-blur: 8px;
 $modal-backdrop: rgba($content-primary, .28);
 

@@ -1,3 +1,4 @@
+import {useState} from 'react'
 import {Link} from 'react-router-dom'
 import {Headphones, PenLine, BookOpenText, ArrowUpRight, Clock3} from 'lucide-react'
 import {RecordSummaryList} from '@/components/RecordSummaryList'
@@ -76,6 +77,10 @@ function dateLabel(value: string | null): string | null {
 
 export function StudentMockExamLibrary({value}: {value: unknown}) {
   const exams = normalizeStudentExams(value)
+  const [sectionFilter, setSectionFilter] = useState<Section | ''>('')
+  const [statusFilter, setStatusFilter] = useState('')
+  const statuses = [...new Set(exams.map(exam => exam.status))]
+  const filteredExams = exams.filter(exam => (!sectionFilter || exam.sections.includes(sectionFilter)) && (!statusFilter || exam.status === statusFilter))
 
   if (exams.length === 0) {
     return (
@@ -94,13 +99,17 @@ export function StudentMockExamLibrary({value}: {value: unknown}) {
   }
 
   return (
+    <>
+      <div className={styles.filters} aria-label="Filter exams">
+        <button type="button" aria-pressed={!sectionFilter} onClick={() => setSectionFilter('')}>All exams</button>
+        {(['reading', 'writing', 'listening'] as const).map(section => <button type="button" key={section} aria-pressed={sectionFilter === section} onClick={() => setSectionFilter(section)}>{SECTION_META[section].label}</button>)}
+        <label><select aria-label="Exam status" value={statusFilter} onChange={event => setStatusFilter(event.target.value)}><option value="">All states</option>{statuses.map(status => <option key={status}>{status}</option>)}</select></label>
+      </div>
+      {filteredExams.length === 0 ? <p role="status">No papers match these filters.</p> : null}
     <section className={styles.library} aria-label="Assigned mock exams">
-      {exams.map((exam, examIndex) => (
+      {filteredExams.map(exam => (
         <article className={styles.examCard} key={exam.id}>
           <header className={styles.examHeader}>
-            <div className={styles.examIndex} aria-hidden="true">
-              {String(examIndex + 1).padStart(2, '0')}
-            </div>
             <div>
               <p className={styles.examLabel}>{exam.label}</p>
               <h2>{exam.title}</h2>
@@ -118,7 +127,7 @@ export function StudentMockExamLibrary({value}: {value: unknown}) {
               {exam.sections.map((section) => {
                 const {label, detail, Icon} = SECTION_META[section]
                 return (
-                  <Link className={styles.sectionLink} to={`/mock-exams/${exam.id}/${section}`} key={section}>
+                  <Link data-section={section} className={styles.sectionLink} to={`/mock-exams/${exam.id}/${section}`} key={section}>
                     <span className={styles.sectionIcon}><Icon size={19} aria-hidden="true" /></span>
                     <span>
                       <strong>{label}</strong>
@@ -135,5 +144,6 @@ export function StudentMockExamLibrary({value}: {value: unknown}) {
         </article>
       ))}
     </section>
+    </>
   )
 }

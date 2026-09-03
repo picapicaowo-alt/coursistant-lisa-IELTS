@@ -147,8 +147,9 @@ export class AdvisorApiService {
     return this.apiClient.get('/v2/student/study-plan');
   }
 
-  startOwnAdvisorTask(taskId: number, request: {expectedVersion?: number} = {}, idempotencyKey: string = crypto.randomUUID()): Promise<ApiResponse<AdvisorTaskResponse>> {
-    return this.apiClient.post(`/v2/student/study-plan/tasks/${taskId}/start`, request, idempotent(idempotencyKey));
+  startOwnAdvisorTask(taskId: number, request: {expectedVersion: number}, idempotencyKey: string = crypto.randomUUID()): Promise<ApiResponse<AdvisorTaskResponse>> {
+    // Start uses a query parameter; complete uses the JSON request body.
+    return this.apiClient.post(`/v2/student/study-plan/tasks/${taskId}/start`, undefined, {...idempotent(idempotencyKey), params: request});
   }
 
   completeOwnAdvisorTask(taskId: number, request: CompleteAdvisorTaskRequest, idempotencyKey: string = crypto.randomUUID()): Promise<ApiResponse<AdvisorTaskResponse>> {

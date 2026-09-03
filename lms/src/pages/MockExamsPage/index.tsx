@@ -41,13 +41,9 @@ const MockExamsPage: React.FC = () => {
     return (
       <main className={studentStyles.studentPage}>
         <header className={studentStyles.masthead}>
-          <div>
-            <p className={studentStyles.brand}>Mock<em>Lab</em></p>
-            <p className={studentStyles.kicker}>IELTS academic examination room</p>
-          </div>
           <div className={studentStyles.intro}>
-            <h1>Choose a paper. Enter exam mode.</h1>
-            <p>Your assigned Listening, Reading and Writing papers use official section timing and keep every tool within reach.</p>
+            <h1>Exams</h1>
+            <p>Choose an assigned paper to practise Listening, Reading or Writing.</p>
           </div>
         </header>
 

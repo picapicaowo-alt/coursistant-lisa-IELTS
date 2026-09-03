@@ -32,6 +32,7 @@ const CourseCataloguePage: React.FC = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.contentContainer}>
+        <h1 className={styles.pageTitle}>{isUserAccount ? t("list.tabs.myCourses") : 'Courses'}</h1>
         <div className={styles.tabsContainer}>
           <button
             type="button"

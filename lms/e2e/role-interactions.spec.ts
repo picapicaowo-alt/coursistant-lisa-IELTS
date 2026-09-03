@@ -72,7 +72,7 @@ test('student can enter both learning products but not advisor operations', asyn
   }));
 
   await page.goto('/mock-exams');
-  await expect(page.getByRole('heading', {name: 'Choose a paper. Enter exam mode.'})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Exams'})).toBeVisible();
   await expect(page.getByRole('link', {name: /Listening/})).toHaveAttribute('href', '/mock-exams/71/listening');
   await expect(page.getByRole('link', {name: 'Exams'})).toBeVisible();
 
@@ -301,9 +301,10 @@ test('student advising view presents profile, plan, and tasks with scannable hie
   await openSection(page, 'Study plan');
   await expect(page.getByRole('heading', {name: /Checkpoint 1/})).toBeVisible();
   await openSection(page, 'Checkpoint 1: Complete the first diagnostic');
-  await openSection(page, 'Complete the week 1 diagnostic');
-  await expect(page.getByText('not started', {exact: true})).toBeVisible();
-  await expect(page.getByRole('button', {name: 'Complete'})).toBeVisible();
+  await page.getByRole('button', {name: 'View tasks'}).click();
+  await page.getByRole('button', {name: 'View Complete the week 1 diagnostic', exact: true}).click();
+  await expect(page.getByRole('complementary').getByText('Not started', {exact: true})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Complete task', exact: true})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('student-advising-polished.png'), fullPage: true});
 });
 

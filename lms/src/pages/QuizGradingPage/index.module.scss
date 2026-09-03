@@ -1,7 +1,7 @@
 .page { min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem; background: t.$page-bg; color: t.$text; }
 .header, .summaryGrid, .card, .page > .success, .page > .error { max-width: t.$workspace-readable-max-inline-size; margin-inline: auto; }
 .header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; }
-.header h1 { margin: .25rem 0 0; font-size: clamp(1.8rem, 4vw, t.$fs-h1); }
+.header h1 { margin: .25rem 0 0; font-size: t.$workspace-title-size; line-height: t.$line-height-title-1; }
 .backLink { display: inline-grid; place-items: center; flex: 0 0 t.$control-size; width: t.$control-size; height: t.$control-size; border-radius: t.$radius-control; background: t.$neutral-fill; color: t.$text; }
 .eyebrow { margin: 0; color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; text-transform: uppercase; letter-spacing: .08em; }
 .headerActions { display: flex; gap: .65rem; margin-left: auto; }

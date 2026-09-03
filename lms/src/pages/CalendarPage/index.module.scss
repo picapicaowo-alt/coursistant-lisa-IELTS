@@ -1,6 +1,6 @@
 .page { min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline 4rem; overflow-y: auto; background: t.$page-bg; color: t.$text; }
 .header { display: flex; max-width: t.$workspace-max-inline-size; margin: 0 auto 1.25rem; align-items: flex-end; justify-content: space-between; gap: 1.5rem; }
-.header h1 { margin: .15rem 0; font-size: clamp(2rem, 4vw, t.$fs-h1); font-weight: t.$fw-extrabold; }
+.header h1 { margin: .15rem 0; font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1; font-weight: t.$fw-extrabold; }
 .header > div:first-child > p:last-child { color: t.$text-muted; }
 .eyebrow { color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
 .viewSwitch { display: flex; gap: .25rem; padding: .3rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }

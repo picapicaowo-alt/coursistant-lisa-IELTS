@@ -178,7 +178,7 @@ const AdvisorOperationsPage: React.FC = () => {
           <AdvisingPagination label="Action task pages" page={taskPage} total={tasks.data?.total ?? 0} onPage={setTaskPage}/>
         </CollapsibleSection>
 
-        <CollapsibleSection title="Student conversations" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{conversations.data?.total ?? 0}</span>}>
+        <CollapsibleSection title="Student conversations" id="conversations" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{conversations.data?.total ?? 0}</span>}>
 
           <div className={styles.form}><label>Search conversations<input type="search" maxLength={100} value={conversationSearch} onChange={event => {setConversationSearch(event.target.value); setConversationPage(0);}}/></label>
           <label className={styles.inlineCheckbox}><input type="checkbox" checked={unreadOnly} onChange={event => {setUnreadOnly(event.target.checked); setConversationPage(0);}}/>Unread only</label></div>
