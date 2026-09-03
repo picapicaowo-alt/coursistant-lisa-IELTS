@@ -329,15 +329,16 @@ test('non-student roles remain outside Vocabulary and parent stays outside stand
   await expect(page).toHaveURL(/\/parent$/);
 });
 
-test('counsellor dashboard cards disclose their real access boundary and the create form marks contract requirements', async ({page}, testInfo) => {
+test('counsellor dashboard keeps count help contextual and the create form marks contract requirements', async ({page}, testInfo) => {
   await installIdentity(page, identity('COUNSELLOR', {id: 905, userId: 905, email: 'casey.counsellor@example.test'}));
   await page.route('**/v2/counsellor/dashboard', route => route.fulfill({
     json: response({createdCount: 4, assignedCount: 2, unassignedCount: 1}),
   }));
 
   await page.goto('/counsellor');
-  await page.getByRole('button', {name: /2 Assigned/}).click();
-  await expect(page.getByText('Assigned means the handover is complete')).toBeVisible();
+  await page.getByLabel('About assigned count').click();
+  await expect(page.getByText(/Intake access transfers to the Advisor at handover/)).toBeVisible();
+  await page.getByLabel('About assigned count').press('Escape');
   await expect(page.getByRole('link', {name: /1 Unassigned/})).toHaveAttribute('href', '/counsellor/intakes');
   await page.screenshot({path: testInfo.outputPath('counsellor-dashboard.png'), fullPage: true});
 

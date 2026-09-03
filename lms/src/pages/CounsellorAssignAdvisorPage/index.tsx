@@ -10,6 +10,8 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
 import {Search} from 'lucide-react';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {intakePath} from '../CounsellorDashboardPage/presentation';
 
 const PAGE_SIZE = 100;
 
@@ -53,10 +55,10 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
     onSuccess: async () => {
       queryClient.removeQueries({queryKey: advisingQueryKeys.counsellorIntake(numericId)});
       await Promise.all([
-        queryClient.invalidateQueries({queryKey: ['counsellor']}),
-        queryClient.invalidateQueries({queryKey: ['advisor', 'students']}),
+        queryClient.invalidateQueries({queryKey: advisingQueryKeys.counsellorAll}),
+        queryClient.invalidateQueries({queryKey: advisingQueryKeys.advisorStudentsAll}),
       ]);
-      navigate('/counsellor/intakes', {replace: true});
+      navigate(APP_ROUTE_PATHS.counsellorIntakes, {replace: true});
     },
   });
 
@@ -73,7 +75,7 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
     return (
       <div className={styles.page}>
         <p className={styles.success} role="status">This student has left the counsellor queue. First assignment is complete.</p>
-        <Link className={styles.link} to="/counsellor/intakes">Back to unassigned queue</Link>
+        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>Back to unassigned queue</Link>
       </div>
     );
   }
@@ -87,7 +89,7 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
             {intake.data ? `${formatPersonName(intake.data, 'Student')} · version ${intake.data.intakeVersion}` : 'Load the current intake version, then assign. You cannot cancel or reassign afterwards.'}
           </p>
         </div>
-        <Link className={styles.link} to={`/counsellor/intakes/${numericId}`}>Back to intake</Link>
+        <Link className={styles.link} to={intakePath(numericId)}>Back to intake</Link>
       </header>
       {assign.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(assign.error, 'Assignment failed.')}</p> : null}
       {intake.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(intake.error, 'Intake could not be loaded.')}</p> : null}
@@ -124,6 +126,7 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
               <button type="button" className={styles.secondary} disabled={(page + 1) * PAGE_SIZE >= advisors.data.total} onClick={() => setPage(page + 1)}>Next</button>
             </nav>
           ) : null}
+          <p className={styles.fieldHelp}>Assigning an Advisor completes the handover. This intake will leave your queue, and you will no longer be able to edit its record or parent links.</p>
           <button className={styles.primary} disabled={assign.isPending || !Number(advisorUserId) || !intake.data}>
             {assign.isPending ? 'Assigning…' : 'Assign advisor'}
           </button>

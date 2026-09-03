@@ -1,8 +1,11 @@
 export const advisingQueryKeys = {
+  counsellorAll: ['counsellor'] as const,
   counsellorDashboard: ['counsellor', 'dashboard'] as const,
+  counsellorIntakesAll: ['counsellor', 'intakes'] as const,
   counsellorIntakes: (page: number, size: number) => ['counsellor', 'intakes', page, size] as const,
   counsellorIntake: (intakeId: number) => ['counsellor', 'intake', intakeId] as const,
   counsellorAdvisors: (page: number, size: number) => ['counsellor', 'advisors', page, size] as const,
+  advisorStudentsAll: ['advisor', 'students'] as const,
   advisorStudents: (page: number, size: number) => ['advisor', 'students', page, size] as const,
   advisorIntake: (studentUserId: number) => ['advisor', 'intake', studentUserId] as const,
   advisorProfile: (studentUserId: number) => ['advisor', 'profile', studentUserId] as const,
