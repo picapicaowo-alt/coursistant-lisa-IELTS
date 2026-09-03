@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
-import {Link, Navigate, useParams} from 'react-router-dom';
+import {generatePath, Link, Navigate, useParams} from 'react-router-dom';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {Field, OperationCard} from '@/components/OperationCard';
 import {EnglishDateInput, EnglishTimeInput} from '@/components/EnglishDateInput';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
@@ -78,14 +79,14 @@ const CourseOperationsPage: React.FC = () => {
           <h1>{access.membership?.title || access.membership?.courseCode || `Course ${id}`}</h1>
           <p>Manage teaching delivery, learner progress, communication, and course resources.</p>
         </div>
-        <Link to={`/course/${id}`} className={styles.back}>Back to course</Link>
+        <Link to={APP_ROUTE_PATHS.course} className={styles.back}>Back to courses</Link>
       </header>
 
       <nav className={styles.shortcuts} aria-label="Course workspace shortcuts">
         <Link to={`/course/${id}`}>Course overview</Link>
         <Link to={`/course/${id}/schedule`}>Teaching schedule</Link>
         <Link to={`/course/${id}/events`}>Course events</Link>
-        <Link to={`/roster/${id}`}>Learner roster</Link>
+        {systemAdmin || access.isInstructor ? <Link to={generatePath(APP_ROUTE_PATHS.rosterCourseId, {courseId: String(id)})}>Learner roster</Link> : null}
         <Link to={`/course/${id}/groups`}>Learning groups</Link>
         <Link to={`/course/${id}/grades`}>Grades</Link>
         {staff ? <Link to={`/course/${id}/assignments/new`}>Create assignment</Link> : null}

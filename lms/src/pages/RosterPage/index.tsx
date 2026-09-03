@@ -1,8 +1,10 @@
 import React, {useState} from 'react';
-import {Link, Navigate, useParams} from 'react-router-dom';
+import {generatePath, Link, Navigate, useLocation, useParams} from 'react-router-dom';
 import {CourseRole} from '@/apis';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {useCourseAccess} from '@/hooks/useCourseAccess';
+import {isRecord} from '@/utils/apiError';
 import {EnrolStudentsPanel} from './EnrolStudentsPanel';
 import {MemberRow} from './MemberRow';
 import {useRoster} from './useRoster';
@@ -12,6 +14,7 @@ const ROLE_FILTERS: Array<CourseRole | 'All'> = ['All', 'Instructor', 'TA', 'Stu
 
 const RosterPage: React.FC = () => {
   const {courseId: courseIdParam} = useParams();
+  const {state: navigationState} = useLocation();
   const parsedCourseId = Number(courseIdParam);
   const requestedCourseId = Number.isInteger(parsedCourseId) && parsedCourseId > 0 ? parsedCourseId : null;
   const {user} = useRequiredAuth();
@@ -24,19 +27,24 @@ const RosterPage: React.FC = () => {
   } = useRoster({enabled: canViewRoster});
   const [search, setSearch] = useState('');
 
-  if (courseId === null) return <p className={styles.status}>Open a course to see its roster.</p>;
+  if (courseId === null) return <div className={styles.status}><p>Open a course to see its roster.</p><Link to={APP_ROUTE_PATHS.course}>Choose a course</Link></div>;
   if (!isSystemAdmin && access.isLoading) return <p className={styles.status} role="status">Checking course access…</p>;
   if (!isSystemAdmin && access.isError) return <p className={styles.status} role="alert">Course access could not be verified.</p>;
   if (!canViewRoster) return <Navigate to={access.membership ? `/course/${courseId}` : '/course'} replace/>;
   if (isForbidden) return <p className={styles.status} role="alert">Only the course instructor can view the roster.</p>;
 
   const isBusy = withdraw.isPending || promote.isPending || demote.isPending || updatePermissions.isPending;
+  const coursePath = generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(courseId)});
+  // Only accept this course's overview as an alternate parent. Deep links and
+  // the teaching operations entry return to the course's management workspace.
+  const fromOverview = isRecord(navigationState) && navigationState.rosterParent === coursePath;
+  const backPath = fromOverview ? coursePath : generatePath(APP_ROUTE_PATHS.courseCourseIdOperations, {courseId: String(courseId)});
 
   return (
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <Link className={styles.backLink} to={`/course/${courseId}`}>← Back to course</Link>
+          <Link className={styles.backLink} to={backPath}>← {fromOverview ? 'Back to course' : 'Back to course operations'}</Link>
           <h1 className={styles.title}>Roster</h1>
         </div>
         <span className={styles.count}>{total} {total === 1 ? 'member' : 'members'}</span>
