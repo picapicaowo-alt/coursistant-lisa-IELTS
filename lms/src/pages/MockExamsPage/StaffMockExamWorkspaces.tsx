@@ -1,3 +1,6 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {ObserverMockExams} from '@/components/ObserverMockExams';
+import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
 import {useEffect, useRef, useState} from 'react'
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query'
 import {Archive, BookOpenText, CheckCircle2, Copy, Eye, FilePenLine, Headphones, Image as ImageIcon, PenLine, Send, Trash2, Upload, Users} from 'lucide-react'
@@ -150,8 +153,7 @@ function TenantMediaManager({
       if (!file) throw new Error('Choose a file first.')
       if (file.size > rule.maxBytes) throw new Error(`This file exceeds the ${Math.round(rule.maxBytes / 1024 / 1024)} MB limit.`)
       const fingerprint = idempotencyFingerprint({kind, name: file.name, size: file.size, lastModified: file.lastModified})
-      const key = idempotency.keyFor(`mock-media-${templateId}-${versionId}-${kind}`, fingerprint)
-      return unwrapData(await mockExamApiService.uploadTenantMedia(templateId, versionId, kind, file, key), 'uploadTenantMockExamMedia')
+      return unwrapData(await idempotency.run(`mock-media-${templateId}-${versionId}-${kind}`, fingerprint, key => mockExamApiService.uploadTenantMedia(templateId, versionId, kind, file, key)), 'uploadTenantMockExamMedia')
     },
     onSuccess: async created => {
       setFile(null)
@@ -189,7 +191,7 @@ function TenantMediaManager({
     {file ? <div className={styles.pendingFile}><span><strong>{file.name}</strong><small>{(file.size / 1024 / 1024).toFixed(1)} MB</small></span><button type="button" className={styles.primary} disabled={upload.isPending} onClick={() => upload.mutate()}>{upload.isPending ? 'Uploading…' : 'Upload and use'}</button></div> : null}
     {media.isPending ? <p className={styles.status}>Loading uploaded media…</p> : null}
     {media.isError ? <ErrorNotice error={media.error} fallback="Uploaded media could not be loaded."/> : null}
-    {items.length > 0 ? <div className={styles.mediaChoices}>{items.map(item => <article className={selectedMediaId === item.mediaId ? styles.selectedMedia : ''} key={item.mediaId}><label><input type="radio" name={`${kind}-media`} checked={selectedMediaId === item.mediaId} onChange={() => onSelect(item.mediaId)}/><span><strong>{item.originalFilename || `${kind.replace(/_/g, ' ').toLowerCase()} #${item.mediaId}`}</strong><small>{[item.status, item.sizeBytes ? `${(item.sizeBytes / 1024 / 1024).toFixed(1)} MB` : ''].filter(Boolean).join(' · ')}</small></span></label><div><button type="button" className={styles.iconAction} aria-label={`Preview ${item.originalFilename || `media ${item.mediaId}`}`} disabled={previewMedia.isPending} onClick={() => previewMedia.mutate(item.mediaId)}><Eye size={16}/></button><button type="button" className={styles.iconAction} aria-label={`Delete ${item.originalFilename || `media ${item.mediaId}`}`} disabled={remove.isPending} onClick={() => remove.mutate(item.mediaId)}><Trash2 size={16}/></button></div></article>)}</div> : !media.isPending && !media.isError ? <p className={styles.mediaEmpty}>No matching upload yet.</p> : null}
+    {items.length > 0 ? <div className={styles.mediaChoices}>{items.map(item => <article className={selectedMediaId === item.mediaId ? styles.selectedMedia : ''} key={item.mediaId}><label><input type="radio" name={`${kind}-media`} disabled={item.status !== 'UPLOADED'} checked={selectedMediaId === item.mediaId} onChange={() => onSelect(item.mediaId)}/><span><strong>{item.fileName || `${kind.replace(/_/g, ' ').toLowerCase()} #${item.mediaId}`}</strong><small>{[item.status, item.sizeBytes ? `${(item.sizeBytes / 1024 / 1024).toFixed(1)} MB` : ''].filter(Boolean).join(' · ')}</small></span></label><div><button type="button" className={styles.iconAction} aria-label={`Preview ${item.fileName || `media ${item.mediaId}`}`} disabled={previewMedia.isPending} onClick={() => previewMedia.mutate(item.mediaId)}><Eye size={16}/></button><button type="button" className={styles.iconAction} aria-label={`Delete ${item.fileName || `media ${item.mediaId}`}`} disabled={remove.isPending || item.status !== 'UPLOADED'} onClick={() => remove.mutate(item.mediaId)}><Trash2 size={16}/></button></div></article>)}</div> : !media.isPending && !media.isError ? <p className={styles.mediaEmpty}>No matching upload yet.</p> : null}
     {preview ? kind === 'LISTENING_AUDIO' ? <audio className={styles.mediaPreview} controls preload="metadata" src={preview.url}>Your browser does not support audio playback.</audio> : <img className={styles.mediaPreview} src={preview.url} alt="Selected exam media preview"/> : null}
     {validationError ? <p className={styles.error} role="alert">{validationError}</p> : null}
     {previewMedia.isError ? <ErrorNotice error={previewMedia.error} fallback="Media preview could not be loaded."/> : null}
@@ -217,7 +219,7 @@ function TemplateCards({value, selectedId, onSelect}: {value: unknown; selectedI
   )
 }
 
-function TenantSectionComposer({templateId, versionId, existingSections, onSaved}: {templateId: number; versionId: number; existingSections: Record<Section, boolean>; onSaved: () => void}) {
+function TenantSectionComposer({templateId, versionId, existingSections, onSaved, revealKey}: {templateId: number; versionId: number; existingSections: Record<Section, boolean>; onSaved: () => void; revealKey?: number}) {
   const [section, setSection] = useState<Section>('listening')
   const [minutes, setMinutes] = useState('40')
   const [title, setTitle] = useState('')
@@ -301,11 +303,8 @@ function TenantSectionComposer({templateId, versionId, existingSections, onSaved
   })
 
   return (
-    <section className={styles.panel}>
-      <div className={styles.panelHeading}>
-        <div><p className={styles.eyebrow}>Draft builder</p><h3>Compose exam content</h3></div>
-        <span className={styles.contextTag}>Template {templateId} · Version {versionId}</span>
-      </div>
+    <CollapsibleSection title="Compose exam content" revealKey={revealKey} summary={`Template ${templateId} · Version ${versionId}`}>
+
       <div className={styles.sectionTabs} role="tablist" aria-label="Mock exam sections">
         {(Object.keys(SECTION_META) as Section[]).map((key) => {
           const {Icon, label: sectionLabel} = SECTION_META[key]
@@ -338,7 +337,7 @@ function TenantSectionComposer({templateId, versionId, existingSections, onSaved
       }
       {confirmCreate && !isExisting ? <div className={styles.confirmCreate}><p>Save this {SECTION_META[section].label} section to the draft? The current backend makes section content read-only immediately after creation.</p><div><button type="button" className={styles.primary} disabled={save.isPending} onClick={() => save.mutate()}>{save.isPending ? 'Saving…' : `Save ${SECTION_META[section].label} to draft`}</button><button type="button" className={styles.secondary} onClick={() => setConfirmCreate(false)}>Back to form</button></div></div> : null}
       {validationError ? <p className={styles.error} role="alert">{validationError}</p> : null}
-    </section>
+    </CollapsibleSection>
   )
 }
 
@@ -346,6 +345,8 @@ export function TenantWorkspace({value}: {value: unknown}) {
   const queryClient = useQueryClient()
   const builderRef = useRef<HTMLDivElement>(null)
   const shouldOpenBuilder = useRef(false)
+  const [builderReveal, setBuilderReveal] = useState(0)
+  const [releaseReveal, setReleaseReveal] = useState(0)
   const templates = templateItems(value)
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(templates[0]?.id ?? null)
   const selectedTemplate = templates.find((item) => item.id === selectedTemplateId) ?? null
@@ -381,6 +382,8 @@ export function TenantWorkspace({value}: {value: unknown}) {
   useEffect(() => {
     if (!shouldOpenBuilder.current || selectedVersion?.status !== 'DRAFT') return
     shouldOpenBuilder.current = false
+    setBuilderReveal(current => current + 1)
+    setReleaseReveal(current => current + 1)
     requestAnimationFrame(() => builderRef.current?.scrollIntoView({behavior: 'smooth', block: 'start'}))
   }, [selectedTemplateId, selectedVersion?.status, selectedVersionId])
 
@@ -433,6 +436,7 @@ export function TenantWorkspace({value}: {value: unknown}) {
   })
 
   const selectTemplate = (templateId: number) => {
+    setReleaseReveal(current => current + 1)
     const next = templates.find(item => item.id === templateId)
     const version = next?.versions?.find(item => item.status === 'DRAFT') ?? next?.versions?.[0]
     setSelectedTemplateId(templateId)
@@ -444,8 +448,8 @@ export function TenantWorkspace({value}: {value: unknown}) {
     <div className={styles.workspace}>
       <section className={styles.hero}><div><h1>Build and release IELTS papers</h1><p>Create an empty template, add Listening, Reading, and Writing once, review the locked content, then publish.</p></div></section>
       <div className={styles.twoColumn}>
-        <section className={styles.panel}>
-          <div className={styles.panelHeading}><div><p className={styles.eyebrow}>Library</p><h2>Template versions</h2></div></div>
+        <CollapsibleSection title="Template versions">
+
           <TemplateCards value={value} selectedId={selectedTemplateId} onSelect={selectTemplate}/>
           <form className={styles.compactForm} onSubmit={(event) => { event.preventDefault(); create.mutate() }}>
             <h3>New draft template</h3>
@@ -454,14 +458,14 @@ export function TenantWorkspace({value}: {value: unknown}) {
             <button className={styles.primary} disabled={create.isPending}>{create.isPending ? 'Creating draft…' : 'Create and open draft'}</button>
           </form>
           <ErrorNotice error={create.error} fallback="The template could not be created."/>
-        </section>
-        <section className={styles.panel}>
-          <div className={styles.panelHeading}><div><p className={styles.eyebrow}>Release control</p><h2>{workingTemplate?.title || 'Select a template'}</h2></div></div>
+        </CollapsibleSection>
+        <CollapsibleSection title={workingTemplate?.title || 'Select a template'} revealKey={releaseReveal}>
+
           {templateDetail.isError ? <ErrorNotice error={templateDetail.error} fallback="Template details could not be loaded."/> : null}
           {workingTemplate?.versions?.length ? (
             <>
               <label className={styles.selectLabel}><span>Working version</span><select value={selectedVersionId ?? ''} onChange={(event) => { setSelectedVersionId(Number(event.target.value)); setConfirmDelete(false) }}>{workingTemplate.versions.map((version) => <option value={version.id} key={version.id}>v{version.versionNo ?? '—'} · {version.status || 'UNKNOWN'}</option>)}</select></label>
-              <div className={styles.versionStatus}>{workingTemplate.versions.map((version) => <button type="button" className={version.id === selectedVersionId ? styles.activeVersion : ''} onClick={() => { setSelectedVersionId(version.id ?? null); setConfirmDelete(false); if (version.status === 'DRAFT') { shouldOpenBuilder.current = true; requestAnimationFrame(() => builderRef.current?.scrollIntoView({behavior: 'smooth', block: 'start'})) } }} key={version.id}><strong>v{version.versionNo ?? '—'}</strong><span>{version.status || 'Unknown'}</span><small>{[version.hasListening && 'Listening', version.hasReading && 'Reading', version.hasWriting && 'Writing'].filter(Boolean).join(' · ') || 'No sections'}</small></button>)}</div>
+              <div className={styles.versionStatus}>{workingTemplate.versions.map((version) => <button type="button" className={version.id === selectedVersionId ? styles.activeVersion : ''} onClick={() => { setSelectedVersionId(version.id ?? null); setConfirmDelete(false); if (version.status === 'DRAFT') { setBuilderReveal(current => current + 1); shouldOpenBuilder.current = true; requestAnimationFrame(() => builderRef.current?.scrollIntoView({behavior: 'smooth', block: 'start'})) } }} key={version.id}><strong>v{version.versionNo ?? '—'}</strong><span>{version.status || 'Unknown'}</span><small>{[version.hasListening && 'Listening', version.hasReading && 'Reading', version.hasWriting && 'Writing'].filter(Boolean).join(' · ') || 'No sections'}</small></button>)}</div>
               {versionDetail.isPending ? <p className={styles.status}>Loading version detail…</p> : versionDetail.isError ? <ErrorNotice error={versionDetail.error} fallback="Version details could not be loaded."/> : null}
               <div className={styles.actionRow}>
                 <button type="button" className={styles.primary} onClick={() => lifecycle.mutate('publish')} disabled={lifecycle.isPending || selectedVersion?.status !== 'DRAFT' || !selectedVersion.hasListening || !selectedVersion.hasReading || !selectedVersion.hasWriting}><CheckCircle2 size={16}/>{lifecycle.isPending ? 'Checking sections…' : 'Publish complete draft'}</button>
@@ -475,10 +479,10 @@ export function TenantWorkspace({value}: {value: unknown}) {
           ) : <Empty>This template does not include a version that can be edited.</Empty>}
           <ErrorNotice error={lifecycle.error} fallback="The version lifecycle action could not be completed."/>
           <ErrorNotice error={versionAction.error} fallback="The version action could not be completed."/>
-        </section>
+        </CollapsibleSection>
       </div>
       <div ref={builderRef} className={styles.builderAnchor}>{selectedTemplateId && selectedVersionId && selectedVersion?.status === 'DRAFT'
-        ? <TenantSectionComposer templateId={selectedTemplateId} versionId={selectedVersionId} existingSections={{listening: selectedVersion.hasListening === true, reading: selectedVersion.hasReading === true, writing: selectedVersion.hasWriting === true}} onSaved={refresh}/>
+        ? <TenantSectionComposer revealKey={builderReveal} key={`${selectedTemplateId}-${selectedVersionId}`} templateId={selectedTemplateId} versionId={selectedVersionId} existingSections={{listening: selectedVersion.hasListening === true, reading: selectedVersion.hasReading === true, writing: selectedVersion.hasWriting === true}} onSaved={refresh}/>
         : selectedVersion ? <section className={styles.panel}><Empty>Published and archived versions are read only.</Empty></section> : null}
       </div>
     </div>
@@ -488,47 +492,52 @@ export function TenantWorkspace({value}: {value: unknown}) {
 export function AdvisorWorkspace({value}: {value: unknown}) {
   const queryClient = useQueryClient()
   const templates = templateItems(value).filter((item) => item.publishedVersionId || item.publishedVersionNo)
+  const idempotency = useIdempotencyCheckpoint()
   const students = useQuery({queryKey: ['advisor', 'students', 'mock-exam-assignment'], retry: false, queryFn: async () => unwrapData(await advisorApiService.listStudents(), 'advisorStudents')})
   const studentRows = runtimeItems(students.data)
   const [studentId, setStudentId] = useState('')
   const [templateId, setTemplateId] = useState('')
   const [instructorId, setInstructorId] = useState('')
   const [sections, setSections] = useState<Record<Section, boolean>>({listening: true, reading: true, writing: true})
-  const history = useQuery({
-    queryKey: ['mock-exams', 'advisor', 'student', studentId],
-    enabled: Number(studentId) > 0,
+  const selectedTemplate = useQuery({
+    queryKey: ['mock-exams', 'advisor', 'template', templateId],
+    enabled: Number(templateId) > 0,
+    queryFn: async () => unwrapData(await mockExamApiService.getAdvisorTemplate(Number(templateId)), 'advisorMockTemplate'),
     retry: false,
-    queryFn: async () => unwrapData(await mockExamApiService.listAdvisorStudentExams(Number(studentId)), 'advisorStudentMockExams'),
   })
   const assign = useMutation({
-    mutationFn: () => mockExamApiService.createAdvisorStudentExam(Number(studentId), {
-      templateId: Number(templateId),
-      listeningSelected: sections.listening,
-      readingSelected: sections.reading,
-      writingSelected: sections.writing,
-      writingInstructorUserId: instructorId ? Number(instructorId) : undefined,
-    }),
-    onSuccess: async () => queryClient.invalidateQueries({queryKey: ['mock-exams', 'advisor', 'student', studentId]}),
+    mutationFn: () => {
+      const request = {
+        templateId: Number(templateId),
+        listeningSelected: sections.listening,
+        readingSelected: sections.reading,
+        writingSelected: sections.writing,
+        writingInstructorUserId: sections.writing && instructorId ? Number(instructorId) : undefined,
+      }
+      return idempotency.run(`assign-mock-exam-${studentId}`, request, (key, payload) => mockExamApiService.createAdvisorStudentExam(Number(studentId), payload, key))
+    },
+    onSuccess: async () => queryClient.invalidateQueries({queryKey: ['mock-exams', 'advisor', 'student', Number(studentId)]}),
   })
   return (
     <div className={styles.workspace}>
-      <section className={styles.hero}><div><p className={styles.eyebrow}>Advisor assignment desk</p><h1>Match students to published papers</h1><p>Select from your assigned students, choose the exam sections, and review every prior assignment before creating another.</p></div><div className={styles.metric}><strong>{templates.length}</strong><span>published</span></div></section>
+      <section className={styles.hero}><div><h1>Match students to published papers</h1><p>Select from your assigned students, choose the exam sections, and review every prior assignment before creating another.</p></div><div className={styles.metric}><strong>{templates.length}</strong><span>published</span></div></section>
       <div className={styles.twoColumn}>
-        <section className={styles.panel}>
-          <div className={styles.panelHeading}><div><p className={styles.eyebrow}>Assignment</p><h2>Prepare a mock exam</h2></div><Users size={22}/></div>
+        <CollapsibleSection title="Prepare a mock exam">
+          <div className={styles.panelHeading}><div></div><Users size={22}/></div>
           <form className={styles.editorForm} onSubmit={(event) => { event.preventDefault(); assign.mutate() }}>
             <label className={styles.full}><span>Student</span><select required value={studentId} onChange={(event) => setStudentId(event.target.value)}><option value="">Select assigned student</option>{studentRows.map((student) => { const id = idFrom(student, 'studentUserId', 'userId'); return id ? <option value={id} key={id}>{recordLabel(student, `Student ${id}`)} · {runtimeString(student, 'email') || `ID ${id}`}</option> : null })}</select></label>
             <label className={styles.full}><span>Published template</span><select required value={templateId} onChange={(event) => setTemplateId(event.target.value)}><option value="">Select paper</option>{templates.map((template) => <option value={template.id} key={template.id}>{template.title || template.label || `Template ${template.id}`} · v{template.publishedVersionNo ?? 'published'}</option>)}</select></label>
+            {templateId ? <div className={styles.full} aria-label="Selected paper details">{selectedTemplate.isPending ? <p role="status">Loading paper details…</p> : selectedTemplate.isError ? <ErrorNotice error={selectedTemplate.error} fallback="Paper details could not be loaded."/> : <RecordSummaryList value={selectedTemplate.data}/>}</div> : null}
             <fieldset className={styles.full}><legend>Assigned sections</legend><div className={styles.checkGrid}>{(Object.keys(SECTION_META) as Section[]).map((section) => <label key={section}><input type="checkbox" checked={sections[section]} onChange={(event) => setSections((current) => ({...current, [section]: event.target.checked}))}/><span>{SECTION_META[section].label}</span></label>)}</div></fieldset>
-            <label className={styles.full}><span>Writing instructor user ID (optional)</span><input inputMode="numeric" value={instructorId} onChange={(event) => setInstructorId(event.target.value)}/><small>The Mock Exam OpenAPI does not expose an instructor directory endpoint.</small></label>
-            <div className={styles.formActions}><button className={styles.primary} disabled={assign.isPending || !Object.values(sections).some(Boolean)}><Send size={16}/>{assign.isPending ? 'Assigning…' : 'Assign exam'}</button></div>
+            <div className={styles.full}>{sections.writing ? <AdvisorInstructorPicker required label="Writing instructor" value={instructorId} onChange={setInstructorId}/> : null}</div>
+            <div className={styles.formActions}><button className={styles.primary} disabled={assign.isPending || (sections.writing && !instructorId) || !Object.values(sections).some(Boolean)}><Send size={16}/>{assign.isPending ? 'Assigning…' : 'Assign exam'}</button></div>
           </form>
           <ErrorNotice error={students.error || assign.error} fallback="The assignment could not be completed."/>
-        </section>
-        <section className={styles.panel}>
-          <div className={styles.panelHeading}><div><p className={styles.eyebrow}>Student history</p><h2>Assigned papers</h2></div></div>
-          {!studentId ? <Empty>Select a student to review assignment history.</Empty> : history.isPending ? <p className={styles.status}>Loading history…</p> : history.isError ? <ErrorNotice error={history.error} fallback="Assignment history could not be loaded."/> : <RecordSummaryList value={history.data} emptyMessage="This student has no assigned mock exams."/>}
-        </section>
+        </CollapsibleSection>
+        <CollapsibleSection title="Assigned papers">
+
+          {!studentId ? <Empty>Select a student to review assignment history.</Empty> : <ObserverMockExams key={studentId} scope="advisor" studentUserId={Number(studentId)}/>}
+        </CollapsibleSection>
       </div>
     </div>
   )
@@ -537,6 +546,7 @@ export function AdvisorWorkspace({value}: {value: unknown}) {
 export function InstructorWorkspace({value}: {value: unknown}) {
   const queryClient = useQueryClient()
   const rows = runtimeItems(value)
+  const [gradeReveal, setGradeReveal] = useState(0)
   const [gradeId, setGradeId] = useState<number | null>(() => rows[0] ? idFrom(rows[0], 'gradeId', 'writingGradeId') : null)
   const [score, setScore] = useState('')
   const [feedback, setFeedback] = useState('')
@@ -544,10 +554,10 @@ export function InstructorWorkspace({value}: {value: unknown}) {
   const submit = useMutation({mutationFn: () => mockExamApiService.gradeInstructorWriting(gradeId as number, {score: Number(score), feedback: feedback.trim() || undefined}), onSuccess: async () => { setScore(''); setFeedback(''); await queryClient.invalidateQueries({queryKey: ['mock-exams', 'instructor']}); await queryClient.invalidateQueries({queryKey: ['mock-exams', 'instructor', 'grade', gradeId]}) }})
   return (
     <div className={styles.workspace}>
-      <section className={styles.hero}><div><p className={styles.eyebrow}>Writing review room</p><h1>Read the script. Return a clear result.</h1><p>Work from the assigned queue, inspect the complete submission, then record a score and candidate-facing feedback.</p></div><div className={styles.metric}><strong>{rows.length}</strong><span>queue items</span></div></section>
+      <section className={styles.hero}><div><h1>Read the script. Return a clear result.</h1><p>Work from the assigned queue, inspect the complete submission, then record a score and candidate-facing feedback.</p></div><div className={styles.metric}><strong>{rows.length}</strong><span>queue items</span></div></section>
       <div className={styles.queueLayout}>
-        <section className={styles.panel}><div className={styles.panelHeading}><div><p className={styles.eyebrow}>Queue</p><h2>Writing submissions</h2></div></div>{rows.length ? <div className={styles.cardList}>{rows.map((row, index) => { const id = idFrom(row, 'gradeId', 'writingGradeId'); return id ? <button type="button" className={gradeId === id ? styles.selectedCard : styles.selectCard} onClick={() => setGradeId(id)} key={id}><span className={styles.cardTopline}>{runtimeString(row, 'status') || 'Awaiting review'}<small>#{id}</small></span><strong>{recordLabel(row, `Writing submission ${index + 1}`)}</strong><span>{runtimeString(row, 'submittedAt', 'createdAt') || 'Submission time unavailable'}</span></button> : null })}</div> : <Empty>No writing submissions are waiting for review.</Empty>}</section>
-        <section className={styles.panel}><div className={styles.panelHeading}><div><p className={styles.eyebrow}>Assessment</p><h2>{gradeId ? `Submission #${gradeId}` : 'Select a submission'}</h2></div></div>{gradeId ? <>{detail.isPending ? <p className={styles.status}>Loading script…</p> : detail.isError ? <ErrorNotice error={detail.error} fallback="The writing script could not be loaded."/> : <div className={styles.script}><RecordSummaryList value={detail.data} emptyMessage="The response contains no readable writing detail."/></div>}<form className={styles.compactForm} onSubmit={(event) => { event.preventDefault(); submit.mutate() }}><label><span>Score</span><input required type="number" step="0.5" min="0" value={score} onChange={(event) => setScore(event.target.value)}/></label><label><span>Feedback</span><textarea required rows={6} value={feedback} onChange={(event) => setFeedback(event.target.value)}/></label><button className={styles.primary} disabled={submit.isPending}>{submit.isPending ? 'Submitting…' : 'Submit result'}</button></form><ErrorNotice error={submit.error} fallback="The writing result could not be submitted."/></> : <Empty>Choose a queue item to begin grading.</Empty>}</section>
+        <CollapsibleSection title="Writing submissions">{rows.length ? <div className={styles.cardList}>{rows.map((row, index) => { const id = idFrom(row, 'gradeId', 'writingGradeId'); return id ? <button type="button" className={gradeId === id ? styles.selectedCard : styles.selectCard} onClick={() => { setGradeReveal(current => current + 1); setGradeId(id) }} key={id}><span className={styles.cardTopline}>{runtimeString(row, 'status') || 'Awaiting review'}<small>#{id}</small></span><strong>{recordLabel(row, `Writing submission ${index + 1}`)}</strong><span>{runtimeString(row, 'submittedAt', 'createdAt') || 'Submission time unavailable'}</span></button> : null })}</div> : <Empty>No writing submissions are waiting for review.</Empty>}</CollapsibleSection>
+        <CollapsibleSection title={gradeId ? `Submission #${gradeId}` : 'Select a submission'} revealKey={gradeReveal}>{gradeId ? <>{detail.isPending ? <p className={styles.status}>Loading script…</p> : detail.isError ? <ErrorNotice error={detail.error} fallback="The writing script could not be loaded."/> : <div className={styles.script}><RecordSummaryList value={detail.data} emptyMessage="The response contains no readable writing detail."/></div>}<form className={styles.compactForm} onSubmit={(event) => { event.preventDefault(); submit.mutate() }}><label><span>Score</span><input required type="number" step="0.5" min="0" value={score} onChange={(event) => setScore(event.target.value)}/></label><label><span>Feedback</span><textarea required rows={6} value={feedback} onChange={(event) => setFeedback(event.target.value)}/></label><button className={styles.primary} disabled={submit.isPending}>{submit.isPending ? 'Submitting…' : 'Submit result'}</button></form><ErrorNotice error={submit.error} fallback="The writing result could not be submitted."/></> : <Empty>Choose a queue item to begin grading.</Empty>}</CollapsibleSection>
       </div>
     </div>
   )
@@ -555,5 +565,5 @@ export function InstructorWorkspace({value}: {value: unknown}) {
 
 export function SystemWorkspace({value}: {value: unknown}) {
   const rows = runtimeItems(value)
-  return <div className={styles.workspace}><section className={styles.hero}><div><p className={styles.eyebrow}>System oversight</p><h1>Mock exam operations</h1><p>Cross-tenant read-only visibility for contract verification, lifecycle support, and operational triage.</p></div><div className={styles.metric}><strong>{rows.length}</strong><span>visible records</span></div></section><section className={styles.panel}><div className={styles.panelHeading}><div><p className={styles.eyebrow}>Cross-tenant index</p><h2>Exam records</h2></div></div><RecordSummaryList value={value} emptyMessage="No system mock-exam records are available."/></section></div>
+  return <div className={styles.workspace}><section className={styles.hero}><div><h1>Mock exam operations</h1><p>Cross-tenant read-only visibility for contract verification, lifecycle support, and operational triage.</p></div><div className={styles.metric}><strong>{rows.length}</strong><span>visible records</span></div></section><CollapsibleSection title="Exam records"><RecordSummaryList value={value} emptyMessage="No system mock-exam records are available."/></CollapsibleSection></div>
 }

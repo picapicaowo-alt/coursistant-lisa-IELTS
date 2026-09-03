@@ -166,7 +166,6 @@ const PickerInput = ({
         onInvalid={event => event.currentTarget.setCustomValidity(`${title}.`)}
         onChange={event => input.onChange(event.target.value)}
         onFocus={event => {
-          setPickerOpen(true);
           onFocus?.(event);
         }}
         onClick={event => {

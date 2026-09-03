@@ -19,7 +19,7 @@ const TenantAdminPage = () => {
   const requested = searchParams.get('section');
   const section: Section = sections.some(item => item.id === requested) ? requested as Section : 'directory';
 
-  return <main className={styles.page}>
+  return <div className={styles.page}>
     <header className={styles.pageHeader}>
       <div><h1>Tenant governance</h1><p>Manage identity, intake, ownership, assessment templates, alert policy, and audit records for your institution.</p></div>
       <div className={styles.quickLinks}><Link to="/admin/intakes"><ClipboardList size={18}/><span><strong>Student intakes</strong><small>Create, assign, reassign, or cancel</small></span></Link><Link to="/mock-exams"><FileCheck2 size={18}/><span><strong>Mock templates</strong><small>Create and publish tenant papers</small></span></Link></div>
@@ -29,7 +29,7 @@ const TenantAdminPage = () => {
     {section === 'ownership' ? <OwnershipPanel/> : null}
     {section === 'alerts' ? <AlertRulesPanel/> : null}
     {section === 'audit' ? <AuditPanel/> : null}
-  </main>;
+  </div>;
 };
 
 export default TenantAdminPage;

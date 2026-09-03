@@ -1,0 +1,20 @@
+.sky { --course-surface: #{t.$course-sky-surface}; --course-ink: #{t.$course-sky-ink}; }
+.indigo { --course-surface: #{t.$course-indigo-surface}; --course-ink: #{t.$course-indigo-ink}; }
+.violet { --course-surface: #{t.$course-violet-surface}; --course-ink: #{t.$course-violet-ink}; }
+.card {
+  align-self: start;
+  border-radius: t.$radius-md;
+  border-color: transparent;
+  background: var(--course-surface);
+
+  > summary { border-radius: t.$radius-md; min-height: 8rem; background: var(--course-surface); }
+  &[open] > summary { border-radius: t.$radius-md t.$radius-md 0 0; }
+  > summary:hover { background: var(--course-surface); filter: brightness(.985); }
+  > summary h3 { color: var(--course-ink); font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+  > summary svg { color: var(--course-ink); }
+  > summary > div > span { -webkit-line-clamp: unset; overflow: visible; }
+  > div { background: t.$surface-raised; border: 1px solid t.$border-default; border-radius: 0 0 t.$radius-md t.$radius-md; }
+}
+.identity { display: grid; gap: t.$space-3; margin-top: t.$space-2; color: var(--course-ink); }
+.code { font-size: t.$font-size-body; font-weight: t.$fw-semibold; letter-spacing: .02em; }
+.metadata { display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-4; font-size: t.$font-size-caption; line-height: t.$line-height-caption; color: var(--course-ink); }

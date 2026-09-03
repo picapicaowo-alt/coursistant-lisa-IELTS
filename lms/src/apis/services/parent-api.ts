@@ -108,8 +108,8 @@ export class ParentApiService {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/reports/${reportId}`);
   }
 
-  listScheduleRequests(studentUserId: number, page = 0, size = 20): Promise<ApiResponse<ParentAcademicRead>> {
-    return this.apiClient.get(`/v2/parent/students/${studentUserId}/schedule-requests`, {params: {page, size}});
+  listScheduleRequests(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+    return this.apiClient.get(`/v2/parent/students/${studentUserId}/schedule-requests`);
   }
 
   createScheduleRequest(studentUserId: number, request: ParentCreateScheduleRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<ParentAcademicRead>> {
@@ -132,8 +132,8 @@ export class ParentApiService {
     return this.apiClient.patch('/v2/parent/notifications/read-all', undefined, idempotent(key));
   }
 
-  listConversationMessages(studentUserId: number, page = 0, size = 50): Promise<ApiResponse<ParentConversationMessageResponse[]>> {
-    return this.apiClient.get(`/v2/parent/students/${studentUserId}/conversation/messages`, {params: {page, size}});
+  listConversationMessages(studentUserId: number, beforeId?: number): Promise<ApiResponse<ParentConversationMessageResponse[]>> {
+    return this.apiClient.get(`/v2/parent/students/${studentUserId}/conversation/messages`, {params: {beforeId}});
   }
 
   sendConversationMessage(studentUserId: number, request: ParentMessageRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<ParentConversationMessageResponse>> {

@@ -58,3 +58,18 @@ Please publish the exact request/response schemas, required `Idempotency-Key` op
 | Prod deployment and protected-flow acceptance | Not performed | No Prod change or authenticated Prod test in this task | Requires separate release authorization and acceptance |
 
 The Local Gate, frontend test suite, build, and local browser checks do not replace Dev or Prod authenticated acceptance. Dev now proves the tokenless Parent Link `401 INVALID_TOKEN` boundary and the authenticated Instructor read-only workflow. It still needs targeted Parent Link checks for a valid Counselor (`200`) and a signed-in user without permission (`403`). The backend's final Counselor Parent Link release gate also remains pending until its deferred complete Maven verification is rerun.
+
+## 7. Advisor Profile history and Study Plan snapshot contract
+
+User report: the Advisor can see `Version 2` on a student's Profile but cannot read earlier Profile versions.
+
+Confirmed against the supplied Advisor Markdown and canonical `docs/api/advising.openapi.yaml`:
+
+- Profile has POST / GET / PUT on `/v2/advisor/students/{studentUserId}/profile`. GET returns the current aggregate. `profileVersion` / `expectedProfileVersion` support optimistic concurrency; they do not provide historical reads.
+- No Profile revision list, historical detail or restore operation is present in this handoff. Please deliver the Profile history read contract, pagination and immutable snapshot schema, with tenant/current-Advisor authorization and private-field boundaries. Historical storage/backfill and any restoration semantics require backend clarification. No speculative Profile endpoint is wired in the frontend.
+- Study Plan already has `advisorListStudyPlanRevisions`. Its `StudyPlanRevisionResponse` includes optional `snapshot: object`. The previous frontend discarded this field and incorrectly claimed that all prior field values were unavailable. That frontend omission is corrected: returned snapshots now have a read-only viewer, with distinct loading, error/retry, empty-list and per-revision missing-snapshot states.
+- The Study Plan snapshot is unstructured in the current schema. The viewer preserves the supplied nested keys and values without assuming it contains historical Profile data or replacing missing values with today's Profile/Plan. Please publish its concrete schema and state which historical revisions include content.
+
+This diagnosis is based on the supplied contracts and current frontend code. Snapshot rendering is verified with browser fixtures, not a live protected history response. No backend changes, Profile history simulation, restore operation or deployment is included.
+
+Follow-up frontend validation: lint, normal/production TypeScript, production build and `git diff --check` pass; 128 test files / 533 unit tests and 38 Chromium E2E tests pass. The new browser scenario verifies nested historical content, missing snapshots, version 0, server pagination and preservation of an unsaved current-plan draft, with no mutations or speculative Profile-history requests. Screenshots: [desktop](ui-review-2026-09-02/advisor-plan-history-desktop.png), [mobile](ui-review-2026-09-02/advisor-plan-history-mobile.png). Profile history remains an unresolved backend-contract dependency.

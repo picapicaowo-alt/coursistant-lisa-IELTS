@@ -219,9 +219,10 @@ components:
     PatchStudentIntakeRequest:
       type: object
       required: [expectedIntakeVersion]
-      description: email, role, level and tenantId are not accepted. At least one mutable field besides expectedIntakeVersion is required.
+      description: email is an explicit forbidden field and is rejected with 400 when present. role, level and tenantId are not accepted. At least one mutable field besides expectedIntakeVersion is required.
       properties:
         expectedIntakeVersion: { type: integer }
+        email: { type: string, deprecated: true, description: Rejected when present. Email is immutable on intake patch. }
         name: { type: string, deprecated: true, description: Rejected when non-blank. Use firstName and lastName. }
         firstName: { type: string, minLength: 1, maxLength: 100 }
         middleName: { type: string, maxLength: 100 }

@@ -15,7 +15,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
-import type {NotificationItem, NotificationType, UnreadNotificationCount} from '@/apis';
+import type {LoginResponse, NotificationItem, NotificationType, UnreadNotificationCount} from '@/apis';
 import {unwrapData} from '@/apis';
 import {notificationApiService} from '@/apis/services/notification-api';
 import {formatNotificationTime, getNotificationTitle, resolveNotificationPath} from './utils';
@@ -45,12 +45,14 @@ const ICONS: Partial<Record<NotificationType, LucideIcon>> = {
 const NotificationRow = ({
   notification,
   onOpen,
+  identity,
 }: {
   notification: NotificationItem;
+  identity?: Pick<LoginResponse, 'role' | 'level'>;
   onOpen: (notification: NotificationItem) => void;
 }) => {
   const Icon = ICONS[notification.notificationType] ?? Bell;
-  const target = resolveNotificationPath(notification);
+  const target = resolveNotificationPath(notification, identity);
   const unread = !notification.readAt;
   const unavailable = notification.availability === 'NO_LONGER_AVAILABLE';
 
@@ -82,7 +84,7 @@ const NotificationRow = ({
   );
 };
 
-const NotificationCenter = () => {
+const NotificationCenter = ({identity}: {identity?: Pick<LoginResponse, 'role' | 'level'>}) => {
   const [isOpen, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -165,7 +167,7 @@ const NotificationCenter = () => {
     // can be reconciled by the next poll without blocking the destination.
     if (!notification.readAt) markReadMutation.mutate(notification.notificationId);
 
-    const target = resolveNotificationPath(notification);
+    const target = resolveNotificationPath(notification, identity);
     if (target) {
       setOpen(false);
       navigate(target);
@@ -238,6 +240,7 @@ const NotificationCenter = () => {
               <ul className={styles.notificationList}>
                 {notifications.map(notification => (
                   <NotificationRow
+                    identity={identity}
                     key={notification.notificationId}
                     notification={notification}
                     onOpen={openNotification}

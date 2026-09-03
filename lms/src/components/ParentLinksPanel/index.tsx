@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {type ManagedUser, unwrapData} from '@/apis';
 import {TenantUserPicker} from '@/components/TenantUserPicker';
@@ -7,12 +7,12 @@ import {advisingErrorMessage} from '@/pages/advising/advisingErrors';
 import styles from '@/pages/advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
-import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
-import {getApiErrorCode} from '@/utils/apiError';
+import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {getApiErrorCode, isNotFound} from '@/utils/apiError';
 
 type Scope = 'counsellor' | 'advisor' | 'tenant';
 
-export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: number}) => {
+export const ParentLinksPanel = ({scope, subjectId, onUnavailable}: {scope: Scope; subjectId: number; onUnavailable?: () => void}) => {
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [tenantMode, setTenantMode] = useState<'create' | 'existing'>('create');
@@ -27,6 +27,7 @@ export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: n
   });
   const queryKey = ['parent-links', scope, subjectId] as const;
   const links = useQuery({
+    meta: scope === 'advisor' ? {advisingStudentId: subjectId} : undefined,
     queryKey,
     enabled: Number.isInteger(subjectId),
     queryFn: async () => unwrapData(
@@ -100,6 +101,10 @@ export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: n
     },
   });
 
+  useEffect(() => {
+    if ([links.error, save.error, unlink.error].some(isNotFound)) onUnavailable?.();
+  }, [links.error, save.error, unlink.error, onUnavailable]);
+
   const relationshipReadErrorCode = getApiErrorCode(links.error);
   const canRetryRelationshipRead = relationshipReadErrorCode !== 'INVALID_TOKEN'
     && relationshipReadErrorCode !== 'FORBIDDEN'
@@ -111,12 +116,7 @@ export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: n
       ? 'Connect a parent or guardian before the intake is handed to an Advisor. You can create, reuse, or unlink a relationship while you still own the intake.'
       : 'Review and manage the parent or guardian accounts connected to this student.';
   return (
-    <section className={styles.card}>
-      <WorkspaceSectionHeader
-        title="Parent or guardian access"
-        description={description}
-        meta={scope === 'advisor' ? <span className={styles.readOnlyBadge}>Read only</span> : undefined}
-      />
+    <CollapsibleSection title="Parent or guardian access" summary={description} count={links.data?.length} className={styles.disclosureLayout} revealKey={links.isError || mutationError ? 'error' : undefined}>
       {links.isError ? (
         <div className={styles.error} role="alert">
           <strong>{advisingErrorMessage(links.error, 'Parent links could not be loaded.')}</strong>
@@ -159,6 +159,6 @@ export const ParentLinksPanel = ({scope, subjectId}: {scope: Scope; subjectId: n
           <button className={styles.primary} disabled={save.isPending || (tenantMode === 'existing' && !selectedParent)}>{save.isPending ? 'Saving…' : !parent.parentUserId ? 'Create or reuse Parent' : 'Link Parent'}</button>
         </form>
       ) : null}
-    </section>
+    </CollapsibleSection>
   );
 };

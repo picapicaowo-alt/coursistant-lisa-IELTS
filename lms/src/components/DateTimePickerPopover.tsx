@@ -3,6 +3,7 @@ import type {RefObject} from 'react';
 import {createPortal} from 'react-dom';
 import {CalendarDays, ChevronLeft, ChevronRight, Clock3} from 'lucide-react';
 import {roundUpToMinutes} from '@/utils/dateTimeRange';
+import {datePopoverPosition} from './datePopoverPosition';
 import styles from './DateTimePickerPopover.module.scss';
 
 export type DateTimePickerKind = 'date' | 'time' | 'datetime';
@@ -96,7 +97,7 @@ export const DateTimePickerPopover = ({
   const [hour, setHour] = useState('12');
   const [minute, setMinute] = useState('00');
   const [period, setPeriod] = useState('PM');
-  const [position, setPosition] = useState({left: 12, top: 12, ready: false});
+  const [position, setPosition] = useState({left: 0, top: 0, maxHeight: 0, ready: false});
   const showCalendar = kind !== 'time';
   const showTime = kind !== 'date';
   const days = useMemo(() => calendarDays(visibleMonth), [visibleMonth]);
@@ -146,35 +147,41 @@ export const DateTimePickerPopover = ({
       const popover = popoverRef.current;
       if (!anchor || !popover) return;
       const anchorRect = anchor.getBoundingClientRect();
-      const popoverRect = popover.getBoundingClientRect();
-      const gap = 8;
-      const viewportPadding = 12;
-      const maxLeft = Math.max(viewportPadding, window.innerWidth - popoverRect.width - viewportPadding);
-      const left = Math.min(Math.max(anchorRect.left, viewportPadding), maxLeft);
-      const roomBelow = window.innerHeight - anchorRect.bottom - gap - viewportPadding;
-      const canFitAbove = anchorRect.top - gap - popoverRect.height >= viewportPadding;
-      const top = roomBelow < popoverRect.height && canFitAbove
-        ? anchorRect.top - gap - popoverRect.height
-        : Math.min(anchorRect.bottom + gap, Math.max(viewportPadding, window.innerHeight - popoverRect.height - viewportPadding));
-      setPosition({left, top, ready: true});
+      const visualViewport = window.visualViewport;
+      const viewport = {left: visualViewport?.offsetLeft ?? 0, top: visualViewport?.offsetTop ?? 0, right: (visualViewport?.offsetLeft ?? 0) + (visualViewport?.width ?? window.innerWidth), bottom: (visualViewport?.offsetTop ?? 0) + (visualViewport?.height ?? window.innerHeight)};
+      if (!anchorRect.height || anchorRect.bottom < viewport.top || anchorRect.top > viewport.bottom) { onClose(); return; }
+      const next = datePopoverPosition(anchorRect, {width: popover.offsetWidth, height: popover.scrollHeight + popover.offsetHeight - popover.clientHeight}, viewport);
+      setPosition(current => current.ready && current.left === next.left && current.top === next.top && current.maxHeight === next.maxHeight ? current : {...next, ready: true});
     };
 
     updatePosition();
     window.addEventListener('resize', updatePosition);
     window.addEventListener('scroll', updatePosition, {capture: true, passive: true});
+    window.visualViewport?.addEventListener('resize', updatePosition);
+    window.visualViewport?.addEventListener('scroll', updatePosition);
+    const observer = new ResizeObserver(updatePosition);
+    if (popoverRef.current) observer.observe(popoverRef.current);
     return () => {
       window.removeEventListener('resize', updatePosition);
       window.removeEventListener('scroll', updatePosition, true);
+      window.visualViewport?.removeEventListener('resize', updatePosition);
+      window.visualViewport?.removeEventListener('scroll', updatePosition);
+      observer.disconnect();
     };
-  }, [anchorRef, kind, open]);
+  }, [anchorRef, kind, onClose, open]);
 
   if (!open || typeof document === 'undefined') return null;
+
+  const dismiss = () => {
+    onClose();
+    anchorRef.current?.focus();
+  };
 
   const selectDate = (dateKey: string) => {
     setSelectedDate(dateKey);
     if (kind === 'date') {
       onChangeValue(dateKey);
-      onClose();
+      dismiss();
     }
   };
 
@@ -183,18 +190,18 @@ export const DateTimePickerPopover = ({
     const date = toDateKey(now);
     const time = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
     onChangeValue(kind === 'date' ? date : kind === 'time' ? time : `${date}T${time}`);
-    onClose();
+    dismiss();
   };
 
   const apply = () => {
     const time = toTimeValue(hour, minute, period);
     onChangeValue(kind === 'time' ? time : `${selectedDate}T${time}`);
-    onClose();
+    dismiss();
   };
 
   const clear = () => {
     onChangeValue('');
-    onClose();
+    dismiss();
   };
 
   const title = kind === 'date' ? 'Select date' : kind === 'time' ? 'Select time' : 'Select date & time';
@@ -205,7 +212,7 @@ export const DateTimePickerPopover = ({
       className={styles.popover}
       role="dialog"
       aria-label={title}
-      style={{left: position.left, top: position.top, visibility: position.ready ? 'visible' : 'hidden'}}
+      style={{left: position.left, top: position.top, maxHeight: position.ready ? position.maxHeight : undefined, visibility: position.ready ? 'visible' : 'hidden'}}
     >
       <div className={styles.titleRow}>
         <span className={styles.titleIcon}>{showCalendar ? <CalendarDays size={18}/> : <Clock3 size={18}/>}</span>
@@ -285,7 +292,7 @@ export const DateTimePickerPopover = ({
           {value ? <button type="button" className={styles.textButton} onClick={clear}>Clear</button> : null}
         </div>
         <div className={styles.actions}>
-          <button type="button" className={styles.cancelButton} onClick={onClose}>Cancel</button>
+          <button type="button" className={styles.cancelButton} onClick={dismiss}>Cancel</button>
           {showTime ? <button type="button" className={styles.applyButton} onClick={apply}>{kind === 'time' ? 'Set time' : 'Set date & time'}</button> : null}
         </div>
       </div>

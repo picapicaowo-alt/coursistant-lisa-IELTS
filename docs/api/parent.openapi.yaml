@@ -22,6 +22,23 @@ tags:
 - name: ParentConversations
 paths:
   /v2/counsellor/student-intakes/{intakeId}/parent-links:
+    get:
+      operationId: counsellorListParentLinks
+      tags: [Counsellor Parent Links]
+      parameters:
+      - $ref: "#/components/parameters/IntakeId"
+      responses:
+        "200":
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkListApiResponse" }
+        "401":
+          description: INVALID_TOKEN
+        "403":
+          description: "FORBIDDEN, ACCESS_DENIED"
+        "404":
+          description: STUDENT_INTAKE_NOT_FOUND
     post:
       operationId: counsellorCreateOrReuseParentLink
       tags: [Counsellor Parent Links]
@@ -581,6 +598,17 @@ components:
       type: object
       properties:
         reason: { type: string, maxLength: 1000 }
+    ParentStudentLinkListApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/ParentStudentLinkResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
     ParentStudentLinkResponse:
       type: object
       properties:

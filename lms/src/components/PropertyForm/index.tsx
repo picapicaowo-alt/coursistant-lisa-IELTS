@@ -1,33 +1,17 @@
-﻿import React from "react";
-import styles from "./index.module.scss";
+import type {CSSProperties, ReactNode} from 'react';
+import {CollapsibleSection} from '@/components/CollapsibleSection';
+import styles from './index.module.scss';
 
 interface PropertySectionProps {
   title?: string;
   columns?: number;
-  children: React.ReactNode;
+  children: ReactNode;
   transparent?: boolean;
 }
 
-export const PropertyForm: React.FC<PropertySectionProps> = ({
-                                                               title = null,
-                                                               columns = 1,
-                                                               children,
-                                                               transparent = false,
-                                                             }) => {
-  const columnTemplate = React.useMemo(() => {
-    let c = "1fr";
-    for (let i = 1; i < columns; i++) {
-      c += " 1fr";
-    }
-    return c;
-  }, [columns]);
-  
-  return (
-    <div className={`${styles.settingsSection} ${transparent ? "" : styles.noTransparent}`}>
-      {title !== null && <h3 className={styles.settingsTitle}>{title}</h3>}
-      <div className={styles.settingsGrid} style={{gridTemplateColumns: columnTemplate}}>
-        {children}
-      </div>
-    </div>
-  );
+export function PropertyForm({title, columns = 1, children, transparent = false}: PropertySectionProps) {
+  const fields = <div className={styles.settingsGrid} style={{'--property-columns': columns} as CSSProperties}>{children}</div>;
+  return title
+    ? <CollapsibleSection title={title} headingLevel={3}>{fields}</CollapsibleSection>
+    : <div className={`${styles.settingsSection} ${transparent ? '' : styles.noTransparent}`}>{fields}</div>;
 }

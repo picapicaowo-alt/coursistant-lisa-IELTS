@@ -27,16 +27,16 @@ export class MockExamApiService {
     if (apiClient) this.apiClient = apiClient;
   }
 
-  listAdvisorTemplates(page = 0, size = 20): Promise<ApiResponse<MockExamTemplateSummary[]>> {
-    return this.apiClient.get('/v2/advisor/mock-exam-templates', {params: {page, size}});
+  listAdvisorTemplates(): Promise<ApiResponse<MockExamTemplateSummary[]>> {
+    return this.apiClient.get('/v2/advisor/mock-exam-templates');
   }
 
   getAdvisorTemplate(templateId: number): Promise<ApiResponse<MockExamRead>> {
     return this.apiClient.get(`/v2/advisor/mock-exam-templates/${templateId}`);
   }
 
-  listAdvisorStudentExams(studentUserId: number, page = 0, size = 20): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get(`/v2/advisor/students/${studentUserId}/mock-exams`, {params: {page, size}});
+  listAdvisorStudentExams(studentUserId: number): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.get(`/v2/advisor/students/${studentUserId}/mock-exams`);
   }
 
   createAdvisorStudentExam(studentUserId: number, request: CreateStudentMockExamRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<MockExamRead>> {
@@ -47,8 +47,8 @@ export class MockExamApiService {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/mock-exams/${studentMockExamId}`);
   }
 
-  listInstructorWritingGrades(page = 0, size = 20): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get('/v2/instructor/mock-exams/writing-grades', {params: {page, size}});
+  listInstructorWritingGrades(): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.get('/v2/instructor/mock-exams/writing-grades');
   }
 
   getInstructorWritingGrade(gradeId: number): Promise<ApiResponse<MockExamRead>> {
@@ -59,16 +59,16 @@ export class MockExamApiService {
     return this.apiClient.post(`/v2/instructor/mock-exams/writing-grades/${gradeId}`, request, idempotent(key));
   }
 
-  listParentStudentExams(studentUserId: number, page = 0, size = 20): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get(`/v2/parent/students/${studentUserId}/mock-exams`, {params: {page, size}});
+  listParentStudentExams(studentUserId: number): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.get(`/v2/parent/students/${studentUserId}/mock-exams`);
   }
 
   getParentStudentExam(studentUserId: number, studentMockExamId: number): Promise<ApiResponse<ObserverMockExamDetail>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/mock-exams/${studentMockExamId}`);
   }
 
-  listStudentExams(page = 0, size = 20): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get('/v2/student/mock-exams', {params: {page, size}});
+  listStudentExams(): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.get('/v2/student/mock-exams');
   }
 
   getStudentExam(studentMockExamId: number): Promise<ApiResponse<StudentMockExamDetail>> {
@@ -95,8 +95,8 @@ export class MockExamApiService {
     return this.apiClient.get(`/v2/student/mock-exams/${studentMockExamId}/${section}`);
   }
 
-  getSystemExams(page = 0, size = 20): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get('/v2/system/mock-exams', {params: {page, size}});
+  getSystemExams(): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.get('/v2/system/mock-exams');
   }
 
   getSystemExam(testId: number): Promise<ApiResponse<MockExamRead>> {

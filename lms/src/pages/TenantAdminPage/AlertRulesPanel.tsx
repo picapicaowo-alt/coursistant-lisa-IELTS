@@ -1,3 +1,4 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {FormEvent, useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {RefreshCw} from 'lucide-react';
@@ -64,8 +65,8 @@ export const AlertRulesPanel = () => {
   });
   const submit = (event: FormEvent) => { event.preventDefault(); setSaved(false); save.mutate(); };
 
-  return <section className={styles.widePanel} aria-labelledby="alert-rules-title">
-    <div className={styles.panelHeading}><div><h2 id="alert-rules-title">Tenant alert rules</h2><p>Choose the tenant-level policy. This page does not read individual student alerts or risk.</p></div><button type="button" className={styles.iconButton} aria-label="Refresh alert rules" onClick={() => void rules.refetch()}><RefreshCw size={18}/></button></div>
+  return <CollapsibleSection title="Tenant alert rules" headingId="alert-rules-title" summary="Choose the tenant-level policy. This page does not read individual student alerts or risk.">
+    <div className={styles.panelHeading}><button type="button" className={styles.iconButton} aria-label="Refresh alert rules" onClick={() => void rules.refetch()}><RefreshCw size={18}/></button></div>
     {rules.isPending ? <p className={styles.status}>Loading alert rules…</p> : null}
     {rules.isError ? <div className={styles.errorNotice} role="alert"><p>{getApiErrorMessage(rules.error, 'Alert rules could not be loaded.')}</p><button type="button" onClick={() => void rules.refetch()}>Try again</button></div> : null}
     {rules.data ? <form className={styles.form} onSubmit={submit}>
@@ -75,5 +76,5 @@ export const AlertRulesPanel = () => {
       {save.isError ? <p className={styles.inlineError} role="alert">{getApiErrorMessage(save.error, 'Alert rules could not be saved. Refresh the latest version and try again.')}</p> : null}
       {saved ? <p className={styles.inlineSuccess} role="status">Alert rules saved from the latest server response.</p> : null}
     </form> : null}
-  </section>;
+  </CollapsibleSection>;
 };

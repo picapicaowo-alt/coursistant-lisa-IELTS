@@ -103,8 +103,8 @@ const QuizPage = () => {
   const attemptsQuery = useQuery({
     queryKey: ['quiz-attempts', courseId, quizId, 'mine'],
     queryFn: async () => unwrapData(
-      await quizApiService.listAttempts(courseId, quizId, {page: 1, pageSize: 50}),
-      'listAttempts',
+      await quizApiService.listMyAttempts(courseId, quizId),
+      'listMyAttempts',
     ),
     enabled: valid && access.isResolved && !isStaff,
     retry: 1,
@@ -117,6 +117,13 @@ const QuizPage = () => {
     ),
     enabled: selectedHistoryAttemptId !== null,
     retry: 1,
+  });
+
+  const historyReceiptQuery = useQuery({
+    queryKey: ['quiz-attempt-receipt', courseId, quizId, selectedHistoryAttemptId],
+    queryFn: async () => unwrapData(await quizApiService.getAttemptReceipt(courseId, quizId, selectedHistoryAttemptId!), 'getAttemptReceipt'),
+    enabled: selectedHistoryAttemptId != null && Boolean(attemptsQuery.data?.some(attempt => attempt.id === selectedHistoryAttemptId && attempt.submittedAt)),
+    retry: false,
   });
 
   useEffect(() => {
@@ -424,7 +431,9 @@ const QuizPage = () => {
           </ol>
           {selectedHistoryAttemptId !== null ? (
             <div className={styles.historyResult} aria-live="polite">
-              {historyResultQuery.isPending ? <p>Loading attempt result…</p> : historyResultQuery.isError ? <p className={styles.error} role="alert">This attempt result could not be loaded.</p> : historyResultQuery.data ? <><strong>{historyResultQuery.data.totalScore === null ? 'Score pending or not released' : `${historyResultQuery.data.totalScore} / ${quiz?.totalPoints ?? 0}`}</strong><span>Receipt {historyResultQuery.data.receiptId || 'pending'}</span></> : null}
+              {historyReceiptQuery.data ? <span>Receipt {historyReceiptQuery.data.receiptId} · {formatUtcTimestamp(historyReceiptQuery.data.submittedAt)}</span> : null}
+              {historyReceiptQuery.isError ? <p className={styles.error} role="alert">The submission receipt could not be loaded.</p> : null}
+              {historyResultQuery.isPending ? <p>Loading attempt result…</p> : historyResultQuery.isError ? <p className={styles.error} role="alert">This attempt result could not be loaded.</p> : historyResultQuery.data ? <><strong>{historyResultQuery.data.totalScore === null ? 'Score pending or not released' : `${historyResultQuery.data.totalScore} / ${quiz?.totalPoints ?? 0}`}</strong></> : null}
             </div>
           ) : null}
         </section>

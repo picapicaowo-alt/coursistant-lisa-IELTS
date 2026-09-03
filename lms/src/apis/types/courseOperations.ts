@@ -30,6 +30,21 @@ export interface RescheduleOccurrenceRequest {
   weekId?: number;
 }
 
+export interface ScheduleRequestResponse {
+  id?: number;
+  courseId?: number;
+  occurrenceId?: number;
+  studentUserId?: number;
+  requestType?: string;
+  status?: string;
+  reason?: string;
+  rejectionReason?: string;
+  proposedOccurrenceDate?: string;
+  proposedStartTime?: string;
+  proposedEndTime?: string;
+  version?: number;
+}
+
 export interface CreateScheduleRequestRequest {
   proposedEndTime?: string;
   proposedOccurrenceDate?: string;
@@ -222,7 +237,7 @@ export interface CourseStudentReportListParams {
 }
 
 export const ATTENDANCE_STATUSES = ['PRESENT', 'ABSENT', 'LATE', 'EXCUSED'] as const;
-export const SCHEDULE_REQUEST_TYPES = ['RESCHEDULE', 'CANCEL'] as const;
+export const SCHEDULE_REQUEST_TYPES = ['ABSENCE', 'SCHEDULE_CHANGE'] as const;
 export const SCHEDULE_DECISIONS = ['APPROVE', 'REJECT'] as const;
 export const WEEKDAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const;
 

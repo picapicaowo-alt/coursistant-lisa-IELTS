@@ -1,23 +1,29 @@
 # Frontend API integration coverage
 
-Registration snapshot received 2026-08-31. The ten registration-related files
-under `docs/api/` are the frontend-consumed copies of the latest backend
-OpenAPI supplied for the 8085 training product. `vocabulary.openapi.yaml`
-remains a separately versioned contract. The browser continues to use
-same-origin `/api`; 8085 proxies that to the training LMS on 8083.
+Current source audit: **2026-09-02**, after the supplied Advisor, Counsellor,
+and Tenant Admin handoffs and seven OpenAPI updates. Eleven contracts contain
+431 operations. See the [operation evidence matrix](frontend-operation-matrix-2026-09-02.md)
+and [role acceptance report](frontend-role-audit-2026-09-02.md).
 
-| Contract | Paths | Operations | Frontend status |
-|---|---:|---:|---|
-| User | 8 | 13 | Current profile/avatar, user directory/detail/avatar, and supported admin writes connected; five `*Disabled` operations intentionally have no UI |
-| Parent | 26 | 31 | Parent portal and Counsellor/Advisor/Tenant link controls, including Tenant create-or-reuse |
-| Notification | 5 | 5 | Personal notification center already connected; admin digest transport added |
-| Counsellor | 5 | 7 | All operations already connected |
-| Course | 112 | 150 | Existing course UI retained; Course Operations and My Operations expose attendance, occurrences, scheduling, hours, reports, alerts, availability, discussions, relationships, ownership, delivery configuration, and personal events |
-| Mock Exam | 40 | 47 | Role-scoped transport and typed observer/student detail responses retained |
-| Assignment | 35 | 42 | Existing workflows plus the full assignment collection and course attachment manifest are connected, including authenticated binary helpers |
-| Auth | 22 | 25 | Split-name registration, Tenant-scoped managed-user directory/detail/audit/enable, login/reset/session, and supported admin operations connected |
-| Advising | 50 | 60 | Split-name intake records, Tenant student intake, Advisor workspaces, course orchestration, tasks, dashboard/hub, reports, conversations, and action tasks connected |
-| Quiz | 22 | 29 | Existing quiz authoring/attempt workflow retained; current-user attempt history and submission receipt added |
+Source classification: 407 operations have a service and production consumer,
+4 use collection reads or batch enrollment instead of individual operations, 10 are Disabled or diagnostic,
+and 10 have transport methods without an identified production consumer.
+These numbers describe source reachability, not live business acceptance.
+The browser integration remains same-origin `/api`.
+
+| Contract | Paths | Operations |
+|---|---:|---:|
+| Advising | 53 | 64 |
+| Assignment | 35 | 42 |
+| Auth | 24 | 27 |
+| Counsellor | 5 | 7 |
+| Course | 113 | 151 |
+| Mock Exam | 43 | 51 |
+| Notification | 5 | 5 |
+| Parent | 26 | 32 |
+| Quiz | 22 | 29 |
+| User | 8 | 13 |
+| Vocabulary | 10 | 10 |
 
 ## UI delivered before Figma
 
@@ -39,9 +45,10 @@ same-origin `/api`; 8085 proxies that to the training LMS on 8083.
   teaching/availability operations.
 - `/course/:courseId/operations` provides the course-level non-authoring
   operations, assignment manifest, and instructor-safe student context.
-- Admin Console operations expose admin/user detail, user avatar, Tenant user
+- Admin Console and Tenant governance expose managed-user
   directory/detail/audit/enable, notification digest, and versioned Tenant
-  alert rules. Managed-user creation is restricted to contract-supported staff
+  alert rules. Generic admin/user detail and another user’s avatar have
+  transport methods without an identified production page consumer. Managed-user creation is restricted to contract-supported staff
   and Tenant administrator levels.
 - Student advising supports task transitions, messaging, read state, and
   authenticated conversation attachment preview/download.
@@ -52,7 +59,7 @@ components. They do not claim final visual parity with a future Figma file.
 ## Contract limitations retained in the frontend
 
 - Many Course, Parent, Assignment, User/Auth and Mock Exam success responses,
-  plus 14 Advising operations, only reference a generic `ApiResponse` or omit a
+  and some Advising operations, only reference a generic `ApiResponse` or omit a
   concrete response payload schema in the supplied YAML. New uncertain reads
   return `unknown`, and the UI uses
   a safe structured contract-data renderer. This prevents invented fields while

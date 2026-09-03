@@ -1,9 +1,12 @@
 import {useState} from 'react';
 import {fireEvent, render, screen, within} from '@testing-library/react';
-import {describe, expect, it, vi} from 'vitest';
+import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {EnglishDateInput, EnglishDateTimeInput, EnglishTimeInput} from './EnglishDateInput';
 
 describe('English date inputs', () => {
+  beforeEach(() => {
+    vi.spyOn(HTMLInputElement.prototype, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 40, 400, 44));
+  });
   it('shows and emits datetime values in a fixed English format', () => {
     const Harness = () => {
       const [value, setValue] = useState('2026-08-03T22:19');
@@ -38,14 +41,14 @@ describe('English date inputs', () => {
     expect((screen.getByLabelText('Start date') as HTMLInputElement).placeholder).toBe('MM/DD/YYYY');
   });
 
-  it('opens a floating calendar on focus and selects a date directly', () => {
+  it('opens a floating calendar on click and selects a date directly', () => {
     const Harness = () => {
       const [value, setValue] = useState('2026-08-03');
       return <><label>Event date<EnglishDateInput value={value} onChangeValue={setValue}/></label><output>{value}</output></>;
     };
     render(<Harness/>);
 
-    fireEvent.focus(screen.getByLabelText('Event date'));
+    fireEvent.click(screen.getByLabelText('Event date'));
     const dialog = screen.getByRole('dialog', {name: 'Select date'});
     fireEvent.click(within(dialog).getByRole('button', {name: 'Monday, August 17, 2026'}));
 
@@ -54,7 +57,7 @@ describe('English date inputs', () => {
     expect((screen.getByLabelText('Event date') as HTMLInputElement).value).toBe('08/17/2026');
   });
 
-  it('keeps a dedicated calendar button in addition to focus-to-open', () => {
+  it('keeps a dedicated calendar button in addition to click-to-open', () => {
     render(<label>Start date<EnglishDateInput value="" onChangeValue={vi.fn()}/></label>);
 
     fireEvent.click(screen.getByRole('button', {name: 'Open calendar'}));
@@ -69,7 +72,7 @@ describe('English date inputs', () => {
     };
     render(<Harness/>);
 
-    fireEvent.focus(screen.getByLabelText('Quiz closes'));
+    fireEvent.click(screen.getByLabelText('Quiz closes'));
     const dialog = screen.getByRole('dialog', {name: 'Select date & time'});
     fireEvent.click(within(dialog).getByRole('button', {name: 'Monday, August 17, 2026'}));
     fireEvent.change(within(dialog).getByLabelText('Hour'), {target: {value: '11'}});

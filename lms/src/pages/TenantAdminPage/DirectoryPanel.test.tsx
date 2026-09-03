@@ -6,6 +6,8 @@ import {DirectoryPanel} from './DirectoryPanel';
 const mocks = vi.hoisted(() => ({
   listTenantUsers: vi.fn(),
   getTenantUser: vi.fn(),
+  patchTenantManagedUser: vi.fn(),
+  getTenantManagedUserDisableBlockers: vi.fn(),
   createTenantManagedUser: vi.fn(),
   changeTenantManagedUserRole: vi.fn(),
   disableTenantManagedUser: vi.fn(),
@@ -51,4 +53,34 @@ describe('Tenant Admin directory', () => {
     expect(screen.queryByRole('option', {name: 'STUDENT'})).not.toBeInTheDocument();
     expect(screen.queryByRole('option', {name: 'TENANT_ADMIN'})).not.toBeInTheDocument();
   });
+  it('preserves a draft on account conflict and submits the refreshed version only after review', async () => {
+    mocks.getTenantUser.mockResolvedValueOnce(response({...instructor, accountVersion: 0}));
+    mocks.patchTenantManagedUser.mockRejectedValueOnce({code: 409, details: {code: 'ACCOUNT_VERSION_CONFLICT'}});
+    renderPanel();
+    fireEvent.click(await screen.findByRole('button', {name: /Ivy Instructor/}));
+    const panel = await screen.findByRole('heading', {name: 'Correct staff profile'});
+    const form = panel.closest('form')!;
+    fireEvent.change(within(form).getByLabelText('First name'), {target: {value: 'Changed'}});
+    fireEvent.click(within(form).getByRole('button', {name: 'Save profile changes'}));
+    await screen.findByRole('button', {name: 'Load latest account'});
+    expect(within(form).getByRole('button', {name: 'Save profile changes'})).toBeDisabled();
+    mocks.getTenantUser.mockResolvedValue(response({...instructor, firstName: 'Server', accountVersion: 4}));
+    fireEvent.click(screen.getByRole('button', {name: 'Load latest account'}));
+    await waitFor(() => expect(within(form).getByRole('button', {name: 'Save profile changes'})).toBeEnabled());
+    expect(within(form).getByLabelText('First name')).toHaveValue('Changed');
+    mocks.patchTenantManagedUser.mockResolvedValue(response({...instructor, firstName: 'Changed', accountVersion: 5}));
+    fireEvent.click(within(form).getByRole('button', {name: 'Save profile changes'}));
+    await waitFor(() => expect(mocks.patchTenantManagedUser).toHaveBeenLastCalledWith(41, {expectedAccountVersion: 4, firstName: 'Changed'}, expect.any(String)));
+  });
+
+  it('shows a disable blocker without offering the disable confirmation', async () => {
+    mocks.getTenantManagedUserDisableBlockers.mockResolvedValue(response({targetUserId: 41, targetStatus: 'ACTIVE', canDisable: false, blockers: ['ACTIVE_COURSE_OWNERSHIP']}));
+    renderPanel();
+    fireEvent.click(await screen.findByRole('button', {name: /Ivy Instructor/}));
+    fireEvent.click(await screen.findByRole('button', {name: 'Check before disabling'}));
+    await screen.findByText('Transfer their courses in Course ownership.');
+    expect(screen.queryByRole('button', {name: 'Confirm disable'})).not.toBeInTheDocument();
+    expect(mocks.disableTenantManagedUser).not.toHaveBeenCalled();
+  });
+
 });

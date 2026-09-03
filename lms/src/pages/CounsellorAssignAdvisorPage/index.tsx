@@ -71,15 +71,15 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
 
   if (handover) {
     return (
-      <main className={styles.page}>
+      <div className={styles.page}>
         <p className={styles.success} role="status">This student has left the counsellor queue. First assignment is complete.</p>
         <Link className={styles.link} to="/counsellor/intakes">Back to unassigned queue</Link>
-      </main>
+      </div>
     );
   }
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <div>
           <h1>Assign advisor</h1>
@@ -129,7 +129,7 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
           </button>
         </form>
       </section>
-    </main>
+    </div>
   );
 };
 

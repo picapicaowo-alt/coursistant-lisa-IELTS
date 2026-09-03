@@ -15,10 +15,16 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/TemplateVersionSummaryListApiResponse"
+          description: SUCCESS
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: INVALID_TOKEN
         "400":
           content:
             application/json:
@@ -58,10 +64,16 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/TemplateVersionSummaryApiResponse"
+          description: SUCCESS
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: INVALID_TOKEN
         "400":
           content:
             application/json:
@@ -101,10 +113,16 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/StudentMockExamSummaryListApiResponse"
+          description: SUCCESS
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: INVALID_TOKEN
         "400":
           content:
             application/json:
@@ -149,9 +167,9 @@ paths:
       responses:
         "201":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
+                $ref: "#/components/schemas/StudentMockExamSummaryApiResponse"
           description: Created
         "400":
           content:
@@ -1729,6 +1747,121 @@ paths:
           description: Conflict
       tags:
       - TenantMockExamTemplates
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/media:
+    post:
+      operationId: uploadTenantMockExamMedia
+      tags: [TenantMockExamTemplates]
+      parameters:
+      - name: Idempotency-Key
+        in: header
+        required: true
+        schema: { type: string }
+      - in: path
+        name: templateId
+        required: true
+        schema: { type: integer, format: int64 }
+      - in: path
+        name: versionId
+        required: true
+        schema: { type: integer, format: int64 }
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [kind, file]
+              properties:
+                kind: { type: string, enum: [LISTENING_AUDIO, READING_IMAGE, WRITING_IMAGE] }
+                file: { type: string, format: binary }
+      responses:
+        "201":
+          description: Created media
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MockExamMediaApiResponse"
+        "400":
+          description: BAD_REQUEST, UNSUPPORTED_FILE_TYPE, FILE_TOO_LARGE
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+        "404": { description: MOCK_EXAM_NOT_FOUND }
+        "409": { description: "MOCK_EXAM_CONTENT_LOCKED, IDEMPOTENCY_KEY_MISMATCH" }
+        "503": { description: STORAGE_FAILURE }
+    get:
+      operationId: listTenantMockExamMedia
+      tags: [TenantMockExamTemplates]
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema: { type: integer, format: int64 }
+      - in: path
+        name: versionId
+        required: true
+        schema: { type: integer, format: int64 }
+      - in: query
+        name: status
+        schema: { type: string, enum: [UPLOADED, BOUND] }
+      responses:
+        "200":
+          description: Media list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MockExamMediaListApiResponse"
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+        "404": { description: MOCK_EXAM_NOT_FOUND }
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/media/{mediaId}/preview:
+    get:
+      operationId: previewTenantMockExamMedia
+      tags: [TenantMockExamTemplates]
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema: { type: integer, format: int64 }
+      - in: path
+        name: versionId
+        required: true
+        schema: { type: integer, format: int64 }
+      - in: path
+        name: mediaId
+        required: true
+        schema: { type: integer, format: int64 }
+      responses:
+        "200": { description: Full media }
+        "206": { description: Partial content }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+        "404": { description: MOCK_EXAM_MEDIA_NOT_FOUND }
+        "416": { description: Range not satisfiable }
+        "503": { description: STORAGE_FAILURE }
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/media/{mediaId}:
+    delete:
+      operationId: deleteTenantMockExamMedia
+      tags: [TenantMockExamTemplates]
+      parameters:
+      - in: path
+        name: templateId
+        required: true
+        schema: { type: integer, format: int64 }
+      - in: path
+        name: versionId
+        required: true
+        schema: { type: integer, format: int64 }
+      - in: path
+        name: mediaId
+        required: true
+        schema: { type: integer, format: int64 }
+      responses:
+        "204": { description: Deleted }
+        "401": { description: Unauthorized }
+        "403": { description: Forbidden }
+        "404": { description: MOCK_EXAM_MEDIA_NOT_FOUND }
+        "409": { description: MOCK_EXAM_MEDIA_STATE_CONFLICT }
+        "503": { description: STORAGE_FAILURE }
   /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/listening:
     get:
       operationId: getTenantMockExamListening
@@ -2349,9 +2482,11 @@ components:
           format: int64
     CreateListeningPartRequest:
       type: object
+      required: [seq, label, audioMediaId, sections]
       properties:
-        audioPath:
-          type: string
+        audioMediaId:
+          type: integer
+          format: int64
         label:
           type: string
         sections:
@@ -2394,6 +2529,9 @@ components:
     CreatePassageQuestionRequest:
       type: object
       properties:
+        imageMediaId:
+          type: integer
+          format: int64
         instruction:
           type: string
         kind:
@@ -2474,8 +2612,9 @@ components:
     CreateWritingTaskRequest:
       type: object
       properties:
-        imagePath:
-          type: string
+        imageMediaId:
+          type: integer
+          format: int64
         minWords:
           type: integer
           format: int32
@@ -2892,6 +3031,161 @@ components:
           type: string
         title:
           type: string
+    MockExamMediaResponse:
+      type: object
+      properties:
+        mediaId: { type: integer, format: int64 }
+        kind: { type: string }
+        fileName: { type: string }
+        contentType: { type: string }
+        sizeBytes: { type: integer, format: int64 }
+        sha256: { type: string }
+        status: { type: string }
+        previewUrl: { type: string }
+    MockExamMediaApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer }
+        code: { type: string }
+        data: { $ref: "#/components/schemas/MockExamMediaResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    MockExamMediaListApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer }
+        code: { type: string }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/MockExamMediaResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    StudentMockExamSummaryDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        testId:
+          type: integer
+          format: int64
+        templateId:
+          type: integer
+          format: int64
+        versionNo:
+          type: integer
+          format: int32
+        title:
+          type: string
+        status:
+          type: string
+        readingSelected:
+          type: boolean
+        listeningSelected:
+          type: boolean
+        writingSelected:
+          type: boolean
+        writingInstructorUserId:
+          type: integer
+          format: int32
+        attemptId:
+          type: integer
+          format: int64
+        attemptStatus:
+          type: string
+        readingCorrect:
+          type: integer
+          format: int32
+        readingTotal:
+          type: integer
+          format: int32
+        listeningCorrect:
+          type: integer
+          format: int32
+        listeningTotal:
+          type: integer
+          format: int32
+        writingScore:
+          type: number
+        writingGradeStatus:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+    StudentMockExamSummaryApiResponse:
+      type: object
+      description: Success envelope wrapping a student mock-exam summary
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/StudentMockExamSummaryDto"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
+    StudentMockExamSummaryListApiResponse:
+      type: object
+      description: Success envelope wrapping Advisor student mock-exam summaries
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentMockExamSummaryDto"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
+    TemplateVersionSummaryApiResponse:
+      type: object
+      description: Success envelope wrapping a published mock-exam template summary
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/TemplateVersionSummaryDto"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
+    TemplateVersionSummaryListApiResponse:
+      type: object
+      description: Success envelope wrapping published mock-exam template summaries
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TemplateVersionSummaryDto"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
   securitySchemes:
     bearerAuth:
       bearerFormat: JWT

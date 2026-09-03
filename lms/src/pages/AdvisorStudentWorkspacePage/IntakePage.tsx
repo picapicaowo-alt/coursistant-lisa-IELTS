@@ -13,7 +13,7 @@ import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
 const AdvisorStudentIntakePage: React.FC = () => {
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
-  const query = useQuery({
+  const query = useQuery({meta: {advisingStudentId: id},
     queryKey: advisingQueryKeys.advisorIntake(id),
     queryFn: async () => unwrapData(await advisorApiService.getStudentIntake(id), 'advisorIntake'),
     enabled: Number.isInteger(id),

@@ -1,0 +1,70 @@
+.section {
+  min-width: 0;
+  width: 100%;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-4;
+  min-height: t.$touch-target;
+  padding: t.$space-5 t.$space-6;
+  list-style: none;
+  cursor: pointer;
+  border-radius: inherit;
+  transition: background-color t.$duration-fast ease;
+
+  &::-webkit-details-marker { display: none; }
+  &:hover { background: t.$surface-subtle; }
+  &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 3px; }
+  &:active { background: t.$surface-muted; }
+}
+
+.heading { display: grid; gap: t.$space-1; min-width: 0; }
+.titleRow { display: flex; align-items: center; gap: t.$space-3; min-width: 0; }
+.titleRow h2, .titleRow h3, .titleRow h4 {
+  margin: 0;
+  font-size: t.$font-size-subhead;
+  font-weight: t.$fw-semibold;
+  line-height: t.$line-height-subhead;
+  overflow-wrap: anywhere;
+}
+.preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: t.$line-height-body;
+  overflow-wrap: anywhere;
+}
+.count {
+  padding: t.$space-1 t.$space-2;
+  border-radius: t.$radius-sm;
+  background: t.$surface-brand-subtle;
+  color: t.$action-primary-hover;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-semibold;
+  font-variant-numeric: tabular-nums;
+}
+.chevron { flex-shrink: 0; color: t.$content-secondary; transition: transform t.$duration-standard t.$ease-out; }
+.section[open] > .summary { border-radius: t.$radius-md t.$radius-md 0 0; }
+.section[open] > .summary .chevron { transform: rotate(180deg); }
+.body { display: grid; gap: t.$space-5; padding: t.$space-6; border-top: 1px solid t.$border-default; min-width: 0; }
+.body > p { margin: 0; max-width: t.$reading-max-width; }
+.body .section { background: t.$surface-subtle; }
+.body .section > .summary { padding: t.$space-4; }
+.body .section > .body { background: t.$surface-raised; padding: t.$space-4; }
+
+@media (max-width: 43.75rem) {
+  .summary, .body { padding: t.$space-4; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .summary, .chevron { transition: none; }
+}
