@@ -1,5 +1,6 @@
 import {lazy, Suspense, useEffect, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
+import {MessageSquare, Sparkles} from 'lucide-react';
 import type {CourseMaterial, CourseWeek} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
 import {assertFileBlob, saveBlob} from '@/utils/downloadBlob';
@@ -8,6 +9,7 @@ import styles from './MaterialReader.module.scss';
 
 import {embeddedVideoUrl} from './materialVideo';
 const CourseAssistant = lazy(() => import('@/components/ChatContent'));
+const PdfMaterialPreview = lazy(() => import('./PdfMaterialPreview'));
 const safeLink = (value: string | null) => {
   try {
     const url = new URL(value ?? '');
@@ -87,7 +89,7 @@ function FilePreview({
         ) : type.startsWith('image/') ? (
           <img src={url} alt={material.displayName} />
         ) : type === 'application/pdf' ? (
-          <iframe src={url} title={material.displayName} />
+          <Suspense fallback={<p role="status">Loading PDF viewer…</p>}><PdfMaterialPreview blob={preview.data!} title={material.displayName} onRetry={() => preview.refetch()}/></Suspense>
         ) : (
           <p>Download this file to view it in a compatible application.</p>
         )
@@ -222,11 +224,11 @@ export function MaterialReader({
               )}
             </div>
           )}
-          <footer>
+          <footer role="toolbar" aria-label="Learning tools">
             <button type="button" onClick={onDiscussion}>
-              Discussion
+              <MessageSquare size={16} aria-hidden="true"/>Discussion
             </button>
-            <button ref={assistantButton} type="button" aria-expanded={assistantOpen} aria-controls="course-assistant" onClick={() => setAssistantOpen(open => !open)}>AI Course</button>
+            <button className={styles.assistantToggle} ref={assistantButton} type="button" aria-expanded={assistantOpen} aria-controls="course-assistant" onClick={() => setAssistantOpen(open => !open)}><Sparkles size={16} aria-hidden="true"/>AI Course</button>
           </footer>
         </div>
         {assistantOpen ? <section id="course-assistant" className={styles.assistant} aria-label="Course AI assistant" onKeyDown={event => {if (event.key === 'Escape') closeAssistant();}}>

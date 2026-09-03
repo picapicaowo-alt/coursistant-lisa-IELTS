@@ -1,0 +1,23 @@
+{
+  "verifiedAtUtc": "2026-09-03T15:46:43.023940+00:00",
+  "revision": "4f2ae484b93dd6659111bf8c8b6fecbf9b691cbc",
+  "release": "20260903T154536Z-4f2ae48-workspace-parity",
+  "publicRootStatus": 200,
+  "publicIndexMatchesArtifact": true,
+  "entry": "/assets/index-CspX8KEp.js",
+  "entryStatus": 200,
+  "entryMatchesArtifact": true,
+  "unauthenticatedApiStatus": 401,
+  "authenticatedAllRoleAcceptance": false,
+  "pr": "https://github.com/picapicaowo-alt/coursistant-lisa-IELTS/pull/11",
+  "cleanDevArtifactE2E": 84,
+  "metadata": {
+    "revision": "4f2ae484b93dd6659111bf8c8b6fecbf9b691cbc",
+    "builtAtUtc": "2026-09-03T15:45:36.331847+00:00",
+    "scope": "IELTS frontend Dev 8085 only",
+    "fileCount": 687,
+    "assetCount": 325,
+    "artifactManifestSha256": "13de6e157c542917ba1e4412cab5bd18bdb58a4e0b981a0ea0f691425acaa362",
+    "indexSha256": "123edebe54253c4db71acf51eceb1245d4876239c36f4167f623f05655ba530d"
+  }
+}

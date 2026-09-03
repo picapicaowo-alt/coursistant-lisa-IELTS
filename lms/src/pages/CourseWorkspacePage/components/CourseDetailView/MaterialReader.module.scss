@@ -1,7 +1,7 @@
 .reader {
   min-width: 0;
   width: 100%;
-  padding: 1rem clamp(1rem, 2vw, 2rem) 2rem;
+  padding: 1rem clamp(1rem, 2vw, 2rem) 5rem;
 }
 .reader > header {
   display: flex;
@@ -91,12 +91,6 @@
   width: 100%;
   margin: 2rem 0;
 }
-.preview iframe {
-  width: 100%;
-  height: 65dvh;
-  border: 1px solid t.$border;
-  border-radius: t.$radius-control;
-}
 .preview p,
 .linkResource p {
   color: t.$text-muted;
@@ -110,13 +104,31 @@
   border: 1px solid t.$border;
 }
 .content footer {
+  position: fixed;
+  z-index: 2;
+  right: clamp(1rem, 2vw, 2rem);
+  bottom: t.$space-4;
   display: flex;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
+  align-items: center;
+  gap: t.$space-2;
+  max-width: calc(100vw - 2rem);
+  padding: t.$space-1;
+  border: 1px solid t.$brand;
+  border-radius: t.$radius-pill;
+  background: t.$surface-raised;
+  box-shadow: t.$shadow-popover;
 }
 .content footer > * {
-  border: 1px solid t.$border;
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-2;
+  border: 0;
+  border-radius: t.$radius-pill;
+  font-size: t.$font-size-caption;
+}
+.content footer .assistantToggle {
+  background: t.$brand;
+  color: t.$content-on-color;
 }
 .reader :is(button, a):focus-visible {
   outline: 2px solid t.$brand;
