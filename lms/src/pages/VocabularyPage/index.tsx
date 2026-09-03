@@ -1,13 +1,15 @@
 import {useMemo, useState} from 'react';
-import {useQuery} from '@tanstack/react-query';
+import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowRight, BookOpen, Filter, Layers3, Play, Sparkles} from 'lucide-react';
-import {Link} from 'react-router-dom';
+import {Link, useNavigate} from 'react-router-dom';
+import type {ContinueStudy} from '@/apis/types/vocabulary';
 import {vocabularyApi} from '@/apis/services/vocabulary-api';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {PageState} from '@/pages/vocabulary/components/PageState';
 import {ProgressRing} from '@/pages/vocabulary/components/ProgressRing';
 import {vocabularyQueryKeys} from '@/pages/vocabulary/queryKeys';
 import {VOCABULARY_PATHS} from '@/pages/vocabulary/routes';
+import {getApiErrorMessage} from '@/utils/apiError';
 import styles from './index.module.scss';
 
 interface LibraryFilters {
@@ -21,6 +23,8 @@ const EMPTY_FILTERS: LibraryFilters = {theme: '', skillFocus: '', difficulty: ''
 const VocabularyPage = () => {
   const {user} = useRequiredAuth();
   const studentId = String(user.userId);
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [filters, setFilters] = useState<LibraryFilters>(EMPTY_FILTERS);
   const queryFilters = useMemo(() => ({
     ...(filters.theme ? {theme: filters.theme} : {}),
@@ -32,11 +36,25 @@ const VocabularyPage = () => {
     queryFn: () => vocabularyApi.list(studentId, queryFilters),
     staleTime: 30_000,
   });
+  const resumeMutation = useMutation({
+    mutationFn: (resumable: ContinueStudy) => vocabularyApi.startSession(
+      studentId,
+      resumable.unitId,
+      {mode: resumable.mode},
+      crypto.randomUUID(),
+    ),
+    onSuccess: session => {
+      queryClient.setQueryData(vocabularyQueryKeys.session(studentId, session.id), session);
+      void queryClient.invalidateQueries({queryKey: vocabularyQueryKeys.all});
+      navigate(VOCABULARY_PATHS.session(session.unitId, session.id));
+    },
+  });
 
   if (query.isPending) return <main className={styles.page}><PageState kind="loading" title="Opening your library" detail="Loading lists and private study progress…"/></main>;
   if (query.isError) return <main className={styles.page}><PageState kind="error" title="The library could not be loaded" detail="Your progress is safe. The Vocabulary service is temporarily unavailable; please try again." onRetry={() => void query.refetch()}/></main>;
 
   const data = query.data;
+  const resumableSession = data.continue;
   return (
     <main className={styles.page}>
       <header className={styles.hero}>
@@ -51,17 +69,26 @@ const VocabularyPage = () => {
         </div>
       </header>
 
-      {data.continue ? (
+      {resumableSession ? (
         <section className={styles.continueCard} aria-labelledby="continue-heading">
           <div className={styles.continueIcon}><Play fill="currentColor"/></div>
           <div>
             <span className={styles.kicker}>Continue where you left off</span>
-            <h2 id="continue-heading">{data.continue.listName}</h2>
-            <p>{data.continue.unitName} · {data.continue.mode === 'TEST' ? 'Test mode' : 'Remember mode'}</p>
+            <h2 id="continue-heading">{resumableSession.listName}</h2>
+            <p>{resumableSession.unitName} · {resumableSession.mode === 'TEST' ? 'Test mode' : 'Remember mode'}</p>
           </div>
-          <Link to={VOCABULARY_PATHS.session(data.continue.unitId, data.continue.sessionId)}>
-            Resume session <ArrowRight size={18}/>
-          </Link>
+          <button
+            type="button"
+            disabled={resumeMutation.isPending}
+            onClick={() => resumeMutation.mutate(resumableSession)}
+          >
+            {resumeMutation.isPending ? 'Resuming…' : 'Resume session'} <ArrowRight size={18}/>
+          </button>
+          {resumeMutation.isError ? (
+            <p className={styles.continueError} role="alert">
+              {getApiErrorMessage(resumeMutation.error, 'The session could not be resumed. Your saved position is unchanged.')}
+            </p>
+          ) : null}
         </section>
       ) : null}
 

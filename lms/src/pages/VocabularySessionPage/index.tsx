@@ -1,13 +1,14 @@
-import {useEffect} from 'react';
+import {useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowRight, Check, CheckCircle2, ChevronLeft, Headphones, HelpCircle, RefreshCcw, X} from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
-import type {RecallRating, StudySessionResponse} from '@/apis/types/vocabulary';
+import type {RecallRating, StudyMode, StudySessionResponse} from '@/apis/types/vocabulary';
 import {vocabularyApi} from '@/apis/services/vocabulary-api';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {PageState} from '@/pages/vocabulary/components/PageState';
 import {vocabularyQueryKeys} from '@/pages/vocabulary/queryKeys';
 import {VOCABULARY_PATHS} from '@/pages/vocabulary/routes';
+import {getApiErrorCode, getApiErrorMessage} from '@/utils/apiError';
 import styles from './index.module.scss';
 
 const RATING_OPTIONS: Array<{rating: RecallRating; label: string; hint: string; icon: typeof Check}> = [
@@ -22,6 +23,7 @@ const VocabularySessionPage = () => {
   const studentId = String(user.userId);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const [requiresResume, setRequiresResume] = useState(false);
   const sessionQuery = useQuery({
     queryKey: vocabularyQueryKeys.session(studentId, sessionId),
     queryFn: () => vocabularyApi.getSession(studentId, sessionId),
@@ -36,9 +38,13 @@ const VocabularySessionPage = () => {
     vocabularyQueryKeys.session(studentId, sessionId),
     session,
   );
+  const reconcileInactiveSession = (error: unknown): void => {
+    if (getApiErrorCode(error) === 'SESSION_NOT_ACTIVE') setRequiresResume(true);
+  };
   const revealMutation = useMutation({
     mutationFn: () => vocabularyApi.revealCard(studentId, sessionId, crypto.randomUUID()),
     onSuccess: setSession,
+    onError: reconcileInactiveSession,
   });
   const rateMutation = useMutation({
     mutationFn: ({wordId, rating}: {wordId: string; rating: RecallRating}) => vocabularyApi.rateCard(
@@ -48,6 +54,7 @@ const VocabularySessionPage = () => {
       crypto.randomUUID(),
     ),
     onSuccess: setSession,
+    onError: reconcileInactiveSession,
   });
   const advanceMutation = useMutation({
     mutationFn: (direction: 'NEXT' | 'PREVIOUS') => vocabularyApi.advance(
@@ -60,6 +67,7 @@ const VocabularySessionPage = () => {
       setSession(session);
       if (session.status === 'COMPLETED') void queryClient.invalidateQueries({queryKey: vocabularyQueryKeys.all});
     },
+    onError: reconcileInactiveSession,
   });
   const exitMutation = useMutation({
     mutationFn: () => vocabularyApi.exit(studentId, sessionId, crypto.randomUUID()),
@@ -67,6 +75,20 @@ const VocabularySessionPage = () => {
       void queryClient.invalidateQueries({queryKey: vocabularyQueryKeys.all});
       if (unitQuery.data) navigate(VOCABULARY_PATHS.list(unitQuery.data.listId));
       else navigate(VOCABULARY_PATHS.root);
+    },
+    onError: reconcileInactiveSession,
+  });
+  const resumeMutation = useMutation({
+    mutationFn: (mode: StudyMode) => vocabularyApi.startSession(
+      studentId,
+      unitId,
+      {mode},
+      crypto.randomUUID(),
+    ),
+    onSuccess: resumedSession => {
+      setRequiresResume(false);
+      setSession(resumedSession);
+      void queryClient.invalidateQueries({queryKey: vocabularyQueryKeys.all});
     },
   });
 
@@ -87,8 +109,8 @@ const VocabularySessionPage = () => {
   if (sessionQuery.isError || unitQuery.isError || !session || !unitQuery.data) return <main className={styles.page}><PageState kind="error" title="This session is unavailable" detail="Your last saved position has not been changed. Return to the library or retry." onRetry={() => {void sessionQuery.refetch(); void unitQuery.refetch();}}/></main>;
 
   const unit = unitQuery.data;
-  const isBusy = revealMutation.isPending || rateMutation.isPending || advanceMutation.isPending || exitMutation.isPending;
-  const mutationError = revealMutation.isError || rateMutation.isError || advanceMutation.isError || exitMutation.isError;
+  const isBusy = revealMutation.isPending || rateMutation.isPending || advanceMutation.isPending || exitMutation.isPending || resumeMutation.isPending;
+  const mutationError = revealMutation.error ?? rateMutation.error ?? advanceMutation.error ?? exitMutation.error;
 
   if (session.status === 'COMPLETED' || session.status === 'ENDED') {
     const wasEnded = session.status === 'ENDED';
@@ -116,6 +138,23 @@ const VocabularySessionPage = () => {
             <button type="button" onClick={() => navigate(VOCABULARY_PATHS.root)}>Vocabulary library</button>
           </div>
         </section>
+      </main>
+    );
+  }
+
+  if (session.status === 'PAUSED' || requiresResume) {
+    return (
+      <main className={styles.page}>
+        <PageState
+          kind={resumeMutation.isError ? 'error' : 'empty'}
+          title="Session paused"
+          detail={resumeMutation.isError
+            ? getApiErrorMessage(resumeMutation.error, 'The session could not be resumed. Your saved position is unchanged.')
+            : 'Resume this session before revealing or rating the next card.'}
+          actionLabel="Resume session"
+          actionPending={resumeMutation.isPending}
+          onRetry={() => resumeMutation.mutate(session.mode)}
+        />
       </main>
     );
   }
@@ -192,7 +231,11 @@ const VocabularySessionPage = () => {
         ) : null}
       </section>
 
-      {mutationError ? <p className={styles.inlineError} role="alert">That action was not saved. Please try it again.</p> : null}
+      {mutationError && getApiErrorCode(mutationError) !== 'SESSION_NOT_ACTIVE' ? (
+        <p className={styles.inlineError} role="alert">
+          {getApiErrorMessage(mutationError, 'That action was not saved. Please try it again.')}
+        </p>
+      ) : null}
 
       <footer className={styles.controls}>
         {isAwaitingRating ? (

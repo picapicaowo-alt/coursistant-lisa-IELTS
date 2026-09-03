@@ -6,9 +6,18 @@ interface PageStateProps {
   title: string;
   detail: string;
   onRetry?: () => void;
+  actionLabel?: string;
+  actionPending?: boolean;
 }
 
-export const PageState = ({kind, title, detail, onRetry}: PageStateProps) => (
+export const PageState = ({
+  kind,
+  title,
+  detail,
+  onRetry,
+  actionLabel = 'Try again',
+  actionPending = false,
+}: PageStateProps) => (
   <div className={styles.state} role={kind === 'error' ? 'alert' : 'status'}>
     <div className={styles.icon} aria-hidden="true">
       {kind === 'error' ? <AlertCircle/> : <BookOpen/>}
@@ -16,9 +25,9 @@ export const PageState = ({kind, title, detail, onRetry}: PageStateProps) => (
     <h2>{title}</h2>
     <p>{detail}</p>
     {onRetry ? (
-      <button type="button" onClick={onRetry}>
+      <button type="button" onClick={onRetry} disabled={actionPending}>
         <RefreshCw size={16}/>
-        Try again
+        {actionPending ? 'Resuming…' : actionLabel}
       </button>
     ) : null}
   </div>
