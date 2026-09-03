@@ -1,0 +1,331 @@
+// Counsellor intake dashboard. Scoped to this page — advising.module.scss still
+// owns .page/.error/.status so the shared page shell stays untouched.
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: t.$space-4;
+  max-width: t.$workspace-max-width;
+  margin: 0 auto t.$space-6;
+}
+
+.heroText {
+  display: grid;
+  gap: t.$space-2;
+  min-width: 0;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  width: fit-content;
+  color: t.$action-primary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-bold;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.heroText h1 {
+  margin: 0;
+  color: t.$content-ink;
+  font-size: t.$workspace-title-size;
+  line-height: t.$line-height-title-1;
+  font-weight: t.$fw-bold;
+}
+
+.lede {
+  margin: 0;
+  max-width: 34rem;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: 1.55;
+}
+
+.createButton {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: .5rem;
+  min-height: t.$control-height-lg;
+  padding: 0 1.3rem;
+  border: 1px solid t.$action-primary;
+  border-radius: t.$radius-sm;
+  background: t.$action-primary;
+  color: t.$content-on-color;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-semibold;
+  text-decoration: none;
+  transition: background t.$duration-fast t.$ease-out, transform t.$duration-fast t.$ease-out, box-shadow t.$duration-fast t.$ease-out;
+}
+
+.createButton:hover {
+  background: t.$action-primary-hover;
+  box-shadow: t.$shadow-lg;
+  transform: translateY(-1px);
+}
+
+.createButton:focus-visible {
+  outline: 3px solid t.$focus-ring;
+  outline-offset: 2px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: t.$space-4;
+  max-width: t.$workspace-max-width;
+  margin: 0 auto t.$space-5;
+}
+
+.statCard {
+  display: flex;
+  align-items: flex-start;
+  gap: t.$space-4;
+  padding: t.$workspace-panel-padding;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-lg;
+  background: t.$surface-raised;
+  box-shadow: t.$shadow-dashboard-card;
+  color: t.$content-primary;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-decoration: none;
+  transition: border-color t.$duration-fast t.$ease-out, box-shadow t.$duration-fast t.$ease-out, transform t.$duration-fast t.$ease-out;
+}
+
+.statCard:hover,
+.statCard:focus-visible,
+.statCard[aria-pressed='true'] {
+  border-color: t.$action-primary;
+  box-shadow: t.$shadow-selected;
+  transform: translateY(-2px);
+}
+
+.statCard:focus-visible {
+  outline: none;
+}
+
+.statCard[data-tone='assigned'] {
+  border-color: t.$action-primary;
+  box-shadow: 0 0 0 1px t.$action-primary, 0 4px 14px rgba(t.$violet-700, .12);
+}
+
+.statIcon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: t.$radius-md;
+  background: t.$surface-muted;
+  color: t.$content-secondary;
+}
+
+.statCard[data-tone='assigned'] .statIcon {
+  background: t.$surface-brand-subtle;
+  color: t.$action-primary;
+}
+
+.statCard[data-tone='warning'] .statIcon {
+  background: t.$feedback-warning-surface;
+  color: t.$feedback-warning;
+}
+
+.statCard[data-tone='success'] .statIcon {
+  background: t.$feedback-success-surface;
+  color: t.$feedback-success;
+}
+
+.statBody {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: .15rem;
+}
+
+.statValue {
+  font-size: t.$font-size-title-2;
+  line-height: t.$line-height-title-2;
+  font-weight: t.$fw-bold;
+  font-variant-numeric: tabular-nums;
+}
+
+.statLabel {
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.statHint {
+  display: inline-flex;
+  align-items: center;
+  gap: .25rem;
+  margin-top: .55rem;
+  color: t.$action-primary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-semibold;
+}
+
+.statChevron {
+  transition: transform t.$duration-fast t.$ease-out;
+}
+
+.statCard:hover .statChevron {
+  transform: translateX(2px);
+}
+
+.notice {
+  display: flex;
+  gap: t.$space-3;
+  max-width: t.$workspace-max-width;
+  margin: 0 auto t.$space-5;
+  padding: t.$space-4 t.$space-5;
+  border: 1px solid t.$border-interactive;
+  border-radius: t.$radius-md;
+  background: t.$surface-brand-subtle;
+  animation: noticeIn t.$duration-standard t.$ease-out;
+}
+
+.noticeIcon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  margin-top: .1rem;
+  place-items: center;
+  border-radius: t.$radius-round;
+  background: t.$surface-raised;
+  color: t.$action-primary;
+}
+
+.notice strong {
+  display: block;
+  margin-bottom: .25rem;
+  color: t.$content-ink;
+}
+
+.notice p {
+  margin: 0;
+  max-width: 58rem;
+  color: t.$content-secondary;
+  line-height: 1.55;
+}
+
+@keyframes noticeIn {
+  from { opacity: 0; transform: translateY(-.35rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stepsSection {
+  max-width: t.$workspace-max-width;
+  margin: 0 auto;
+  padding: t.$space-6 t.$space-5;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-lg;
+  background: t.$surface-raised;
+}
+
+.stepsHeading {
+  margin: 0 0 t.$space-5;
+  display: grid;
+  gap: .25rem;
+}
+
+.stepsHeading strong {
+  color: t.$content-ink;
+  font-size: t.$font-size-subhead;
+  line-height: t.$line-height-subhead;
+  font-weight: t.$fw-semibold;
+}
+
+.stepsHeading span {
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+}
+
+.stepList {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: t.$space-5;
+  position: relative;
+}
+
+.stepList::before {
+  content: '';
+  position: absolute;
+  top: 1.375rem;
+  left: calc(100% / 6);
+  right: calc(100% / 6);
+  height: 1px;
+  background: t.$border-default;
+  z-index: 0;
+}
+
+.step {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: .6rem;
+}
+
+.stepTop {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+}
+
+.stepIndex {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid t.$border-interactive;
+  border-radius: t.$radius-round;
+  background: t.$surface-raised;
+  color: t.$action-primary;
+}
+
+.stepTitle {
+  margin: 0;
+  color: t.$content-ink;
+  font-size: t.$font-size-body-lg;
+  font-weight: t.$fw-semibold;
+}
+
+.step p {
+  margin: 0;
+  padding-left: calc(2.75rem + .65rem);
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  line-height: 1.55;
+}
+
+@media (max-width: 900px) {
+  .statsGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .stepList {
+    grid-template-columns: minmax(0, 1fr);
+    gap: t.$space-4;
+  }
+
+  .stepList::before {
+    display: none;
+  }
+
+  .hero {
+    align-items: flex-start;
+  }
+
+  .createButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
