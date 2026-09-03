@@ -105,7 +105,8 @@ test('advisor support cards align with the student summary and retain independen
   await page.goto('/advisor/students/301/support');
   for (const width of [390, 1440]) {
     await page.setViewportSize({width, height: 960});
-    const conversation = page.locator('summary[aria-label="Conversation"]');
+    // The conversation is an always-open chat panel; the record panels below it stay independent disclosures.
+    const conversation = page.getByRole('region', {name: 'Conversation', exact: true});
     const reports = page.locator('summary[aria-label="Reports"]');
     const history = page.locator('summary[aria-label="Learning history"]');
     await expect(reports).toBeVisible();

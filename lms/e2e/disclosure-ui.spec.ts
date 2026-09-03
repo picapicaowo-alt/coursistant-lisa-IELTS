@@ -82,7 +82,8 @@ for (const width of [1440, 390]) {
     await page.goto('/advisor/students/301/courses');
     await expect(sectionTrigger(page, courses[2].title)).toBeVisible();
     await expect(page.locator('details[open]')).toHaveCount(0);
-    const tones = await Promise.all(courses.map(course => sectionTrigger(page, course.title).evaluate(element => getComputedStyle(element).backgroundColor)));
+    // Identity colour lives in the leading mark tile; card surfaces stay neutral.
+    const tones = await Promise.all(courses.map(course => sectionTrigger(page, course.title).locator('> span').first().evaluate(element => getComputedStyle(element).backgroundColor)));
     expect(new Set(tones).size).toBe(3);
     await page.screenshot({path: testInfo.outputPath(`course-cards-${width}.png`), fullPage: true});
     await openSection(page, courses[1].title);

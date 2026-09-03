@@ -7,6 +7,7 @@ import {OwnedCourses} from './OwnedCourses';
 import {actionTaskTargetPath} from './actionTaskTarget';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import React, {useState} from 'react';
+import {CalendarClock, ClipboardList, MessagesSquare, UserRoundCheck} from 'lucide-react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {RecordSummaryList} from '@/components/RecordSummaryList';
@@ -27,6 +28,16 @@ const formatDateTime = (value?: string): string => {
   if (!value) return '';
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
+};
+
+/** Dot colour per workload stat; keys follow the dashboard contract fields. */
+const STAT_TONES: Record<string, 'brand' | 'ok' | 'risk' | 'attention'> = {
+  assignedStudentCount: 'brand',
+  onTrackCount: 'ok',
+  atRiskCount: 'risk',
+  needsAttentionCount: 'attention',
+  pendingApprovalCount: 'risk',
+  overdueFollowUpCount: 'attention',
 };
 
 const AdvisorOperationsPage: React.FC = () => {
@@ -140,7 +151,7 @@ const AdvisorOperationsPage: React.FC = () => {
       {dashboard.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(dashboard.error, 'Dashboard could not be loaded.')}</p> : null}
       <section className={styles.advisorStats} aria-label="Advisor workload summary">
         {dashboard.isPending ? <p className={styles.status}>Loading workload…</p> : dashboardView.stats.map(stat => (
-          <article className={styles.advisorStat} key={stat.key}>
+          <article className={styles.advisorStat} data-tone={STAT_TONES[stat.key]} key={stat.key}>
             <strong>{stat.value}</strong>
             <span>{stat.label}</span>
           </article>
@@ -148,7 +159,7 @@ const AdvisorOperationsPage: React.FC = () => {
       </section>
 
       <div className={styles.advisorColumns}>
-        <CollapsibleSection title="Action tasks" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{tasks.data?.total ?? 0}</span>}>
+        <CollapsibleSection title="Action tasks" icon={<ClipboardList/>} summary="Follow-ups and support tasks waiting on you." className={styles.disclosureLayout} count={tasks.data?.total ?? 0}>
 
           <div className={`${styles.form} ${styles.formGrid}`}>{(['status', 'priority', 'type', 'studentType'] as const).map(field => <label key={field}>{{status: 'Status', priority: 'Priority', type: 'Task type', studentType: 'Student type'}[field]}<select value={taskFilters[field]} onChange={event => {setTaskFilters(current => ({...current, [field]: event.target.value})); setTaskPage(0);}}><option value="">All</option>{(field === 'status' ? ['PENDING', 'IN_PROGRESS', 'RESOLVED'] : field === 'priority' ? ['HIGH', 'MEDIUM', 'LOW'] : field === 'studentType' ? ['VIP', 'STANDARD'] : ACTION_TASK_TYPES).map(value => <option key={value}>{value}</option>)}</select></label>)}</div>
           {tasksError ? <p className={styles.error} role="alert">{advisingErrorMessage(tasksError, 'Action tasks could not be loaded.')}</p> : null}
@@ -178,7 +189,7 @@ const AdvisorOperationsPage: React.FC = () => {
           <AdvisingPagination label="Action task pages" page={taskPage} total={tasks.data?.total ?? 0} onPage={setTaskPage}/>
         </CollapsibleSection>
 
-        <CollapsibleSection title="Student conversations" id="conversations" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{conversations.data?.total ?? 0}</span>}>
+        <CollapsibleSection title="Student conversations" id="conversations" icon={<MessagesSquare/>} summary="Threads with your assigned students; unread first." className={styles.disclosureLayout} count={conversations.data?.total ?? 0}>
 
           <div className={styles.form}><label>Search conversations<input type="search" maxLength={100} value={conversationSearch} onChange={event => {setConversationSearch(event.target.value); setConversationPage(0);}}/></label>
           <label className={styles.inlineCheckbox}><input type="checkbox" checked={unreadOnly} onChange={event => {setUnreadOnly(event.target.checked); setConversationPage(0);}}/>Unread only</label></div>
@@ -202,7 +213,8 @@ const AdvisorOperationsPage: React.FC = () => {
         </CollapsibleSection>
       </div>
 
-      <CollapsibleSection title="Schedule requests" id="schedule-requests" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{scheduleRequests.data?.total ?? 0}</span>}>
+      <div className={styles.advisorColumns}>
+      <CollapsibleSection title="Schedule requests" id="schedule-requests" icon={<CalendarClock/>} summary="Absence and reschedule requests awaiting a decision." className={styles.disclosureLayout} count={scheduleRequests.data?.total ?? 0}>
 
         <div className={styles.form}><label>Request type<select value={requestType} onChange={event => {setRequestType(event.target.value); setSchedulePage(0);}}><option value="">All requests</option><option>ABSENCE</option><option>SCHEDULE_CHANGE</option></select></label></div>
         {studentFilter ? <p>Requests for student #{studentFilter} · <Link to="/advisor/operations#schedule-requests">Show all students</Link></p> : null}
@@ -236,8 +248,7 @@ const AdvisorOperationsPage: React.FC = () => {
         ) : null}
       </CollapsibleSection>
 
-      <CollapsibleSection title="Instructor availability" className={styles.disclosureLayout}>
-
+      <CollapsibleSection title="Instructor availability" icon={<UserRoundCheck/>} summary="Look up an instructor's recorded teaching slots." className={styles.disclosureLayout}>
         <form className={styles.inlineLookup} onSubmit={event => { event.preventDefault(); setAvailabilityInstructorId(Number(instructorId)); }}>
           <AdvisorInstructorPicker required value={instructorId} onChange={setInstructorId}/>
           <button className={styles.primary} disabled={!Number(instructorId) || availability.isFetching}>Check availability</button>
@@ -246,6 +257,7 @@ const AdvisorOperationsPage: React.FC = () => {
         {availability.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(availability.error, 'Instructor availability could not be loaded.')}</p> : null}
         {availability.data !== undefined ? <div className={styles.compactResult}><RecordSummaryList value={availability.data} emptyMessage="No availability is recorded for this instructor."/></div> : null}
       </CollapsibleSection>
+      </div>
       <OwnedCourses/>
     </div>
   );

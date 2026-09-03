@@ -1,5 +1,7 @@
 import {useState} from 'react';
+import {Plus} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
+import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {unwrapData, type CreateCourseRequest} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
@@ -21,9 +23,7 @@ export function CreateGroupCourse() {
     },
     onSuccess: async course => {await client.invalidateQueries({queryKey: ['advisor', 'owned-courses']}); navigate(`/advisor/courses/${course.id}/delivery`);},
   });
-  return <details className={styles.card}>
-    <summary>Create a group course</summary>
-    <p>You own the course lifecycle. The primary instructor prepares weeks, syllabus, assignments, and teaching content.</p>
+  return <CollapsibleSection title="Create a group course" headingLevel={3} icon={<Plus/>} summary="You own the lifecycle; the primary instructor prepares weeks, syllabus, and content." className={styles.createCourseCard}>
     <form className={styles.form} onSubmit={event => {event.preventDefault(); create.mutate();}}>
       <label>Course code<input required value={form.courseCode} onChange={event => setForm(current => ({...current, courseCode: event.target.value}))}/></label>
       <label>Course title<input required value={form.title} onChange={event => setForm(current => ({...current, title: event.target.value}))}/></label>
@@ -32,6 +32,6 @@ export function CreateGroupCourse() {
       <label>Term end<EnglishDateInput required value={form.termEndDate} onChangeValue={termEndDate => setForm(current => ({...current, termEndDate}))}/></label>
       <button className={styles.primary} disabled={create.isPending || !form.instructorId || form.termEndDate < form.termStartDate}>{create.isPending ? 'Creating…' : 'Create group course'}</button>
     </form>
-    {create.isError ? <p role="alert">{advisingErrorMessage(create.error, 'The course could not be created.')}</p> : null}
-  </details>;
+    {create.isError ? <p role="alert" className={styles.error}>{advisingErrorMessage(create.error, 'The course could not be created.')}</p> : null}
+  </CollapsibleSection>;
 }

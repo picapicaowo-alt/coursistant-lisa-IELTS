@@ -1,8 +1,10 @@
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {CourseIdentityCard} from '@/components/CourseIdentityCard';
+import {courseStatusTone} from '@/components/CourseIdentityCard/courseBadges';
 import {getApiErrorCode} from '@/utils/apiError';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
+import {CalendarPlus, Link2, PencilLine} from 'lucide-react';
 import React, {useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {Link, useParams} from 'react-router-dom';
@@ -126,12 +128,16 @@ const CoursesPage: React.FC = () => {
         </div>
       ) : null}
       <section className={styles.courseCollection}>
-        <div className={styles.sectionHeading}><h2>Current courses</h2><span className={styles.countBadge}>{courses.data?.length ?? 0}</span></div>
+        <div className={styles.sectionHeading}><div className={styles.sectionTitle}><h2>Current courses</h2><span className={styles.countBadge}>{courses.data?.length ?? 0}</span></div><p className={styles.muted}>Courses linked to this study plan. Open a card to change its status or schedule.</p></div>
         {courses.isPending ? <p className={styles.status}>Loading courses…</p> : null}
-        {courses.data?.length === 0 ? <p className={styles.status}>No course is linked to this study plan.</p> : null}
+        {courses.data?.length === 0 ? <div className={styles.emptyState}><strong>No course is linked yet</strong><span>Link a group course or create a one-to-one course below.</span></div> : null}
         <div className={styles.courseCardGrid}>
-          {(courses.data ?? []).map((course, index) => (
-            <CourseIdentityCard key={course.courseId ?? index} courseId={course.courseId ?? index} title={course.title || course.courseCode || `Course #${course.courseId}`} code={course.courseCode} metadata={<><span>{course.deliveryMode === 'ONE_ON_ONE' ? 'One-to-one' : course.deliveryMode === 'GROUP' ? 'Group course' : 'Course'}</span><span>{course.launchState || course.status || 'Pending'}</span><span>{formatPersonName({firstName: course.instructorFirstName, middleName: course.instructorMiddleName, lastName: course.instructorLastName}, 'Instructor not assigned')}</span></>}>
+          {(courses.data ?? []).map((course, index) => {
+            const status = course.launchState || course.status || 'Pending';
+            return (
+            <CourseIdentityCard key={course.courseId ?? index} courseId={course.courseId ?? index} title={course.title || course.courseCode || `Course #${course.courseId}`} code={course.courseCode}
+              badges={[{label: course.deliveryMode === 'ONE_ON_ONE' ? '1-on-1' : course.deliveryMode === 'GROUP' ? 'Group' : 'Course', tone: 'brand'}, {label: status, tone: courseStatusTone(status)}]}
+              metadata={<span>{formatPersonName({firstName: course.instructorFirstName, middleName: course.instructorMiddleName, lastName: course.instructorLastName}, 'Instructor not assigned')}</span>}>
               <div className={styles.actions}>
                 {!['COMPLETED', 'HIDDEN'].includes(course.lifecycleStatus ?? '') && course.status !== 'WITHDRAWN' ? <>
                 {course.deliveryMode === 'ONE_ON_ONE' && course.courseId != null ? <button className={styles.secondary} onClick={() => { setEditorReveal(current => current + 1); setCourseEdit(current => ({...current, courseId: String(course.courseId), expectedVersion: course.courseLaunchVersion == null ? '' : String(course.courseLaunchVersion), instructorId: course.instructorUserId == null ? '' : String(course.instructorUserId)})); }}>Edit schedule</button> : null}
@@ -143,11 +149,15 @@ const CoursesPage: React.FC = () => {
                 </> : <span className={styles.readOnlyBadge}>{course.lifecycleStatus || course.status}</span>}
               </div>
             </CourseIdentityCard>
-          ))}
+            );
+          })}
         </div>
       </section>
 
-      <CollapsibleSection title="Link a group course">
+      <section className={styles.courseCollection} aria-labelledby="course-planning-heading">
+        <div className={styles.sectionHeading}><div className={styles.sectionTitle}><h2 id="course-planning-heading">Plan a course</h2></div><p className={styles.muted}>Add to this student&apos;s plan. Each action opens its own form; drafts stay in place while you switch.</p></div>
+        <div className={styles.actionGrid}>
+      <CollapsibleSection title="Link a group course" icon={<Link2/>} summary="Search the catalogue and attach an existing group course.">
         <p className={styles.muted}>Current study plan version: {plan.data?.plan.studyPlanVersion ?? 'not available'}</p>
         <form className={styles.form} onSubmit={event => { event.preventDefault(); linkGroup.mutate(); }}>
           <label>Search available courses<input maxLength={120} value={courseSearch} onChange={event => setCourseSearch(event.target.value)} placeholder="Course code or title"/></label>
@@ -165,7 +175,7 @@ const CoursesPage: React.FC = () => {
         </form>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Create a one-to-one course">
+      <CollapsibleSection title="Create a one-to-one course" icon={<CalendarPlus/>} summary="Set up a private course with an instructor, term, and weekly slot.">
         <form className={styles.form} onSubmit={event => { event.preventDefault(); createOneOnOne.mutate(); }}>
           <label>Title<input required value={oneOnOne.title} onChange={event => setOneOnOne(current => ({...current, title: event.target.value}))}/></label>
           <AdvisorInstructorPicker required value={oneOnOne.instructorId} onChange={instructorId => setOneOnOne(current => ({...current, instructorId}))}/>
@@ -179,7 +189,7 @@ const CoursesPage: React.FC = () => {
         </form>
       </CollapsibleSection>
 
-      <CollapsibleSection title="Update a one-to-one course" revealKey={editorReveal}>
+      <CollapsibleSection title="Update a one-to-one course" icon={<PencilLine/>} summary={courseEdit.courseId ? `Editing course #${courseEdit.courseId}` : 'Reassign the instructor or replace the weekly sessions.'} revealKey={editorReveal}>
         {!courseEdit.courseId ? <div className={styles.emptyState}><strong>Select a one-to-one course to edit</strong><span>Use “Edit schedule” on a current one-to-one course. Course and record versions are carried into this form automatically.</span></div> : null}
         <div className={styles.form}>
           {courseEdit.courseId ? <div className={styles.selectionSummary}><span>Editing</span><strong>Course #{courseEdit.courseId} · launch version {courseEdit.expectedVersion || 'not supplied'}</strong></div> : null}
@@ -192,6 +202,8 @@ const CoursesPage: React.FC = () => {
           <button type="button" className={styles.primary} disabled={needsReload || !Number(courseEdit.courseId) || !courseEdit.expectedVersion || !courseEdit.startTime || !courseEdit.endTime || updateOneOnOne.isPending} onClick={() => updateOneOnOne.mutate('sessions')}>Replace sessions</button>
         </div>
       </CollapsibleSection>
+        </div>
+      </section>
     </div>
   );
 };

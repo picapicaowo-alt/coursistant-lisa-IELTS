@@ -8,4 +8,166 @@
 .skills { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 9rem), 1fr)); gap: t.$space-4; padding: 0; margin: t.$space-5 0 0; list-style: none; li { padding: t.$space-3 t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-control; } span { display: block; font-size: t.$font-size-caption; color: t.$content-secondary; margin-bottom: t.$space-2; } strong { font-size: t.$font-size-body-lg; } }
 .tabs { display: flex; flex-wrap: wrap; align-items: stretch; gap: t.$space-6; border-bottom: 1px solid t.$border-default; margin-bottom: t.$space-6; a { display: flex; align-items: center; min-height: t.$touch-target; padding: t.$space-3 t.$space-1; border-bottom: 3px solid transparent; color: t.$content-secondary; font-weight: t.$fw-medium; } a[aria-current='page'] { color: t.$action-primary; border-bottom-color: t.$action-primary; } }
 .support { display: grid; gap: t.$space-5; min-width: 0; > *, > div > details { width: 100%; min-width: 0; margin: 0; } > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-5; } }
-@container (max-width: 40rem) { .tabs { gap: t.$space-3; } .support > div { grid-template-columns: minmax(0, 1fr); } .facts { gap: t.$space-4; } }
+.srOnly { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+// ---------------------------------------------------------------- Support: chat panel
+// Figma "Recent Messages" / chat surface: 20px radius, #E2E8F0 outline, soft
+// assistant-tint composer. The panel is always open because it is the tab's job.
+.conversationPanel {
+  display: grid;
+  overflow: clip;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-lg;
+  background: t.$surface-raised;
+}
+.panelHeader {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+  padding: t.$space-4 t.$space-5;
+  border-bottom: 1px dashed t.$border-default;
+  > div { flex: 1; min-width: 0; }
+  h2 { margin: 0; font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; line-height: t.$line-height-body; }
+  p { margin: t.$space-1 0 0; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+}
+.panelIcon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border-radius: t.$radius-sm;
+  background: t.$surface-brand-subtle;
+  color: t.$action-primary;
+  svg { width: 1.125rem; height: 1.125rem; }
+}
+.thread {
+  display: grid;
+  gap: t.$space-3;
+  align-content: start;
+  max-height: 30rem;
+  min-height: 12rem;
+  overflow: auto;
+  padding: t.$space-5;
+  background: t.$surface-subtle;
+}
+.threadEmpty {
+  display: grid;
+  gap: t.$space-1;
+  align-self: center;
+  justify-items: center;
+  padding: t.$space-8 t.$space-5;
+  text-align: center;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  strong { color: t.$content-primary; font-size: t.$font-size-body; }
+}
+.bubble {
+  display: grid;
+  gap: t.$space-2;
+  justify-self: start;
+  width: fit-content;
+  max-width: min(100%, 40rem);
+  padding: t.$space-3 t.$space-4;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md t.$radius-md t.$radius-md t.$radius-xs;
+  background: t.$surface-raised;
+  p { margin: 0; line-height: 1.5; overflow-wrap: anywhere; white-space: pre-wrap; }
+}
+.bubbleMine {
+  justify-self: end;
+  border-color: t.$violet-200;
+  border-radius: t.$radius-md t.$radius-md t.$radius-xs t.$radius-md;
+  background: t.$surface-brand-subtle;
+}
+.bubbleMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: t.$space-3;
+  font-size: t.$font-size-caption;
+  line-height: t.$line-height-caption;
+  strong { color: t.$content-primary; font-weight: t.$fw-semibold; }
+  time { color: t.$content-placeholder; }
+}
+.attachments {
+  display: grid;
+  gap: t.$space-1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  li { display: flex; flex-wrap: wrap; align-items: center; gap: t.$space-2; font-size: t.$font-size-caption; color: t.$content-secondary; }
+  li > span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+}
+.markRead {
+  width: fit-content;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: t.$content-placeholder;
+  font: inherit;
+  font-size: t.$font-size-caption;
+  cursor: pointer;
+  &:hover { color: t.$action-primary; }
+}
+.composer {
+  display: grid;
+  gap: t.$space-3;
+  padding: t.$space-4 t.$space-5;
+  border-top: 1px solid t.$border-default;
+  background: t.$surface-raised;
+  textarea {
+    width: 100%;
+    min-height: 3.5rem;
+    padding: t.$space-3 t.$space-4;
+    resize: vertical;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-sm;
+    background: t.$surface-raised;
+    color: t.$content-primary;
+    font: inherit;
+    line-height: 1.5;
+    &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 1px; }
+  }
+}
+.composerBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: t.$space-3;
+  > button:last-child { margin-inline-start: auto; }
+}
+.attachButton {
+  display: inline-flex;
+  align-items: center;
+  gap: t.$space-2;
+  min-height: t.$control-height-sm;
+  padding: 0 t.$space-3;
+  border: 1px dashed t.$border-strong;
+  border-radius: t.$radius-sm;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-medium;
+  cursor: pointer;
+  &:hover { border-color: t.$action-primary; color: t.$action-primary; }
+  input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  &:has(input:focus-visible) { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+}
+
+// ---------------------------------------------------------------- Shared section heading
+.sectionHeading {
+  display: grid;
+  gap: t.$space-1;
+  padding-top: t.$space-2;
+  h2 { margin: 0; font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; line-height: t.$line-height-body; }
+  p { margin: 0; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+}
+
+@container (max-width: 40rem) {
+  .tabs { gap: t.$space-3; }
+  .support > div { grid-template-columns: minmax(0, 1fr); }
+  .facts { gap: t.$space-4; }
+  .thread { max-height: none; }
+  .bubble { max-width: 100%; }
+}

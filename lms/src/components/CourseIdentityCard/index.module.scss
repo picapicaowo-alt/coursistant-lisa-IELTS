@@ -1,17 +1,58 @@
+// Figma "My courses" card: white surface, 1px border, 20px radius. The course
+// identity colour lives only in the small mark tile so a wall of cards stays calm.
 .card {
   align-self: start;
-  border-radius: t.$radius-md;
-  border-color: transparent;
-  background: var(--course-surface);
+  border-radius: t.$radius-lg;
+  background: t.$surface-raised;
 
-  > summary { align-items: flex-start; border-radius: t.$radius-md; min-height: 8rem; background: var(--course-surface); }
-  &[open] > summary { align-items: flex-start; border-radius: t.$radius-md t.$radius-md 0 0; }
-  > summary:hover { background: var(--course-surface); filter: brightness(.985); }
-  > summary h3 { color: var(--course-ink); font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
-  > summary svg { color: var(--course-ink); }
+  > summary { align-items: flex-start; padding: t.$space-5; }
   > summary > div > span { -webkit-line-clamp: unset; overflow: visible; }
-  > div { background: t.$surface-raised; border: 1px solid t.$border-default; border-radius: 0 0 t.$radius-md t.$radius-md; }
+  > summary h3 { color: t.$content-primary; font-size: t.$font-size-subhead; line-height: t.$line-height-subhead; font-weight: t.$fw-bold; }
+  > div { background: t.$surface-raised; }
 }
-.identity { display: grid; gap: t.$space-3; margin-top: t.$space-2; color: var(--course-ink); }
-.code { font-size: t.$font-size-body; font-weight: t.$fw-semibold; letter-spacing: .02em; }
-.metadata { display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-4; font-size: t.$font-size-caption; line-height: t.$line-height-caption; color: var(--course-ink); }
+
+// Override the shared icon slot so the tile carries the identity tone.
+.card > summary > span:first-child {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: t.$radius-sm;
+  background: var(--course-surface);
+  color: var(--course-ink);
+}
+.mark {
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-bold;
+  letter-spacing: .04em;
+  line-height: 1;
+}
+
+.identity { display: grid; gap: t.$space-3; margin-top: t.$space-2; }
+.badges { display: flex; flex-wrap: wrap; gap: t.$space-2; }
+.badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.25rem;
+  padding: 0 t.$space-2;
+  border-radius: t.$radius-xs;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-medium;
+  line-height: t.$line-height-caption;
+}
+// Figma chip palette: 1-on-1 #EBE9FF/#4835EB, Ongoing #E3F9FF/#22CCEE-ink, Completed #C3EDC3/#1BC033.
+.badgeBrand { background: t.$violet-50; color: t.$action-primary; }
+.badgeSuccess { background: t.$type-green-subtle; color: t.$green-700; }
+.badgeInfo { background: t.$type-cyan-subtle; color: t.$blue-700; }
+.badgeWarning { background: t.$feedback-warning-surface; color: t.$feedback-warning; }
+.badgeNeutral { background: t.$surface-muted; color: t.$content-secondary; }
+
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: t.$space-1 t.$space-2;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  line-height: t.$line-height-caption;
+  > * + *::before { content: '·'; margin-inline-end: t.$space-2; color: t.$border-strong; }
+}
+.code { font-weight: t.$fw-semibold; letter-spacing: .02em; color: t.$content-primary; }

@@ -21,8 +21,28 @@
 .courseCardGrid:not(:has(> details[open])) > details > summary { height: 100%; }
 
 .courseCollection { display: grid; gap: t.$space-4; min-width: 0; }
-.courseCardGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 22rem), 1fr)); gap: t.$space-6; min-width: 0; }
+.courseCardGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 20rem), 1fr)); gap: t.$space-5; min-width: 0; }
 @media (max-width: 56.25rem) { .courseCardGrid { grid-template-columns: minmax(0, 1fr); } }
+
+// Planning actions sit side by side so the page reads as "three things you can do" rather than a stack of headings.
+.actionGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: t.$space-5; min-width: 0; align-items: start; }
+.actionGrid:has(> details[open]) { grid-template-columns: minmax(0, 1fr); }
+.actionGrid > details { min-width: 0; margin: 0; }
+
+// Compact inline filters above a card grid (Figma "Students Information" toolbar: 36px controls, 10px radius).
+.filterBar {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  gap: t.$space-3;
+  min-width: 0;
+  label { display: grid; gap: t.$space-1; min-width: 0; color: t.$content-secondary; font-size: t.$font-size-caption; font-weight: t.$fw-medium; }
+  input, select { width: 100%; min-height: t.$control-height-sm; padding: 0 t.$space-3; border: 1px solid t.$border-strong; border-radius: t.$radius-sm; background: t.$surface-raised; color: t.$content-primary; font: inherit; font-size: t.$font-size-body; }
+}
+@media (max-width: 56.25rem) { .filterBar { grid-template-columns: minmax(0, 1fr); } }
+
+// "Create" tile that sits in the course grid as a dashed placeholder card until opened.
+.createCourseCard { border-style: dashed; background: t.$surface-subtle; align-self: start; }
+.createCourseCard[open] { border-style: solid; background: t.$surface-raised; grid-column: 1 / -1; }
 
 .disclosureLayout {
   min-width: 0;
@@ -541,36 +561,50 @@ a:focus-visible {
   color: t.$text;
 }
 
+// Figma Dashborad/Advisor: workload reads as a single strip of "label + number"
+// pairs under the greeting, separated from the panels by a dashed rule.
 .advisorStats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr));
-  gap: t.$space-4;
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-3 t.$space-8;
   max-width: t.$workspace-max-width;
-  margin: 0 auto 1rem;
+  margin: 0 auto t.$space-6;
+  padding-bottom: t.$space-5;
+  border-bottom: 1px dashed t.$border-default;
 }
 
 .advisorStat {
-  display: grid;
-  gap: .25rem;
-  min-height: 6.5rem;
-  align-content: space-between;
-  padding: 1rem;
-  border: 1px solid t.$border;
-  border-radius: t.$radius-card;
-  background: t.$card-bg;
-  box-shadow: t.$shadow-card;
+  display: flex;
+  align-items: baseline;
+  gap: t.$space-2;
 }
 
+.advisorStat::before {
+  content: '';
+  align-self: center;
+  width: .625rem;
+  height: .625rem;
+  border: 2px solid var(--stat-dot, #{t.$border-strong});
+  border-radius: t.$radius-round;
+}
+
+.advisorStat[data-tone='attention'] { --stat-dot: #{t.$red-500}; }
+.advisorStat[data-tone='risk'] { --stat-dot: #{t.$orange-500}; }
+.advisorStat[data-tone='ok'] { --stat-dot: #{t.$green-500}; }
+.advisorStat[data-tone='brand'] { --stat-dot: #{t.$action-primary}; }
+
 .advisorStat strong {
-  font-size: t.$font-size-title-2;
-  line-height: t.$line-height-title-2;
-  font-weight: t.$fw-extrabold;
+  order: 1;
+  font-size: t.$font-size-subhead;
+  line-height: t.$line-height-subhead;
+  font-weight: t.$fw-bold;
+  font-variant-numeric: tabular-nums;
 }
 
 .advisorStat span {
-  color: t.$text-muted;
-  font-size: t.$fs-caption;
-  font-weight: t.$fw-semibold;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-medium;
 }
 
 .advisorColumns {
@@ -695,12 +729,32 @@ a:focus-visible {
 }
 
 .sectionHeading {
-  margin-bottom: 1rem;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: t.$space-1;
+  margin-bottom: t.$space-2;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
 }
 
 .sectionHeading h2,
 .sectionHeading p {
   margin: 0;
+}
+
+.sectionHeading h2 {
+  font-size: t.$font-size-body-lg;
+  font-weight: t.$fw-semibold;
+  line-height: t.$line-height-body;
+}
+
+.sectionHeading p {
+  font-size: t.$font-size-caption;
+  line-height: t.$line-height-caption;
 }
 
 .sectionKicker {
@@ -724,11 +778,15 @@ a:focus-visible {
 
 .countBadge {
   justify-content: center;
-  min-width: 2rem;
-  min-height: 2rem;
-  padding: 0 .55rem;
+  min-width: 1.5rem;
+  min-height: 1.25rem;
+  padding: 0 t.$space-2;
+  border-radius: t.$radius-xs;
   background: t.$brand-subtle;
   color: t.$brand;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-semibold;
+  font-variant-numeric: tabular-nums;
 }
 
 .unreadBadge {
@@ -1299,7 +1357,7 @@ a:focus-visible {
   .stats { grid-template-columns: 1fr; }
   .header, .headerActions, .row, .selectedRow, .toolbar, .inboxRow, .attachmentRow { align-items: stretch; flex-direction: column; }
   .tabs { flex-wrap: wrap; }
-  .advisorStats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .advisorStats { gap: t.$space-3 t.$space-5; }
   .advisorColumns, .inlineLookup, .formColumns, .intakeFilters { grid-template-columns: 1fr; }
   .studentMark { display: none; }
   .primaryLink, .secondaryLink { width: 100%; }

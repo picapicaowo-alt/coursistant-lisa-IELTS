@@ -4,6 +4,7 @@ import {getApiErrorCode} from '@/utils/apiError';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {AdvisingPagination} from '../advising/AdvisingPagination';
 import React, {useEffect, useRef, useState} from 'react';
+import {CalendarCheck, Clock3, Database, FileText, MessageSquare, Paperclip, Send} from 'lucide-react';
 import {Link, useParams, useSearchParams} from 'react-router-dom';
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -110,57 +111,67 @@ const SupportPage: React.FC = () => {
     <div className={layout.support}>
       {primaryError ? <p className={styles.error} role="alert">{advisingErrorMessage(primaryError, 'Student support information could not be loaded.')}</p> : null}
 
-      <CollapsibleSection title="Conversation" id="conversation" meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
+      {/* The conversation is the primary job on this tab, so it stays open as a chat panel instead of a disclosure. */}
+      <section className={layout.conversationPanel} id="conversation" aria-labelledby="conversation-heading">
+        <header className={layout.panelHeader}>
+          <span className={layout.panelIcon} aria-hidden="true"><MessageSquare/></span>
+          <div><h2 id="conversation-heading">Conversation</h2><p>{conversationRows.length === 0 ? 'No messages yet' : `${conversationRows.length} message${conversationRows.length === 1 ? '' : 's'} loaded`}</p></div>
+          {messages.hasNextPage ? <button type="button" className={styles.secondary} disabled={messages.isFetchingNextPage} onClick={() => void messages.fetchNextPage()}>Load older</button> : null}
+        </header>
 
-        {messages.isPending ? <p className={styles.status}>Loading conversation…</p> : null}
-        {!messages.isPending && !messages.isError && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No messages yet</strong><span>Start the conversation below. File actions appear on messages that have attachments.</span></div> : null}
-        <div className={styles.messageList}>
-          {conversationRows.map((message, index) => (
-            <article className={styles.messageRow} key={message.messageId ?? index}>
-              <div className={styles.rowTitle}><strong>{message.senderUserId == null ? 'Conversation message' : `User #${message.senderUserId}`}</strong>{message.createdAt ? <small>{formatDateTime(message.createdAt)}</small> : null}</div>
-              <p>{message.body || 'Message has no text content.'}</p>
-              {(message.attachments?.length ?? 0) > 0 ? <div className={styles.attachmentList}>{message.attachments?.map(attachment => attachment.attachmentId == null ? null : (
-                <div className={styles.attachmentRow} key={attachment.attachmentId}>
-                  <span>{attachment.originalName || `Attachment #${attachment.attachmentId}`}</span>
-                  <div className={styles.actions}>
-                    {attachment.previewAvailable ? <button type="button" className={styles.secondary} onClick={() => void previewAttachment(attachment.attachmentId!)}>Preview</button> : null}
-                    <button type="button" className={styles.secondary} onClick={() => void advisorApiService.downloadConversationAttachment(id, attachment.attachmentId!).then(blob => saveBlob(blob, attachment.originalName || `conversation-attachment-${attachment.attachmentId}`))}>Download</button>
-                  </div>
-                </div>
-              ))}</div> : null}
-              {message.messageId != null ? <button type="button" className={styles.textButton} disabled={markRead.isPending} onClick={() => markRead.mutate(message.messageId!)}>Mark read through this message</button> : null}
-            </article>
-          ))}
+        <div className={layout.thread} role="log" aria-live="polite">
+          {messages.isPending ? <p className={styles.status}>Loading conversation…</p> : null}
+          {!messages.isPending && !messages.isError && conversationRows.length === 0 ? <div className={layout.threadEmpty}><strong>Start the conversation</strong><span>Your first message to this student will appear here. File actions show on messages that carry attachments.</span></div> : null}
+          {conversationRows.map((message, index) => {
+            const mine = message.senderUserId != null && message.senderUserId !== id;
+            return (
+              <article className={`${layout.bubble} ${mine ? layout.bubbleMine : ''}`} key={message.messageId ?? index}>
+                <div className={layout.bubbleMeta}><strong>{message.senderUserId == null ? 'Conversation' : mine ? 'You' : 'Student'}</strong>{message.createdAt ? <time dateTime={message.createdAt}>{formatDateTime(message.createdAt)}</time> : null}</div>
+                <p>{message.body || 'Message has no text content.'}</p>
+                {(message.attachments?.length ?? 0) > 0 ? <ul className={layout.attachments}>{message.attachments?.map(attachment => attachment.attachmentId == null ? null : (
+                  <li key={attachment.attachmentId}>
+                    <Paperclip size={14} aria-hidden="true"/>
+                    <span>{attachment.originalName || `Attachment #${attachment.attachmentId}`}</span>
+                    {attachment.previewAvailable ? <button type="button" className={styles.textButton} onClick={() => void previewAttachment(attachment.attachmentId!)}>Preview</button> : null}
+                    <button type="button" className={styles.textButton} onClick={() => void advisorApiService.downloadConversationAttachment(id, attachment.attachmentId!).then(blob => saveBlob(blob, attachment.originalName || `conversation-attachment-${attachment.attachmentId}`))}>Download</button>
+                  </li>
+                ))}</ul> : null}
+                {message.messageId != null ? <button type="button" className={layout.markRead} disabled={markRead.isPending} onClick={() => markRead.mutate(message.messageId!)}>Mark read through this message</button> : null}
+              </article>
+            );
+          })}
         </div>
-        {messages.hasNextPage ? <button type="button" className={styles.secondary} disabled={messages.isFetchingNextPage} onClick={() => void messages.fetchNextPage()}>Load older messages</button> : null}
-        <form className={styles.composeBox} onSubmit={event => { event.preventDefault(); sendMessage.mutate(); }}>
-          <label htmlFor="advisor-message">Reply to student</label>
-          <textarea id="advisor-message" value={messageBody} onChange={event => setMessageBody(event.target.value)} placeholder="Write a support message…"/>
-          <label htmlFor="advisor-message-files">Attachments</label>
-          <input key={fileInputKey} id="advisor-message-files" type="file" multiple onChange={event => setMessageFiles(Array.from(event.target.files ?? []))}/>
-          {messageFiles.length > 0 ? <div className={styles.selectedFiles}>{messageFiles.map((file, index) => <span key={`${file.name}-${file.lastModified}-${index}`}>{file.name}<button type="button" aria-label={`Remove ${file.name}`} onClick={() => setMessageFiles(current => current.filter((_, fileIndex) => fileIndex !== index))}>×</button></span>)}</div> : null}
-          <div className={styles.actions}><button className={styles.primary} disabled={(!messageBody.trim() && messageFiles.length === 0) || sendMessage.isPending}>{sendMessage.isPending ? 'Sending…' : 'Send message'}</button></div>
+
+        <form className={layout.composer} onSubmit={event => { event.preventDefault(); sendMessage.mutate(); }}>
+          <label htmlFor="advisor-message" className={layout.srOnly}>Reply to student</label>
+          <textarea id="advisor-message" rows={2} value={messageBody} onChange={event => setMessageBody(event.target.value)} placeholder="Write a support message…"/>
+          <div className={layout.composerBar}>
+            <label className={layout.attachButton}>
+              <Paperclip size={16} aria-hidden="true"/><span>Attach files</span>
+              <input key={fileInputKey} id="advisor-message-files" type="file" multiple onChange={event => setMessageFiles(Array.from(event.target.files ?? []))}/>
+            </label>
+            {messageFiles.length > 0 ? <div className={styles.selectedFiles}>{messageFiles.map((file, index) => <span key={`${file.name}-${file.lastModified}-${index}`}>{file.name}<button type="button" aria-label={`Remove ${file.name}`} onClick={() => setMessageFiles(current => current.filter((_, fileIndex) => fileIndex !== index))}>×</button></span>)}</div> : null}
+            <button className={styles.primary} disabled={(!messageBody.trim() && messageFiles.length === 0) || sendMessage.isPending}><Send size={16} aria-hidden="true"/>{sendMessage.isPending ? 'Sending…' : 'Send message'}</button>
+          </div>
         </form>
-      </CollapsibleSection>
+      </section>
 
+      <div className={layout.sectionHeading}><h2>Records</h2><p>Published reports, attendance, and purchased hours for this student.</p></div>
       <div className={styles.advisorColumns}>
-        <CollapsibleSection title="Reports">
-
+        <CollapsibleSection title="Reports" icon={<FileText/>} count={contractRecordNumber(studentReports.data, 'total') ?? contractItems(studentReports.data).length} summary="Published advising reports for this student.">
           {studentReports.isPending ? <p className={styles.status}>Loading reports…</p> : null}
           {!studentReports.isPending && !studentReports.isError && contractItems(studentReports.data).length === 0 ? <div className={styles.emptyState}><strong>No published reports</strong><span>Reports become visible here after publication.</span></div> : null}
           {contractItems(studentReports.data).length > 0 ? <div className={styles.compactResult}><RecordSummaryList value={studentReports.data}/></div> : null}
           <AdvisingPagination label="Student report pages" page={reportPage} total={contractRecordNumber(studentReports.data, 'total') ?? 0} onPage={setReportPage}/>
         </CollapsibleSection>
-        <CollapsibleSection title="Learning history">
-
+        <CollapsibleSection title="Learning history" icon={<CalendarCheck/>} count={contractItems(attendance.data).length} summary="Attendance recorded across linked courses.">
           {attendance.isPending ? <p className={styles.status}>Loading attendance…</p> : null}
           {!attendance.isPending && !attendance.isError && contractItems(attendance.data).length === 0 ? <div className={styles.emptyState}><strong>No attendance records</strong><span>Recorded course attendance will appear here.</span></div> : null}
           {contractItems(attendance.data).length > 0 ? <div className={styles.compactResult}><RecordSummaryList value={attendance.data}/></div> : null}
         </CollapsibleSection>
       </div>
 
-      <CollapsibleSection title="Course hours &amp; reports" id="course-support">
-
+      <CollapsibleSection title="Course hours &amp; reports" id="course-support" icon={<Clock3/>} summary={positiveId(selectedCourseId) ? `Managing ${(courses.data ?? []).find(item => String(item.courseId) === selectedCourseId)?.title || `course #${selectedCourseId}`}` : 'Pick a linked course to set purchased hours and read course reports.'}>
         {(courses.data?.length ?? 0) === 0 ? <div className={styles.emptyState}><strong>No linked courses</strong><span>Link or create a course before managing hours and course reports.</span><Link className={styles.secondaryLink} to={`/advisor/students/${id}/courses`}>Open courses</Link></div> : (
           <label className={styles.coursePicker}>Course<select value={selectedCourseId} onChange={event => setSelectedCourseId(event.target.value)}><option value="">Select a course</option>{(courses.data ?? []).map((item, index) => <option key={item.courseId ?? index} value={item.courseId}>{item.title || item.courseCode || `Course #${item.courseId}`}</option>)}</select></label>
         )}
@@ -186,7 +197,7 @@ const SupportPage: React.FC = () => {
         </div> : null}
       </CollapsibleSection>
 
-      <CollapsibleSection title="Advanced record lookup">
+      <CollapsibleSection title="Advanced record lookup" icon={<Database/>} summary="Task feedback and record-level lookups by backend identifier.">
         <p className={styles.muted}>Use backend record identifiers only when handling a specific task, occurrence, or report.</p>
         <div className={styles.advisorColumns}>
           <form className={styles.form} onSubmit={event => { event.preventDefault(); taskFeedback.mutate(); }}>
@@ -206,7 +217,7 @@ const SupportPage: React.FC = () => {
         </div>
       </CollapsibleSection>
 
-      {hub.data !== undefined ? <CollapsibleSection title="Student support summary"><div className={styles.compactResult}><RecordSummaryList value={hub.data}/></div></CollapsibleSection> : null}
+      {hub.data !== undefined ? <CollapsibleSection title="Student support summary" icon={<FileText/>} summary="Raw hub record for troubleshooting."><div className={styles.compactResult}><RecordSummaryList value={hub.data}/></div></CollapsibleSection> : null}
     </div>
   );
 };

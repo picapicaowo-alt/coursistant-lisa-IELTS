@@ -7,6 +7,8 @@ interface CollapsibleSectionProps {
   summary?: ReactNode;
   count?: number;
   meta?: ReactNode;
+  /** Leading glyph rendered beside the title so a collapsed panel still reads as a distinct destination. */
+  icon?: ReactNode;
   headingId?: string;
   children: ReactNode;
   id?: string;
@@ -27,7 +29,7 @@ const revealDisclosureAncestors = (target: Element) => {
 };
 
 export function CollapsibleSection({
-  title, summary, count, meta, headingId, children, id, className, bodyClassName,
+  title, summary, count, meta, icon, headingId, children, id, className, bodyClassName,
   headingLevel = 2, defaultOpen = false, revealKey,
 }: CollapsibleSectionProps) {
   const ref = useRef<HTMLDetailsElement>(null);
@@ -62,6 +64,7 @@ export function CollapsibleSection({
       data-disclosure-section=""
     >
       <summary className={styles.summary} aria-label={title}>
+        {icon ? <span className={styles.icon} aria-hidden="true">{icon}</span> : null}
         <div className={styles.heading}>
           <div className={styles.titleRow}><Heading id={titleId}>{title}</Heading>{count != null ? <span className={styles.count}>{count}</span> : null}{meta}</div>
           {summary ? <span className={styles.preview}>{summary}</span> : null}
