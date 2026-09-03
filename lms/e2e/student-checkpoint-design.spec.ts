@@ -107,7 +107,7 @@ test('checkpoint layout reflows across viewport sizes without fixed page widths'
     const detail = page.getByRole('complementary', {name: 'Build vocabulary range'});
     await expect(detail).toBeVisible();
     await expect(page.getByRole('button', {name: 'Close task details'})).toBeVisible();
-    expect(await page.evaluate(() => ({width: innerWidth, scroll: document.documentElement.scrollWidth, broken: Array.from(document.images).filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src)}))).toEqual({width, scroll: width, broken: []});
+    await expect.poll(() => page.evaluate(() => ({width: innerWidth, scroll: document.documentElement.scrollWidth, broken: Array.from(document.images).filter(img => !img.complete || img.naturalWidth === 0).map(img => img.src)}))).toEqual({width, scroll: width, broken: []});
     const bounds = await detail.boundingBox();
     expect(bounds!.x).toBeGreaterThanOrEqual(0);
     expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);

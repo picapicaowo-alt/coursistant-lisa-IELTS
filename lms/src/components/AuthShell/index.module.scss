@@ -31,7 +31,8 @@
   background: t.$action-primary url('/icons/figma-auth/pattern.svg') center / 76% auto repeat-y;
 }
 .artwork {
-  width: 100%;
+  width: min(100%, 56dvh);
+  // Scale artwork with available height on wide, short screens.
   // Cap only the decorative artwork, never the page canvas or form columns.
   max-width: 48rem;
   padding-bottom: 12%;
