@@ -1,3 +1,4 @@
+import {AuthShell, AuthHeading} from '@/components/AuthShell';
 import {FormEvent, useEffect, useState} from 'react';
 import {Eye, EyeOff} from 'lucide-react';
 import {Link, useNavigate} from 'react-router-dom';
@@ -172,20 +173,8 @@ export default function SignUpView() {
       : t('signup.verifyEmail');
 
   return (
-    <main className={styles.page}>
-      <div className={styles.shell}>
-        <div className={styles.visualPanel} aria-hidden="true">
-          <img src="/icons/login/login-img-xlearn.png" alt=""/>
-        </div>
-
-        <section className={styles.formPanel}>
-          <div className={styles.brandMark} aria-label="X-Learn">
-            <img src="/icons/coursistant_icon_ver2.png" alt=""/>
-            <span>X—LEARN</span>
-          </div>
-          <h1>{t('signup.title')}</h1>
-          <p className={styles.subtitle}>{t('signup.subtitle')}</p>
-
+    <AuthShell>
+      <AuthHeading title={t('signup.title')} subtitle={t('signup.subtitle')}/>
           <form className={styles.form} onSubmit={handleSubmit} noValidate>
             <div className={styles.fieldRow}>
               <div className={styles.field}>
@@ -328,8 +317,6 @@ export default function SignUpView() {
               {t('signup.signinLink')}
             </Link>
           </p>
-        </section>
-      </div>
-    </main>
+    </AuthShell>
   );
 }

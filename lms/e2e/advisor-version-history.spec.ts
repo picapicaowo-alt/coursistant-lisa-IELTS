@@ -30,6 +30,7 @@ test('Advisor reads historic plan snapshots without changing the current draft o
   expect(reads.some(path => /profile\/(revisions|history)/.test(path))).toBe(false);
 
   await page.goto('/advisor/students/301/study-plan');
+  await page.getByRole('button', {name: 'Edit study plan', exact: true}).click();
   await openSection(page, 'Plan direction');
   const strategy = page.getByRole('textbox', {name: 'Strategy', exact: true});
   await strategy.fill('My unsaved plan changes');

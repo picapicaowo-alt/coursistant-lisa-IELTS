@@ -1,3 +1,4 @@
+import {LearningJourney} from './LearningJourney';
 import {StudyPlanHistory} from './StudyPlanHistory';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {getApiErrorCode} from '@/utils/apiError';
@@ -54,6 +55,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
   const idempotency = useIdempotencyCheckpoint();
   const initialized = useRef(false);
   const [reviewedVersion, setReviewedVersion] = useState<number>();
+  const [isEditing, setIsEditing] = useState(false);
   const [reviewedProfileVersion, setReviewedProfileVersion] = useState<number>();
   const [reloadRequired, setReloadRequired] = useState(false);
   const [form, setForm] = useState<PlanFormState>(emptyForm);
@@ -153,6 +155,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
       setReloadRequired(false);
       await queryClient.invalidateQueries({queryKey: advisingQueryKeys.advisorStudyPlan(id)});
       await queryClient.invalidateQueries({queryKey: ['advisor', 'study-plan-revisions', id]});
+      setIsEditing(false);
     },
   });
 
@@ -201,19 +204,19 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
 
   return (
     <div className={styles.editorPage}>
-      <WorkspaceSectionHeader
+      {missing || isEditing ? <WorkspaceSectionHeader
         title={missing ? 'Create study plan' : 'Study plan'}
         description="Turn the student's target into a dated strategy, then break it into checkpoints and concrete tasks."
         meta={!missing ? <span className={styles.versionBadge}>Version {planQuery.data?.plan.studyPlanVersion}</span> : undefined}
-      />
+      /> : null}
       {planQuery.data?.plan.profileChangedSincePlanUpdate ? (
         <p className={styles.warn} role="status">The profile changed after this plan. Saving will require the current profile version.</p>
       ) : null}
       {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your edits are preserved. Reload the latest record and review before saving again.</p><button type="button" className={styles.secondary} onClick={() => void planQuery.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.plan.studyPlanVersion); setReviewedProfileVersion(result.data.profileContext.currentProfileVersion ?? result.data.plan.basedOnProfileVersion); setReloadRequired(false);}})}>Load latest record</button></div> : null}
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'Study plan could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Study plan saved.</p> : null}
-      {!missing ? <StudyPlanHistory key={id} studentUserId={id}/> : null}
-      <form className={styles.form} onSubmit={(event: FormEvent) => { event.preventDefault(); save.mutate(); }}>
+      {!missing && !isEditing && planQuery.data?.plan ? <LearningJourney plan={planQuery.data.plan} checkpointTarget={checkpointTarget} taskTarget={taskTarget} onEdit={() => setIsEditing(true)}/> : null}
+      {missing || isEditing ? <form className={styles.form} onSubmit={(event: FormEvent) => { event.preventDefault(); save.mutate(); }}>
         <CollapsibleSection title="Plan direction" headingLevel={3} summary={form.strategySummary || 'Set the strategy and plan dates'}>
           <p>Keep the strategy concise enough to scan, while making the start and end dates explicit.</p>
           <div className={styles.formGrid}>
@@ -250,7 +253,8 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
           <button type="button" className={styles.secondary} onClick={() => { setAddedCheckpoint(form.checkpoints.length); setForm(current => ({...current, checkpoints: [...current.checkpoints, emptyCheckpoint(current.checkpoints.length + 1)]})); }}>Add checkpoint</button>
         </CollapsibleSection>
         <div className={styles.formActions}><button className={styles.primary} disabled={save.isPending || reloadRequired}>{save.isPending ? 'Saving…' : missing ? 'Create study plan' : 'Save study plan'}</button></div>
-      </form>
+      </form> : null}
+      {!missing ? <StudyPlanHistory key={id} studentUserId={id}/> : null}
 
     </div>
   );

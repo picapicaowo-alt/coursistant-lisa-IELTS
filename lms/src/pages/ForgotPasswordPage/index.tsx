@@ -1,7 +1,7 @@
 import {ChangeEvent, KeyboardEvent} from 'react';
 import {Icon} from '@iconify/react';
 import {Link} from 'react-router-dom';
-import ProgressBar from '../ProgressBar.jsx';
+import {AuthShell} from '@/components/AuthShell';
 import usePasswordReset from './usePasswordReset';
 import styles from './index.module.scss';
 
@@ -13,7 +13,6 @@ const ForgotPasswordPage = () => {
     inputRefs, sendCode, confirmCode, submitPassword,
   } = reset;
 
-  const progress = step === 'email' ? 1 : step === 'code' ? 2 : step === 'password' ? 3 : 4;
   const codeDigits = Array.from({length: 6}, (_, index) => code[index] ?? '');
 
   const updateDigit = (index: number, value: string) => {
@@ -41,15 +40,7 @@ const ForgotPasswordPage = () => {
   };
 
   return (
-    <div className={styles.page}>
-      <div className={styles.shell}>
-        <div className={styles.hero} aria-hidden="true">
-          <img src="/icons/login/login-img.png" alt="" className={styles.heroImage}/>
-        </div>
-        <div className={styles.panel}>
-          <div className={styles.formWrap}>
-            {step !== 'complete' ? <div className={styles.progress}><ProgressBar step={progress}/></div> : null}
-
+    <AuthShell>
             {step === 'email' ? (
               <>
                 <Link to="/login" className={styles.backLink}>{t('forgotPassword.backToLogin')}</Link>
@@ -184,10 +175,7 @@ const ForgotPasswordPage = () => {
                 </button>
               </div>
             ) : null}
-          </div>
-        </div>
-      </div>
-    </div>
+    </AuthShell>
   );
 };
 

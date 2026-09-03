@@ -38,6 +38,7 @@ describe('reviewed draft versions', () => {
   });
   it('pins both plan and profile versions while editing a study plan', async () => {
     const client = mount(<StudyPlanPage/>);
+    fireEvent.click(await screen.findByRole('button', {name: 'Edit study plan'}));
     const field = await screen.findByLabelText(/Strategy/);
     await waitFor(() => expect(field).toHaveValue('Original strategy'));
     fireEvent.change(field, {target: {value: 'My revised strategy'}});

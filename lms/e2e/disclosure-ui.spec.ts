@@ -63,10 +63,14 @@ for (const width of [1440, 390]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 
     await page.goto('/advisor/students/301/study-plan');
+    await expect(page.getByRole('heading', {name: 'Learning journey'})).toBeVisible();
+    await page.getByRole('button', {name: 'Edit study plan', exact: true}).click();
     await expect(sectionTrigger(page, 'Plan direction')).toBeVisible();
     await expect(page.locator('details[open]')).toHaveCount(0);
     await page.screenshot({path: testInfo.outputPath(`study-plan-collapsed-${width}.png`), fullPage: true});
     await page.goto('/advisor/students/301/study-plan?advisorTaskId=101');
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.getByRole('button', {name: 'Edit checkpoint & tasks'}).click();
     await expect(page.getByLabel('Title', {exact: true})).toBeVisible();
     await expect(page.getByLabel('Title', {exact: true})).toHaveValue('Submit the week 1 essay');
     await expect(sectionTrigger(page, 'Plan direction').locator('..')).not.toHaveAttribute('open');

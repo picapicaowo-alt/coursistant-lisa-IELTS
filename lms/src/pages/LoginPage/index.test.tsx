@@ -97,7 +97,7 @@ describe('LoginPage branding and sign-in method', () => {
   it('shows the X-Learn hero while keeping email and password as the only sign-in method', () => {
     const {container} = renderLogin();
 
-    expect(container.querySelector('img[src="/icons/login/login-img-xlearn.png"]')).toBeInTheDocument();
+    expect(container.querySelector('img[src="/icons/figma-auth/dashboard.png"]')).toBeInTheDocument();
     expect(screen.getByRole('textbox', {name: 'Email'})).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: /google|microsoft|linkedin|facebook/i})).not.toBeInTheDocument();

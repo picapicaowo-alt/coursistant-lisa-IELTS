@@ -1,3 +1,4 @@
+import {AdvisingPagination} from '../advising/AdvisingPagination';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {ObserverMockExams} from '@/components/ObserverMockExams';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
@@ -59,6 +60,7 @@ const ParentPortalPage: React.FC = () => {
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [studentUserId, setStudentUserId] = useState<number | null>(null);
+  const [notificationPage, setNotificationPage] = useState(0);
   const [section, setSection] = useState<ParentSection>('dashboard');
   const [message, setMessage] = useState('');
   const [messageFiles, setMessageFiles] = useState<File[]>([]);
@@ -78,12 +80,12 @@ const ParentPortalPage: React.FC = () => {
   }, [studentIds, studentUserId, linked.isSuccess]);
 
   const content = useQuery({
-    queryKey: ['parent', studentUserId, 'section', section],
+    queryKey: ['parent', studentUserId, 'section', section, section === 'notifications' ? notificationPage : 0],
     enabled: studentUserId != null || section === 'notifications',
     retry: false,
     queryFn: async () => {
       if (section === 'notifications') {
-        const [notifications, unread] = await Promise.all([parentApiService.listNotifications(), parentApiService.getNotificationUnreadCount()]);
+        const [notifications, unread] = await Promise.all([parentApiService.listNotifications(notificationPage), parentApiService.getNotificationUnreadCount()]);
         return {notifications: unwrapData(notifications, 'parentNotifications'), unread: unwrapData(unread, 'parentNotificationUnreadCount')};
       }
       if (studentUserId == null) throw new Error('No linked student selected');
@@ -124,11 +126,15 @@ const ParentPortalPage: React.FC = () => {
   const conversation = useInfiniteQuery({
     queryKey: ['parent', studentUserId, 'messages'],
     enabled: studentUserId != null && section === 'messages',
-    queryFn: async ({pageParam}) => unwrapData(await parentApiService.listConversationMessages(studentUserId!, pageParam), 'parentMessages'),
+    queryFn: async ({pageParam}) => {
+      const data = unwrapData(await parentApiService.listConversationMessages(studentUserId!, pageParam), 'parentMessages');
+      // The live endpoint returns a cursor page; older contracts also returned arrays.
+      return Array.isArray(data) ? {items: data, nextBeforeId: data.length ? Math.min(...data.flatMap(item => item.messageId == null ? [] : [item.messageId])) : undefined} : data;
+    },
     initialPageParam: undefined as number | undefined,
-    getNextPageParam: lastPage => {
-      const ids = lastPage.flatMap(item => item.messageId == null ? [] : [item.messageId]);
-      return ids.length ? Math.min(...ids) : undefined;
+    getNextPageParam: (lastPage, _pages, lastCursor) => {
+      const next = lastPage.nextBeforeId;
+      return lastPage.hasMore !== false && next != null && Number.isFinite(next) && (lastCursor == null || next < lastCursor) ? next : undefined;
     },
     retry: false,
   });
@@ -196,8 +202,10 @@ const ParentPortalPage: React.FC = () => {
   };
 
   const contentRecord = isRecord(content.data) ? content.data : null;
-  const messages: ParentConversationMessageResponse[] = conversation.data?.pages.flat() ?? [];
-  const notifications = section === 'notifications' && contentRecord && Array.isArray(contentRecord.notifications) ? contentRecord.notifications as ParentNotification[] : [];
+  const messages: ParentConversationMessageResponse[] = [...new Map((conversation.data?.pages.flatMap(page => page.items) ?? []).map(item => [item.messageId, item])).values()].sort((a, b) => (a.messageId ?? 0) - (b.messageId ?? 0));
+  const notificationData = section === 'notifications' && contentRecord ? contentRecord.notifications : undefined;
+  const notifications = recordItems(notificationData) as ParentNotification[];
+  const notificationTotal = isRecord(notificationData) ? numberField(notificationData, 'total') ?? notifications.length : notifications.length;
   const reportRows = section === 'reports' ? recordItems(content.data) : [];
   const calendarRows = section === 'schedule' && contentRecord ? recordItems(contentRecord.calendar) : [];
 
@@ -276,7 +284,7 @@ const ParentPortalPage: React.FC = () => {
           ) : null}
 
           {section === 'notifications' ? (
-            <CollapsibleSection title="Notifications" className={styles.disclosureLayout}><div className={styles.sectionHeading}><button type="button" className={styles.secondary} disabled={markAllNotificationsRead.isPending || notifications.length === 0} onClick={() => markAllNotificationsRead.mutate()}>Mark all read</button></div>{notifications.length === 0 ? <div className={styles.emptyState}><strong>No notifications</strong><span>New academic updates will appear here.</span></div> : <div className={styles.inboxList}>{notifications.map((item, index) => <article className={styles.inboxRow} key={item.notificationId ?? index}><div className={styles.inboxMain}><div className={styles.rowTitle}><strong>{item.notificationType || 'Notification'}</strong>{item.readAt ? <span className={styles.statusPill}>Read</span> : <span className={styles.unreadBadge}>New</span>}</div><span>{item.message || 'Academic update'}</span><small>{[item.courseCode, item.createdAt].filter(Boolean).join(' · ')}</small></div>{item.notificationId != null && !item.readAt ? <button type="button" className={styles.secondary} disabled={markNotificationRead.isPending} onClick={() => markNotificationRead.mutate(item.notificationId!)}>Mark read</button> : null}</article>)}</div>}</CollapsibleSection>
+            <CollapsibleSection title="Notifications" className={styles.disclosureLayout}><AdvisingPagination label="Notification pages" page={notificationPage} total={notificationTotal} onPage={setNotificationPage}/><div className={styles.sectionHeading}><button type="button" className={styles.secondary} disabled={markAllNotificationsRead.isPending || notifications.length === 0} onClick={() => markAllNotificationsRead.mutate()}>Mark all read</button></div>{notifications.length === 0 ? <div className={styles.emptyState}><strong>No notifications</strong><span>New academic updates will appear here.</span></div> : <div className={styles.inboxList}>{notifications.map((item, index) => <article className={styles.inboxRow} key={item.notificationId ?? index}><div className={styles.inboxMain}><div className={styles.rowTitle}><strong>{item.notificationType || 'Notification'}</strong>{item.readAt ? <span className={styles.statusPill}>Read</span> : <span className={styles.unreadBadge}>New</span>}</div><span>{item.message || 'Academic update'}</span><small>{[item.courseCode, item.createdAt].filter(Boolean).join(' · ')}</small></div>{item.notificationId != null && !item.readAt ? <button type="button" className={styles.secondary} disabled={markNotificationRead.isPending} onClick={() => markNotificationRead.mutate(item.notificationId!)}>Mark read</button> : null}</article>)}</div>}</CollapsibleSection>
           ) : null}
 
           {!['schedule', 'messages', 'reports', 'notifications', 'exams'].includes(section) ? <CollapsibleSection title={SECTIONS.find(item => item.id === section)?.label ?? 'Student overview'} className={styles.disclosureLayout}>

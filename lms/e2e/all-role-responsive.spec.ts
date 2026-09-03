@@ -99,3 +99,27 @@ test('exam filters use supplied sections and states', async ({page}) => {
   await page.getByRole('combobox', {name: 'Exam status'}).selectOption('Assigned');
   await expect(page.getByText('No papers match these filters.')).toBeVisible();
 });
+
+test('advisor support cards align with the student summary and retain independent disclosure', async ({page}, testInfo) => {
+  await fixture(page, 'ADVISOR');
+  await page.goto('/advisor/students/301/support');
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({width, height: 960});
+    const conversation = page.locator('summary[aria-label="Conversation"]');
+    const reports = page.locator('summary[aria-label="Reports"]');
+    const history = page.locator('summary[aria-label="Learning history"]');
+    await expect(reports).toBeVisible();
+    const boxes = await Promise.all([conversation, reports, history].map(item => item.boundingBox()));
+    expect(boxes.every(Boolean)).toBe(true);
+    expect(Math.abs(boxes[1]!.x - boxes[0]!.x)).toBeLessThan(2);
+    if (width > 1000) {
+      expect(Math.abs(boxes[1]!.y - boxes[2]!.y)).toBeLessThan(2);
+      expect(boxes[2]!.x + boxes[2]!.width).toBeCloseTo(boxes[0]!.x + boxes[0]!.width, 0);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    await page.screenshot({path: testInfo.outputPath(`advisor-support-${width}.png`), fullPage: true});
+  }
+  await page.locator('summary[aria-label="Reports"]').click();
+  await expect(page.getByRole('region', {name: 'Reports', exact: true})).toBeVisible();
+  await expect(page.getByRole('region', {name: 'Learning history', exact: true})).not.toBeVisible();
+});

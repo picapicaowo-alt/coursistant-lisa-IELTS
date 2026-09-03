@@ -273,6 +273,18 @@ test('advisor profile and study-plan editors explain record semantics and progre
 
   await page.goto('/advisor/students/301/study-plan');
   await expect(page.locator('details[open]')).toHaveCount(0);
+  await expect(page.getByRole('heading', {name: 'Learning journey'})).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('advisor-learning-journey.png'), fullPage: true});
+  await page.getByRole('button', {name: 'View phase 1', exact: true}).click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+  const dialogBox = await page.getByRole('dialog').boundingBox();
+  expect(dialogBox!.x).toBeGreaterThan(0);
+  expect(dialogBox!.y).toBeGreaterThan(0);
+  await expect(page.getByRole('dialog').getByText('Complete the week 1 diagnostic')).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('advisor-phase-dialog.png'), fullPage: true});
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('button', {name: 'View phase 1', exact: true})).toBeFocused();
+  await page.getByRole('button', {name: 'Edit study plan', exact: true}).click();
   await openSection(page, 'Checkpoints and tasks');
   await openSection(page, 'Complete the first diagnostic');
   await expect(page.locator('summary[aria-label="Review progress"]').locator('..')).not.toHaveAttribute('open');

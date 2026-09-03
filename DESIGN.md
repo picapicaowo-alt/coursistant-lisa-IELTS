@@ -289,3 +289,7 @@ The review routes use mock fixtures. Several screenshots intentionally show unav
 - Instructor, Counsellor, Parent, Tenant Admin and System Admin surfaces inherit these semantic roles and responsive rules when no matching frame is available. Their functional contract boundaries remain authoritative.
 
 All long sections remain independently collapsible and initially closed. History remains a read-only view of the actual returned revision payload; it does not simulate missing historical data.
+
+## Figma authority and authentication/detail frames
+
+Figma composition and interaction models take precedence over earlier generic requests for folded sections or colored backgrounds. Source 715:3994 governs authentication: centered left form and a rounded violet product illustration on the right; below the readable two-column threshold only the form remains. The original dashboard and goal artwork are stored locally in `lms/public/icons/figma-auth/`. Source 803:13456 governs the Advisor student summary, skill metrics and underline navigation; source 813:4892 governs the centered task dialog. Learning journey phases are visible cards; long edit forms retain independent disclosure and version-protected saving. Missing server fields are omitted or marked unavailable, never filled with Figma sample data.
