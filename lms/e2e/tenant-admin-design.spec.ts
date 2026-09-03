@@ -100,7 +100,7 @@ test('tenant reference layouts render across desktop and mobile without page ove
         }
       }
       if (viewport.width === 390 && name === 'alerts') {
-        await expect(page.locator('details').filter({hasText: 'Learning inactivity'}).first()).toBeInViewport();
+        await expect(page.getByRole('listitem').filter({hasText: 'Learning inactivity'}).first()).toBeInViewport();
       }
       await page.screenshot({path: `${directory}/${name}-${viewport.width}.png`, fullPage: true, animations: 'disabled'});
       if ((viewport.width === 390 && ['people', 'audit', 'intakes', 'alerts', 'version'].includes(name)) || name === 'composer') {
@@ -146,15 +146,15 @@ test('governance secondary filters and policy summaries remain usable on mobile'
     await expect.poll(() => requests.some(request => request.path.endsWith('/audit-events') && new URLSearchParams(request.query).has('from'))).toBe(true);
   }
   await page.goto('/admin?section=alerts');
-  const inactivity = page.locator('details').filter({hasText: 'Learning inactivity'}).first();
-  await expect(inactivity.locator('summary')).toContainText('Inactivity (days): 7');
-  await inactivity.locator('summary').click();
+  const inactivity = page.getByRole('listitem').filter({hasText: 'Learning inactivity'}).first();
+  await expect(inactivity).toContainText('Inactivity: 7 days');
+  await inactivity.getByRole('button', {name: 'Edit learning inactivity'}).click();
   await page.getByLabel('Inactivity (days)', {exact: true}).fill('9');
-  await inactivity.locator('summary').click();
-  await expect(inactivity.locator('summary')).toContainText('Inactivity (days): 9');
-  await expect(inactivity.locator('summary')).toContainText('Unsaved changes');
-  await expect(page.locator('details').filter({hasText: 'Negative hours'}).first().locator('summary')).toContainText('Disabled');
-  await expect(page.locator('details').filter({hasText: 'Overdue tasks'}).first().locator('summary')).toContainText('Enabled');
+  await page.getByRole('button', {name: 'Apply to draft', exact: true}).click();
+  await expect(inactivity).toContainText('Inactivity: 9 days');
+  await expect(inactivity.getByLabel('Unsaved changes')).toHaveCount(1);
+  await expect(page.getByRole('switch', {name: 'Negative hours'})).not.toBeChecked();
+  await expect(page.getByRole('switch', {name: 'Overdue tasks'})).toBeChecked();
   await page.screenshot({path: `${directory}/alerts-unsaved-390.png`, animations: 'disabled'});
 });
 

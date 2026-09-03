@@ -623,10 +623,11 @@ test('tenant admin can complete governance work using only the handoff routes', 
 
   await page.getByRole('button', {name: 'Alert rules'}).click();
   await page.getByText('Tenant override', {exact: true}).click();
-  await page.getByText('Learning inactivity', {exact: true}).click();
+  await page.getByRole('button', {name: 'Edit learning inactivity'}).click();
   await page.getByLabel('Inactivity (days)').fill('7');
-  await page.getByRole('button', {name: 'Save alert rules'}).click();
-  await expect(page.getByText('Alert rules saved from the latest server response.')).toBeVisible();
+  await page.getByRole('button', {name: 'Apply to draft'}).click();
+  await page.getByRole('button', {name: 'Save changes'}).click();
+  await expect(page.getByText('Changes saved')).toBeVisible();
   expect(alertPutHeaders['idempotency-key']).toBeUndefined();
 
   await page.getByRole('button', {name: 'Audit'}).click();
