@@ -1,0 +1,97 @@
+.panel {
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  padding: clamp(1rem, 2vw, 1.75rem);
+  background: t.$surface-raised;
+}
+.composer {
+  display: grid;
+  gap: 0.75rem;
+}
+.composer label {
+  display: grid;
+  gap: 0.5rem;
+  font-weight: t.$fw-medium;
+}
+.composer textarea {
+  width: 100%;
+  min-height: 5rem;
+  resize: vertical;
+  padding: 0.85rem 1rem;
+  background: t.$surface-detail-panel;
+  border: 1px solid transparent;
+  border-radius: t.$radius-control;
+  font: inherit;
+  color: t.$text;
+}
+.actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.file {
+  font-size: t.$fs-caption;
+  min-width: 0;
+}
+.file input {
+  max-width: 100%;
+}
+.panel button {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.85rem;
+  border-radius: t.$radius-control;
+  color: t.$brand;
+  cursor: pointer;
+}
+.panel button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.panel .primary {
+  justify-self: end;
+  background: t.$brand;
+  color: t.$content-on-color;
+}
+.post {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid t.$border;
+}
+.thread {
+  margin: 1rem 0 0 clamp(0.25rem, 2vw, 2rem);
+  border-left: 2px solid t.$border;
+  padding-left: 1rem;
+}
+.thread h3 {
+  font-size: 1rem;
+  margin: 1rem 0 0.5rem;
+}
+.attachment {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.pagination {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 1rem;
+  font-size: t.$fs-caption;
+}
+.error {
+  color: t.$feedback-danger;
+  margin: 0.5rem 0;
+}
+.empty {
+  padding: 2rem 0;
+  color: t.$text-muted;
+}
+.panel :is(button, textarea, input):focus-visible {
+  outline: 2px solid t.$brand;
+  outline-offset: 3px;
+}

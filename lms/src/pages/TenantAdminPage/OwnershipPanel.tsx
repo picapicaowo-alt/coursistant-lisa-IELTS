@@ -1,3 +1,4 @@
+import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {FormEvent, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -73,7 +74,7 @@ export const OwnershipPanel = () => {
 
   return (
     <div className={styles.directoryLayout}>
-      <CollapsibleSection title="Course ownership" headingId="ownership-title" summary="Govern course owners without opening the teaching Course catalogue.">
+      <WorkspaceSection title="Course ownership" headingId="ownership-title" summary="Govern course owners without opening the teaching Course catalogue.">
         <div className={styles.panelHeading}><button type="button" className={styles.iconButton} aria-label="Refresh ownerships" onClick={() => void ownerships.refetch()}><RefreshCw size={18}/></button></div>
         <form className={styles.singleSearch} role="search" onSubmit={submitSearch}><label><span>Search by course code or title</span><div><Search size={17}/><input value={searchDraft} onChange={event => setSearchDraft(event.target.value)} placeholder="Course code or title"/></div></label><button className={styles.primaryButton}>Search</button></form>
         {ownerships.isPending ? <p className={styles.status}>Loading ownerships…</p> : null}
@@ -83,7 +84,7 @@ export const OwnershipPanel = () => {
           {ownerships.data?.items.map(item => <button type="button" className={selectedCourseId === item.courseId ? styles.selectedRecord : styles.record} key={item.courseId} onClick={() => { setEditorReveal(current => current + 1); setSelectedCourseId(item.courseId); setAdvisor(null); setReason(''); setConfirmTransfer(false); setSuccess(''); }}><span><strong>{item.courseCode} · {item.title}</strong><small>{item.launchState ?? 'Launch state unavailable'} · {item.lifecycleState ?? 'Lifecycle unavailable'}</small></span><span className={styles.recordMeta}><em>{ownerName(item)}</em><small>Version {item.ownershipVersion}</small></span><ArrowRightLeft size={18}/></button>)}
         </div>
         {ownerships.data && ownerships.data.total > PAGE_SIZE ? <nav className={styles.pagination} aria-label="Ownership pages"><button type="button" disabled={page === 0} onClick={() => setPage(current => current - 1)}>Previous</button><span>Page {page + 1} · {ownerships.data.total} courses</span><button type="button" disabled={(page + 1) * PAGE_SIZE >= ownerships.data.total} onClick={() => setPage(current => current + 1)}>Next</button></nav> : null}
-      </CollapsibleSection>
+      </WorkspaceSection>
 
       <aside className={styles.sideColumn}>
         <CollapsibleSection title="Transfer owner" headingId="transfer-title" revealKey={editorReveal} summary="Use only for a governance handover.">

@@ -1,3 +1,18 @@
+/** StudentProgressResponse in the consumed course OpenAPI. Counts describe assignments, not lesson time. */
+export interface CourseProgressResponse {
+  courseId?: number;
+  courseTitle?: string;
+  completedAssignmentCount?: number;
+  totalAssignmentCount?: number;
+}
+
+export interface StudentProgressResponse {
+  completedAssignmentCount?: number;
+  totalAssignmentCount?: number;
+  courses?: CourseProgressResponse[];
+  checkpoints?: Array<{checkpointId?: number; dueDate?: string; status?: string; title?: string}>;
+}
+
 export interface AttendanceEntryRequest {
   status?: string;
   studentUserId?: number;

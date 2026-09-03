@@ -1,4 +1,5 @@
-import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {WorkspaceSection as CollapsibleSection} from '@/components/WorkspaceSection';
+import {PlanOverview} from './PlanOverview';
 import React, {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {CheckpointWorkspace} from './CheckpointWorkspace';
@@ -15,7 +16,6 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import {advisorConversationMessageViews} from '../AdvisorOperationsPage/advisorViewModels';
 import styles from '../advising/advising.module.scss';
-import {formatPersonName} from '@/utils/personName';
 
 const StudentAdvisingPage: React.FC = () => {
   const queryClient = useQueryClient();
@@ -117,44 +117,10 @@ const StudentAdvisingPage: React.FC = () => {
           <p className={styles.lede}>Your goals, checkpoints, and next steps.</p>
         </div>
       </header>
-      <CollapsibleSection title="Learning profile" className={styles.disclosureLayout} summary="Your current goal and the skills being measured." meta={<span className={styles.readOnlyBadge}>Read only</span>}>
-
-        {profile.isPending ? <p className={styles.status}>Loading profile…</p> : null}
-        {profile.isError && isNotFound(profile.error) ? <p className={styles.status}>Your advisor has not created a profile yet.</p> : null}
-        {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')}</p> : null}
-        {profile.data ? (
-          <>
-            <CollapsibleSection title="Primary target" headingLevel={3} summary={profile.data.targetGoal || 'Goal and target date'}><dl className={styles.summaryGrid}>
-              <div className={styles.summaryItem}><dt>Name</dt><dd>{formatPersonName(profile.data, '—')}</dd></div>
-              <div className={styles.summaryItem}><dt>Primary target</dt><dd>{[profile.data.targetMetric, profile.data.targetValue, profile.data.targetDate].filter(Boolean).join(' · ') || '—'}</dd></div>
-              <div className={`${styles.summaryItem} ${styles.spanTwo}`}><dt>Goal</dt><dd>{profile.data.targetGoal || '—'}</dd></div>
-            </dl></CollapsibleSection>
-            {(profile.data.skills ?? []).length > 0 ? <CollapsibleSection title="Measured skills" headingLevel={3} count={profile.data.skills?.length}><div className={styles.skillSummary}>{(profile.data.skills ?? []).map(skill => (
-              <CollapsibleSection title={skill.displayName || skill.skillCode || 'Measured skill'} headingLevel={4} key={skill.skillCode} summary={skill.scale}>
-                <div className={styles.metaRow}><span>{skill.scale || 'Scale not specified'}</span><span>Current {skill.currentValue || '—'}</span><span>Target {skill.targetValue || '—'}</span></div>
-                {skill.gapSummary ? <p>{skill.gapSummary}</p> : null}
-              </CollapsibleSection>
-            ))}</div></CollapsibleSection> : null}
-          </>
-        ) : null}
-      </CollapsibleSection>
-      <CollapsibleSection title="Study plan" className={styles.disclosureLayout} summary="Follow the plan one checkpoint at a time. Tasks can be started and completed here." meta={plan.data ? <span className={styles.versionBadge}>Version {plan.data.plan.studyPlanVersion}</span> : undefined}>
-
-        {plan.isPending ? <p className={styles.status}>Loading study plan…</p> : null}
-        {plan.isError && isNotFound(plan.error) ? <p className={styles.status}>Your advisor has not created a study plan yet.</p> : null}
-        {plan.isError && !isNotFound(plan.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, 'Study plan could not be loaded.')}</p> : null}
-        {plan.data ? (
-          <div className={styles.checkpointList}>
-            <div className={styles.summaryItem}><strong>{plan.data.plan.strategySummary}</strong><span className={styles.muted}>{plan.data.plan.startDate} – {plan.data.plan.planEndDate}</span></div>
-            {(plan.data.plan.checkpoints ?? []).map((checkpoint, checkpointIndex) => (
-              <CollapsibleSection key={checkpoint.id ?? checkpoint.position} title={`Checkpoint ${checkpointIndex + 1}: ${checkpoint.description}`} headingLevel={3} summary={checkpoint.goal}>
-                <div className={styles.metaRow}><span>Due {checkpoint.dueDate || 'date not set'}</span><span>{(checkpoint.tasks ?? []).length} task{(checkpoint.tasks ?? []).length === 1 ? '' : 's'}</span></div>
-                <button type="button" className={styles.primary} onClick={() => openCheckpoint(studyPlanRecordKey(checkpoint, checkpointIndex))}>View tasks</button>
-              </CollapsibleSection>
-            ))}
-          </div>
-        ) : null}
-      </CollapsibleSection>
+      {profile.isPending || plan.isPending ? <p role="status">Loading your learning plan…</p> : null}
+      {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')} <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
+      {plan.isError && !isNotFound(plan.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, 'Study plan could not be loaded.')} <button type="button" onClick={() => void plan.refetch()}>Retry plan</button></p> : null}
+      {!profile.isPending && !plan.isPending && (!profile.isError || isNotFound(profile.error)) && (!plan.isError || isNotFound(plan.error)) ? <PlanOverview profile={profile.data} plan={plan.data?.plan} onCheckpoint={openCheckpoint}/> : null}
       {taskMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskMutation.error, 'The task could not be updated.')}</p> : null}
       <CollapsibleSection title="Advisor conversation" className={styles.disclosureLayout} summary="Ask questions, share context, or attach supporting files." meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
 

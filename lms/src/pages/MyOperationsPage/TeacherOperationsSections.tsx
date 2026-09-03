@@ -1,3 +1,4 @@
+import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {dashboardApiService} from '@/apis/services/dashboard-api';
 import {assignmentGradingPath} from '@/configs/coursePaths';
@@ -134,41 +135,41 @@ const TeachingQueue: React.FC = () => {
   const todayClasses = today.data ?? [];
 
   return <div className={styles.grid}>
-    <CollapsibleSection title="Today’s classes" headingId="today-classes-title" summary="Your live teaching schedule and class context." meta={<span className={styles.countBadge}>{todayClasses.length}</span>}>
+    <WorkspaceSection title="Today’s classes" headingId="today-classes-title" summary="Your live teaching schedule and class context." meta={<span className={styles.countBadge}>{todayClasses.length}</span>}>
 
       {today.isPending || today.isError ? <QueryState loading={today.isPending} error={today.isError} empty="No classes today." onRetry={() => void today.refetch()}/> : todayClasses.length === 0 ? <p className={styles.empty}>No classes today.</p> : <div className={styles.operationList}>{todayClasses.map((item: TeachingTodayClassResponse) => <Link to={`/course/${item.courseId}`} className={styles.operationRow} key={item.occurrenceId ?? item.sessionId ?? `${item.courseId}-${item.startTime}`}><span><strong>{item.courseTitle || item.courseCode || `Course #${item.courseId}`}</strong><small>{[item.lectureNumber ? `Lecture ${item.lectureNumber}` : undefined, `${formatTime(item.startTime) ?? 'Time pending'}${item.endTime ? `–${formatTime(item.endTime)}` : ''}`, item.location, typeof item.studentCount === 'number' ? `${item.studentCount} students` : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>)}</div>}
-    </CollapsibleSection>
+    </WorkspaceSection>
 
-    <CollapsibleSection title="Grading queue" headingId="grading-title" summary="Submissions currently waiting for your review." meta={<span className={styles.countBadge}>{grading.isError ? 'Unavailable' : grading.isPending ? '…' : gradingItems.length}</span>}>
+    <WorkspaceSection title="Grading queue" headingId="grading-title" summary="Submissions currently waiting for your review." meta={<span className={styles.countBadge}>{grading.isError ? 'Unavailable' : grading.isPending ? '…' : gradingItems.length}</span>}>
 
       {grading.isPending || grading.isError ? <QueryState loading={grading.isPending} error={grading.isError} empty="Nothing is waiting for grading." onRetry={() => void grading.refetch()}/> : gradingItems.length === 0 ? <p className={styles.empty}>Nothing is waiting for grading.</p> : <div className={styles.operationList}>{gradingItems.map((item: TeachingGradingItemResponse) => {
         const destination = assignmentGradingPath(item.courseId, item.assignmentId);
         return <Link to={destination} className={styles.operationRow} key={`${item.assignmentId}-${item.studentUserId}`}><span><strong>{item.title}</strong><small>{[formatName(item), item.courseCode, humanize(item.status), item.dueAt ? `Due ${formatDate(item.dueAt)}` : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
       })}</div>}
-    </CollapsibleSection>
+    </WorkspaceSection>
 
-    <CollapsibleSection title="Students needing support" headingId="support-title" summary="Signals that may need a timely teaching response." meta={<span className={styles.countBadge}>{supportStudents.length}</span>}>
+    <WorkspaceSection title="Students needing support" headingId="support-title" summary="Signals that may need a timely teaching response." meta={<span className={styles.countBadge}>{supportStudents.length}</span>}>
 
       {support.isPending || support.isError ? <QueryState loading={support.isPending} error={support.isError} empty="No students currently need attention." onRetry={() => void support.refetch()}/> : supportStudents.length === 0 ? <p className={styles.empty}>No students currently need attention.</p> : <div className={styles.operationList}>{supportStudents.map((item: TeachingStudentSupportResponse) => {
         const destination = registeredDestination(item.deepLink) ?? `/course/${item.courseId}`;
         return <Link to={destination} className={styles.operationRow} key={`${item.courseId}-${item.studentUserId}`}><span><strong>{formatName(item)}</strong><small>{[item.courseTitle, ...(item.reasons ?? []).map(humanize)].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
       })}</div>}
-    </CollapsibleSection>
+    </WorkspaceSection>
 
-    <CollapsibleSection title="Teaching alerts" headingId="alerts-title" summary="Course and learner signals that require attention.">
+    <WorkspaceSection title="Teaching alerts" headingId="alerts-title" summary="Course and learner signals that require attention.">
 
       {alerts.isPending || alerts.isError ? <QueryState loading={alerts.isPending} error={alerts.isError} empty="No teaching alerts." onRetry={() => void alerts.refetch()}/> : <RecordRows items={recordsFrom(alerts.data)} kind="alert" empty="No teaching alerts."/>}
-    </CollapsibleSection>
+    </WorkspaceSection>
 
-    <CollapsibleSection title="My teaching courses" className={styles.fullWidthCard}>
+    <WorkspaceSection title="My teaching courses" className={styles.fullWidthCard}>
 
       {courses.isPending || courses.isError ? <QueryState loading={courses.isPending} error={courses.isError} empty="No teaching courses." onRetry={() => void courses.refetch()}/> : !courses.data?.length ? <p className={styles.empty}>No teaching courses.</p> : <div className={styles.operationList}>{courses.data.map(course => <Link className={styles.operationRow} to={`/course/${course.id}`} key={course.id}><span><strong>{course.title}</strong><small>{course.courseCode}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>)}</div>}
-    </CollapsibleSection>
+    </WorkspaceSection>
 
-    <CollapsibleSection title="Schedule requests" headingId="requests-title" className={styles.fullWidthCard} summary="Student schedule changes that need your review or awareness.">
+    <WorkspaceSection title="Schedule requests" headingId="requests-title" className={styles.fullWidthCard} summary="Student schedule changes that need your review or awareness.">
 
       {requests.isPending || requests.isError ? <QueryState loading={requests.isPending} error={requests.isError} empty="No schedule requests." onRetry={() => void requests.refetch()}/> : <RecordRows items={recordsFrom(requests.data)} kind="request" empty="No schedule requests."/>}
-    </CollapsibleSection>
+    </WorkspaceSection>
   </div>;
 };
 
@@ -246,7 +247,7 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
     : '';
 
   return <div className={styles.workspace}>
-    <CollapsibleSection title="Weekly availability" headingId="availability-title" summary="These windows tell advisors when you can teach. They do not create classes automatically." meta={<span className={styles.versionBadge}>Version {version ?? '—'}</span>}>
+    <WorkspaceSection title="Weekly availability" headingId="availability-title" summary="These windows tell advisors when you can teach. They do not create classes automatically." meta={<span className={styles.versionBadge}>Version {version ?? '—'}</span>}>
 
       {windows.length === 0 ? <div className={styles.emptyPanel}><strong>No weekly availability yet</strong><span>Add your first teaching window below.</span></div> : <div className={styles.availabilityList}>{windows.map((item, index) => <article className={styles.availabilityRow} key={`${item.dayOfWeek}-${item.startTime}-${item.effectiveFrom ?? 'ongoing'}-${index}`}>
         <span className={styles.availabilityIcon}><CalendarClock size={19} aria-hidden="true"/></span>
@@ -254,7 +255,7 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
         <span className={styles.rowActions}><button type="button" onClick={() => { setEditorReveal(current => current + 1); setSelectedIndex(index); setDraft({...item}); setSaved(false); }}><Pencil size={16} aria-hidden="true"/> Edit</button><button type="button" className={styles.textDanger} onClick={() => { setWindows(current => current.filter((_, itemIndex) => itemIndex !== index)); if (selectedIndex === index) { setSelectedIndex(null); setDraft(emptyWindow(timezone)); } setSaved(false); }}><Trash2 size={16} aria-hidden="true"/> Remove</button></span>
       </article>)}</div>}
       {exceptions.length > 0 ? <div className={styles.exceptionNotice}><strong>{exceptions.length} date exception{exceptions.length === 1 ? '' : 's'} will be preserved</strong><span>This contract supports saving existing exceptions, but does not yet identify their business labels. No exception is deleted when weekly hours are changed.</span></div> : null}
-    </CollapsibleSection>
+    </WorkspaceSection>
 
     <CollapsibleSection title={selectedIndex == null ? 'Add teaching window' : 'Edit teaching window'} headingId="availability-editor-title" revealKey={editorReveal} summary="Set a recurring day and the dates when this window applies.">
 

@@ -2,7 +2,7 @@ import {MyCourse} from '@/apis';
 import {useMyCourses} from '@/hooks/useCourseAccess';
 import {DashboardCourse} from '../types';
 
-const INSTRUCTOR_AVATAR_FALLBACK = '/icons/course/instructor.png';
+const INSTRUCTOR_AVATAR_FALLBACK = ''; // No photo is supplied by the course summary contract.
 
 /**
  * The dashboard card shows the instructor, so surface the name only when the

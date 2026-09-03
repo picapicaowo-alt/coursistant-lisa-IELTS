@@ -1,7 +1,7 @@
-.card { display: flex; flex-direction: column; min-width: 0; gap: t.$space-5; padding: t.$workspace-panel-padding; border: 1px solid t.$border-default; border-radius: t.$radius-lg; background: var(--course-surface); }
-.card h3 { margin: 0; color: var(--course-ink); font-size: t.$font-size-headline; line-height: t.$line-height-headline; overflow-wrap: anywhere; }
+.card { display: flex; flex-direction: column; min-width: 0; gap: t.$space-5; padding: t.$workspace-panel-padding; border: 1px solid t.$border-default; border-radius: t.$radius-lg; background: t.$surface-raised; }
+.card h3 { margin: 0; color: t.$content-primary; font-size: t.$font-size-headline; line-height: t.$line-height-headline; overflow-wrap: anywhere; }
 .instructor { display: flex; align-items: center; gap: t.$space-3; font-size: t.$font-size-body; }
-.instructor img { width: t.$touch-target; height: t.$touch-target; border-radius: t.$radius-pill; object-fit: cover; }
+.instructor > :first-child { width: t.$touch-target; height: t.$touch-target; border-radius: t.$radius-pill; object-fit: cover; }
 .instructor small { display: block; color: t.$content-secondary; font-size: t.$font-size-caption; }
 .card footer { margin-top: auto; padding-top: t.$space-4; border-top: 1px dashed t.$border-strong; display: flex; justify-content: flex-end; }
 .card a { display: inline-flex; align-items: center; gap: t.$space-4; min-height: t.$touch-target; padding: t.$space-2 t.$space-4; border-radius: t.$radius-sm; background: t.$action-primary; color: t.$content-on-color; font-size: t.$font-size-body; font-weight: t.$fw-medium; }

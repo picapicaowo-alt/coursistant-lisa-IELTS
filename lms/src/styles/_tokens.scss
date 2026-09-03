@@ -104,7 +104,8 @@ $surface-status-complete: $type-green-subtle;
 // Product-surface roles used across workspaces.
 $surface-toolbar: #F1F5F9;
 $surface-brand-tint: #F0F7FF;
-$surface-profile-accent: #67D8CB;
+$profile-gradient-start: #A194F4;
+$surface-profile-accent: $profile-gradient-start;
 $border-chart: #E8EDF5;
 
 // Stable course identities use Figma course-category surfaces; identity is not status.
@@ -158,9 +159,9 @@ $space-10: 2.5rem;
 $space-12: 3rem;
 $space-16: 4rem;
 
-$shell-sidebar-inline-size: clamp(11.25rem, 12.5vw, 15rem);
+$shell-sidebar-inline-size: 11.25rem;
 $shell-header-height: 5.5rem;
-$workspace-gutter-inline: clamp(1rem, 3.3vw, 4rem);
+$workspace-gutter-inline: clamp(1rem, 1.67vw, 2rem);
 $workspace-gutter-block: clamp(1rem, 2.2vw, 2rem);
 $workspace-section-gap: clamp(1rem, 1.8vw, 1.5rem);
 $workspace-title-size: clamp($font-size-title-2, 2.2vw, $font-size-title-1);

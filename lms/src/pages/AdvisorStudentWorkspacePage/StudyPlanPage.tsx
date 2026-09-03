@@ -1,3 +1,4 @@
+import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {LearningJourney} from './LearningJourney';
 import {StudyPlanHistory} from './StudyPlanHistory';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
@@ -60,7 +61,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
   const [reloadRequired, setReloadRequired] = useState(false);
   const [form, setForm] = useState<PlanFormState>(emptyForm);
   const [addedCheckpoint, setAddedCheckpoint] = useState<number>();
-  const [addedTask, setAddedTask] = useState<{checkpoint: number; task: number}>();
+  const [, setAddedTask] = useState<{checkpoint: number; task: number}>();
 
   const planQuery = useQuery({meta: {advisingStudentId: id},
     queryKey: advisingQueryKeys.advisorStudyPlan(id),
@@ -215,17 +216,17 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
       {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your edits are preserved. Reload the latest record and review before saving again.</p><button type="button" className={styles.secondary} onClick={() => void planQuery.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.plan.studyPlanVersion); setReviewedProfileVersion(result.data.profileContext.currentProfileVersion ?? result.data.plan.basedOnProfileVersion); setReloadRequired(false);}})}>Load latest record</button></div> : null}
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'Study plan could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Study plan saved.</p> : null}
-      {!missing && !isEditing && planQuery.data?.plan ? <LearningJourney plan={planQuery.data.plan} checkpointTarget={checkpointTarget} taskTarget={taskTarget} onEdit={() => setIsEditing(true)}/> : null}
+      {!missing && !isEditing && planQuery.data?.plan ? <LearningJourney plan={planQuery.data.plan} studentUserId={id} checkpointTarget={checkpointTarget} taskTarget={taskTarget} onEdit={() => setIsEditing(true)}/> : null}
       {missing || isEditing ? <form className={styles.form} onSubmit={(event: FormEvent) => { event.preventDefault(); save.mutate(); }}>
-        <CollapsibleSection title="Plan direction" headingLevel={3} summary={form.strategySummary || 'Set the strategy and plan dates'}>
+        <WorkspaceSection title="Plan direction" headingLevel={3} summary={form.strategySummary || 'Set the strategy and plan dates'}>
           <p>Keep the strategy concise enough to scan, while making the start and end dates explicit.</p>
           <div className={styles.formGrid}>
             <label className={styles.spanTwo}><span>Strategy</span><textarea required value={form.strategySummary} onChange={event => setForm(current => ({...current, strategySummary: event.target.value}))}/></label>
             <label><span>Start date</span><EnglishDateInput required value={form.startDate} onChangeValue={startDate => setForm(current => ({...current, startDate}))}/></label>
             <label><span>End date</span><EnglishDateInput required value={form.planEndDate} onChangeValue={planEndDate => setForm(current => ({...current, planEndDate}))}/></label>
           </div>
-        </CollapsibleSection>
-        <CollapsibleSection title="Checkpoints and tasks" headingLevel={3} count={form.checkpoints.length} summary="Milestones, due dates and student actions" revealKey={checkpointTarget || taskTarget}>
+        </WorkspaceSection>
+        <WorkspaceSection title="Checkpoints and tasks" headingLevel={3} count={form.checkpoints.length} summary="Milestones, due dates and student actions">
           <p>Expand the milestones and tasks you want to work on. Each can stay open independently.</p>
           {form.checkpoints.map((checkpoint, index) => (
             <CollapsibleSection key={`${checkpoint.position}-${index}`} title={checkpoint.description.trim() || `Checkpoint ${index + 1}`} headingLevel={4} summary={`${checkpoint.dueDate ? `Due ${checkpoint.dueDate}` : 'Due date not set'} · ${(checkpoint.tasks ?? []).length} tasks`} revealKey={addedCheckpoint === index ? index + 1 : checkpoint.id === checkpointTarget || checkpoint.tasks?.some(task => task.id === taskTarget) ? checkpointTarget || taskTarget : undefined}>
@@ -235,14 +236,14 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
                   <label><span>Due date</span><EnglishDateInput required value={checkpoint.dueDate} onChangeValue={dueDate => setCheckpoint(index, {dueDate})}/></label>
                 </div>
                 {(checkpoint.tasks ?? []).map((task, taskIndex) => (
-                  <CollapsibleSection key={`${task.position}-${taskIndex}`} title={task.title || `Task ${taskIndex + 1}`} headingLevel={4} summary={task.dueDate ? `Due ${task.dueDate}` : 'Add task details'} revealKey={addedTask?.checkpoint === index && addedTask.task === taskIndex ? taskIndex + 1 : task.id === taskTarget ? taskTarget : undefined}>
+                  <WorkspaceSection key={`${task.position}-${taskIndex}`} title={task.title || `Task ${taskIndex + 1}`} headingLevel={4} summary={task.dueDate ? `Due ${task.dueDate}` : 'Add task details'}>
                     <div className={styles.recordGrid}>
                       <label className={styles.spanTwo}><span>Title</span><input required={taskIndex === 0} value={task.title} onChange={event => setTask(index, taskIndex, {title: event.target.value})}/></label>
                       <label className={styles.spanTwo}><span>Description</span><textarea value={task.description} onChange={event => setTask(index, taskIndex, {description: event.target.value})}/></label>
                       <label><span>Due date</span><EnglishDateInput value={task.dueDate ?? ''} onChangeValue={dueDate => setTask(index, taskIndex, {dueDate})}/></label>
                     </div>
                     {(checkpoint.tasks ?? []).length > 1 ? <div className={styles.recordActions}><button type="button" className={styles.textDanger} onClick={() => removeTask(index, taskIndex)}>Remove task</button></div> : null}
-                  </CollapsibleSection>
+                  </WorkspaceSection>
                 ))}
                 <div className={styles.recordActions}>
                   {form.checkpoints.length > 1 ? <button type="button" className={styles.textDanger} onClick={() => removeCheckpoint(index)}>Remove checkpoint</button> : null}
@@ -251,7 +252,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
             </CollapsibleSection>
           ))}
           <button type="button" className={styles.secondary} onClick={() => { setAddedCheckpoint(form.checkpoints.length); setForm(current => ({...current, checkpoints: [...current.checkpoints, emptyCheckpoint(current.checkpoints.length + 1)]})); }}>Add checkpoint</button>
-        </CollapsibleSection>
+        </WorkspaceSection>
         <div className={styles.formActions}><button className={styles.primary} disabled={save.isPending || reloadRequired}>{save.isPending ? 'Saving…' : missing ? 'Create study plan' : 'Save study plan'}</button></div>
       </form> : null}
       {!missing ? <StudyPlanHistory key={id} studentUserId={id}/> : null}

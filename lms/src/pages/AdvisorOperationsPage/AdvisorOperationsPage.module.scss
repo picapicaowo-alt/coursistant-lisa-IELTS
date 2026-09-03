@@ -1,0 +1,75 @@
+.page {
+  min-height: 100%;
+  min-width: 0;
+  width: 100%;
+  padding: t.$space-6;
+  padding-bottom: t.$space-16;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+}
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-4;
+  background: t.$surface-raised;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-card-lg;
+  padding: t.$workspace-panel-padding;
+  min-width: 0;
+}
+.cardHeader, .headerTitleGroup {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: t.$space-2;
+}
+.cardHeader h2 {
+  margin: 0;
+  font-size: t.$font-size-subhead;
+  font-weight: t.$fw-semibold;
+}
+.countBadge {
+  padding: t.$space-1 t.$space-2;
+  border-radius: t.$radius-pill;
+  background: t.$surface-brand-subtle;
+  color: t.$action-primary;
+  font-size: t.$fs-caption;
+}
+.filterBar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: t.$space-3;
+}
+.filterBar label {display:grid; gap:t.$space-2; font-size:t.$fs-caption;}
+.searchInputGroup {flex:1 1 14rem; min-width:0;}
+.filterBar :is(input,select) {
+  min-height: t.$touch-target;
+  min-width: 0;
+  width: 100%;
+  padding: t.$space-2 t.$space-3;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+  font: inherit;
+}
+.primaryQueueLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-4;
+  background: t.$action-primary;
+  color: t.$content-on-color;
+  border-radius: t.$radius-control;
+  text-decoration: none;
+  font-size: t.$font-size-body;
+}
+.operations {
+  display: grid;
+  gap: t.$workspace-section-gap;
+  margin-top: t.$space-8;
+}
+.page :is(button,input,select,a):focus-visible {outline:2px solid t.$action-primary; outline-offset:2px;}
+@media(max-width:700px) {.page {padding-inline:t.$space-4;}}

@@ -76,7 +76,7 @@ describe('CourseCataloguePage for platform administrators', () => {
 
     expect(await screen.findByText('ADMIN-VISIBLE')).toBeInTheDocument();
     await waitFor(() => expect(mocks.browseCourses).toHaveBeenCalledWith({
-      state: 'Active',
+      state: undefined,
       page: 0,
       size: 20,
     }));

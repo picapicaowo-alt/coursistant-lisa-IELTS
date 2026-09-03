@@ -1,0 +1,19 @@
+.container {
+  display: grid;
+  gap: t.$space-6;
+  min-width: 0;
+}
+.assignmentDialog {
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: t.$space-6;
+  overflow-y: auto;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-lg;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+}
+.assignmentDialog::backdrop {
+  background: t.$modal-backdrop;
+}

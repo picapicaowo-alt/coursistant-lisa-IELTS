@@ -1,0 +1,352 @@
+[
+  {
+    "id": "17:914",
+    "name": "Dashborad/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "108:882",
+    "name": "Dashborad/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "466:3289",
+    "name": "Dashborad/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "82:357",
+    "name": "My courses/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "414:3326",
+    "name": "Study plan/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "498:4121",
+    "name": "Study plan/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "507:3365",
+    "name": "Study plan/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "494:3386",
+    "name": "Study plan/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "496:3494",
+    "name": "Study plan/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "506:3609",
+    "name": "Study plan/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "493:3350",
+    "name": "Study plan/student",
+    "section": "dashborad"
+  },
+  {
+    "id": "772:3458",
+    "name": "Dashborad/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "792:11208",
+    "name": "Dashborad/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "783:8276",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "810:15612",
+    "name": "messages/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "813:4672",
+    "name": "messages/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "791:10510",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "803:13456",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "813:4892",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "805:14271",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "818:7178",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "818:7815",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "815:5643",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "810:15017",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "816:6276",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "818:8771",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "819:9475",
+    "name": "student/Advisor",
+    "section": "Advisor"
+  },
+  {
+    "id": "100:456",
+    "name": "Study plan/student",
+    "section": "Ungrouped"
+  },
+  {
+    "id": "148:642",
+    "name": "Study plan/student",
+    "section": "Ungrouped"
+  },
+  {
+    "id": "378:1714",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "406:2399",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "405:2345",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "410:2120",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "410:2408",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "408:2433",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "406:3008",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "408:1956",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "406:1914",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "399:1628",
+    "name": "Dashborad/student",
+    "section": "Profle"
+  },
+  {
+    "id": "335:1033",
+    "name": "Calendar",
+    "section": "Calendar"
+  },
+  {
+    "id": "375:1621",
+    "name": "Calendar",
+    "section": "Calendar"
+  },
+  {
+    "id": "375:1956",
+    "name": "Calendar",
+    "section": "Calendar"
+  },
+  {
+    "id": "375:2540",
+    "name": "Calendar",
+    "section": "Calendar"
+  },
+  {
+    "id": "375:3392",
+    "name": "Calendar",
+    "section": "Calendar"
+  },
+  {
+    "id": "375:3937",
+    "name": "Calendar",
+    "section": "Calendar"
+  },
+  {
+    "id": "375:4466",
+    "name": "Calendar",
+    "section": "Calendar"
+  },
+  {
+    "id": "365:1122",
+    "name": "Calendar",
+    "section": "Calendar"
+  },
+  {
+    "id": "201:906",
+    "name": "AI ChatBot/student",
+    "section": "AI ChatBot"
+  },
+  {
+    "id": "322:865",
+    "name": "AI ChatBot/student",
+    "section": "AI ChatBot"
+  },
+  {
+    "id": "333:974",
+    "name": "AI ChatBot/student",
+    "section": "AI ChatBot"
+  },
+  {
+    "id": "410:9227",
+    "name": "AI ChatBot/student",
+    "section": "AI ChatBot"
+  },
+  {
+    "id": "163:698",
+    "name": "Exams/student",
+    "section": "Exams"
+  },
+  {
+    "id": "423:3034",
+    "name": "Exams/student",
+    "section": "Exams"
+  },
+  {
+    "id": "417:2798",
+    "name": "Exams/student",
+    "section": "Exams"
+  },
+  {
+    "id": "427:2930",
+    "name": "Exams/student",
+    "section": "Exams"
+  },
+  {
+    "id": "427:3588",
+    "name": "Exams/student",
+    "section": "Exams"
+  },
+  {
+    "id": "427:2694",
+    "name": "Exams/student",
+    "section": "Exams"
+  },
+  {
+    "id": "445:3397",
+    "name": "Study plan/student",
+    "section": "Study plan"
+  },
+  {
+    "id": "445:3823",
+    "name": "Study plan/student",
+    "section": "Study plan"
+  },
+  {
+    "id": "464:3172",
+    "name": "Study plan/student",
+    "section": "Study plan"
+  },
+  {
+    "id": "430:2779",
+    "name": "Study plan/student",
+    "section": "Study plan"
+  },
+  {
+    "id": "715:3994",
+    "name": "Log in",
+    "section": "Log in"
+  },
+  {
+    "id": "730:4653",
+    "name": "Create an account",
+    "section": "Log in"
+  },
+  {
+    "id": "731:4840",
+    "name": "Forgot password",
+    "section": "Log in"
+  },
+  {
+    "id": "731:4886",
+    "name": "Verify email",
+    "section": "Log in"
+  },
+  {
+    "id": "732:4924",
+    "name": "Verify email",
+    "section": "Log in"
+  },
+  {
+    "id": "732:4973",
+    "name": "Verify email",
+    "section": "Log in"
+  },
+  {
+    "id": "730:4753",
+    "name": "Sign with",
+    "section": "Log in"
+  },
+  {
+    "id": "729:3484",
+    "name": "Log in/Error",
+    "section": "Log in"
+  },
+  {
+    "id": "774:7079",
+    "name": "UX Flow",
+    "section": "Ungrouped"
+  }
+]

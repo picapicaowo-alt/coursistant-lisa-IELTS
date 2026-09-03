@@ -239,3 +239,15 @@
     height: 1.25rem;
   }
 }
+
+.collapseToggle { order:3; display:grid; place-items:center; align-self:flex-end; min-height:t.$touch-target; width:t.$touch-target; margin-top:auto; border:0; border-radius:t.$radius-control; background:transparent; color:t.$content-secondary; }
+.collapseToggle:hover { background:t.$surface-muted; }
+@media(min-width:701px) {
+  .sidebar[data-collapsed] { width:t.$space-16; min-width:t.$space-16; padding-inline:t.$space-2; }
+  .sidebar[data-collapsed] .wordmark { display:none; }
+  .sidebar[data-collapsed] .logo { justify-content:center; }
+  .sidebar[data-collapsed] .collapseToggle { align-self:center; }
+  .sidebar[data-collapsed] .navigationItem { justify-content:center; padding-inline:t.$space-2; }
+  .sidebar[data-collapsed] .navigationItem span { position:absolute; width:1px; height:1px; clip-path:inset(50%); overflow:hidden; }
+}
+@media(max-width:700px) { .collapseToggle { display:none; } }

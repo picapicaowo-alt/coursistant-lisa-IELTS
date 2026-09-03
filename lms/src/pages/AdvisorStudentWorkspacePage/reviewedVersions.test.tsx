@@ -8,6 +8,9 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 
 const api = vi.hoisted(() => ({getStudentProfile: vi.fn(), updateStudentProfile: vi.fn(), getStudyPlan: vi.fn(), listStudyPlanRevisions: vi.fn(), updateStudyPlan: vi.fn()}));
 vi.mock('@/apis/services/advisor-api', () => ({advisorApiService: api}));
+vi.mock('@/apis/services/course-operations-api', () => ({
+  courseOperationsApiService: {listAdvisorScheduleRequests: vi.fn().mockResolvedValue({code: 'SUCCESS', status: 200, data: {items: [], total: 0}})},
+}));
 const response = <T,>(data: T) => ({code: 'SUCCESS', status: 200, data});
 const profile = {studentUserId: 301, profileVersion: 2, targetGoal: 'Original target', skills: [{skillCode: 'WR', displayName: 'Writing', scale: 'IELTS', position: 1}]};
 const plan = {profileContext: {currentProfileVersion: 2}, plan: {studyPlanVersion: 3, basedOnProfileVersion: 2, strategySummary: 'Original strategy', startDate: '2026-09-01', planEndDate: '2026-12-01', checkpoints: []}};

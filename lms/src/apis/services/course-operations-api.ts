@@ -23,6 +23,7 @@ import type {
   TeachingGradingItemResponse,
   TeachingStudentSupportResponse,
   TeachingTodayClassResponse,
+  StudentProgressResponse,
   TransferCourseOwnerRequest,
   UpsertCourseStudentReportRequest,
 } from '@/apis';
@@ -243,8 +244,8 @@ export class CourseOperationsApiService {
 
   getMyAlerts(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/alerts'); }
   getMyAttendance(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/attendance'); }
-  getMyCalendar(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/calendar'); }
-  getMyProgress(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/progress'); }
+  getMyCalendar(params: {from?: string; to?: string; timezone?: string} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/calendar', {params}); }
+  getMyProgress(): Promise<ApiResponse<StudentProgressResponse>> { return this.apiClient.get('/v2/me/progress'); }
   getMyScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/schedule-requests'); }
   getMyWorkQueue(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/work-queue'); }
   getMyCourseHours(courseId: number): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get(`/v2/me/courses/${courseId}/hours`); }
@@ -254,8 +255,8 @@ export class CourseOperationsApiService {
   getMyTeachingStudentsNeedingSupport(): Promise<ApiResponse<TeachingStudentSupportResponse[]>> { return this.apiClient.get('/v2/me/teaching/students-needing-support'); }
   getMyTeachingTodayClasses(): Promise<ApiResponse<TeachingTodayClassResponse[]>> { return this.apiClient.get('/v2/me/teaching/today-classes'); }
 
-  listMyPersonalEvents(): Promise<ApiResponse<CourseOperationRead>> {
-    return this.apiClient.get('/v2/me/personal-events');
+  listMyPersonalEvents(params: {fromUtc: string; toUtc: string}): Promise<ApiResponse<CourseOperationRead>> {
+    return this.apiClient.get('/v2/me/personal-events', {params});
   }
 
   createMyPersonalEvent(request: PersonalEventRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseOperationRead>> {

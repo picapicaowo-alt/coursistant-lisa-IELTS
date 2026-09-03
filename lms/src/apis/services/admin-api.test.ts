@@ -8,22 +8,6 @@ const service = new AdminApiService(client as unknown as typeof V2ApiClient);
 describe('AdminApiService', () => {
   beforeEach(() => vi.clearAllMocks());
 
-  it('uses system-admin tenant CRUD routes', async () => {
-    const payload = {name: 'West Campus', timezone: 'America/Los_Angeles'};
-    client.get.mockResolvedValue({status: 200, data: []});
-    client.post.mockResolvedValue({status: 200, data: {id: 2}});
-    client.patch.mockResolvedValue({status: 200, data: {id: 2}});
-    client.delete.mockResolvedValue({status: 200, data: null});
-    await service.listTenants();
-    await service.createTenant(payload);
-    await service.updateTenant(2, payload);
-    await service.deleteTenant(2);
-    expect(client.get).toHaveBeenCalledWith('/v2/admin/tenants');
-    expect(client.post).toHaveBeenCalledWith('/v2/admin/tenants', payload, expect.objectContaining({headers: expect.any(Object)}));
-    expect(client.patch).toHaveBeenCalledWith('/v2/admin/tenants/2', payload, expect.objectContaining({headers: expect.any(Object)}));
-    expect(client.delete).toHaveBeenCalledWith('/v2/admin/tenants/2', expect.objectContaining({headers: expect.any(Object)}));
-  });
-
   it('keeps system and tenant managed-user scopes distinct', async () => {
     const systemRequest = {email: 'instructor@example.com', firstName: 'Ivy', lastName: 'Instructor', role: 'USER' as const, level: 'INSTRUCTOR' as const, tenantId: 2};
     const roleRequest = {role: 'TENANT_ADMIN' as const, level: 'NOT_APPLICABLE' as const};

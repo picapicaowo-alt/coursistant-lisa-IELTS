@@ -128,15 +128,16 @@ export const DateTimePickerPopover = ({
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault();
+        event.stopPropagation();
         onClose();
         anchorRef.current?.focus();
       }
     };
     document.addEventListener('mousedown', handlePointerDown, true);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keydown', handleKeyDown, true);
     return () => {
       document.removeEventListener('mousedown', handlePointerDown, true);
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('keydown', handleKeyDown, true);
     };
   }, [anchorRef, onClose, open]);
 
@@ -297,6 +298,7 @@ export const DateTimePickerPopover = ({
         </div>
       </div>
     </div>,
-    document.body,
+    // Native dialogs form a top layer. A body portal would be inert behind it.
+    anchorRef.current?.closest('dialog[open]') ?? document.body,
   );
 };

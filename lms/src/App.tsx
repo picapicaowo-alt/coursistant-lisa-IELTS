@@ -48,12 +48,14 @@ const CounsellorIntakeFormPage = lazy(() => import('./pages/CounsellorIntakeForm
 const CounsellorAssignAdvisorPage = lazy(() => import('./pages/CounsellorAssignAdvisorPage'));
 const AdvisorStudentsPage = lazy(() => import('./pages/AdvisorStudentsPage'));
 const AdvisorOperationsPage = lazy(() => import('./pages/AdvisorOperationsPage'));
+const AdvisorMessagesPage = lazy(() => import('@/pages/AdvisorMessagesPage'));
 const AdvisorStudentLayout = lazy(() => import('./pages/AdvisorStudentWorkspacePage'));
 const AdvisorStudentIntakePage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/IntakePage'));
 const AdvisorStudentProfilePage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/ProfilePage'));
 const AdvisorStudentStudyPlanPage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/StudyPlanPage'));
 const AdvisorStudentCoursesPage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/CoursesPage'));
 const AdvisorStudentSupportPage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/SupportPage'));
+const AdvisorStudentExamsPage = lazy(() => import('./pages/AdvisorStudentWorkspacePage/ExamsPage'));
 const StudentAdvisingPage = lazy(() => import('./pages/StudentAdvisingPage'));
 const ParentPortalPage = lazy(() => import('./pages/ParentPortalPage'));
 const MockExamsPage = lazy(() => import('./pages/MockExamsPage'));
@@ -160,6 +162,7 @@ const App = () => {
               <Route path={APP_ROUTE_PATHS.counsellorIntakesIntakeIdAssign} element={<RequireAdvisingAccess gate="counsellor"><CounsellorAssignAdvisorPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.advisorStudents} element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentsPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.advisorOperations} element={<RequireAdvisingAccess gate="advisor"><AdvisorOperationsPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.advisorMessages} element={<RequireAdvisingAccess gate="advisor"><AdvisorMessagesPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserId} element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentLayout/></RequireAdvisingAccess>}>
                 <Route index element={<Navigate to="intake" replace/>}/>
                 <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdIntake} element={<AdvisorStudentIntakePage/>}/>
@@ -167,6 +170,7 @@ const App = () => {
                 <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdStudyPlan} element={<AdvisorStudentStudyPlanPage/>}/>
                 <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdCourses} element={<AdvisorStudentCoursesPage/>}/>
                 <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdSupport} element={<AdvisorStudentSupportPage/>}/>
+                <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdExams} element={<AdvisorStudentExamsPage/>}/>
               </Route>
               <Route path={APP_ROUTE_PATHS.myPlan} element={<RequireAdvisingAccess gate="student"><StudentAdvisingPage/></RequireAdvisingAccess>}/>
               <Route path={APP_ROUTE_PATHS.parent} element={<RequireAdvisingAccess gate="parent"><ParentPortalPage/></RequireAdvisingAccess>}/>

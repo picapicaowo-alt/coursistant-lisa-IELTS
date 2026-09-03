@@ -1,0 +1,113 @@
+commit,author_date,subject
+49c8a1dd4fffb5238b482c1e900a79d21f09152f,2026-09-02T22:04:07-07:00,Merge pull request #9 from picapicaowo-alt/codex/parent-notification-presentation
+5210b3774a9728cda171c020215f523c8809810e,2026-09-02T22:00:08-07:00,Align Parent notification presentation with the shared inbox
+b093ecc5b3980de8b3202d3267dd81a2ce0c2a2e,2026-09-02T21:56:41-07:00,Merge pull request #8 from picapicaowo-alt/codex/figma-auth-viewport-fit
+8a2153879b9baba771d94ae5d7713d411b1c0f46,2026-09-02T21:52:12-07:00,test: wait for checkpoint artwork decoding
+8550d93116b09fb3e93106013323a0062e32fbb0,2026-09-02T21:50:49-07:00,fix: fit auth artwork to wide short viewports
+ad8a9f28b03fd9fe3b465e8ca05c22f297f7148b,2026-09-02T21:47:11-07:00,Merge pull request #7 from picapicaowo-alt/codex/figma-responsive-all-roles
+3fb9f9e36171949d333a2ae89c668076512ddd00,2026-09-02T21:44:19-07:00,feat: align authentication and advisor details with Figma
+4bd46cd99201fded41c248a775aa680e5398ce36,2026-09-02T20:17:02-07:00,feat: implement responsive Figma workspaces across roles
+cc6575a8f1b75bf5c5fd1d1ecf3e06b258c07d8a,2026-09-02T19:06:22-07:00,Merge pull request #6 from picapicaowo-alt/codex/contract-disclosures-history-release
+a76c8a26e77b33c071b64e2507790f13d8b7d1f4,2026-09-02T19:02:30-07:00,feat: align role contracts and add collapsible advising workspaces
+718c4a553af96e314392ac01f8c800e351f3d6e4,2026-09-02T03:36:45-07:00,Merge pull request #5 from picapicaowo-alt/codex/dev8085-validation-matrix
+d6b30c458e87bcf2d33949c2b322ccea94a48314,2026-09-02T03:34:03-07:00,docs: update Dev acceptance matrix
+f12f985ca9dfde386d31375665eb6d985ed88c98,2026-09-02T03:26:20-07:00,Merge pull request #4 from picapicaowo-alt/codex/full-role-uiux-release
+29cc1b36e93545653a8bb719755efc3893656f5d,2026-09-02T03:22:20-07:00,fix: stabilize responsive role acceptance
+9784780c22ae5aba52260013deb3fc3c3bc0e4f3,2026-09-02T03:02:09-07:00,feat: polish role workflows and contract UX
+ff98939444d050bd746bf155db8043792f97e411,2026-09-01T21:39:25-07:00,feat: complete tenant governance workflows
+0c4b33e9909bfdc170bfb7cb9b61e2dc5e002831,2026-09-01T20:59:04-07:00,Merge pull request #3 from picapicaowo-alt/codex/responsive-shell-dashboard
+0c3712ddf384c3d6fb07fe9be8756549ffb6d671,2026-09-01T20:55:36-07:00,feat(ui): make app shell and workspaces responsive
+3d3093cceabddf842a958cd80cf92f962e1c298b,2026-09-01T17:07:31-07:00,Merge pull request #2 from picapicaowo-alt/codex/figma-uiux-refresh
+a1367b8e9930f6692b7436c310d89dc3f5c952bf,2026-09-01T17:04:10-07:00,feat: align X-Learn UI with Figma
+b22ec48554f6985369cbab9213266f36935432b4,2026-08-31T12:40:58-07:00,feat: align IELTS frontend with latest API contracts
+6bd4ba5df4775261e0becbaca15d9a4be5372ff1,2026-08-29T21:30:33-07:00,fix: connect vocabulary to deployed service safely
+66d76ae48cd51df62262598817374d0c6bdd1fa1,2026-08-29T20:54:34-07:00,merge: integrate vocabulary learning module
+6ea74d756db99436573c05f3186b7d817288567b,2026-08-29T20:52:11-07:00,feat: add role-aware training operations and mock exams
+44c568f76cc4c2311ce6ef525c67e9b1525ef85b,2026-08-29T20:27:49-07:00,feat: flip vocabulary cards before rating
+e8ef083e3c307c880c72f5a7013f7e12b13a4e27,2026-08-29T19:17:10-07:00,feat: identify and end blocking vocabulary sessions
+ee716768db7c332584ca6bcb5e287f795cc461e6,2026-08-29T18:59:00-07:00,fix: clarify vocabulary study mode behavior
+d97783d525686452cfd0a3be85790095396e120f,2026-08-29T18:25:10-07:00,docs: keep vocabulary setup portable
+dae0a1ffc84978f588e8d37775c766da8bad5403,2026-08-29T18:24:11-07:00,feat: add vocabulary learning prototype
+3080f73f293256531bf21dc86792a907f65cae10,2026-08-26T04:46:05-07:00,fix: reserve USC dev port
+ac30a5203ab6d74598f581a56ea590b747de49c7,2026-08-26T04:28:36-07:00,docs: record dev api proxy handoff
+17a683c6641483371604fcbc897c27800602e10f,2026-08-26T04:25:16-07:00,fix: complete advising dev integration
+72d35b762a380bf7e6862fad3bd40e2490280f73,2026-08-26T01:46:43-07:00,feat: bootstrap IELTS frontend with counsellor and advisor A/B flows
+58e646d23175da08b426b2ea09b1bb427ab043c8,2026-08-24T23:54:49-07:00,fix: enforce course-local assignment deadlines
+8ea239f73704a135dd421c0894bb0b8941d03c20,2026-08-24T23:28:59-07:00,fix: streamline admin TA assignment
+b23584e2a482f0916ff51b785762a865f9278f09,2026-08-24T22:34:35-07:00,feat: manage course enrollments in admin
+11025b7c059ad7f01118ab373af806a09b89c89f,2026-08-24T13:32:33-07:00,docs: clarify repository transition
+6aaa33d3ba069361a52adc4094f16e0a8c00d878,2026-08-24T13:24:27-07:00,docs: clarify frontend contracts and UI policy
+29a1897d9bc9bb0220eee1f6b5169cac3a9816b2,2026-08-24T12:58:00-07:00,ci: update GitHub actions runtimes
+eb3b0e0c060c1f6a0f2f2b9827ce0f4d52ebde76,2026-08-24T12:52:36-07:00,chore: synchronize yarn dependency lock
+2f44f76e1de257c239db824c8a528794be709d40,2026-08-24T12:52:26-07:00,docs: define frontend ownership and standards
+e79dd330f8c93207ccf9988c778846021c062ab7,2026-08-24T12:42:02-07:00,"Revert ""chore: make frontend releases reproducible"""
+9cc3906c9091ee9b4b083ddd209d0fc37317b976,2026-08-24T07:55:00-07:00,chore: make frontend releases reproducible
+df71d8a0c01e57b664b4dc46647e623fcf327b07,2026-08-24T07:00:58-07:00,fix: reliably remove inline text formatting
+c342c6be0d3acb2842f279fe100e018e046a8669,2026-08-24T06:43:34-07:00,fix: show quiz attempt review in modal
+dc8fef291d6a9e3c8bd1e10ef07101269803067a,2026-08-24T06:33:03-07:00,feat: upgrade AI workspace experience
+1414cbe7a5b09a41b6484a6bc5afd1cf3fde9ae7,2026-08-24T06:16:43-07:00,fix: harden instructor grading workflows
+ea68eb83c83a5ab0aa4eca4b122eff5d27d0c106,2026-08-24T04:01:41-07:00,fix: remove unfinished product copy
+b398775c008ac144dff1e70a1c44bc5f8ddcba0a,2026-08-24T03:44:41-07:00,fix: support course grades notification links
+c26eb8e209a450ec3b1e9d85a29897d473f02256,2026-08-24T03:32:20-07:00,fix: refresh regraded quiz results
+46858dc5ec07083d1ff1c5fb9d9e969e9295c6d9,2026-08-24T03:26:44-07:00,feat: expose calendar and admin workflows
+b4832032aa9b83892e5aff0ea343f2dca05fee76,2026-08-24T02:58:53-07:00,fix: handle hidden course responses
+283817df804284ecd4422cdc8cd01b4f34de1e11,2026-08-24T02:55:09-07:00,fix: clarify forbidden course access
+01eea90f850d9359cde457ea7f695bdbffeb51a0,2026-08-24T02:47:50-07:00,feat: add student course grades view
+e0eaa6979a290a7b0716fdf103807f1d58f03887,2026-08-24T02:30:37-07:00,fix: normalize dashboard announcement times
+c03b519be744feef1024855ad3bcd9d08a1de3d4,2026-08-24T02:23:54-07:00,fix: align grading and course time workflows
+21701835611b084eaf1ac9e8f5451d1df7ad01e6,2026-08-24T02:00:53-07:00,fix: hide rubric upload guidance from students
+b247f22d39ea2b8cafae5f92e980ac5e74c25d7d,2026-08-24T01:38:19-07:00,fix: treat missing rubric as empty state
+b9b5c666c2c4b92c795ee157fd3a77cfcc4baf4b,2026-08-24T00:59:10-07:00,feat: add inline Markdown and LaTeX authoring
+d2e986f118c86381f112db860d82672fdcb19d3a,2026-08-23T23:12:34-07:00,fix(auth): preserve LMS session on agent failure
+b76b3475763c5f864dd98789ec314795a92c7e5b,2026-08-23T23:02:44-07:00,fix(ai): finalize streamed study support replies
+a173ea5f9ed06426b87ff5755762dfce78eb38ca,2026-08-23T22:57:43-07:00,fix(ai): align dynamic chat integrations
+e23bcd5905f47590db57a9b5cc2380c026ae4de4,2026-08-23T21:42:32-07:00,feat(ai): add dynamic thinking progress
+9934e60f6338b231cb1f553a0cf3c46f3ef43a82,2026-08-23T20:59:28-07:00,fix(auth): update login hero to X-Learn branding
+f0cd7b435cbfe0d6641ba6cf69c6c36faabcc420,2026-08-23T17:37:07-07:00,feat: complete P1/P2 frontend integration
+23a95c30cea6522542276eeee85be8b154009b05,2026-08-23T16:28:59-07:00,fix(types): resolve typecheck and lint issues in WeekContentCard and useRoster test
+d67089242003950fa3b4d77492b42f756385572a,2026-08-23T15:59:23-07:00,feat: integrate P1 & P2 backend release updates
+2e62ae645324acc8689eddba2bedb490a8c7618f,2026-08-20T18:07:07-07:00,feat: sort roster members by role priority (Instructor -> TA -> Student)
+01525586abb222567ddec7515d99353d5b2bfb56,2026-08-20T17:50:46-07:00,fix: correct typo 'Enrol' to 'Enroll' on RosterCard
+d48e39eb77d18fbe5db183f90643e576f456e40c,2026-08-19T21:18:59-07:00,chore: change AnnouncementsCard action label for staff to Manage announcements
+22343028ba0a94302c00cb2c7a36d662e343f37e,2026-08-19T21:13:22-07:00,feat: show top 3 announcements in AnnouncementsCard and add View All link
+0746f2176039bead845a3556d600a089a7fa63d2,2026-08-19T17:25:36-07:00,feat(settings): restore global navigation shell and add back button on Settings page
+9427fd9b49cdd55155b238b9df744cc431695ae0,2026-08-19T16:49:46-07:00,Add mandatory self-testing rule to lms sub-rules
+0feed70494eabf17d5ddcbd4295f9a6518d7592d,2026-08-19T16:35:36-07:00,Update settings UI and cursor rules
+b7c34892b0121b43e500fc79849403f81e0ddeb6,2026-08-19T16:11:07-07:00,feat: first-round production closure for modern LMS surfaces
+c6fa59295a9c35d1725921e4244e899035022361,2026-08-19T15:11:14-07:00,fix: accept images and documents in the shared editor upload dialog
+e65719c79d0a8731d765d1bac249ba8f0767e444,2026-08-19T15:03:31-07:00,chore: add Cursor rules for team frontend development
+6d55a95c4deb8e145cecbe91dc2132a39567b4df,2026-08-19T15:02:59-07:00,fix: replace editor Image URL prompts with file upload dialogs
+2b8ac7fecaf69379790432e3beaab816731a6ec8,2026-08-19T13:05:33-07:00,fix: use confirm buttons for Workflow deadline changes
+c577f1b698c4ae42248239b1417b1fd0dacb3d06,2026-08-19T11:57:38-07:00,docs: adopt and extend project standards for coursistant-lisa
+96c5fe31b49826fb828a5f0f487c7fa3affd9dec,2026-08-18T19:02:50-07:00,"feat: ship assignment UX, markdown AI replies, and date pickers"
+353eb014511f08fcd3bb28cd163e7811f05b9490,2026-08-18T11:03:59-07:00,fix: confirm rubric replacement after grading
+ac9c832c3b2309dbdc889567f4a1b932db83f88c,2026-08-18T10:46:53-07:00,Hide teaching activity dashboard widget
+d5159bb3b1954cc9fd330f5380673363dd04987f,2026-08-18T10:39:08-07:00,fix: align AI workplace composers
+a2a1f4a82b500a69fcf07d5d8dd9d3ad27934e25,2026-08-18T05:34:25-07:00,feat complete LMS management and file workflows
+50f0a94fafc1b14a76ff93c5b3da02913ef3f6ad,2026-08-18T05:19:35-07:00,fix: simplify deadline approval warning
+c66bdcd1301c1095e9448562f95f6726325a8047,2026-08-18T05:10:28-07:00,fix: add dev environment build
+18d5c9f7aad3a80728342814c9d36bd5a3052b28,2026-08-18T05:04:17-07:00,feat: add deadline approval dialog
+aeec524c28842caeaa8677535ce3218e97aae616,2026-08-18T04:45:19-07:00,feat: integrate AI workplace workflow agent
+d4a2c2ddf279f90f431d609b14809bd55f0d1314,2026-08-17T23:42:46-07:00,fix: support reliable user and admin sign-in
+b2ac02a805d8069c93b2d679fdfa8e7c9cbd487a,2026-08-17T23:23:48-07:00,feat: complete dashboard UX and LMS v2 flows
+689efa92bf28600e9bd38d4dd00ab79099d24858,2026-08-17T20:13:22-07:00,feat: complete LMS frontend takeover foundation
+d9593c79b928ce291ae1c34ef8f5784d639dfe52,2026-08-11T02:25:55-07:00,fix(courses): stop the course page throwing on routes with no course id
+d1dea2d3adc8445d759d0892e9662ffe194a1bd0,2026-08-11T02:01:37-07:00,"feat(courses): build course edit mode, and stop view mode rendering the edit shell"
+f9f56993066b76a82235fa0a0f3961e992f8e686,2026-08-11T01:46:27-07:00,feat(courses): rebuild course detail to match the design
+fd249942c38f7fa0a8dc7eb71e888e270b5e53e3,2026-08-11T01:10:15-07:00,fix(courses): load the course workspace from the endpoints that exist
+d9da43c64bb6055c6c217f385ce5c8d4ed7eb278,2026-08-11T00:42:06-07:00,fix(build): strip the BOM before injecting design tokens into SCSS
+b92fdc9a8984eee4619fa5af714bb616da31af7d,2026-08-11T00:26:19-07:00,fix(auth): refresh an expired access token instead of dropping the session
+24a78e8261173a3a3855a4db7cbe3e0f9d65cb42,2026-08-11T00:03:16-07:00,feat(courses): build the course card to the design
+4ad804b30ee42a306f10cb8a21a86b6a9221b4fe,2026-08-10T23:46:13-07:00,fix(courses): load My Course from /v2/me/courses
+aadddedc453087b00e4e922334a2ec407721c828,2026-08-10T23:31:30-07:00,"Revert ""feat(dashboard): make the widget canvas rearrangeable"""
+b40dabe73a108eb54b7e2e971ea343bc335ef1e9,2026-08-10T23:28:29-07:00,feat(dashboard): make the widget canvas rearrangeable
+f67c7f07624cccdb32ad90a130ba5db85feb1d9c,2026-08-10T23:00:24-07:00,fix(dashboard): lay the widget grid out the way the design does
+0ed38ac541c98b6624ba9d94c9f15e88c62b23ff,2026-08-10T22:53:13-07:00,fix(dashboard): match the widget rows to the screenshots
+d090dcb8cee614db5cc09ed819f2a8ef52b35fcf,2026-08-10T22:34:19-07:00,feat(dashboard): load the remaining widgets from the real endpoints
+8627fe58842cf6191620076edd6869e0ebd038a3,2026-08-10T22:16:49-07:00,feat(dashboard): load My Course from /v2/me/courses
+38ae295b5c60fdc34e82a55ed82263d774c22bb6,2026-08-10T22:16:32-07:00,fix(auth): sign in against /v1/auth/login
+f07a0821060c2944b453bd95891fa781af9f9dee,2026-08-10T22:16:16-07:00,fix(api): model the response envelope the backend actually sends
+7f44358ef5bce4125add23ffc8f9ae37dd1f1315,2026-08-10T22:16:01-07:00,fix(api): reach the real backend and get past CORS
+ea0ae28447f5465548b981e579cae8042c25069d,2026-08-10T22:15:36-07:00,build: add design tokens from the Figma spec
+155e62a76b90e1be60254e6855d3118f4b84ed7c,2026-08-10T22:12:09-07:00,chore: ignore local tooling config and product docs
+5dd904172c6e4d8f666395f0a9508b687aeedf3e,2026-07-16T09:17:01+08:00,init commit

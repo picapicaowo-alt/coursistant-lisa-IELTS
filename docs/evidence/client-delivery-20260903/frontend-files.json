@@ -1,0 +1,657 @@
+{
+  "baseCommit": "49c8a1dd4fffb5238b482c1e900a79d21f09152f",
+  "files": [
+    {
+      "path": "lms/e2e/all-role-responsive.spec.ts",
+      "bytes": 8669,
+      "sha256": "c5d61a180f5f7131b23c0d6db4ae539ce15bf840371084e023f90beaca99982e"
+    },
+    {
+      "path": "lms/e2e/client-delivery.spec.ts",
+      "bytes": 11189,
+      "sha256": "e83ca03dc2419aca1cdb4ddb17c6ea0f7ef280860303646a30d38f4536639cb2"
+    },
+    {
+      "path": "lms/e2e/disclosure-helpers.ts",
+      "bytes": 565,
+      "sha256": "a01b07a9c07d0cf3e6ba443062b9e37ab5dcb7785c5b74f4e72105c4e7754a77"
+    },
+    {
+      "path": "lms/e2e/disclosure-ui.spec.ts",
+      "bytes": 9659,
+      "sha256": "b0bed0f3af4fec1c2bb29a8e2bbabffca0e95cd64a489504e698b89df734b902"
+    },
+    {
+      "path": "lms/e2e/figma-parity.spec.ts",
+      "bytes": 13262,
+      "sha256": "15f91662352bbdeff87e468b1122e3add39f498b0c4f84026a6f55d6024abd0b"
+    },
+    {
+      "path": "lms/e2e/role-contract-audit.spec.ts",
+      "bytes": 9749,
+      "sha256": "2fb9b179ba5e1563241d446aa461f366af22a679a2f73f01b2354e3404a7aa5c"
+    },
+    {
+      "path": "lms/e2e/role-interactions.spec.ts",
+      "bytes": 42542,
+      "sha256": "a14227526ae35288d8a3fbcd984455aab39c623a8844638eba002dab9feaf410"
+    },
+    {
+      "path": "lms/e2e/student-checkpoint-design.spec.ts",
+      "bytes": 8206,
+      "sha256": "be302cc1c42b1aa7a2c59507d8b6039e6e1ff7d4dfc9113981da50632721f768"
+    },
+    {
+      "path": "lms/e2e/teaching-grading-link.spec.ts",
+      "bytes": 5574,
+      "sha256": "4c378e165e360c91814e5817e9f5448d76c4ba1ba6da4dcf8bad6246188c260f"
+    },
+    {
+      "path": "lms/public/fonts/inter/InterVariable.woff2",
+      "bytes": 352240,
+      "sha256": "693b77d4f32ee9b8bfc995589b5fad5e99adf2832738661f5402f9978429a8e3"
+    },
+    {
+      "path": "lms/public/fonts/inter/LICENSE.txt",
+      "bytes": 4380,
+      "sha256": "262481e844521b326f5ecd053e59b98c8b2da78c8ee1bdbb6e8174305e54935a"
+    },
+    {
+      "path": "lms/public/fonts/inter/README.md",
+      "bytes": 274,
+      "sha256": "24b3614a5b71c3149e55e26862430b4b9a9368401bc9bfd1da61baf5552b0b12"
+    },
+    {
+      "path": "lms/public/icons/figma-ai/assistant.svg",
+      "bytes": 743,
+      "sha256": "804de6d2b91c3b720d321d1d9fc5dee900be922ccfe877441fa6ce5da25cd9bf"
+    },
+    {
+      "path": "lms/public/icons/figma-courses/grid.svg",
+      "bytes": 976,
+      "sha256": "19824fe7661a3dc2f2f82429fd67d86828b0aa7fd5312ca8a28edf0581ad32a4"
+    },
+    {
+      "path": "lms/public/icons/figma-courses/list.svg",
+      "bytes": 707,
+      "sha256": "38b5441e1e5dee180ec6ea287945e078fbf64bb648725d124b030a172858bd41"
+    },
+    {
+      "path": "lms/src/App.tsx",
+      "bytes": 15017,
+      "sha256": "1926a63b1db9fa96325257d5da87b44a0d7c43d5a6c5f90d63dce7d2deabd04c"
+    },
+    {
+      "path": "lms/src/apis/services/admin-api.test.ts",
+      "bytes": 4927,
+      "sha256": "0c7e95aee8b8b643c1557deaeb26488086706b4197a5d21612eba3717af40b21"
+    },
+    {
+      "path": "lms/src/apis/services/admin-api.ts",
+      "bytes": 5039,
+      "sha256": "c7abd0118a06af020480efa5d6410c35e327c93ed12ad051bdedd8bd87486098"
+    },
+    {
+      "path": "lms/src/apis/services/course-operations-api.ts",
+      "bytes": 17363,
+      "sha256": "926a56d5df737afc4371b24b7dc88bc199e059aa54cd875dc1e21dce99c5c6e0"
+    },
+    {
+      "path": "lms/src/apis/types/courseOperations.ts",
+      "bytes": 6514,
+      "sha256": "a4778dbda799d0516d69d34e4f0d017151fb346c57171739aa213a0a718da46b"
+    },
+    {
+      "path": "lms/src/components/AssignmentProgress/index.module.scss",
+      "bytes": 811,
+      "sha256": "b02451b87fb722693f53fc4e0cad21b371d991d3cf0c1964ea55e3da5afc81ba"
+    },
+    {
+      "path": "lms/src/components/AssignmentProgress/index.tsx",
+      "bytes": 1315,
+      "sha256": "5a146efd9048d5802d304ce2ef1f3c5edce7dd9536cb5ef6000cd44e6e8ca205"
+    },
+    {
+      "path": "lms/src/components/ChatContent.tsx",
+      "bytes": 23984,
+      "sha256": "a7eba165ce6fe1f383a533e2de24170b7b84fd81261a3d5a4aad5cc4dc737f4c"
+    },
+    {
+      "path": "lms/src/components/CourseIdentityCard/index.module.scss",
+      "bytes": 1653,
+      "sha256": "3b818fe4169660b18e5934265acf1c71fdb5a7b0a0cd25ca243923cc46b6fdf3"
+    },
+    {
+      "path": "lms/src/components/CourseIdentityCard/index.tsx",
+      "bytes": 1925,
+      "sha256": "2c6f2a4d9b7efbd29d912e6e90300aa599e6af40ec2bb1b19b64e0c92514244a"
+    },
+    {
+      "path": "lms/src/components/DateTimePickerPopover.tsx",
+      "bytes": 12027,
+      "sha256": "760a5722067d2ded429f99512042e0e20e2ab13d1bd208fd501dfa4c0e6e9e2a"
+    },
+    {
+      "path": "lms/src/components/ObserverMockExams/index.module.scss",
+      "bytes": 2709,
+      "sha256": "fda899f0909d57717e24ce849bfc618a1f313206ffa6eb4ee9ee5c00e16d0747"
+    },
+    {
+      "path": "lms/src/components/ObserverMockExams/index.tsx",
+      "bytes": 5045,
+      "sha256": "9d73517ba767603ad21303aa21093d72fc5e124255cf8312d503e4481ea8728e"
+    },
+    {
+      "path": "lms/src/components/RecordSummaryList/RecordSummaryList.module.scss",
+      "bytes": 1505,
+      "sha256": "ef84bdab9f270e952ab3718b525566f14fae1645377d212285c3870231e2b6a0"
+    },
+    {
+      "path": "lms/src/components/RecordSummaryList/index.test.tsx",
+      "bytes": 1856,
+      "sha256": "2ca527f739347d07cc66d13cf8014821ed41dcc1853093fc3d09db37679f726c"
+    },
+    {
+      "path": "lms/src/components/RecordSummaryList/index.tsx",
+      "bytes": 3195,
+      "sha256": "662498f20ad10cebe3850906b26dae7cdc5a1e3ece025f009b0860d37ba21f5a"
+    },
+    {
+      "path": "lms/src/components/RecordSummaryList/recordPresentation.ts",
+      "bytes": 2693,
+      "sha256": "dfbf8db44d2459f51c8bc6a314e42c82bbdd05f03e1a67803c20db208d95f11d"
+    },
+    {
+      "path": "lms/src/components/StudentIntakeFormFields/index.tsx",
+      "bytes": 2863,
+      "sha256": "68113d84df7ed43312e451525c407a48811bcbe63161c2fc8540d2e128d79c2e"
+    },
+    {
+      "path": "lms/src/components/UserAvatar/index.module.scss",
+      "bytes": 214,
+      "sha256": "4fc8e1e0813f45aba70b44a54dd90f6e3bf6ba91c024dbe37823d089710682a3"
+    },
+    {
+      "path": "lms/src/components/UserAvatar/index.tsx",
+      "bytes": 858,
+      "sha256": "7eb05f1de2344be2ed72e39c5a11db1464f74b52cdcbaab1daa43c303ec1dfdd"
+    },
+    {
+      "path": "lms/src/components/WorkspaceSection/index.module.scss",
+      "bytes": 894,
+      "sha256": "aa0e7c64dd4c62be292ebdd16a1815610e8775ef710731000d94a4b6a1d23608"
+    },
+    {
+      "path": "lms/src/components/WorkspaceSection/index.tsx",
+      "bytes": 1250,
+      "sha256": "5cb49283eb00589228bbdfdf0e2ccb1c4c05a9d4d8024d20d805435e57debc4f"
+    },
+    {
+      "path": "lms/src/configs/routePaths.ts",
+      "bytes": 3582,
+      "sha256": "1b833aef0daff578a03bd7e6460f92de7c6a3f89a6b62f1086608cb6396c358b"
+    },
+    {
+      "path": "lms/src/hooks/useStudentProgress.ts",
+      "bytes": 469,
+      "sha256": "9057dfc7f335c10046cbacd4ba022fcb665d710532d93c4e5c284431c0811384"
+    },
+    {
+      "path": "lms/src/i18n/resources/en/course.json",
+      "bytes": 12548,
+      "sha256": "76b00f80a91a5edc23bcd1412322585bc07667f9f9bf0968e46ad328b4346b90"
+    },
+    {
+      "path": "lms/src/index.css",
+      "bytes": 2149,
+      "sha256": "680639ba8f62c8071974ee171b1ee2057eab3aeffc71d2b3b51401592d24073f"
+    },
+    {
+      "path": "lms/src/layouts/Header.tsx",
+      "bytes": 6345,
+      "sha256": "357b35c6f0265e90e76743a13edcdfff25b4e94d794670624b99e3f1f7f072e5"
+    },
+    {
+      "path": "lms/src/layouts/Sidebar.module.scss",
+      "bytes": 5578,
+      "sha256": "e2d0bf661af60e9bb82d231d9f995070f9446e87e984e922a73c6334f2982ceb"
+    },
+    {
+      "path": "lms/src/layouts/Sidebar.tsx",
+      "bytes": 10268,
+      "sha256": "1a2a3242fa41ed35e83b2f1c500c76a1df45928dab00f8263b88f1d10ff6c904"
+    },
+    {
+      "path": "lms/src/pages/AdminConsolePage/components/AdminContractOperations.tsx",
+      "bytes": 10581,
+      "sha256": "a5d193e393d99b4b51bb2f7d8a300ee6c8b3f7e324aa2f417dcc68734c18e2d7"
+    },
+    {
+      "path": "lms/src/pages/AdminConsolePage/index.tsx",
+      "bytes": 35737,
+      "sha256": "5b3a808cfc84c48f1f0c17b726000ebe67af4b9e193f88d9ff0e07d086354272"
+    },
+    {
+      "path": "lms/src/pages/AdvisorMessagesPage/index.module.scss",
+      "bytes": 3205,
+      "sha256": "c1d511b33ef227135154aff39ac19bae40a5e253d5f006ead041a311b445aa6f"
+    },
+    {
+      "path": "lms/src/pages/AdvisorMessagesPage/index.tsx",
+      "bytes": 5577,
+      "sha256": "a8514af3a9d01b11c26cffab9f82617c27a98487213586b8e574b2c850c6ee3d"
+    },
+    {
+      "path": "lms/src/pages/AdvisorOperationsPage/AdvisorDashboardOverview.module.scss",
+      "bytes": 2565,
+      "sha256": "977b7cef9a206845036c9c3779ddd82762630d44156b7571712af99573b11ad7"
+    },
+    {
+      "path": "lms/src/pages/AdvisorOperationsPage/AdvisorDashboardOverview.tsx",
+      "bytes": 7150,
+      "sha256": "dd6b400f11b5ef7200179c53e737ffbc54312b9d4d20687dee7df750ea4dbd80"
+    },
+    {
+      "path": "lms/src/pages/AdvisorOperationsPage/AdvisorOperationsPage.module.scss",
+      "bytes": 1873,
+      "sha256": "e6c81c60f1e2c882a7b40af0f5db38f11144dc85370196cc81c4027638f0108c"
+    },
+    {
+      "path": "lms/src/pages/AdvisorOperationsPage/OwnedCourses.tsx",
+      "bytes": 4735,
+      "sha256": "2a100667669bffe2c861d24e344e0157b247d6bd1d5927ae73f16aa41b6837d2"
+    },
+    {
+      "path": "lms/src/pages/AdvisorOperationsPage/index.tsx",
+      "bytes": 26917,
+      "sha256": "ed18c88f071ea21134bf6848673ae969011c79986705c4861ca2aad66e3ecb80"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/CourseSummaryDialog.tsx",
+      "bytes": 3382,
+      "sha256": "5c2886c28fabd9b0906096e51528d6d4da482d7d789bb8264d7f89118e4113dd"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/CoursesPage.module.scss",
+      "bytes": 9638,
+      "sha256": "2d3bbde9f61b8867f1577d8438cd4933d8023fa695cbb4ebd711d5415fe5b304"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/CoursesPage.tsx",
+      "bytes": 26055,
+      "sha256": "02a881bb118a6c29c0e9469aef4e1a07001bdc7c86d88b8c0ad4908c9bf552c0"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/ExamsPage.module.scss",
+      "bytes": 421,
+      "sha256": "5904459a89e45cc1a59fd1da39c53e2d954add74e0320b4952251e4a5b70a3db"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/ExamsPage.tsx",
+      "bytes": 6185,
+      "sha256": "58767a84954ca80f0a5440944b228e53bdb3448444c0679417adfbdf3e8160fb"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/LearningJourney.module.scss",
+      "bytes": 10919,
+      "sha256": "65aedb3d958b2afc45886bc3b1593d4b1dd02ce084d3e503aa96d0e737d0e1fb"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/LearningJourney.tsx",
+      "bytes": 13845,
+      "sha256": "4aff9894429f6dfc3e39f62c9b1bab253daf7aabe89c32fd38735ff5a0b3ae29"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/ProfilePage.tsx",
+      "bytes": 15096,
+      "sha256": "a62d75338fc574f7108d1739762c1f7571726f8c09700ca8cfb1d8ab9785e064"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/StudyPlanPage.tsx",
+      "bytes": 15159,
+      "sha256": "6a64fbfbe2c0fe66b7b1a7dc9e39e4215001f27e80583a401ab10484526603a7"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/SupportPage.module.scss",
+      "bytes": 10993,
+      "sha256": "7cc76c9aa7797c58d9bb8c036396c9f100a6a2bafcc0858fee3875be13f80d50"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/SupportPage.tsx",
+      "bytes": 29912,
+      "sha256": "f739820597636f795ed9e7472e213ccd2c85f61f11246ae2e095d3a528c0011b"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/index.module.scss",
+      "bytes": 6507,
+      "sha256": "f2a508f1844f5c63a13b0fb7bf2253bbd207369dfe7e0bc49f068b189fa7d9f8"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/index.tsx",
+      "bytes": 7424,
+      "sha256": "42d23236ffb5715df4f0aa1459d9f5864c112fa89c3ba892469f0b96a75eabca"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentWorkspacePage/reviewedVersions.test.tsx",
+      "bytes": 3808,
+      "sha256": "d88802bbbe13a38bc3a4419ad626de30e047809a3e5d61850fd46f32261ac3a1"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentsPage/index.module.scss",
+      "bytes": 9545,
+      "sha256": "aaef1cc38c5e24dbf931e1e2f04d3ce40122609bdb11187cdb50308805587af7"
+    },
+    {
+      "path": "lms/src/pages/AdvisorStudentsPage/index.tsx",
+      "bytes": 13047,
+      "sha256": "b90328d6ecf550b4033d39eef2b850707d4e93c2a73196e38539d657b71b1236"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/PersonalEventEditor.tsx",
+      "bytes": 8404,
+      "sha256": "372f98bd049cabf792efb42d0698e2d5f1d27530813a80e247fca75502fee7b8"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/WeekCalendar.tsx",
+      "bytes": 3486,
+      "sha256": "a50f53d6c1a93c1f2d60a12776c432b8ada3da82c3bd8ebc1d4070ad466e8ee5"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/calendarData.test.ts",
+      "bytes": 2263,
+      "sha256": "60e46ac1a6474d66a092ea4e62321bfb703d55d7f2641cb011ddb886f8c19477"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/calendarData.ts",
+      "bytes": 6072,
+      "sha256": "b45b768aa6f18bcdf8858dad8cd45ce314755e4c87744f84b92619bd95134cdb"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/calendarOccurrences.ts",
+      "bytes": 2604,
+      "sha256": "bb7bdfd30dd7820b89c50773b45f4fbfd68fc019d05f748ee4c6256b4fef33eb"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/index.module.scss",
+      "bytes": 8718,
+      "sha256": "b24b2528a6acde4b26808ab44bc68564f854dc4136ffb8fa9584d1a847835e4f"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/index.tsx",
+      "bytes": 10875,
+      "sha256": "4b9cc9b63d2419d4500889ea8eeeb2358f290c06056e6415760902c1066726b7"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/personalEvents.ts",
+      "bytes": 2523,
+      "sha256": "5aad4aba291dcd678a5a34bd83f9377e6ac9fb3a474705d0372003e78006ec70"
+    },
+    {
+      "path": "lms/src/pages/CalendarPage/weekLayout.ts",
+      "bytes": 1535,
+      "sha256": "4fb7129790341d253d61bdfa4d49e62bca36290f967564d47cfe25f2dc9de396"
+    },
+    {
+      "path": "lms/src/pages/CourseCataloguePage/components/CoursePreview.module.scss",
+      "bytes": 5620,
+      "sha256": "207af7a058dfa6e5c7cb6bd3c93fb3ca43e6a66c1fd8729b79be8d2563bddccb"
+    },
+    {
+      "path": "lms/src/pages/CourseCataloguePage/components/CoursePreview.tsx",
+      "bytes": 10265,
+      "sha256": "3f7cf71ba7e1edfd927169dafd0814a7cc103fbccad6d6bc3077e7b3e5bd2fee"
+    },
+    {
+      "path": "lms/src/pages/CourseCataloguePage/index.module.scss",
+      "bytes": 5081,
+      "sha256": "105b432a55f87f0c538288919d03390345607b40a83a71648fb46b79faf1e8c6"
+    },
+    {
+      "path": "lms/src/pages/CourseCataloguePage/index.test.tsx",
+      "bytes": 3259,
+      "sha256": "0fe7dea68cbb53735420318b29f309b5767baedfaee74beb8b45541937d0fdae"
+    },
+    {
+      "path": "lms/src/pages/CourseCataloguePage/index.tsx",
+      "bytes": 7928,
+      "sha256": "626e4bcac9d4d8881c1f8d040b1afb19f027f27d7fb1f2ce0440f1d12c47ced7"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/ContentCard.tsx",
+      "bytes": 6875,
+      "sha256": "a2646fce8c5cf925a7356d308cd9a9cd8cdb8f67769615a2487716f33b94f2d1"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/DiscussionPanel.module.scss",
+      "bytes": 1797,
+      "sha256": "725fabeb31b1c9ec86e127e721dc1b44ad368bbd4dc90084b98f79b531c6f3a0"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/DiscussionPanel.tsx",
+      "bytes": 10615,
+      "sha256": "ecbd83a97a599ed730695bd914cf86c150876de5ec916d7ee0ec98222e44af85"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/MaterialReader.module.scss",
+      "bytes": 2582,
+      "sha256": "ff72925770b0ec0edb15d43fee605ac5b64a6db3e91f9e5393bd9fec410ecc66"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/MaterialReader.tsx",
+      "bytes": 7092,
+      "sha256": "7e6c889939bb627a6d6fa19420141ccda8debff28b2d8490fcd9ad60a3d72c6f"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/index.module.scss",
+      "bytes": 14519,
+      "sha256": "00bf68be8275b1ae8f9ef2edb3cbd4117c33d1ffe1d3df40246301d18bab8496"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/index.test.tsx",
+      "bytes": 2009,
+      "sha256": "d9e6387d168017f83e21e47b72fbe0687e5e2fc3ed5f2004736ff5709a58f086"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/index.tsx",
+      "bytes": 7757,
+      "sha256": "e24b852c5886534b0cb5b484fb7a3bb6ab8cbd4d297f5a5c1ea75993ca546c14"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/materialVideo.test.ts",
+      "bytes": 965,
+      "sha256": "8fc5b72d1bc81d9d6cd989deb92bb1d83fcea35dae99f1c818e493fe7bc798b9"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/CourseDetailView/materialVideo.ts",
+      "bytes": 877,
+      "sha256": "2424b582c590c38303c2ea80279de706bf3e6d4967e03d71367161ac92f84020"
+    },
+    {
+      "path": "lms/src/pages/CourseWorkspacePage/components/PageBody.module.scss",
+      "bytes": 2161,
+      "sha256": "2da04da023807ca1c57421a319f14d9093304a04ad068c6ab45d59bf81ca8fc4"
+    },
+    {
+      "path": "lms/src/pages/LmsHomePage/components/CourseCard.module.scss",
+      "bytes": 1167,
+      "sha256": "fc7f2aa21528dcc150134035a0cadccea53c89da23974b05dc87733abe45d6be"
+    },
+    {
+      "path": "lms/src/pages/LmsHomePage/components/CourseCard.tsx",
+      "bytes": 791,
+      "sha256": "ea86af4d334abad7d2cdde38c0e6f0497b04618ccafa5a272401e1488528bc10"
+    },
+    {
+      "path": "lms/src/pages/LmsHomePage/components/Dashboard.tsx",
+      "bytes": 14611,
+      "sha256": "0323af904cca46cb0cc6db17aa761d9bfb3db1382d1e4e335d35dda35fc838a9"
+    },
+    {
+      "path": "lms/src/pages/LmsHomePage/hooks/useCourseList.ts",
+      "bytes": 1820,
+      "sha256": "eb9ed39253d7f925269550065e62a940f72a48f30fb764081a73b32cae95c05f"
+    },
+    {
+      "path": "lms/src/pages/LmsHomePage/index.module.scss",
+      "bytes": 1122,
+      "sha256": "ea5b2c26656c2ee67affb471810fd2c672cc96d9e8f781d379a79970a08c2c8a"
+    },
+    {
+      "path": "lms/src/pages/LmsHomePage/index.tsx",
+      "bytes": 1211,
+      "sha256": "4de4668bb633492f2b04ab13eee5f85dce55f06a315840a1daed19d5951c3bdd"
+    },
+    {
+      "path": "lms/src/pages/MockExamsPage/StaffMockExamWorkspaces.tsx",
+      "bytes": 56037,
+      "sha256": "875ab3d819bd8e94e5a79787b250ee8c7b418ab1ea9a7e995581fc90b941255a"
+    },
+    {
+      "path": "lms/src/pages/MockExamsPage/StudentMockExamLibrary.tsx",
+      "bytes": 6423,
+      "sha256": "d6d64350654eb37b1b1b0278544ed9a9b9f1fd9ee18ef6cd4406f509acb731d8"
+    },
+    {
+      "path": "lms/src/pages/MockExamsPage/WritingGradeReview.tsx",
+      "bytes": 3218,
+      "sha256": "0e73e1e8f9d363a898aeb2e21aa92c1f47fa9b979319f00a6ccc583b2b344f0e"
+    },
+    {
+      "path": "lms/src/pages/MyOperationsPage/TeacherOperationsSections.tsx",
+      "bytes": 20748,
+      "sha256": "1db73c5968161e8eae6fc2d84834d654adc0cc31dc16f53993b057b1756b0254"
+    },
+    {
+      "path": "lms/src/pages/MyOperationsPage/index.tsx",
+      "bytes": 20132,
+      "sha256": "ebd06b52d3ef42d3e809a26e438aa17a0ffef33d1f8412fa1fb82e57729d5648"
+    },
+    {
+      "path": "lms/src/pages/ParentPortalPage/ParentAcademicSections.tsx",
+      "bytes": 3276,
+      "sha256": "8886a65b36ee81add83aa256bf62d691308c95523a73559cd952a05d99d4e4ab"
+    },
+    {
+      "path": "lms/src/pages/ParentPortalPage/index.module.scss",
+      "bytes": 969,
+      "sha256": "bdb1ce81aafe10e8694cb7b58b4612fb60d782d76e6a645ce64c549b2468c73c"
+    },
+    {
+      "path": "lms/src/pages/ParentPortalPage/index.tsx",
+      "bytes": 40252,
+      "sha256": "ae92a4918efa8865f1ed94b75558f838077ebb919421590c7368f6cf7e663b3d"
+    },
+    {
+      "path": "lms/src/pages/ParentPortalPage/useLinkedStudents.ts",
+      "bytes": 1013,
+      "sha256": "1e18b67d84444a45c3018aace6c0a25f080b02f2d795419746286bf33bc5ff8e"
+    },
+    {
+      "path": "lms/src/pages/StudentAdvisingPage/AdvisorTasks.tsx",
+      "bytes": 6142,
+      "sha256": "530e474b409f90fc3435ee17512898f0ec913716dbf6b138753f454f69caa70f"
+    },
+    {
+      "path": "lms/src/pages/StudentAdvisingPage/PlanOverview.module.scss",
+      "bytes": 7353,
+      "sha256": "9b715fcb027c4799c4083396e661897a7e261f096b9a9a9e598a06f77f89fc5e"
+    },
+    {
+      "path": "lms/src/pages/StudentAdvisingPage/PlanOverview.tsx",
+      "bytes": 8722,
+      "sha256": "8af232f0b49bd3d6af0c69e7a190377419030364d524b9018d3c35522c3b0c87"
+    },
+    {
+      "path": "lms/src/pages/StudentAdvisingPage/index.tsx",
+      "bytes": 11967,
+      "sha256": "8e26c7248cf253f3dbeea3c11f7ed650b5e1f7250bce3dcd50768919773c38b7"
+    },
+    {
+      "path": "lms/src/pages/TenantAdminPage/AlertRulesPanel.tsx",
+      "bytes": 7183,
+      "sha256": "fd605c98fcfcfd924d2fbd67beaa6e2d9bcfc488641304fd1d0d61678956acc3"
+    },
+    {
+      "path": "lms/src/pages/TenantAdminPage/AuditPanel.tsx",
+      "bytes": 5907,
+      "sha256": "ee7a274cc88f0ecd1c081a5bd92b38cbb45d11e259274a4bd79966ae62bf356b"
+    },
+    {
+      "path": "lms/src/pages/TenantAdminPage/DirectoryPanel.tsx",
+      "bytes": 23150,
+      "sha256": "b457d82884cffa3ea52563832025b37a9a1d27ea6dad64cd0a7268a3d281d063"
+    },
+    {
+      "path": "lms/src/pages/TenantAdminPage/OwnershipPanel.tsx",
+      "bytes": 8717,
+      "sha256": "71f859399407ce9ccbcfe76065fe7a60414f63fb440276ca2e165d6f42c1f2dc"
+    },
+    {
+      "path": "lms/src/pages/aibot/StudySupportWorkspace.module.scss",
+      "bytes": 838,
+      "sha256": "2a685a0f6e0f4426a980e88596478dd3766f0408910a2d0bb61a65f52e3f88a4"
+    },
+    {
+      "path": "lms/src/pages/aibot/WorkflowPanel.tsx",
+      "bytes": 13188,
+      "sha256": "aba5b76e88937ab25b38f46b8bab5e46f34cbc67ed99e9845c9720c1bead5e9d"
+    },
+    {
+      "path": "lms/src/pages/aibot/index.module.scss",
+      "bytes": 10514,
+      "sha256": "d87d4f4a188ab477f6a86acac3cbf78ea1c9058ea87b771147097e87a0ff8ea5"
+    },
+    {
+      "path": "lms/src/pages/aibot/index.tsx",
+      "bytes": 1134,
+      "sha256": "b2185608d38ab6b0c94213382d3332ad51ffaf0f1d3433476439e1a5cf533b8c"
+    },
+    {
+      "path": "lms/src/pages/profile/AvatarCropDialog.module.scss",
+      "bytes": 1412,
+      "sha256": "a72b276a9ab95530df7335aec36d3413ae9c3b8fd49c993d5cf502dff3164435"
+    },
+    {
+      "path": "lms/src/pages/profile/AvatarCropDialog.tsx",
+      "bytes": 4058,
+      "sha256": "9084fa3382006bade00609da9d52b8c6741f1521a585e5fa94ea42e893371869"
+    },
+    {
+      "path": "lms/src/pages/profile/LearningProfile.module.scss",
+      "bytes": 5243,
+      "sha256": "d12ef1c68796aae0c3b578268d326e3b7e53bac9e036ed6d0187e9ea386eb7db"
+    },
+    {
+      "path": "lms/src/pages/profile/LearningProfile.tsx",
+      "bytes": 6495,
+      "sha256": "5f9c2ed40137576c4f859d942a18e9e2cfb0dd3c99925b9c927b53bcc5b0de59"
+    },
+    {
+      "path": "lms/src/pages/profile/ReleasedAssessments.tsx",
+      "bytes": 4459,
+      "sha256": "b1665517c6d5bd6eb38847377bac5a0309aab5d6b63989a5da16223422e82965"
+    },
+    {
+      "path": "lms/src/pages/profile/index.tsx",
+      "bytes": 9515,
+      "sha256": "15c8b5e1986c2e9477fc8db1427cdc8c05703363dee3e6909d04706f45b55a00"
+    },
+    {
+      "path": "lms/src/pages/profile/styles.module.scss",
+      "bytes": 3467,
+      "sha256": "0baaa35b57afd374e507be39d510e159204c963edb474a6dde41bc1eb4c45854"
+    },
+    {
+      "path": "lms/src/pages/profile/useLearningProfile.ts",
+      "bytes": 405,
+      "sha256": "7a9272175fc8946f8d6a470e9b813ee7cf31f414ce91a511c84888cc193beb06"
+    },
+    {
+      "path": "lms/src/styles/_tokens.scss",
+      "bytes": 8983,
+      "sha256": "ac0e90147d6aed0517ef58029a3c525b0ba9737500d326bc4ed07cb9540d1e1c"
+    }
+  ],
+  "frontendFileCount": 130,
+  "buildIndexSha256": "aa114cf85e770393939e208b9d54625e679f0dd3a10d7ae5b86918c6af7ab7f8"
+}

@@ -238,7 +238,7 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
   expect(sectionCheckboxBox?.height).toBeLessThanOrEqual(22);
   await page.getByRole('group', {name: 'Assigned sections'}).scrollIntoViewIfNeeded();
   await page.screenshot({path: testInfo.outputPath('advisor-mock-exam-sections.png'), fullPage: true});
-  await page.getByLabel('Student').selectOption('301');
+  await page.getByRole('combobox', {name: /^Student/}).selectOption('301');
   await page.getByLabel('Published template').selectOption('45');
   await page.getByRole('combobox', {name: 'Writing instructor'}).selectOption('501');
   await page.getByRole('button', {name: 'Assign exam'}).click();
@@ -309,11 +309,8 @@ test('student advising view presents profile, plan, and tasks with scannable hie
   await page.route('**/v2/student/advisor-conversation/messages**', route => route.fulfill({json: response([])}));
 
   await page.goto('/my-plan');
-  await expect(page.getByRole('heading', {name: 'Learning profile'})).toBeVisible();
-  await openSection(page, 'Study plan');
-  await expect(page.getByRole('heading', {name: /Checkpoint 1/})).toBeVisible();
-  await openSection(page, 'Checkpoint 1: Complete the first diagnostic');
-  await page.getByRole('button', {name: 'View tasks'}).click();
+  await expect(page.getByRole('heading', {name: 'My Learning Goal'})).toBeVisible();
+  await page.getByRole('region', {name: 'Learning Journey', exact: true}).getByRole('button', {name: /Complete the first diagnostic/}).click();
   await page.getByRole('button', {name: 'View Complete the week 1 diagnostic', exact: true}).click();
   await expect(page.getByRole('complementary').getByText('Not started', {exact: true})).toBeVisible();
   await expect(page.getByRole('button', {name: 'Complete task', exact: true})).toBeVisible();

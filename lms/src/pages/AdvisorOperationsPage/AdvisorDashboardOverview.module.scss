@@ -1,0 +1,128 @@
+.welcome {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-5;
+  padding-bottom: t.$space-5;
+  margin-bottom: t.$space-5;
+  border-bottom: 1px dashed t.$border-default;
+}
+.welcome h1 {
+  margin: 0;
+  font-size: t.$workspace-title-size;
+  line-height: t.$line-height-title-1;
+}
+.welcome > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-4;
+  font-size: t.$font-size-caption;
+}
+.welcome strong {
+  margin-left: t.$space-2;
+}
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.45fr) minmax(0, 0.8fr);
+  gap: t.$workspace-section-gap;
+  align-items: start;
+}
+.column {
+  display: grid;
+  min-width: 0;
+  gap: t.$space-5;
+}
+.assistant {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-3;
+  min-height: 35rem;
+  padding: t.$space-6;
+  border-radius: t.$radius-lg;
+  background: t.$surface-brand-subtle;
+}
+.assistant h2 {
+  margin: t.$space-6 0 0;
+  font-size: t.$font-size-headline;
+  line-height: t.$line-height-headline;
+}
+.assistant p {
+  margin: 0 0 t.$space-6;
+  font-size: t.$font-size-subhead;
+  line-height: t.$line-height-subhead;
+}
+.assistant a {
+  padding: t.$space-3 t.$space-4;
+  border-radius: t.$radius-sm;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+}
+.assistant small {
+  margin-top: auto;
+  color: t.$content-secondary;
+}
+.row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-3;
+  padding: t.$space-2 0;
+  color: t.$content-primary;
+  text-decoration: none;
+  font-size: t.$font-size-body;
+}
+.row > div {
+  display: grid;
+  min-width: 0;
+  gap: t.$space-1;
+  overflow-wrap: anywhere;
+}
+.row small,
+.row > span {
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+}
+.row a {
+  flex-shrink: 0;
+}
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$space-5;
+  margin: 0;
+}
+.stats dt {
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+}
+.stats dd {
+  margin: t.$space-1 0 0;
+  font-size: t.$font-size-headline;
+  font-weight: t.$fw-semibold;
+}
+.error {
+  color: t.$feedback-danger;
+}
+@media (max-width: 1200px) {
+  .grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.5fr);
+  }
+  .grid > .column:last-child {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 760px) {
+  .grid,
+  .grid > .column:last-child {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .assistant {
+    min-height: auto;
+  }
+  .assistant h2 {
+    margin-top: 0;
+  }
+}

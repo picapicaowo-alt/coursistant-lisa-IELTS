@@ -1,3 +1,4 @@
+import {UserAvatar} from '@/components/UserAvatar';
 import React from "react";
 import {Navigate} from "react-router-dom";
 import styles from "./index.module.scss"
@@ -22,14 +23,7 @@ const UserDashboard: React.FC = () => {
   return (
     <section className={styles.dashboardPage} aria-labelledby="dashboard-title">
       <header className={styles.welcomeHeader}>
-        <img
-          src={user.avatar || '/icons/default_avatar.jpg'}
-          alt=""
-          onError={event => {
-            event.currentTarget.onerror = null;
-            event.currentTarget.src = '/icons/default_avatar.jpg';
-          }}
-        />
+        <UserAvatar src={user.avatar} className={styles.welcomeAvatar}/>
         <h1 id="dashboard-title">Welcome back, {user.name || (instructor ? 'instructor' : 'learner')}!</h1>
       </header>
       <Dashboard audience={instructor ? 'instructor' : 'student'}/>

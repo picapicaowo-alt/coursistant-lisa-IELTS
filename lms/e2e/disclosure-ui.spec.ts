@@ -29,26 +29,24 @@ async function installFixture(page: Page, level = 'ADVISOR') {
 }
 
 for (const width of [1440, 390]) {
-  test(`independent disclosures preserve drafts and reveal required fields at ${width}px`, async ({page}, testInfo) => {
+  test(`visible primary fields preserve drafts and optional skills reveal validation at ${width}px`, async ({page}, testInfo) => {
     await page.setViewportSize({width, height: 960});
     await installFixture(page);
     const errors: string[] = [];
     page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
     await page.goto('/advisor/students/301/profile');
-    await expect(sectionTrigger(page, 'Primary target')).toBeVisible();
+    await expect(page.getByRole('region', {name: 'Primary target', exact: true})).toBeVisible();
     await expect(page.locator('details[open]')).toHaveCount(0);
     await page.screenshot({path: testInfo.outputPath(`profile-collapsed-${width}.png`), fullPage: true});
     await openSection(page, 'Student context');
     await page.getByRole('textbox', {name: 'Academic background', exact: true}).fill('Unsaved background stays in place.');
-    await sectionTrigger(page, 'Student context').click();
     await openSection(page, 'Primary target');
-    await expect(sectionTrigger(page, 'Student context').locator('..')).not.toHaveAttribute('open');
     await openSection(page, 'Student context');
     await expect(page.getByRole('textbox', {name: 'Academic background', exact: true})).toHaveValue('Unsaved background stays in place.');
     await openSection(page, 'Measured skills');
     await openSection(page, 'Writing');
     await page.getByRole('textbox', {name: /^Skill code/}).fill('');
-    await sectionTrigger(page, 'Measured skills').click();
+    await sectionTrigger(page, 'Writing').click();
     const saveButton = page.getByRole('button', {name: 'Save profile', exact: true});
     await saveButton.scrollIntoViewIfNeeded();
     if (width === 390) {
@@ -57,15 +55,15 @@ for (const width of [1440, 390]) {
     }
     await saveButton.click();
     await expect(page.getByRole('textbox', {name: /^Skill code/})).toBeFocused();
-    await expect(sectionTrigger(page, 'Measured skills').locator('..')).toHaveAttribute('open', '');
+    await expect(page.getByRole('region', {name: 'Measured skills', exact: true})).toBeVisible();
     await expect(sectionTrigger(page, 'Writing').locator('..')).toHaveAttribute('open', '');
     expect(errors.filter(message => /not focusable|validateDOMNesting|Maximum update/.test(message))).toEqual([]);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 
     await page.goto('/advisor/students/301/study-plan');
-    await expect(page.getByRole('heading', {name: 'Learning journey'})).toBeVisible();
+    await expect(page.getByRole('heading', {name: 'Learning Journey', exact: true})).toBeVisible();
     await page.getByRole('button', {name: 'Edit study plan', exact: true}).click();
-    await expect(sectionTrigger(page, 'Plan direction')).toBeVisible();
+    await expect(page.getByRole('region', {name: 'Plan direction', exact: true})).toBeVisible();
     await expect(page.locator('details[open]')).toHaveCount(0);
     await page.screenshot({path: testInfo.outputPath(`study-plan-collapsed-${width}.png`), fullPage: true});
     await page.goto('/advisor/students/301/study-plan?advisorTaskId=101');
@@ -73,26 +71,26 @@ for (const width of [1440, 390]) {
     await page.getByRole('button', {name: 'Edit checkpoint & tasks'}).click();
     await expect(page.getByLabel('Title', {exact: true})).toBeVisible();
     await expect(page.getByLabel('Title', {exact: true})).toHaveValue('Submit the week 1 essay');
-    await expect(sectionTrigger(page, 'Plan direction').locator('..')).not.toHaveAttribute('open');
+    await expect(page.getByRole('region', {name: 'Plan direction', exact: true})).toBeVisible();
   });
 
-  test(`colored courses stay distinct and date popovers never cover their anchor at ${width}px`, async ({page}, testInfo) => {
+  test(`white course cards remain readable and date popovers never cover their anchor at ${width}px`, async ({page}, testInfo) => {
     await page.setViewportSize({width, height: 960});
     await installFixture(page);
     await page.goto('/advisor/students/301/courses');
-    await expect(sectionTrigger(page, courses[2].title)).toBeVisible();
+    await expect(page.getByRole('heading', {name: courses[2].title})).toBeVisible();
     await expect(page.locator('details[open]')).toHaveCount(0);
-    const tones = await Promise.all(courses.map(course => sectionTrigger(page, course.title).evaluate(element => getComputedStyle(element).backgroundColor)));
-    expect(new Set(tones).size).toBe(3);
+    const tones = await Promise.all(courses.map(course => page.getByRole('article', {name: course.title}).evaluate(element => getComputedStyle(element).backgroundColor)));
+    expect(new Set(tones)).toEqual(new Set(['rgb(255, 255, 255)']));
     await page.screenshot({path: testInfo.outputPath(`course-cards-${width}.png`), fullPage: true});
-    await openSection(page, courses[1].title);
     await page.getByRole('button', {name: 'Edit schedule'}).click();
     await expect(sectionTrigger(page, 'Update a one-to-one course').locator('..')).toHaveAttribute('open', '');
     await sectionTrigger(page, 'Update a one-to-one course').click();
     await page.getByRole('button', {name: 'Edit schedule'}).click();
     await expect(sectionTrigger(page, 'Update a one-to-one course').locator('..')).toHaveAttribute('open', '');
     await sectionTrigger(page, 'Update a one-to-one course').click();
-    await openSection(page, 'Create a one-to-one course');
+    await page.getByRole('button', {name: 'Add Course', exact: true}).click();
+    await page.getByRole('button', {name: 'Create 1-on-1 Course', exact: true}).click();
     const input = page.getByLabel('Term start', {exact: true});
     await input.scrollIntoViewIfNeeded();
     await input.click();
@@ -109,6 +107,8 @@ for (const width of [1440, 390]) {
     const cancelBox = await popup.getByRole('button', {name: 'Cancel', exact: true}).boundingBox();
     if (!cancelBox) throw new Error('Calendar dismissal must remain reachable');
     expect(cancelBox.y + cancelBox.height).toBeLessThanOrEqual(popupBox.y + popupBox.height);
+    await expect(popup.getByRole('button', {name: 'Today', exact: true})).toBeInViewport();
+    await popup.getByRole('button', {name: 'Next month', exact: true}).click();
     await page.screenshot({path: testInfo.outputPath(`calendar-position-${width}.png`)});
     await page.keyboard.press('Escape');
     await expect(popup).toHaveCount(0);
@@ -117,12 +117,12 @@ for (const width of [1440, 390]) {
   });
 }
 
-test('a collapsed intake reveals required fields on native form validation', async ({page}) => {
+test('intake keeps primary fields visible with native form validation', async ({page}) => {
   await installFixture(page, 'COUNSELLOR');
   await page.goto('/counsellor/intakes/new');
-  await expect(sectionTrigger(page, 'Student identity')).toBeVisible();
+  await expect(page.getByRole('region', {name: 'Student identity', exact: true})).toBeVisible();
   await expect(page.locator('details[open]')).toHaveCount(0);
   await page.getByRole('button', {name: 'Create intake', exact: true}).click();
   await expect(page.getByLabel('First name *')).toBeFocused();
-  await expect(sectionTrigger(page, 'Learning context').locator('..')).toHaveAttribute('open', '');
+  await expect(page.getByRole('region', {name: 'Learning context', exact: true})).toBeVisible();
 });

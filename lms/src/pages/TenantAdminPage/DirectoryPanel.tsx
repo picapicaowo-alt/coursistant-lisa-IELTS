@@ -1,3 +1,4 @@
+import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {FormEvent, useEffect, useRef, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -201,7 +202,7 @@ export const DirectoryPanel = () => {
 
   return (
     <div className={styles.directoryLayout}>
-      <CollapsibleSection title="User directory" headingId="directory-title" summary="Search and filter people in your tenant. Search covers names and email only.">
+      <WorkspaceSection title="User directory" headingId="directory-title" summary="Search and filter people in your tenant. Search covers names and email only.">
         <div className={styles.panelHeading}>
 
           <button type="button" className={styles.iconButton} aria-label="Refresh directory" onClick={() => void directory.refetch()}><RefreshCw size={18}/></button>
@@ -227,7 +228,7 @@ export const DirectoryPanel = () => {
           ))}
         </div>
         {directory.data && directory.data.total > PAGE_SIZE ? <nav className={styles.pagination} aria-label="Directory pages"><button type="button" disabled={page === 0} onClick={() => setPage(current => current - 1)}>Previous</button><span>Page {page + 1} · {directory.data.total} users</span><button type="button" disabled={(page + 1) * PAGE_SIZE >= directory.data.total} onClick={() => setPage(current => current + 1)}>Next</button></nav> : null}
-      </CollapsibleSection>
+      </WorkspaceSection>
 
       <aside className={styles.sideColumn}>
         <CollapsibleSection title="Create account" headingId="create-account-title" summary="Staff and additional Tenant Admins only.">

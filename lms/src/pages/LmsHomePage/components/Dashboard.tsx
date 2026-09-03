@@ -118,7 +118,7 @@ const ChatPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
       </div>
 
       <form className={styles.chatComposer} onSubmit={event => { event.preventDefault(); openChat(prompt); }}>
-        <button type="button" aria-label="Add attachment" className={styles.composerAdd}>+</button>
+        <button type="button" aria-label="Open chat to add an attachment" onClick={() => openChat('')} className={styles.composerAdd}>+</button>
         <input
           value={prompt}
           onChange={event => setPrompt(event.target.value)}

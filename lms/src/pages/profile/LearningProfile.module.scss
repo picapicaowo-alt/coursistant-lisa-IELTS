@@ -1,0 +1,269 @@
+.summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+.goal {
+  display: grid;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 7rem;
+}
+.goal span {
+  font-size: t.$fs-caption;
+  opacity: 0.9;
+}
+.goal strong {
+  font-size: clamp(1.25rem, 2vw, 2rem);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.arrow {
+  font-size: 2rem;
+  opacity: 0.65;
+}
+.summary dl {
+  display: grid;
+  gap: 0.9rem;
+  flex: 1;
+  min-width: 12rem;
+  padding-left: 1.5rem;
+  border-left: 1px solid rgba(t.$white, 0.4);
+}
+.summary dt {
+  font-size: t.$fs-caption;
+  opacity: 0.85;
+}
+.summary dd {
+  font-size: t.$font-size-body;
+  margin: 0.2rem 0 0;
+  font-weight: t.$fw-semibold;
+}
+.learningDetails {
+  margin: 1.25rem 0;
+}
+.skills {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
+  gap: 1rem;
+}
+.skills article {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+}
+.skillSymbol {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: t.$radius-control;
+  color: t.$brand;
+  background: t.$brand-subtle;
+  font-size: 1.25rem;
+  font-weight: t.$fw-semibold;
+}
+.skills h2 {
+  font-size: t.$fs-caption;
+  color: t.$text-muted;
+  text-transform: uppercase;
+  margin: 0.4rem 0 0;
+}
+.skills strong {
+  font-size: 1.65rem;
+  font-weight: t.$fw-bold;
+}
+.skills small {
+  color: t.$text-muted;
+}
+.insightLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(12rem, 1fr);
+  gap: 1.5rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid t.$border;
+}
+.insightLayout > section {
+  min-width: 0;
+}
+.insightLayout nav {
+  display: flex;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+.insightLayout nav button {
+  min-height: 2.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: t.$radius-control;
+  cursor: pointer;
+}
+.insightLayout nav [aria-pressed='true'] {
+  background: t.$neutral-fill;
+}
+.insights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.insights article {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  min-height: 14rem;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  padding: 1.1rem;
+  overflow-wrap: anywhere;
+}
+.insights h2,
+.insightLayout aside h2,
+.assessments h2 {
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-semibold;
+  margin: 0;
+}
+.insights h2 {
+  color: t.$brand;
+}
+.insights :is(p, li) {
+  font-size: t.$fs-caption;
+  line-height: 1.65;
+}
+.insights ul {
+  padding-left: 1rem;
+}
+.insightLayout aside {
+  border-left: 1px solid t.$border;
+  padding-left: 1.25rem;
+}
+.insightLayout aside h2 {
+  margin-bottom: 1rem;
+}
+.assessments {
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card-lg;
+  padding: 1.25rem;
+}
+.assessments dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 1.25rem;
+  margin: 1.25rem 0 0;
+}
+.assessments dt {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+.assessments dd {
+  margin: 0.5rem 0 0;
+  font-size: 1.25rem;
+  font-weight: t.$fw-semibold;
+}
+.empty {
+  color: t.$text-muted;
+  padding: 1rem;
+}
+.learningDetails button:focus-visible {
+  outline: 2px solid t.$brand;
+  outline-offset: 3px;
+}
+@media (max-width: 1000px) {
+  .insightLayout {
+    grid-template-columns: 1fr;
+  }
+  .insightLayout aside {
+    border-left: 0;
+    border-top: 1px solid t.$border;
+    padding: 1.25rem 0 0;
+  }
+}
+@media (max-width: 650px) {
+  .insights {
+    grid-template-columns: 1fr;
+  }
+  .insights article {
+    min-height: auto;
+    gap: 1rem;
+  }
+  .summary dl {
+    flex-basis: 100%;
+    border-left: 0;
+    padding-left: 0;
+    border-top: 1px solid rgba(t.$white, 0.4);
+    padding-top: 1rem;
+  }
+  .skills {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.assessmentFilter {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+  margin-bottom: t.$space-5;
+  color: t.$content-secondary;
+}
+.assessmentFilter select {
+  width: min(100%, 20rem);
+  min-width: 0;
+  min-height: t.$touch-target;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  padding: t.$space-2;
+}
+.assessmentCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: t.$space-4;
+}
+.assessmentCards article {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: t.$space-3;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-lg;
+  padding: t.$space-5;
+}
+.assessmentCards h3 {
+  font-size: t.$font-size-subhead;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.assessmentCards svg,
+.assessmentCards article > strong {
+  color: t.$action-primary;
+}
+.assessmentCards strong {
+  font-size: t.$font-size-headline;
+}
+.assessmentCards small {
+  color: t.$content-secondary;
+}
+.assessmentCards a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: t.$touch-target;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  width: 100%;
+}
+.assessmentPages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-4;
+  align-items: center;
+  margin: t.$space-4 0;
+}
+.assessments {
+  margin-top: t.$space-5;
+}

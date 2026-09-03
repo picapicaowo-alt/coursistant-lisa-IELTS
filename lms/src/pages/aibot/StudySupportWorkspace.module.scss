@@ -1,0 +1,47 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  max-width: 54rem;
+  margin: auto;
+  padding: 0.5rem;
+}
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+.toolbar button {
+  min-height: 2.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: t.$radius-control;
+  border: 1px solid t.$border;
+  color: t.$text;
+  cursor: pointer;
+}
+.welcome {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 1.5rem;
+  flex: 1;
+  padding: 2rem 0;
+}
+.welcome img {
+  width: 6rem;
+  height: 6rem;
+}
+.welcome h2 {
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  line-height: 1.4;
+  font-weight: t.$fw-medium;
+  color: t.$content-ink;
+}
+.welcome span {
+  color: t.$brand;
+}
+.toolbar button:focus-visible {
+  outline: 2px solid t.$brand;
+  outline-offset: 3px;
+}

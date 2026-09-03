@@ -1,0 +1,163 @@
+.page {
+  padding: t.$workspace-gutter-block t.$workspace-gutter-inline;
+  min-width: 0;
+}
+.page h1 {
+  margin: 0 0 t.$space-5;
+  font-size: t.$workspace-title-size;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(16rem, 0.7fr) minmax(0, 1.6fr);
+  min-height: 72dvh;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-lg;
+  background: t.$surface-raised;
+}
+.directory {
+  min-width: 0;
+  border-right: 1px solid t.$border-default;
+}
+.directory header {
+  display: grid;
+  gap: t.$space-3;
+  padding: t.$space-5;
+  background: t.$surface-brand-subtle;
+  border-radius: t.$radius-lg 0 0 0;
+}
+.directory h2,
+.threadHeader h2 {
+  margin: 0;
+  font-size: t.$font-size-subhead;
+}
+.directory label {
+  display: grid;
+  gap: t.$space-2;
+  font-size: t.$font-size-caption;
+}
+.directory input[type='search'] {
+  width: 100%;
+  min-width: 0;
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-3;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-raised;
+}
+.directory .checkbox {
+  display: flex;
+  align-items: center;
+}
+.directory ul {
+  list-style: none;
+  margin: 0;
+  padding: t.$space-2;
+}
+.directory > p,
+.directory > div[role='alert'] {
+  padding: t.$space-5;
+}
+.person {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: t.$space-3;
+  padding: t.$space-4 t.$space-3;
+  border: 0;
+  border-radius: t.$radius-sm;
+  background: transparent;
+  text-align: left;
+}
+.person[aria-current],
+.person:hover {
+  background: t.$surface-brand-subtle;
+}
+.person > span:nth-child(2) {
+  display: grid;
+  min-width: 0;
+  gap: t.$space-1;
+}
+.person strong {
+  font-size: t.$font-size-body;
+}
+.person small {
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.avatar {
+  display: grid;
+  flex: 0 0 t.$touch-target;
+  height: t.$touch-target;
+  place-items: center;
+  border-radius: t.$radius-pill;
+  background: t.$surface-muted;
+  color: t.$action-primary;
+}
+.unread {
+  margin-left: auto;
+  color: t.$feedback-danger;
+  font-size: t.$font-size-caption;
+}
+.thread {
+  min-width: 0;
+  padding: t.$space-5;
+}
+.threadHeader {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+  margin-bottom: t.$space-5;
+}
+.threadHeader a {
+  margin-left: auto;
+  font-size: t.$font-size-caption;
+}
+.back {
+  display: none;
+}
+.empty {
+  display: flex;
+  min-height: 60dvh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: t.$content-secondary;
+}
+.empty img {
+  width: t.$touch-target;
+  height: t.$touch-target;
+}
+.empty h2 {
+  color: t.$content-primary;
+  font-size: t.$font-size-headline;
+}
+@media (max-width: 760px) {
+  .workspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .directory {
+    border-right: 0;
+  }
+  .directory header {
+    border-radius: t.$radius-lg t.$radius-lg 0 0;
+  }
+  .workspace:not([data-selected]) .thread {
+    display: none;
+  }
+  .workspace[data-selected] .directory {
+    display: none;
+  }
+  .back {
+    display: inline-flex;
+    min-height: t.$touch-target;
+    align-items: center;
+  }
+  .thread {
+    padding: t.$space-3;
+  }
+}

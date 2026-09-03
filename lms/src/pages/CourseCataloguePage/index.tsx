@@ -14,7 +14,10 @@ import {
   canAccessCourseOperations,
   canCreateCourses,
   isAdvisorAccount,
+  isStudentAccount,
 } from '@/utils/roleCapabilities';
+import {useStudentProgress} from '@/hooks/useStudentProgress';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {getSignedInHomePath} from '@/utils/signedInHomePath';
 
 const CourseCataloguePage: React.FC = () => {
@@ -23,7 +26,9 @@ const CourseCataloguePage: React.FC = () => {
   const {user} = useRequiredAuth();
   const isUserAccount = user.role === 'USER';
   const canCreateCourse = canCreateCourses(user);
-  const [courseState, setCourseState] = useState<CourseState>('Active');
+  const [courseState, setCourseState] = useState<CourseState | undefined>(undefined);
+
+  const [view, setView] = useState<'grid' | 'list'>('grid');
 
   if (!canAccessCourseCatalogue(user)) {
     return <Navigate to={getSignedInHomePath(user)} replace/>;
@@ -34,29 +39,13 @@ const CourseCataloguePage: React.FC = () => {
       <div className={styles.contentContainer}>
         <h1 className={styles.pageTitle}>{isUserAccount ? t("list.tabs.myCourses") : 'Courses'}</h1>
         <div className={styles.tabsContainer}>
-          <button
-            type="button"
-            className={`${styles.tab} ${courseState === 'Active' ? styles.active : ""}`}
-            onClick={() => setCourseState('Active')}
-          >
-            <span className={styles.tabLabel}>
-              {isUserAccount ? t("list.tabs.myCourses") : 'Courses'}
-            </span>
-          </button>
-          <button
-            type="button"
-            className={`${styles.tab} ${courseState === 'Archived' ? styles.active : ""}`}
-            onClick={() => setCourseState('Archived')}
-          >
-            <span className={styles.tabLabel}>Archived</span>
-          </button>
-          
+          {([{value: undefined, label: 'All Status'}, {value: 'Active', label: 'Active'}, {value: 'Archived', label: 'Archived'}] as const).map(tab => <button key={tab.label} type="button" className={`${styles.tab} ${courseState === tab.value ? styles.active : ''}`} aria-pressed={courseState === tab.value} onClick={() => setCourseState(tab.value)}>{tab.label}</button>)}
           <div className={styles.tabSpacer}/>
           
           {canCreateCourse ? (
             <button
               className={styles.addButton}
-              onClick={() => navigate("/course/add-content")}
+              onClick={() => navigate(APP_ROUTE_PATHS.courseAddContent)}
             >
               <span className={styles.addIcon}>+</span>
               <span className={styles.addText}>
@@ -64,10 +53,10 @@ const CourseCataloguePage: React.FC = () => {
               </span>
             </button>
           ) : null}
+          <div className={styles.viewToggle} aria-label="Course display"><button type="button" aria-label="Grid view" aria-pressed={view === 'grid'} onClick={() => setView('grid')}><img src="/icons/figma-courses/grid.svg" alt=""/></button><button type="button" aria-label="List view" aria-pressed={view === 'list'} onClick={() => setView('list')}><img src="/icons/figma-courses/list.svg" alt=""/></button></div>
         </div>
-        
         <Suspense fallback={<LoadingOverlay/>}>
-          <CoursesList key={courseState} state={courseState}/>
+          <CoursesList key={courseState} state={courseState} view={view}/>
         </Suspense>
       </div>
     </div>
@@ -76,11 +65,12 @@ const CourseCataloguePage: React.FC = () => {
 
 const PAGE_SIZE = 20;
 
-const CoursesList: React.FC<{state: CourseState}> = ({state}) => {
+const CoursesList: React.FC<{state?: CourseState; view: 'grid' | 'list'}> = ({state, view}) => {
   const {t} = useTranslation("course");
   const {user} = useRequiredAuth();
   const isUserAccount = user.role === 'USER';
   const [currentPage, setCurrentPage] = useState(1);
+  const studentProgress = useStudentProgress(isStudentAccount(user));
 
   /**
    * The user's own courses.
@@ -126,15 +116,19 @@ const CoursesList: React.FC<{state: CourseState}> = ({state}) => {
 
   return (
     <React.Fragment>
-      <div className={styles.courseGrid}>
+      <div className={view === 'list' ? styles.courseList : styles.courseGrid}>
         {courses.map((course) => (
           <CoursePreview
             key={course.id}
             id={course.id}
             courseCode={course.courseCode}
             title={course.title}
-            state={state}
+            state={course.state}
             instructorName={course.primaryInstructor?.name ?? null}
+            progress={studentProgress.data?.courses?.find(item => item.courseId === course.id)}
+            progressLoading={studentProgress.isFetching}
+            progressFailed={studentProgress.isError}
+            showProgress={isStudentAccount(user)}
             // Archiving is a Course Manager action. A TA never qualifies, no
             // matter which permission flags it holds, so this checks the
             // enrolment role rather than any of them.
@@ -145,10 +139,11 @@ const CoursesList: React.FC<{state: CourseState}> = ({state}) => {
         ))}
       </div>
 
-      {courses.length > 0 && (
+      {totalPages > 1 && (
         <div className={styles.paginationContainer}>
           <button
             className={styles.paginationButton}
+            aria-label="Previous course page"
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
           >
@@ -158,19 +153,22 @@ const CoursesList: React.FC<{state: CourseState}> = ({state}) => {
           </button>
           
           <div className={styles.pageNumbers}>
-            {[...Array(totalPages)].map((_, i) => (
+            {Array.from({length: Math.min(totalPages, 5)}, (_, offset) => Math.min(Math.max(currentPage - 2, 1), Math.max(totalPages - 4, 1)) + offset).map(page => (
               <button
-                key={i}
-                className={`${styles.pageButton} ${currentPage === i + 1 ? styles.active : ""}`}
-                onClick={() => setCurrentPage(i + 1)}
+                key={page}
+                aria-label={`Course page ${page}`}
+                aria-current={currentPage === page ? 'page' : undefined}
+                className={`${styles.pageButton} ${currentPage === page ? styles.active : ""}`}
+                onClick={() => setCurrentPage(page)}
               >
-                {i + 1}
+                {page}
               </button>
             ))}
           </div>
           
           <button
             className={styles.paginationButton}
+            aria-label="Next course page"
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
           >

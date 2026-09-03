@@ -1,0 +1,369 @@
+.overview {
+  display: grid;
+  gap: t.$space-6;
+  min-width: 0;
+}
+.tabs {
+  display: flex;
+  gap: t.$space-3;
+}
+.tabs button {
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-5;
+  border: 0;
+  border-radius: t.$radius-sm;
+  background: transparent;
+  color: t.$content-primary;
+}
+.tabs [aria-pressed='true'] {
+  background: t.$surface-muted;
+}
+.summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$space-5;
+}
+.goal {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-4;
+  padding: t.$space-6;
+  border-radius: t.$radius-lg;
+  background: t.$action-primary;
+  color: t.$content-on-color;
+}
+.goal h2 {
+  margin: 0;
+  font-size: t.$font-size-headline;
+  line-height: t.$line-height-headline;
+}
+.goal p {
+  margin: 0;
+  max-width: 65ch;
+}
+.goalValues {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$space-5;
+  margin: t.$space-4 0;
+}
+.goalValues > div {
+  display: grid;
+  gap: t.$space-2;
+}
+.goalValues strong {
+  font-size: t.$font-size-headline;
+  overflow-wrap: anywhere;
+}
+.goalValues span,
+.goal small {
+  font-size: t.$font-size-caption;
+}
+.progress {
+  display: grid;
+  gap: t.$space-2;
+  margin-top: auto;
+}
+.progress > span {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: t.$space-2;
+}
+.progress progress {
+  width: 100%;
+  height: t.$space-2;
+  accent-color: t.$content-on-color;
+}
+.skill {
+  display: grid;
+  gap: t.$space-2;
+  min-width: 0;
+}
+.skill > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: t.$space-3;
+}
+.skill span,
+.skill small {
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+}
+.skill b {
+  color: t.$content-primary;
+}
+.skill meter {
+  width: 100%;
+  height: t.$space-3;
+  accent-color: t.$feedback-success;
+}
+.journey {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: t.$space-5;
+}
+.checkpoint {
+  display: grid;
+  grid-template-columns: t.$touch-target minmax(0, 1fr) auto t.$space-4;
+  align-items: center;
+  gap: t.$space-4;
+  width: 100%;
+  padding: t.$space-4 0;
+  border: 0;
+  border-bottom: 1px dashed t.$border-default;
+  background: transparent;
+  text-align: left;
+  color: t.$content-primary;
+}
+.checkpoint > span:not(.step) {
+  display: grid;
+  gap: t.$space-1;
+}
+.checkpoint small {
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+}
+.checkpoint img {
+  width: t.$space-4;
+  height: t.$space-4;
+}
+.step {
+  display: grid;
+  width: t.$space-8;
+  height: t.$space-8;
+  place-items: center;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-pill;
+  color: t.$action-primary;
+}
+.step[data-complete] {
+  background: t.$action-primary;
+  color: t.$content-on-color;
+}
+.task {
+  display: grid;
+  gap: t.$space-2;
+  width: 100%;
+  padding: t.$space-4;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-subtle;
+  text-align: left;
+  color: t.$content-primary;
+}
+.task:hover,
+.checkpoint:hover {
+  border-color: t.$action-primary;
+}
+.task small {
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+}
+@media (max-width: 1000px) {
+  .summary,
+  .journey {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 480px) {
+  .checkpoint {
+    grid-template-columns: t.$space-8 minmax(0, 1fr) t.$space-4;
+    gap: t.$space-2;
+  }
+  .checkpoint > span:nth-child(3) {
+    grid-column: 2;
+  }
+  .checkpoint img {
+    grid-column: 3;
+    grid-row: 1;
+  }
+  .goal {
+    padding: t.$space-4;
+  }
+}
+
+.tasksLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(15rem, 1fr);
+  gap: t.$space-5;
+  align-items: start;
+}
+.tasksMain,
+.tasksRail {
+  display: grid;
+  gap: t.$space-5;
+  min-width: 0;
+}
+.tasksRail p {
+  margin: 0;
+  line-height: t.$line-height-body;
+}
+.tasksRail svg {
+  color: t.$action-primary;
+}
+.taskOverview,
+.taskBoard {
+  padding: t.$space-6;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-lg;
+  min-width: 0;
+}
+.taskOverview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 7rem;
+  gap: t.$space-4;
+}
+.taskOverview h2 {
+  margin: 0 0 t.$space-2;
+  font-size: t.$font-size-subhead;
+}
+.taskOverview p {
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+}
+.taskOverview img {
+  width: 100%;
+  align-self: center;
+}
+.taskCounts {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+}
+.taskCounts button {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  font-size: t.$font-size-caption;
+  min-height: t.$touch-target;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: t.$content-secondary;
+}
+.taskCounts button[aria-pressed='true'] {
+  border-bottom-color: t.$action-primary;
+  color: t.$content-primary;
+}
+.taskCounts button > span {
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid t.$content-secondary;
+  border-radius: t.$radius-pill;
+}
+.taskCounts button > span[data-tone='active'] {
+  border-color: t.$action-primary;
+}
+.taskCounts button > span[data-tone='complete'] {
+  border-color: t.$feedback-success;
+}
+.steps {
+  display: flex;
+  gap: t.$space-1;
+  overflow: auto;
+  padding-bottom: t.$space-3;
+}
+.steps button {
+  flex: 1 0 5rem;
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-4;
+  border: 0;
+  background: t.$surface-muted;
+  color: t.$content-secondary;
+  clip-path: polygon(0 0, 93% 0, 100% 50%, 93% 100%, 0 100%, 7% 50%);
+}
+.steps button[aria-pressed='true'] {
+  background: t.$action-primary;
+  color: t.$content-on-color;
+}
+.steps button:focus-visible {
+  outline-offset: -5px;
+}
+.taskBoard h3 {
+  margin: t.$space-3 0;
+  font-size: t.$font-size-body;
+}
+.taskRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: t.$space-3;
+  padding: t.$space-4 t.$space-2;
+  border-radius: t.$radius-control;
+  font-size: t.$font-size-caption;
+}
+.taskRow:nth-of-type(even) {
+  background: t.$surface-subtle;
+}
+.taskRow > div {
+  grid-row: span 2;
+  overflow-wrap: anywhere;
+}
+.taskRow p {
+  color: t.$content-secondary;
+  margin: t.$space-1 0 0;
+}
+.taskRow > button {
+  grid-column: 3;
+  min-height: t.$touch-target;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  background: t.$surface-raised;
+  padding: t.$space-1 t.$space-3;
+}
+.taskDate {
+  display: flex;
+  gap: t.$space-1;
+  align-items: center;
+}
+.taskStatus {
+  padding: t.$space-1 t.$space-2;
+  border-radius: t.$radius-xs;
+  background: t.$surface-muted;
+  font-size: t.$font-size-caption;
+}
+.taskStatus[data-tone='active'] {
+  background: t.$brand-subtle;
+  color: t.$action-primary;
+}
+.taskStatus[data-tone='complete'] {
+  background: t.$success-subtle;
+  color: t.$feedback-success;
+}
+.taskEmpty {
+  color: t.$content-secondary;
+  padding: t.$space-6 0;
+}
+@media (max-width: 1050px) {
+  .tasksLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .tasksRail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (max-width: 600px) {
+  .tasksRail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .taskBoard,
+  .taskOverview {
+    padding: t.$space-4;
+  }
+  .taskRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .taskRow > div {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+  .taskRow > button {
+    grid-column: 2;
+  }
+  .taskStatus {
+    grid-column: 1;
+  }
+}

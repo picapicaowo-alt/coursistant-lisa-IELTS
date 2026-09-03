@@ -1,4 +1,4 @@
-import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {FormEvent, useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {RefreshCw} from 'lucide-react';
@@ -65,7 +65,7 @@ export const AlertRulesPanel = () => {
   });
   const submit = (event: FormEvent) => { event.preventDefault(); setSaved(false); save.mutate(); };
 
-  return <CollapsibleSection title="Tenant alert rules" headingId="alert-rules-title" summary="Choose the tenant-level policy. This page does not read individual student alerts or risk.">
+  return <WorkspaceSection title="Tenant alert rules" headingId="alert-rules-title" summary="Choose the tenant-level policy. This page does not read individual student alerts or risk.">
     <div className={styles.panelHeading}><button type="button" className={styles.iconButton} aria-label="Refresh alert rules" onClick={() => void rules.refetch()}><RefreshCw size={18}/></button></div>
     {rules.isPending ? <p className={styles.status}>Loading alert rules…</p> : null}
     {rules.isError ? <div className={styles.errorNotice} role="alert"><p>{getApiErrorMessage(rules.error, 'Alert rules could not be loaded.')}</p><button type="button" onClick={() => void rules.refetch()}>Try again</button></div> : null}
@@ -76,5 +76,5 @@ export const AlertRulesPanel = () => {
       {save.isError ? <p className={styles.inlineError} role="alert">{getApiErrorMessage(save.error, 'Alert rules could not be saved. Refresh the latest version and try again.')}</p> : null}
       {saved ? <p className={styles.inlineSuccess} role="status">Alert rules saved from the latest server response.</p> : null}
     </form> : null}
-  </CollapsibleSection>;
+  </WorkspaceSection>;
 };

@@ -62,7 +62,7 @@ interface WorkflowPanelProps {
 const WorkflowPanel = ({
   isExpanded = false,
   isHidden = false,
-  onToggleExpand = () => undefined,
+  onToggleExpand,
 }: WorkflowPanelProps) => {
   const {user} = useRequiredAuth();
   const role = getAgentRole(user);
@@ -275,11 +275,11 @@ const WorkflowPanel = ({
           <h2 id="workflow-title">Workflow</h2>
           <span className={`${styles.badge} ${styles.workflowBadge}`}>Actions · Planning · Organization</span>
         </div>
-        <PanelExpandButton
+        {onToggleExpand ? <PanelExpandButton
           panelName="Workflow"
           isExpanded={isExpanded}
           onToggle={onToggleExpand}
-        />
+        /> : null}
       </div>
       <p className={styles.toolDescription}>
         Ask the AI Agent to inspect LMS data and complete supported tasks. Consequential changes always require approval.

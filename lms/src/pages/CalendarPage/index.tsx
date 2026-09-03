@@ -1,138 +1,79 @@
-import {useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {addMonths, addWeeks, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMonth, startOfMonth, startOfWeek} from 'date-fns';
-import {CalendarDays, ChevronLeft, ChevronRight, Clock3, MapPin} from 'lucide-react';
+import {addDays, addMonths, addWeeks, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMonth, max, min, parseISO, startOfDay, endOfDay, startOfMonth, startOfWeek} from 'date-fns';
+import {ChevronLeft, ChevronRight} from 'lucide-react';
 import {Link} from 'react-router-dom';
-import {loadCalendarWindow} from './calendarData';
+import {loadCalendarWindow, type CalendarItem} from './calendarData';
+import {usePersonalEvents, type PersonalEventView} from './personalEvents';
+import {PersonalEventEditor} from './PersonalEventEditor';
+import {WeekCalendar} from './WeekCalendar';
 import styles from './index.module.scss';
 
-type CalendarView = 'month' | 'week';
-const COURSE_COLORS = ['cyan', 'green', 'orange', 'pink', 'brand'] as const;
-const courseColor = (courseId: number) => COURSE_COLORS[Math.abs(courseId) % COURSE_COLORS.length];
+type CalendarView = 'month' | 'week' | 'day';
+type Category = 'all' | 'courses' | 'assignments' | 'personal';
+const CATEGORIES = [{id: 'all', label: 'All Events'}, {id: 'courses', label: 'Courses'}, {id: 'assignments', label: 'Assignments'}, {id: 'personal', label: 'Personal'}] as const;
+const color = (item: CalendarItem) => item.kind === 'Personal' ? 'neutral' : item.kind === 'Assignment' || item.kind === 'Quiz' ? 'cyan' : item.kind === 'Event' ? 'pink' : 'brand';
 
 const CalendarPage = () => {
-  const [view, setView] = useState<CalendarView>('month');
+  const [view, setView] = useState<CalendarView>('week');
+  const [category, setCategory] = useState<Category>('all');
   const [cursor, setCursor] = useState(() => new Date());
+  const [editor, setEditor] = useState<{event: PersonalEventView | null} | null>(null);
+  const [selected, setSelected] = useState<CalendarItem>();
   const [hiddenCourseIds, setHiddenCourseIds] = useState<Set<number>>(() => new Set());
-
   const range = useMemo(() => {
-    const start = view === 'month'
-      ? startOfWeek(startOfMonth(cursor), {weekStartsOn: 0})
-      : startOfWeek(cursor, {weekStartsOn: 0});
-    const end = view === 'month'
-      ? endOfWeek(endOfMonth(cursor), {weekStartsOn: 0})
-      : endOfWeek(cursor, {weekStartsOn: 0});
-    return {start, end, startKey: format(start, 'yyyy-MM-dd'), endKey: format(end, 'yyyy-MM-dd')};
+    const start = view === 'day' ? startOfDay(cursor) : startOfWeek(view === 'month' ? startOfMonth(cursor) : cursor, {weekStartsOn: 1});
+    const end = view === 'day' ? endOfDay(cursor) : endOfWeek(view === 'month' ? endOfMonth(cursor) : cursor, {weekStartsOn: 1});
+    return {start, end, startKey: format(start, 'yyyy-MM-dd'), endKey: format(end, 'yyyy-MM-dd'), fromUtc: start.toISOString(), toUtc: addDays(new Date(end.getFullYear(), end.getMonth(), end.getDate()), 1).toISOString()};
   }, [cursor, view]);
-
-  const calendarQuery = useQuery({
-    queryKey: ['calendar', range.startKey, range.endKey],
-    queryFn: () => loadCalendarWindow(range.startKey, range.endKey),
-    retry: 1,
-  });
-
+  const calendar = useQuery({queryKey: ['calendar', range.startKey, range.endKey], queryFn: () => loadCalendarWindow(range.startKey, range.endKey), retry: false});
+  const personal = usePersonalEvents(range.fromUtc, range.toUtc);
   const days = useMemo(() => eachDayOfInterval({start: range.start, end: range.end}), [range.end, range.start]);
-  const visibleItems = useMemo(() => (calendarQuery.data?.items ?? []).filter(item => !hiddenCourseIds.has(item.courseId)), [calendarQuery.data?.items, hiddenCourseIds]);
-  const itemsByDate = useMemo(() => {
-    const grouped = new Map<string, typeof visibleItems>();
-    visibleItems.forEach(item => {
-      const existing = grouped.get(item.date) ?? [];
-      existing.push(item);
-      grouped.set(item.date, existing);
+  const personalItems = useMemo<CalendarItem[]>(() => (personal.data?.items ?? []).flatMap(event => {
+    const start = max([parseISO(event.startsAtLocal.slice(0, 10)), range.start]);
+    // The end is exclusive: midnight belongs to the preceding event day.
+    const endDate = parseISO(event.endsAtLocal.slice(0, 10));
+    const lastDay = event.endsAtLocal.slice(11, 19) === '00:00:00' || event.endsAtLocal.slice(11) === '00:00' ? addDays(endDate, -1) : endDate;
+    const end = min([lastDay, range.end]);
+    if (start > end || !Number.isFinite(+start) || !Number.isFinite(+end)) return [];
+    return eachDayOfInterval({start, end}).map(day => {
+      const date = format(day, 'yyyy-MM-dd');
+      return {id: `personal-${event.id}-${date}`, sourceId: event.id, courseCode: '', courseTitle: '', title: event.title, kind: 'Personal' as const, date, startTime: date === event.startsAtLocal.slice(0, 10) ? event.startsAtLocal.slice(11, 16) : '00:00', endTime: date === event.endsAtLocal.slice(0, 10) ? event.endsAtLocal.slice(11, 16) : '23:59', timezone: event.timezone, location: null};
     });
-    return grouped;
-  }, [visibleItems]);
-  const timezones = [...new Set(visibleItems.map(item => item.timezone))];
-
-  const move = (direction: -1 | 1) => setCursor(current => view === 'month'
-    ? addMonths(current, direction)
-    : addWeeks(current, direction));
-  const toggleCourse = (courseId: number) => setHiddenCourseIds(current => {
-    const next = new Set(current);
-    if (next.has(courseId)) next.delete(courseId);
-    else next.add(courseId);
-    return next;
-  });
-
-  return (
-    <main className={styles.page}>
-      <header className={styles.header}>
-        <div><p className={styles.eyebrow}>My schedule</p><h1>Calendar</h1><p>Class sessions, assignments, quizzes, and course events in one place.</p></div>
-        <div className={styles.viewSwitch} aria-label="Calendar view">
-          <button type="button" aria-pressed={view === 'month'} onClick={() => setView('month')}>Month</button>
-          <button type="button" aria-pressed={view === 'week'} onClick={() => setView('week')}>Week</button>
-        </div>
-      </header>
-
-      <section className={styles.toolbar} aria-label="Calendar navigation">
-        <div className={styles.navigation}>
-          <button type="button" onClick={() => move(-1)} aria-label={`Previous ${view}`}><ChevronLeft size={19}/></button>
-          <button type="button" onClick={() => setCursor(new Date())}>Today</button>
-          <button type="button" onClick={() => move(1)} aria-label={`Next ${view}`}><ChevronRight size={19}/></button>
-          <h2>{view === 'month' ? format(cursor, 'MMMM yyyy') : `${format(range.start, 'MMM d')} – ${format(range.end, 'MMM d, yyyy')}`}</h2>
-        </div>
-        <p className={styles.timezone}><Clock3 size={16}/>{timezones.length === 1 ? timezones[0] : timezones.length > 1 ? `${timezones.length} course timezones` : 'Course timezone'}</p>
-      </section>
-
-      {calendarQuery.data?.courses.length ? (
-        <section className={styles.filters} aria-label="Filter courses">
-          {calendarQuery.data.courses.map(course => (
-            <label key={course.id} data-color={courseColor(course.id)}>
-              <input type="checkbox" checked={!hiddenCourseIds.has(course.id)} onChange={() => toggleCourse(course.id)}/>
-              <span aria-hidden="true"/>{course.courseCode}<small>{course.title}</small>
-            </label>
-          ))}
-        </section>
-      ) : null}
-
-      {calendarQuery.data?.failures.length ? (
-        <details className={styles.partialWarning}>
-          <summary>Some calendar data could not be loaded ({calendarQuery.data.failures.length})</summary>
-          <ul>{calendarQuery.data.failures.map(failure => <li key={failure}>{failure}</li>)}</ul>
-        </details>
-      ) : null}
-
-      {calendarQuery.isPending ? <section className={styles.status} role="status"><CalendarDays size={26}/>Loading calendar…</section> : null}
-      {calendarQuery.isError ? <section className={styles.status} role="alert"><p>Calendar could not be loaded.</p><button type="button" onClick={() => void calendarQuery.refetch()}>Retry</button></section> : null}
-
-      {calendarQuery.data ? view === 'month' ? (
-        <section className={styles.monthGrid} aria-label={format(cursor, 'MMMM yyyy')}>
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(label => <div key={label} className={styles.weekday}>{label}</div>)}
-          {days.map(day => {
-            const date = format(day, 'yyyy-MM-dd');
-            return (
-              <article key={date} className={styles.dayCell} data-outside={!isSameMonth(day, cursor)}>
-                <time dateTime={date}>{format(day, 'd')}</time>
-                <div className={styles.dayItems}>{(itemsByDate.get(date) ?? []).map(item => (
-                  <Link key={item.id} to={item.path} className={styles.calendarItem} data-color={courseColor(item.courseId)} title={`${item.courseCode} · ${item.title}`}>
-                    <strong>{item.startTime ?? 'All day'}</strong><span>{item.courseCode} · {item.title}</span>
-                  </Link>
-                ))}</div>
-              </article>
-            );
-          })}
-        </section>
-      ) : (
-        <section className={styles.weekList} aria-label="Week calendar">
-          {days.map(day => {
-            const date = format(day, 'yyyy-MM-dd');
-            const dayItems = itemsByDate.get(date) ?? [];
-            return (
-              <article key={date} className={styles.weekDay}>
-                <header><time dateTime={date}><strong>{format(day, 'EEE')}</strong><span>{format(day, 'MMM d')}</span></time></header>
-                <div>{dayItems.length ? dayItems.map(item => (
-                  <Link key={item.id} to={item.path} className={styles.weekItem} data-color={courseColor(item.courseId)}>
-                    <span className={styles.itemTime}>{item.startTime ?? 'All day'}{item.endTime ? `–${item.endTime}` : ''}</span>
-                    <span className={styles.itemBody}><strong>{item.title}</strong><small>{item.courseCode} · {item.kind}{item.location ? <><MapPin size={13}/>{item.location}</> : null}</small></span>
-                  </Link>
-                )) : <p>No scheduled items</p>}</div>
-              </article>
-            );
-          })}
-        </section>
-      ) : null}
-    </main>
-  );
+  }), [personal.data?.items, range.end, range.start]);
+  const visibleItems = useMemo(() => [...(calendar.data?.items ?? []), ...personalItems].filter(item =>
+    (item.courseId == null || !hiddenCourseIds.has(item.courseId)) && (category === 'all' || category === 'personal' && item.kind === 'Personal' || category === 'assignments' && (item.kind === 'Assignment' || item.kind === 'Quiz') || category === 'courses' && (item.kind === 'Session' || item.kind === 'Event')),
+  ).sort((a, b) => `${a.date}${a.startTime ?? ''}`.localeCompare(`${b.date}${b.startTime ?? ''}`)), [calendar.data?.items, personalItems, hiddenCourseIds, category]);
+  const byDate = useMemo(() => {const grouped = new Map<string, CalendarItem[]>(); visibleItems.forEach(item => grouped.set(item.date, [...grouped.get(item.date) ?? [], item])); return grouped;}, [visibleItems]);
+  const toggleCourse = (id: number) => setHiddenCourseIds(current => {const next = new Set(current); if (next.has(id)) next.delete(id); else next.add(id); return next;});
+  const move = (direction: -1 | 1) => setCursor(current => view === 'month' ? addMonths(current, direction) : view === 'day' ? addDays(current, direction) : addWeeks(current, direction));
+  const eventButton = (item: CalendarItem) => <button type="button" key={item.id} className={styles.calendarItem} data-color={color(item)} onClick={() => setSelected(item)} title={`${item.title} · ${item.date} ${item.startTime ?? ''} · ${item.timezone}`}><strong>{item.title}</strong><span>{item.startTime ?? 'All day'}{item.endTime ? ` – ${item.endTime}` : ''}</span></button>;
+  return <main className={styles.page}>
+    <h1 className={styles.visuallyHidden}>Calendar</h1>
+    <nav className={styles.categoryTabs} aria-label="Calendar categories">{CATEGORIES.map(item => <button type="button" key={item.id} aria-pressed={category === item.id} onClick={() => setCategory(item.id)}>{item.label}</button>)}</nav>
+    <div className={styles.calendarShell}><div className={styles.calendarMain}>
+      <header className={styles.toolbar}><div className={styles.navigation}><button type="button" onClick={() => move(-1)} aria-label={`Previous ${view}`}><ChevronLeft size={18}/></button><h2>{view === 'month' ? format(cursor, 'MMMM yyyy') : view === 'day' ? format(cursor, 'MMMM d, yyyy') : `${format(range.start, 'MMM d')} – ${format(range.end, 'MMM d, yyyy')}`}</h2><button type="button" onClick={() => move(1)} aria-label={`Next ${view}`}><ChevronRight size={18}/></button></div><div className={styles.viewSwitch}><button type="button" onClick={() => setCursor(new Date())}>Today</button><label><span className={styles.visuallyHidden}>Calendar view</span><select value={view} onChange={event => setView(event.target.value as CalendarView)}><option value="day">Day</option><option value="week">Week</option><option value="month">Month</option></select></label><button type="button" className={styles.primary} onClick={() => setEditor({event: null})}>+ Add event</button></div></header>
+      {calendar.isPending || personal.isPending ? <p className={styles.status} role="status">Loading calendar…</p> : null}
+      {calendar.isError ? <p className={styles.warning} role="alert">Course calendar could not be loaded. <button type="button" onClick={() => void calendar.refetch()}>Retry courses</button></p> : null}
+      {personal.isError ? <p className={styles.warning} role="alert">Personal events could not be loaded. <button type="button" onClick={() => void personal.refetch()}>Retry personal events</button></p> : null}
+      {personal.data?.unavailableCount ? <p className={styles.warning} role="alert">{personal.data.unavailableCount} personal events lack the details required to display them.</p> : null}
+      {calendar.data?.failures.length ? <p className={styles.warning} role="alert">{calendar.data.failures.join('. ')}. <button type="button" onClick={() => void calendar.refetch()}>Retry</button></p> : null}
+      {view !== 'month' ? <WeekCalendar days={days} byDate={byDate} renderItem={eventButton}/> : <section className={styles.monthGrid} aria-label={format(cursor, 'MMMM yyyy')}>
+        {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(label => <div key={label} className={styles.weekday}>{label}</div>)}
+        {days.map(day => {const date = format(day, 'yyyy-MM-dd'); return <article key={date} className={styles.dayCell} data-outside={!isSameMonth(day, cursor)}><time dateTime={date}>{format(day, 'd')}</time><div className={styles.dayItems}>{(byDate.get(date) ?? []).map(eventButton)}</div></article>;})}
+      </section>}
+      <section className={styles.mobileAgenda} aria-label="Daily agenda">{days.map(day => {const date = format(day, 'yyyy-MM-dd'); return <article key={date}><h3>{format(day, 'EEE, MMM d')}</h3>{(byDate.get(date) ?? []).length ? byDate.get(date)!.map(eventButton) : <p>No events</p>}</article>;})}</section>
+    </div><aside className={styles.eventRail}><h2>Events in view</h2><p className={styles.timezone}>Times shown in each event’s timezone.</p>{visibleItems.length ? visibleItems.map(item => <div className={styles.railItem} key={item.id}>{eventButton(item)}<small>{item.date} · {item.timezone}</small></div>) : !calendar.isPending && !personal.isPending && !calendar.isError && !personal.isError ? <p className={styles.empty}>No events in this view.</p> : null}
+      {calendar.data?.courses.length ? <fieldset className={styles.courseFilters}><legend>Courses</legend>{calendar.data.courses.map(course => <label key={course.id}><input type="checkbox" checked={!hiddenCourseIds.has(course.id)} onChange={() => toggleCourse(course.id)}/>{course.title || course.courseCode}</label>)}</fieldset> : null}
+    </aside></div>
+    {selected ? <EventDetails item={selected} onClose={() => setSelected(undefined)} onEdit={() => {const event = personal.data?.items.find(event => event.id === selected.sourceId); if (event) {setEditor({event}); setSelected(undefined);}}}/> : null}
+    {editor ? <PersonalEventEditor selected={editor.event} onClose={() => setEditor(null)}/> : null}
+  </main>;
 };
 
+function EventDetails({item, onClose, onEdit}: {item: CalendarItem; onClose: () => void; onEdit: () => void}) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {dialog.current?.showModal();}, []);
+  return <dialog ref={dialog} className={styles.eventDialog} aria-labelledby="event-details-title" onClose={onClose}><header><h2 id="event-details-title">{item.title}</h2><button type="button" aria-label="Close event details" onClick={onClose}>×</button></header><dl className={styles.eventFacts}><div><dt>Date</dt><dd>{item.date}</dd></div><div><dt>Time</dt><dd>{item.startTime ?? 'All day'}{item.endTime ? ` – ${item.endTime}` : ''} · {item.timezone}</dd></div>{item.courseTitle ? <div><dt>Course</dt><dd>{item.courseTitle}</dd></div> : null}{item.location ? <div><dt>Location</dt><dd>{item.location}</dd></div> : null}<div><dt>Category</dt><dd>{item.kind}</dd></div></dl><footer>{item.path ? <Link className={styles.primary} to={item.path}>View {item.kind.toLowerCase()}</Link> : null}{item.kind === 'Personal' ? <button type="button" className={styles.primary} onClick={onEdit}>Edit event</button> : null}<button type="button" onClick={onClose}>Close</button></footer></dialog>;
+}
 export default CalendarPage;

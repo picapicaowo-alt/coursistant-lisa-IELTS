@@ -1,4 +1,4 @@
-import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {WorkspaceSection as CollapsibleSection} from '@/components/WorkspaceSection';
 import type {ChangeEvent} from 'react';
 import type {StudentType} from '@/apis';
 import type {StudentIntakeFormValue} from './model';

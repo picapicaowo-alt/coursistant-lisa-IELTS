@@ -61,7 +61,7 @@ function normalizeStudentExams(value: unknown): StudentExamSummary[] {
       id: idValue,
       title: nestedString(item, 'title') ?? `Mock exam ${idValue}`,
       label: nestedString(item, 'label') ?? 'IELTS Academic',
-      status: asString(item.status) ?? 'Assigned',
+      status: asString(item.status) ?? 'Status unavailable',
       assignedAt: asString(item.assignedAt) ?? asString(item.createdAt),
       sections,
     }]

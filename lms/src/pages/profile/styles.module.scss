@@ -1,75 +1,12 @@
-.horizontalDivider {
-    width: 100%;
-    height: 1px;
-    border: 1px dashed rgba(226, 232, 240, 1);
-    margin: -0.2rem auto;
-}
-
-.verticalDivider {
-    width: 2px;
-    border: 1px dashed rgba(226, 232, 240, 1);
-}
-
-.courseListContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-  
-    .course {
-        background-color: t.$content-on-color;
-        border-radius: 1rem;
-        padding: 1rem;
-    }
-  }
-
-  .postListContainer {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-    margin: 2rem auto;
-    padding: 0 1rem;
-  }
-
-.modalOverlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modalContent {
-  background: t.$surface-raised;
-  border-radius: 16px;
-  padding: 32px;
-  min-width: 400px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
-  position: relative;
-}
-
-.closeBtn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.profilePage { width: 100%; max-width: 1200px; margin: 0 auto; padding: 2rem; }
-.profileCover { height: 180px; border-radius: 24px; background: linear-gradient(135deg, t.$action-primary, t.$surface-profile-accent); }
-.profileCard { display: grid; grid-template-columns: 190px 1fr; gap: 2rem; margin: -72px 2rem 0; padding: 2rem; background: t.$surface-raised; border: 1px solid t.$border-default; border-radius: 24px; box-shadow: t.$shadow-lg; position: relative; }
+.profilePage { width: 100%; max-width: t.$workspace-max-inline-size; margin: 0 auto; padding: t.$workspace-gutter-block t.$workspace-gutter-inline; }
+.profileCard {display:grid; grid-template-columns:8.5rem minmax(0,1fr); gap:1.5rem; padding:clamp(1.25rem,3vw,2rem); border-radius:t.$radius-card-lg; background:linear-gradient(115deg,t.$profile-gradient-start,t.$brand); color:t.$content-on-color;}
+.profileCard[data-editing='true'] {background:t.$surface-raised; color:t.$text; border:1px solid t.$border;}
 .avatarColumn { display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-.profileAvatar { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 5px solid t.$surface-canvas; box-shadow: t.$shadow-sm; }
-.profileDetails { min-width: 0; padding-top: 3.8rem; }
+.profileAvatar { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid t.$border-strong;  }
+.profileDetails { min-width: 0; padding-top: 0; }
 .profileHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
-.profileHeading h1 { margin: 0; font-size: 2rem; color: t.$content-primary; }
-.eyebrow { margin: 0 0 .25rem; color: t.$action-primary; font-size: .78rem; font-weight: 700; letter-spacing: .12em; }
+.profileHeading h1 { margin: 0; font-size: clamp(1.5rem,2.3vw,2rem); color: inherit; }
+.eyebrow { margin: 0 0 .25rem; color: inherit; font-size: .78rem; font-weight: 700; letter-spacing: .12em; }
 .profileFacts { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 1rem; margin-top: 1.5rem; }
 .profileFacts div { padding: 1rem; background: t.$surface-subtle; border-radius: 12px; }
 .profileFacts dt { color: t.$content-secondary; font-size: .82rem; }
@@ -80,11 +17,11 @@
 .primaryButton, .secondaryButton, .linkButton { border-radius: 9px; padding: .58rem .9rem; font-weight: 600; cursor: pointer; }
 .primaryButton { border: 0; background: t.$action-primary; color: t.$content-on-color; }
 .secondaryButton { border: 1px solid t.$border-strong; background: t.$surface-raised; color: t.$content-primary; }
-.linkButton { border: 0; background: transparent; color: #b91c1c; }
+.linkButton { border: 0; background: transparent; color: t.$feedback-danger; }
 .primaryButton:disabled, .secondaryButton:disabled, .linkButton:disabled { opacity: .55; cursor: not-allowed; }
 .profileSuccess, .profileError { margin: 1rem 0 0; padding: .7rem 1rem; border-radius: 9px; }
-.profileSuccess { color: #166534; background: #f0fdf4; }
-.profileError { color: #b91c1c; background: #fef2f2; }
+.profileSuccess { color: t.$feedback-success; background: t.$feedback-success-surface; }
+.profileError { color: t.$feedback-danger; background: t.$feedback-danger-surface; }
 .visuallyHidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
 
 @media (max-width: 720px) {
@@ -92,3 +29,11 @@
   .profileDetails { padding-top: 0; }
   .profileFacts { grid-template-columns: 1fr; }
 }
+
+.profileCard:not([data-editing]) .linkButton {color:t.$content-on-color; text-decoration:underline;}
+.profilePage :is(button,input):focus-visible {outline:2px solid t.$brand; outline-offset:3px;}
+
+.editDialog {width:min(32rem,calc(100% - 2rem)); max-height:calc(100dvh - 2rem); overflow:auto; border:1px solid t.$border; border-radius:t.$radius-modal; margin:auto; padding:1.5rem; box-shadow:t.$shadow-lg; color:t.$text;}
+.editDialog::backdrop {background:t.$surface-modal-backdrop;}
+.editDialog h2 {font-size:t.$font-size-subhead; font-weight:t.$fw-semibold;}
+.editDialog .profileForm {margin-top:1rem; max-width:none;}
