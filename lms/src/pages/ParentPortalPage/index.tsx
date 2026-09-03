@@ -1,16 +1,19 @@
-import { AdvisingPagination } from "../advising/AdvisingPagination";
 import { WorkspaceSection } from "@/components/WorkspaceSection";
-import { ObserverMockExams } from "@/components/ObserverMockExams";
+import {ChevronDown, MessageSquareText, Paperclip, UserRound, X} from 'lucide-react';
+import { AdvisingPagination } from "../advising/AdvisingPagination";
 import { useIdempotencyCheckpoint } from "@/hooks/useIdempotencyCheckpoint";
 import { sendStableMessage } from "@/utils/sendStableMessage";
 import {
   getNotificationTitle,
   formatNotificationTime,
 } from "@/utils/notificationPresentation";
-import {
-  EnglishDateInput,
-  EnglishTimeInput,
-} from "@/components/EnglishDateInput";
+import {getParentSection, PARENT_SECTIONS, PARENT_LEARNING_TABS} from '@/configs/parentNavigation';
+import {ParentSectionNav} from './ParentSectionNav';
+import {ParentOverview} from './ParentOverview';
+import {ParentSchedule, type ParentScheduleDraft} from './ParentSchedule';
+import {ParentReports} from './ParentReports';
+import {ParentMockExams} from './ParentMockExams';
+import {parentStudentName, asRecord, parentText} from './parentPresentation';
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLinkedStudents } from "./useLinkedStudents";
@@ -22,7 +25,6 @@ import {
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-import { RecordSummaryList } from "@/components/RecordSummaryList";
 import {
   SCHEDULE_REQUEST_TYPES,
   unwrapData,
@@ -32,30 +34,12 @@ import {
 import { parentApiService } from "@/apis/services/parent-api";
 import { advisingErrorMessage } from "../advising/advisingErrors";
 import styles from "../advising/advising.module.scss";
+import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {
   openPreviewWindow,
   saveBlob,
   showBlobInPreviewWindow,
 } from "@/utils/downloadBlob";
-
-type ParentSection =
-  | "dashboard"
-  | "learning"
-  | "schedule"
-  | "reports"
-  | "exams"
-  | "messages"
-  | "notifications";
-
-const SECTIONS: Array<{ id: ParentSection; label: string }> = [
-  { id: "dashboard", label: "Overview" },
-  { id: "learning", label: "Learning" },
-  { id: "schedule", label: "Schedule" },
-  { id: "reports", label: "Reports" },
-  { id: "exams", label: "Mock exams" },
-  { id: "messages", label: "Messages" },
-  { id: "notifications", label: "Notifications" },
-];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -91,16 +75,6 @@ const numberField = (
   return undefined;
 };
 
-const textField = (
-  record: Record<string, unknown>,
-  ...keys: string[]
-): string | undefined => {
-  for (const key of keys)
-    if (typeof record[key] === "string" && (record[key] as string).trim())
-      return record[key] as string;
-  return undefined;
-};
-
 const ParentStudentWorkspace: React.FC<{
   studentUserId: number;
   studentIds: number[];
@@ -109,32 +83,33 @@ const ParentStudentWorkspace: React.FC<{
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [notificationPage, setNotificationPage] = useState(0);
-  const [params, setParams] = useSearchParams();
-  const section =
-    SECTIONS.find((item) => item.id === params.get("section"))?.id ??
-    "dashboard";
-  const setSection = (section: ParentSection) =>
-    setParams((current) => {
-      const next = new URLSearchParams(current);
-      next.set("section", section);
-      return next;
-    });
+  const [params] = useSearchParams();
+  const section = getParentSection(params);
+  const learningTab = PARENT_LEARNING_TABS.find(tab => tab.id === params.get('tab'))?.id ?? PARENT_LEARNING_TABS[0].id;
+  const studentSummary = useQuery({
+    // Share the overview cache so persistent student context does not duplicate the dashboard request.
+    queryKey: ['parent', studentUserId, 'section', 'dashboard', 0],
+    queryFn: async () => unwrapData(await parentApiService.getStudentDashboard(studentUserId), 'parentDashboard'),
+    retry: false,
+  });
   const [reportPage, setReportPage] = useState(0);
   const [attachmentError, setAttachmentError] = useState<unknown>();
   const [attachmentBusy, setAttachmentBusy] = useState<number>();
   const [message, setMessage] = useState("");
   const [messageFiles, setMessageFiles] = useState<File[]>([]);
   const [fileInputKey, setFileInputKey] = useState(0);
-  const [schedule, setSchedule] = useState({
+  const [schedule, setSchedule] = useState<ParentScheduleDraft>({
     courseId: "",
     occurrenceId: "",
-    requestType: String(SCHEDULE_REQUEST_TYPES[1]),
+    requestType: SCHEDULE_REQUEST_TYPES[1],
     reason: "",
     date: "",
     start: "",
     end: "",
   });
-  const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
+  // undefined selects the first report on arrival; null is an intentional closed detail.
+  const [selectedReportId, setSelectedReportId] = useState<number | null | undefined>(undefined);
+  const {user} = useRequiredAuth();
 
   const content = useQuery({
     queryKey: [
@@ -270,17 +245,20 @@ const ParentStudentWorkspace: React.FC<{
         queryKey: ["parent", studentUserId, "section", "notifications"],
       }),
   });
+  const reportRows = section === "reports" ? recordItems(content.data) : [];
+  const firstReportId = reportRows.length ? numberField(reportRows[0], 'reportId') : undefined;
+  const activeReportId = selectedReportId === undefined ? firstReportId ?? null : selectedReportId;
   const reportDetail = useQuery({
-    queryKey: ["parent", studentUserId, "report", selectedReportId],
+    queryKey: ["parent", studentUserId, "report", activeReportId],
     queryFn: async () =>
       unwrapData(
         await parentApiService.getStudentReport(
           studentUserId!,
-          selectedReportId!,
+          activeReportId!,
         ),
         "parentReportDetail",
       ),
-    enabled: section === "reports" && selectedReportId != null,
+    enabled: section === "reports" && activeReportId != null,
     retry: false,
   });
 
@@ -312,7 +290,7 @@ const ParentStudentWorkspace: React.FC<{
       setSchedule({
         courseId: "",
         occurrenceId: "",
-        requestType: String(SCHEDULE_REQUEST_TYPES[1]),
+        requestType: SCHEDULE_REQUEST_TYPES[1],
         reason: "",
         date: "",
         start: "",
@@ -375,26 +353,22 @@ const ParentStudentWorkspace: React.FC<{
   const notificationTotal = isRecord(notificationData)
     ? (numberField(notificationData, "total") ?? notifications.length)
     : notifications.length;
-  const reportRows = section === "reports" ? recordItems(content.data) : [];
-  const calendarRows =
-    section === "schedule" && contentRecord
-      ? recordItems(contentRecord.calendar)
-      : [];
-
   return (
-    <div className={styles.page}>
-      <header className={styles.header}>
+    <div className={`${styles.page} ${parentStyles.page}`}>
+      <header className={parentStyles.pageHeader}>
         <div>
-          <h1>Student progress</h1>
-          <p className={styles.lede}>
-            Read academic updates, request schedule changes, and contact the
-            advising team.
-          </p>
+          <h1>{PARENT_SECTIONS[section].label}</h1>
+          <p>{PARENT_SECTIONS[section].description}</p>
         </div>
-        {studentIds.length > 1 ? (
-          <label className={styles.form}>
-            Student
+      </header>
+      <div className={parentStyles.studentContext}>
+        <span className={parentStyles.studentIcon}><UserRound size={20} aria-hidden="true"/></span>
+        {studentIds.length > 1 ? <label className={parentStyles.studentPicker}>
+            <span className={parentStyles.visuallyHidden}>Student</span>
             <select
+              aria-label="Student"
+              name="studentUserId"
+              autoComplete="off"
               value={studentUserId}
               disabled={
                 sendMessage.isPending || createScheduleRequest.isPending
@@ -403,13 +377,14 @@ const ParentStudentWorkspace: React.FC<{
             >
               {studentIds.map((id) => (
                 <option value={id} key={id}>
-                  Student #{id}
+                  {parentStudentName(queryClient.getQueryData(['parent', id, 'section', 'dashboard', 0]), `Student #${id}`)}
                 </option>
               ))}
             </select>
-          </label>
-        ) : null}
-      </header>
+            <ChevronDown size={17} aria-hidden="true"/>
+          </label> : <strong>{parentStudentName(studentSummary.data, `Student #${studentUserId}`)}</strong>}
+        {parentText(asRecord(asRecord(studentSummary.data)?.student), 'email') ? <><span className={parentStyles.studentDivider} aria-hidden="true">·</span><span>{parentText(asRecord(asRecord(studentSummary.data)?.student), 'email')}</span></> : null}
+      </div>
 
       {studentIds.length > 0 ? (
         <>
@@ -435,214 +410,19 @@ const ParentStudentWorkspace: React.FC<{
               </button>
             </div>
           ) : null}
-          <nav
-            className={parentStyles.tabs}
-            aria-label="Parent portal sections"
-          >
-            {SECTIONS.map((item) => (
-              <button
-                type="button"
-                aria-current={item.id === section ? "page" : undefined}
-                key={item.id}
-                onClick={() => setSection(item.id)}
-              >
-                {item.label}
-              </button>
-            ))}
-          </nav>
+          <ParentSectionNav section={section} params={params}/>
 
-          {section === "exams" && studentUserId != null ? (
-            <WorkspaceSection
-              title="Assigned mock exams"
-              className={styles.disclosureLayout}
-              summary="Review completed sections and published scores."
-            >
-              <ObserverMockExams
-                key={studentUserId}
-                scope="parent"
-                studentUserId={studentUserId}
-              />
-            </WorkspaceSection>
-          ) : null}
-          {section === "schedule" ? (
-            <WorkspaceSection
-              title="Request a schedule change"
-              className={styles.disclosureLayout}
-            >
-              {content.isPending ? (
-                <p role="status">Loading scheduled classes…</p>
-              ) : content.isError ? null : calendarRows.length === 0 ? (
-                <div className={styles.emptyState}>
-                  <strong>No upcoming class can be changed</strong>
-                  <span>
-                    Schedule actions appear beside available calendar
-                    occurrences.
-                  </span>
-                </div>
-              ) : (
-                <div className={styles.inboxList}>
-                  {calendarRows.map((row, index) => {
-                    const courseId = numberField(row, "courseId");
-                    const occurrenceId = numberField(
-                      row,
-                      "occurrenceId",
-                      "sessionOccurrenceId",
-                    );
-                    const selected =
-                      String(courseId) === schedule.courseId &&
-                      String(occurrenceId) === schedule.occurrenceId;
-                    return (
-                      <article
-                        className={styles.inboxRow}
-                        key={occurrenceId ?? index}
-                      >
-                        <div className={styles.inboxMain}>
-                          <strong>
-                            {textField(
-                              row,
-                              "courseTitle",
-                              "courseCode",
-                              "title",
-                            ) || "Scheduled class"}
-                          </strong>
-                          <span>
-                            {[
-                              textField(row, "occurrenceDate", "date"),
-                              textField(row, "startTime"),
-                              textField(row, "location"),
-                            ]
-                              .filter(Boolean)
-                              .join(" · ")}
-                          </span>
-                        </div>
-                        {courseId != null && occurrenceId != null ? (
-                          <button
-                            type="button"
-                            className={
-                              selected ? styles.primary : styles.secondary
-                            }
-                            onClick={() =>
-                              setSchedule((current) => ({
-                                ...current,
-                                courseId: String(courseId),
-                                occurrenceId: String(occurrenceId),
-                              }))
-                            }
-                          >
-                            {selected ? "Selected" : "Request change"}
-                          </button>
-                        ) : null}
-                      </article>
-                    );
-                  })}
-                </div>
-              )}
-              {schedule.courseId && schedule.occurrenceId ? (
-                <form
-                  className={styles.reviewPanel}
-                  onSubmit={(event) => {
-                    event.preventDefault();
-                    createScheduleRequest.mutate();
-                  }}
-                >
-                  <strong>Selected scheduled class</strong>
-                  <label>
-                    Request type
-                    <select
-                      value={schedule.requestType}
-                      onChange={(event) =>
-                        setSchedule((current) => ({
-                          ...current,
-                          requestType: event.target.value,
-                        }))
-                      }
-                    >
-                      {SCHEDULE_REQUEST_TYPES.map((type) => (
-                        <option key={type}>{type}</option>
-                      ))}
-                    </select>
-                  </label>
-                  {schedule.requestType === SCHEDULE_REQUEST_TYPES[1] ? (
-                    <div className={styles.formGrid}>
-                      <label>
-                        Proposed date
-                        <EnglishDateInput
-                          required
-                          value={schedule.date}
-                          onChangeValue={(date) =>
-                            setSchedule((current) => ({ ...current, date }))
-                          }
-                        />
-                      </label>
-                      <label>
-                        Starts
-                        <EnglishTimeInput
-                          required
-                          value={schedule.start}
-                          onChangeValue={(start) =>
-                            setSchedule((current) => ({ ...current, start }))
-                          }
-                        />
-                      </label>
-                      <label>
-                        Ends
-                        <EnglishTimeInput
-                          required
-                          value={schedule.end}
-                          onChangeValue={(end) =>
-                            setSchedule((current) => ({ ...current, end }))
-                          }
-                        />
-                      </label>
-                    </div>
-                  ) : null}
-                  <label>
-                    Reason
-                    <textarea
-                      value={schedule.reason}
-                      onChange={(event) =>
-                        setSchedule((current) => ({
-                          ...current,
-                          reason: event.target.value,
-                        }))
-                      }
-                    />
-                  </label>
-                  <button
-                    className={styles.primary}
-                    disabled={createScheduleRequest.isPending}
-                  >
-                    Submit request
-                  </button>
-                </form>
-              ) : null}
-              {createScheduleRequest.isError ? (
-                <p className={styles.error} role="alert">
-                  {advisingErrorMessage(
-                    createScheduleRequest.error,
-                    "Schedule request could not be submitted.",
-                  )}
-                </p>
-              ) : null}
-              {contentRecord?.requests !== undefined ? (
-                <div className={styles.compactResult}>
-                  <RecordSummaryList
-                    value={contentRecord.requests}
-                    emptyMessage="No schedule requests have been submitted."
-                  />
-                </div>
-              ) : null}
-            </WorkspaceSection>
-          ) : null}
+          {section === "exams" && studentUserId != null ? <ParentMockExams key={studentUserId} studentUserId={studentUserId}/> : null}
+          {section === 'schedule' ? <ParentSchedule
+            value={content.data} history={params.get('tab') === 'requests'}
+            loading={content.isPending} loadError={content.isError}
+            draft={schedule} setDraft={setSchedule} pending={createScheduleRequest.isPending}
+            error={createScheduleRequest.error} success={createScheduleRequest.isSuccess}
+            onSubmit={() => createScheduleRequest.mutate()}
+          /> : null}
 
-          {section === "messages" ? (
-            <WorkspaceSection
-              title="Conversation"
-              className={styles.disclosureLayout}
-              meta={
-                <span className={styles.countBadge}>{messages.length}</span>
-              }
-            >
+          {section === "messages" ? <div className={parentStyles.messageGrid}>
+            <WorkspaceSection title="Conversation" count={messages.length} className={parentStyles.messageThread}>
               {conversation.isPending ? (
                 <p role="status">Loading messages…</p>
               ) : null}
@@ -654,22 +434,21 @@ const ParentStudentWorkspace: React.FC<{
               ) : null}
               {conversation.isSuccess && messages.length === 0 ? (
                 <div className={styles.emptyState}>
+                  <MessageSquareText size={42} aria-hidden="true"/>
                   <strong>No messages yet</strong>
-                  <span>Start the conversation below.</span>
+                  <span>Start the conversation with the advising team.</span>
                 </div>
               ) : (
-                <div className={styles.messageList}>
+                <div className={parentStyles.messageList}>
                   {messages.map((item, index) => (
                     <article
-                      className={styles.messageRow}
+                      className={parentStyles.messageRow}
+                      data-owner={item.senderUserId === user.userId ? 'parent' : 'advising'}
                       key={item.messageId ?? index}
                     >
                       <div className={styles.rowTitle}>
-                        <strong>
-                          {item.senderUserId == null
-                            ? "Conversation message"
-                            : `User #${item.senderUserId}`}
-                        </strong>
+                        <strong>{item.senderUserId === user.userId ? 'You' : 'Advising team'}</strong>
+                        <span className={parentStyles.messageDirection}>{item.senderUserId === user.userId ? 'Sent' : 'Received'}</span>
                         <small>
                           {item.createdAt
                             ? formatNotificationTime(item.createdAt)
@@ -725,7 +504,7 @@ const ParentStudentWorkspace: React.FC<{
                           )}
                         </div>
                       ) : null}
-                      {item.messageId != null ? (
+                      {item.messageId != null && item.senderUserId !== user.userId ? (
                         <button
                           type="button"
                           className={styles.textButton}
@@ -734,7 +513,7 @@ const ParentStudentWorkspace: React.FC<{
                             markMessageRead.mutate(item.messageId!)
                           }
                         >
-                          Mark read through this message
+                          Mark as read
                         </button>
                       ) : null}
                     </article>
@@ -759,25 +538,38 @@ const ParentStudentWorkspace: React.FC<{
                   Load older messages
                 </button>
               ) : null}
+            </WorkspaceSection>
+            <WorkspaceSection title="New message" className={parentStyles.messageComposerPanel}>
               <form
-                className={styles.composeBox}
+                className={`${styles.composeBox} ${parentStyles.messageComposer}`}
                 onSubmit={(event) => {
                   event.preventDefault();
                   sendMessage.mutate();
                 }}
               >
                 <label htmlFor="parent-message">Message</label>
-                <textarea
-                  maxLength={4000}
-                  id="parent-message"
-                  value={message}
-                  onChange={(event) => setMessage(event.target.value)}
-                  placeholder="Write to the advising team…"
-                />
-                <label htmlFor="parent-message-files">Attachments</label>
+                <div className={parentStyles.messageField}>
+                  <textarea
+                    maxLength={4000}
+                    id="parent-message"
+                    name="body"
+                    autoComplete="off"
+                    value={message}
+                    onChange={(event) => setMessage(event.target.value)}
+                    placeholder="Write to the advising team…"
+                  />
+                  <span className={parentStyles.characterCount}>{message.length} / 4000</span>
+                </div>
+                <span className={parentStyles.fieldLabel}>Attachments</span>
+                <label className={parentStyles.filePicker} htmlFor="parent-message-files">
+                  <Paperclip size={24} aria-hidden="true"/>
+                  <span><strong>Add attachments</strong><small>Choose one or more files</small></span>
+                </label>
                 <input
+                  className={parentStyles.visuallyHidden}
                   key={fileInputKey}
                   id="parent-message-files"
+                  name="files"
                   type="file"
                   multiple
                   onChange={(event) =>
@@ -800,7 +592,7 @@ const ParentStudentWorkspace: React.FC<{
                             )
                           }
                         >
-                          ×
+                          <X size={15} aria-hidden="true"/>
                         </button>
                       </span>
                     ))}
@@ -826,109 +618,21 @@ const ParentStudentWorkspace: React.FC<{
                 </p>
               ) : null}
             </WorkspaceSection>
-          ) : null}
+          </div> : null}
 
-          {section === "reports" ? (
-            <WorkspaceSection
-              title="Reports"
-              className={styles.disclosureLayout}
-              meta={
-                <span className={styles.countBadge}>{reportRows.length}</span>
-              }
-            >
-              <AdvisingPagination
-                label="Report pages"
-                page={reportPage}
-                total={
-                  contentRecord
-                    ? (numberField(contentRecord, "total") ?? reportRows.length)
-                    : reportRows.length
-                }
-                onPage={(page) => {
-                  setReportPage(page);
-                  setSelectedReportId(null);
-                }}
-              />
-              {reportDetail.isFetching ? (
-                <p role="status">Loading report…</p>
-              ) : null}
-              {reportDetail.isError ? (
-                <p role="alert" className={styles.error}>
-                  {advisingErrorMessage(
-                    reportDetail.error,
-                    "The report could not be loaded.",
-                  )}{" "}
-                  <button
-                    type="button"
-                    onClick={() => void reportDetail.refetch()}
-                  >
-                    Retry
-                  </button>
-                </p>
-              ) : null}
-              {content.isPending ? (
-                <p role="status">Loading reports…</p>
-              ) : content.isError ? null : reportRows.length === 0 ? (
-                <div className={styles.emptyState}>
-                  <strong>No published reports</strong>
-                  <span>Published learning reports will appear here.</span>
-                </div>
-              ) : (
-                <div className={styles.inboxList}>
-                  {reportRows.map((row, index) => {
-                    const reportId = numberField(row, "reportId");
-                    return (
-                      <article
-                        className={styles.inboxRow}
-                        key={reportId ?? index}
-                      >
-                        <div className={styles.inboxMain}>
-                          <strong>
-                            {textField(row, "reportType", "title") ||
-                              "Learning report"}
-                          </strong>
-                          <span>
-                            {textField(row, "overallSummary", "summary") ||
-                              textField(row, "publishedAt") ||
-                              "Published report"}
-                          </span>
-                        </div>
-                        {reportId != null ? (
-                          <button
-                            type="button"
-                            className={styles.secondary}
-                            onClick={() => setSelectedReportId(reportId)}
-                          >
-                            Open report
-                          </button>
-                        ) : null}
-                      </article>
-                    );
-                  })}
-                </div>
-              )}
-              {reportDetail.data ? (
-                <div className={styles.reportDetail}>
-                  <h3>{reportDetail.data.reportType || "Report detail"}</h3>
-                  <p>{reportDetail.data.overallSummary}</p>
-                  {reportDetail.data.strengths ? (
-                    <p>
-                      <strong>Strengths</strong>
-                      <br />
-                      {reportDetail.data.strengths}
-                    </p>
-                  ) : null}
-                  {reportDetail.data.improvementSuggestions ? (
-                    <p>
-                      <strong>Next steps</strong>
-                      <br />
-                      {reportDetail.data.improvementSuggestions}
-                    </p>
-                  ) : null}
-                </div>
-              ) : null}
-            </WorkspaceSection>
-          ) : null}
+          {section === "reports" ? <ParentReports
+            value={content.data}
+            loading={content.isPending}
+            listError={content.isError}
+            page={reportPage}
+            onPage={page => {setReportPage(page); setSelectedReportId(undefined);}}
+            selectedId={activeReportId}
+            onSelect={setSelectedReportId}
+            detail={reportDetail.data}
+            detailLoading={reportDetail.isFetching}
+            detailError={reportDetail.error}
+            onRetryDetail={() => void reportDetail.refetch()}
+          /> : null}
 
           {section === "notifications" ? (
             <>
@@ -1028,11 +732,8 @@ const ParentStudentWorkspace: React.FC<{
                 <p role="status">Loading academic updates…</p>
               ) : null}
               {content.isSuccess ? (
-                <ParentAcademicSections
-                  value={content.data}
-                  learning={section === "learning"}
-                  studentUserId={studentUserId}
-                />
+                section === 'dashboard' ? <ParentOverview value={content.data} params={params}/> :
+                <ParentAcademicSections studentUserId={studentUserId} tab={learningTab}/>
               ) : null}
             </>
           ) : null}

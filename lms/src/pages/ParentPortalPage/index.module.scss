@@ -1,29 +1,223 @@
 @use '../../styles/workspace' as workspace;
-.tabs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: t.$space-2 t.$space-6;
-  border-bottom: 1px dashed t.$border-default;
-  margin-block: t.$space-3 t.$space-6;
+
+.page { min-width: 0; }
+.page .pageHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: t.$space-4; margin-bottom: t.$space-5; }
+.pageHeader h1 { margin: 0; color: t.$content-primary; font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1; letter-spacing: -.02em; }
+.pageHeader p { max-width: 70ch; margin: t.$space-2 0 0; color: t.$content-secondary; }
+
+.studentContext { display: flex; width: fit-content; max-width: 100%; min-height: t.$touch-target; align-items: center; gap: t.$space-2; margin-bottom: t.$space-8; padding: t.$space-1 t.$space-3 t.$space-1 t.$space-1; border: 1px solid t.$border-default; border-radius: t.$radius-pill; background: t.$surface-raised; color: t.$content-secondary; }
+.studentContext strong { color: t.$content-primary; white-space: nowrap; }
+.studentContext > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.studentIcon, .iconTile, .quickLinkIcon, .classIcon, .reportHeroIcon, .examHeroIcon { display: grid; flex: 0 0 auto; place-items: center; color: t.$action-primary; background: t.$surface-brand-subtle; }
+.studentIcon { width: t.$control-height-sm; height: t.$control-height-sm; border-radius: t.$radius-pill; }
+.studentDivider { color: t.$border-strong; }
+.studentPicker { position: relative; display: flex; min-width: 10rem; align-items: center; }
+.studentPicker select { width: 100%; min-height: t.$control-height-sm; padding: 0 t.$space-8 0 t.$space-2; appearance: none; border: 0; background: transparent; color: t.$content-primary; font: inherit; font-weight: t.$fw-semibold; cursor: pointer; }
+.studentPicker svg { position: absolute; right: t.$space-2; pointer-events: none; }
+
+.tabs { display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-8; margin-bottom: t.$space-6; border-bottom: 1px solid t.$border-default; }
+.tabs a { display: flex; min-height: t.$touch-target; align-items: center; padding: t.$space-2 t.$space-1; border-bottom: 3px solid transparent; color: t.$content-secondary; font-size: t.$font-size-body; text-decoration: none; transition: color t.$duration-fast t.$ease-out, border-color t.$duration-fast t.$ease-out; }
+.tabs a[aria-current='page'] { border-bottom-color: t.$action-primary; color: t.$action-primary; font-weight: t.$fw-semibold; }
+.tabs a:hover, .textLink:hover, .quickLinks a:hover { color: t.$action-primary-hover; }
+.page :is(a, button, select, summary, input, textarea):focus-visible { outline: 2px solid t.$action-primary; outline-offset: 3px; }
+
+.overviewGrid, .learningGrid, .scheduleGrid, .messageGrid, .reportGrid, .examGrid { @include workspace.grid; }
+.overviewCourses { @include workspace.region(7, 12); }
+.overviewSummary { @include workspace.region(5, 12); }
+.overviewLinks { grid-column: 1 / -1; }
+.studyPlan, .courses, .attendance { @include workspace.region(8, 12); }
+.learningProfile, .assignments, .hours { @include workspace.region(4, 12); }
+.studyPlan, .learningProfile { align-self: stretch; }
+
+.textLink { display: inline-flex; min-height: t.$touch-target; align-items: center; gap: t.$space-1; color: t.$action-primary; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; text-decoration: none; }
+.courseList { display: grid; }
+.courseRow { min-width: 0; padding-block: t.$space-5; }
+.courseRow:first-child { padding-top: 0; }
+.courseRow:last-child { padding-bottom: 0; }
+.courseRow + .courseRow { border-top: 1px solid t.$border-default; }
+.overviewCourses .courseRow h3 { margin-top: t.$space-4; font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+.rowHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: t.$space-3; flex-wrap: wrap; }
+.rowHeading > :first-child { flex: 1; min-width: min(100%, 12rem); }
+.rowHeading h3 { margin: 0; color: t.$content-primary; font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; line-height: t.$line-height-subhead; }
+.rowHeading p, .meta { margin: t.$space-2 0 0; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-body; overflow-wrap: anywhere; }
+.courseProgress { margin-top: t.$space-8; }
+.courseProgress > div { display: flex; align-items: end; justify-content: space-between; gap: t.$space-3; margin-bottom: t.$space-3; font-size: t.$font-size-body; font-weight: t.$fw-medium; }
+.courseProgress strong { color: t.$action-primary; font-size: t.$font-size-title-2; line-height: t.$line-height-title-2; font-variant-numeric: tabular-nums; }
+.courseProgress progress, .examResult progress { display: block; width: 100%; height: t.$space-2; appearance: none; overflow: hidden; border: 0; border-radius: t.$radius-pill; background: t.$surface-muted; }
+.courseProgress progress::-webkit-progress-bar, .examResult progress::-webkit-progress-bar { background: t.$surface-muted; }
+.courseProgress progress::-webkit-progress-value, .examResult progress::-webkit-progress-value { border-radius: t.$radius-pill; background: t.$action-primary; }
+.courseProgress progress::-moz-progress-bar, .examResult progress::-moz-progress-bar { border-radius: t.$radius-pill; background: t.$action-primary; }
+.details { min-width: 0; margin-top: t.$space-3; }
+.details summary { min-height: t.$touch-target; align-content: center; color: t.$action-primary; font-size: t.$font-size-caption; cursor: pointer; }
+
+.progressSummary { gap: 0; }
+.summaryGroup { display: grid; grid-template-columns: t.$touch-target minmax(0, 1fr); gap: t.$space-4; padding-block: t.$space-5; }
+.summaryGroup:first-child { padding-top: 0; }
+.summaryGroup + .summaryGroup { border-top: 1px solid t.$border-default; }
+.iconTile, .quickLinkIcon { width: t.$touch-target; height: t.$touch-target; border-radius: t.$radius-control; }
+.summaryContent > strong { display: block; margin-bottom: t.$space-3; color: t.$content-primary; font-size: t.$font-size-body-lg; }
+.summaryContent dl { display: grid; gap: t.$space-3; margin: 0; }
+.summaryContent dl > div { display: flex; justify-content: space-between; gap: t.$space-3; }
+.summaryContent dt, .summaryContent p { margin: 0; color: t.$content-secondary; }
+.summaryContent dd { margin: 0; color: t.$content-primary; font-weight: t.$fw-semibold; font-variant-numeric: tabular-nums; }
+.summaryContent .summaryTotal { margin-top: t.$space-1; padding-top: t.$space-3; border-top: 1px solid t.$border-default; }
+.summaryTotal dd { color: t.$action-primary; font-size: t.$font-size-subhead; }
+
+.quickLinks { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; padding: 0; }
+.quickLinks a { display: grid; min-width: 0; min-height: 10rem; grid-template-columns: minmax(0, 1fr) auto; align-content: center; align-items: end; gap: t.$space-4; padding: t.$space-6; color: t.$content-primary; text-decoration: none; transition: color t.$duration-fast t.$ease-out, background t.$duration-fast t.$ease-out; }
+.quickLinks a:hover { background: t.$surface-subtle; }
+.quickLinks a + a { border-left: 1px solid t.$border-default; }
+.quickLinks .quickLinkIcon { grid-column: 1 / -1; }
+.quickLinks strong, .quickLinks small { display: block; }
+.quickLinks small { margin-top: t.$space-2; color: t.$content-secondary; line-height: t.$line-height-body; }
+
+.planSummary { max-width: 70ch; margin: 0 0 t.$space-4; font-size: t.$font-size-body-lg; line-height: 1.6; }
+.planPeriod { display: flex; align-items: center; gap: t.$space-3; margin: 0; padding-bottom: t.$space-5; border-bottom: 1px solid t.$border-default; color: t.$content-secondary; }
+.planPeriod svg { color: t.$action-primary; }
+.planPeriod strong { color: t.$content-primary; font-weight: t.$fw-medium; }
+.milestoneHeading { margin: t.$space-6 0 0; font-size: t.$font-size-body-lg; }
+.checkpoints { margin: 0; padding: 0 0 0 t.$space-8; list-style: none; }
+.checkpoints > li { position: relative; padding: t.$space-6 0; }
+.checkpoints > li:not(:last-child)::before { position: absolute; top: t.$space-8; bottom: calc(-1 * t.$space-8); left: calc(-1 * t.$space-5 - 1px); width: 1px; background: t.$border-default; content: ''; }
+.timelineMarker { position: absolute; top: t.$space-6; left: calc(-1 * t.$space-8); display: grid; width: t.$space-6; height: t.$space-6; place-items: center; border: 2px solid t.$border-strong; border-radius: t.$radius-pill; background: t.$surface-raised; color: t.$content-secondary; }
+.checkpoints > li[data-status='REACHED_COMPLETED'] .timelineMarker { border-color: t.$feedback-success; background: t.$feedback-success; color: t.$content-on-color; }
+.checkpoints > li[data-status='REACHED_INCOMPLETE'] .timelineMarker { border-color: t.$action-primary; color: t.$action-primary; }
+.planTasks { display: grid; gap: t.$space-3; margin: t.$space-4 0 0; padding: 0; list-style: none; }
+.planTasks > li { position: relative; padding: t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-subtle; }
+.taskHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: t.$space-3; }
+.taskHeading strong, .taskHeading span { display: block; }
+.taskHeading div span, .taskHeading > span { margin-top: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.taskStatus { display: flex; justify-content: flex-end; margin-top: t.$space-2; }
+
+.profileStatus { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; }
+.profileStatus > span { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.profileFacts { margin: 0; }
+.profileFacts > div { display: grid; grid-template-columns: t.$touch-target minmax(0, 1fr); gap: t.$space-4; padding-block: t.$space-4; }
+.profileFacts > div + div { border-top: 1px solid t.$border-default; }
+.profileFacts dt { margin-bottom: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.profileFacts dd { margin: 0; color: t.$content-primary; line-height: 1.5; }
+.profileFacts dd[data-emphasis] { color: t.$action-primary; font-size: t.$font-size-title-2; font-weight: t.$fw-semibold; line-height: t.$line-height-title-2; font-variant-numeric: tabular-nums; }
+
+.scheduleList, .messageThread { @include workspace.region(7, 12); }
+.scheduleEditor, .messageComposerPanel { @include workspace.region(5, 12); }
+.scheduleList, .scheduleEditor, .messageThread, .messageComposerPanel { align-self: stretch; }
+.scheduleHistory { width: 100%; }
+.classRow { min-width: 0; overflow: hidden; border: 1px solid t.$border-default; border-radius: t.$radius-lg; background: t.$surface-raised; }
+.classRow + .classRow { margin-top: t.$space-4; }
+.classRow[data-selected] { border-color: t.$border-interactive; box-shadow: t.$shadow-selected; }
+.classHeader { display: flex; align-items: center; gap: t.$space-4; padding: t.$space-5; background: t.$surface-brand-tint; }
+.classHeader > div { display: grid; gap: t.$space-1; }
+.classHeader strong { color: t.$content-primary; font-size: t.$font-size-subhead; }
+.classHeader span { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.classIcon { width: t.$space-16; height: t.$space-16; border-radius: t.$radius-pill; }
+.classFacts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; margin: 0; padding: t.$space-5; }
+.classFacts > div { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: t.$space-3; padding-inline: t.$space-4; }
+.classFacts > div:first-child { padding-left: 0; }
+.classFacts > div + div { border-left: 1px solid t.$border-default; }
+.classFacts svg { margin-top: t.$space-1; color: t.$action-primary; }
+.classFacts dt, .classFacts small { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.classFacts dd { margin: t.$space-1 0 0; color: t.$content-primary; font-weight: t.$fw-semibold; line-height: t.$line-height-body; }
+.classFacts small { display: block; margin-top: t.$space-1; }
+.classRow > button, .classRow > p { margin: 0 t.$space-5 t.$space-5; }
+.resultCount { margin: t.$space-4 0 0; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.scheduleForm { display: grid; gap: t.$space-4; }
+.scheduleForm h3 { margin: 0; color: t.$content-primary; font-size: t.$font-size-subhead; }
+.scheduleForm label { display: grid; min-width: 0; gap: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; }
+.scheduleForm :is(input, select, textarea) { width: 100%; min-height: t.$touch-target; padding: t.$space-3; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-primary; font: inherit; }
+.scheduleForm input { padding-inline-end: t.$touch-target; }
+.scheduleForm textarea { min-height: 7rem; resize: vertical; }
+.timeFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-3; }
+.formActions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: t.$space-3; }
+.success { color: t.$feedback-success; }
+.scheduleEmpty, .detailEmpty { min-height: 22rem; place-content: center; }
+.scheduleEmpty svg, .detailEmpty svg { margin-bottom: t.$space-3; color: t.$action-primary; }
+
+.messageList { display: grid; gap: t.$space-4; }
+.messageRow { padding: t.$space-5; border-radius: t.$radius-control; background: t.$surface-subtle; }
+.messageRow[data-owner='parent'] { background: t.$surface-brand-tint; }
+.messageRow p { margin: t.$space-3 0; line-height: 1.6; }
+.messageDirection { padding: t.$space-1 t.$space-2; border-radius: t.$radius-pill; background: t.$surface-brand-subtle; color: t.$action-primary; font-size: t.$font-size-micro; font-weight: t.$fw-semibold; text-transform: uppercase; }
+.messageComposer { margin: 0; padding-top: 0; border-top: 0; }
+.messageField { position: relative; }
+.messageField textarea { width: 100%; min-height: 14rem; padding-bottom: t.$space-8; }
+.characterCount { position: absolute; right: t.$space-3; bottom: t.$space-3; color: t.$content-secondary; font-size: t.$font-size-caption; font-variant-numeric: tabular-nums; pointer-events: none; }
+.fieldLabel { color: t.$content-secondary; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; }
+.filePicker { display: flex; min-height: 8.5rem; align-items: center; justify-content: center; gap: t.$space-3; padding: t.$space-5; border: 1px dashed t.$border-strong; border-radius: t.$radius-control; color: t.$action-primary; text-align: left; cursor: pointer; }
+.filePicker:hover { border-color: t.$action-primary; background: t.$surface-subtle; }
+.filePicker strong, .filePicker small { display: block; }
+.filePicker small { margin-top: t.$space-1; color: t.$content-secondary; font-weight: t.$fw-regular; }
+.messageComposer > button { width: 100%; }
+
+.reportList, .examList { @include workspace.region(4, 12); }
+.reportDetail, .examDetail { @include workspace.region(8, 12); align-self: stretch; }
+.reportRows, .examRows { display: grid; gap: t.$space-2; }
+.reportRow, .examRow { display: grid; width: 100%; min-height: 5rem; grid-template-columns: t.$touch-target minmax(0, 1fr); align-items: center; gap: t.$space-3; padding: t.$space-3; border: 1px solid transparent; border-radius: t.$radius-control; background: transparent; color: t.$content-primary; font: inherit; text-align: left; cursor: pointer; }
+.reportRow:hover, .examRow:hover, .reportRow[data-selected], .examRow[data-selected] { border-color: t.$border-interactive; background: t.$surface-brand-subtle; }
+.reportRow:disabled { opacity: .65; cursor: default; }
+.reportRow strong, .reportRow small, .examRow strong, .examRow small { display: block; overflow-wrap: anywhere; }
+.reportRow small, .examRow small { margin-top: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.reportNote { display: flex; align-items: flex-start; gap: t.$space-2; margin: auto 0 0; padding-top: t.$space-4; border-top: 1px solid t.$border-default; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-body; }
+.reportArticle > header, .examArticle > header { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: t.$space-4; margin-bottom: t.$space-6; }
+.reportHeroIcon, .examHeroIcon { width: t.$space-16; height: t.$space-16; border-radius: t.$radius-pill; }
+.reportArticle h3, .examArticle h3 { margin: 0; color: t.$content-primary; font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
+.reportArticle header p, .examArticle header p { display: flex; align-items: center; gap: t.$space-2; margin: t.$space-2 0 0; color: t.$content-secondary; }
+.reportSummary { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: t.$space-4; margin-bottom: t.$space-6; padding: t.$space-5; border-radius: t.$radius-control; background: t.$surface-brand-tint; color: t.$action-primary; }
+.reportSummary p { max-width: 70ch; margin: 0; color: t.$content-primary; font-size: t.$font-size-body-lg; line-height: 1.6; }
+.reportFacts { margin: 0; }
+.reportFacts > div { display: grid; grid-template-columns: t.$touch-target minmax(0, 1fr); gap: t.$space-4; padding-block: t.$space-5; }
+.reportFacts > div + div { border-top: 1px solid t.$border-default; }
+.reportFacts dt { margin-bottom: t.$space-2; color: t.$content-primary; font-weight: t.$fw-semibold; }
+.reportFacts dd { max-width: 70ch; margin: 0; color: t.$content-secondary; line-height: 1.6; }
+.iconButton { display: grid; width: t.$touch-target; height: t.$touch-target; place-items: center; padding: 0; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-secondary; cursor: pointer; }
+.iconButton:hover { border-color: t.$action-primary; color: t.$action-primary; }
+
+.examResults { display: grid; }
+.examResult { display: grid; grid-template-columns: t.$touch-target minmax(0, 1fr); gap: t.$space-4; padding-block: t.$space-5; }
+.examResult + .examResult { border-top: 1px solid t.$border-default; }
+.examResult > div > div { display: flex; align-items: baseline; justify-content: space-between; gap: t.$space-4; }
+.examResult > div > div > span { color: t.$content-primary; font-size: t.$font-size-title-2; font-weight: t.$fw-semibold; line-height: t.$line-height-title-2; font-variant-numeric: tabular-nums; }
+.examResult span small { margin-left: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-body; font-weight: t.$fw-regular; }
+.examResult progress { display: inline-block; width: calc(100% - 4rem); margin-top: t.$space-3; }
+.examResult progress + small { display: inline-block; width: 4rem; color: t.$content-secondary; text-align: right; font-variant-numeric: tabular-nums; }
+.compactPagination { display: flex; align-items: center; justify-content: space-between; gap: t.$space-2; margin-top: t.$space-4; }
+.compactPagination button { min-height: t.$control-height-md; padding: t.$space-2 t.$space-3; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-primary; font: inherit; }
+.compactPagination button:disabled { opacity: .5; }
+
+.visuallyHidden,
+.messageComposer input.visuallyHidden { position: absolute; width: 1px; height: 1px; min-height: 1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); border: 0; white-space: nowrap; }
+
+@media (max-width: t.$breakpoint-dashboard-single) {
+  .overviewCourses, .overviewSummary, .studyPlan, .learningProfile, .courses, .assignments, .attendance, .hours, .scheduleList, .scheduleEditor, .messageThread, .messageComposerPanel, .reportList, .reportDetail, .examList, .examDetail { grid-column: 1 / -1; }
+  .studyPlan, .scheduleList, .messageThread, .reportList, .examList { order: -1; }
+  .quickLinks { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quickLinks a:nth-child(3) { border-top: 1px solid t.$border-default; border-left: 0; }
+  .quickLinks a:nth-child(4) { border-top: 1px solid t.$border-default; }
 }
-.tabs button {
-  min-height: t.$touch-target;
-  padding: t.$space-2 t.$space-1;
-  border: 0;
-  border-bottom: 3px solid transparent;
-  background: transparent;
-  font-size: t.$font-size-body;
-  color: t.$content-secondary;
+
+@media (max-width: t.$breakpoint-shell-mobile) {
+  .pageHeader p { display: none; }
+  .studentContext { width: 100%; margin-bottom: t.$space-5; }
+  .studentContext > span:last-child { min-width: 0; }
+  .tabs { flex-wrap: nowrap; gap: t.$space-5; overflow-x: auto; }
+  .tabs a { flex: 0 0 auto; }
+  .quickLinks { grid-template-columns: minmax(0, 1fr); }
+  .quickLinks a { min-height: 7.5rem; }
+  .quickLinks a + a, .quickLinks a:nth-child(3) { border-top: 1px solid t.$border-default; border-left: 0; }
+  .planPeriod { align-items: flex-start; flex-wrap: wrap; }
+  .planPeriod strong { width: 100%; padding-left: calc(18px + t.$space-3); }
+  .checkpoints { padding-left: t.$space-6; }
+  .timelineMarker { left: calc(-1 * t.$space-6); }
+  .checkpoints > li:not(:last-child)::before { left: calc(-1 * t.$space-3 - 1px); }
+  .taskHeading { flex-direction: column; }
+  .reportArticle > header, .examArticle > header { grid-template-columns: auto minmax(0, 1fr); }
+  .reportArticle > header > :last-child, .examArticle > header > :last-child { grid-column: 2; justify-self: start; }
+  .classFacts { grid-template-columns: minmax(0, 1fr); }
+  .classFacts > div { padding: t.$space-3 0; }
+  .classFacts > div + div { border-top: 1px solid t.$border-default; border-left: 0; }
+  .timeFields { grid-template-columns: minmax(0, 1fr); }
+  .scheduleEmpty, .detailEmpty { min-height: 14rem; }
+  .messageField textarea { min-height: 11rem; }
+  .examResult > div > div { align-items: flex-start; flex-direction: column; gap: t.$space-1; }
+  .examResult progress { width: calc(100% - 3.5rem); }
+  .examResult progress + small { width: 3.5rem; }
 }
-.tabs button[aria-current="page"] {
-  border-bottom-color: t.$action-primary;
-  color: t.$action-primary;
-  font-weight: t.$fw-semibold;
-}
-.tabs button:focus-visible {
-  outline: 2px solid t.$action-primary;
-  outline-offset: 3px;
-}
-.learningGrid { @include workspace.grid; }
-.studyPlan, .courses { @include workspace.region(8, 6); }
-.profile, .risk, .assignments, .attendance, .hours { @include workspace.region(4, 6); }

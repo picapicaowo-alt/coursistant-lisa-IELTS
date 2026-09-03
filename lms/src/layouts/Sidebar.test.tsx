@@ -57,6 +57,16 @@ describe('Sidebar role navigation', () => {
     expect(screen.queryByRole('link', {name: 'Exams'})).not.toBeInTheDocument();
   });
 
+  it('groups Parent notifications under Messages and preserves the selected student', () => {
+    mocks.user = {role: 'USER', level: 'PARENT'};
+    render(<MemoryRouter initialEntries={['/parent?section=notifications&studentUserId=302']}><Sidebar/></MemoryRouter>);
+    expect(screen.getAllByRole('link', {name: 'Messages'})[0]).toHaveAttribute('aria-current', 'page');
+    expect(screen.getAllByRole('link', {name: 'Schedule'})[0]).toHaveAttribute('href', '/parent?section=schedule&studentUserId=302');
+    expect(screen.getAllByRole('link', {name: 'Learning'})[0]).not.toHaveAttribute('aria-current');
+    expect(screen.queryByRole('link', {name: 'Notifications'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', {name: 'My Courses'})).not.toBeInTheDocument();
+  });
+
   it('does not expose a dashboard link that redirects instructor-advisors away', () => {
     mocks.user = {role: 'USER', level: 'INSTRUCTOR_ADVISOR'};
     const {container} = render(<MemoryRouter><Sidebar/></MemoryRouter>);

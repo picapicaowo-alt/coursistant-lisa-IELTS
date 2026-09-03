@@ -6,6 +6,7 @@ import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import NotificationCenter from '../components/NotificationCenter';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {getParentSection, PARENT_SECTIONS} from '@/configs/parentNavigation';
 import {canAccessAdminConsole, canAccessCourseCatalogue, isInstructorLevel} from '@/utils/roleCapabilities';
 import styles from './Header.module.scss';
 
@@ -40,7 +41,7 @@ const getWorkspaceLabel = (pathname: string, instructor: boolean): string => {
 const Header = () => {
   const {t} = useTranslation();
   const {user, logout} = useAuth();
-  const {pathname} = useLocation();
+  const {pathname, search} = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -114,7 +115,7 @@ const Header = () => {
       ) : (
         <div className={styles.workspaceContext}>
           <span>Workspace</span>
-          <strong>{getWorkspaceLabel(pathname, instructor)}</strong>
+          <strong>{pathname === APP_ROUTE_PATHS.parent ? PARENT_SECTIONS[getParentSection(new URLSearchParams(search))].label : getWorkspaceLabel(pathname, instructor)}</strong>
         </div>
       )}
 
