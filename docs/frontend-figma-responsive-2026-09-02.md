@@ -43,10 +43,20 @@ These browser fixtures validate frontend interactions and exact request contract
 
 Eight supplied accounts successfully signed in through the public Dev frontend API boundary: Tenant Admin, Counsellor, Advisor, two Instructors, two Students and Parent. Of 36 subsequent reads, 33 returned SUCCESS/200, two teacher grading-queue reads returned INTERNAL_SERVER_ERROR/500, and the Parent request for an unlinked student correctly returned NOT_FOUND/404. This is targeted authenticated coverage, not exhaustive mutation or permission-matrix acceptance. No business records were changed by this probe.
 
-Real browser checks additionally confirmed Advisor student/profile/plan-history navigation, teacher operations/availability, Tenant Admin intake/governance navigation, and Counsellor dashboard/unassigned queue. The old Dev UI remains live until the release recorded below.
+All eight supplied accounts also completed actual browser sign-in. Browser checks confirmed Advisor student/profile/plan-history navigation, teacher operations/availability, Tenant Admin intake/governance navigation, Counsellor dashboard/unassigned queue, both Student dashboards, and the Parent portal. These checks cover real reads and navigation; they do not establish acceptance of every business mutation.
 
 ### Auth design contract boundaries
 
 The supplied auth contract requires structured names, institution ID and email verification for registration. Figma invitation-code activation and a 30-day remembered-session guarantee are not implemented as unsupported backend behaviors. Registration retains its required fields inside the shared Figma composition. Promotional images are decorative original Figma assets, not live student data.
 
 Live Parent message-page navigation exposed an array/page-envelope mismatch. This release fixes cursor pagination and notification page extraction, with a browser regression covering Messages → Overview → Notifications and the next page.
+
+## Deployment and post-release checks
+
+PRs #7 and #8 were merged and deployed to Dev 8085. The published build includes the Figma authentication shell, Advisor summary/underline tabs/phase dialog, and responsive workspace changes. The authentication illustration also scales with viewport height for short laptop screens. No other environment was deployed.
+
+The clean merged build passed all 58 E2E checks without retries. All 652 frontend artifact files were checked against the staged release manifest; public HTML, entry script, feature chunks and all four original Figma authentication assets matched local hashes. Deep routes returned the application shell and the unauthenticated API boundary returned 401. The release retains its previous immutable artifact for rollback.
+
+After deployment, the real Advisor account opened the student list, student summary, study plan and task dialog. The real Parent account opened Messages, returned to Overview and opened Notifications without the earlier pagination exception. Overview displayed the linked course and Notifications displayed the returned academic updates.
+
+The teacher grading-queue 500 and unavailable historical profile/snapshot content remain external acceptance gaps. No claim of exhaustive authenticated write-flow coverage or complete role permission-matrix acceptance is made.
