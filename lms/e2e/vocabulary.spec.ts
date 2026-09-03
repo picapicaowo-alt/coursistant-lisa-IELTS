@@ -125,6 +125,38 @@ test('library remains usable without horizontal overflow on mobile', async ({pag
   expect(overflow).toBe(false);
 });
 
+test('resumes a paused session from the library before opening its cards', async ({page}) => {
+  await installSession(page);
+  let resumeRequests = 0;
+  const resumableLibrary = {
+    ...library,
+    continue: {
+      listId: LIST_ID,
+      listName: 'Academic Foundations',
+      unitId: UNIT_ID,
+      unitName: 'Evidence and Change',
+      sessionId: SESSION_ID,
+      mode: 'TEST',
+    },
+  };
+  await page.route('**/vocabulary-api/v1/vocabulary/lists', route => route.fulfill({json: resumableLibrary}));
+  await page.route(`**/vocabulary-api/v1/vocabulary/units/${UNIT_ID}/sessions`, async route => {
+    expect(route.request().method()).toBe('POST');
+    expect(route.request().postDataJSON()).toEqual({mode: 'TEST'});
+    resumeRequests += 1;
+    return route.fulfill({json: hiddenCard});
+  });
+  await page.route(`**/vocabulary-api/v1/vocabulary/units/${UNIT_ID}`, route => route.fulfill({json: unit}));
+  await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}`, route => route.fulfill({json: hiddenCard}));
+  await page.goto('/vocabulary');
+
+  await page.getByRole('button', {name: 'Resume session'}).click();
+
+  await expect(page).toHaveURL(`/vocabulary/units/${UNIT_ID}/sessions/${SESSION_ID}`);
+  await expect(page.getByRole('heading', {name: 'analyse'})).toBeVisible();
+  expect(resumeRequests).toBe(1);
+});
+
 test('test mode requires reveal before rating and hides the LMS shell', async ({page}) => {
   await installSession(page);
   await page.route(`**/vocabulary-api/v1/vocabulary/units/${UNIT_ID}`, route => route.fulfill({json: unit}));
@@ -146,6 +178,32 @@ test('test mode requires reveal before rating and hides the LMS shell', async ({
   await page.getByRole('button', {name: /Don't remember/}).click();
   await expect(page.getByRole('button', {name: 'Next card'})).toBeVisible();
   await expect(page.getByRole('button', {name: /Know well/})).toHaveCount(0);
+});
+
+test('offers recovery when a card action discovers that the session is paused', async ({page}) => {
+  await installSession(page);
+  let resumeRequests = 0;
+  await page.route(`**/vocabulary-api/v1/vocabulary/units/${UNIT_ID}`, route => route.fulfill({json: unit}));
+  await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}`, route => {
+    if (route.request().method() === 'GET') return route.fulfill({json: hiddenCard});
+    return route.fallback();
+  });
+  await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}/reveal`, route => route.fulfill({
+    status: 409,
+    json: {code: 'SESSION_NOT_ACTIVE', message: 'The session is not active.'},
+  }));
+  await page.route(`**/vocabulary-api/v1/vocabulary/units/${UNIT_ID}/sessions`, route => {
+    resumeRequests += 1;
+    return route.fulfill({json: hiddenCard});
+  });
+  await page.goto(`/vocabulary/units/${UNIT_ID}/sessions/${SESSION_ID}`);
+
+  await page.getByRole('button', {name: 'Show answer for analyse'}).click();
+  await expect(page.getByRole('heading', {name: 'Session paused'})).toBeVisible();
+  await page.getByRole('button', {name: 'Resume session'}).click();
+
+  await expect(page.getByRole('heading', {name: 'analyse'})).toBeVisible();
+  expect(resumeRequests).toBe(1);
 });
 
 test('identifies and ends the session blocking a different mode', async ({page}) => {

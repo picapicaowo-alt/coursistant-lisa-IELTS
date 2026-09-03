@@ -91,9 +91,10 @@
   .kicker {color: t.$brand;}
   h2 {margin: 0.2rem 0; font-size: t.$fs-item-title;}
   p {margin: 0; color: t.$text-muted; font-size: t.$fs-caption;}
-  a {
+  > button {
     min-height: 2.75rem;
     padding: 0 1rem;
+    border: 0;
     border-radius: t.$radius-control;
     background: t.$brand;
     color: t.$card-bg;
@@ -102,7 +103,16 @@
     gap: 0.5rem;
     font-weight: t.$fw-semibold;
     text-decoration: none;
+
+    &:disabled {opacity: 0.65; cursor: wait;}
   }
+}
+
+.continueError {
+  grid-column: 2 / -1;
+  margin: 0;
+  color: t.$danger;
+  font-size: t.$fs-caption;
 }
 
 .continueIcon {
@@ -171,7 +181,8 @@
   .page {padding: 1rem 0.75rem 2rem;}
   .hero {min-height: 16rem; padding: 1.5rem; align-items: flex-end;}
   .heroMark {display: none;}
-  .continueCard {margin: 0.75rem 0 0; grid-template-columns: auto 1fr; a {grid-column: 1 / -1; justify-content: center;}}
+  .continueCard {margin: 0.75rem 0 0; grid-template-columns: auto 1fr; > button {grid-column: 1 / -1; justify-content: center;}}
+  .continueError {grid-column: 1 / -1;}
   .sectionHeading {align-items: flex-start;}
   .filters {align-items: stretch; flex-direction: column; > svg {display: none;} label {width: 100%;}}
 }

@@ -1,5 +1,5 @@
 import {describe, expect, it} from 'vitest';
-import {isVocabularyListCollection, requireVocabularyPayload} from './vocabulary-contract';
+import {isStudySession, isVocabularyListCollection, requireVocabularyPayload} from './vocabulary-contract';
 
 describe('Vocabulary runtime contract', () => {
   it('rejects the SPA HTML fallback before page rendering', () => {
@@ -8,6 +8,21 @@ describe('Vocabulary runtime contract', () => {
       isVocabularyListCollection,
       'library',
     )).toThrow('Invalid library response');
+  });
+
+  it('rejects unknown study-session statuses at the service boundary', () => {
+    expect(isStudySession({
+      id: 'session-id',
+      unitId: 'unit-id',
+      mode: 'TEST',
+      status: 'STALE',
+      position: 0,
+      totalScheduled: 20,
+      revealed: false,
+      rated: false,
+      canGoPrevious: false,
+      currentCard: null,
+    })).toBe(false);
   });
 
   it('accepts a well-formed empty library', () => {

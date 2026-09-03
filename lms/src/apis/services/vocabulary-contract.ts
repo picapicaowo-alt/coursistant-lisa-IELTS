@@ -55,7 +55,7 @@ export const isStudySession = (value: unknown): value is StudySessionResponse =>
   && typeof value.id === 'string'
   && typeof value.unitId === 'string'
   && (value.mode === 'REMEMBER' || value.mode === 'TEST')
-  && typeof value.status === 'string'
+  && ['ACTIVE', 'PAUSED', 'COMPLETED', 'ENDED'].includes(String(value.status))
   && typeof value.position === 'number'
   && typeof value.totalScheduled === 'number'
   && typeof value.revealed === 'boolean'
