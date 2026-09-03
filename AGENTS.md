@@ -45,8 +45,20 @@ stack and ownership boundary. It is not a drop-in replacement for
   requests. TanStack Query owns server state; Zustand owns complex client/page
   state; `useState` owns local transient state.
 - SCSS Modules and the existing design tokens are the default styling path.
-  Figma is not ready: ship functional pages that can be restyled later. MUI or
-  another UI kit requires an explicit frontend architecture decision.
+  The user-supplied Figma frames and exports are the visual authority where
+  available; retain their composition, interactions and semantic status colors.
+  Use `docs/final-figma-review-2026-09-03.md` for the frame/API mapping and known
+  gaps. MUI or another UI kit requires an explicit frontend architecture decision.
+- Pages without a direct Figma frame use a responsive 12-column desktop grid,
+  with primary and supporting regions (such as 8+4 or 7+5). Collapse deliberately
+  at smaller breakpoints. Do not default to a narrow centered stack or append
+  unrelated feature workspaces below a Dashboard; keep their navigation and
+  routes complete. Preserve useful whitespace rather than filling it with
+  invented data, nested cards or duplicate shells.
+- Verify visible controls through their actual frontend behavior and consumed
+  API contract. Record unsupported features and live-access gaps explicitly;
+  fixture tests, screenshots and successful builds are separate evidence from
+  authenticated live acceptance. Keep reserved AI UI honest about readiness.
 - Do not add deploy-specific URLs, credentials, demo values, duplicated route
   strings, role/status strings, or design colors directly in feature code.
 - Comments explain constraints, invariants, compatibility decisions, and the
