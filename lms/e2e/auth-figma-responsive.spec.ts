@@ -22,6 +22,13 @@ for (const route of [{path: '/login', title: 'Welcome to X-Learn'}, {path: '/sig
       }
       if (width === 390 || width === 1440) await page.screenshot({path: testInfo.outputPath(`auth-${width}.png`), fullPage: true});
     }
+    if (route.path === '/login') {
+      for (const viewport of [{width: 1280, height: 720}, {width: 1710, height: 805}, {width: 2560, height: 960}]) {
+        await page.setViewportSize(viewport);
+        const art = await page.locator('img[src="/icons/figma-auth/goal.png"]').boundingBox();
+        expect(art!.y + art!.height).toBeLessThanOrEqual(viewport.height);
+      }
+    }
     expect(errors).toEqual([]);
   });
 }
