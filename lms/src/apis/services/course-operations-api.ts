@@ -1,3 +1,4 @@
+import type {SessionOccurrenceResponse, StudentWorkQueueItemResponse, StudentScheduleRequestItem, InstructorScheduleRequestItem, CourseStudentReportSummaryResponse} from '../types/studentInstructorReadModels';
 import type {
   ApiResponse,
   AdvisingPage,
@@ -146,7 +147,7 @@ export class CourseOperationsApiService {
     return this.getDiscussionAttachment(courseId, postId, attachmentId, 'download');
   }
 
-  listSessionOccurrences(courseId: number, params: OccurrenceListParams = {}): Promise<ApiResponse<CourseOperationRead>> {
+  listSessionOccurrences(courseId: number, params: OccurrenceListParams = {}): Promise<ApiResponse<SessionOccurrenceResponse[]>> {
     return this.apiClient.get(`/v2/courses/${courseId}/session-occurrences`, {params});
   }
 
@@ -158,7 +159,7 @@ export class CourseOperationsApiService {
     return this.apiClient.post(`/v2/courses/${courseId}/session-occurrences/generate`, request, idempotent(key));
   }
 
-  getSessionOccurrence(courseId: number, occurrenceId: number): Promise<ApiResponse<CourseOperationRead>> {
+  getSessionOccurrence(courseId: number, occurrenceId: number): Promise<ApiResponse<SessionOccurrenceResponse>> {
     return this.apiClient.get(`/v2/courses/${courseId}/session-occurrences/${occurrenceId}`);
   }
 
@@ -246,12 +247,13 @@ export class CourseOperationsApiService {
   getMyAttendance(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/attendance'); }
   getMyCalendar(params: {from?: string; to?: string; timezone?: string} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/calendar', {params}); }
   getMyProgress(): Promise<ApiResponse<StudentProgressResponse>> { return this.apiClient.get('/v2/me/progress'); }
-  getMyScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/schedule-requests'); }
-  getMyWorkQueue(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/work-queue'); }
+  getMyScheduleRequests(params: {page?: number; size?: number; requestType?: string; status?: string; courseId?: number} = {}): Promise<ApiResponse<AdvisingPage<StudentScheduleRequestItem>>> { return this.apiClient.get('/v2/me/schedule-requests', {params}); }
+  getMyWorkQueue(params: {page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<StudentWorkQueueItemResponse>>> { return this.apiClient.get('/v2/me/work-queue', {params}); }
   getMyCourseHours(courseId: number): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get(`/v2/me/courses/${courseId}/hours`); }
   getMyTeachingAlerts(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/alerts'); }
-  getMyTeachingGradingItems(): Promise<ApiResponse<TeachingGradingItemResponse[]>> { return this.apiClient.get('/v2/me/teaching/grading-items'); }
-  getMyTeachingScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/schedule-requests'); }
+  getMyTeachingGradingItems(params: {page?: number; size?: number; courseId?: number; status?: string} = {}): Promise<ApiResponse<AdvisingPage<TeachingGradingItemResponse>>> { return this.apiClient.get('/v2/me/teaching/grading-items', {params}); }
+  getMyTeachingScheduleRequests(params: {page?: number; size?: number; courseId?: number} = {}): Promise<ApiResponse<AdvisingPage<InstructorScheduleRequestItem>>> { return this.apiClient.get('/v2/me/teaching/schedule-requests', {params}); }
+  listMyPublishedReports(params: {page?: number; size?: number; courseId?: number; reportType?: string} = {}): Promise<ApiResponse<AdvisingPage<CourseStudentReportSummaryResponse>>> { return this.apiClient.get('/v2/me/student-reports', {params}); }
   getMyTeachingStudentsNeedingSupport(): Promise<ApiResponse<TeachingStudentSupportResponse[]>> { return this.apiClient.get('/v2/me/teaching/students-needing-support'); }
   getMyTeachingTodayClasses(): Promise<ApiResponse<TeachingTodayClassResponse[]>> { return this.apiClient.get('/v2/me/teaching/today-classes'); }
 

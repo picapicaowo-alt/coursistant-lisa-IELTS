@@ -1,0 +1,6 @@
+.colored {
+  &[data-skill='READING'], &[data-skill='RD'] { color: t.$skill-reading; }
+  &[data-skill='WRITING'], &[data-skill='WR'] { color: t.$skill-writing; }
+  &[data-skill='SPEAKING'], &[data-skill='SP'] { color: t.$skill-speaking; }
+  &[data-skill='LISTENING'], &[data-skill='LS'] { color: t.$skill-listening; }
+}

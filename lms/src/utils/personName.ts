@@ -18,3 +18,8 @@ export const formatPersonName = (
 
   return formatted || fallback;
 };
+
+/** Course instructor projections use role-prefixed structured name fields. */
+export function formatCourseInstructor(instructor?: {instructorFirstName?: string; instructorMiddleName?: string; instructorLastName?: string} | null): string {
+  return formatPersonName({firstName: instructor?.instructorFirstName, middleName: instructor?.instructorMiddleName, lastName: instructor?.instructorLastName}, '');
+}

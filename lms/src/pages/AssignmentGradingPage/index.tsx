@@ -1,3 +1,4 @@
+import {formatPersonName} from '@/utils/personName';
 import {FormEvent, useEffect, useMemo, useRef, useState} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, CheckCircle2, Download, FileText, MessageSquare, RotateCcw, Search, Trash2, Upload, X} from 'lucide-react';
@@ -21,7 +22,7 @@ const parseId = (value?: string) => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 };
 
-const getDisplayName = (row: GradingRosterItem) => row.groupName || row.studentName || 'Unknown learner';
+const getDisplayName = (row: GradingRosterItem) => row.groupName || formatPersonName({firstName: row.studentFirstName, middleName: row.studentMiddleName, lastName: row.studentLastName}, row.studentName || 'Unknown learner');
 const getDisplayEmail = (row: GradingRosterItem) => row.groupId
   ? `${row.memberCount ?? 0} group member(s)`
   : row.studentEmail || 'No email available';
@@ -322,7 +323,7 @@ export const GradeDialog = ({
 };
 
 const AssignmentGradingPage = () => {
-  const {courseId: courseParam, assignmentId: assignmentParam} = useParams();
+  const {courseId: courseParam, assignmentId: assignmentParam, studentUserId, groupId} = useParams();
   const courseId = parseId(courseParam);
   const assignmentId = parseId(assignmentParam);
   const access = useCourseAccess(courseId);
@@ -345,6 +346,18 @@ const AssignmentGradingPage = () => {
     ),
   });
 
+  const openedTarget = useRef<string>();
+  useEffect(() => {
+    const target = `${courseId}/${assignmentId}/${studentUserId ?? ''}/${groupId ?? ''}`;
+    if (openedTarget.current === target || !rosterQuery.data || (!studentUserId && !groupId)) return;
+    openedTarget.current = target;
+    const row = rosterQuery.data.items.find(item => groupId
+      ? item.groupId === parseId(groupId)
+      : item.groupId == null && item.studentUserId === parseId(studentUserId));
+    if (row) setSelectedRow(row);
+    else setActionError('This submission is not available in your grading roster.');
+  }, [assignmentId, courseId, groupId, rosterQuery.data, studentUserId]);
+
   const rows = useMemo(() => {
     const roster = rosterQuery.data?.items ?? [];
     const needle = search.trim().toLowerCase();
@@ -352,7 +365,7 @@ const AssignmentGradingPage = () => {
     return roster.filter(row => {
       const graded = row.gradeStatus !== 'Ungraded';
       const matchesFilter = filter === 'All' || (filter === 'Graded' ? graded : !graded);
-      const matchesSearch = !needle || [row.studentName, row.studentEmail, row.groupName]
+      const matchesSearch = !needle || [getDisplayName(row), row.studentEmail]
         .some(value => value?.toLowerCase().includes(needle));
       return matchesFilter && matchesSearch;
     });

@@ -336,6 +336,9 @@ export interface SubmitAssignmentPayload {
 export type GradeStatus = 'Ungraded' | 'Entered' | 'Released' | string;
 
 export interface GradingRosterItem {
+  studentFirstName?: string | null;
+  studentMiddleName?: string | null;
+  studentLastName?: string | null;
   studentUserId?: number;
   studentName?: string;
   studentEmail?: string;

@@ -1,0 +1,16 @@
+.feedback {
+  padding-block: t.$space-2;
+  color: t.$text-muted;
+  overflow-wrap: anywhere;
+
+  p { margin: 0 0 t.$space-2; }
+  button {
+    border: 1px solid t.$border;
+    border-radius: t.$radius-control-sm;
+    padding: t.$space-2 t.$space-3;
+    background: t.$card-bg;
+    color: t.$brand;
+    font: inherit;
+    cursor: pointer;
+  }
+}

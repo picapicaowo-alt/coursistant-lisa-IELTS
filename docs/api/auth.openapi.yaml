@@ -1056,6 +1056,8 @@ components:
       properties:
         email:
           type: string
+          format: email
+          maxLength: 255
           description: Email
           example: admin@example.com
         level:
@@ -1140,6 +1142,8 @@ components:
       properties:
         email:
           type: string
+          format: email
+          maxLength: 255
           description: Email
           example: advisor@example.com
         level:
@@ -1191,7 +1195,7 @@ components:
         firstName: { type: string, minLength: 1, maxLength: 100 }
         middleName: { type: string, maxLength: 100 }
         lastName: { type: string, minLength: 1, maxLength: 100 }
-        email: { type: string, maxLength: 255 }
+        email: { type: string, format: email, maxLength: 255 }
         phone: { type: string, maxLength: 64 }
         role: { type: string, deprecated: true, description: Rejected when present. }
         level: { type: string, deprecated: true, description: Rejected when present. }

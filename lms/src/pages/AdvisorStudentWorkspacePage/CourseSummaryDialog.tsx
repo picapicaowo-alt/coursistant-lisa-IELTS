@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
-import {X} from 'lucide-react';
+import {CalendarClock, X} from 'lucide-react';
 import type {AdvisorStudentCourseResponse} from '@/apis';
-import {RecordSummaryList} from '@/components/RecordSummaryList';
+import {contractClock} from '@/utils/contractTime';
 import {formatPersonName} from '@/utils/personName';
 import styles from './CoursesPage.module.scss';
 
@@ -99,10 +99,14 @@ export function CourseSummaryDialog({
           </div>
         </dl>
       ) : (
-        <RecordSummaryList
-          value={course.schedule}
-          emptyMessage="No class schedule is available yet."
-        />
+        course.schedule?.length ? <div className={styles.scheduleList}>{course.schedule.map((session, index) => <article className={styles.scheduleRow} key={session.sessionId ?? index}>
+          <CalendarClock size={20} aria-hidden="true"/>
+          <div><strong>{session.dayOfWeek ? session.dayOfWeek.charAt(0) + session.dayOfWeek.slice(1).toLowerCase() : 'Weekly class'}</strong>
+            <p>{[contractClock(session.startTime), contractClock(session.endTime)].filter(Boolean).join('–') || 'Time not provided'}</p>
+            {session.location ? <small>{session.location}</small> : null}
+          </div>
+          {session.type ? <span>{session.type.replace(/_/g, ' ')}</span> : null}
+        </article>)}</div> : <p>No class schedule is available yet.</p>
       )}
       <footer>
         <button type="button" onClick={onClose}>

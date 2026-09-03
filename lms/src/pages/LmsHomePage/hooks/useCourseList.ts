@@ -1,3 +1,6 @@
+import {formatCourseInstructor} from '@/utils/personName';
+import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
+import {COURSE_VIEWS} from '@/apis/types/dashboard';
 import {MyCourse} from '@/apis';
 import {useMyCourses} from '@/hooks/useCourseAccess';
 import {DashboardCourse} from '../types';
@@ -15,8 +18,10 @@ const toDashboardCourse = (course: MyCourse): DashboardCourse => ({
   courseCode: course.courseCode,
   title: course.title ?? course.name,
   courseRole: course.courseRole ?? course.role,
-  instructorName: course.primaryInstructor?.name ?? null,
+  instructorName: formatCourseInstructor(course.primaryInstructor) || null,
   instructorAvatar: INSTRUCTOR_AVATAR_FALLBACK,
+  lectureTotal: course.lectureTotal,
+  lectureCompleted: course.lectureCompleted,
 });
 
 export interface CourseListResult {
@@ -37,9 +42,11 @@ export interface CourseListResult {
  * collapsing into `courses: []`.
  */
 export const useCourseList = (): CourseListResult => {
-  const query = useMyCourses();
+  const {user} = useRequiredAuth();
+  const student = user.level === 'STUDENT';
+  const query = useMyCourses(student ? COURSE_VIEWS.current : undefined);
   const courses = (query.data ?? [])
-    .filter(course => (course.state ?? course.status) === 'Active')
+    .filter(course => student || course.state == null || (course.state ?? course.status) === 'Active')
     .map(toDashboardCourse);
 
   return {

@@ -1,3 +1,4 @@
+import type {AdvisorConversationCursorPage} from '../types/advising';
 import type {AdvisorStudentFilters, AdvisorInstructor, AdvisorOwnedCourse, AdvisorOwnedCourseFilters, AdvisorConversationSummary, AdvisorStudentHub} from '../types/advisorWorkspace';
 import {
   AdvisingPage,
@@ -281,9 +282,8 @@ export class AdvisorApiService {
     return this.apiClient.post(`/v2/advisor/students/${studentUserId}/conversation/read`, request, idempotent(idempotencyKey));
   }
 
-  listOwnConversationMessages(beforeId?: number): Promise<ApiResponse<AdvisingOpenApiRead>> {
-    const url = '/v2/student/advisor-conversation/messages';
-    return beforeId == null ? this.apiClient.get(url) : this.apiClient.get(url, {params: {beforeId}});
+  listOwnConversationMessages(beforeId?: number, size = 50): Promise<ApiResponse<AdvisorConversationCursorPage>> {
+    return this.apiClient.get('/v2/student/advisor-conversation/messages', {params: {beforeId, size}});
   }
 
   sendOwnConversationMessage(request: SendAdvisorMessageRequest, idempotencyKey: string = crypto.randomUUID()): Promise<ApiResponse<AdvisingOpenApiRead>> {

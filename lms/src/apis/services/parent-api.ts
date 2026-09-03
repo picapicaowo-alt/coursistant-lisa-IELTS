@@ -1,8 +1,8 @@
+import type * as ParentRead from '../types/parentReadModels';
 import type {
   ApiResponse,
   CreateOrReuseParentLinkRequest,
   MarkParentConversationReadRequest,
-  ParentAcademicRead,
   ParentConversationMessageResponse,
   ParentConversationMessagePage,
   ParentNotificationPage,
@@ -11,7 +11,6 @@ import type {
   ParentLinkRequest,
   ParentMessageRequest,
   ParentNotification,
-  ParentReportDetail,
   ParentStudentLinkResponse,
 } from '@/apis';
 import {idempotent, V2ApiClient} from '@/apis';
@@ -66,55 +65,55 @@ export class ParentApiService {
     return this.apiClient.get('/v2/parent/linked-students', {params: {page, size}});
   }
 
-  getStudentDashboard(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  getStudentDashboard(studentUserId: number): Promise<ApiResponse<ParentRead.ParentDashboard>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/dashboard`);
   }
 
-  getStudentProfile(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  getStudentProfile(studentUserId: number): Promise<ApiResponse<ParentRead.ParentStudentProfile>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/profile`);
   }
 
-  getStudentStudyPlan(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  getStudentStudyPlan(studentUserId: number): Promise<ApiResponse<ParentRead.ParentStudyPlan>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/study-plan`);
   }
 
-  listStudentCourses(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  listStudentCourses(studentUserId: number): Promise<ApiResponse<ParentRead.ParentCourse[]>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/courses`);
   }
 
-  listStudentAssignments(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  listStudentAssignments(studentUserId: number): Promise<ApiResponse<ParentRead.ParentAssignment[]>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/assignments`);
   }
 
-  listStudentCalendar(studentUserId: number, limit = 50): Promise<ApiResponse<ParentAcademicRead>> {
-    return this.apiClient.get(`/v2/parent/students/${studentUserId}/calendar`, {params: {limit}});
+  listStudentCalendar(studentUserId: number, params: {from?: string; to?: string; timezone?: string} = {}): Promise<ApiResponse<ParentRead.ParentCalendarResponse>> {
+    return this.apiClient.get(`/v2/parent/students/${studentUserId}/calendar`, {params});
   }
 
-  listStudentAttendance(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  listStudentAttendance(studentUserId: number): Promise<ApiResponse<ParentRead.ParentAttendance[]>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/attendance`);
   }
 
-  getStudentHours(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  getStudentHours(studentUserId: number): Promise<ApiResponse<ParentRead.ParentHours>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/hours`);
   }
 
-  getStudentRisk(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  getStudentRisk(studentUserId: number): Promise<ApiResponse<ParentRead.ParentPublicRisk>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/risk`);
   }
 
-  listStudentReports(studentUserId: number, page = 0, size = 20): Promise<ApiResponse<ParentAcademicRead>> {
+  listStudentReports(studentUserId: number, page = 0, size = 20): Promise<ApiResponse<ParentRead.ParentPublishedReportPage>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/reports`, {params: {page, size}});
   }
 
-  getStudentReport(studentUserId: number, reportId: number): Promise<ApiResponse<ParentReportDetail>> {
+  getStudentReport(studentUserId: number, reportId: number): Promise<ApiResponse<ParentRead.ParentPublishedReportDetail>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/reports/${reportId}`);
   }
 
-  listScheduleRequests(studentUserId: number): Promise<ApiResponse<ParentAcademicRead>> {
+  listScheduleRequests(studentUserId: number): Promise<ApiResponse<ParentRead.ParentScheduleRequestResponse[]>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/schedule-requests`);
   }
 
-  createScheduleRequest(studentUserId: number, request: ParentCreateScheduleRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<ParentAcademicRead>> {
+  createScheduleRequest(studentUserId: number, request: ParentCreateScheduleRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<ParentRead.ParentScheduleRequestResponse>> {
     return this.apiClient.post(`/v2/parent/students/${studentUserId}/schedule-requests`, request, idempotent(key));
   }
 
@@ -134,8 +133,8 @@ export class ParentApiService {
     return this.apiClient.patch('/v2/parent/notifications/read-all', undefined, idempotent(key));
   }
 
-  listConversationMessages(studentUserId: number, beforeId?: number): Promise<ApiResponse<ParentConversationMessagePage | ParentConversationMessageResponse[]>> {
-    return this.apiClient.get(`/v2/parent/students/${studentUserId}/conversation/messages`, {params: {beforeId}});
+  listConversationMessages(studentUserId: number, beforeId?: number, size = 50): Promise<ApiResponse<ParentConversationMessagePage>> {
+    return this.apiClient.get(`/v2/parent/students/${studentUserId}/conversation/messages`, {params: {beforeId, size}});
   }
 
   sendConversationMessage(studentUserId: number, request: ParentMessageRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<ParentConversationMessageResponse>> {

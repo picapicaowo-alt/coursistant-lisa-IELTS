@@ -48,6 +48,8 @@ export interface LayoutOptions {
  * (PRIN-03); the card falls back to the course code until an API provides it.
  */
 export interface DashboardCourse {
+  lectureTotal?: number | null;
+  lectureCompleted?: number | null;
   id: number;
   courseCode: string;
   title: string;

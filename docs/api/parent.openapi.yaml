@@ -53,6 +53,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkApiResponse" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -75,6 +78,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -95,6 +101,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -110,6 +119,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkListApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -127,6 +139,9 @@ paths:
       responses:
         "200":
           description: Linked or reused Parent
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -148,6 +163,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -168,6 +186,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -183,6 +204,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentLinkListApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -194,13 +218,16 @@ paths:
       parameters:
       - name: page
         in: query
-        schema: { type: integer, default: 0 }
+        schema: { type: integer, default: 0, minimum: 0 }
       - name: size
         in: query
-        schema: { type: integer, default: 20 }
+        schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudentSummaryPageApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
   /v2/parent/students/{studentUserId}/dashboard:
@@ -212,6 +239,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentDashboardApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -225,6 +255,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentProfileApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -238,6 +271,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentStudyPlanApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -251,6 +287,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentCourseListApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -264,6 +303,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentAssignmentListApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -274,12 +316,24 @@ paths:
       tags: [Parent Academic Reads]
       parameters:
       - $ref: "#/components/parameters/StudentUserId"
-      - name: limit
+      - name: from
         in: query
-        schema: { type: integer, default: 50 }
+        description: Inclusive local date. Defaults to tenant today.
+        schema: { type: string, format: date }
+      - name: to
+        in: query
+        description: Exclusive local date. Defaults to from + 14 days. Window is 1-90 days.
+        schema: { type: string, format: date }
+      - name: timezone
+        in: query
+        description: IANA timezone. Defaults to the Student tenant timezone.
+        schema: { type: string }
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentCalendarApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -293,6 +347,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentAttendanceListApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -306,6 +363,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentHoursApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -319,6 +379,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentPublicRiskApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -331,13 +394,16 @@ paths:
       - $ref: "#/components/parameters/StudentUserId"
       - name: page
         in: query
-        schema: { type: integer, default: 0 }
+        schema: { type: integer, default: 0, minimum: 0 }
       - name: size
         in: query
-        schema: { type: integer, default: 20 }
+        schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentReportPageApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -355,6 +421,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentReportDetailApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -368,6 +437,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentScheduleRequestListApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -386,6 +458,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentScheduleRequestApiResponse" }
         "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
@@ -400,13 +475,16 @@ paths:
       parameters:
       - name: page
         in: query
-        schema: { type: integer, default: 0 }
+        schema: { type: integer, default: 0, minimum: 0 }
       - name: size
         in: query
-        schema: { type: integer, default: 20 }
+        schema: { type: integer, default: 20, minimum: 1, maximum: 100 }
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentNotificationPageApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
   /v2/parent/notifications/unread-count:
@@ -416,6 +494,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentUnreadCountApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
   /v2/parent/notifications/{notificationId}/read:
@@ -431,6 +512,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VoidApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -444,6 +528,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentUnreadCountApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
   /v2/parent/students/{studentUserId}/conversation/messages:
@@ -455,13 +542,20 @@ paths:
       - name: beforeId
         in: query
         schema: { type: integer, format: int64 }
+      - name: size
+        in: query
+        schema: { type: integer, default: 50, minimum: 1, maximum: 100 }
       responses:
         "200":
-          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS. Messages with id greater than the current link watermark."
+          description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentConversationCursorApiResponse" }
+        "400": { $ref: "#/components/responses/BadRequest" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
-          description: NOT_FOUND
+          description: "NOT_FOUND, CONVERSATION_NOT_FOUND"
     post:
       operationId: parentSendConversationMessage
       tags: [ParentConversations]
@@ -476,6 +570,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ParentConversationMessageApiResponse" }
         "400":
           description: "UNSUPPORTED_FILE_TYPE, FILE_TOO_LARGE, PARAM_MISSING or BAD_REQUEST"
         "401": { $ref: "#/components/responses/Unauthorized" }
@@ -498,6 +595,9 @@ paths:
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VoidApiResponse" }
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
@@ -576,7 +676,7 @@ components:
     BadRequest:
       description: PARAM_MISSING or BAD_REQUEST
     Unauthorized:
-      description: UNAUTHORIZED
+      description: INVALID_TOKEN
     Forbidden:
       description: FORBIDDEN
   schemas:
@@ -676,7 +776,12 @@ components:
         studentUserId: { type: integer }
         courseId: { type: integer, nullable: true, description: "Null for course-less Study Plan / Advisor Task events" }
         courseCode: { type: string, nullable: true }
-        notificationType: { type: string }
+        notificationType:
+          type: string
+          enum: [REPORT_PUBLISHED, ABSENCE_REQUEST_DECIDED, SCHEDULE_REQUEST_DECIDED,
+            SESSION_SCHEDULE_CHANGED, SESSION_CANCELLED, ATTENDANCE_STATUS_CHANGED,
+            COURSE_HOURS_CHANGED, ADVISOR_TASK_CREATED, ADVISOR_TASK_STATUS_CHANGED,
+            ADVISOR_TASK_FEEDBACK_CHANGED, CHECKPOINT_REACHED_INCOMPLETE, ASSIGNMENT_GRADE_RELEASED]
         message: { type: string }
         subjectType: { type: string }
         subjectId: { type: integer }
@@ -697,7 +802,7 @@ components:
           enum: [NOT_REACHED, REACHED_INCOMPLETE, REACHED_COMPLETED]
         tasks:
           type: array
-          items: { type: object }
+          items: { $ref: "#/components/schemas/ParentStudyPlanTask" }
     ParentReportDetail:
       type: object
       properties:
@@ -709,3 +814,527 @@ components:
         skillEvaluation: { type: string }
         improvementSuggestions: { type: string }
         publishedAt: { type: string, format: date-time }
+    VoidApiResponse:
+      type: object
+      required: [status, code]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { nullable: true }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentStudentLinkApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentStudentLinkResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentStudentSummaryPageApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentStudentSummaryPage" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentStudentSummaryPage:
+      type: object
+      required: [items, page, size, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ParentStudentSummary" }
+        page: { type: integer, minimum: 0 }
+        size: { type: integer, minimum: 1, maximum: 100 }
+        total: { type: integer, format: int64 }
+    ParentStudentSummary:
+      type: object
+      required: [studentUserId]
+      properties:
+        studentUserId: { type: integer }
+        firstName: { type: string }
+        middleName: { type: string }
+        lastName: { type: string }
+        email: { type: string }
+        avatarUrl: { type: string }
+    ParentDashboardApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentDashboard" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentDashboard:
+      type: object
+      properties:
+        student: { $ref: "#/components/schemas/ParentStudentSummary" }
+        currentCourses:
+          type: array
+          items: { $ref: "#/components/schemas/ParentCourse" }
+        hours: { $ref: "#/components/schemas/ParentHoursSummary" }
+        attendance: { $ref: "#/components/schemas/ParentAttendanceSummary" }
+        requests: { $ref: "#/components/schemas/ParentRequestSummary" }
+        latestReleasedFeedback: { $ref: "#/components/schemas/ParentFeedback" }
+        latestPublishedReport: { $ref: "#/components/schemas/ParentPublishedReport" }
+        publicAlerts:
+          type: array
+          items: { $ref: "#/components/schemas/ParentPublicAlert" }
+        upcomingSchedule:
+          type: array
+          items: { $ref: "#/components/schemas/ParentCalendarItem" }
+        risk: { $ref: "#/components/schemas/ParentPublicRisk" }
+    ParentProfileApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentStudentProfile" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentStudentProfile:
+      type: object
+      properties:
+        student: { $ref: "#/components/schemas/ParentStudentSummary" }
+        contactPhone: { type: string }
+        intakeBackground: { type: string }
+        academicBackground: { type: string }
+        priorTestExperience: { type: string }
+        baselineAssessment: { type: string }
+        targetGoal: { type: string }
+        targetMetric: { type: string }
+        targetValue: { type: string }
+        targetDate: { type: string, format: date }
+        advisorInterpretation: { type: string }
+        skills:
+          type: array
+          items: { $ref: "#/components/schemas/ParentStudentSkill" }
+    ParentStudentSkill:
+      type: object
+      properties:
+        skillCode: { type: string }
+        displayName: { type: string }
+        scale: { type: string }
+        currentValue: { type: string }
+        targetValue: { type: string }
+        gapSummary: { type: string }
+        position: { type: integer }
+    ParentStudyPlanApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentStudyPlan" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentStudyPlan:
+      type: object
+      properties:
+        strategySummary: { type: string }
+        startDate: { type: string, format: date }
+        planEndDate: { type: string, format: date }
+        checkpoints:
+          type: array
+          items: { $ref: "#/components/schemas/ParentStudyPlanCheckpoint" }
+    ParentCourseListApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/ParentCourse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentCourse:
+      type: object
+      required: [courseId]
+      properties:
+        courseId: { type: integer }
+        courseCode: { type: string }
+        title: { type: string }
+        instructorFirstName: { type: string }
+        instructorMiddleName: { type: string }
+        instructorLastName: { type: string }
+        lifecycleStatus:
+          type: string
+          enum: [DRAFT, READY, PUBLISHED, ONGOING, COMPLETED]
+        termStartDate: { type: string, format: date }
+        termEndDate: { type: string, format: date }
+        publishedAssignmentCount: { type: integer }
+        submittedAssignmentCount: { type: integer }
+        progressPercent: { type: number }
+        schedule:
+          type: array
+          items: { $ref: "#/components/schemas/ParentCourseSchedule" }
+    ParentCourseSchedule:
+      type: object
+      properties:
+        courseId: { type: integer }
+        type: { type: string }
+        dayOfWeek: { type: string, enum: [MON, TUE, WED, THU, FRI, SAT, SUN] }
+        startTime: { type: string, format: time }
+        endTime: { type: string, format: time }
+        location: { type: string }
+    ParentAssignmentListApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/ParentAssignment" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentAssignment:
+      type: object
+      properties:
+        assignmentId: { type: integer }
+        courseId: { type: integer }
+        courseTitle: { type: string }
+        title: { type: string }
+        deadline: { type: string, format: date-time, description: UTC }
+        submissionStatus: { type: string, enum: [NOT_SUBMITTED, SUBMITTED] }
+        submittedAt: { type: string, format: date-time, description: UTC }
+        releasedScore: { type: number }
+        pointsPossible: { type: number }
+        studentVisibleFeedback: { type: string }
+        gradeReleasedAt: { type: string, format: date-time, description: UTC }
+    ParentCalendarApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentCalendarResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentCalendarResponse:
+      type: object
+      required: [timezone, fromUtc, toUtc, items]
+      properties:
+        timezone: { type: string, description: "IANA timezone used to interpret [from,to)" }
+        fromUtc: { type: string, format: date-time, description: Inclusive UTC instant }
+        toUtc: { type: string, format: date-time, description: Exclusive UTC instant }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ParentCalendarItem" }
+    ParentCalendarItem:
+      type: object
+      required: [eventType, sourceId, startsAtUtc, endsAtUtc, timezone]
+      properties:
+        eventType: { type: string, enum: [SESSION, ASSIGNMENT_DEADLINE] }
+        sourceId: { type: string }
+        startsAtUtc: { type: string, format: date-time, description: UTC }
+        endsAtUtc: { type: string, format: date-time, description: UTC }
+        timezone: { type: string }
+        courseId: { type: integer }
+        courseCode: { type: string }
+        courseTitle: { type: string }
+        title: { type: string }
+        weekId: { type: integer }
+        lectureId: { type: integer }
+        lectureNumber: { type: integer }
+        instructorUserId: { type: integer }
+        instructorFirstName: { type: string }
+        instructorMiddleName: { type: string }
+        instructorLastName: { type: string }
+        assignmentId: { type: integer }
+        occurrenceId: { type: integer, format: int64 }
+    ParentAttendanceListApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/ParentAttendance" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentAttendance:
+      type: object
+      properties:
+        occurrenceId: { type: integer, format: int64 }
+        courseId: { type: integer }
+        courseTitle: { type: string }
+        occurrenceDate: { type: string, format: date }
+        startTime: { type: string, format: time }
+        endTime: { type: string, format: time }
+        timezone: { type: string }
+        occurrenceStatus: { type: string }
+        effectiveStatus: { type: string }
+        requestStatus: { type: string }
+    ParentHoursApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentHours" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentHours:
+      type: object
+      properties:
+        purchasedMinutes: { type: integer }
+        usedMinutes: { type: integer }
+        remainingMinutes: { type: integer }
+        courses:
+          type: array
+          items: { $ref: "#/components/schemas/ParentHoursBalance" }
+        ledger:
+          type: array
+          items: { $ref: "#/components/schemas/ParentHoursLedger" }
+    ParentHoursSummary:
+      type: object
+      properties:
+        purchasedMinutes: { type: integer }
+        usedMinutes: { type: integer }
+        remainingMinutes: { type: integer }
+    ParentHoursBalance:
+      type: object
+      properties:
+        courseId: { type: integer }
+        courseTitle: { type: string }
+        purchasedMinutes: { type: integer }
+        usedMinutes: { type: integer }
+        remainingMinutes: { type: integer }
+    ParentHoursLedger:
+      type: object
+      properties:
+        courseId: { type: integer }
+        courseTitle: { type: string }
+        occurrenceId: { type: integer, format: int64 }
+        entryType: { type: string }
+        minutes: { type: integer }
+        beforeRemainingMinutes: { type: integer }
+        afterRemainingMinutes: { type: integer }
+        recordedAt: { type: string, format: date-time, description: UTC }
+    ParentAttendanceSummary:
+      type: object
+      properties:
+        total: { type: integer }
+        present: { type: integer }
+        absent: { type: integer }
+        excused: { type: integer }
+    ParentRequestSummary:
+      type: object
+      properties:
+        pending: { type: integer }
+        approved: { type: integer }
+        rejected: { type: integer }
+    ParentFeedback:
+      type: object
+      properties:
+        assignmentId: { type: integer }
+        assignmentTitle: { type: string }
+        score: { type: number }
+        pointsPossible: { type: number }
+        studentVisibleFeedback: { type: string }
+        releasedAt: { type: string, format: date-time, description: UTC }
+    ParentPublishedReport:
+      type: object
+      properties:
+        reportId: { type: integer, format: int64 }
+        courseId: { type: integer }
+        courseTitle: { type: string }
+        reportType: { type: string, enum: [MID_TERM, FINAL] }
+        overallSummary: { type: string }
+        strengths: { type: string }
+        weaknesses: { type: string }
+        skillEvaluation: { type: string }
+        improvementSuggestions: { type: string }
+        publishedAt: { type: string, format: date-time, description: UTC }
+    ParentPublicAlert:
+      type: object
+      properties:
+        code: { type: string }
+        severity: { type: string, enum: [ON_TRACK, AT_RISK, NEEDS_ATTENTION] }
+    ParentPublicRiskApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentPublicRisk" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentPublicRisk:
+      type: object
+      properties:
+        status: { type: string, enum: [ON_TRACK, AT_RISK, NEEDS_ATTENTION] }
+        reasons:
+          type: array
+          items: { type: string }
+    ParentReportPageApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentPublishedReportPage" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentPublishedReportPage:
+      type: object
+      required: [items, page, size, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ParentPublishedReportSummary" }
+        page: { type: integer, minimum: 0 }
+        size: { type: integer, minimum: 1, maximum: 100 }
+        total: { type: integer, format: int64 }
+    ParentPublishedReportSummary:
+      type: object
+      properties:
+        reportId: { type: integer, format: int64 }
+        studentUserId: { type: integer }
+        courseId: { type: integer }
+        courseCode: { type: string }
+        courseTitle: { type: string }
+        title: { type: string }
+        reportType: { type: string, enum: [MID_TERM, FINAL] }
+        publishedAt: { type: string, format: date-time, description: UTC }
+    ParentReportDetailApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentPublishedReportDetail" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentPublishedReportDetail:
+      allOf:
+      - $ref: "#/components/schemas/ParentPublishedReportSummary"
+      - type: object
+        properties:
+          overallSummary: { type: string }
+          strengths: { type: string }
+          weaknesses: { type: string }
+          skillEvaluation: { type: string }
+          improvementSuggestions: { type: string }
+    ParentScheduleRequestListApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/ParentScheduleRequestResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentScheduleRequestApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentScheduleRequestResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentScheduleRequestResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        courseId: { type: integer }
+        occurrenceId: { type: integer, format: int64 }
+        studentUserId: { type: integer }
+        requestedBy: { type: string }
+        requestType: { type: string, enum: [ABSENCE, SCHEDULE_CHANGE] }
+        status: { type: string, enum: [PENDING_INSTRUCTOR, PENDING_ADVISOR, APPROVED, REJECTED] }
+        reason: { type: string }
+        rejectionReason: { type: string }
+        proposedOccurrenceDate: { type: string, format: date }
+        proposedStartTime: { type: string, format: time }
+        proposedEndTime: { type: string, format: time }
+        replacementOccurrenceId: { type: integer, format: int64 }
+        createdAt: { type: string, format: date-time, description: UTC }
+        updatedAt: { type: string, format: date-time, description: UTC }
+    ParentNotificationPageApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentNotificationPage" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentNotificationPage:
+      type: object
+      required: [items, page, size, total]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ParentNotification" }
+        page: { type: integer, minimum: 0 }
+        size: { type: integer, minimum: 1, maximum: 100 }
+        total: { type: integer, format: int64 }
+    ParentUnreadCountApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/UnreadCountResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    UnreadCountResponse:
+      type: object
+      required: [unreadCount]
+      properties:
+        unreadCount: { type: integer, format: int64 }
+    ParentConversationCursorApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentConversationMessageCursorPage" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentConversationMessageCursorPage:
+      type: object
+      required: [items, hasMore]
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/ParentConversationMessageResponse" }
+        nextBeforeId: { type: integer, format: int64, nullable: true }
+        hasMore: { type: boolean }
+    ParentConversationMessageApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/ParentConversationMessageResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    ParentStudyPlanTask:
+      type: object
+      properties:
+        taskId: { type: integer, format: int64 }
+        checkpointId: { type: integer, format: int64 }
+        position: { type: integer }
+        title: { type: string }
+        description: { type: string }
+        dueDate: { type: string, format: date }
+        submissionRequirement: { type: string }
+        status: { type: string }
+        startedAt: { type: string, format: date-time, description: UTC }
+        completedAt: { type: string, format: date-time, description: UTC }
+        submissionText: { type: string }
+        publicFeedback: { type: string }

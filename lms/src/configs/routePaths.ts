@@ -1,4 +1,4 @@
-import {ASSIGNMENT_GRADING_ROUTE} from './coursePaths';
+import {ASSIGNMENT_GRADING_ROUTE, INDIVIDUAL_GRADING_ROUTE, GROUP_GRADING_ROUTE} from './coursePaths';
 import {VOCABULARY_ROUTE_PATTERNS} from '@/pages/vocabulary/routes';
 
 export const STUDENT_PLAN_VIEWS = {overview: 'overview', tasks: 'tasks', learning: 'learning', messages: 'messages'} as const;
@@ -70,6 +70,6 @@ export const APP_ROUTE_PATHS = {
   advisorCoursesCourseIdDelivery: '/advisor/courses/:courseId/delivery',
 } as const;
 
-export const REGISTERED_ROUTE_PATTERNS = [...Object.values(APP_ROUTE_PATHS), ASSIGNMENT_GRADING_ROUTE, ...Object.values(VOCABULARY_ROUTE_PATTERNS)];
+export const REGISTERED_ROUTE_PATTERNS = [...Object.values(APP_ROUTE_PATHS), ASSIGNMENT_GRADING_ROUTE, INDIVIDUAL_GRADING_ROUTE, GROUP_GRADING_ROUTE, ...Object.values(VOCABULARY_ROUTE_PATTERNS)];
 
 export const STUDENT_LEARNING_PATH = `${APP_ROUTE_PATHS.myPlan}?view=${STUDENT_PLAN_VIEWS.learning}`;

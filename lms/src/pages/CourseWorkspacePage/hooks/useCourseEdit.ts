@@ -1,3 +1,4 @@
+import {formatCourseInstructor} from '@/utils/personName';
 import React from "react";
 import {useCourseWorkspaceStore} from "../stores/useCourseWorkspaceStore";
 import {CourseDetailDTO, CourseResponse, CourseWeek} from "@/apis";
@@ -27,7 +28,7 @@ const toCourseDetail = (course: CourseResponse, weeks: CourseWeek[]): CourseDeta
     termStartDate: course.termStartDate,
     termEndDate: course.termEndDate,
     location: course.location,
-    teacherName: course.primaryInstructor?.name,
+    teacherName: formatCourseInstructor(course.primaryInstructor),
     teacherEmail: course.primaryInstructor?.email,
     createdAt: new Date(course.createdAt),
     updatedAt: new Date(course.updatedAt),

@@ -619,6 +619,7 @@ const AdminConsolePage: React.FC = () => {
                 <input
                   required
                   type="email"
+                  maxLength={255}
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                 />

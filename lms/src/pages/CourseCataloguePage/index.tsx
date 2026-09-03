@@ -1,3 +1,5 @@
+import {formatCourseInstructor} from '@/utils/personName';
+import {COURSE_VIEWS, type StudentCourseView} from '@/apis/types/dashboard';
 import React, {Suspense, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import styles from "./index.module.scss";
@@ -25,6 +27,8 @@ const CourseCataloguePage: React.FC = () => {
   const navigate = useNavigate();
   const {user} = useRequiredAuth();
   const isUserAccount = user.role === 'USER';
+  const student = isStudentAccount(user);
+  const [courseView, setCourseView] = useState<StudentCourseView | undefined>(undefined);
   const canCreateCourse = canCreateCourses(user);
   const [courseState, setCourseState] = useState<CourseState | undefined>(undefined);
 
@@ -39,7 +43,7 @@ const CourseCataloguePage: React.FC = () => {
       <div className={styles.contentContainer}>
         <h1 className={styles.pageTitle}>{isUserAccount ? t("list.tabs.myCourses") : 'Courses'}</h1>
         <div className={styles.tabsContainer}>
-          {([{value: undefined, label: 'All Status'}, {value: 'Active', label: 'Active'}, {value: 'Archived', label: 'Archived'}] as const).map(tab => <button key={tab.label} type="button" className={`${styles.tab} ${courseState === tab.value ? styles.active : ''}`} aria-pressed={courseState === tab.value} onClick={() => setCourseState(tab.value)}>{tab.label}</button>)}
+          {student ? [{label: 'all', value: undefined}, ...Object.entries(COURSE_VIEWS).map(([label, value]) => ({label, value}))].map(({label, value}) => <button key={label} type="button" className={`${styles.tab} ${courseView === value ? styles.active : ''}`} aria-pressed={courseView === value} onClick={() => setCourseView(value)}>{label === 'all' ? 'All Status' : label === 'current' ? 'Current' : 'Completed'}</button>) : ([{value: undefined, label: 'All Status'}, {value: 'Active', label: 'Active'}, {value: 'Archived', label: 'Archived'}] as const).map(tab => <button key={tab.label} type="button" className={`${styles.tab} ${courseState === tab.value ? styles.active : ''}`} aria-pressed={courseState === tab.value} onClick={() => setCourseState(tab.value)}>{tab.label}</button>)}
           <div className={styles.tabSpacer}/>
           
           {canCreateCourse ? (
@@ -56,7 +60,7 @@ const CourseCataloguePage: React.FC = () => {
           <div className={styles.viewToggle} aria-label="Course display"><button type="button" aria-label="Grid view" aria-pressed={view === 'grid'} onClick={() => setView('grid')}><img src="/icons/figma-courses/grid.svg" alt=""/></button><button type="button" aria-label="List view" aria-pressed={view === 'list'} onClick={() => setView('list')}><img src="/icons/figma-courses/list.svg" alt=""/></button></div>
         </div>
         <Suspense fallback={<LoadingOverlay/>}>
-          <CoursesList key={courseState} state={courseState} view={view}/>
+          <CoursesList key={student ? courseView : courseState} state={student ? undefined : courseState} courseView={student ? courseView : undefined} view={view}/>
         </Suspense>
       </div>
     </div>
@@ -65,7 +69,7 @@ const CourseCataloguePage: React.FC = () => {
 
 const PAGE_SIZE = 20;
 
-const CoursesList: React.FC<{state?: CourseState; view: 'grid' | 'list'}> = ({state, view}) => {
+const CoursesList: React.FC<{state?: CourseState; courseView?: StudentCourseView; view: 'grid' | 'list'}> = ({state, courseView, view}) => {
   const {t} = useTranslation("course");
   const {user} = useRequiredAuth();
   const isUserAccount = user.role === 'USER';
@@ -81,10 +85,11 @@ const CoursesList: React.FC<{state?: CourseState; view: 'grid' | 'list'}> = ({st
    * is the endpoint every USER account can call for their own enrolments.
    */
   const {data} = useSuspenseQuery({
-    queryKey: [isUserAccount ? 'my-courses' : 'admin-courses', user.id, state, currentPage],
+    queryKey: [isUserAccount ? 'my-courses' : 'admin-courses', user.id, 'catalogue', state, courseView, currentPage],
     queryFn: async () => {
       const params = {
         state,
+        courseView,
         page: currentPage - 1,
         size: PAGE_SIZE,
       } as const;
@@ -124,7 +129,10 @@ const CoursesList: React.FC<{state?: CourseState; view: 'grid' | 'list'}> = ({st
             courseCode={course.courseCode}
             title={course.title}
             state={course.state}
-            instructorName={course.primaryInstructor?.name ?? null}
+            lifecycleStatus={'lifecycleStatus' in course ? course.lifecycleStatus : undefined}
+            lectureTotal={'lectureTotal' in course ? course.lectureTotal : undefined}
+            lectureCompleted={'lectureCompleted' in course ? course.lectureCompleted : undefined}
+            instructorName={formatCourseInstructor(course.primaryInstructor) || null}
             progress={studentProgress.data?.courses?.find(item => item.courseId === course.id)}
             progressLoading={studentProgress.isFetching}
             progressFailed={studentProgress.isError}

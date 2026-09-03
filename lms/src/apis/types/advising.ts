@@ -431,8 +431,17 @@ export interface AdvisorStudentCourseResponse {
   lectureCompleted?: number;
   completionVersion?: number;
   completedAt?: string;
-  schedule?: unknown[];
+  schedule?: GroupCourseSchedulePreviewResponse[];
   instructors?: GroupCourseInstructorPreviewResponse[];
+}
+
+export interface GroupCourseSchedulePreviewResponse {
+  sessionId?: number;
+  type?: string;
+  dayOfWeek?: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
 }
 
 export interface GroupCourseInstructorPreviewResponse {
@@ -556,3 +565,10 @@ export const ADVISING_ERROR_CODES = {
   studyPlanInvalidTimeline: 'STUDY_PLAN_INVALID_TIMELINE',
   studyPlanChildInvalid: 'STUDY_PLAN_CHILD_INVALID',
 } as const;
+
+/** Explicit continuation metadata; a short page may still have older messages. */
+export interface AdvisorConversationCursorPage {
+  items: AdvisorConversationMessageResponse[];
+  nextBeforeId?: number | null;
+  hasMore: boolean;
+}

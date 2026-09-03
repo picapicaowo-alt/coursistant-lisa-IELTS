@@ -1,8 +1,8 @@
 # Frontend operation evidence matrix — 2026-09-02
 
-Updated 2026-09-03: ten previously transport-only reads now have explicit UI consumers (administrator/user detail, avatars, system exam sections/media). Assignment creation also now supplies required `weekId` and `learningType`; observer exam cards retain declared summaries. **417 wired entries, 4 alternate workflows, 10 excluded entries. These are contract entries, including duplicated routes across snapshots, not 431 live-tested endpoints.**
+Updated 2026-09-03: ten previously transport-only reads now have explicit UI consumers (administrator/user detail, avatars, system exam sections/media). Assignment creation also now supplies required `weekId` and `learningType`; observer exam cards retain declared summaries. **417 wired entries, 5 alternate workflows, 10 excluded entries. These are contract entries, including duplicated routes across snapshots, not 432 live-tested endpoints.**
 
-Scope: the 11 checked-in OpenAPI snapshots; 431 operations. This is a source reachability audit, not proof of authenticated runtime success. Paths with parameterized service wrappers are candidate matches and were checked against their service implementations. UI evidence names actual calling pages, components or hooks; it does not assert that every response schema or business state has been accepted live.
+Scope: the 11 checked-in OpenAPI snapshots; 432 operations. This is a source reachability audit, not proof of authenticated runtime success. Paths with parameterized service wrappers are candidate matches and were checked against their service implementations. UI evidence names actual calling pages, components or hooks; it does not assert that every response schema or business state has been accepted live.
 
 Status: **wired** = service and production consumer found; **transport / review** = service exists but no direct consumer was identified; **alternate workflow** = the page uses a collection projection or batch operation; **excluded** = explicitly Disabled or diagnostic endpoint. System-only functions are outside the supplied Tenant Admin account matrix.
 
@@ -12,7 +12,7 @@ Status: **wired** = service and production consumer found; **transport / review*
 | assignment.openapi.yaml | 42 |
 | auth.openapi.yaml | 27 |
 | counsellor.openapi.yaml | 7 |
-| course.openapi.yaml | 151 |
+| course.openapi.yaml | 152 |
 | mockexam.openapi.yaml | 51 |
 | notification.openapi.yaml | 5 |
 | parent.openapi.yaml | 32 |
@@ -258,7 +258,7 @@ Status: **wired** = service and production consumer found; **transport / review*
 | `courseSessionUpdate` | `PUT /v2/courses/{courseId}/sessions/{sessionId}` | `apis/services/course-api.ts#updateCourseSession` | `pages/CourseSchedulePage/index.tsx` | wired |
 | `listCourseStudentReports` | `GET /v2/courses/{courseId}/student-reports` | `apis/services/course-operations-api.ts#listCourseStudentReports` | `pages/CourseOperationsPage/index.tsx` | wired |
 | `createCourseStudentReport` | `POST /v2/courses/{courseId}/student-reports` | `apis/services/course-operations-api.ts#createCourseStudentReport` | `pages/CourseOperationsPage/index.tsx` | wired |
-| `listMyPublishedCourseReports` | `GET /v2/courses/{courseId}/student-reports/published/me` | `apis/services/course-operations-api.ts#listMyPublishedCourseReports` | `pages/MyOperationsPage/index.tsx` | wired |
+| `listMyPublishedCourseReports` | `GET /v2/courses/{courseId}/student-reports/published/me` | `apis/services/course-operations-api.ts#listMyPublishedCourseReports` | Superseded in the Student workspace by the latest all-course `meListPublishedStudentReports` projection with `courseId`; detail still uses the documented course-scoped endpoint. | alternate workflow |
 | `getMyPublishedCourseReport` | `GET /v2/courses/{courseId}/student-reports/published/me/{reportId}` | `apis/services/course-operations-api.ts#getMyPublishedCourseReport` | `pages/MyOperationsPage/index.tsx` | wired |
 | `getCourseStudentReport` | `GET /v2/courses/{courseId}/student-reports/{reportId}` | `apis/services/course-operations-api.ts#getCourseStudentReport` | `pages/CourseOperationsPage/index.tsx` | wired |
 | `updateCourseStudentReport` | `PATCH /v2/courses/{courseId}/student-reports/{reportId}` | `apis/services/course-operations-api.ts#updateCourseStudentReport` | `pages/CourseOperationsPage/index.tsx` | wired |
@@ -304,6 +304,7 @@ Status: **wired** = service and production consumer found; **transport / review*
 | `meAttendanceHistory` | `GET /v2/me/attendance` | `apis/services/course-operations-api.ts#getMyAttendance` | `pages/MyOperationsPage/index.tsx` | wired |
 | `meCalendar` | `GET /v2/me/calendar` | `apis/services/course-operations-api.ts#getMyCalendar` | `pages/MyOperationsPage/index.tsx` | wired |
 | `meCoursesList` | `GET /v2/me/courses` | `apis/services/dashboard-api.ts#getMyCourses` | `hooks/useCourseAccess.ts`<br>`pages/CalendarPage/calendarData.ts`<br>`pages/CourseCataloguePage/index.tsx`<br>`utils/chatCourses.ts` | wired |
+| `meListPublishedStudentReports` | `GET /v2/me/student-reports` | `apis/services/course-operations-api.ts#listMyPublishedReports` | `pages/MyOperationsPage/StudentReports.tsx`; zero-based server filtering by course and report type. | wired |
 | `meCourseHours` | `GET /v2/me/courses/{courseId}/hours` | `apis/services/course-operations-api.ts#getMyCourseHours` | `pages/MyOperationsPage/index.tsx` | wired |
 | `meEventsUpcoming` | `GET /v2/me/events/upcoming` | `apis/services/dashboard-api.ts#getUpcomingActivities` | `pages/LmsHomePage/hooks/useDashboardActivities.ts` | wired |
 | `listMyPersonalEvents` | `GET /v2/me/personal-events` | `apis/services/course-operations-api.ts#listMyPersonalEvents` | `pages/MyOperationsPage/index.tsx` | wired |

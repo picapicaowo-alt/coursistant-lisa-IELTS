@@ -1,0 +1,15 @@
+
+> lms@0.0.0 test:run
+> vitest run
+
+(node:48321) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ RUN  v4.1.11 /private/tmp/xlearn-figma-resume-20260903/lms
+
+
+ Test Files  132 passed (132)
+      Tests  548 passed (548)
+   Start at  10:00:54
+   Duration  40.51s (transform 21.63s, setup 29.24s, import 97.84s, tests 38.99s, environment 142.28s)
+

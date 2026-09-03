@@ -73,7 +73,7 @@ export function LearningProfileDetails({
           .map((skill, index) => {
             return <article key={skill.skillCode ?? index}>
               <span className={styles.skillSymbol} aria-hidden="true">
-                <SkillIcon code={skill.skillCode}/>
+                <SkillIcon code={skill.skillCode} size={32} colored/>
               </span>
               <h2>{skill.displayName || skill.skillCode}</h2>
               <strong>{skill.currentValue || 'Not assessed'}</strong>

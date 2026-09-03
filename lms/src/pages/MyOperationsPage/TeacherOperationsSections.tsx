@@ -1,3 +1,9 @@
+import {unwrapPageData} from '@/apis';
+import {GRADING_QUEUE_STATUSES, OPERATION_QUEUE_PAGE_SIZE} from '@/apis/types/operationQueues';
+import {AdvisingPagination} from '../advising/AdvisingPagination';
+import {QueryFeedback} from '@/components/QueryFeedback';
+import {InstructorScheduleRequestRow} from './InstructorScheduleRequestRow';
+import {contractClock, contractTimeValue, formatZonedTimestamp} from '@/utils/contractTime';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {dashboardApiService} from '@/apis/services/dashboard-api';
@@ -65,7 +71,7 @@ const formatName = (record: {
   studentFirstName?: string;
   studentMiddleName?: string;
   studentLastName?: string;
-  studentUserId: number;
+  studentUserId?: number | null;
 }): string => [record.studentFirstName, record.studentMiddleName, record.studentLastName]
   .filter(Boolean)
   .join(' ') || `Student #${record.studentUserId}`;
@@ -80,9 +86,10 @@ const formatDate = (value?: string): string | undefined => {
   return new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric'}).format(parsed);
 };
 
-const formatTime = (value?: string): string | undefined => {
-  const match = value?.match(/^(\d{2}):(\d{2})/);
-  if (!match) return value;
+const formatTime = (value: unknown): string | undefined => {
+  const clock = contractClock(value);
+  const match = clock?.match(/^(\d{2}):(\d{2})/);
+  if (!match) return undefined;
   const hour = Number(match[1]);
   const minute = match[2];
   return `${hour % 12 || 12}:${minute} ${hour >= 12 ? 'PM' : 'AM'}`;
@@ -124,28 +131,38 @@ const RecordRows: React.FC<{
 };
 
 const TeachingQueue: React.FC = () => {
+  const [gradingPage, setGradingPage] = useState(0);
+  const [requestPage, setRequestPage] = useState(0);
+  const [courseId, setCourseId] = useState('');
+  const [status, setStatus] = useState('');
+  const size = OPERATION_QUEUE_PAGE_SIZE;
+  const selectedCourse = courseId ? Number(courseId) : undefined;
+
   const courses = useQuery({queryKey: ['me', 'teaching-courses'], queryFn: async () => unwrapData(await dashboardApiService.getTeachingCourses(), 'teachingCourses'), retry: false});
   const alerts = useQuery({queryKey: ['me', 'teaching-alerts'], queryFn: async () => unwrapData(await courseOperationsApiService.getMyTeachingAlerts(), 'myTeachingAlerts'), retry: false});
-  const grading = useQuery({queryKey: ['me', 'teaching-grading-items'], queryFn: async () => unwrapData(await courseOperationsApiService.getMyTeachingGradingItems(), 'myTeachingGradingItems'), retry: false});
-  const requests = useQuery({queryKey: ['me', 'teaching-schedule-requests'], queryFn: async () => unwrapData(await courseOperationsApiService.getMyTeachingScheduleRequests(), 'myTeachingScheduleRequests'), retry: false});
+  const grading = useQuery({queryKey: ['me', 'teaching-grading-items', gradingPage, selectedCourse, status], queryFn: async () => unwrapPageData(await courseOperationsApiService.getMyTeachingGradingItems({page: gradingPage, size, courseId: selectedCourse, status: status || undefined}), 'myTeachingGradingItems'), retry: false});
+  const requests = useQuery({queryKey: ['me', 'teaching-schedule-requests', requestPage, selectedCourse], queryFn: async () => unwrapPageData(await courseOperationsApiService.getMyTeachingScheduleRequests({page: requestPage, size, courseId: selectedCourse}), 'myTeachingScheduleRequests'), retry: false});
   const support = useQuery({queryKey: ['me', 'teaching-support'], queryFn: async () => unwrapData(await courseOperationsApiService.getMyTeachingStudentsNeedingSupport(), 'myTeachingSupport'), retry: false});
   const today = useQuery({queryKey: ['me', 'teaching-today'], queryFn: async () => unwrapData(await courseOperationsApiService.getMyTeachingTodayClasses(), 'myTeachingToday'), retry: false});
-  const gradingItems = grading.data ?? [];
+  const gradingItems = grading.data?.items ?? [];
   const supportStudents = support.data ?? [];
   const todayClasses = today.data ?? [];
 
   return <div className={styles.grid}>
+    <label className={styles.coursePicker}>Queue course<select value={courseId} onChange={event => {setCourseId(event.target.value); setGradingPage(0); setRequestPage(0);}}><option value="">All teaching courses</option>{courses.data?.map(course => <option key={course.id} value={course.id}>{course.title || course.courseCode}</option>)}</select></label>
     <WorkspaceSection title="Today’s classes" headingId="today-classes-title" summary="Your live teaching schedule and class context." meta={<span className={styles.countBadge}>{todayClasses.length}</span>}>
 
       {today.isPending || today.isError ? <QueryState loading={today.isPending} error={today.isError} empty="No classes today." onRetry={() => void today.refetch()}/> : todayClasses.length === 0 ? <p className={styles.empty}>No classes today.</p> : <div className={styles.operationList}>{todayClasses.map((item: TeachingTodayClassResponse) => <Link to={`/course/${item.courseId}`} className={styles.operationRow} key={item.occurrenceId ?? item.sessionId ?? `${item.courseId}-${item.startTime}`}><span><strong>{item.courseTitle || item.courseCode || `Course #${item.courseId}`}</strong><small>{[item.lectureNumber ? `Lecture ${item.lectureNumber}` : undefined, `${formatTime(item.startTime) ?? 'Time pending'}${item.endTime ? `–${formatTime(item.endTime)}` : ''}`, item.location, typeof item.studentCount === 'number' ? `${item.studentCount} students` : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>)}</div>}
     </WorkspaceSection>
 
-    <WorkspaceSection title="Grading queue" headingId="grading-title" summary="Submissions currently waiting for your review." meta={<span className={styles.countBadge}>{grading.isError ? 'Unavailable' : grading.isPending ? '…' : gradingItems.length}</span>}>
+    <WorkspaceSection title="Grading queue" headingId="grading-title" summary="Submissions currently waiting for your review." meta={<span className={styles.countBadge}>{grading.isError ? 'Unavailable' : grading.isPending ? '…' : grading.data?.total ?? 0}</span>}>
 
-      {grading.isPending || grading.isError ? <QueryState loading={grading.isPending} error={grading.isError} empty="Nothing is waiting for grading." onRetry={() => void grading.refetch()}/> : gradingItems.length === 0 ? <p className={styles.empty}>Nothing is waiting for grading.</p> : <div className={styles.operationList}>{gradingItems.map((item: TeachingGradingItemResponse) => {
-        const destination = assignmentGradingPath(item.courseId, item.assignmentId);
-        return <Link to={destination} className={styles.operationRow} key={`${item.assignmentId}-${item.studentUserId}`}><span><strong>{item.title}</strong><small>{[formatName(item), item.courseCode, humanize(item.status), item.dueAt ? `Due ${formatDate(item.dueAt)}` : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
+      <label className={styles.coursePicker}>Grading status<select value={status} onChange={event => {setStatus(event.target.value); setGradingPage(0);}}><option value="">All statuses</option>{GRADING_QUEUE_STATUSES.map(value => <option key={value} value={value}>{humanize(value)}</option>)}</select></label>
+      {grading.isPending || grading.isError ? <QueryFeedback pending={grading.isPending} error={grading.error} onRetry={() => void grading.refetch()}/> : gradingItems.length === 0 ? <p className={styles.empty}>Nothing is waiting for grading.</p> : <div className={styles.operationList}>{gradingItems.map((item: TeachingGradingItemResponse) => {
+        const destination = registeredDestination(item.gradingDeepLink) ?? assignmentGradingPath(item.courseId, item.assignmentId);
+        return <Link to={destination} className={styles.operationRow} key={`${item.assignmentId}-${item.groupId ?? item.studentUserId}`}><span><strong>{item.title}</strong><small>{[item.submissionType === 'Group' ? item.groupName || `Group #${item.groupId}` : formatName(item), item.courseCode, humanize(item.status), item.dueAtUtc ? `Due ${formatZonedTimestamp(item.dueAtUtc, item.timezone)}` : item.dueAtLocal].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
       })}</div>}
+      {grading.isSuccess ? <AdvisingPagination label="Grading queue pages" page={gradingPage} size={size} total={grading.data.total} onPage={setGradingPage}/> : null}
     </WorkspaceSection>
 
     <WorkspaceSection title="Students needing support" headingId="support-title" summary="Signals that may need a timely teaching response." meta={<span className={styles.countBadge}>{supportStudents.length}</span>}>
@@ -168,7 +185,10 @@ const TeachingQueue: React.FC = () => {
 
     <WorkspaceSection title="Schedule requests" headingId="requests-title" className={styles.fullWidthCard} summary="Student schedule changes that need your review or awareness.">
 
-      {requests.isPending || requests.isError ? <QueryState loading={requests.isPending} error={requests.isError} empty="No schedule requests." onRetry={() => void requests.refetch()}/> : <RecordRows items={recordsFrom(requests.data)} kind="request" empty="No schedule requests."/>}
+      {requests.isPending || requests.isError ? <QueryFeedback pending={requests.isPending} error={requests.error} onRetry={() => void requests.refetch()}/> : <>
+        {requests.data.items.length ? requests.data.items.map(item => <InstructorScheduleRequestRow key={`${item.id}-${item.version}`} item={item}/>) : <p className={styles.empty}>No schedule requests.</p>}
+        <AdvisingPagination label="Schedule request pages" page={requestPage} size={size} total={requests.data.total} onPage={setRequestPage}/>
+      </>}
     </WorkspaceSection>
   </div>;
 };
@@ -198,8 +218,8 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
     if (!availability.data || initialized.current) return;
     initialized.current = true;
     setVersion(availability.data.version ?? availability.data.availabilityVersion ?? null);
-    setWindows(availability.data.windows ?? []);
-    setExceptions(availability.data.exceptions ?? []);
+    setWindows((availability.data.windows ?? []).map(item => ({...item, startTime: contractTimeValue(item.startTime), endTime: contractTimeValue(item.endTime)})));
+    setExceptions((availability.data.exceptions ?? []).map(item => ({...item, startTime: contractTimeValue(item.startTime), endTime: contractTimeValue(item.endTime)})));
     setSelectedIndex(null);
     setDraft(emptyWindow(timezone));
   }, [availability.data, timezone]);
@@ -275,7 +295,7 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
       </div>
       {version == null ? <p className={styles.formMessage} role="alert">The backend response did not provide the version required for a safe update.</p> : null}
       {saved ? <p className={styles.successMessage} role="status">Availability saved.</p> : null}
-      {errorMessage ? <div className={styles.inlineAlert} role="alert"><span>{errorMessage}</span>{reloadRequired ? <button type="button" onClick={() => void availability.refetch().then(result => {if (result.data && !result.isError) {setVersion(result.data.version ?? result.data.availabilityVersion ?? null); setReloadRequired(false); mutation.reset();}})}>Reload latest</button> : null}</div> : null}
+      {errorMessage ? <div className={styles.inlineAlert} role="alert"><span>{errorMessage}</span>{reloadRequired ? <button type="button" onClick={() => void availability.refetch().then(result => {if (result.data && !result.isError) {setVersion(result.data.version ?? result.data.availabilityVersion ?? null); setWindows((result.data.windows ?? []).map(item => ({...item, startTime: contractTimeValue(item.startTime), endTime: contractTimeValue(item.endTime)}))); setExceptions((result.data.exceptions ?? []).map(item => ({...item, startTime: contractTimeValue(item.startTime), endTime: contractTimeValue(item.endTime)}))); setSelectedIndex(null); setDraft(emptyWindow(timezone)); setReloadRequired(false); mutation.reset();}})}>Discard draft and reload</button> : null}</div> : null}
   </div>;
 };
 

@@ -23,7 +23,7 @@ test('parent can request absence, read exam results, load older messages, and re
     let data: unknown = [];
     if (path.endsWith('/unread-count')) data = {unreadCount: 0};
     else if (path === '/v2/parent/linked-students') data = {items: [{studentUserId: 41}], page: 0, size: 20, total: 1};
-    else if (path.endsWith('/calendar')) data = [{courseId: 31, occurrenceId: 51, title: 'Writing workshop', occurrenceDate: '2026-09-10', startTime: '10:00:00'}];
+    else if (path.endsWith('/calendar')) data = {timezone: 'America/Los_Angeles', fromUtc: '2026-09-01T07:00:00Z', toUtc: '2026-09-15T07:00:00Z', items: [{courseId: 31, occurrenceId: 51, sourceId: 'session-51', eventType: 'SESSION', title: 'Writing workshop', startsAtUtc: '2026-09-10T17:00:00Z', endsAtUtc: '2026-09-10T18:00:00Z', timezone: 'America/Los_Angeles'}]};
     else if (path.endsWith('/schedule-requests') && request.method() === 'POST') {
       requested = request.postDataJSON(); data = {id: 61, status: 'PENDING'};
     } else if (path.endsWith('/mock-exams')) data = [{id: 71, title: 'September diagnostic'}];
@@ -37,7 +37,7 @@ test('parent can request absence, read exam results, load older messages, and re
         const cursor = url.searchParams.get('beforeId');
         if (cursor) cursors.push(cursor);
         expect(url.searchParams.has('page')).toBe(false);
-        data = cursor ? [] : [{messageId: 100, body: 'This week’s learning update', senderUserId: 52}];
+        data = cursor ? {items: [], nextBeforeId: null, hasMore: false} : {items: [{messageId: 100, body: 'This week’s learning update', senderUserId: 52}], nextBeforeId: 100, hasMore: true};
       }
     }
     await route.fulfill({json: response(data)});
@@ -89,6 +89,7 @@ test('student operations distinguish unavailable alerts and preserve event detai
     let data: unknown = [];
     if (path.endsWith('/unread-count')) data = {unreadCount: 0};
     else if (path.endsWith('/me/courses')) data = {items: [], page: 0, size: 20, total: 0};
+    else if (['/v2/me/work-queue', '/v2/me/schedule-requests', '/v2/me/student-reports'].some(endpoint => path.endsWith(endpoint))) data = {items: [], page: 0, size: 20, total: 0};
     else if (path.endsWith('/me/alerts')) return route.fulfill({status: 503, json: {status: 503, code: 'UNAVAILABLE', message: 'Alerts temporarily unavailable'}});
     else if (path.endsWith('/personal-events')) data = [{eventId: 71, title: 'Study session', version: 1}];
     else if (path.endsWith('/personal-events/71') && request.method() === 'GET') data = {eventId: 71, title: 'Study session', startsAtLocal: '2026-09-10T10:00:00', endsAtLocal: '2026-09-10T11:00:00', timezone: 'Asia/Singapore', version: 4};

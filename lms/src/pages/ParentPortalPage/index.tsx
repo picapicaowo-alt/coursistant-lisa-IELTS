@@ -1,3 +1,8 @@
+import {unwrapCursorData} from '@/apis';
+import {QueryFeedback} from '@/components/QueryFeedback';
+import {formatPersonName} from '@/utils/personName';
+import {formatZonedTimestamp} from '@/utils/contractTime';
+import type {ParentStudentSummary} from '@/apis/types/parentReadModels';
 import { AdvisingPagination } from "../advising/AdvisingPagination";
 import { WorkspaceSection } from "@/components/WorkspaceSection";
 import { ObserverMockExams } from "@/components/ObserverMockExams";
@@ -104,8 +109,9 @@ const textField = (
 const ParentStudentWorkspace: React.FC<{
   studentUserId: number;
   studentIds: number[];
+  students: ParentStudentSummary[];
   onStudentChange: (id: number) => void;
-}> = ({ studentUserId, studentIds, onStudentChange }) => {
+}> = ({ studentUserId, studentIds, students, onStudentChange }) => {
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [notificationPage, setNotificationPage] = useState(0);
@@ -120,6 +126,11 @@ const ParentStudentWorkspace: React.FC<{
       return next;
     });
   const [reportPage, setReportPage] = useState(0);
+  const [calendarDraft, setCalendarDraft] = useState({from: '', to: '', timezone: ''});
+  const [calendarWindow, setCalendarWindow] = useState({from: '', to: '', timezone: ''});
+  const calendarDays = calendarDraft.from && calendarDraft.to ? (Date.parse(calendarDraft.to) - Date.parse(calendarDraft.from)) / 86400000 : null;
+  const calendarWindowInvalid = calendarDays != null && (calendarDays <= 0 || calendarDays > 90);
+
   const [attachmentError, setAttachmentError] = useState<unknown>();
   const [attachmentBusy, setAttachmentBusy] = useState<number>();
   const [message, setMessage] = useState("");
@@ -142,6 +153,7 @@ const ParentStudentWorkspace: React.FC<{
       studentUserId,
       "section",
       section,
+      section === "schedule" ? calendarWindow : null,
       section === "notifications"
         ? notificationPage
         : section === "reports"
@@ -168,16 +180,7 @@ const ParentStudentWorkspace: React.FC<{
           "parentDashboard",
         );
       if (section === "learning") return null;
-      if (section === "schedule") {
-        const [calendar, requests] = await Promise.all([
-          parentApiService.listStudentCalendar(studentUserId),
-          parentApiService.listScheduleRequests(studentUserId),
-        ]);
-        return {
-          calendar: unwrapData(calendar, "parentCalendar"),
-          requests: unwrapData(requests, "parentScheduleRequests"),
-        };
-      }
+      if (section === "schedule") return null;
       if (section === "reports")
         return unwrapData(
           await parentApiService.listStudentReports(studentUserId, reportPage),
@@ -188,41 +191,34 @@ const ParentStudentWorkspace: React.FC<{
     },
   });
 
+  const calendar = useQuery({
+    queryKey: ['parent', studentUserId, 'section', 'schedule', 'calendar', calendarWindow],
+    enabled: studentUserId != null && section === 'schedule',
+    retry: false,
+    queryFn: async () => unwrapData(await parentApiService.listStudentCalendar(studentUserId!, {from: calendarWindow.from || undefined, to: calendarWindow.to || undefined, timezone: calendarWindow.timezone || undefined}), 'parentCalendar'),
+  });
+  const scheduleRequests = useQuery({
+    queryKey: ['parent', studentUserId, 'section', 'schedule', 'requests'],
+    enabled: studentUserId != null && section === 'schedule',
+    retry: false,
+    queryFn: async () => unwrapData(await parentApiService.listScheduleRequests(studentUserId!), 'parentScheduleRequests'),
+  });
+
   const conversation = useInfiniteQuery({
     queryKey: ["parent", studentUserId, "messages"],
     enabled: studentUserId != null && section === "messages",
     queryFn: async ({ pageParam }) => {
-      const data = unwrapData(
+      const data = unwrapCursorData(
         await parentApiService.listConversationMessages(
           studentUserId!,
           pageParam,
         ),
         "parentMessages",
       );
-      // The live endpoint returns a cursor page; older contracts also returned arrays.
-      return Array.isArray(data)
-        ? {
-            items: data,
-            nextBeforeId: data.length
-              ? Math.min(
-                  ...data.flatMap((item) =>
-                    item.messageId == null ? [] : [item.messageId],
-                  ),
-                )
-              : undefined,
-          }
-        : data;
+      return data;
     },
     initialPageParam: undefined as number | undefined,
-    getNextPageParam: (lastPage, _pages, lastCursor) => {
-      const next = lastPage.nextBeforeId;
-      return lastPage.hasMore !== false &&
-        next != null &&
-        Number.isFinite(next) &&
-        (lastCursor == null || next < lastCursor)
-        ? next
-        : undefined;
-    },
+    getNextPageParam: lastPage => lastPage.hasMore && lastPage.nextBeforeId != null ? lastPage.nextBeforeId : undefined,
     retry: false,
   });
 
@@ -359,14 +355,14 @@ const ParentStudentWorkspace: React.FC<{
     }
   };
 
-  const contentRecord = isRecord(content.data) ? content.data : null;
+  const contentRecord: Record<string, unknown> | null = isRecord(content.data) ? content.data : null;
   const messages: ParentConversationMessageResponse[] = [
     ...new Map(
       (conversation.data?.pages.flatMap((page) => page.items) ?? []).map(
         (item) => [item.messageId, item],
       ),
     ).values(),
-  ].sort((a, b) => (a.messageId ?? 0) - (b.messageId ?? 0));
+  ].sort((a, b) => (Date.parse(a.createdAt ?? '') || 0) - (Date.parse(b.createdAt ?? '') || 0) || (a.messageId ?? 0) - (b.messageId ?? 0));
   const notificationData =
     section === "notifications" && contentRecord
       ? contentRecord.notifications
@@ -376,10 +372,7 @@ const ParentStudentWorkspace: React.FC<{
     ? (numberField(notificationData, "total") ?? notifications.length)
     : notifications.length;
   const reportRows = section === "reports" ? recordItems(content.data) : [];
-  const calendarRows =
-    section === "schedule" && contentRecord
-      ? recordItems(contentRecord.calendar)
-      : [];
+  const calendarRows = section === 'schedule' ? recordItems(calendar.data) : [];
 
   return (
     <div className={styles.page}>
@@ -403,7 +396,7 @@ const ParentStudentWorkspace: React.FC<{
             >
               {studentIds.map((id) => (
                 <option value={id} key={id}>
-                  Student #{id}
+                  {formatPersonName(students.find(student => student.studentUserId === id), `Student #${id}`)}
                 </option>
               ))}
             </select>
@@ -413,28 +406,7 @@ const ParentStudentWorkspace: React.FC<{
 
       {studentIds.length > 0 ? (
         <>
-          {content.isError ||
-          (section === "messages" && conversation.isError) ? (
-            <div className={styles.conflictNotice} role="alert">
-              <p>
-                {advisingErrorMessage(
-                  content.error || conversation.error,
-                  "This section could not be loaded.",
-                )}
-              </p>
-              <button
-                type="button"
-                className={styles.secondary}
-                onClick={() =>
-                  void (section === "messages"
-                    ? conversation.refetch()
-                    : content.refetch())
-                }
-              >
-                Retry
-              </button>
-            </div>
-          ) : null}
+          <QueryFeedback pending={false} error={content.error || (section === 'messages' ? conversation.error : null)} onRetry={() => void (section === 'messages' ? conversation.refetch() : content.refetch())}/>
           <nav
             className={parentStyles.tabs}
             aria-label="Parent portal sections"
@@ -469,9 +441,16 @@ const ParentStudentWorkspace: React.FC<{
               title="Request a schedule change"
               className={styles.disclosureLayout}
             >
-              {content.isPending ? (
-                <p role="status">Loading scheduled classes…</p>
-              ) : content.isError ? null : calendarRows.length === 0 ? (
+              <form className={styles.form} onSubmit={event => {event.preventDefault(); if (!calendarWindowInvalid) {setCalendarWindow(calendarDraft); setSchedule(current => ({...current, courseId: '', occurrenceId: ''}));}}}>
+                <label>From<EnglishDateInput value={calendarDraft.from} onChangeValue={from => setCalendarDraft(current => ({...current, from}))}/></label>
+                <label>To (exclusive)<EnglishDateInput value={calendarDraft.to} onChangeValue={to => setCalendarDraft(current => ({...current, to}))}/></label>
+                <label>Timezone<input placeholder="Student timezone" value={calendarDraft.timezone} onChange={event => setCalendarDraft(current => ({...current, timezone: event.target.value}))}/></label>
+                <button type="submit" className={styles.secondary} disabled={calendarWindowInvalid}>Apply dates</button>
+                {calendarWindowInvalid ? <p role="alert">Choose a date range of 1–90 days.</p> : null}
+              </form>
+              {calendar.isPending || calendar.isError ? (
+                <QueryFeedback pending={calendar.isPending} error={calendar.error} onRetry={() => void calendar.refetch()}/>
+              ) : !calendar.isSuccess ? null : calendarRows.length === 0 ? (
                 <div className={styles.emptyState}>
                   <strong>No upcoming class can be changed</strong>
                   <span>
@@ -494,28 +473,28 @@ const ParentStudentWorkspace: React.FC<{
                     return (
                       <article
                         className={styles.inboxRow}
-                        key={occurrenceId ?? index}
+                        key={textField(row, "sourceId") ?? occurrenceId ?? index}
                       >
                         <div className={styles.inboxMain}>
                           <strong>
                             {textField(
                               row,
+                              "title",
                               "courseTitle",
                               "courseCode",
-                              "title",
                             ) || "Scheduled class"}
                           </strong>
                           <span>
                             {[
-                              textField(row, "occurrenceDate", "date"),
-                              textField(row, "startTime"),
-                              textField(row, "location"),
+                              textField(row, "startsAtUtc") ? formatZonedTimestamp(textField(row, "startsAtUtc"), textField(row, "timezone")) : undefined,
+                              textField(row, "endsAtUtc") !== textField(row, "startsAtUtc") && textField(row, "endsAtUtc") ? `to ${formatZonedTimestamp(textField(row, "endsAtUtc"), textField(row, "timezone"))}` : undefined,
+                              textField(row, "timezone"),
                             ]
                               .filter(Boolean)
                               .join(" · ")}
                           </span>
                         </div>
-                        {courseId != null && occurrenceId != null ? (
+                        {courseId != null && occurrenceId != null && textField(row, "eventType") === "SESSION" ? (
                           <button
                             type="button"
                             className={
@@ -624,10 +603,11 @@ const ParentStudentWorkspace: React.FC<{
                   )}
                 </p>
               ) : null}
-              {contentRecord?.requests !== undefined ? (
+              <QueryFeedback pending={scheduleRequests.isPending} error={scheduleRequests.error} onRetry={() => void scheduleRequests.refetch()}/>
+              {scheduleRequests.isSuccess ? (
                 <div className={styles.compactResult}>
                   <RecordSummaryList
-                    value={contentRecord.requests}
+                    value={scheduleRequests.data}
                     emptyMessage="No schedule requests have been submitted."
                   />
                 </div>
@@ -1060,6 +1040,7 @@ const ParentPortalPage: React.FC = () => {
         key={selectedId}
         studentUserId={selectedId}
         studentIds={ids}
+        students={linked.data ?? []}
         onStudentChange={(id) =>
           setParams((current) => {
             const next = new URLSearchParams(current);

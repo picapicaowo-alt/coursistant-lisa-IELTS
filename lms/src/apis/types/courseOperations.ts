@@ -1,3 +1,5 @@
+import type {LocalTime} from './studentInstructorReadModels';
+
 /** StudentProgressResponse in the consumed course OpenAPI. Counts describe assignments, not lesson time. */
 export interface CourseProgressResponse {
   courseId?: number;
@@ -94,22 +96,27 @@ export interface AvailabilityExceptionRequest {
 export interface TeachingAvailabilityResponse {
   /** Some backend versions use `availabilityVersion`; reads accept both aliases. */
   availabilityVersion?: number;
-  exceptions?: AvailabilityExceptionRequest[];
+  exceptions?: Array<Omit<AvailabilityExceptionRequest, 'startTime' | 'endTime'> & {startTime?: LocalTime; endTime?: LocalTime}>;
   version?: number;
-  windows?: AvailabilityWindowRequest[];
+  windows?: Array<Omit<AvailabilityWindowRequest, 'startTime' | 'endTime'> & {startTime?: LocalTime; endTime?: LocalTime}>;
 }
 
 export interface TeachingGradingItemResponse {
   assignmentId: number;
   courseCode?: string;
   courseId: number;
-  dueAt?: string;
+  dueAtUtc?: string;
+  dueAtLocal?: string;
+  timezone?: string;
+  submissionType?: 'Individual' | 'Group';
+  groupId?: number | null;
+  groupName?: string | null;
   gradingDeepLink?: string;
   status?: string;
   studentFirstName?: string;
   studentLastName?: string;
   studentMiddleName?: string;
-  studentUserId: number;
+  studentUserId?: number | null;
   submittedAt?: string;
   title: string;
   urgency?: string;

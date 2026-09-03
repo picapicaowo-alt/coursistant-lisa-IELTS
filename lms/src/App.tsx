@@ -1,5 +1,5 @@
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {ASSIGNMENT_GRADING_ROUTE} from '@/configs/coursePaths';
+import {ASSIGNMENT_GRADING_ROUTE, INDIVIDUAL_GRADING_ROUTE, GROUP_GRADING_ROUTE} from '@/configs/coursePaths';
 import {Suspense, lazy} from "react";
 import {BrowserRouter as Router, Navigate, Routes, Route} from "react-router-dom";
 import {AuthProvider} from "./contexts/AuthContext";
@@ -131,6 +131,8 @@ const App = () => {
                 <Route path={APP_ROUTE_PATHS.courseCourseIdAssignmentsNew} element={<AssignmentEditorPage/>}/>
                 <Route path={APP_ROUTE_PATHS.courseCourseIdAssignmentsAssignmentIdEdit} element={<AssignmentEditorPage/>}/>
                 <Route path={ASSIGNMENT_GRADING_ROUTE} element={<AssignmentGradingPage/>}/>
+                <Route path={INDIVIDUAL_GRADING_ROUTE} element={<AssignmentGradingPage/>}/>
+                <Route path={GROUP_GRADING_ROUTE} element={<AssignmentGradingPage/>}/>
                 <Route path={APP_ROUTE_PATHS.courseCourseIdAssignmentsAssignmentIdSubmissionsSubmissionId} element={<AssignmentSubmissionPage/>}/>
                 <Route path={APP_ROUTE_PATHS.courseCourseIdAnnouncementsSubjectId} element={<NotificationSubjectPage kind="announcement"/>}/>
                 <Route path={APP_ROUTE_PATHS.courseCourseIdAnnouncements} element={<CourseAnnouncementsPage/>}/>
