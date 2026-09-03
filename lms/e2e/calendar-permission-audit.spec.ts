@@ -20,22 +20,18 @@ for (const pagePath of ['/calendar', '/my-operations']) {
         : route.fulfill({json: reply([])});
     });
     await page.goto(pagePath);
-    if (pagePath === '/my-operations') await page.getByRole('navigation', {name: 'Operations sections'}).getByRole('button', {name: 'calendar', exact: true}).click();
+    if (pagePath === '/my-operations') await page.getByRole('navigation', {name: 'Operations sections'}).getByRole('button', {name: 'Calendar', exact: true}).click();
     const retry = page.getByRole('button', {name: 'Retry personal events', exact: true});
     await expect(retry).toBeVisible();
-    await expect(page.getByText(pagePath === '/calendar' ? 'Personal events could not be loaded.' : 'No Permission to Perform This Action', {exact: false})).toBeVisible();
+    await expect(page.getByText('Personal events could not be loaded.', {exact: false})).toBeVisible();
     expect(calls).toHaveLength(1);
     expect(calls[0].authenticated).toBe(true);
     expect(Object.keys(calls[0].params).sort()).toEqual(['fromUtc', 'toUtc']);
     expect(Date.parse(calls[0].params.fromUtc)).toBeLessThan(Date.parse(calls[0].params.toUtc));
     expect(calls[0].params.fromUtc).toMatch(/Z$/);
     expect(calls[0].params.toUtc).toMatch(/Z$/);
-    if (pagePath === '/my-operations') {
-      await page.locator('summary[aria-label="Personal events"]').click();
-      await expect(page.getByText('No personal events.', {exact: true})).toHaveCount(0);
-    } else {
-      await expect(page.getByRole('region', {name: 'Daily agenda'}).getByText('No events', {exact: true})).toHaveCount(0);
-    }
+    await expect(page.getByRole('region', {name: 'Daily agenda'}).getByText('No events', {exact: true})).toHaveCount(0);
+    await expect(page.getByText('No events in this view.', {exact: true})).toHaveCount(0);
     await retry.click();
     await expect.poll(() => calls.length).toBe(2);
     await expect(retry).toBeVisible();
@@ -43,8 +39,8 @@ for (const pagePath of ['/calendar', '/my-operations']) {
     denied = false;
     await retry.click();
     await expect(retry).toHaveCount(0);
-    if (pagePath === '/my-operations') await expect(page.getByText('No personal events.', {exact: true})).toBeVisible();
-    else await expect(page.getByRole('region', {name: 'Daily agenda'}).getByText('No events', {exact: true})).toHaveCount(7);
+    if (pagePath === '/calendar') await expect(page.getByRole('region', {name: 'Daily agenda'}).getByText('No events', {exact: true})).toHaveCount(7);
+    else await expect(page.getByText('No events in this view.', {exact: true})).toBeVisible();
     expect(calls).toHaveLength(3);
     expect(calls.every(call => call.method === 'GET')).toBe(true);
     expect(refreshes).toEqual([]);

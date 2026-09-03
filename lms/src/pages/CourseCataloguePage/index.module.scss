@@ -1,4 +1,6 @@
 @use '../../styles/workspace' as workspace;
+.pageContainer.instructorPage { background: t.$surface-subtle; padding: clamp(1.5rem, 3vw, 3rem); .tabsContainer { margin-bottom: t.$space-8; flex-wrap: wrap; } .tab { border: 1px solid t.$border-default; border-radius: t.$radius-pill; background: t.$surface-raised; &.active { background: t.$content-primary; border-color: t.$content-primary; color: t.$content-on-color; } } }
+.eyebrow { margin: 0 0 t.$space-3; color: t.$content-secondary; font-size: t.$font-size-caption; text-transform: uppercase; font-weight: t.$fw-semibold; span { margin-inline: t.$space-3; } }
 .pageTitle { margin: 0 0 t.$space-6; font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1; }
 
 .pageContainer {

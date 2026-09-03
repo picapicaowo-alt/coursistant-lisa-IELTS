@@ -8,7 +8,7 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import styles from './staff.module.scss';
 
 /** Mounted by grade ID so scores, feedback and retries never move to another script. */
-export function WritingGradeReview({gradeId}: {gradeId: number}) {
+export function WritingGradeReview({gradeId, onBusy}: {gradeId: number; onBusy?: (busy: boolean) => void}) {
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [score, setScore] = useState('');
@@ -24,6 +24,8 @@ export function WritingGradeReview({gradeId}: {gradeId: number}) {
       if (!hasDetail || !score.trim() || !Number.isFinite(Number(score)) || Number(score) < 0) throw new Error('Load the script and enter a valid score before submitting.');
       return idempotency.run('writing-grade', [gradeId, {score: Number(score), feedback: feedback.trim() || undefined}] satisfies Parameters<typeof mockExamApiService.gradeInstructorWriting>, (key, args) => mockExamApiService.gradeInstructorWriting(...args, key));
     },
+    onMutate: () => onBusy?.(true),
+    onSettled: () => onBusy?.(false),
     onSuccess: async () => {
       setScore('');
       setFeedback('');
@@ -33,6 +35,7 @@ export function WritingGradeReview({gradeId}: {gradeId: number}) {
   return <>
     {detail.isPending ? <p role="status" className={styles.status}>Loading script…</p> : detail.isError ? <div role="alert" className={styles.error}><p>{advisingErrorMessage(detail.error, 'The writing script could not be loaded.')}</p><button type="button" className={styles.secondary} onClick={() => void detail.refetch()}>Retry</button></div> : <div className={styles.script}><RecordSummaryList value={detail.data} emptyMessage="No writing script is available to grade."/></div>}
     <form className={styles.compactForm} onSubmit={event => {event.preventDefault(); submit.mutate();}}>
+      <h3>Assessment</h3>
       <label><span>Score</span><input required type="number" step="0.5" min="0" disabled={!hasDetail || submit.isPending} value={score} onChange={event => setScore(event.target.value)}/></label>
       <label><span>Feedback</span><textarea required rows={6} disabled={!hasDetail || submit.isPending} value={feedback} onChange={event => setFeedback(event.target.value)}/></label>
       <button className={styles.primary} disabled={!hasDetail || submit.isPending}>{submit.isPending ? 'Submitting…' : 'Submit result'}</button>

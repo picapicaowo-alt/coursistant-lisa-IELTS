@@ -6,11 +6,13 @@ import {useCourseWorkspaceStore} from "../stores/useCourseWorkspaceStore";
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 
 interface PageHeaderProps {
+  instructorView?: boolean;
   canEditCourse?: boolean;
   canManageMaterials?: boolean;
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({
+  instructorView = false,
   canEditCourse = false,
   canManageMaterials = false,
 }) => {
@@ -57,7 +59,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
   }, [canEditCourse, canManageMaterials, workspaceMode, t, navigate, setWorkspaceMode]);
   
   return (
-    <div className={styles.workspaceHeader}>
+    <div className={`${styles.workspaceHeader} ${instructorView && workspaceMode === 'view' ? styles.instructorHeader : ''}`}>
       <button
         className={styles.backButton}
         onClick={() => navigate(APP_ROUTE_PATHS.course)}
@@ -67,9 +69,10 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
+        {instructorView && workspaceMode === 'view' ? <span>Back to courses</span> : null}
       </button>
       
-      <div className={styles.titleContainer}>
+      <div className={styles.titleContainer} hidden={instructorView && workspaceMode === 'view'}>
         <span className={`${styles.courseTitle} ${!course.name ? styles.placeholderTitle : ''}`}>
           {course.name || t('addContent.untitledCourse')}
         </span>

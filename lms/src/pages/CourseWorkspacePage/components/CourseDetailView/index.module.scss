@@ -585,3 +585,31 @@
 @media (max-width: 600px) { .unitHeader { padding: t.$space-4; gap: t.$space-2; } }
 .assignmentFilter { display: flex; align-items: center; gap: t.$space-3; padding: t.$space-3 t.$space-5; color: t.$content-secondary; font-size: t.$fs-caption; }
 .assignmentFilter select { min-height: t.$touch-target; min-width: 0; padding: t.$space-2 t.$space-3; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; background: t.$surface-raised; }
+.learningWorkspace.instructorWorkspace {
+  background: t.$surface-subtle; padding: t.$space-6 clamp(1.5rem, 3vw, 3rem) t.$space-12; gap: t.$space-8; min-height: calc(100dvh - t.$shell-header-height);
+  .learningHeader { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); align-items: center; gap: t.$space-8; }
+  .description { color: t.$content-secondary; }
+  .courseContext { align-items: center; gap: t.$space-3 t.$space-6; > div { display: flex; flex-wrap: wrap; align-items: baseline; gap: t.$space-2; } span { font-size: t.$font-size-caption; } strong { font-size: t.$font-size-caption; } }
+  .currentLesson { background: t.$surface-raised; grid-template-columns: t.$space-10 minmax(0, 1fr); gap: t.$space-4; padding: t.$space-5; h2 { font-size: t.$font-size-body; margin: t.$space-1 0; } img { width: t.$space-10; height: t.$space-10; } a { display: none; } }
+  .learningTabs { border-bottom-style: solid; gap: t.$space-6; [aria-pressed='true'] { color: t.$action-primary; } }
+  .learningBody { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); gap: t.$space-6; }
+  .cards { gap: t.$space-6; }
+  .card, .learningUnit { background: t.$surface-raised; border-radius: t.$radius-card-lg; box-shadow: none; }
+  .card { padding: t.$space-6; }
+  .cardTitle { font-size: t.$font-size-headline; }
+  .unitHeader { grid-template-columns: minmax(0, 1fr) t.$space-5; padding: t.$space-6; strong { font-size: t.$font-size-headline; font-weight: t.$fw-semibold; order: -1; } }
+  .unitNumber { display: none; }
+  .learningUnit .card { border: 0; padding-top: 0; }
+  .cardHeader { border: 0; }
+  .materialList { gap: t.$space-3; }
+  .material { padding: t.$space-4; background: t.$surface-subtle; border: 0; border-radius: t.$radius-control; }
+  .materialIcon { display: grid; place-items: center; width: t.$space-10; height: t.$space-10; background: t.$feedback-danger-surface; color: t.$feedback-danger; border-radius: t.$radius-sm; }
+  .materialName { text-align: left; font-weight: t.$fw-semibold; font-size: t.$font-size-body; }
+  .materialActions button, .downloadWeekButton { min-height: t.$touch-target; background: transparent; border-color: transparent; font-size: t.$font-size-body; padding-inline: t.$space-2; }
+  .overviewCounts dt, .courseContext strong, .courseContext span, .unitHeader small, .currentLesson span, .currentLesson p { font-size: t.$font-size-body; }
+  .overviewCounts { border-top: 1px solid t.$border-default; padding-top: t.$space-5; }
+  @media (max-width: 75rem) { .learningHeader { grid-template-columns: minmax(0, 1fr); } .currentLesson { max-width: 28rem; } }
+  @media (max-width: 64rem) { .learningBody { grid-template-columns: minmax(0, 1fr); } .learningRail { order: -1; } .overviewCounts { grid-template-columns: repeat(3, minmax(0, 1fr)); > div { flex-wrap: wrap; } } }
+  @media (max-width: 40rem) { .card, .unitHeader { padding: t.$space-5; } .courseContext > div { width: 100%; } .material { flex-wrap: wrap; } }
+}
+.openMaterials { display: inline-flex; align-items: center; justify-content: center; gap: t.$space-3; min-height: t.$touch-target; padding: t.$space-3 t.$space-5; margin-top: t.$space-6; border: 0; border-radius: t.$radius-control; background: t.$action-primary; color: t.$content-on-color; font-weight: t.$fw-semibold; }

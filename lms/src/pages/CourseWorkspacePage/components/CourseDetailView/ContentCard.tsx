@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import {Download, ExternalLink, Eye} from 'lucide-react';
+import {ArrowRight, Download, ExternalLink, Eye, FileText} from 'lucide-react';
 import styles from "./index.module.scss";
 import {CourseMaterial, CourseWeek} from "@/apis";
 import {courseApiService} from '@/apis/services/course-api';
@@ -25,11 +25,11 @@ const zipFilename = (week: CourseWeek) => {
  * description field; it holds materials. So the card lists those instead of
  * leaving the space blank or padding it with text the course never wrote.
  */
-export const ContentCard: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: number) => void}> = ({week, onOpenMaterial}) => (
-  <ContentCardBody week={week} onOpenMaterial={onOpenMaterial}/>
+export const ContentCard: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: number) => void; compact?: boolean}> = ({week, onOpenMaterial, compact}) => (
+  <ContentCardBody week={week} onOpenMaterial={onOpenMaterial} compact={compact}/>
 );
 
-const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: number) => void}> = ({week, onOpenMaterial}) => {
+const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: number) => void; compact?: boolean}> = ({week, onOpenMaterial, compact}) => {
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -115,7 +115,7 @@ const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: 
         <p className={styles.cardEmpty}>Select a week to see its content.</p>
       ) : (
         <>
-          <h2 className={styles.contentTitle}>{week.title}</h2>
+          {!compact ? <h2 className={styles.contentTitle}>{week.title}</h2> : null}
 
           {week.materials.length === 0 ? (
             <p className={styles.cardEmpty}>No materials in this week yet.</p>
@@ -124,7 +124,7 @@ const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: 
               {week.materials.map((material) => (
                 <li key={material.id} className={styles.material}>
                   <span className={styles.materialIcon} aria-hidden="true">
-                    {material.materialType === 'LINK' ? 'LINK' : (material.extension ?? 'file').toUpperCase()}
+                    {compact ? material.materialType === 'LINK' ? <ExternalLink size={20}/> : <FileText size={20}/> : material.materialType === 'LINK' ? 'LINK' : (material.extension ?? 'file').toUpperCase()}
                   </span>
                   {onOpenMaterial ? <button type="button" className={styles.materialName} onClick={() => onOpenMaterial(material.id)}>{material.displayName}</button> : <span className={styles.materialName} title={material.displayName}>{material.displayName}</span>}
                   {material.materialType === 'FILE' && material.sizeBytes !== null ? (
@@ -164,6 +164,7 @@ const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: 
             </ul>
           )}
           {error ? <p className={styles.materialError} role="alert">{error}</p> : null}
+          {compact && onOpenMaterial && week.materials[0] ? <button type="button" className={styles.openMaterials} onClick={() => onOpenMaterial(week.materials[0].id)}>Open learning materials<ArrowRight size={18}/></button> : null}
         </>
       )}
     </section>

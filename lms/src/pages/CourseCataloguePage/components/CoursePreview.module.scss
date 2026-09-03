@@ -238,3 +238,29 @@
 
 .badges {display:flex; align-items:center; flex-wrap:wrap; gap:t.$space-2;}
 .courseCode {font-size:t.$fs-caption; color:t.$content-secondary;}
+
+.instructorCard {
+    position: relative;
+    border-top: 5px solid t.$action-primary;
+    padding: t.$space-6;
+    gap: t.$space-5;
+    box-shadow: 0 4px 14px rgba(t.$text, .04);
+    .courseHeader[hidden] { display: none; }
+    .courseContent { gap: t.$space-2; }
+    .courseTitle { font-size: t.$font-size-headline; line-height: 1.4; }
+    .courseFooter { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: t.$space-3; margin: 0; padding: t.$space-4 0 0; border-top: 1px solid t.$border-default; }
+    .viewDetails { justify-content: center; text-align: center; padding-inline: t.$space-2; font-size: t.$font-size-body; border: 1px solid t.$action-primary; font-weight: t.$fw-semibold; }
+    .viewDetails > span { display: none; }
+    .outlineAction { background: t.$surface-raised; color: t.$action-primary; &:hover { background: t.$surface-brand-subtle; } }
+    .menuAnchor { position: absolute; right: t.$space-3; top: t.$space-3; }
+    .menu { top: 100%; bottom: auto; }
+    &:has(.menuAnchor) .teachingTop { padding-right: t.$space-8; }
+}
+.teachingTop { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; }
+.teachingInstructor { display: flex; align-items: flex-start; gap: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-body; svg { flex-shrink: 0; margin-top: 2px; } }
+.teachingSchedule { grid-column: 1 / -1; display: grid; gap: t.$space-3; padding-bottom: t.$space-2; font-size: t.$font-size-body;
+    > div { display: flex; gap: t.$space-3; align-items: flex-start; min-width: 0; }
+    svg { color: t.$content-secondary; flex-shrink: 0; }
+    span { overflow-wrap: anywhere; }
+    > div + div { color: t.$content-secondary; }
+}

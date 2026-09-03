@@ -186,7 +186,7 @@ const Sidebar: React.FC = () => {
   }, [pathname, hash, search]);
 
   return (
-    <aside className={styles.sidebar} data-collapsed={collapsed || undefined} data-workspace={isTenantAdminAccount(user) ? 'tenant' : undefined} aria-label="Primary navigation">
+    <aside className={styles.sidebar} data-collapsed={collapsed || undefined} data-workspace={isTenantAdminAccount(user) ? 'tenant' : user.role === 'USER' && user.level === 'INSTRUCTOR' ? 'instructor' : undefined} aria-label="Primary navigation">
       <Link to={homePath} className={styles.logo} aria-label={t('sidebar.dashboard')}>
         <img src="/icons/figma-dashboard/logo-mark.svg" alt=""/>
         <img className={styles.wordmark} src="/icons/figma-dashboard/logo-wordmark.svg" alt="X—LEARN"/>
