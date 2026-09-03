@@ -1,0 +1,220 @@
+{
+  "total": 432,
+  "matched": 420,
+  "missing": [
+    {
+      "contract": "auth.openapi.yaml",
+      "operationId": "authHello",
+      "http": "GET",
+      "route": "/v1"
+    },
+    {
+      "contract": "auth.openapi.yaml",
+      "operationId": "adminAddDisabled",
+      "http": "POST",
+      "route": "/v2/admins"
+    },
+    {
+      "contract": "auth.openapi.yaml",
+      "operationId": "adminDeleteBatchDisabled",
+      "http": "DELETE",
+      "route": "/v2/admins/batch"
+    },
+    {
+      "contract": "auth.openapi.yaml",
+      "operationId": "adminDeleteDisabled",
+      "http": "DELETE",
+      "route": "/v2/admins/{id}"
+    },
+    {
+      "contract": "auth.openapi.yaml",
+      "operationId": "adminUpdateDisabled",
+      "http": "PUT",
+      "route": "/v2/admins/{id}"
+    },
+    {
+      "contract": "course.openapi.yaml",
+      "operationId": "courseSessionGet",
+      "http": "GET",
+      "route": "/v2/courses/{courseId}/sessions/{sessionId}"
+    },
+    {
+      "contract": "quiz.openapi.yaml",
+      "operationId": "quizQuestionGet",
+      "http": "GET",
+      "route": "/v2/courses/{courseId}/quizzes/{quizId}/questions/{questionId}"
+    },
+    {
+      "contract": "user.openapi.yaml",
+      "operationId": "userAddDisabled",
+      "http": "POST",
+      "route": "/v2/users"
+    },
+    {
+      "contract": "user.openapi.yaml",
+      "operationId": "userDeleteBatchDisabled",
+      "http": "DELETE",
+      "route": "/v2/users/batch"
+    },
+    {
+      "contract": "user.openapi.yaml",
+      "operationId": "userDeleteDisabled",
+      "http": "DELETE",
+      "route": "/v2/users/{id}"
+    },
+    {
+      "contract": "user.openapi.yaml",
+      "operationId": "userUpdateDisabled",
+      "http": "PUT",
+      "route": "/v2/users/{id}"
+    },
+    {
+      "contract": "user.openapi.yaml",
+      "operationId": "userPasswordStatusDisabled",
+      "http": "PATCH",
+      "route": "/v2/users/{id}/password-status"
+    }
+  ],
+  "noDirectUI": [
+    {
+      "operationId": "assignmentDownloadAttachment",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/attachments/{attachmentId}/download",
+      "methods": [
+        "getAttachmentBlob"
+      ]
+    },
+    {
+      "operationId": "assignmentPreviewAttachment",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/attachments/{attachmentId}/preview",
+      "methods": [
+        "getAttachmentBlob"
+      ]
+    },
+    {
+      "operationId": "assignmentDownloadGroupAnnotatedFile",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/groups/{groupId}/grade/annotated-file",
+      "methods": [
+        "downloadAnnotatedFile"
+      ]
+    },
+    {
+      "operationId": "assignmentUploadGroupAnnotatedFile",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/groups/{groupId}/grade/annotated-file",
+      "methods": [
+        "uploadAnnotatedFile"
+      ]
+    },
+    {
+      "operationId": "assignmentDownloadRubric",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/rubric/download",
+      "methods": [
+        "getRubricBlob"
+      ]
+    },
+    {
+      "operationId": "assignmentPreviewRubric",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/rubric/preview",
+      "methods": [
+        "getRubricBlob"
+      ]
+    },
+    {
+      "operationId": "assignmentDownloadAnnotatedFile",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/students/{studentUserId}/grade/annotated-file",
+      "methods": [
+        "downloadAnnotatedFile"
+      ]
+    },
+    {
+      "operationId": "assignmentUploadAnnotatedFile",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/students/{studentUserId}/grade/annotated-file",
+      "methods": [
+        "uploadAnnotatedFile"
+      ]
+    },
+    {
+      "operationId": "assignmentDownloadSubmissionFile",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/submissions/{submissionId}/files/{fileId}/download",
+      "methods": [
+        "getSubmissionFileBlob"
+      ]
+    },
+    {
+      "operationId": "assignmentPreviewSubmissionFile",
+      "route": "/v2/courses/{courseId}/assignments/{assignmentId}/submissions/{submissionId}/files/{fileId}/preview",
+      "methods": [
+        "getSubmissionFileBlob"
+      ]
+    },
+    {
+      "operationId": "authRefreshToken",
+      "route": "/v1/auth/refresh-token",
+      "methods": [
+        "refreshToken"
+      ]
+    },
+    {
+      "operationId": "downloadCourseDiscussionAttachment",
+      "route": "/v2/courses/{courseId}/discussion/posts/{postId}/attachments/{attachmentId}/download",
+      "methods": [
+        "getDiscussionAttachment"
+      ]
+    },
+    {
+      "operationId": "previewCourseDiscussionAttachment",
+      "route": "/v2/courses/{courseId}/discussion/posts/{postId}/attachments/{attachmentId}/preview",
+      "methods": [
+        "getDiscussionAttachment"
+      ]
+    },
+    {
+      "operationId": "listMyPublishedCourseReports",
+      "route": "/v2/courses/{courseId}/student-reports/published/me",
+      "methods": [
+        "listMyPublishedCourseReports"
+      ]
+    },
+    {
+      "operationId": "courseStudentAdd",
+      "route": "/v2/courses/{courseId}/students",
+      "methods": [
+        "enrolStudent"
+      ]
+    },
+    {
+      "operationId": "courseWeekGet",
+      "route": "/v2/courses/{courseId}/weeks/{weekId}",
+      "methods": [
+        "getCourseWeek"
+      ]
+    },
+    {
+      "operationId": "courseMaterialDownload",
+      "route": "/v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}/download",
+      "methods": [
+        "getMaterialBlob"
+      ]
+    },
+    {
+      "operationId": "courseMaterialPreview",
+      "route": "/v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}/preview",
+      "methods": [
+        "getMaterialBlob"
+      ]
+    },
+    {
+      "operationId": "parentPreviewConversationAttachment",
+      "route": "/v2/parent/students/{studentUserId}/conversation/attachments/{attachmentId}/preview",
+      "methods": [
+        "getConversationAttachment"
+      ]
+    },
+    {
+      "operationId": "parentDownloadConversationAttachment",
+      "route": "/v2/parent/students/{studentUserId}/conversation/attachments/{attachmentId}/download",
+      "methods": [
+        "getConversationAttachment"
+      ]
+    }
+  ]
+}

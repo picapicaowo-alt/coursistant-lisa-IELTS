@@ -60,7 +60,7 @@ export function ParentAcademicSections({
       ? LEARNING_SECTIONS.map((section) => ({
           queryKey: ["parent", studentUserId, "learning", section.key],
           queryFn: async () =>
-            unwrapData(
+            unwrapData<unknown>(
               await section.load(studentUserId),
               `parent-${section.key}`,
             ),

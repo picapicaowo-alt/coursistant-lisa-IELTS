@@ -1,3 +1,4 @@
+import {isHttpStatus} from '@/utils/apiError';
 import {Navigate, useLocation} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -25,7 +26,7 @@ export default function AdvisorOperationsPage() {
   return <div className={styles.page}>
     <AdvisorDashboardOverview name={user.name || 'Advisor'} dashboard={advisorDashboardView(dashboard.data)} students={students.data?.items ?? []}
       tasks={tasks.data?.items ?? []} conversations={advisorConversationViews(conversations.data)} schedule={advisorScheduleRequestViews(schedule.data)}
-      loading={queries.some(query => query.isPending)} error={queries.some(query => query.isError)}
-      onRetry={() => void Promise.all(queries.filter(query => query.isError).map(query => query.refetch()))}/>
+      states={{dashboard, students, tasks, conversations, schedule}}
+      onRetry={() => void Promise.all(queries.filter(query => query.isError && !isHttpStatus(query.error, 403) && !isHttpStatus(query.error, 404)).map(query => query.refetch()))}/>
   </div>;
 }

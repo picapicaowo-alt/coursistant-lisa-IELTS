@@ -1,5 +1,6 @@
 import {getApiErrorCode} from '@/utils/apiError';
 import {OwnerCourseSchedule} from './OwnerCourseSchedule';
+import {OwnerDatedSchedule} from './OwnerDatedSchedule';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import React, {useEffect, useRef, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -85,6 +86,7 @@ const AdvisorCourseDeliveryPage: React.FC = () => {
         ) : null}
       </section>
       {config.data?.deliveryMode === 'GROUP' && config.data.launchState !== 'PUBLISHED' ? <OwnerCourseSchedule courseId={id}/> : null}
+      {config.isSuccess ? <OwnerDatedSchedule key={id} courseId={id}/> : null}
     </div>
   );
 };

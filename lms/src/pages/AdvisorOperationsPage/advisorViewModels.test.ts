@@ -13,6 +13,8 @@ describe('Advisor view models', () => {
     expect(view.stats[0]).toMatchObject({label: 'Assigned students', value: 4});
     expect(view.stats[1]).toMatchObject({label: 'On track', value: 3});
     expect(view.urgentTasks).toEqual([]);
+    expect(view.stats.find(stat => stat.key === 'atRiskCount')?.value).toBeUndefined();
+    expect(advisorDashboardView({atRiskCount: 0}).stats.find(stat => stat.key === 'atRiskCount')?.value).toBe(0);
   });
 
   it('supports both arrays and page-shaped collections', () => {

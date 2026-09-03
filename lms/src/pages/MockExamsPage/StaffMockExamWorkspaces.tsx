@@ -1562,7 +1562,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
 export function InstructorWorkspace({ value }: { value: unknown }) {
   const rows = runtimeItems(value);
   const [gradeId, setGradeId] = useState<number | null>(() =>
-    rows[0] ? idFrom(rows[0], "gradeId", "writingGradeId") : null,
+    rows[0] ? idFrom(rows[0], "id") : null,
   );
   return (
     <div className={styles.workspace}>
@@ -1584,7 +1584,7 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
           {rows.length ? (
             <div className={styles.cardList}>
               {rows.map((row, index) => {
-                const id = idFrom(row, "gradeId", "writingGradeId");
+                const id = idFrom(row, "id");
                 return id ? (
                   <button
                     type="button"
@@ -1601,8 +1601,9 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
                       <small>#{id}</small>
                     </span>
                     <strong>
-                      {recordLabel(row, `Writing submission ${index + 1}`)}
+                      {[runtimeString(row, "studentFirstName"), runtimeString(row, "studentMiddleName"), runtimeString(row, "studentLastName")].filter(Boolean).join(" ") || recordLabel(row, `Writing submission ${index + 1}`)}
                     </strong>
+                    <span>{runtimeString(row, "templateTitle", "templateLabel")}{runtimeNumber(row, "versionNo") != null ? ` · Version ${runtimeNumber(row, "versionNo")}` : ''}</span>
                     <span>
                       {runtimeString(row, "submittedAt", "createdAt") ||
                         "Submission time unavailable"}

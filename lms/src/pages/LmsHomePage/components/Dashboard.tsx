@@ -6,6 +6,8 @@ import {DashboardAssistant} from '@/components/DashboardAssistant';
 import {AdvisorTasksPanel} from './AdvisorTasksPanel';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
+import {unwrapPageData} from '@/apis';
+import {OPERATION_QUEUE_PAGE_SIZE} from '@/apis/types/operationQueues';
 import LearningScheduleComponent from '@/sections/learning_schedule/LearningScheduleComponent';
 import {useCourseList} from '../hooks/useCourseList';
 import {useDashboardAssignments, type AssignmentRow} from '../hooks/useDashboardAssignments';
@@ -168,10 +170,10 @@ const CourseWorkPanel: React.FC = () => {
 const ExamsPanel: React.FC = () => {
   const query = useQuery({
     queryKey: ['dashboard', 'mock-exams'],
-    queryFn: async () => (await mockExamApiService.listStudentExams()).data,
+    queryFn: async () => unwrapPageData(await mockExamApiService.listStudentExams({page: 0, size: OPERATION_QUEUE_PAGE_SIZE}), 'dashboardMockExams'),
     retry: false,
   });
-  const exams = recordsFrom(query.data).slice(0, 3);
+  const exams = query.data?.items.slice(0, 3) ?? [];
 
   return (
     <section className={`${styles.panel} ${styles.examsPanel}`}>
@@ -181,18 +183,20 @@ const ExamsPanel: React.FC = () => {
       {!query.isPending && !query.isError && exams.length === 0 ? <RegionStatus state="empty" emptyMessage="No mock exams have been assigned."/> : null}
       <div className={styles.examGrid}>
         {exams.map((exam, index) => {
-          const title = textFrom(exam, 'title', 'label', 'templateTitle') ?? 'IELTS Mock Test';
-          const status = textFrom(exam, 'status', 'attemptStatus') ?? 'Not started';
-          const score = numberFrom(exam, 'score', 'overallScore', 'writingScore');
-          const start = textFrom(exam, 'startedAt', 'scheduledAt', 'createdAt');
+          const title = exam.title || 'Mock exam';
+          const status = exam.status || exam.attemptStatus || 'Not started';
+          const score = exam.writingScore;
+          const assignedAt = exam.createdAt;
           const destination = resolveDashboardExamRoute(exam);
           const direct = destination !== '/mock-exams';
           return (
             <article className={styles.examCard} key={numberFrom(exam, 'id', 'testId') ?? `${title}-${index}`}>
               <strong>{title}</strong>
-              <small>IELTS</small>
+              <small>Mock exam</small>
               <span className={`${styles.examStatus} ${status.toLowerCase().includes('progress') ? styles.examProgress : status.toLowerCase().includes('graded') ? styles.examGraded : ''}`}>{humanize(status)}</span>
-              <p>{score === undefined ? (start ? `Start time: ${formatLocalDate(start)}` : 'Ready when you are') : `Score: ${score}`}</p>
+              {exam.readingCorrect != null && exam.readingTotal != null ? <p>Reading: {exam.readingCorrect}/{exam.readingTotal}</p> : null}
+              {exam.listeningCorrect != null && exam.listeningTotal != null ? <p>Listening: {exam.listeningCorrect}/{exam.listeningTotal}</p> : null}
+              <p>{score == null ? (assignedAt ? `Assigned: ${formatLocalDate(assignedAt)}` : 'Assignment date not provided') : `Writing: ${score}`}</p>
               <Link to={destination}>
                 {dashboardExamActionLabel(status, score, direct)}
               </Link>

@@ -1,3 +1,4 @@
+import {unwrapCursorData} from '@/apis';
 import {WorkspaceSection as CollapsibleSection} from '@/components/WorkspaceSection';
 import {PlanOverview} from './PlanOverview';
 import React, {lazy, Suspense, useState} from 'react';
@@ -43,12 +44,10 @@ const StudentAdvisingPage: React.FC = () => {
   });
   const conversation = useInfiniteQuery({
     queryKey: ['student', 'advisor-conversation'],
-    queryFn: async ({pageParam}) => advisorConversationMessageViews(unwrapData(await advisorApiService.listOwnConversationMessages(pageParam), 'studentAdvisorConversation')),
+    enabled: showMessages,
+    queryFn: async ({pageParam}) => unwrapCursorData(await advisorApiService.listOwnConversationMessages(pageParam), 'studentAdvisorConversation'),
     initialPageParam: undefined as number | undefined,
-    getNextPageParam: lastPage => {
-      const ids = lastPage.flatMap(item => item.messageId == null ? [] : [item.messageId]);
-      return ids.length ? Math.min(...ids) : undefined;
-    },
+    getNextPageParam: lastPage => lastPage.hasMore && lastPage.nextBeforeId != null ? lastPage.nextBeforeId : undefined,
     retry: false,
   });
   const taskMutation = useMutation({
@@ -85,7 +84,7 @@ const StudentAdvisingPage: React.FC = () => {
       throw error;
     }
   };
-  const conversationRows = conversation.data?.pages.flat() ?? [];
+  const conversationRows = advisorConversationMessageViews(conversation.data?.pages.flatMap(page => page.items) ?? []);
   const checkpointKey = searchParams.get(STUDY_PLAN_PARAMS.checkpoint);
   const checkpointIndex = plan.data?.plan?.checkpoints?.findIndex((checkpoint, index) => studyPlanRecordKey(checkpoint, index) === checkpointKey) ?? -1;
   const checkpoint = checkpointIndex >= 0 ? plan.data?.plan?.checkpoints?.[checkpointIndex] : undefined;
@@ -140,7 +139,7 @@ const StudentAdvisingPage: React.FC = () => {
         {messageMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(messageMutation.error, 'Message could not be sent.')}</p> : null}
         {conversation.isPending ? <p className={styles.status}>Loading messages…</p> : null}
         {conversation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(conversation.error, 'Messages could not be loaded.')}</p> : null}
-        {!conversation.isPending && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No messages yet</strong><span>Send a message or attachment to start the conversation.</span></div> : null}
+        {conversation.isSuccess && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No messages yet</strong><span>Send a message or attachment to start the conversation.</span></div> : null}
         <div className={styles.messageList}>{conversationRows.map((item, index) => <article className={styles.messageRow} key={item.messageId ?? index}>
           <div className={styles.rowTitle}><strong>{item.senderUserId == null ? 'Conversation message' : `User #${item.senderUserId}`}</strong><small>{item.createdAt || ''}</small></div>
           <p>{item.body || 'Message has no text content.'}</p>

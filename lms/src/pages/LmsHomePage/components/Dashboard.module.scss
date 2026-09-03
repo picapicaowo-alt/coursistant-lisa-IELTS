@@ -320,11 +320,13 @@
   background: t.$surface-dashboard-card;
 
   > strong {
+    display: -webkit-box;
     overflow: hidden;
+    min-height: 2.25rem;
     font-size: .8125rem;
     line-height: 1.125rem;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   > small {

@@ -266,13 +266,13 @@ test('writing grades keep drafts with their script and reuse the same request on
     const request = route.request();
     const path = new URL(request.url()).pathname;
     let data: unknown = [];
-    if (path.endsWith('/writing-grades')) data = [{gradeId: 51, title: 'First script'}, {gradeId: 52, title: 'Second script'}];
+    if (path.endsWith('/writing-grades')) data = {page: 0, size: 20, total: 2, items: [{id: 51, studentFirstName: 'First', studentLastName: 'script', status: 'PENDING'}, {id: 52, studentFirstName: 'Second', studentLastName: 'script', status: 'PENDING'}]};
     else if (/\/writing-grades\/\d+$/.test(path)) {
       if (request.method() === 'POST') {
         writes.push({key: request.headers()['idempotency-key'], body: request.postDataJSON(), path});
         if (writes.length === 1) return route.fulfill({status: 503, json: {status: 503, code: 'UNAVAILABLE', message: 'Grading temporarily unavailable'}});
         data = {gradeId: 52, status: 'GRADED'};
-      } else data = {gradeId: Number(path.split('/').at(-1)), title: 'Writing response', content: 'The candidate makes a supported argument.'};
+      } else data = {id: Number(path.split('/').at(-1)), status: 'PENDING', tasks: [{seq: 1, content: 'The candidate makes a supported argument.'}]};
     } else if (path.endsWith('/unread-count')) data = {unreadCount: 0};
     return route.fulfill({json: response(data)});
   });

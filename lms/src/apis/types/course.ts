@@ -19,6 +19,9 @@ export interface CourseSummary {
   instructorId: number | null;
   primaryInstructor: {
     userId: number;
+    instructorFirstName?: string;
+    instructorMiddleName?: string;
+    instructorLastName?: string;
     name?: string;
     email?: string;
   } | null;
@@ -56,6 +59,9 @@ export interface CourseResponse {
   instructorId: number | null;
   primaryInstructor: {
     userId: number;
+    instructorFirstName?: string;
+    instructorMiddleName?: string;
+    instructorLastName?: string;
     name?: string;
     email?: string;
   } | null;

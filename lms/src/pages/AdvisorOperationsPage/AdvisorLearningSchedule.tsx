@@ -1,3 +1,4 @@
+import {contractClock} from '@/utils/contractTime';
 import {useMemo, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {addDays, addWeeks, format, isSameDay, startOfWeek} from 'date-fns';
@@ -25,9 +26,9 @@ async function loadOwnedCourseSchedule(from: string, to: string) {
       if (!value || typeof value !== 'object' || Array.isArray(value)) return [];
       const row = value as Record<string, unknown>;
       const id = row.occurrenceId ?? row.id;
-      if (typeof id !== 'number' || typeof row.occurrenceDate !== 'string' || typeof row.startTime !== 'string') { unavailable++; return []; }
+      if (typeof id !== 'number' || typeof row.occurrenceDate !== 'string' || !contractClock(row.startTime)) { unavailable++; return []; }
       if (row.status === 'CANCELLED' || row.occurrenceDate < from || row.occurrenceDate >= to) return [];
-      return [{id, courseId: course.courseId, title: course.title || course.courseCode || 'Course session', date: row.occurrenceDate, start: row.startTime.slice(0, 5), end: typeof row.endTime === 'string' ? row.endTime.slice(0, 5) : undefined}];
+      return [{id, courseId: course.courseId, title: course.title || course.courseCode || 'Course session', date: row.occurrenceDate, start: contractClock(row.startTime)!, end: contractClock(row.endTime), timezone: typeof row.timezone === 'string' ? row.timezone : undefined}];
     });
   }).sort((a, b) => `${a.date}${a.start}`.localeCompare(`${b.date}${b.start}`));
   return {sessions, unavailable};
@@ -47,7 +48,7 @@ export function AdvisorLearningSchedule() {
     <div className={styles.days}>{Array.from({length: 7}, (_, index) => {const date = addDays(week, index); const key = format(date, 'yyyy-MM-dd'); return <div key={key}><span>{format(date, 'EEEEE')}</span><button type="button" aria-label={format(date, 'EEEE, MMMM d, yyyy')} aria-pressed={selected === key} aria-current={isSameDay(date, new Date()) ? 'date' : undefined} data-event={query.data?.sessions.some(session => session.date === key) || undefined} onClick={() => setSelected(current => current === key ? undefined : key)}>{format(date, 'd')}</button></div>;})}</div>
     {query.isPending ? <p className={styles.status}>Loading schedule…</p> : query.isError ? <p role="alert" className={styles.status}>Schedule could not be loaded. <button type="button" onClick={() => void query.refetch()}>Retry</button></p> : <>
       {query.data?.unavailable ? <p className={styles.status} role="alert">Some course sessions could not be displayed. <button type="button" onClick={() => void query.refetch()}>Retry</button></p> : null}
-      <div className={styles.timeline}>{sessions.length ? sessions.map(session => <Link key={`${session.courseId}-${session.id}`} to={generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(session.courseId)})}><i aria-hidden="true"/><div><small>{session.date === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(new Date(`${session.date}T00:00:00`), 'MMM d, EEE')}</small><strong>{session.title}</strong><span>{session.start}{session.end ? ` – ${session.end}` : ''}</span></div></Link>) : <p className={styles.status}>No course sessions {selected ? 'on this day' : 'this week'}.</p>}</div>
+      <div className={styles.timeline}>{sessions.length ? sessions.map(session => <Link key={`${session.courseId}-${session.id}`} to={generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(session.courseId)})}><i aria-hidden="true"/><div><small>{session.date === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(new Date(`${session.date}T00:00:00`), 'MMM d, EEE')}</small><strong>{session.title}</strong><span>{session.start}{session.end ? ` – ${session.end}` : ''}{session.timezone ? ` · ${session.timezone}` : ''}</span></div></Link>) : <p className={styles.status}>No course sessions {selected ? 'on this day' : 'this week'}.</p>}</div>
     </>}
     <Link className={styles.manage} to={APP_ROUTE_PATHS.advisorSchedule}>Manage schedule requests <ChevronRight size={16}/></Link>
   </WorkspaceSection>;

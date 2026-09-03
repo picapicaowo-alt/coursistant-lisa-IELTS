@@ -1,0 +1,22 @@
+{
+  "operations": 432,
+  "counts": {
+    "advising.openapi.yaml": 64,
+    "assignment.openapi.yaml": 42,
+    "auth.openapi.yaml": 27,
+    "counsellor.openapi.yaml": 7,
+    "course.openapi.yaml": 152,
+    "mockexam.openapi.yaml": 51,
+    "notification.openapi.yaml": 5,
+    "parent.openapi.yaml": 32,
+    "quiz.openapi.yaml": 29,
+    "user.openapi.yaml": 13,
+    "vocabulary.openapi.yaml": 10
+  },
+  "remaining": [
+    "authRefreshToken",
+    "listMyPublishedCourseReports",
+    "courseStudentAdd",
+    "courseWeekGet"
+  ]
+}

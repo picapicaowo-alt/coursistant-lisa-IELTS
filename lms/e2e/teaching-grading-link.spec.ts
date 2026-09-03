@@ -16,7 +16,8 @@ test('Week 1 grading queue opens the registered grading page despite an incompat
     if (path.endsWith('/me/courses')) data = {items: [{id: 37, courseId: 37, courseCode: 'HVW101', title: 'Academic Writing Studio', courseRole: 'Instructor', status: 'Published'}], page: 0, size: 100, total: 1};
     if (path.endsWith('/notifications/unread-count')) data = {unreadCount: 0};
     if (path.endsWith('/teaching/courses')) data = [{id: 37, courseCode: 'HVW101', title: 'Academic Writing Studio'}];
-    if (path.endsWith('/teaching/grading-items')) data = [{courseId: 37, assignmentId: 12, studentUserId: 45, studentFirstName: 'Emily', studentLastName: 'Wong', title: 'Week 1 Diagnostic Essay', gradingDeepLink: '/instructor/courses/37/assignments/12/submissions/45'}];
+    if (path.endsWith('/teaching/grading-items')) data = {page: 0, size: 20, total: 1, items: [{courseId: 37, assignmentId: 12, studentUserId: 45, studentFirstName: 'Emily', studentLastName: 'Wong', title: 'Week 1 Diagnostic Essay', gradingDeepLink: '/instructor/courses/37/assignments/12/submissions/45'}]};
+    if (path.endsWith('/teaching/schedule-requests')) data = {items: [], page: 0, size: 20, total: 0};
     if (path.endsWith('/assignments/12/grading-roster')) data = {assignmentId: 12, assignmentTitle: 'Week 1 Diagnostic Essay', courseId: 37, gradingWritable: true, totalCount: 0, enteredCount: 0, releasedCount: 0, items: []};
     return route.fulfill({json: {status: 200, code: 'SUCCESS', data}});
   });

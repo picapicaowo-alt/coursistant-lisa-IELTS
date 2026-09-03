@@ -18,7 +18,7 @@ function dateLabel(value: string | null): string | null {
   return new Intl.DateTimeFormat(undefined, {month: 'short', day: 'numeric', year: 'numeric'}).format(date)
 }
 
-export function StudentMockExamLibrary({value}: {value: unknown}) {
+export function StudentMockExamLibrary({value, serverStatusFilter = false}: {value: unknown; serverStatusFilter?: boolean}) {
   const exams = normalizeStudentExams(value)
   const [sectionFilter, setSectionFilter] = useState<Section | ''>('')
   const [statusFilter, setStatusFilter] = useState('')
@@ -41,7 +41,7 @@ export function StudentMockExamLibrary({value}: {value: unknown}) {
       <div className={styles.filters} aria-label="Filter exams">
         <button type="button" aria-pressed={!sectionFilter} onClick={() => setSectionFilter('')}>All exams</button>
         {(['reading', 'writing', 'listening'] as const).map(section => <button type="button" key={section} aria-pressed={sectionFilter === section} onClick={() => setSectionFilter(section)}>{SECTION_META[section].label}</button>)}
-        <label><select aria-label="Exam status" value={statusFilter} onChange={event => setStatusFilter(event.target.value)}><option value="">All states</option>{statuses.map(status => <option key={status}>{status}</option>)}</select></label>
+        {!serverStatusFilter ? <label><select aria-label="Exam status" value={statusFilter} onChange={event => setStatusFilter(event.target.value)}><option value="">All states</option>{statuses.map(status => <option key={status}>{status}</option>)}</select></label> : null}
       </div>
       {filteredExams.length === 0 ? <p role="status">No papers match these filters.</p> : null}
     <section className={styles.library} aria-label="Assigned mock exams">

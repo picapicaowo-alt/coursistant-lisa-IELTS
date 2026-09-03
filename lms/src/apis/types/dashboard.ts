@@ -48,42 +48,47 @@ export interface UpcomingActivity {
 export interface PrimaryInstructor {
   userId: number;
   name?: string;
+  instructorFirstName?: string;
+  instructorMiddleName?: string;
+  instructorLastName?: string;
   email?: string;
 }
 
 /**
  * A course from `/v2/me/courses`.
  *
- * The payload ships aliased pairs (`id`/`courseId`, `title`/`name`,
- * `state`/`status`, `courseRole`/`role`) that always carry the same value.
- * Prefer the first of each pair; the aliases are typed so responses still
- * parse if the backend drops one.
+ * The current projection uses lifecycleStatus and lecture counts. Legacy
+ * enrollment metadata remains optional for older non-student responses.
  */
 export interface MyCourse {
   id: number;
   courseId: number;
   courseCode: string;
   title: string;
-  name: string;
-  description: string | null;
-  tenantId: number;
-  state: CourseState;
-  status: CourseState;
+  name?: string;
+  description?: string | null;
+  tenantId?: number;
+  state?: CourseState;
+  status?: CourseState;
   courseRole: CourseRole;
-  role: CourseRole;
+  role?: CourseRole;
   /** Set only when `courseRole=TA`; `null` for Student and Instructor. */
-  canGrade: boolean | null;
-  canPostAnnouncements: boolean | null;
-  canManageGroups: boolean | null;
+  canGrade?: boolean | null;
+  canPostAnnouncements?: boolean | null;
+  canManageGroups?: boolean | null;
   /** PRD TA content toggle. Optional until the backend contract is aligned. */
   canManageContent?: boolean | null;
-  canManageCourseEvents: boolean | null;
+  canManageCourseEvents?: boolean | null;
   /** May carry only `userId` when the user row is missing. */
-  primaryInstructor: PrimaryInstructor | null;
+  primaryInstructor?: PrimaryInstructor | null;
   /** `LocalDateTime` with no trailing `Z`. */
-  createdAt: string;
-  updatedAt: string;
-  archivedAt: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  archivedAt?: string | null;
+  lifecycleStatus?: string | null;
+  completedAt?: string | null;
+  lectureTotal?: number | null;
+  lectureCompleted?: number | null;
 }
 
 /** `/v2/me/courses` returns a page object, not a bare array. */
@@ -94,11 +99,15 @@ export interface MyCoursePageResponse {
   total: number;
 }
 
+export const COURSE_VIEWS = {current: 'CURRENT', completed: 'COMPLETED'} as const;
+export type StudentCourseView = typeof COURSE_VIEWS[keyof typeof COURSE_VIEWS];
+
 export interface MyCoursesParams {
+  courseView?: StudentCourseView;
   state?: CourseState;
-  /** Negative values are treated as 0. */
+  /** Zero based, nonnegative. */
   page?: number;
-  /** `< 1` becomes 20; `> 100` is clamped to 100. */
+  /** Page size from 1 to 100. */
   size?: number;
 }
 

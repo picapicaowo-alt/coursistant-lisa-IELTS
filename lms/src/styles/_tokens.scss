@@ -65,6 +65,11 @@ $border-interactive: $violet-400;
 $border-dashboard: $border-default;
 
 $action-primary: $violet-700;
+// Figma profile skill palette (405:2345); Advisor summaries remain monochrome.
+$skill-reading: $violet-700;
+$skill-writing: #F27316;
+$skill-speaking: #F63D68;
+$skill-listening: #AE55E2;
 $action-primary-hover: $violet-800;
 $action-primary-active: $violet-900;
 $action-secondary: $violet-400;
@@ -93,6 +98,11 @@ $type-orange: #F27316;
 $type-orange-subtle: #FCC5A9;
 $type-pink: #F63D68;
 $type-pink-subtle: #FFBBC2;
+// Preserve Figma badge surfaces while giving small labels readable contrast.
+$advising-high-ink: #9F1239;
+$advising-medium-ink: $orange-800;
+$advising-low-ink: $green-700;
+$advising-review-ink: #155E75;
 $type-fuchsia: #AE55E2;
 $type-fuchsia-subtle: #EECAFF;
 $type-indigo: #0000FF;
@@ -258,6 +268,7 @@ $radius-modal: $radius-lg;
 $radius-control: $radius-sm;
 $radius-control-sm: $radius-sm;
 $radius-pill: $radius-round;
+$radius-badge: .375rem;
 $control-size: $touch-target;
 $shadow-card: $shadow-dashboard-card;
 $modal-backdrop-blur: 8px;

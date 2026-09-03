@@ -30,5 +30,5 @@ export const dashboardExamActionLabel = (
 ): string => {
   if (!direct) return 'Open exams';
   if (status.toLowerCase().includes('progress')) return 'Continue the exam';
-  return score === undefined ? 'Open exam' : 'View feedback';
+  return score === undefined ? 'Open exam' : 'View results';
 };

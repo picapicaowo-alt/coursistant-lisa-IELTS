@@ -52,7 +52,7 @@ const installIdentity = async (page: Page, user: TestIdentity): Promise<void> =>
 test('student can enter both learning products but not advisor operations', async ({page}) => {
   await installIdentity(page, identity('STUDENT'));
   await page.route('**/v2/student/mock-exams**', route => route.fulfill({
-    json: response([{studentMockExamId: 71, title: 'IELTS Academic Practice', label: 'Practice A', status: 'Assigned', listeningSelected: true}]),
+    json: response({page: 0, size: 20, total: 1, items: [{id: 71, title: 'IELTS Academic Practice', status: 'READY', listeningSelected: true}]}),
   }));
   await page.route('**/vocabulary-api/v1/vocabulary/lists', route => route.fulfill({
     json: {
@@ -93,7 +93,7 @@ test('dashboard quick prompt hands structured context to Study Support', async (
   await page.route('**/v2/me/courses**', route => route.fulfill({json: response({items: [], page: 0, size: 100, total: 0})}));
   await page.route('**/v2/me/assignments/upcoming**', route => route.fulfill({json: response([])}));
   await page.route('**/v2/me/activities/upcoming**', route => route.fulfill({json: response([])}));
-  await page.route('**/v2/me/work-queue', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/work-queue**', route => route.fulfill({json: response({items: [], page: 0, size: 20, total: 0})}));
   await page.route('**/v2/student/mock-exams**', route => route.fulfill({json: response([])}));
   await page.route('**/v2/me/alerts', route => route.fulfill({json: response([])}));
   let pendingChat: string | undefined;
@@ -175,8 +175,8 @@ test('instructor dashboard uses teaching data and availability edits preserve ev
   await expect(page.getByText(/your teaching today/)).toBeVisible();
   await expect.poll(() => studentOnlyRequests).toEqual([]);
 
-  await page.route('**/v2/me/teaching/grading-items', route => route.fulfill({json: response([])}));
-  await page.route('**/v2/me/teaching/schedule-requests', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/teaching/grading-items**', route => route.fulfill({json: response({items: [], page: 0, size: 20, total: 0})}));
+  await page.route('**/v2/me/teaching/schedule-requests**', route => route.fulfill({json: response({items: [], page: 0, size: 20, total: 0})}));
   await page.route('**/v2/me/teaching/students-needing-support', route => route.fulfill({json: response([])}));
   await page.route('**/v2/me/teaching/today-classes', route => route.fulfill({json: response([])}));
   await page.route('**/v2/me/teaching/availability', async route => {
@@ -184,7 +184,7 @@ test('instructor dashboard uses teaching data and availability edits preserve ev
       savedAvailability = route.request().postDataJSON() as Record<string, unknown>;
       return route.fulfill({json: response({version: 5, windows, exceptions})});
     }
-    return route.fulfill({json: response({version: 4, windows, exceptions})});
+    return route.fulfill({json: response({version: 4, windows: windows.map((item, index) => index === 0 ? {...item, startTime: {hour: 9, minute: 0, second: 0, nano: 0}, endTime: {hour: 12, minute: 0, second: 0, nano: 0}} : item), exceptions})});
   });
 
   await page.goto('/my-operations');
@@ -197,7 +197,7 @@ test('instructor dashboard uses teaching data and availability edits preserve ev
   await expect(page.getByText('Record', {exact: true})).toHaveCount(0);
   await page.getByRole('button', {name: 'Save all availability'}).click();
   await expect.poll(() => savedAvailability).toBeDefined();
-  expect(savedAvailability).toMatchObject({expectedVersion: 4, windows, exceptions});
+  expect(savedAvailability).toMatchObject({expectedVersion: 4, windows: windows.map((item, index) => index === 0 ? {...item, startTime: '09:00:00', endTime: '12:00:00'} : item), exceptions});
   await expect(page.getByText('Availability saved.')).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('instructor-availability.png'), fullPage: true});
 
@@ -308,7 +308,7 @@ test('student advising view presents profile, plan, and tasks with scannable hie
   const plan = {studentUserId: 301, profileContext: {currentProfileVersion: 2}, plan: {studyPlanId: 81, studyPlanVersion: 1, basedOnProfileVersion: 2, strategySummary: 'Weekly timed essays and targeted review.', startDate: '2026-09-14', planEndDate: '2026-10-12', checkpoints: [{id: 91, position: 1, description: 'Complete the first diagnostic', goal: 'Identify recurring patterns', dueDate: '2026-09-21', tasks: [{id: 101, position: 1, title: 'Complete the week 1 diagnostic', description: 'Submit one timed response.', dueDate: '2026-09-21', status: 'NOT_STARTED', version: 0}]}]}};
   await page.route('**/v2/student/profile', route => route.fulfill({json: response(profile)}));
   await page.route('**/v2/student/study-plan', route => route.fulfill({json: response(plan)}));
-  await page.route('**/v2/student/advisor-conversation/messages**', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/student/advisor-conversation/messages**', route => route.fulfill({json: response({items: [], nextBeforeId: null, hasMore: false})}));
 
   await page.goto('/my-plan');
   await expect(page.getByRole('heading', {name: 'My Learning Goal'})).toBeVisible();

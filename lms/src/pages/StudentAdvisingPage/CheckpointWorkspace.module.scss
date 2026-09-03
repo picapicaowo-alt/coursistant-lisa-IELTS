@@ -19,6 +19,8 @@
 .phaseCopy { min-width: 0; }
 .phase { display: inline-flex; border: 1px solid t.$action-primary; border-radius: t.$radius-sm; padding: t.$space-1 t.$space-2; color: t.$action-primary; font-size: t.$font-size-caption; font-weight: t.$fw-bold; }
 .phaseCopy h1 { margin: t.$space-3 0 t.$space-2; font-size: t.$font-size-title-compact; line-height: t.$line-height-title-compact; font-weight: t.$fw-bold; overflow-wrap: anywhere; }
+// Route changes focus these headings for screen readers; they are not controls.
+.phaseCopy h1:focus, .detail h2:focus { outline: none; }
 .phaseCopy p { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; margin: 0; max-width: t.$reading-max-width; }
 .illustration { width: clamp(6rem, 12cqw, 10.3125rem); height: auto; }
 .statistics { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-4; margin-top: t.$space-4; }

@@ -53,3 +53,21 @@ export function unwrapData<T>(response: ApiResponse<T>, context: string): T {
   }
   return response.data;
 }
+
+/** Reject a mismatched deployment's array response without crashing the page or
+ * presenting it as a successful empty queue. */
+export function unwrapPageData<T>(response: ApiResponse<{items: T[]; page: number; size: number; total: number}>, context: string) {
+  const data = unwrapData(response, context);
+  if (!data || !Array.isArray(data.items) || !Number.isInteger(data.page) || !Number.isInteger(data.size) || !Number.isFinite(data.total)) {
+    throw new Error('This list returned an unsupported response. Please refresh after the service update.');
+  }
+  return data;
+}
+
+export function unwrapCursorData<T>(response: ApiResponse<{items: T[]; nextBeforeId?: number | null; hasMore: boolean}>, context: string) {
+  const data = unwrapData(response, context);
+  if (!data || !Array.isArray(data.items) || typeof data.hasMore !== 'boolean' || (data.hasMore && typeof data.nextBeforeId !== 'number')) {
+    throw new Error('Messages returned an unsupported response. Please refresh after the service update.');
+  }
+  return data;
+}

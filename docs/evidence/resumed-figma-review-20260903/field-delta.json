@@ -1,0 +1,816 @@
+[
+  {
+    "contract": "course",
+    "schema": "AdvisorOwnedCoursePageApiResponse",
+    "fields": [
+      {
+        "name": "message",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "example": "Success"
+        }
+      },
+      {
+        "name": "status",
+        "before": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "after": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "AttendanceHistoryApiResponse",
+    "fields": [
+      {
+        "name": "message",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "example": "Success"
+        }
+      },
+      {
+        "name": "status",
+        "before": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "after": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "AttendanceRowApiResponse",
+    "fields": [
+      {
+        "name": "message",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "example": "Success"
+        }
+      },
+      {
+        "name": "status",
+        "before": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "after": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "CourseHoursBalanceApiResponse",
+    "fields": [
+      {
+        "name": "message",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "example": "Success"
+        }
+      },
+      {
+        "name": "status",
+        "before": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "after": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "InstructorAvailabilityApiResponse",
+    "fields": [
+      {
+        "name": "message",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "example": "Success"
+        }
+      },
+      {
+        "name": "status",
+        "before": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "after": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "MemberResponse",
+    "fields": [
+      {
+        "name": "userFirstName",
+        "before": {
+          "type": "string",
+          "nullable": true
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "userMiddleName",
+        "before": {
+          "type": "string",
+          "nullable": true
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "userLastName",
+        "before": {
+          "type": "string",
+          "nullable": true
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "active",
+        "after": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "assignmentSubmitFrozen",
+        "after": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "canGrade",
+        "after": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "canManageCourseEvents",
+        "after": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "canManageGroups",
+        "after": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "canPostAnnouncements",
+        "after": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "courseId",
+        "after": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "courseRole",
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "createdAt",
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "enrolledAt",
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "id",
+        "after": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "joinedAt",
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "level",
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "updatedAt",
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "userEmail",
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "userId",
+        "after": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "withdrawnAt",
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "PrimaryInstructorSummary",
+    "fields": [
+      {
+        "name": "instructorFirstName",
+        "before": {
+          "type": "string",
+          "nullable": true
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "instructorMiddleName",
+        "before": {
+          "type": "string",
+          "nullable": true
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "instructorLastName",
+        "before": {
+          "type": "string",
+          "nullable": true
+        },
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "email",
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "userId",
+        "after": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "ScheduleRequestApiResponse",
+    "fields": [
+      {
+        "name": "message",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "example": "Success"
+        }
+      },
+      {
+        "name": "status",
+        "before": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "after": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "ScheduleRequestPageApiResponse",
+    "fields": [
+      {
+        "name": "message",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "example": "Success"
+        }
+      },
+      {
+        "name": "status",
+        "before": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "after": {
+          "type": "integer",
+          "format": "int32",
+          "example": 200
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "StudentAlertResponse",
+    "fields": [
+      {
+        "name": "deepLink",
+        "after": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "StudentWorkQueueApiResponse",
+    "fields": [
+      {
+        "name": "data",
+        "before": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/StudentWorkQueueItemResponse"
+          }
+        },
+        "after": {
+          "$ref": "#/components/schemas/StudentWorkQueuePage"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "StudentWorkQueueItemResponse",
+    "fields": [
+      {
+        "name": "description",
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "actionAtUtc",
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "timezone",
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "submissionRequirement",
+        "after": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "TeachingGradingItemResponse",
+    "fields": [
+      {
+        "name": "dueAt",
+        "before": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "status",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "enum": [
+            "PENDING",
+            "IN_PROGRESS",
+            "COMPLETED"
+          ]
+        }
+      },
+      {
+        "name": "urgency",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "enum": [
+            "OVERDUE",
+            "DUE_TODAY",
+            "UPCOMING"
+          ]
+        }
+      },
+      {
+        "name": "dueAtLocal",
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "dueAtUtc",
+        "after": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      {
+        "name": "groupId",
+        "after": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      {
+        "name": "groupName",
+        "after": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "submissionType",
+        "after": {
+          "type": "string",
+          "enum": [
+            "Individual",
+            "Group"
+          ]
+        }
+      },
+      {
+        "name": "timezone",
+        "after": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "TeachingGradingItemsApiResponse",
+    "fields": [
+      {
+        "name": "data",
+        "before": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/TeachingGradingItemResponse"
+          }
+        },
+        "after": {
+          "$ref": "#/components/schemas/TeachingGradingItemPage"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "course",
+    "schema": "TenantAlertRuleRequest",
+    "fields": [
+      {
+        "name": "mode",
+        "before": {
+          "type": "string",
+          "description": "SYSTEM_DEFAULT, TENANT_OVERRIDE, or DISABLED",
+          "enum": [
+            "SYSTEM_DEFAULT",
+            "TENANT_OVERRIDE",
+            "DISABLED"
+          ]
+        },
+        "after": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "parent",
+    "schema": "ParentNotification",
+    "fields": [
+      {
+        "name": "notificationType",
+        "before": {
+          "type": "string"
+        },
+        "after": {
+          "type": "string",
+          "enum": [
+            "REPORT_PUBLISHED",
+            "ABSENCE_REQUEST_DECIDED",
+            "SCHEDULE_REQUEST_DECIDED",
+            "SESSION_SCHEDULE_CHANGED",
+            "SESSION_CANCELLED",
+            "ATTENDANCE_STATUS_CHANGED",
+            "COURSE_HOURS_CHANGED",
+            "ADVISOR_TASK_CREATED",
+            "ADVISOR_TASK_STATUS_CHANGED",
+            "ADVISOR_TASK_FEEDBACK_CHANGED",
+            "CHECKPOINT_REACHED_INCOMPLETE",
+            "ASSIGNMENT_GRADE_RELEASED"
+          ]
+        }
+      }
+    ]
+  },
+  {
+    "contract": "parent",
+    "schema": "ParentStudyPlanCheckpoint",
+    "fields": [
+      {
+        "name": "tasks",
+        "before": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "after": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/ParentStudyPlanTask"
+          }
+        }
+      }
+    ]
+  },
+  {
+    "contract": "user",
+    "schema": "ProfileResponse",
+    "fields": [
+      {
+        "name": "firstName",
+        "before": {
+          "type": "string",
+          "description": "Given name",
+          "example": "Alex"
+        },
+        "after": {
+          "type": "string",
+          "description": "Given name",
+          "example": "Alex",
+          "nullable": true
+        }
+      },
+      {
+        "name": "lastName",
+        "before": {
+          "type": "string",
+          "description": "Family name",
+          "example": "Rivera"
+        },
+        "after": {
+          "type": "string",
+          "description": "Family name",
+          "example": "Rivera",
+          "nullable": true
+        }
+      },
+      {
+        "name": "middleName",
+        "before": {
+          "type": "string",
+          "description": "Middle name"
+        },
+        "after": {
+          "type": "string",
+          "description": "Middle name",
+          "nullable": true
+        }
+      }
+    ]
+  },
+  {
+    "contract": "user",
+    "schema": "UpdateProfileRequest",
+    "fields": [
+      {
+        "name": "displayName",
+        "before": {
+          "type": "string",
+          "deprecated": true,
+          "description": "Rejected when non-blank. Use firstName and lastName.",
+          "example": "Alex Rivera",
+          "maxLength": 100
+        },
+        "after": {
+          "type": "string",
+          "description": "Rejected when non-blank. Use firstName and lastName.",
+          "example": "Alex Rivera",
+          "maxLength": 100,
+          "deprecated": true
+        }
+      },
+      {
+        "name": "firstName",
+        "before": {
+          "type": "string",
+          "description": "Given name",
+          "example": "Alex",
+          "maxLength": 100
+        },
+        "after": {
+          "type": "string",
+          "description": "Given name",
+          "maxLength": 100
+        }
+      },
+      {
+        "name": "lastName",
+        "before": {
+          "type": "string",
+          "description": "Family name",
+          "example": "Rivera",
+          "maxLength": 100
+        },
+        "after": {
+          "type": "string",
+          "description": "Family name",
+          "maxLength": 100
+        }
+      },
+      {
+        "name": "middleName",
+        "before": {
+          "type": "string",
+          "description": "Middle name",
+          "example": "Marie",
+          "maxLength": 100
+        },
+        "after": {
+          "type": "string",
+          "description": "Middle name",
+          "maxLength": 100
+        }
+      }
+    ]
+  },
+  {
+    "contract": "user",
+    "schema": "User",
+    "fields": [
+      {
+        "name": "clearMiddleName",
+        "before": {
+          "type": "boolean"
+        }
+      },
+      {
+        "name": "name",
+        "before": {
+          "type": "string"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "auth",
+    "schema": "SystemManagedUserCreateRequest",
+    "fields": [
+      {
+        "name": "email",
+        "before": {
+          "type": "string",
+          "description": "Email",
+          "example": "admin@example.com"
+        },
+        "after": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 255,
+          "description": "Email",
+          "example": "admin@example.com"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "auth",
+    "schema": "TenantManagedUserCreateRequest",
+    "fields": [
+      {
+        "name": "email",
+        "before": {
+          "type": "string",
+          "description": "Email",
+          "example": "advisor@example.com"
+        },
+        "after": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 255,
+          "description": "Email",
+          "example": "advisor@example.com"
+        }
+      }
+    ]
+  },
+  {
+    "contract": "auth",
+    "schema": "TenantManagedUserPatchRequest",
+    "fields": [
+      {
+        "name": "email",
+        "before": {
+          "type": "string",
+          "maxLength": 255
+        },
+        "after": {
+          "type": "string",
+          "format": "email",
+          "maxLength": 255
+        }
+      }
+    ]
+  }
+]

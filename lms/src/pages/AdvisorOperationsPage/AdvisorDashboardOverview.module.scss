@@ -15,7 +15,7 @@
 .person strong { font-weight: t.$fw-semibold; }
 .person small, .reason small, .taskTitle small { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
 .avatar { width: 2.5rem; height: 2.5rem; border: 2px solid t.$border-default; }
-.viewButton { display: inline-flex; min-width: 3.75rem; min-height: 2rem; padding: t.$space-1 t.$space-4; align-items: center; justify-content: center; border: 1px solid t.$border-strong; border-radius: t.$radius-pill; color: t.$content-primary; text-decoration: none; }
+.viewButton { display: inline-flex; min-width: 3.75rem; min-height: 2rem; padding: t.$space-1 t.$space-4; align-items: center; justify-content: center; border: 1px solid t.$border-strong; border-radius: t.$radius-control; color: t.$content-primary; text-decoration: none; }
 .viewButton[data-primary], .viewButton:hover { background: t.$action-primary; border-color: t.$action-primary; color: t.$content-on-color; }
 .taskBody { container-type: inline-size; gap: t.$space-3; }
 .taskRow { display: grid; grid-template-columns: 1.5rem 1rem minmax(0, 1fr) auto auto; align-items: center; gap: t.$space-3; }
@@ -28,17 +28,13 @@
 .taskCheck input:focus-visible {outline:2px solid t.$action-primary; outline-offset:3px;}
 .taskTitle { display: grid; gap: t.$space-1; color: t.$content-primary; font-size: t.$font-size-body; text-decoration: none; overflow-wrap: anywhere; }
 .taskTitle:hover strong { color: t.$action-primary; }
-.taskTime { color: t.$content-secondary; font-size: t.$font-size-caption; text-align: right; white-space: nowrap; }
+.taskTime { display: grid; gap: t.$space-1; max-width: 7rem; color: t.$content-secondary; font-size: t.$font-size-caption; text-align: right; }
 .categoryDot { width: 0.75rem; height: 0.75rem; border-radius: t.$radius-round; background: t.$content-placeholder; }
 .categoryDot[data-category='REVIEW'] { background: t.$type-cyan; }
 .categoryDot[data-category='FOLLOW_UP'], .categoryDot[data-category='PLANNING'] { background: t.$type-green; }
 .categoryDot[data-category='APPROVAL'], .categoryDot[data-category='ONGOING'] { background: t.$type-orange; }
 .categoryDot[data-category='RISK'] { background: t.$type-pink; }
 .period { color: t.$content-secondary; font-size: t.$font-size-caption; }
-.periodSelectWrapper { position: relative; display: inline-flex; align-items: center; }
-.periodSelect { appearance: none; border: 0; background: transparent; color: t.$content-secondary; font-size: t.$font-size-caption; font-weight: t.$fw-medium; padding-right: 1.25rem; cursor: pointer; }
-.periodSelect:focus-visible { outline: 2px solid t.$action-primary; border-radius: t.$radius-sm; }
-.periodChevron { position: absolute; right: 0; pointer-events: none; color: t.$content-secondary; }
 .progressBar { display: flex; gap: t.$space-1; height: .5rem; overflow: hidden; border-radius: t.$radius-pill; background: t.$surface-muted; }
 .progressBar span { min-width: 0; }
 .progressBar [data-stat='onTrackCount'] { background: t.$type-green; }

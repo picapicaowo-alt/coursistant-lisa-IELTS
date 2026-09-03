@@ -1,3 +1,6 @@
+import {formatCourseInstructor} from '@/utils/personName';
+import {unwrapData} from '@/apis';
+import {LectureProgress} from '@/components/LectureProgress';
 import {UserAvatar} from '@/components/UserAvatar';
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './CoursePreview.module.scss';
@@ -13,7 +16,10 @@ interface CoursePreviewProps {
   id: number;
   courseCode: string;
   title: string;
-  state: CourseState;
+  state?: CourseState;
+  lifecycleStatus?: string | null;
+  lectureTotal?: number | null;
+  lectureCompleted?: number | null;
   /** Null when the payload carried only a userId for the instructor. */
   instructorName: string | null;
   /** Course Managers get the archive action; everyone else does not. */
@@ -55,6 +61,8 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
                                                               courseCode,
                                                               title,
                                                               state,
+                                                              lifecycleStatus,
+                                                              lectureTotal, lectureCompleted,
                                                               instructorName,
                                                               canManage,
                                                               showOperations,
@@ -76,7 +84,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
     gcTime: 5 * 60 * 1000,
     // A missing schedule must not turn into a retry storm across every card.
     retry: 1,
-    enabled: state === 'Active',
+    enabled: state == null || state === 'Active',
   });
 
   const archive = useMutation({
@@ -118,6 +126,8 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, [menuOpen]);
 
+  const detail = useQuery({queryKey: ['course', id], queryFn: async () => unwrapData(await courseApiService.getCourse(id), 'courseCardDetail'), enabled: !instructorName, retry: false, staleTime: 5 * 60 * 1000});
+  const displayInstructor = instructorName || formatCourseInstructor(detail.data?.primaryInstructor);
   const firstSession = sessions?.[0];
 
   return (
@@ -129,7 +139,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
               <UserAvatar src={avatarUrl} className={styles.avatar}/>
             </div>
             <div>
-              <div className={styles.instructorName}>{instructorName || 'Instructor not assigned'}</div>
+              <div className={styles.instructorName}>{displayInstructor || (detail.isFetching ? 'Loading instructor…' : 'Instructor details unavailable')}</div>
               <div className={styles.instructorRole}>{t("card.instructor")}</div>
             </div>
           </div>
@@ -138,8 +148,8 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
 
       <div className={styles.courseContent}>
         <h2 className={styles.courseTitle}>{title || courseCode}</h2>
-        <div className={styles.badges}><span className={styles.courseState}>{state}</span><span className={styles.courseCode}>{courseCode}</span></div>
-        {showProgress ? <div className={styles.progressUnavailable}><AssignmentProgress progress={progress} loading={progressLoading} failed={progressFailed}/></div> : null}
+        <div className={styles.badges}><span className={styles.courseState}>{lifecycleStatus || state || 'Enrolled'}</span><span className={styles.courseCode}>{courseCode}</span></div>
+        {lectureCompleted != null && lectureTotal != null ? <LectureProgress completed={lectureCompleted} total={lectureTotal}/> : showProgress ? <div className={styles.progressUnavailable}><AssignmentProgress progress={progress} loading={progressLoading} failed={progressFailed}/></div> : null}
       </div>
       <div className={styles.courseFooter}>
         <div className={styles.scheduleSummary}><img src="/icons/figma-dashboard/calendar.svg" alt=""/><div><span>Weekly class</span>

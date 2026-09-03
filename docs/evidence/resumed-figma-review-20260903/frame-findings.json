@@ -1,0 +1,347 @@
+{
+  "17:914": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "108:882": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "466:3289": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "82:357": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "414:3326": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "498:4121": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "507:3365": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "494:3386": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "496:3494": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "506:3609": {
+    "reviewed": true,
+    "status": "blocked-by-contract",
+    "finding": "No course-note persistence contract."
+  },
+  "493:3350": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "772:3458": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "792:11208": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "783:8276": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "810:15612": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "813:4672": {
+    "reviewed": true,
+    "status": "blocked-by-contract",
+    "finding": "No separate Advisor parent-directory or parent-recipient route."
+  },
+  "791:10510": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "803:13456": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "813:4892": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "805:14271": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "818:7178": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "818:7815": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "815:5643": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "810:15017": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "816:6276": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "818:8771": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "819:9475": {
+    "reviewed": true,
+    "status": "blocked-by-contract",
+    "finding": "Advisor observer detail has no question-level edit/feedback mutation."
+  },
+  "100:456": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "148:642": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "378:1714": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "406:2399": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "405:2345": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "410:2120": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "410:2408": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "408:2433": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "406:3008": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "408:1956": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "406:1914": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "399:1628": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "335:1033": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "375:1621": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "375:1956": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "375:2540": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "375:3392": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "375:3937": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "375:4466": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "365:1122": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "201:906": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "322:865": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "333:974": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "410:9227": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "163:698": {
+    "reviewed": true,
+    "status": "supported-different-presentation",
+    "finding": "Exam assignment cards use returned status/selection fields; planned sitting times are absent."
+  },
+  "423:3034": {
+    "reviewed": true,
+    "status": "supported-different-presentation",
+    "finding": "Section filtering is functional; unsupplied scheduled times are omitted."
+  },
+  "417:2798": {
+    "reviewed": true,
+    "status": "supported-different-presentation",
+    "finding": "Real section runner uses released question payloads; unsupported Advisor-note controls are omitted."
+  },
+  "427:2930": {
+    "reviewed": true,
+    "status": "supported-different-presentation",
+    "finding": "Released correctness is shown from returned results; no invented answer explanation."
+  },
+  "427:3588": {
+    "reviewed": true,
+    "status": "blocked-by-contract",
+    "finding": "No exam-specific AI explanation or Advisor-note contract."
+  },
+  "427:2694": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "445:3397": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "445:3823": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "464:3172": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "430:2779": {
+    "reviewed": true,
+    "status": "blocked-by-contract",
+    "finding": "Advisor task has no linked quiz identifier."
+  },
+  "715:3994": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "730:4653": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "731:4840": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "731:4886": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "732:4924": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "732:4973": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  },
+  "730:4753": {
+    "reviewed": true,
+    "status": "supported-different-presentation",
+    "finding": "Email/code registration uses required structured names and tenant fields; no activation/social operation."
+  },
+  "729:3484": {
+    "reviewed": true,
+    "status": "reviewed-supported-flow",
+    "finding": "Source and corresponding API-backed desktop/mobile state were reviewed; data density follows the returned records."
+  }
+}

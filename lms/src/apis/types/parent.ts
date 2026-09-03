@@ -1,3 +1,4 @@
+import type {ParentStudentSummary} from './parentReadModels';
 import type {AdvisingPage} from './advising';
 
 /** Contracts declared by docs/api/parent.openapi.yaml. */
@@ -24,7 +25,7 @@ export interface ParentStudentLinkResponse {
   parentEmail?: string;
 }
 
-export type ParentLinkedStudentPage = AdvisingPage<ParentStudentLinkResponse>;
+export type ParentLinkedStudentPage = AdvisingPage<ParentStudentSummary>;
 
 export interface ParentCreateScheduleRequest {
   courseId: number;
@@ -80,28 +81,11 @@ export interface ParentNotification {
   availability?: string;
 }
 
-export interface ParentReportDetail {
-  reportId?: number;
-  reportType?: string;
-  overallSummary?: string;
-  strengths?: string;
-  weaknesses?: string;
-  skillEvaluation?: string;
-  improvementSuggestions?: string;
-  publishedAt?: string;
-}
-
-/**
- * Several Parent read operations deliberately omit a response schema in the
- * supplied OpenAPI. Keep that boundary honest instead of inventing fields.
- */
-export type ParentAcademicRead = unknown;
-
-/** Observed Dev pagination envelope; the supplied OpenAPI leaves this GET schema open. */
+/** Explicit cursor envelope in the September 3 cutover contract. */
 export interface ParentConversationMessagePage {
   items: ParentConversationMessageResponse[];
   nextBeforeId?: number | null;
-  hasMore?: boolean;
+  hasMore: boolean;
 }
 
 export type ParentNotificationPage = AdvisingPage<ParentNotification>;

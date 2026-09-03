@@ -29,7 +29,7 @@ describe('Dashboard exam actions', () => {
 
   it('uses honest fallback copy when a direct exam destination is unavailable', () => {
     expect(dashboardExamActionLabel('InProgress', undefined, true)).toBe('Continue the exam');
-    expect(dashboardExamActionLabel('Graded', 88, true)).toBe('View feedback');
+    expect(dashboardExamActionLabel('Graded', 88, true)).toBe('View results');
     expect(dashboardExamActionLabel('InProgress', undefined, false)).toBe('Open exams');
   });
 });

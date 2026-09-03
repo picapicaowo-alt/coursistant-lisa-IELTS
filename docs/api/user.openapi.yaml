@@ -138,6 +138,14 @@ paths:
         schema:
           $ref: "#/components/schemas/User"
       - in: query
+        name: name
+        required: false
+        schema:
+          type: string
+        description: >
+          Case-insensitive substring match on firstName, middleName, lastName,
+          and their joined display form. Blank is ignored. Does not search user.name.
+      - in: query
         name: role
         required: false
         schema:
@@ -401,6 +409,20 @@ components:
           type: string
           description: "Avatar URL with cache-buster query, or null if none"
           example: https://example.com/api/v2/users/385/avatar?v=abc
+        firstName:
+          type: string
+          description: Given name
+          example: Alex
+          nullable: true
+        middleName:
+          type: string
+          description: Middle name
+          nullable: true
+        lastName:
+          type: string
+          description: Family name
+          example: Rivera
+          nullable: true
         email:
           type: string
           description: Email
@@ -409,14 +431,6 @@ components:
           type: boolean
           description: Whether the user receives email notifications
           example: true
-        firstName:
-          type: string
-          description: Given name
-          example: Alex
-        lastName:
-          type: string
-          description: Family name
-          example: Rivera
         level:
           type: string
           description: Business identity as stored. INSTRUCTOR_ADVISOR is the only
@@ -430,9 +444,6 @@ components:
           - INSTRUCTOR_ADVISOR
           - NOT_APPLICABLE
           example: STUDENT
-        middleName:
-          type: string
-          description: Middle name
         phone:
           type: string
           description: Optional contact phone
@@ -454,29 +465,26 @@ components:
       properties:
         displayName:
           type: string
-          deprecated: true
           description: Rejected when non-blank. Use firstName and lastName.
           example: Alex Rivera
+          maxLength: 100
+          deprecated: true
+        firstName:
+          type: string
+          description: Given name
+          maxLength: 100
+        middleName:
+          type: string
+          description: Middle name
+          maxLength: 100
+        lastName:
+          type: string
+          description: Family name
           maxLength: 100
         emailNotifications:
           type: boolean
           description: Whether to receive email notifications
           example: false
-        firstName:
-          type: string
-          description: Given name
-          example: Alex
-          maxLength: 100
-        lastName:
-          type: string
-          description: Family name
-          example: Rivera
-          maxLength: 100
-        middleName:
-          type: string
-          description: Middle name
-          example: Marie
-          maxLength: 100
         phone:
           type: string
           description: Optional contact phone; blank clears it (max 64 chars after
@@ -492,8 +500,6 @@ components:
           format: int32
         avatar:
           type: string
-        clearMiddleName:
-          type: boolean
         email:
           type: string
         emailNotifications:
@@ -501,20 +507,18 @@ components:
         encryptPassword:
           type: string
           writeOnly: true
-        firstName:
-          type: string
         id:
           type: integer
           format: int32
-        lastName:
-          type: string
         level:
-          type: string
-        middleName:
           type: string
         mustChangePassword:
           type: boolean
-        name:
+        firstName:
+          type: string
+        middleName:
+          type: string
+        lastName:
           type: string
         newPassword:
           type: string

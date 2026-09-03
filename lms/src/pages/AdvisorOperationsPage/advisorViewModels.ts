@@ -31,7 +31,7 @@ export const contractItems = (value: unknown): unknown[] => {
 };
 
 export interface AdvisorDashboardView {
-  stats: Array<{key: string; label: string; value: number}>;
+  stats: Array<{key: string; label: string; value?: number}>;
   urgentTasks: unknown[];
 }
 
@@ -50,7 +50,7 @@ export const advisorDashboardView = (value: unknown): AdvisorDashboardView => {
     stats: DASHBOARD_STATS.map(([key, label]) => ({
       key,
       label,
-      value: readNumber(record, key) ?? 0,
+      value: readNumber(record, key),
     })),
     urgentTasks: contractItems(record.urgentTasks),
   };

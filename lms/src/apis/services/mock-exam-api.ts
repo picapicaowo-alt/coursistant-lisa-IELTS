@@ -1,3 +1,5 @@
+import type {AdvisingPage} from '@/apis/types/advising';
+import type {StudentMockExamSummaryDto, InstructorWritingGradeQueueItem, WritingGradeDto} from '@/apis/types/mockExamReadModels';
 import type {
   ApiResponse,
   CreateMockExamListeningRequest,
@@ -47,11 +49,11 @@ export class MockExamApiService {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/mock-exams/${studentMockExamId}`);
   }
 
-  listInstructorWritingGrades(): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get('/v2/instructor/mock-exams/writing-grades');
+  listInstructorWritingGrades(params: {page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<InstructorWritingGradeQueueItem>>> {
+    return this.apiClient.get('/v2/instructor/mock-exams/writing-grades', {params});
   }
 
-  getInstructorWritingGrade(gradeId: number): Promise<ApiResponse<MockExamRead>> {
+  getInstructorWritingGrade(gradeId: number): Promise<ApiResponse<WritingGradeDto>> {
     return this.apiClient.get(`/v2/instructor/mock-exams/writing-grades/${gradeId}`);
   }
 
@@ -67,8 +69,8 @@ export class MockExamApiService {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/mock-exams/${studentMockExamId}`);
   }
 
-  listStudentExams(): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get('/v2/student/mock-exams');
+  listStudentExams(params: {page?: number; size?: number; status?: string} = {}): Promise<ApiResponse<AdvisingPage<StudentMockExamSummaryDto>>> {
+    return this.apiClient.get('/v2/student/mock-exams', {params});
   }
 
   getStudentExam(studentMockExamId: number): Promise<ApiResponse<StudentMockExamDetail>> {

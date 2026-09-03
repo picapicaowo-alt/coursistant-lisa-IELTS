@@ -1,5 +1,6 @@
+import {isHttpStatus} from '@/utils/apiError';
 import {useQuery} from '@tanstack/react-query';
-import type {MyCourse} from '@/apis';
+import type {MyCourse, StudentCourseView} from '@/apis';
 import {unwrapData} from '@/apis';
 import {dashboardApiService, DASHBOARD_LIMITS} from '@/apis/services/dashboard-api';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
@@ -16,10 +17,10 @@ export const myCoursesQueryKey = (userId: number) => ['my-courses', userId] as c
  * parallel, keeping course cards and course-level permission checks on one
  * shared React Query cache entry.
  */
-const loadMyCourses = async (): Promise<MyCourse[]> => {
+const loadMyCourses = async (courseView?: StudentCourseView): Promise<MyCourse[]> => {
   const pageSize = DASHBOARD_LIMITS.coursePageSize.max;
   const firstPage = unwrapData(
-    await dashboardApiService.getMyCourses({page: 0, size: pageSize}),
+    await dashboardApiService.getMyCourses({page: 0, size: pageSize, courseView}),
     'getMyCourses page 0'
   );
 
@@ -34,7 +35,7 @@ const loadMyCourses = async (): Promise<MyCourse[]> => {
     Array.from({length: pageCount - 1}, async (_, index) => {
       const page = index + 1;
       const response = unwrapData(
-        await dashboardApiService.getMyCourses({page, size: pageSize}),
+        await dashboardApiService.getMyCourses({page, size: pageSize, courseView}),
         `getMyCourses page ${page}`
       );
       if (!Array.isArray(response.items)) {
@@ -47,17 +48,17 @@ const loadMyCourses = async (): Promise<MyCourse[]> => {
   return [firstPage.items, ...remainingPages].flat();
 };
 
-export const useMyCourses = () => {
+export const useMyCourses = (courseView?: StudentCourseView) => {
   const {user} = useRequiredAuth();
   const isUserAccount = user.role === 'USER';
 
   return useQuery({
-    queryKey: myCoursesQueryKey(user.id),
-    queryFn: loadMyCourses,
+    queryKey: [...myCoursesQueryKey(user.id), 'enrollments', courseView ?? 'all'],
+    queryFn: () => loadMyCourses(courseView),
     enabled: isUserAccount,
     staleTime: FIVE_MINUTES,
     gcTime: FIVE_MINUTES,
-    retry: 2,
+    retry: (attempt, error) => attempt < 2 && !isHttpStatus(error, 403) && !isHttpStatus(error, 404),
     retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 };

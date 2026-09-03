@@ -34,7 +34,8 @@ async function fixture(page: Page, level: string, role = 'USER') {
     else if (path.endsWith('/me/courses')) data = {items: courses, page: 0, size: 100, total: courses.length};
     else if (path.endsWith('/profile')) data = {studentUserId: 301, profileVersion: 1, targetGoal: 'Reach IELTS 6.5', skills: []};
     else if (path.endsWith('/study-plan')) data = {studentUserId: 301, profileContext: {currentProfileVersion: 1}, plan: {studyPlanId: 81, studyPlanVersion: 1, basedOnProfileVersion: 1, strategySummary: 'Weekly practice and review', checkpoints: []}};
-    else if (path === '/v2/student/mock-exams') data = [{studentMockExamId: 71, title: 'September Academic Practice', status: 'Assigned', listeningSelected: true, readingSelected: true}, {studentMockExamId: 72, title: 'Writing Skills Review', status: 'Completed', writingSelected: true}];
+    else if (path === '/v2/student/mock-exams') { const items = [{id: 71, title: 'September Academic Practice', status: 'READY', listeningSelected: true, readingSelected: true}, {id: 72, title: 'Writing Skills Review', status: 'COMPLETED', writingSelected: true}].filter(item => !url.searchParams.get('status') || item.status === url.searchParams.get('status')); data = {items, page: 0, size: 20, total: items.length}; }
+    if (['/v2/me/teaching/grading-items', '/v2/me/teaching/schedule-requests'].includes(path)) data = {items: [], page: 0, size: 20, total: 0};
     return route.fulfill({json: envelope(data)});
   });
   return writes;
@@ -96,7 +97,7 @@ test('exam filters use supplied sections and states', async ({page}) => {
   await page.getByRole('button', {name: 'Writing', exact: true}).click();
   await expect(page.getByRole('heading', {name: 'Writing Skills Review'})).toBeVisible();
   await expect(page.getByRole('heading', {name: 'September Academic Practice'})).toHaveCount(0);
-  await page.getByRole('combobox', {name: 'Exam status'}).selectOption('Assigned');
+  await page.getByRole('combobox', {name: 'Exam status'}).selectOption('READY');
   await expect(page.getByText('No papers match these filters.')).toBeVisible();
 });
 

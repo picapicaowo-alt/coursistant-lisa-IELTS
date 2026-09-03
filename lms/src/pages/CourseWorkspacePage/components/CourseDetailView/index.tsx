@@ -1,3 +1,4 @@
+import {formatCourseInstructor} from '@/utils/personName';
 import React, {useState} from "react";
 import {useSearchParams} from 'react-router-dom';
 import {MaterialReader} from './MaterialReader';
@@ -61,7 +62,7 @@ export const CourseDetailView: React.FC<CourseDetailViewProps> = ({canCreateAssi
     <div className={styles.learningWorkspace}>
       <header className={styles.learningHeader}>
         <div><h1 className={styles.courseTitle}>{course.title || course.name || course.courseCode}</h1>{course.description ? <p className={styles.description}>{course.description}</p> : null}
-          <div className={styles.courseContext}><div><span>Course code</span><strong>{course.courseCode}</strong></div>{canViewOwnGrades ? <AssignmentProgress progress={studentProgress.data?.courses?.find(item => item.courseId === course.id)} loading={studentProgress.isFetching} failed={studentProgress.isError}/> : null}<div><span>Instructor</span><strong>{course.primaryInstructor?.name || 'Not assigned'}</strong></div><div><span>Term</span><strong>{course.termStartDate} – {course.termEndDate}</strong></div><div><span>Course status</span><strong>{course.state}</strong></div></div>
+          <div className={styles.courseContext}><div><span>Course code</span><strong>{course.courseCode}</strong></div>{canViewOwnGrades ? <AssignmentProgress progress={studentProgress.data?.courses?.find(item => item.courseId === course.id)} loading={studentProgress.isFetching} failed={studentProgress.isError}/> : null}<div><span>Instructor</span><strong>{formatCourseInstructor(course.primaryInstructor) || 'Not assigned'}</strong></div><div><span>Term</span><strong>{course.termStartDate} – {course.termEndDate}</strong></div><div><span>Course status</span><strong>{course.state}</strong></div></div>
         </div>
         <section className={styles.currentLesson} aria-label="Selected course content"><img src="/icons/figma-dashboard/study-plan.svg" alt=""/><div><span>Course content</span><h2>{activeWeek?.title || 'No content published yet'}</h2><p>{activeWeek?.materials.length ?? 0} learning materials</p></div>{activeWeek ? <a href={`#week-${activeWeek.id}`} className={styles.addButton} onClick={() => {setActiveTab('courses'); setActiveWeekId(activeWeek.id);}}>Open learning materials</a> : null}</section>
       </header>
