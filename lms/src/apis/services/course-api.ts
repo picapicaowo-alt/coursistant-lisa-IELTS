@@ -70,8 +70,8 @@ export class CourseApiService {
     return this.apiClient.post(`/v2/courses/${courseId}/sessions`, request, idempotent(key));
   }
 
-  async updateCourseSession(courseId: number, sessionId: number, request: CourseSessionPayload): Promise<ApiResponse<CourseSession>> {
-    return this.apiClient.put(`/v2/courses/${courseId}/sessions/${sessionId}`, request, idempotent());
+  async updateCourseSession(courseId: number, sessionId: number, request: CourseSessionPayload, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseSession>> {
+    return this.apiClient.put(`/v2/courses/${courseId}/sessions/${sessionId}`, request, idempotent(key));
   }
 
   async deleteCourseSession(courseId: number, sessionId: number): Promise<ApiResponse<void>> {
