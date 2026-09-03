@@ -221,7 +221,11 @@ export interface CourseMember {
   id: number;
   courseId: number;
   userId: number;
-  userName: string | null;
+  userFirstName?: string | null;
+  userMiddleName?: string | null;
+  userLastName?: string | null;
+  /** Display-only fallback for member responses from before structured names. */
+  userName?: string | null;
   userEmail: string | null;
   courseRole: CourseRole;
   canGrade?: boolean;

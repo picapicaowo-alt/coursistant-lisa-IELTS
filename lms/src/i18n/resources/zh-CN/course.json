@@ -35,6 +35,7 @@
     },
     "detail": {
         "backToDashboard": "返回首页",
+        "backToCourses": "返回课程列表",
         "students": "学生",
         "teacher": "教师",
         "assignments": "作业",
