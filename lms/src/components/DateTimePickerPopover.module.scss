@@ -1,5 +1,8 @@
 .popover {
   position: fixed;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   z-index: 20000;
   width: min(21.25rem, calc(100vw - #{t.$space-6}));
   padding: t.$space-4;
@@ -169,6 +172,10 @@
 }
 
 .footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 1;
+  background: t.$surface-raised;
   display: flex;
   justify-content: space-between;
   gap: t.$space-3;

@@ -1,5 +1,7 @@
 import type {
   ApiResponse,
+  AdvisingPage,
+  ScheduleRequestResponse,
   CourseOperationRead,
   CourseOwnershipListParams,
   CourseStudentReportListParams,
@@ -64,8 +66,8 @@ export class CourseOperationsApiService {
     return this.apiClient.put(`/v2/tenant/courses/${courseId}/owner`, request);
   }
 
-  listAdvisorScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> {
-    return this.apiClient.get('/v2/advisor/schedule-requests');
+  listAdvisorScheduleRequests(params: {requestType?: string; studentUserId?: number; page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<ScheduleRequestResponse>>> {
+    return this.apiClient.get('/v2/advisor/schedule-requests', {params});
   }
 
   decideAdvisorScheduleRequest(requestId: number, request: ScheduleRequestDecisionRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseOperationRead>> {
@@ -187,8 +189,8 @@ export class CourseOperationsApiService {
     return this.apiClient.post(`/v2/courses/${courseId}/session-occurrences/${occurrenceId}/reschedule`, request, idempotent(key));
   }
 
-  listCourseScheduleRequests(courseId: number, occurrenceId: number, page = 0, size = 20): Promise<ApiResponse<CourseOperationRead>> {
-    return this.apiClient.get(`/v2/courses/${courseId}/session-occurrences/${occurrenceId}/schedule-requests`, {params: {page, size}});
+  listCourseScheduleRequests(courseId: number, occurrenceId: number): Promise<ApiResponse<CourseOperationRead>> {
+    return this.apiClient.get(`/v2/courses/${courseId}/session-occurrences/${occurrenceId}/schedule-requests`);
   }
 
   createCourseScheduleRequest(courseId: number, occurrenceId: number, request: CreateScheduleRequestRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseOperationRead>> {
@@ -231,7 +233,7 @@ export class CourseOperationsApiService {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/courses/${courseId}/session-occurrences/${occurrenceId}/attendance`);
   }
 
-  listAdvisorPublishedCourseReports(studentUserId: number, courseId: number, page = 0, size = 20): Promise<ApiResponse<CourseOperationRead>> {
+  listAdvisorPublishedCourseReports(studentUserId: number, courseId: number, page = 1, size = 20): Promise<ApiResponse<CourseOperationRead>> {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/courses/${courseId}/student-reports`, {params: {page, size}});
   }
 

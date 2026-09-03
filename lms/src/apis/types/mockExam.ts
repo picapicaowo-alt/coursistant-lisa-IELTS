@@ -160,11 +160,12 @@ export type MockExamMediaKind = 'LISTENING_AUDIO' | 'READING_IMAGE' | 'WRITING_I
 export interface MockExamMediaRead {
   mediaId: number;
   kind: MockExamMediaKind;
-  originalFilename?: string;
+  fileName?: string;
   contentType?: string;
   sizeBytes?: number;
   status?: string;
-  createdAt?: string;
+  sha256?: string;
+  previewUrl?: string;
 }
 
 /** Response payloads remain generic where the supplied OpenAPI has no schema. */

@@ -1,3 +1,4 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
 import React from 'react';
 import {useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
@@ -22,16 +23,16 @@ const TenantStudentRecordPage: React.FC = () => {
   });
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Tenant admin</p>
+
           <h1>{formatPersonName(user.data, `Student #${id}`)}</h1>
           <p className={styles.lede}>Account identity and Parent links for this tenant.</p>
         </div>
       </header>
-      <section className={styles.card}>
-        <h2>Account</h2>
+      <CollapsibleSection title="Account" className={styles.disclosureLayout}>
+
         {user.isPending ? <p className={styles.status}>Loading account…</p> : null}
         {user.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(user.error, 'Account could not be loaded.')}</p> : null}
         {user.isSuccess && !user.data ? <p className={styles.error} role="alert">The directory returned an unsupported account payload.</p> : null}
@@ -40,9 +41,9 @@ const TenantStudentRecordPage: React.FC = () => {
           <dt>Identity</dt><dd>{user.data.role} / {user.data.level}</dd>
           <dt>Status</dt><dd>{user.data.status}</dd>
         </dl> : null}
-      </section>
+      </CollapsibleSection>
       <ParentLinksPanel scope="tenant" subjectId={id}/>
-    </main>
+    </div>
   );
 };
 

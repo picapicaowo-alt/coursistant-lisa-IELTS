@@ -21,10 +21,10 @@ const CounsellorIntakesPage: React.FC = () => {
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Counsellor</p>
+
           <h1>Unassigned intakes</h1>
           <p className={styles.lede}>Only OPEN intakes you created in this tenant, before the first advisor assignment.</p>
         </div>
@@ -57,7 +57,7 @@ const CounsellorIntakesPage: React.FC = () => {
           </nav>
         ) : null}
       </div>
-    </main>
+    </div>
   );
 };
 

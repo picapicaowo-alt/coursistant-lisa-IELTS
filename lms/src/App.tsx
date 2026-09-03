@@ -1,3 +1,5 @@
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {ASSIGNMENT_GRADING_ROUTE} from '@/configs/coursePaths';
 import {Suspense, lazy} from "react";
 import {BrowserRouter as Router, Navigate, Routes, Route} from "react-router-dom";
 import {AuthProvider} from "./contexts/AuthContext";
@@ -79,7 +81,7 @@ const App = () => {
       <Router>
         <Suspense fallback={<div role="status">Loading…</div>}>
           <Routes>
-            <Route path="/login"
+            <Route path={APP_ROUTE_PATHS.login}
                    element={
                      <AuthLayout>
                        <Login/>
@@ -87,7 +89,7 @@ const App = () => {
                    }
             />
 
-            <Route path="/signup"
+            <Route path={APP_ROUTE_PATHS.signup}
                    element={
                      <AuthLayout>
                        <Signup/>
@@ -95,7 +97,7 @@ const App = () => {
                    }
             />
 
-            <Route path="/forgotpassword"
+            <Route path={APP_ROUTE_PATHS.forgotpassword}
                    element={
                      <AuthLayout>
                        <ForgotPassword/>
@@ -104,7 +106,7 @@ const App = () => {
             />
 
             <Route
-              path="/mock-exams/:studentMockExamId/:section"
+              path={APP_ROUTE_PATHS.mockExamsStudentMockExamIdSection}
               element={
                 <RequiredAuthProvider>
                   <RequireRoleAccess capability="mockExamSession">
@@ -114,67 +116,67 @@ const App = () => {
               }
             />
 
-            <Route path="/" element={<RequiredAuthProvider><Layout/></RequiredAuthProvider>}>
+            <Route path={APP_ROUTE_PATHS.home} element={<RequiredAuthProvider><Layout/></RequiredAuthProvider>}>
               <Route index element={<SignedInHome/>}/>
               <Route element={<RequireRoleAccess capability="courses"/>}>
-                <Route path="course" element={<CourseCataloguePage/>}/>
-                <Route path="course/:courseId" element={<CourseWorkspacePage/>}/>
-                <Route path="course/:courseId/operations" element={<CourseOperationsPage/>}/>
-                <Route path="course/:courseId/assignments/:assignmentId" element={<AssignmentDetailPage/>}/>
-                <Route path="course/:courseId/assignments/new" element={<AssignmentEditorPage/>}/>
-                <Route path="course/:courseId/assignments/:assignmentId/edit" element={<AssignmentEditorPage/>}/>
-                <Route path="course/:courseId/assignments/:assignmentId/grading" element={<AssignmentGradingPage/>}/>
-                <Route path="course/:courseId/assignments/:assignmentId/submissions/:submissionId" element={<AssignmentSubmissionPage/>}/>
-                <Route path="course/:courseId/announcements/:subjectId" element={<NotificationSubjectPage kind="announcement"/>}/>
-                <Route path="course/:courseId/announcements" element={<CourseAnnouncementsPage/>}/>
-                <Route path="course/:courseId/events" element={<CourseEventsPage/>}/>
-                <Route path="course/:courseId/events/:eventId" element={<CourseEventsPage/>}/>
-                <Route path="course/:courseId/schedule" element={<CourseSchedulePage/>}/>
-                <Route path="course/:courseId/groups" element={<CourseGroupsPage/>}/>
-                <Route path="course/:courseId/group-sets/:groupSetId" element={<GroupSetDetailPage/>}/>
-                <Route path="course/:courseId/weeks/:subjectId" element={<NotificationSubjectPage kind="week"/>}/>
-                <Route path="course/:courseId/quizzes/new" element={<QuizEditorPage/>}/>
-                <Route path="course/:courseId/quizzes/:quizId" element={<QuizPage/>}/>
-                <Route path="course/:courseId/quizzes/:quizId/edit" element={<QuizEditorPage/>}/>
-                <Route path="course/:courseId/quizzes/:quizId/grading" element={<QuizGradingPage/>}/>
-                <Route path="course/:courseId/grades" element={<CourseGradesPage/>}/>
-                <Route path="course/add-content" element={<RequireRoleAccess capability="courseCreation"><CourseCreatePage/></RequireRoleAccess>}/>
+                <Route path={APP_ROUTE_PATHS.course} element={<CourseCataloguePage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseId} element={<CourseWorkspacePage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdOperations} element={<CourseOperationsPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdAssignmentsAssignmentId} element={<AssignmentDetailPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdAssignmentsNew} element={<AssignmentEditorPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdAssignmentsAssignmentIdEdit} element={<AssignmentEditorPage/>}/>
+                <Route path={ASSIGNMENT_GRADING_ROUTE} element={<AssignmentGradingPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdAssignmentsAssignmentIdSubmissionsSubmissionId} element={<AssignmentSubmissionPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdAnnouncementsSubjectId} element={<NotificationSubjectPage kind="announcement"/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdAnnouncements} element={<CourseAnnouncementsPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdEvents} element={<CourseEventsPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdEventsEventId} element={<CourseEventsPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdSchedule} element={<CourseSchedulePage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdGroups} element={<CourseGroupsPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdGroupSetsGroupSetId} element={<GroupSetDetailPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdWeeksSubjectId} element={<NotificationSubjectPage kind="week"/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdQuizzesNew} element={<QuizEditorPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdQuizzesQuizId} element={<QuizPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdQuizzesQuizIdEdit} element={<QuizEditorPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdQuizzesQuizIdGrading} element={<QuizGradingPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseCourseIdGrades} element={<CourseGradesPage/>}/>
+                <Route path={APP_ROUTE_PATHS.courseAddContent} element={<RequireRoleAccess capability="courseCreation"><CourseCreatePage/></RequireRoleAccess>}/>
               </Route>
-              <Route path="calendar" element={<RequireRoleAccess capability="calendar"><CalendarPage/></RequireRoleAccess>}/>
-              <Route path="my-operations" element={<RequireRoleAccess capability="myOperations"><MyOperationsPage/></RequireRoleAccess>}/>
-              <Route path="post" element={<RequireRoleAccess capability="courses"><Post/></RequireRoleAccess>}/>
-              <Route path="post/:postId" element={<RequireRoleAccess capability="courses"><PostDetail/></RequireRoleAccess>}/>
-              <Route path="roster" element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
-              <Route path="roster/:courseId" element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
-              <Route path="profile" element={<RequireRoleAccess capability="selfProfile"><Profile/></RequireRoleAccess>}/>
-              <Route path="create/:contentType" element={<RequireRoleAccess capability="courseAuthoring"><CreateContent/></RequireRoleAccess>}/>
-              <Route path="aibot" element={<RequireRoleAccess capability="aiWorkspace"><AIBot/></RequireRoleAccess>}/>
-              <Route path="settings" element={<Settings/>}/>
-              <Route path="admin" element={<RequireRoleAccess capability="adminConsole"><AdminLandingPage/></RequireRoleAccess>}/>
-              <Route path="counsellor" element={<RequireAdvisingAccess gate="counsellor"><CounsellorDashboardPage/></RequireAdvisingAccess>}/>
-              <Route path="counsellor/intakes" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakesPage/></RequireAdvisingAccess>}/>
-              <Route path="counsellor/intakes/new" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>
-              <Route path="counsellor/intakes/:intakeId" element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>
-              <Route path="counsellor/intakes/:intakeId/assign" element={<RequireAdvisingAccess gate="counsellor"><CounsellorAssignAdvisorPage/></RequireAdvisingAccess>}/>
-              <Route path="advisor/students" element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentsPage/></RequireAdvisingAccess>}/>
-              <Route path="advisor/operations" element={<RequireAdvisingAccess gate="advisor"><AdvisorOperationsPage/></RequireAdvisingAccess>}/>
-              <Route path="advisor/students/:studentUserId" element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentLayout/></RequireAdvisingAccess>}>
+              <Route path={APP_ROUTE_PATHS.calendar} element={<RequireRoleAccess capability="calendar"><CalendarPage/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.myOperations} element={<RequireRoleAccess capability="myOperations"><MyOperationsPage/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.post} element={<RequireRoleAccess capability="courses"><Post/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.postPostId} element={<RequireRoleAccess capability="courses"><PostDetail/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.roster} element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.rosterCourseId} element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.profile} element={<RequireRoleAccess capability="selfProfile"><Profile/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.createContentType} element={<RequireRoleAccess capability="courseAuthoring"><CreateContent/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.aibot} element={<RequireRoleAccess capability="aiWorkspace"><AIBot/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.settings} element={<Settings/>}/>
+              <Route path={APP_ROUTE_PATHS.admin} element={<RequireRoleAccess capability="adminConsole"><AdminLandingPage/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.counsellor} element={<RequireAdvisingAccess gate="counsellor"><CounsellorDashboardPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.counsellorIntakes} element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakesPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.counsellorIntakesNew} element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.counsellorIntakesIntakeId} element={<RequireAdvisingAccess gate="counsellor"><CounsellorIntakeFormPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.counsellorIntakesIntakeIdAssign} element={<RequireAdvisingAccess gate="counsellor"><CounsellorAssignAdvisorPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.advisorStudents} element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentsPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.advisorOperations} element={<RequireAdvisingAccess gate="advisor"><AdvisorOperationsPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserId} element={<RequireAdvisingAccess gate="advisor"><AdvisorStudentLayout/></RequireAdvisingAccess>}>
                 <Route index element={<Navigate to="intake" replace/>}/>
-                <Route path="intake" element={<AdvisorStudentIntakePage/>}/>
-                <Route path="profile" element={<AdvisorStudentProfilePage/>}/>
-                <Route path="study-plan" element={<AdvisorStudentStudyPlanPage/>}/>
-                <Route path="courses" element={<AdvisorStudentCoursesPage/>}/>
-                <Route path="support" element={<AdvisorStudentSupportPage/>}/>
+                <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdIntake} element={<AdvisorStudentIntakePage/>}/>
+                <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdProfile} element={<AdvisorStudentProfilePage/>}/>
+                <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdStudyPlan} element={<AdvisorStudentStudyPlanPage/>}/>
+                <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdCourses} element={<AdvisorStudentCoursesPage/>}/>
+                <Route path={APP_ROUTE_PATHS.advisorStudentsStudentUserIdSupport} element={<AdvisorStudentSupportPage/>}/>
               </Route>
-              <Route path="my-plan" element={<RequireAdvisingAccess gate="student"><StudentAdvisingPage/></RequireAdvisingAccess>}/>
-              <Route path="parent" element={<RequireAdvisingAccess gate="parent"><ParentPortalPage/></RequireAdvisingAccess>}/>
-              <Route path="mock-exams" element={<RequireRoleAccess capability="mockExams"><MockExamsPage/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.myPlan} element={<RequireAdvisingAccess gate="student"><StudentAdvisingPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.parent} element={<RequireAdvisingAccess gate="parent"><ParentPortalPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.mockExams} element={<RequireRoleAccess capability="mockExams"><MockExamsPage/></RequireRoleAccess>}/>
               <Route path={VOCABULARY_ROUTE_PATTERNS.root} element={<RequireVocabularyStudent><VocabularyPage/></RequireVocabularyStudent>}/>
               <Route path={VOCABULARY_ROUTE_PATTERNS.list} element={<RequireVocabularyStudent><VocabularyListPage/></RequireVocabularyStudent>}/>
               <Route path={VOCABULARY_ROUTE_PATTERNS.session} element={<RequireVocabularyStudent><VocabularySessionPage/></RequireVocabularyStudent>}/>
-              <Route path="admin/intakes" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantIntakesPage/></RequireAdvisingAccess>}/>
-              <Route path="admin/students/:studentUserId" element={<RequireAdvisingAccess gate="tenantAdmin"><TenantStudentRecordPage/></RequireAdvisingAccess>}/>
-              <Route path="advisor/courses/:courseId/delivery" element={<RequireAdvisingAccess gate="advisor"><AdvisorCourseDeliveryPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.adminIntakes} element={<RequireAdvisingAccess gate="tenantAdmin"><TenantIntakesPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.adminStudentsStudentUserId} element={<RequireAdvisingAccess gate="tenantAdmin"><TenantStudentRecordPage/></RequireAdvisingAccess>}/>
+              <Route path={APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery} element={<RequireAdvisingAccess gate="advisor"><AdvisorCourseDeliveryPage/></RequireAdvisingAccess>}/>
               <Route path="*" element={<NotFoundPage/>}/>
             </Route>
             <Route

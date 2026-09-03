@@ -1,5 +1,8 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
 import React, {useState} from 'react';
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
+import {sendStableMessage} from '@/utils/sendStableMessage';
 import {unwrapData} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/downloadBlob';
@@ -9,10 +12,10 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import {advisorConversationMessageViews} from '../AdvisorOperationsPage/advisorViewModels';
 import styles from '../advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
-import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
 
 const StudentAdvisingPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const idempotency = useIdempotencyCheckpoint();
   const [taskSubmissions, setTaskSubmissions] = useState<Record<number, string>>({});
   const [message, setMessage] = useState('');
   const [messageFiles, setMessageFiles] = useState<File[]>([]);
@@ -27,24 +30,29 @@ const StudentAdvisingPage: React.FC = () => {
     queryFn: async () => unwrapData(await advisorApiService.getOwnStudyPlan(), 'studentStudyPlan'),
     retry: false,
   });
-  const conversation = useQuery({
+  const conversation = useInfiniteQuery({
     queryKey: ['student', 'advisor-conversation'],
-    queryFn: async () => unwrapData(await advisorApiService.listOwnConversationMessages(), 'studentAdvisorConversation'),
+    queryFn: async ({pageParam}) => advisorConversationMessageViews(unwrapData(await advisorApiService.listOwnConversationMessages(pageParam), 'studentAdvisorConversation')),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: lastPage => {
+      const ids = lastPage.flatMap(item => item.messageId == null ? [] : [item.messageId]);
+      return ids.length ? Math.min(...ids) : undefined;
+    },
     retry: false,
   });
   const taskMutation = useMutation({
     mutationFn: ({action, taskId, version}: {action: 'start' | 'complete'; taskId: number; version?: number}) =>
       action === 'start'
-        ? advisorApiService.startOwnAdvisorTask(taskId, {expectedVersion: version})
-        : advisorApiService.completeOwnAdvisorTask(taskId, {expectedVersion: version, submissionText: taskSubmissions[taskId] || undefined}),
+        ? idempotency.run('student-start-task', [taskId, {expectedVersion: version}] satisfies Parameters<typeof advisorApiService.startOwnAdvisorTask>, (key, args) => advisorApiService.startOwnAdvisorTask(...args, key))
+        : idempotency.run('student-complete-task', [taskId, {expectedVersion: version, submissionText: taskSubmissions[taskId] || undefined}] satisfies Parameters<typeof advisorApiService.completeOwnAdvisorTask>, (key, args) => advisorApiService.completeOwnAdvisorTask(...args, key)),
     onSuccess: async () => queryClient.invalidateQueries({queryKey: advisingQueryKeys.studentStudyPlan}),
   });
   const messageMutation = useMutation({
     mutationFn: () => {
-      const clientMessageId = crypto.randomUUID();
-      return messageFiles.length > 0
-        ? advisorApiService.sendOwnConversationMessageMultipart({clientMessageId, body: message.trim() || undefined, files: messageFiles})
-        : advisorApiService.sendOwnConversationMessage({clientMessageId, body: message.trim()});
+      if (messageFiles.some(file => file.type.startsWith('audio/'))) throw new Error('Audio attachments are not supported.');
+      return sendStableMessage(idempotency, 'student-advisor', {body: message.trim(), files: messageFiles}, (draft, key) => draft.files.length
+        ? advisorApiService.sendOwnConversationMessageMultipart(draft, key)
+        : advisorApiService.sendOwnConversationMessage({clientMessageId: draft.clientMessageId, body: draft.body}, key));
     },
     onSuccess: async () => {
       setMessage('');
@@ -66,41 +74,39 @@ const StudentAdvisingPage: React.FC = () => {
       throw error;
     }
   };
-  const conversationRows = advisorConversationMessageViews(conversation.data);
+  const conversationRows = conversation.data?.pages.flat() ?? [];
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <div>
           <h1>My advising record</h1>
           <p className={styles.lede}>Review the profile and plan maintained by your Advisor, complete assigned tasks, and keep the conversation in one place.</p>
         </div>
       </header>
-      <section className={styles.card}>
-        <WorkspaceSectionHeader title="Learning profile" description="Your current goal and the skills being measured." meta={<span className={styles.readOnlyBadge}>Read only</span>}/>
+      <CollapsibleSection title="Learning profile" className={styles.disclosureLayout} summary="Your current goal and the skills being measured." meta={<span className={styles.readOnlyBadge}>Read only</span>}>
+
         {profile.isPending ? <p className={styles.status}>Loading profile…</p> : null}
         {profile.isError && isNotFound(profile.error) ? <p className={styles.status}>Your advisor has not created a profile yet.</p> : null}
         {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')}</p> : null}
         {profile.data ? (
           <>
-            <dl className={styles.summaryGrid}>
+            <CollapsibleSection title="Primary target" headingLevel={3} summary={profile.data.targetGoal || 'Goal and target date'}><dl className={styles.summaryGrid}>
               <div className={styles.summaryItem}><dt>Name</dt><dd>{formatPersonName(profile.data, '—')}</dd></div>
               <div className={styles.summaryItem}><dt>Primary target</dt><dd>{[profile.data.targetMetric, profile.data.targetValue, profile.data.targetDate].filter(Boolean).join(' · ') || '—'}</dd></div>
               <div className={`${styles.summaryItem} ${styles.spanTwo}`}><dt>Goal</dt><dd>{profile.data.targetGoal || '—'}</dd></div>
-            </dl>
-            {(profile.data.skills ?? []).length > 0 ? <div className={styles.skillSummary}>{(profile.data.skills ?? []).map(skill => (
-              <article className={styles.skillCard} key={skill.skillCode}>
-                <h3>{skill.displayName || skill.skillCode || 'Measured skill'}</h3>
+            </dl></CollapsibleSection>
+            {(profile.data.skills ?? []).length > 0 ? <CollapsibleSection title="Measured skills" headingLevel={3} count={profile.data.skills?.length}><div className={styles.skillSummary}>{(profile.data.skills ?? []).map(skill => (
+              <CollapsibleSection title={skill.displayName || skill.skillCode || 'Measured skill'} headingLevel={4} key={skill.skillCode} summary={skill.scale}>
                 <div className={styles.metaRow}><span>{skill.scale || 'Scale not specified'}</span><span>Current {skill.currentValue || '—'}</span><span>Target {skill.targetValue || '—'}</span></div>
                 {skill.gapSummary ? <p>{skill.gapSummary}</p> : null}
-              </article>
-            ))}</div> : null}
+              </CollapsibleSection>
+            ))}</div></CollapsibleSection> : null}
           </>
         ) : null}
-        {'advisorPrivateNotes' in (profile.data ?? {}) ? <p className={styles.error}>Private notes leaked into the student view.</p> : null}
-      </section>
-      <section className={styles.card}>
-        <WorkspaceSectionHeader title="Study plan" description="Follow the plan one checkpoint at a time. Tasks can be started and completed here." meta={plan.data ? <span className={styles.versionBadge}>Version {plan.data.plan.studyPlanVersion}</span> : undefined}/>
+      </CollapsibleSection>
+      <CollapsibleSection title="Study plan" className={styles.disclosureLayout} summary="Follow the plan one checkpoint at a time. Tasks can be started and completed here." meta={plan.data ? <span className={styles.versionBadge}>Version {plan.data.plan.studyPlanVersion}</span> : undefined}>
+
         {plan.isPending ? <p className={styles.status}>Loading study plan…</p> : null}
         {plan.isError && isNotFound(plan.error) ? <p className={styles.status}>Your advisor has not created a study plan yet.</p> : null}
         {plan.isError && !isNotFound(plan.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, 'Study plan could not be loaded.')}</p> : null}
@@ -108,12 +114,10 @@ const StudentAdvisingPage: React.FC = () => {
           <div className={styles.checkpointList}>
             <div className={styles.summaryItem}><strong>{plan.data.plan.strategySummary}</strong><span className={styles.muted}>{plan.data.plan.startDate} – {plan.data.plan.planEndDate}</span></div>
             {(plan.data.plan.checkpoints ?? []).map((checkpoint, checkpointIndex) => (
-              <article key={checkpoint.id ?? checkpoint.position} className={styles.checkpointCard}>
-                <div className={styles.recordTitle}><h3>Checkpoint {checkpointIndex + 1}: {checkpoint.description}</h3><p>{checkpoint.goal}</p></div>
+              <CollapsibleSection key={checkpoint.id ?? checkpoint.position} title={`Checkpoint ${checkpointIndex + 1}: ${checkpoint.description}`} headingLevel={3} summary={checkpoint.goal}>
                 <div className={styles.metaRow}><span>Due {checkpoint.dueDate || 'date not set'}</span><span>{(checkpoint.tasks ?? []).length} task{(checkpoint.tasks ?? []).length === 1 ? '' : 's'}</span></div>
                 <div className={styles.taskList}>{(checkpoint.tasks ?? []).map(task => (
-                  <div key={task.id ?? task.position} className={styles.taskCard}>
-                    <div className={styles.rowTitle}><h4>{task.title || 'Advisor task'}</h4><span className={styles.taskStatus}>{(task.status || 'NOT_STARTED').replace(/_/g, ' ').toLowerCase()}</span></div>
+                  <CollapsibleSection key={task.id ?? task.position} title={task.title || 'Advisor task'} headingLevel={4} summary={(task.status || 'NOT_STARTED').replace(/_/g, ' ').toLowerCase()}>
                     {task.description ? <p>{task.description}</p> : null}
                     {task.dueDate ? <div className={styles.metaRow}><span>Due {task.dueDate}</span></div> : null}
                     {task.id != null && task.status !== 'COMPLETED' ? (
@@ -129,16 +133,16 @@ const StudentAdvisingPage: React.FC = () => {
                       </>
                     ) : null}
                     {task.advisorFeedback ? <p><strong>Advisor feedback:</strong> {task.advisorFeedback}</p> : null}
-                  </div>
+                  </CollapsibleSection>
                 ))}</div>
-              </article>
+              </CollapsibleSection>
             ))}
           </div>
         ) : null}
-      </section>
+      </CollapsibleSection>
       {taskMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskMutation.error, 'The task could not be updated.')}</p> : null}
-      <section className={styles.card}>
-        <WorkspaceSectionHeader title="Advisor conversation" description="Ask questions, share context, or attach supporting files." meta={<span className={styles.countBadge}>{conversationRows.length}</span>}/>
+      <CollapsibleSection title="Advisor conversation" className={styles.disclosureLayout} summary="Ask questions, share context, or attach supporting files." meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
+
         {messageMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(messageMutation.error, 'Message could not be sent.')}</p> : null}
         {conversation.isPending ? <p className={styles.status}>Loading messages…</p> : null}
         {conversation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(conversation.error, 'Messages could not be loaded.')}</p> : null}
@@ -152,14 +156,15 @@ const StudentAdvisingPage: React.FC = () => {
           </div>)}</div> : null}
           {item.messageId != null ? <button type="button" className={styles.textButton} disabled={markReadMutation.isPending} onClick={() => markReadMutation.mutate(item.messageId!)}>Mark read through this message</button> : null}
         </article>)}</div>
+        {conversation.hasNextPage ? <button type="button" className={styles.secondary} disabled={conversation.isFetchingNextPage} onClick={() => void conversation.fetchNextPage()}>Load older messages</button> : null}
         <form className={styles.composeBox} onSubmit={event => { event.preventDefault(); messageMutation.mutate(); }}>
           <label htmlFor="student-advisor-message">Message</label><textarea id="student-advisor-message" value={message} onChange={event => setMessage(event.target.value)} placeholder="Write to your advisor…"/>
           <label htmlFor="student-advisor-files">Attachments</label><input key={fileInputKey} id="student-advisor-files" type="file" multiple onChange={event => setMessageFiles(Array.from(event.target.files ?? []))}/>
           {messageFiles.length > 0 ? <div className={styles.selectedFiles}>{messageFiles.map((file, index) => <span key={`${file.name}-${file.lastModified}-${index}`}>{file.name}<button type="button" aria-label={`Remove ${file.name}`} onClick={() => setMessageFiles(current => current.filter((_, fileIndex) => fileIndex !== index))}>×</button></span>)}</div> : null}
           <button className={styles.primary} disabled={(!message.trim() && messageFiles.length === 0) || messageMutation.isPending}>Send message</button>
         </form>
-      </section>
-    </main>
+      </CollapsibleSection>
+    </div>
   );
 };
 

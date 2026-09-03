@@ -1,3 +1,4 @@
+import {openSection} from './disclosure-helpers';
 import {expect, test, type Page} from '@playwright/test';
 
 type TestIdentity = {
@@ -41,6 +42,8 @@ const installIdentity = async (page: Page, user: TestIdentity): Promise<void> =>
     window.localStorage.setItem('user', JSON.stringify(currentUser));
     window.localStorage.setItem('accToken', currentUser.accessToken);
   }, user);
+  // Unrelated reads must stay in this isolated browser fixture, never the live proxy.
+  await page.route('**/v2/**', route => route.fulfill({json: response([])}));
   await page.route('**/v2/me/notifications/unread-count', route => route.fulfill({
     json: response({unreadCount: 0}),
   }));
@@ -185,6 +188,7 @@ test('instructor dashboard uses teaching data and availability edits preserve ev
   await page.goto('/my-operations');
   await page.getByRole('button', {name: 'availability'}).click();
   await expect(page.getByRole('heading', {name: 'Weekly availability'})).toBeVisible();
+  await openSection(page, 'Weekly availability');
   await expect(page.getByText('Monday', {exact: true})).toBeVisible();
   await expect(page.getByText('Wednesday', {exact: true})).toBeVisible();
   await expect(page.getByText('1 date exception will be preserved')).toBeVisible();
@@ -205,6 +209,7 @@ test('instructor dashboard uses teaching data and availability edits preserve ev
 test('advisor can assign a published mock exam and cannot enter Vocabulary', async ({page}, testInfo) => {
   await installIdentity(page, identity('ADVISOR', {id: 902, userId: 902}));
   let assignmentRequests = 0;
+  await page.route('**/v2/advisor/instructors**', route => route.fulfill({json: response({items: [{instructorUserId: 501, firstName: 'Writing', lastName: 'Instructor', email: 'writing@example.test', level: 'INSTRUCTOR'}], page: 0, size: 20, total: 1})}));
 
   await page.route('**/v2/advisor/mock-exam-templates**', route => route.fulfill({
     json: response([{
@@ -217,7 +222,7 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
     }]),
   }));
   await page.route('**/v2/advisor/students**', route => route.fulfill({
-    json: response([{studentUserId: 301, name: 'Assigned Student', email: 'student@example.test'}]),
+    json: response({items: [{studentUserId: 301, firstName: 'Assigned', lastName: 'Student', email: 'student@example.test'}], page: 0, size: 20, total: 1}),
   }));
   await page.route('**/v2/advisor/students/301/mock-exams**', route => {
     if (route.request().method() === 'POST') assignmentRequests += 1;
@@ -226,6 +231,7 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
 
   await page.goto('/mock-exams');
   await expect(page.getByRole('heading', {name: 'Match students to published papers'})).toBeVisible();
+  await openSection(page, 'Prepare a mock exam');
   const sectionCheckbox = page.getByRole('checkbox', {name: 'Listening'});
   const sectionCheckboxBox = await sectionCheckbox.boundingBox();
   expect(sectionCheckboxBox?.width).toBeLessThanOrEqual(22);
@@ -234,6 +240,7 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
   await page.screenshot({path: testInfo.outputPath('advisor-mock-exam-sections.png'), fullPage: true});
   await page.getByLabel('Student').selectOption('301');
   await page.getByLabel('Published template').selectOption('45');
+  await page.getByRole('combobox', {name: 'Writing instructor'}).selectOption('501');
   await page.getByRole('button', {name: 'Assign exam'}).click();
   await expect.poll(() => assignmentRequests).toBe(1);
   await expect(page.getByRole('link', {name: 'Vocabulary'})).toHaveCount(0);
@@ -248,6 +255,7 @@ test('advisor profile and study-plan editors explain record semantics and progre
   const profile = {studentUserId: 301, profileVersion: 2, firstName: 'Alex', lastName: 'Chen', targetGoal: 'Reach IELTS Writing 6.5', targetMetric: 'IELTS Writing', targetValue: '6.5', targetDate: '2026-10-12', skills: [{skillCode: 'WR', displayName: 'Writing', scale: 'IELTS', currentValue: '5.5', targetValue: '6.5', gapSummary: 'Improve task response and cohesion.', position: 1}]};
   const plan = {studentUserId: 301, profileContext: {currentProfileVersion: 2}, plan: {studyPlanId: 81, studyPlanVersion: 1, basedOnProfileVersion: 2, strategySummary: 'Weekly timed essays and targeted review.', startDate: '2026-09-14', planEndDate: '2026-10-12', checkpoints: [{id: 91, position: 1, description: 'Complete the first diagnostic', goal: 'Identify recurring patterns', dueDate: '2026-09-21', tasks: [{id: 101, position: 1, title: 'Complete the week 1 diagnostic', description: 'Submit one timed response.', dueDate: '2026-09-21', status: 'NOT_STARTED', version: 0}]}, {id: 92, position: 2, description: 'Review progress', goal: 'Confirm the next focus', dueDate: '2026-10-05', tasks: []}]}};
 
+  await page.route('**/v2/advisor/students/301/hub', route => route.fulfill({json: response({...intake, activeTasks: [], activeCourseCount: 0, publishedReportCount: 0, pendingRequestCount: 0})}));
   await page.route('**/v2/advisor/students/301/intake', route => route.fulfill({json: response(intake)}));
   await page.route('**/v2/advisor/students/301/profile', route => route.fulfill({json: response(profile)}));
   await page.route('**/v2/advisor/students/301/study-plan/revisions**', route => route.fulfill({json: response({items: [{entityVersion: 1, action: 'STUDY_PLAN_UPDATED', createdAt: '2026-09-02T07:16:57Z', actorId: 902}], page: 0, size: 20, total: 1})}));
@@ -255,17 +263,22 @@ test('advisor profile and study-plan editors explain record semantics and progre
 
   await page.goto('/advisor/students/301/profile');
   await expect(page.getByRole('heading', {name: 'Student profile'})).toBeVisible();
+  await expect(page.locator('details[open]')).toHaveCount(0);
+  await openSection(page, 'Measured skills');
+  await openSection(page, 'Writing');
   await expect(page.getByText(/stable record identifier/)).toBeVisible();
   await expect(page.getByText(/human-readable skill name/)).toBeVisible();
   await expect(page.getByText('Parent or guardian access')).toHaveCount(0);
   await page.screenshot({path: testInfo.outputPath('advisor-profile-polished.png'), fullPage: true});
 
   await page.goto('/advisor/students/301/study-plan');
-  await expect(page.getByText(/not created on every keystroke/)).toBeVisible();
-  await expect(page.locator('details').filter({hasText: 'Checkpoint 1'})).toHaveAttribute('open', '');
-  await expect(page.locator('details').filter({hasText: 'Checkpoint 2'})).not.toHaveAttribute('open', '');
-  await page.getByText('Revision activity').click();
-  await expect(page.getByText(/previous field values/)).toBeVisible();
+  await expect(page.locator('details[open]')).toHaveCount(0);
+  await openSection(page, 'Checkpoints and tasks');
+  await openSection(page, 'Complete the first diagnostic');
+  await expect(page.locator('summary[aria-label="Review progress"]').locator('..')).not.toHaveAttribute('open');
+  await openSection(page, 'Version history');
+  await openSection(page, 'Version 1');
+  await expect(page.getByText(/saved content for this version was not included/)).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('advisor-study-plan-polished.png'), fullPage: true});
 
   await page.setViewportSize({width: 390, height: 844});
@@ -285,7 +298,10 @@ test('student advising view presents profile, plan, and tasks with scannable hie
 
   await page.goto('/my-plan');
   await expect(page.getByRole('heading', {name: 'Learning profile'})).toBeVisible();
+  await openSection(page, 'Study plan');
   await expect(page.getByRole('heading', {name: /Checkpoint 1/})).toBeVisible();
+  await openSection(page, 'Checkpoint 1: Complete the first diagnostic');
+  await openSection(page, 'Complete the week 1 diagnostic');
   await expect(page.getByText('not started', {exact: true})).toBeVisible();
   await expect(page.getByRole('button', {name: 'Complete'})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('student-advising-polished.png'), fullPage: true});
@@ -413,6 +429,8 @@ test('counsellor completes intake, parent link, edit, and first advisor handover
   });
 
   await page.goto('/counsellor/intakes/new');
+  await openSection(page, 'Student identity');
+  await openSection(page, 'Learning context');
   await page.getByLabel('First name *').fill('Alex');
   await page.getByLabel('Last name *').fill('Chen');
   await page.getByLabel('Email *').fill('alex.chen@example.test');
@@ -423,6 +441,7 @@ test('counsellor completes intake, parent link, edit, and first advisor handover
 
   await expect(page).toHaveURL(/\/counsellor\/intakes\/99$/);
   await expect(page.getByRole('heading', {name: 'Parent or guardian access'})).toBeVisible();
+  await openSection(page, 'Parent or guardian access');
   await expect(page.getByText('No parent or guardian linked')).toBeVisible();
   await page.getByLabel('Parent email').fill('taylor.chen@example.test');
   await page.getByLabel('First name', {exact: true}).fill('Taylor');
@@ -431,6 +450,9 @@ test('counsellor completes intake, parent link, edit, and first advisor handover
   await page.getByRole('button', {name: 'Create or reuse Parent'}).click();
   await expect(page.getByText('Taylor Chen')).toBeVisible();
 
+  await expect(page.getByRole('link', {name: 'Continue to advisor assignment'})).toBeVisible();
+  await openSection(page, 'Learning context');
+  await page.getByLabel('Course request *').fill('IELTS writing and speaking support');
   await page.getByRole('button', {name: 'Save changes'}).click();
   await expect(page).toHaveURL(/\/counsellor\/intakes\/99\/assign$/);
   await expect(page.getByText('Ari Advisor', {exact: true})).toBeVisible();
@@ -446,7 +468,7 @@ test('counsellor completes intake, parent link, edit, and first advisor handover
   expect(createBody).not.toHaveProperty('password');
   expect(createBody).not.toHaveProperty('name');
   expect(parentBody).toMatchObject({email: 'taylor.chen@example.test', firstName: 'Taylor', lastName: 'Chen'});
-  expect(patchBody).toMatchObject({expectedIntakeVersion: 0, firstName: 'Alex', lastName: 'Chen'});
+  expect(patchBody).toEqual({expectedIntakeVersion: 0, courseRequest: 'IELTS writing and speaking support'});
   expect(patchBody).not.toHaveProperty('email');
   expect(assignmentBody).toEqual({advisorUserId: 52, expectedIntakeVersion: 1});
   expect(idempotencyHeaders).toHaveLength(4);
@@ -567,6 +589,7 @@ test('tenant admin can complete governance work using only the handoff routes', 
 
   await page.goto('/admin');
   await expect(page.getByRole('heading', {name: 'Tenant governance'})).toBeVisible();
+  await openSection(page, 'User directory');
   await expect(page.getByText('Ivy Instructor')).toBeVisible();
   await page.getByLabel('Search by name or email').fill('ivy@example.test');
   await page.getByRole('button', {name: 'Apply filters'}).click();
@@ -574,6 +597,7 @@ test('tenant admin can complete governance work using only the handoff routes', 
   await expect(page.getByRole('link', {name: 'Courses'})).toHaveCount(0);
 
   await page.getByRole('button', {name: 'Course ownership'}).click();
+  await openSection(page, 'Course ownership');
   await expect(page.getByText('IELTS-71 · Academic Writing')).toBeVisible();
   await page.getByRole('button', {name: /IELTS-71 · Academic Writing/}).click();
   await page.getByRole('button', {name: 'Choose eligible advisor'}).click();
@@ -585,6 +609,7 @@ test('tenant admin can complete governance work using only the handoff routes', 
   await expect(page.getByText(/Ownership transferred to Ari Advisor/)).toBeVisible();
 
   await page.getByRole('button', {name: 'Alert rules'}).click();
+  await openSection(page, 'Tenant alert rules');
   await page.getByText('Tenant override', {exact: true}).click();
   await page.getByLabel('Inactivity (days)').fill('7');
   await page.getByRole('button', {name: 'Save alert rules'}).click();
@@ -592,6 +617,7 @@ test('tenant admin can complete governance work using only the handoff routes', 
   expect(alertPutHeaders['idempotency-key']).toBeUndefined();
 
   await page.getByRole('button', {name: 'Audit'}).click();
+  await openSection(page, 'Governance audit');
   await expect(page.getByText('MANAGED_USER_CREATED')).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('tenant-governance.png'), fullPage: true});
 
@@ -650,6 +676,8 @@ test('tenant admin reviews protected mock-exam media and publishes only after th
 
   await page.goto('/mock-exams');
   await expect(page.getByRole('heading', {name: 'Build and release IELTS papers'})).toBeVisible();
+  await openSection(page, 'Compose exam content');
+  await openSection(page, 'IELTS Academic A');
   await expect(page.getByRole('tab', {name: /Listening · Read only/})).toBeVisible();
   await expect(page.getByRole('button', {name: 'Copy to new draft'})).toBeVisible();
   await expect(page.getByRole('button', {name: 'Delete draft'})).toBeVisible();
@@ -685,6 +713,7 @@ test('creating a mock-exam draft opens the new version builder immediately', asy
   });
 
   await page.goto('/mock-exams');
+  await openSection(page, 'Template versions');
   await page.getByLabel('Internal label').fill('Academic B');
   await page.getByLabel('Candidate title').fill('IELTS Academic B');
   await page.getByRole('button', {name: 'Create and open draft'}).click();

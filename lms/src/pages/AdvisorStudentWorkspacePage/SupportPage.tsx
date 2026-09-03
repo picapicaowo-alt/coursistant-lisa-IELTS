@@ -1,6 +1,10 @@
-import React, {useEffect, useState} from 'react';
-import {Link, useParams} from 'react-router-dom';
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {getApiErrorCode} from '@/utils/apiError';
+import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
+import {AdvisingPagination} from '../advising/AdvisingPagination';
+import React, {useEffect, useRef, useState} from 'react';
+import {Link, useParams, useSearchParams} from 'react-router-dom';
+import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
@@ -22,35 +26,52 @@ const SupportPage: React.FC = () => {
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const idempotency = useIdempotencyCheckpoint();
+  const [reportPage, setReportPage] = useState(0);
+  const [courseReportPage, setCourseReportPage] = useState(0);
   const [messageBody, setMessageBody] = useState('');
   const [messageFiles, setMessageFiles] = useState<File[]>([]);
   const [fileInputKey, setFileInputKey] = useState(0);
-  const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [selectedCourseId, setSelectedCourseId] = useState(searchParams.get('courseId') ?? '');
+  const hoursInitializedFor = useRef<number | null>(null);
+  const [hoursReloadRequired, setHoursReloadRequired] = useState(false);
   const [hoursForm, setHoursForm] = useState({purchasedMinutes: '', expectedVersion: '', reason: ''});
-  const [advanced, setAdvanced] = useState({taskId: '', taskVersion: '', feedback: '', occurrenceId: '', reportId: ''});
+  const [advanced, setAdvanced] = useState({taskId: '', taskVersion: '', feedback: '', occurrenceId: '', reportId: searchParams.get('reportId') ?? ''});
 
-  const hub = useQuery({queryKey: ['advisor', 'student-hub', id], queryFn: async () => unwrapData(await advisorApiService.getStudentHub(id), 'advisorStudentHub'), enabled: Number.isInteger(id), retry: false});
-  const studentReports = useQuery({queryKey: ['advisor', 'student-reports', id], queryFn: async () => unwrapData(await advisorApiService.listStudentPublishedReports(id), 'advisorStudentReports'), enabled: Number.isInteger(id), retry: false});
-  const attendance = useQuery({queryKey: ['advisor', 'student-attendance', id], queryFn: async () => unwrapData(await courseOperationsApiService.getAdvisorStudentAttendance(id), 'advisorStudentAttendance'), enabled: Number.isInteger(id), retry: false});
-  const courses = useQuery({queryKey: ['advisor', 'student-courses', id], queryFn: async () => unwrapData(await advisorApiService.listStudentCourses(id), 'advisorStudentCourses'), enabled: Number.isInteger(id), retry: false});
-  const messages = useQuery({queryKey: ['advisor', 'student-conversation', id], queryFn: async () => unwrapData(await advisorApiService.listConversationMessages(id), 'advisorConversationMessages'), enabled: Number.isInteger(id), retry: false});
+  const hub = useQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'student-hub', id], queryFn: async () => unwrapData(await advisorApiService.getStudentHub(id), 'advisorStudentHub'), enabled: Number.isInteger(id), retry: false});
+  const studentReports = useQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'student-reports', id, reportPage], queryFn: async () => unwrapData(await advisorApiService.listStudentPublishedReports(id, reportPage), 'advisorStudentReports'), enabled: Number.isInteger(id), retry: false});
+  const attendance = useQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'student-attendance', id], queryFn: async () => unwrapData(await courseOperationsApiService.getAdvisorStudentAttendance(id), 'advisorStudentAttendance'), enabled: Number.isInteger(id), retry: false});
+  const courses = useQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'student-courses', id], queryFn: async () => unwrapData(await advisorApiService.listStudentCourses(id), 'advisorStudentCourses'), enabled: Number.isInteger(id), retry: false});
+  const messages = useInfiniteQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'student-conversation', id], queryFn: async ({pageParam}) => advisorConversationMessageViews(unwrapData(await advisorApiService.listConversationMessages(id, pageParam), 'advisorConversationMessages')),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: lastPage => {
+      const ids = lastPage.flatMap(message => message.messageId == null ? [] : [message.messageId]);
+      return ids.length ? Math.min(...ids) : undefined;
+    }, enabled: Number.isInteger(id), retry: false});
   const courseId = Number(selectedCourseId);
-  const hours = useQuery({queryKey: ['advisor', 'student-course-hours', id, courseId], queryFn: async () => unwrapData(await courseOperationsApiService.getAdvisorStudentCourseHours(id, courseId), 'advisorStudentCourseHours'), enabled: positiveId(selectedCourseId), retry: false});
-  const courseReports = useQuery({queryKey: ['advisor', 'student-course-reports', id, courseId], queryFn: async () => unwrapData(await courseOperationsApiService.listAdvisorPublishedCourseReports(id, courseId), 'advisorCourseReports'), enabled: positiveId(selectedCourseId), retry: false});
+  const hours = useQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'student-course-hours', id, courseId], queryFn: async () => unwrapData(await courseOperationsApiService.getAdvisorStudentCourseHours(id, courseId), 'advisorStudentCourseHours'), enabled: positiveId(selectedCourseId), retry: false});
+  const courseReports = useQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'student-course-reports', id, courseId, courseReportPage], queryFn: async () => unwrapData(await courseOperationsApiService.listAdvisorPublishedCourseReports(id, courseId, courseReportPage + 1, 20), 'advisorCourseReports'), enabled: positiveId(selectedCourseId), retry: false});
 
   useEffect(() => {
-    if (!hours.data) return;
+    if (!hours.data || hoursInitializedFor.current === courseId) return;
+    hoursInitializedFor.current = courseId;
     const purchasedMinutes = contractRecordNumber(hours.data, 'purchasedMinutes', 'totalPurchasedMinutes');
     const expectedVersion = contractRecordNumber(hours.data, 'hoursVersion', 'version');
     setHoursForm(current => ({...current, purchasedMinutes: purchasedMinutes == null ? current.purchasedMinutes : String(purchasedMinutes), expectedVersion: expectedVersion == null ? current.expectedVersion : String(expectedVersion)}));
-  }, [hours.data]);
+  }, [hours.data, courseId]);
 
-  const sendMessage = useMutation({
-    mutationFn: () => {
-      const clientMessageId = crypto.randomUUID();
-      return messageFiles.length > 0
-        ? advisorApiService.sendConversationMessageMultipart(id, {clientMessageId, body: messageBody.trim() || undefined, files: messageFiles})
-        : advisorApiService.sendConversationMessage(id, {clientMessageId, body: messageBody.trim()});
+  const sendMessage = useMutation({meta: {advisingStudentId: id},
+    mutationFn: async () => {
+      if (messageFiles.some(file => file.type.startsWith('audio/'))) throw new Error('Audio attachments are not supported.');
+      const draft = {body: messageBody.trim(), files: messageFiles};
+      const fingerprint = idempotencyFingerprint(draft);
+      const clientMessageId = idempotency.keyFor(`message-client-${id}`, fingerprint);
+      const result = await idempotency.run(`message-send-${id}`, draft, key => messageFiles.length > 0
+        ? advisorApiService.sendConversationMessageMultipart(id, {clientMessageId, body: draft.body || undefined, files: messageFiles}, key)
+        : advisorApiService.sendConversationMessage(id, {clientMessageId, body: draft.body}, key));
+      idempotency.completeFingerprint(`message-client-${id}`, fingerprint);
+      return result;
     },
     onSuccess: async () => {
       setMessageBody('');
@@ -59,16 +80,17 @@ const SupportPage: React.FC = () => {
       await Promise.all([queryClient.invalidateQueries({queryKey: ['advisor', 'student-conversation', id]}), queryClient.invalidateQueries({queryKey: ['advisor', 'conversations']})]);
     },
   });
-  const markRead = useMutation({mutationFn: (messageId: number) => advisorApiService.markConversationRead(id, {messageId}), onSuccess: async () => queryClient.invalidateQueries({queryKey: ['advisor', 'conversations']})});
-  const saveHours = useMutation({
-    mutationFn: () => courseOperationsApiService.setAdvisorStudentCourseHours(id, courseId, {purchasedMinutes: Number(hoursForm.purchasedMinutes), expectedVersion: Number(hoursForm.expectedVersion), reason: hoursForm.reason.trim() || undefined}),
-    onSuccess: async () => queryClient.invalidateQueries({queryKey: ['advisor', 'student-course-hours', id, courseId]}),
+  const markRead = useMutation({meta: {advisingStudentId: id}, mutationFn: (messageId: number) => idempotency.run('markConversationRead', [id, {messageId}] satisfies Parameters<typeof advisorApiService.markConversationRead>, (key, args) => advisorApiService.markConversationRead(...args, key)), onSuccess: async () => queryClient.invalidateQueries({queryKey: ['advisor', 'conversations']})});
+  const saveHours = useMutation({meta: {advisingStudentId: id},
+    mutationFn: () => idempotency.run('setAdvisorStudentCourseHours', [id, courseId, {purchasedMinutes: Number(hoursForm.purchasedMinutes), expectedVersion: Number(hoursForm.expectedVersion), reason: hoursForm.reason.trim() || undefined}] satisfies Parameters<typeof courseOperationsApiService.setAdvisorStudentCourseHours>, (key, args) => courseOperationsApiService.setAdvisorStudentCourseHours(...args, key)),
+    onError: error => {if (getApiErrorCode(error)?.endsWith('VERSION_CONFLICT')) setHoursReloadRequired(true);},
+    onSuccess: async () => {hoursInitializedFor.current = null; await queryClient.invalidateQueries({queryKey: ['advisor', 'student-course-hours', id, courseId]});},
   });
-  const taskFeedback = useMutation({mutationFn: () => advisorApiService.feedbackAdvisorTask(id, Number(advanced.taskId), {expectedVersion: Number(advanced.taskVersion), feedback: advanced.feedback.trim()})});
-  const occurrenceAttendance = useQuery({queryKey: ['advisor', 'occurrence-attendance', id, courseId, advanced.occurrenceId], queryFn: async () => unwrapData(await courseOperationsApiService.getAdvisorStudentOccurrenceAttendance(id, courseId, Number(advanced.occurrenceId)), 'advisorOccurrenceAttendance'), enabled: positiveId(selectedCourseId) && positiveId(advanced.occurrenceId), retry: false});
-  const reportDetail = useQuery({queryKey: ['advisor', 'published-course-report', id, courseId, advanced.reportId], queryFn: async () => unwrapData(await courseOperationsApiService.getAdvisorPublishedCourseReport(id, courseId, Number(advanced.reportId)), 'advisorPublishedCourseReport'), enabled: positiveId(selectedCourseId) && positiveId(advanced.reportId), retry: false});
+  const taskFeedback = useMutation({meta: {advisingStudentId: id}, mutationFn: () => idempotency.run('feedbackAdvisorTask', [id, Number(advanced.taskId), {expectedVersion: Number(advanced.taskVersion), feedback: advanced.feedback.trim()}] satisfies Parameters<typeof advisorApiService.feedbackAdvisorTask>, (key, args) => advisorApiService.feedbackAdvisorTask(...args, key))});
+  const occurrenceAttendance = useQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'occurrence-attendance', id, courseId, advanced.occurrenceId], queryFn: async () => unwrapData(await courseOperationsApiService.getAdvisorStudentOccurrenceAttendance(id, courseId, Number(advanced.occurrenceId)), 'advisorOccurrenceAttendance'), enabled: positiveId(selectedCourseId) && positiveId(advanced.occurrenceId), retry: false});
+  const reportDetail = useQuery({meta: {advisingStudentId: id}, queryKey: ['advisor', 'published-course-report', id, courseId, advanced.reportId], queryFn: async () => unwrapData(await courseOperationsApiService.getAdvisorPublishedCourseReport(id, courseId, Number(advanced.reportId)), 'advisorPublishedCourseReport'), enabled: positiveId(selectedCourseId) && positiveId(advanced.reportId), retry: false});
 
-  const conversationRows = advisorConversationMessageViews(messages.data);
+  const conversationRows = [...new Map((messages.data?.pages.flat() ?? []).map(message => [message.messageId, message])).values()].sort((left, right) => (left.messageId ?? 0) - (right.messageId ?? 0));
   const primaryError = hub.error || studentReports.error || attendance.error || courses.error || messages.error || sendMessage.error || markRead.error;
 
   const previewAttachment = async (attachmentId: number): Promise<void> => {
@@ -87,8 +109,8 @@ const SupportPage: React.FC = () => {
     <div className={styles.grid}>
       {primaryError ? <p className={styles.error} role="alert">{advisingErrorMessage(primaryError, 'Student support information could not be loaded.')}</p> : null}
 
-      <section className={styles.card} id="conversation">
-        <div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Student support</p><h2>Conversation</h2></div><span className={styles.countBadge}>{conversationRows.length}</span></div>
+      <CollapsibleSection title="Conversation" id="conversation" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
+
         {messages.isPending ? <p className={styles.status}>Loading conversation…</p> : null}
         {!messages.isPending && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No messages yet</strong><span>Start the conversation below. File actions appear on messages that have attachments.</span></div> : null}
         <div className={styles.messageList}>
@@ -109,6 +131,7 @@ const SupportPage: React.FC = () => {
             </article>
           ))}
         </div>
+        {messages.hasNextPage ? <button type="button" className={styles.secondary} disabled={messages.isFetchingNextPage} onClick={() => void messages.fetchNextPage()}>Load older messages</button> : null}
         <form className={styles.composeBox} onSubmit={event => { event.preventDefault(); sendMessage.mutate(); }}>
           <label htmlFor="advisor-message">Reply to student</label>
           <textarea id="advisor-message" value={messageBody} onChange={event => setMessageBody(event.target.value)} placeholder="Write a support message…"/>
@@ -117,47 +140,50 @@ const SupportPage: React.FC = () => {
           {messageFiles.length > 0 ? <div className={styles.selectedFiles}>{messageFiles.map((file, index) => <span key={`${file.name}-${file.lastModified}-${index}`}>{file.name}<button type="button" aria-label={`Remove ${file.name}`} onClick={() => setMessageFiles(current => current.filter((_, fileIndex) => fileIndex !== index))}>×</button></span>)}</div> : null}
           <div className={styles.actions}><button className={styles.primary} disabled={(!messageBody.trim() && messageFiles.length === 0) || sendMessage.isPending}>{sendMessage.isPending ? 'Sending…' : 'Send message'}</button></div>
         </form>
-      </section>
+      </CollapsibleSection>
 
       <div className={styles.advisorColumns}>
-        <section className={styles.card}>
-          <div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Progress</p><h2>Reports</h2></div></div>
+        <CollapsibleSection title="Reports" className={styles.disclosureLayout}>
+
           {studentReports.isPending ? <p className={styles.status}>Loading reports…</p> : null}
           {!studentReports.isPending && contractItems(studentReports.data).length === 0 ? <div className={styles.emptyState}><strong>No published reports</strong><span>Reports become visible here after publication.</span></div> : null}
           {contractItems(studentReports.data).length > 0 ? <div className={styles.compactResult}><RecordSummaryList value={studentReports.data}/></div> : null}
-        </section>
-        <section className={styles.card}>
-          <div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Attendance</p><h2>Learning history</h2></div></div>
+          <AdvisingPagination label="Student report pages" page={reportPage} total={contractRecordNumber(studentReports.data, 'total') ?? 0} onPage={setReportPage}/>
+        </CollapsibleSection>
+        <CollapsibleSection title="Learning history" className={styles.disclosureLayout}>
+
           {attendance.isPending ? <p className={styles.status}>Loading attendance…</p> : null}
           {!attendance.isPending && contractItems(attendance.data).length === 0 ? <div className={styles.emptyState}><strong>No attendance records</strong><span>Recorded course attendance will appear here.</span></div> : null}
           {contractItems(attendance.data).length > 0 ? <div className={styles.compactResult}><RecordSummaryList value={attendance.data}/></div> : null}
-        </section>
+        </CollapsibleSection>
       </div>
 
-      <section className={styles.card}>
-        <div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Course service</p><h2>Course hours &amp; reports</h2></div></div>
+      <CollapsibleSection title="Course hours &amp; reports" id="course-support" className={styles.disclosureLayout}>
+
         {(courses.data?.length ?? 0) === 0 ? <div className={styles.emptyState}><strong>No linked courses</strong><span>Link or create a course before managing hours and course reports.</span><Link className={styles.secondaryLink} to={`/advisor/students/${id}/courses`}>Open courses</Link></div> : (
           <label className={styles.coursePicker}>Course<select value={selectedCourseId} onChange={event => setSelectedCourseId(event.target.value)}><option value="">Select a course</option>{(courses.data ?? []).map((item, index) => <option key={item.courseId ?? index} value={item.courseId}>{item.title || item.courseCode || `Course #${item.courseId}`}</option>)}</select></label>
         )}
         {positiveId(selectedCourseId) ? <div className={styles.advisorColumns}>
           <div>
             <h3>Purchased hours</h3>
+            {hoursReloadRequired ? <div role="alert"><p>Your entered hours are preserved. Reload the latest version before confirming.</p><button type="button" onClick={() => void hours.refetch().then(result => {const version = contractRecordNumber(result.data, 'version'); if (!result.isError && version != null) {setHoursForm(current => ({...current, expectedVersion: String(version)})); setHoursReloadRequired(false);}})}>Load latest hours</button></div> : null}
             {hours.isError ? <p className={styles.error}>{advisingErrorMessage(hours.error, 'Course hours could not be loaded.')}</p> : null}
             <form className={styles.form} onSubmit={event => { event.preventDefault(); saveHours.mutate(); }}>
               <label>Purchased minutes<input required type="number" min="0" value={hoursForm.purchasedMinutes} onChange={event => setHoursForm(current => ({...current, purchasedMinutes: event.target.value}))}/></label>
-              <label>Record version<input required type="number" min="0" value={hoursForm.expectedVersion} onChange={event => setHoursForm(current => ({...current, expectedVersion: event.target.value}))}/></label>
-              <label>Reason<textarea value={hoursForm.reason} onChange={event => setHoursForm(current => ({...current, reason: event.target.value}))}/></label>
-              <button className={styles.primary} disabled={!hoursForm.purchasedMinutes || !hoursForm.expectedVersion || saveHours.isPending}>Save purchased hours</button>
+              <p>Record version: {hoursForm.expectedVersion || 'unavailable'}</p>
+              <label>Reason<textarea required value={hoursForm.reason} onChange={event => setHoursForm(current => ({...current, reason: event.target.value}))}/></label>
+              <button className={styles.primary} disabled={hoursReloadRequired || !hoursForm.reason.trim() || !hoursForm.purchasedMinutes || !hoursForm.expectedVersion || saveHours.isPending}>Save purchased hours</button>
             </form>
           </div>
           <div>
             <h3>Published course reports</h3>
+            <AdvisingPagination label="Course report pages" page={courseReportPage} total={contractRecordNumber(courseReports.data, 'total') ?? 0} onPage={setCourseReportPage}/>
             {courseReports.isError ? <p className={styles.error}>{advisingErrorMessage(courseReports.error, 'Course reports could not be loaded.')}</p> : null}
             {!courseReports.isPending && contractItems(courseReports.data).length === 0 ? <div className={styles.emptyState}><strong>No published course reports</strong><span>Published reports for this course will appear here.</span></div> : null}
             {contractItems(courseReports.data).length > 0 ? <div className={styles.compactResult}><RecordSummaryList value={courseReports.data}/></div> : null}
           </div>
         </div> : null}
-      </section>
+      </CollapsibleSection>
 
       <details className={styles.card}>
         <summary className={styles.detailsSummary}>Advanced record lookup</summary>

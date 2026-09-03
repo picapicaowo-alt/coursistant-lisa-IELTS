@@ -206,7 +206,7 @@ const TenantIntakesPage: React.FC = () => {
   };
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <div><p className={styles.eyebrow}>Tenant admin</p><h1>Student intakes</h1><p className={styles.lede}>Search, correct, assign, reassign, or cancel intake records within the governance boundary.</p></div>
         <div className={styles.headerActions}>
@@ -246,7 +246,7 @@ const TenantIntakesPage: React.FC = () => {
           <section><h3>{selected.assignmentStatus === 'ASSIGNED' ? 'Reassign advisor' : 'Assign advisor'}</h3>{selected.lifecycleStatus === 'CANCELLED' ? <p className={styles.status}>Cancelled intakes cannot be assigned or edited.</p> : <form className={styles.form} onSubmit={onAssign}><div className={styles.pickerField}><span>Eligible advisor</span><TenantUserPicker title={selected.assignmentStatus === 'ASSIGNED' ? 'Choose the replacement advisor' : 'Choose an advisor'} description="Searches active Advisor and Instructor Advisor identities in this tenant." triggerLabel="Choose advisor" levels={['ADVISOR', 'INSTRUCTOR_ADVISOR']} selectedUser={advisor} onSelect={setAdvisor}/></div><label><span>Reason {selected.assignmentStatus === 'UNASSIGNED' ? '(required only when cancelling)' : '(recommended for reassignment)'}</span><textarea value={reason} onChange={event => setReason(event.target.value)}/></label><div className={styles.actions}><button className={styles.primary} disabled={busy || !advisor}>{busy ? 'Saving…' : selected.assignmentStatus === 'ASSIGNED' ? 'Reassign advisor' : 'Assign advisor'}</button>{selected.assignmentStatus === 'UNASSIGNED' ? <button type="button" className={styles.danger} disabled={busy || !reason.trim()} onClick={() => cancel.mutate()}>Cancel intake</button> : null}</div></form>}</section>
         </div> : null}
       </section> : null}
-    </main>
+    </div>
   );
 };
 

@@ -107,3 +107,11 @@ describe('resolveNotificationPath', () => {
     })).toBe('/course/7/events');
   });
 });
+
+it('keeps role-specific notifications inside the recipient workspace', () => {
+  const item = {availability: 'AVAILABLE' as const, courseId: 31, deepLink: '/courses/31', notificationType: 'COURSE_HOURS_CHANGED' as const};
+  expect(resolveNotificationPath(item, {role: 'USER', level: 'ADVISOR'})).toBe('/advisor/operations');
+  expect(resolveNotificationPath(item, {role: 'USER', level: 'PARENT'})).toBe('/parent');
+  expect(resolveNotificationPath(item, {role: 'USER', level: 'STUDENT'})).toBe('/my-operations');
+  expect(resolveNotificationPath({...item, deepLink: '/advisor/students/41/support'}, {role: 'USER', level: 'ADVISOR'})).toBe('/advisor/students/41/support');
+});

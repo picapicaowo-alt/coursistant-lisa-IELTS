@@ -71,8 +71,10 @@ export interface ManagedUserDisableBlocker {
 }
 
 export interface ManagedUserDisableBlockersResponse {
+  targetUserId: number;
+  targetStatus: string;
   canDisable: boolean;
-  blockers: Array<string | ManagedUserDisableBlocker>;
+  blockers: string[];
 }
 
 export interface TenantUserDirectoryPage {

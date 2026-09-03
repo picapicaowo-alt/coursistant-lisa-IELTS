@@ -1,6 +1,6 @@
 .page {
   min-height: 100%;
-  padding: 2rem clamp(1rem, 4vw, 3.5rem) 4rem;
+  padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16;
   overflow-y: auto;
   background: t.$page-bg;
   color: t.$text;
@@ -10,7 +10,7 @@
 .tabs,
 .directoryLayout,
 .widePanel {
-  width: min(100%, 88rem);
+  width: min(100%, t.$workspace-max-width);
   margin-inline: auto;
 }
 
@@ -740,7 +740,7 @@ summary:focus-visible {
 
 @media (max-width: 640px) {
   .page {
-    padding: 1rem .75rem 3rem;
+    padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16;
   }
 
   .quickLinks,

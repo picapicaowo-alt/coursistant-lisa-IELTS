@@ -233,7 +233,7 @@ const AdvisorTasksPanel: React.FC = () => {
 const ExamsPanel: React.FC = () => {
   const query = useQuery({
     queryKey: ['dashboard', 'mock-exams'],
-    queryFn: async () => (await mockExamApiService.listStudentExams(0, 3)).data,
+    queryFn: async () => (await mockExamApiService.listStudentExams()).data,
     retry: false,
   });
   const exams = recordsFrom(query.data).slice(0, 3);

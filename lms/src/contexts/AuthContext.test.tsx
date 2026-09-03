@@ -1,3 +1,4 @@
+import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
@@ -33,7 +34,7 @@ const storedUser = {
 };
 
 const AuthHarness = () => {
-  const {loading, logout, user} = useAuth();
+  const {loading, login, logout, user} = useAuth();
 
   if (loading) return <span>Loading</span>;
 
@@ -41,6 +42,7 @@ const AuthHarness = () => {
     <div>
       <span>{user?.email ?? 'Signed out'}</span>
       <button type="button" onClick={() => void logout()}>Log out</button>
+      <button type="button" onClick={() => login({...storedUser, email: "next@example.test", role: "USER", level: "STUDENT"})}>Switch account</button>
     </div>
   );
 };
@@ -57,13 +59,24 @@ describe('AuthProvider logout', () => {
     window.history.replaceState({}, '', '/');
   });
 
+  it('clears user-relative queries and mutation history before switching identities', async () => {
+    const client = new QueryClient();
+    client.setQueryData(['me', 'progress'], {studentUserId: 7});
+    client.getMutationCache().build(client, {mutationKey: ['private-feedback']});
+    render(<QueryClientProvider client={client}><AuthProvider><AuthHarness/></AuthProvider></QueryClientProvider>);
+    fireEvent.click(await screen.findByRole('button', {name: 'Switch account'}));
+    expect(client.getQueryCache().getAll()).toHaveLength(0);
+    expect(client.getMutationCache().getAll()).toHaveLength(0);
+    expect(await screen.findByText('next@example.test')).toBeInTheDocument();
+  });
+
   it('revokes the server session before clearing local authentication', async () => {
     mocks.serverLogout.mockResolvedValue({status: 200, data: null});
 
     render(
-      <AuthProvider>
+      <QueryClientProvider client={new QueryClient()}><AuthProvider>
         <AuthHarness/>
-      </AuthProvider>
+      </AuthProvider></QueryClientProvider>
     );
 
     expect(await screen.findByText(storedUser.email)).toBeInTheDocument();
@@ -82,9 +95,9 @@ describe('AuthProvider logout', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
     render(
-      <AuthProvider>
+      <QueryClientProvider client={new QueryClient()}><AuthProvider>
         <AuthHarness/>
-      </AuthProvider>
+      </AuthProvider></QueryClientProvider>
     );
 
     fireEvent.click(await screen.findByRole('button', {name: 'Log out'}));

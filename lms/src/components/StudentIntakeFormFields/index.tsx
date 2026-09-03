@@ -1,3 +1,4 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
 import type {ChangeEvent} from 'react';
 import type {StudentType} from '@/apis';
 import type {StudentIntakeFormValue} from './model';
@@ -24,6 +25,7 @@ export const StudentIntakeFormFields = ({
   return (
     <>
       <p className={styles.contractNote}><strong>Required fields are marked *</strong><span>These requirements come from the backend intake contract; they are not configurable by Counsellors.</span></p>
+      <CollapsibleSection title="Student identity" summary={[value.firstName, value.lastName].filter(Boolean).join(' ') || 'Name, email and student type'} className={styles.section} bodyClassName={styles.fields}>
       <label><span>First name *</span><input required maxLength={100} autoComplete="given-name" {...field('firstName')}/></label>
       <label><span>Middle name <em className={styles.optional}>Optional</em></span><input maxLength={100} autoComplete="additional-name" {...field('middleName')}/></label>
       <label><span>Last name *</span><input required maxLength={100} autoComplete="family-name" {...field('lastName')}/></label>
@@ -41,9 +43,12 @@ export const StudentIntakeFormFields = ({
           <option value="VIP">VIP</option>
         </select>
       </label>
+      </CollapsibleSection>
+      <CollapsibleSection title="Learning context" summary={value.courseRequest || 'Course request, contact and background'} className={styles.section} bodyClassName={styles.fields}>
       <label><span>Course request *</span><textarea required maxLength={2000} {...field('courseRequest')}/></label>
       <label><span>Contact phone <em className={styles.optional}>Optional</em></span><input minLength={7} maxLength={64} autoComplete="tel" {...field('contactPhone')}/></label>
       <label><span>Basic background <em className={styles.optional}>Optional</em></span><textarea maxLength={4000} {...field('basicBackground')}/></label>
+      </CollapsibleSection>
     </>
   );
 };

@@ -31,7 +31,7 @@ const CourseOperationsPage: React.FC = () => {
   const [occurrence, setOccurrence] = useState({sessionId: '', weekId: '', date: '', start: '', end: '', expectedVersion: ''});
   const [range, setRange] = useState({from: '', to: '', includeHistory: false});
   const [attendance, setAttendance] = useState({studentUserId: '', status: 'PRESENT', version: ''});
-  const [schedule, setSchedule] = useState({requestId: '', requestType: 'RESCHEDULE', date: '', start: '', end: '', reason: '', decision: 'APPROVE', version: '', rejectionReason: ''});
+  const [schedule, setSchedule] = useState({requestId: '', requestType: String(SCHEDULE_REQUEST_TYPES[1]), date: '', start: '', end: '', reason: '', decision: 'APPROVE', version: '', rejectionReason: ''});
   const [report, setReport] = useState<{
     reportId: string;
     studentUserId: string;

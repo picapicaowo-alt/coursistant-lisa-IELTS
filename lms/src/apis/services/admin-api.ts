@@ -92,8 +92,8 @@ export class AdminApiService {
     return this.apiClient.post(`/v2/${scope}/managed-users`, request, idempotent());
   }
 
-  createTenantManagedUser(request: CreateManagedUserRequest): Promise<ApiResponse<number>> {
-    return this.apiClient.post('/v2/tenant/managed-users', request, idempotent());
+  createTenantManagedUser(request: CreateManagedUserRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<number>> {
+    return this.apiClient.post('/v2/tenant/managed-users', request, idempotent(key));
   }
 
   patchTenantManagedUser(userId: number, request: PatchTenantManagedUserRequest, key: string): Promise<ApiResponse<ManagedUser>> {
@@ -108,8 +108,8 @@ export class AdminApiService {
     return this.apiClient.put(`/v2/${scope}/managed-users/${userId}/role`, request, idempotent());
   }
 
-  changeTenantManagedUserRole(userId: number, request: ChangeManagedUserRoleRequest): Promise<ApiResponse<void>> {
-    return this.apiClient.put(`/v2/tenant/managed-users/${userId}/role`, request, idempotent());
+  changeTenantManagedUserRole(userId: number, request: ChangeManagedUserRoleRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<void>> {
+    return this.apiClient.put(`/v2/tenant/managed-users/${userId}/role`, request, idempotent(key));
   }
 
   disableManagedUser(scope: 'system' | 'tenant', userId: number): Promise<ApiResponse<void>> {

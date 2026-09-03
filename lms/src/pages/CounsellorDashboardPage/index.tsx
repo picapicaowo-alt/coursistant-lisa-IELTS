@@ -15,10 +15,10 @@ const CounsellorDashboardPage: React.FC = () => {
   });
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Counsellor</p>
+
           <h1>Intake dashboard</h1>
           <p className={styles.lede}>Counts are independent. They do not have to add up.</p>
         </div>
@@ -35,14 +35,14 @@ const CounsellorDashboardPage: React.FC = () => {
       ) : null}
       {activeMetric ? <section className={styles.dashboardNotice} aria-live="polite">
         <strong>{activeMetric === 'created' ? 'Created is a lifetime intake count' : 'Assigned means the handover is complete'}</strong>
-        <p>{activeMetric === 'created' ? 'Cancelled records can remain in this count, so it may not equal Assigned plus Unassigned.' : 'The backend removes assigned intakes from Counsellor access immediately. Counsellors cannot open, edit, or delete those student records after handover; Tenant Admin manages reassignment.'}</p>
+        <p>{activeMetric === 'created' ? 'Cancelled records can remain in this count, so it may not equal Assigned plus Unassigned.' : 'Counsellor access ends as soon as a student is handed over. The assigned Advisor takes over the student record; contact your Tenant Admin if reassignment is needed.'}</p>
       </section> : null}
       <section className={styles.capabilityGrid} aria-label="Counsellor workflow">
         <div><span>1</span><strong>Create the intake</strong><p>Create the Student account and admissions record together. The student sets a password through Forgot password.</p></div>
         <div><span>2</span><strong>Complete the record</strong><p>Edit your open intake and add or remove Parent links before assignment.</p></div>
         <div><span>3</span><strong>Hand over to an Advisor</strong><p>Select an eligible Advisor. Successful assignment immediately closes Counsellor access.</p></div>
       </section>
-    </main>
+    </div>
   );
 };
 

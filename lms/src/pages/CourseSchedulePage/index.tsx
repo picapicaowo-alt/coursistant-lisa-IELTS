@@ -1,3 +1,4 @@
+import {COURSE_SESSION_DAYS as DAYS, COURSE_SESSION_TYPES as TYPES} from '@/configs/courseSessions';
 import {FormEvent, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, Clock3, MapPin, Pencil, Plus, Trash2, X} from 'lucide-react';
@@ -17,11 +18,6 @@ import {
 } from '@/utils/dateTimeRange';
 import styles from '../CourseEventsPage/index.module.scss';
 
-const DAYS: {value: SessionDayOfWeek; label: string}[] = [
-  {value: 'MON', label: 'Monday'}, {value: 'TUE', label: 'Tuesday'}, {value: 'WED', label: 'Wednesday'},
-  {value: 'THU', label: 'Thursday'}, {value: 'FRI', label: 'Friday'}, {value: 'SAT', label: 'Saturday'}, {value: 'SUN', label: 'Sunday'},
-];
-const TYPES: SessionType[] = ['Lecture', 'Lab', 'Tutorial'];
 const dayLabel = (day: SessionDayOfWeek) => DAYS.find(item => item.value === day)?.label ?? day;
 const emptyDraft = (): CourseSessionPayload => ({type: 'Lecture', dayOfWeek: 'MON', startTime: '09:00', endTime: '10:00', location: ''});
 const toDraft = (session: CourseSession): CourseSessionPayload => ({type: session.type, dayOfWeek: session.dayOfWeek, startTime: session.startTime.slice(0, 5), endTime: session.endTime.slice(0, 5), location: session.location ?? ''});

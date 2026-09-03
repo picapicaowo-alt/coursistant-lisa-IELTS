@@ -11,11 +11,11 @@ describe('MockExamApiService', () => {
 
   it('lists role-scoped mock exams', async () => {
     client.get.mockResolvedValue({status: 200, data: []});
-    await service.listStudentExams(0, 20);
-    await service.listAdvisorTemplates(1, 10);
+    await service.listStudentExams();
+    await service.listAdvisorTemplates();
     await service.listTenantTemplates();
-    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/student/mock-exams', {params: {page: 0, size: 20}});
-    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/advisor/mock-exam-templates', {params: {page: 1, size: 10}});
+    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/student/mock-exams');
+    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/advisor/mock-exam-templates');
     expect(client.get).toHaveBeenNthCalledWith(3, '/v2/tenant/mock-exam-templates');
   });
 

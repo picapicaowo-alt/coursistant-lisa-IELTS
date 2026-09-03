@@ -1,3 +1,4 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
 import React, {useState} from 'react';
 import {useMutation} from '@tanstack/react-query';
 import {RecordSummaryList} from '@/components/RecordSummaryList';
@@ -34,14 +35,8 @@ export const OperationCard = ({
   });
 
   return (
-    <section className={styles.card}>
-      <div className={styles.heading}>
-        <div>
-          <h3>{title}</h3>
-          {description ? <p>{description}</p> : null}
-        </div>
-        {completedAt ? <span className={styles.timestamp}>Updated {completedAt}</span> : null}
-      </div>
+    <CollapsibleSection title={title} summary={description} headingLevel={3}>
+      {completedAt ? <span className={styles.timestamp}>Updated {completedAt}</span> : null}
       {children ? <div className={styles.fields}>{children}</div> : null}
       <button
         type="button"
@@ -57,7 +52,7 @@ export const OperationCard = ({
           <RecordSummaryList value={responseData(operation.data)}/>
         </div>
       ) : null}
-    </section>
+    </CollapsibleSection>
   );
 };
 

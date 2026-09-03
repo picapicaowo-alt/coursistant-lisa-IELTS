@@ -1,9 +1,13 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {ObserverMockExams} from '@/components/ObserverMockExams';
+import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
+import {sendStableMessage} from '@/utils/sendStableMessage';
+import {EnglishDateInput, EnglishTimeInput} from '@/components/EnglishDateInput';
 import React, {useEffect, useMemo, useState} from 'react';
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {RecordSummaryList} from '@/components/RecordSummaryList';
 import {SCHEDULE_REQUEST_TYPES, unwrapData, type ParentConversationMessageResponse, type ParentNotification} from '@/apis';
 import {parentApiService} from '@/apis/services/parent-api';
-import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import styles from '../advising/advising.module.scss';
 import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/downloadBlob';
@@ -53,12 +57,13 @@ const textField = (record: Record<string, unknown>, ...keys: string[]): string |
 
 const ParentPortalPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const idempotency = useIdempotencyCheckpoint();
   const [studentUserId, setStudentUserId] = useState<number | null>(null);
   const [section, setSection] = useState<ParentSection>('dashboard');
   const [message, setMessage] = useState('');
   const [messageFiles, setMessageFiles] = useState<File[]>([]);
   const [fileInputKey, setFileInputKey] = useState(0);
-  const [schedule, setSchedule] = useState({courseId: '', occurrenceId: '', requestType: 'RESCHEDULE', reason: ''});
+  const [schedule, setSchedule] = useState({courseId: '', occurrenceId: '', requestType: String(SCHEDULE_REQUEST_TYPES[1]), reason: '', date: '', start: '', end: ''});
   const [selectedReportId, setSelectedReportId] = useState<number | null>(null);
 
   const linked = useQuery({
@@ -69,11 +74,11 @@ const ParentPortalPage: React.FC = () => {
   const studentIds = useMemo(() => linkedStudentIds(linked.data), [linked.data]);
 
   useEffect(() => {
-    if (studentUserId == null && studentIds.length > 0) setStudentUserId(studentIds[0]);
-  }, [studentIds, studentUserId]);
+    if (linked.isSuccess && (studentUserId == null || !studentIds.includes(studentUserId))) setStudentUserId(studentIds[0] ?? null);
+  }, [studentIds, studentUserId, linked.isSuccess]);
 
   const content = useQuery({
-    queryKey: ['parent', studentUserId, section],
+    queryKey: ['parent', studentUserId, 'section', section],
     enabled: studentUserId != null || section === 'notifications',
     retry: false,
     queryFn: async () => {
@@ -111,15 +116,27 @@ const ParentPortalPage: React.FC = () => {
         return {calendar: unwrapData(calendar, 'parentCalendar'), requests: unwrapData(requests, 'parentScheduleRequests')};
       }
       if (section === 'reports') return unwrapData(await parentApiService.listStudentReports(studentUserId), 'parentReports');
-      if (section === 'exams') return unwrapData(await mockExamApiService.listParentStudentExams(studentUserId), 'parentMockExams');
-      return unwrapData(await parentApiService.listConversationMessages(studentUserId), 'parentMessages');
+      if (section === 'exams') return null;
+      return null;
     },
+  });
+
+  const conversation = useInfiniteQuery({
+    queryKey: ['parent', studentUserId, 'messages'],
+    enabled: studentUserId != null && section === 'messages',
+    queryFn: async ({pageParam}) => unwrapData(await parentApiService.listConversationMessages(studentUserId!, pageParam), 'parentMessages'),
+    initialPageParam: undefined as number | undefined,
+    getNextPageParam: lastPage => {
+      const ids = lastPage.flatMap(item => item.messageId == null ? [] : [item.messageId]);
+      return ids.length ? Math.min(...ids) : undefined;
+    },
+    retry: false,
   });
 
   const sendMessage = useMutation({
     mutationFn: async () => {
       if (studentUserId == null) throw new Error('No linked student selected');
-      return parentApiService.sendConversationMessage(studentUserId, {clientMessageId: crypto.randomUUID(), body: message.trim() || undefined, files: messageFiles});
+      return sendStableMessage(idempotency, `parent-${studentUserId}`, {body: message.trim(), files: messageFiles}, (draft, key) => parentApiService.sendConversationMessage(studentUserId, draft, key));
     },
     onSuccess: async () => {
       setMessage('');
@@ -135,11 +152,11 @@ const ParentPortalPage: React.FC = () => {
   });
   const markNotificationRead = useMutation({
     mutationFn: (notificationId: number) => parentApiService.markNotificationRead(notificationId),
-    onSuccess: async () => queryClient.invalidateQueries({queryKey: ['parent', studentUserId, 'notifications']}),
+    onSuccess: async () => queryClient.invalidateQueries({queryKey: ['parent', studentUserId, 'section', 'notifications']}),
   });
   const markAllNotificationsRead = useMutation({
     mutationFn: () => parentApiService.markAllNotificationsRead(),
-    onSuccess: async () => queryClient.invalidateQueries({queryKey: ['parent', studentUserId, 'notifications']}),
+    onSuccess: async () => queryClient.invalidateQueries({queryKey: ['parent', studentUserId, 'section', 'notifications']}),
   });
   const reportDetail = useQuery({
     queryKey: ['parent', studentUserId, 'report', selectedReportId],
@@ -151,16 +168,17 @@ const ParentPortalPage: React.FC = () => {
   const createScheduleRequest = useMutation({
     mutationFn: async () => {
       if (studentUserId == null) throw new Error('No linked student selected');
-      return parentApiService.createScheduleRequest(studentUserId, {
+      return idempotency.run('parent-schedule-request', [studentUserId, {
         courseId: Number(schedule.courseId),
         occurrenceId: Number(schedule.occurrenceId),
         requestType: schedule.requestType,
         reason: schedule.reason || undefined,
-      });
+        ...(schedule.requestType === SCHEDULE_REQUEST_TYPES[1] ? {proposedOccurrenceDate: schedule.date || undefined, proposedStartTime: schedule.start || undefined, proposedEndTime: schedule.end || undefined} : {}),
+      }] satisfies Parameters<typeof parentApiService.createScheduleRequest>, (key, args) => parentApiService.createScheduleRequest(...args, key));
     },
     onSuccess: async () => {
-      setSchedule({courseId: '', occurrenceId: '', requestType: 'RESCHEDULE', reason: ''});
-      await queryClient.invalidateQueries({queryKey: ['parent', studentUserId, 'schedule']});
+      setSchedule({courseId: '', occurrenceId: '', requestType: String(SCHEDULE_REQUEST_TYPES[1]), reason: '', date: '', start: '', end: ''});
+      await queryClient.invalidateQueries({queryKey: ['parent', studentUserId, 'section', 'schedule']});
     },
   });
 
@@ -178,23 +196,23 @@ const ParentPortalPage: React.FC = () => {
   };
 
   const contentRecord = isRecord(content.data) ? content.data : null;
-  const messages = section === 'messages' && Array.isArray(content.data) ? content.data as ParentConversationMessageResponse[] : [];
+  const messages: ParentConversationMessageResponse[] = conversation.data?.pages.flat() ?? [];
   const notifications = section === 'notifications' && contentRecord && Array.isArray(contentRecord.notifications) ? contentRecord.notifications as ParentNotification[] : [];
   const reportRows = section === 'reports' ? recordItems(content.data) : [];
   const calendarRows = section === 'schedule' && contentRecord ? recordItems(contentRecord.calendar) : [];
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Parent portal</p>
+
           <h1>Student progress</h1>
           <p className={styles.lede}>Read academic updates, request schedule changes, and contact the advising team.</p>
         </div>
         {studentIds.length > 1 ? (
           <label className={styles.form}>
             Student
-            <select value={studentUserId ?? ''} onChange={event => setStudentUserId(Number(event.target.value))}>
+            <select value={studentUserId ?? ''} onChange={event => {setStudentUserId(Number(event.target.value)); setMessage(''); setMessageFiles([]); setFileInputKey(current => current + 1); setSelectedReportId(null); setSchedule({courseId: '', occurrenceId: '', requestType: String(SCHEDULE_REQUEST_TYPES[1]), reason: '', date: '', start: '', end: ''});}}>
               {studentIds.map(id => <option value={id} key={id}>Student #{id}</option>)}
             </select>
           </label>
@@ -207,6 +225,7 @@ const ParentPortalPage: React.FC = () => {
 
       {studentIds.length > 0 ? (
         <>
+          {content.isError || conversation.isError ? <div className={styles.conflictNotice} role="alert"><p>{advisingErrorMessage(content.error || conversation.error, 'This section could not be loaded.')}</p><button type="button" className={styles.secondary} onClick={() => void (section === 'messages' ? conversation.refetch() : content.refetch())}>Retry</button></div> : null}
           <nav className={styles.tabs} aria-label="Parent portal sections">
             {SECTIONS.map(item => (
               <button type="button" className={item.id === section ? styles.primary : styles.secondary} key={item.id} onClick={() => setSection(item.id)}>
@@ -215,9 +234,10 @@ const ParentPortalPage: React.FC = () => {
             ))}
           </nav>
 
+          {section === 'exams' && studentUserId != null ? <CollapsibleSection title="Assigned mock exams" className={styles.disclosureLayout} summary="Review completed sections and published scores."><ObserverMockExams key={studentUserId} scope="parent" studentUserId={studentUserId}/></CollapsibleSection> : null}
           {section === 'schedule' ? (
-            <section className={styles.card}>
-              <div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Calendar</p><h2>Request a schedule change</h2></div></div>
+            <CollapsibleSection title="Request a schedule change" className={styles.disclosureLayout}>
+
               {calendarRows.length === 0 ? <div className={styles.emptyState}><strong>No upcoming class can be changed</strong><span>Schedule actions appear beside available calendar occurrences.</span></div> : <div className={styles.inboxList}>{calendarRows.map((row, index) => {
                 const courseId = numberField(row, 'courseId');
                 const occurrenceId = numberField(row, 'occurrenceId', 'sessionOccurrenceId');
@@ -227,18 +247,20 @@ const ParentPortalPage: React.FC = () => {
               {schedule.courseId && schedule.occurrenceId ? <form className={styles.reviewPanel} onSubmit={event => { event.preventDefault(); createScheduleRequest.mutate(); }}>
                 <strong>Selected scheduled class</strong>
                 <label>Request type<select value={schedule.requestType} onChange={event => setSchedule(current => ({...current, requestType: event.target.value}))}>{SCHEDULE_REQUEST_TYPES.map(type => <option key={type}>{type}</option>)}</select></label>
+                {schedule.requestType === SCHEDULE_REQUEST_TYPES[1] ? <div className={styles.formGrid}><label>Proposed date<EnglishDateInput required value={schedule.date} onChangeValue={date => setSchedule(current => ({...current, date}))}/></label><label>Starts<EnglishTimeInput required value={schedule.start} onChangeValue={start => setSchedule(current => ({...current, start}))}/></label><label>Ends<EnglishTimeInput required value={schedule.end} onChangeValue={end => setSchedule(current => ({...current, end}))}/></label></div> : null}
                 <label>Reason<textarea value={schedule.reason} onChange={event => setSchedule(current => ({...current, reason: event.target.value}))}/></label>
                 <button className={styles.primary} disabled={createScheduleRequest.isPending}>Submit request</button>
               </form> : null}
               {createScheduleRequest.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(createScheduleRequest.error, 'Schedule request could not be submitted.')}</p> : null}
               {contentRecord?.requests !== undefined ? <div className={styles.compactResult}><RecordSummaryList value={contentRecord.requests} emptyMessage="No schedule requests have been submitted."/></div> : null}
-            </section>
+            </CollapsibleSection>
           ) : null}
 
           {section === 'messages' ? (
-            <section className={styles.card}>
-              <div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Student support</p><h2>Conversation</h2></div><span className={styles.countBadge}>{messages.length}</span></div>
+            <CollapsibleSection title="Conversation" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{messages.length}</span>}>
+
               {messages.length === 0 ? <div className={styles.emptyState}><strong>No messages yet</strong><span>Start the conversation below.</span></div> : <div className={styles.messageList}>{messages.map((item, index) => <article className={styles.messageRow} key={item.messageId ?? index}><div className={styles.rowTitle}><strong>{item.senderUserId == null ? 'Conversation message' : `User #${item.senderUserId}`}</strong><small>{item.createdAt || ''}</small></div><p>{item.body || 'Message has no text content.'}</p>{(item.attachments?.length ?? 0) > 0 ? <div className={styles.attachmentList}>{item.attachments?.map(attachment => attachment.attachmentId == null ? null : <div className={styles.attachmentRow} key={attachment.attachmentId}><span>{attachment.originalName || 'Attachment'}</span><div className={styles.actions}>{attachment.previewAvailable ? <button type="button" className={styles.secondary} onClick={() => void previewAttachment(attachment.attachmentId!)}>Preview</button> : null}<button type="button" className={styles.secondary} onClick={() => void parentApiService.downloadConversationAttachment(studentUserId!, attachment.attachmentId!).then(blob => saveBlob(blob, attachment.originalName || 'conversation-attachment'))}>Download</button></div></div>)}</div> : null}{item.messageId != null ? <button type="button" className={styles.textButton} disabled={markMessageRead.isPending} onClick={() => markMessageRead.mutate(item.messageId!)}>Mark read through this message</button> : null}</article>)}</div>}
+              {conversation.hasNextPage ? <button type="button" className={styles.secondary} disabled={conversation.isFetchingNextPage} onClick={() => void conversation.fetchNextPage()}>Load older messages</button> : null}
               <form className={styles.composeBox} onSubmit={event => { event.preventDefault(); sendMessage.mutate(); }}>
                 <label htmlFor="parent-message">Message</label><textarea id="parent-message" value={message} onChange={event => setMessage(event.target.value)} placeholder="Write to the advising team…"/>
                 <label htmlFor="parent-message-files">Attachments</label><input key={fileInputKey} id="parent-message-files" type="file" multiple onChange={event => setMessageFiles(Array.from(event.target.files ?? []))}/>
@@ -246,26 +268,26 @@ const ParentPortalPage: React.FC = () => {
                 <button className={styles.primary} disabled={(!message.trim() && messageFiles.length === 0) || sendMessage.isPending}>Send message</button>
               </form>
               {sendMessage.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(sendMessage.error, 'Message could not be sent.')}</p> : null}
-            </section>
+            </CollapsibleSection>
           ) : null}
 
           {section === 'reports' ? (
-            <section className={styles.card}><div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Published updates</p><h2>Reports</h2></div><span className={styles.countBadge}>{reportRows.length}</span></div>{reportRows.length === 0 ? <div className={styles.emptyState}><strong>No published reports</strong><span>Published learning reports will appear here.</span></div> : <div className={styles.inboxList}>{reportRows.map((row, index) => { const reportId = numberField(row, 'reportId'); return <article className={styles.inboxRow} key={reportId ?? index}><div className={styles.inboxMain}><strong>{textField(row, 'reportType', 'title') || 'Learning report'}</strong><span>{textField(row, 'overallSummary', 'summary') || textField(row, 'publishedAt') || 'Published report'}</span></div>{reportId != null ? <button type="button" className={styles.secondary} onClick={() => setSelectedReportId(reportId)}>Open report</button> : null}</article>; })}</div>}{reportDetail.data ? <div className={styles.reportDetail}><h3>{reportDetail.data.reportType || 'Report detail'}</h3><p>{reportDetail.data.overallSummary}</p>{reportDetail.data.strengths ? <p><strong>Strengths</strong><br/>{reportDetail.data.strengths}</p> : null}{reportDetail.data.improvementSuggestions ? <p><strong>Next steps</strong><br/>{reportDetail.data.improvementSuggestions}</p> : null}</div> : null}</section>
+            <CollapsibleSection title="Reports" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{reportRows.length}</span>}>{reportRows.length === 0 ? <div className={styles.emptyState}><strong>No published reports</strong><span>Published learning reports will appear here.</span></div> : <div className={styles.inboxList}>{reportRows.map((row, index) => { const reportId = numberField(row, 'reportId'); return <article className={styles.inboxRow} key={reportId ?? index}><div className={styles.inboxMain}><strong>{textField(row, 'reportType', 'title') || 'Learning report'}</strong><span>{textField(row, 'overallSummary', 'summary') || textField(row, 'publishedAt') || 'Published report'}</span></div>{reportId != null ? <button type="button" className={styles.secondary} onClick={() => setSelectedReportId(reportId)}>Open report</button> : null}</article>; })}</div>}{reportDetail.data ? <div className={styles.reportDetail}><h3>{reportDetail.data.reportType || 'Report detail'}</h3><p>{reportDetail.data.overallSummary}</p>{reportDetail.data.strengths ? <p><strong>Strengths</strong><br/>{reportDetail.data.strengths}</p> : null}{reportDetail.data.improvementSuggestions ? <p><strong>Next steps</strong><br/>{reportDetail.data.improvementSuggestions}</p> : null}</div> : null}</CollapsibleSection>
           ) : null}
 
           {section === 'notifications' ? (
-            <section className={styles.card}><div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Updates</p><h2>Notifications</h2></div><button type="button" className={styles.secondary} disabled={markAllNotificationsRead.isPending || notifications.length === 0} onClick={() => markAllNotificationsRead.mutate()}>Mark all read</button></div>{notifications.length === 0 ? <div className={styles.emptyState}><strong>No notifications</strong><span>New academic updates will appear here.</span></div> : <div className={styles.inboxList}>{notifications.map((item, index) => <article className={styles.inboxRow} key={item.notificationId ?? index}><div className={styles.inboxMain}><div className={styles.rowTitle}><strong>{item.notificationType || 'Notification'}</strong>{item.readAt ? <span className={styles.statusPill}>Read</span> : <span className={styles.unreadBadge}>New</span>}</div><span>{item.message || 'Academic update'}</span><small>{[item.courseCode, item.createdAt].filter(Boolean).join(' · ')}</small></div>{item.notificationId != null && !item.readAt ? <button type="button" className={styles.secondary} disabled={markNotificationRead.isPending} onClick={() => markNotificationRead.mutate(item.notificationId!)}>Mark read</button> : null}</article>)}</div>}</section>
+            <CollapsibleSection title="Notifications" className={styles.disclosureLayout}><div className={styles.sectionHeading}><button type="button" className={styles.secondary} disabled={markAllNotificationsRead.isPending || notifications.length === 0} onClick={() => markAllNotificationsRead.mutate()}>Mark all read</button></div>{notifications.length === 0 ? <div className={styles.emptyState}><strong>No notifications</strong><span>New academic updates will appear here.</span></div> : <div className={styles.inboxList}>{notifications.map((item, index) => <article className={styles.inboxRow} key={item.notificationId ?? index}><div className={styles.inboxMain}><div className={styles.rowTitle}><strong>{item.notificationType || 'Notification'}</strong>{item.readAt ? <span className={styles.statusPill}>Read</span> : <span className={styles.unreadBadge}>New</span>}</div><span>{item.message || 'Academic update'}</span><small>{[item.courseCode, item.createdAt].filter(Boolean).join(' · ')}</small></div>{item.notificationId != null && !item.readAt ? <button type="button" className={styles.secondary} disabled={markNotificationRead.isPending} onClick={() => markNotificationRead.mutate(item.notificationId!)}>Mark read</button> : null}</article>)}</div>}</CollapsibleSection>
           ) : null}
 
-          {!['schedule', 'messages', 'reports', 'notifications'].includes(section) ? <section className={styles.card}>
-            <h2>{SECTIONS.find(item => item.id === section)?.label}</h2>
+          {!['schedule', 'messages', 'reports', 'notifications', 'exams'].includes(section) ? <CollapsibleSection title={SECTIONS.find(item => item.id === section)?.label ?? 'Student overview'} className={styles.disclosureLayout}>
+
             {content.isPending ? <p className={styles.status}>Loading…</p> : null}
             {content.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(content.error, 'This section could not be loaded.')}</p> : null}
             {content.data !== undefined ? <RecordSummaryList value={content.data} emptyMessage={`No ${SECTIONS.find(item => item.id === section)?.label.toLowerCase()} records are available.`}/> : null}
-          </section> : null}
+          </CollapsibleSection> : null}
         </>
       ) : null}
-    </main>
+    </div>
   );
 };
 

@@ -373,16 +373,15 @@ components:
           example: AVAILABLE
         courseCode:
           type: string
-          description: Course code when available. Null when courseId is null.
-          example: CS101
           nullable: true
+          description: Course code when available. Null for course-less ADVISOR_TASK and STUDY_PLAN_CHECKPOINT events.
+          example: CS101
         courseId:
           type: integer
           format: int32
-          description: Course id when the event is course-scoped. Null for course-less
-            ADVISOR_TASK and STUDY_PLAN_CHECKPOINT events.
-          example: 7
           nullable: true
+          description: Course id when the event is course-scoped. Null for course-less ADVISOR_TASK and STUDY_PLAN_CHECKPOINT events.
+          example: 7
         createdAt:
           type: string
           format: date-time

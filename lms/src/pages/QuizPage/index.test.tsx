@@ -11,6 +11,8 @@ const quizApi = vi.hoisted(() => ({
   getCurrentAttempt: vi.fn(),
   getMyResult: vi.fn(),
   listAttempts: vi.fn(),
+  listMyAttempts: vi.fn(),
+  getAttemptReceipt: vi.fn(),
   startAttempt: vi.fn(),
   autosaveAnswer: vi.fn(),
   submitAttempt: vi.fn(),
@@ -85,6 +87,7 @@ describe('QuizPage Question Attempt Gate', () => {
     vi.clearAllMocks();
     quizApi.getQuiz.mockResolvedValue(response(quizData));
     quizApi.listAttempts.mockResolvedValue(response([]));
+    quizApi.listMyAttempts.mockResolvedValue(response([]));
     quizApi.getMyResult.mockRejectedValue({code: 404, details: {code: 'QUIZ_ATTEMPT_NOT_FOUND'}});
   });
 

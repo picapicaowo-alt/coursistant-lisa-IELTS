@@ -32,6 +32,13 @@ export class IdempotencyCheckpoint {
       this.checkpoints.delete(operation);
     }
   }
+
+  async run<TPayload, T>(operation: string, payload: TPayload, request: (key: string, payload: TPayload) => Promise<T>): Promise<T> {
+    const key = this.keyFor(operation, idempotencyFingerprint(payload));
+    const result = await request(key, payload);
+    this.complete(operation, key);
+    return result;
+  }
 }
 
 const jsonReplacer = (_key: string, value: unknown): unknown => {

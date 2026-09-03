@@ -151,4 +151,17 @@ describe('AdvisorApiService', () => {
     expect((body as FormData).getAll('files')).toEqual([file]);
     expect(config).toEqual({headers: {'Idempotency-Key': 'upload-key'}});
   });
+  it('uses new Advisor directories and combines search with paging filters', async () => {
+    await service.listInstructors({q: 'Ivy', page: 1, size: 20});
+    await service.listOwnedCourses({q: 'writing', launchState: 'DRAFT', page: 0, size: 20});
+    await service.listStudents(1, 20, {q: 'Wong', risk: 'AT_RISK', studentType: 'VIP'});
+    await service.searchGroupCourseOptions(41, {q: 'Academic', page: 0, size: 20});
+    await service.listConversations(2, 20, {q: 'Wong', unreadOnly: true});
+    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/advisor/instructors', {params: {q: 'Ivy', page: 1, size: 20}});
+    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/advisor/courses', {params: {q: 'writing', launchState: 'DRAFT', page: 0, size: 20}});
+    expect(client.get).toHaveBeenNthCalledWith(3, '/v2/advisor/students', {params: {page: 1, size: 20, q: 'Wong', risk: 'AT_RISK', studentType: 'VIP'}});
+    expect(client.get).toHaveBeenNthCalledWith(4, '/v2/advisor/students/41/course-options', {params: {q: 'Academic', page: 0, size: 20}});
+    expect(client.get).toHaveBeenNthCalledWith(5, '/v2/advisor/conversations', {params: {page: 2, size: 20, q: 'Wong', unreadOnly: true}});
+  });
+
 });

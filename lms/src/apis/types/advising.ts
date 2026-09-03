@@ -1,3 +1,4 @@
+import type {AdvisorActionTaskTarget} from './advisorWorkspace';
 /** Advising contracts from docs/api/advising.openapi.yaml. */
 
 export type StudentType = 'VIP' | 'STANDARD';
@@ -472,6 +473,7 @@ export interface InstructorStudentProfileContextResponse {
 }
 
 export interface AdvisorActionTaskResponse {
+  target?: AdvisorActionTaskTarget | null;
   taskId?: number;
   studentUserId?: number;
   taskType?: string;

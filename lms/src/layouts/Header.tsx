@@ -115,7 +115,7 @@ const Header = () => {
       )}
 
       <div className={styles.accountActions}>
-        {user?.role === 'USER' ? <NotificationCenter/> : null}
+        {user?.role === 'USER' ? <NotificationCenter identity={user ?? undefined}/> : null}
         <div className={styles.profile} ref={menuRef}>
           <img
             className={styles.avatar}

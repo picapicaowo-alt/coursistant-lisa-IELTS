@@ -25,7 +25,7 @@ describe('Counsellor dashboard interactions', () => {
     const assigned = await screen.findByRole('button', {name: /2 Assigned/});
     fireEvent.click(assigned);
     expect(screen.getByText('Assigned means the handover is complete')).toBeInTheDocument();
-    expect(screen.getByText(/backend removes assigned intakes from Counsellor access immediately/i)).toBeInTheDocument();
+    expect(screen.getByText(/Counsellor access ends as soon as a student is handed over/i)).toBeInTheDocument();
   });
 
   it('links the actionable unassigned count to the queue', async () => {

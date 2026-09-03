@@ -1,3 +1,4 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {FormEvent, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowRightLeft, RefreshCw, Search} from 'lucide-react';
@@ -23,6 +24,7 @@ export const OwnershipPanel = () => {
   const [searchDraft, setSearchDraft] = useState('');
   const [query, setQuery] = useState('');
   const [page, setPage] = useState(0);
+  const [editorReveal, setEditorReveal] = useState(0);
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const [advisor, setAdvisor] = useState<ManagedUser | null>(null);
   const [reason, setReason] = useState('');
@@ -71,21 +73,21 @@ export const OwnershipPanel = () => {
 
   return (
     <div className={styles.directoryLayout}>
-      <section className={styles.primaryPanel} aria-labelledby="ownership-title">
-        <div className={styles.panelHeading}><div><h2 id="ownership-title">Course ownership</h2><p>Govern course owners without opening the teaching Course catalogue.</p></div><button type="button" className={styles.iconButton} aria-label="Refresh ownerships" onClick={() => void ownerships.refetch()}><RefreshCw size={18}/></button></div>
+      <CollapsibleSection title="Course ownership" headingId="ownership-title" summary="Govern course owners without opening the teaching Course catalogue.">
+        <div className={styles.panelHeading}><button type="button" className={styles.iconButton} aria-label="Refresh ownerships" onClick={() => void ownerships.refetch()}><RefreshCw size={18}/></button></div>
         <form className={styles.singleSearch} role="search" onSubmit={submitSearch}><label><span>Search by course code or title</span><div><Search size={17}/><input value={searchDraft} onChange={event => setSearchDraft(event.target.value)} placeholder="Course code or title"/></div></label><button className={styles.primaryButton}>Search</button></form>
         {ownerships.isPending ? <p className={styles.status}>Loading ownerships…</p> : null}
         {ownerships.isError ? <div className={styles.errorNotice} role="alert"><p>{getApiErrorMessage(ownerships.error, 'Course ownerships could not be loaded.')}</p><button type="button" onClick={() => void ownerships.refetch()}>Try again</button></div> : null}
         {!ownerships.isPending && !ownerships.isError && ownerships.data.items.length === 0 ? <p className={styles.empty}>No course ownerships match this search.</p> : null}
         <div className={styles.recordList}>
-          {ownerships.data?.items.map(item => <button type="button" className={selectedCourseId === item.courseId ? styles.selectedRecord : styles.record} key={item.courseId} onClick={() => { setSelectedCourseId(item.courseId); setAdvisor(null); setReason(''); setConfirmTransfer(false); setSuccess(''); }}><span><strong>{item.courseCode} · {item.title}</strong><small>{item.launchState ?? 'Launch state unavailable'} · {item.lifecycleState ?? 'Lifecycle unavailable'}</small></span><span className={styles.recordMeta}><em>{ownerName(item)}</em><small>Version {item.ownershipVersion}</small></span><ArrowRightLeft size={18}/></button>)}
+          {ownerships.data?.items.map(item => <button type="button" className={selectedCourseId === item.courseId ? styles.selectedRecord : styles.record} key={item.courseId} onClick={() => { setEditorReveal(current => current + 1); setSelectedCourseId(item.courseId); setAdvisor(null); setReason(''); setConfirmTransfer(false); setSuccess(''); }}><span><strong>{item.courseCode} · {item.title}</strong><small>{item.launchState ?? 'Launch state unavailable'} · {item.lifecycleState ?? 'Lifecycle unavailable'}</small></span><span className={styles.recordMeta}><em>{ownerName(item)}</em><small>Version {item.ownershipVersion}</small></span><ArrowRightLeft size={18}/></button>)}
         </div>
         {ownerships.data && ownerships.data.total > PAGE_SIZE ? <nav className={styles.pagination} aria-label="Ownership pages"><button type="button" disabled={page === 0} onClick={() => setPage(current => current - 1)}>Previous</button><span>Page {page + 1} · {ownerships.data.total} courses</span><button type="button" disabled={(page + 1) * PAGE_SIZE >= ownerships.data.total} onClick={() => setPage(current => current + 1)}>Next</button></nav> : null}
-      </section>
+      </CollapsibleSection>
 
       <aside className={styles.sideColumn}>
-        <section className={styles.secondaryPanel} aria-labelledby="transfer-title">
-          <div className={styles.panelHeading}><div><h2 id="transfer-title">Transfer owner</h2><p>Use only for a governance handover.</p></div></div>
+        <CollapsibleSection title="Transfer owner" headingId="transfer-title" revealKey={editorReveal} summary="Use only for a governance handover.">
+
           {!selectedCourseId ? <p className={styles.empty}>Select a course to prepare a transfer.</p> : ownerDetail.isPending ? <p className={styles.status}>Loading current owner…</p> : ownerDetail.isError ? <div className={styles.errorNotice} role="alert"><p>{getApiErrorMessage(ownerDetail.error, 'The current owner could not be loaded.')}</p><button type="button" onClick={() => void ownerDetail.refetch()}>Try again</button></div> : ownerDetail.data ? <>
             <dl className={styles.detailList}><dt>Course</dt><dd>{ownerDetail.data.courseCode} · {ownerDetail.data.title}</dd><dt>Current owner</dt><dd>{ownerName(ownerDetail.data)}</dd><dt>Ownership version</dt><dd>{ownerDetail.data.ownershipVersion}</dd></dl>
             <form className={styles.form} onSubmit={event => { event.preventDefault(); setConfirmTransfer(true); }}>
@@ -97,7 +99,7 @@ export const OwnershipPanel = () => {
             {transfer.isError ? <p className={styles.inlineError} role="alert">{getApiErrorMessage(transfer.error, 'Ownership could not be transferred. Reload the current version and confirm eligibility.')}</p> : null}
             {success ? <p className={styles.inlineSuccess} role="status">{success}</p> : null}
           </> : null}
-        </section>
+        </CollapsibleSection>
       </aside>
     </div>
   );

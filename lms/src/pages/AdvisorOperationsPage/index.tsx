@@ -1,5 +1,13 @@
+import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {getApiErrorCode} from '@/utils/apiError';
+import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
+import {AdvisingPagination} from '../advising/AdvisingPagination';
+import {ADVISOR_PAGE_SIZE, ACTION_TASK_TYPES} from '@/apis/types/advisorWorkspace';
+import {OwnedCourses} from './OwnedCourses';
+import {actionTaskTargetPath} from './actionTaskTarget';
+import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import React, {useState} from 'react';
-import {Link} from 'react-router-dom';
+import {Link, useSearchParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {RecordSummaryList} from '@/components/RecordSummaryList';
 import {unwrapData} from '@/apis';
@@ -23,7 +31,20 @@ const formatDateTime = (value?: string): string => {
 
 const AdvisorOperationsPage: React.FC = () => {
   const queryClient = useQueryClient();
+  const idempotency = useIdempotencyCheckpoint();
+  const [searchParams] = useSearchParams();
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null);
+  const [taskPage, setTaskPage] = useState(0);
+  const [taskFilters, setTaskFilters] = useState({status: '', priority: '', type: '', studentType: ''});
+  const [conversationPage, setConversationPage] = useState(0);
+  const [conversationSearch, setConversationSearch] = useState('');
+  const [unreadOnly, setUnreadOnly] = useState(false);
+  const [schedulePage, setSchedulePage] = useState(0);
+  const [requestType, setRequestType] = useState('');
+  const studentFilter = Number(searchParams.get('studentUserId')) || undefined;
+
   const [scheduleReview, setScheduleReview] = useState<AdvisorScheduleRequestView | null>(null);
+  const [scheduleConflict, setScheduleConflict] = useState(false);
   const [scheduleDecision, setScheduleDecision] = useState('APPROVE');
   const [rejectionReason, setRejectionReason] = useState('');
   const [instructorId, setInstructorId] = useState('');
@@ -35,18 +56,24 @@ const AdvisorOperationsPage: React.FC = () => {
     retry: false,
   });
   const tasks = useQuery({
-    queryKey: ['advisor', 'action-tasks'],
-    queryFn: async () => unwrapData(await advisorApiService.listActionTasks({page: 0, size: 50}), 'advisorActionTasks'),
+    queryKey: ['advisor', 'action-tasks', taskPage, taskFilters],
+    queryFn: async () => unwrapData(await advisorApiService.listActionTasks({page: taskPage, size: ADVISOR_PAGE_SIZE, status: taskFilters.status || undefined, priority: taskFilters.priority || undefined, type: taskFilters.type || undefined, studentType: taskFilters.studentType || undefined}), 'advisorActionTasks'),
+    retry: false,
+  });
+  const taskDetail = useQuery({
+    queryKey: ['advisor', 'action-task', selectedTaskId],
+    queryFn: async () => unwrapData(await advisorApiService.getActionTask(selectedTaskId!), 'advisorActionTask'),
+    enabled: selectedTaskId != null,
     retry: false,
   });
   const conversations = useQuery({
-    queryKey: ['advisor', 'conversations'],
-    queryFn: async () => unwrapData(await advisorApiService.listConversations(), 'advisorConversations'),
+    queryKey: ['advisor', 'conversations', conversationPage, conversationSearch, unreadOnly],
+    queryFn: async () => unwrapData(await advisorApiService.listConversations(conversationPage, ADVISOR_PAGE_SIZE, {q: conversationSearch || undefined, unreadOnly}), 'advisorConversations'),
     retry: false,
   });
   const scheduleRequests = useQuery({
-    queryKey: ['advisor', 'schedule-requests'],
-    queryFn: async () => unwrapData(await courseOperationsApiService.listAdvisorScheduleRequests(), 'advisorScheduleRequests'),
+    queryKey: ['advisor', 'schedule-requests', schedulePage, requestType, studentFilter],
+    queryFn: async () => unwrapData(await courseOperationsApiService.listAdvisorScheduleRequests({page: schedulePage, size: ADVISOR_PAGE_SIZE, requestType: requestType || undefined, studentUserId: studentFilter}), 'advisorScheduleRequests'),
     retry: false,
   });
   const availability = useQuery({
@@ -62,9 +89,14 @@ const AdvisorOperationsPage: React.FC = () => {
   const taskMutation = useMutation({
     mutationFn: ({action, taskId, version}: {action: 'start' | 'resolve'; taskId: number; version?: number}) =>
       action === 'start'
-        ? advisorApiService.startActionTask(taskId, {expectedVersion: version})
-        : advisorApiService.resolveActionTask(taskId, {expectedVersion: version}),
-    onSuccess: async () => queryClient.invalidateQueries({queryKey: ['advisor', 'action-tasks']}),
+        ? advisorApiService.startActionTask(taskId, {expectedVersion: version}, idempotency.keyFor(`start-task-${taskId}`, String(version)))
+        : advisorApiService.resolveActionTask(taskId, {expectedVersion: version}, idempotency.keyFor(`resolve-task-${taskId}`, String(version))),
+    onSuccess: async () => {await Promise.all([
+      queryClient.invalidateQueries({queryKey: ['advisor', 'action-tasks']}),
+      queryClient.invalidateQueries({queryKey: ['advisor', 'action-task']}),
+      queryClient.invalidateQueries({queryKey: ['advisor', 'dashboard']}),
+    ]);},
+    onError: async () => {await queryClient.invalidateQueries({queryKey: ['advisor', 'action-tasks']});},
   });
   const scheduleMutation = useMutation({
     mutationFn: (request: AdvisorScheduleRequestView) => courseOperationsApiService.decideAdvisorScheduleRequest(
@@ -74,8 +106,11 @@ const AdvisorOperationsPage: React.FC = () => {
         expectedVersion: request.expectedVersion,
         rejectionReason: scheduleDecision === 'REJECT' ? rejectionReason : undefined,
       },
+      idempotency.keyFor(`schedule-decision-${request.requestId}`, idempotencyFingerprint({version: request.expectedVersion, scheduleDecision, rejectionReason})),
     ),
+    onError: error => {if (getApiErrorCode(error)?.endsWith('VERSION_CONFLICT')) setScheduleConflict(true);},
     onSuccess: async () => {
+      setScheduleConflict(false);
       setScheduleReview(null);
       setRejectionReason('');
       await Promise.all([
@@ -92,10 +127,10 @@ const AdvisorOperationsPage: React.FC = () => {
   const scheduleError = scheduleRequests.error || scheduleMutation.error;
 
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Advisor work desk</p>
+
           <h1>Today’s student work</h1>
           <p className={styles.lede}>Open a student to manage courses, support, reports, hours, and conversation history.</p>
         </div>
@@ -113,14 +148,12 @@ const AdvisorOperationsPage: React.FC = () => {
       </section>
 
       <div className={styles.advisorColumns}>
-        <section className={styles.card}>
-          <div className={styles.sectionHeading}>
-            <div><p className={styles.sectionKicker}>Work queue</p><h2>Action tasks</h2></div>
-            <span className={styles.countBadge}>{tasks.data?.total ?? 0}</span>
-          </div>
+        <CollapsibleSection title="Action tasks" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{tasks.data?.total ?? 0}</span>}>
+
+          <div className={`${styles.form} ${styles.formGrid}`}>{(['status', 'priority', 'type', 'studentType'] as const).map(field => <label key={field}>{{status: 'Status', priority: 'Priority', type: 'Task type', studentType: 'Student type'}[field]}<select value={taskFilters[field]} onChange={event => {setTaskFilters(current => ({...current, [field]: event.target.value})); setTaskPage(0);}}><option value="">All</option>{(field === 'status' ? ['PENDING', 'IN_PROGRESS', 'RESOLVED'] : field === 'priority' ? ['HIGH', 'MEDIUM', 'LOW'] : field === 'studentType' ? ['VIP', 'STANDARD'] : ACTION_TASK_TYPES).map(value => <option key={value}>{value}</option>)}</select></label>)}</div>
           {tasksError ? <p className={styles.error} role="alert">{advisingErrorMessage(tasksError, 'Action tasks could not be loaded.')}</p> : null}
           {tasks.isPending ? <p className={styles.status}>Loading tasks…</p> : null}
-          {!tasks.isPending && (tasks.data?.items.length ?? 0) === 0 ? <div className={styles.emptyState}><strong>No action tasks need attention</strong><span>New support and follow-up tasks will appear here.</span></div> : null}
+          {!tasks.isPending && !tasks.isError && (tasks.data?.items.length ?? 0) === 0 ? <div className={styles.emptyState}><strong>No action tasks need attention</strong><span>New support and follow-up tasks will appear here.</span></div> : null}
           <div className={styles.inboxList}>
             {(tasks.data?.items ?? []).map((task, index) => (
               <article className={styles.inboxRow} key={task.taskId ?? index}>
@@ -129,24 +162,29 @@ const AdvisorOperationsPage: React.FC = () => {
                   <strong>{task.description || task.taskType || `Task #${task.taskId}`}</strong>
                   <small>{task.category || 'Student support'} · {task.status || 'Open'} · Student #{task.studentUserId ?? '—'}</small>
                 </div>
-                {task.taskId != null ? <div className={styles.actions}>
-                  {task.studentUserId != null ? <Link className={styles.secondaryLink} to={`/advisor/students/${task.studentUserId}/support`}>Open student</Link> : null}
-                  <button className={styles.secondary} disabled={taskMutation.isPending || task.status === 'IN_PROGRESS'} onClick={() => taskMutation.mutate({action: 'start', taskId: task.taskId!, version: task.version})}>Start</button>
-                  <button className={styles.primary} disabled={taskMutation.isPending || task.status === 'RESOLVED'} onClick={() => taskMutation.mutate({action: 'resolve', taskId: task.taskId!, version: task.version})}>Resolve</button>
+                {task.taskId != null ? <div className={styles.actions}><button type="button" className={styles.secondary} aria-expanded={selectedTaskId === task.taskId} onClick={() => setSelectedTaskId(current => current === task.taskId ? null : task.taskId!)}>Details</button>
+                  {actionTaskTargetPath(task.target) ? <Link className={styles.secondaryLink} to={actionTaskTargetPath(task.target)!}>Open task record</Link> : null}
+                  <button className={styles.secondary} disabled={taskMutation.isPending || task.version == null || task.status !== 'PENDING'} onClick={() => taskMutation.mutate({action: 'start', taskId: task.taskId!, version: task.version})}>Start</button>
+                  <button className={styles.primary} disabled={taskMutation.isPending || task.version == null || task.status === 'RESOLVED'} onClick={() => taskMutation.mutate({action: 'resolve', taskId: task.taskId!, version: task.version})}>Resolve</button>
                 </div> : null}
               </article>
             ))}
           </div>
-        </section>
+          {selectedTaskId != null ? <section className={styles.reviewPanel} aria-label="Action task details">
+            {taskDetail.isPending ? <p role="status">Loading task…</p> : null}
+            {taskDetail.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskDetail.error, 'This task is unavailable.')}</p> : null}
+            {taskDetail.data ? <><h3>{taskDetail.data.description || 'Action task'}</h3><p>{taskDetail.data.status} · {taskDetail.data.priority}</p><p>{taskDetail.data.createdAt ? `Created ${formatDateTime(taskDetail.data.createdAt)}` : ''}</p>{taskDetail.data.resolvedAt ? <p>Resolved {formatDateTime(taskDetail.data.resolvedAt)}</p> : null}</> : null}
+          </section> : null}
+          <AdvisingPagination label="Action task pages" page={taskPage} total={tasks.data?.total ?? 0} onPage={setTaskPage}/>
+        </CollapsibleSection>
 
-        <section className={styles.card}>
-          <div className={styles.sectionHeading}>
-            <div><p className={styles.sectionKicker}>Inbox</p><h2>Student conversations</h2></div>
-            <span className={styles.countBadge}>{conversationRows.length}</span>
-          </div>
+        <CollapsibleSection title="Student conversations" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{conversations.data?.total ?? 0}</span>}>
+
+          <div className={styles.form}><label>Search conversations<input type="search" maxLength={100} value={conversationSearch} onChange={event => {setConversationSearch(event.target.value); setConversationPage(0);}}/></label>
+          <label className={styles.inlineCheckbox}><input type="checkbox" checked={unreadOnly} onChange={event => {setUnreadOnly(event.target.checked); setConversationPage(0);}}/>Unread only</label></div>
           {conversations.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(conversations.error, 'Conversations could not be loaded.')}</p> : null}
           {conversations.isPending ? <p className={styles.status}>Loading conversations…</p> : null}
-          {!conversations.isPending && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No assigned student conversations</strong><span>Open the student queue to review assignments.</span></div> : null}
+          {!conversations.isPending && !conversations.isError && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No assigned student conversations</strong><span>Open the student queue to review assignments.</span></div> : null}
           <div className={styles.inboxList}>
             {conversationRows.map(conversation => (
               <article className={styles.inboxRow} key={conversation.studentUserId}>
@@ -160,17 +198,17 @@ const AdvisorOperationsPage: React.FC = () => {
               </article>
             ))}
           </div>
-        </section>
+          <AdvisingPagination label="Conversation pages" page={conversationPage} total={conversations.data?.total ?? 0} onPage={setConversationPage}/>
+        </CollapsibleSection>
       </div>
 
-      <section className={`${styles.card} ${styles.wideCard}`}>
-        <div className={styles.sectionHeading}>
-          <div><p className={styles.sectionKicker}>Approvals</p><h2>Schedule requests</h2></div>
-          <span className={styles.countBadge}>{scheduleRows.length}</span>
-        </div>
+      <CollapsibleSection title="Schedule requests" id="schedule-requests" className={styles.disclosureLayout} meta={<span className={styles.countBadge}>{scheduleRequests.data?.total ?? 0}</span>}>
+
+        <div className={styles.form}><label>Request type<select value={requestType} onChange={event => {setRequestType(event.target.value); setSchedulePage(0);}}><option value="">All requests</option><option>ABSENCE</option><option>SCHEDULE_CHANGE</option></select></label></div>
+        {studentFilter ? <p>Requests for student #{studentFilter} · <Link to="/advisor/operations#schedule-requests">Show all students</Link></p> : null}
         {scheduleError ? <p className={styles.error} role="alert">{advisingErrorMessage(scheduleError, 'Schedule requests could not be loaded.')}</p> : null}
         {scheduleRequests.isPending ? <p className={styles.status}>Loading schedule requests…</p> : null}
-        {!scheduleRequests.isPending && scheduleRows.length === 0 ? <div className={styles.emptyState}><strong>No schedule requests are waiting</strong><span>Student and parent requests will appear here with the record version required for a safe decision.</span></div> : null}
+        {!scheduleRequests.isPending && !scheduleRequests.isError && scheduleRows.length === 0 ? <div className={styles.emptyState}><strong>No schedule requests are waiting</strong><span>Student and parent requests will appear here with the record version required for a safe decision.</span></div> : null}
         <div className={styles.inboxList}>
           {scheduleRows.map(request => (
             <article className={styles.inboxRow} key={request.requestId}>
@@ -179,34 +217,37 @@ const AdvisorOperationsPage: React.FC = () => {
                 <span>{request.courseLabel}{request.requestedDate ? ` · ${request.requestedDate}` : ''}{request.requestedTime ? ` · ${request.requestedTime}` : ''}</span>
                 {request.reason ? <small>{request.reason}</small> : null}
               </div>
-              <button className={styles.primary} disabled={request.expectedVersion == null} onClick={() => setScheduleReview(request)}>Review request</button>
+              <button className={styles.primary} disabled={request.expectedVersion == null} onClick={() => {setScheduleReview(request); setScheduleConflict(false);}}>Review request</button>
             </article>
           ))}
         </div>
+        <AdvisingPagination label="Schedule request pages" page={schedulePage} total={scheduleRequests.data?.total ?? 0} onPage={setSchedulePage}/>
         {scheduleReview ? (
           <form className={styles.reviewPanel} onSubmit={event => { event.preventDefault(); scheduleMutation.mutate(scheduleReview); }}>
             <div><strong>Review request #{scheduleReview.requestId}</strong><span>{scheduleReview.studentName} · version {scheduleReview.expectedVersion}</span></div>
+            {scheduleConflict ? <div role="alert"><p>The request changed. Your decision and reason are preserved.</p><button type="button" onClick={() => void scheduleRequests.refetch().then(result => {const latest = advisorScheduleRequestViews(result.data).find(item => item.requestId === scheduleReview.requestId); if (latest) {setScheduleReview(latest); setScheduleConflict(false);} else if (!result.isError) setScheduleReview(null);})}>Load latest request</button></div> : null}
             <label>Decision<select value={scheduleDecision} onChange={event => setScheduleDecision(event.target.value)}>{SCHEDULE_DECISIONS.map(decision => <option key={decision}>{decision}</option>)}</select></label>
             {scheduleDecision === 'REJECT' ? <label>Reason<textarea required value={rejectionReason} onChange={event => setRejectionReason(event.target.value)}/></label> : null}
             <div className={styles.actions}>
-              <button className={styles.primary} disabled={scheduleMutation.isPending || (scheduleDecision === 'REJECT' && !rejectionReason.trim())}>{scheduleMutation.isPending ? 'Saving…' : 'Save decision'}</button>
+              <button className={styles.primary} disabled={scheduleMutation.isPending || scheduleConflict || (scheduleDecision === 'REJECT' && !rejectionReason.trim())}>{scheduleMutation.isPending ? 'Saving…' : 'Save decision'}</button>
               <button type="button" className={styles.secondary} onClick={() => setScheduleReview(null)}>Cancel</button>
             </div>
           </form>
         ) : null}
-      </section>
+      </CollapsibleSection>
 
-      <section className={`${styles.card} ${styles.wideCard}`}>
-        <div className={styles.sectionHeading}><div><p className={styles.sectionKicker}>Planning reference</p><h2>Instructor availability</h2></div></div>
+      <CollapsibleSection title="Instructor availability" className={styles.disclosureLayout}>
+
         <form className={styles.inlineLookup} onSubmit={event => { event.preventDefault(); setAvailabilityInstructorId(Number(instructorId)); }}>
-          <label>Instructor user ID<input required inputMode="numeric" value={instructorId} onChange={event => setInstructorId(event.target.value)}/></label>
+          <AdvisorInstructorPicker required value={instructorId} onChange={setInstructorId}/>
           <button className={styles.primary} disabled={!Number(instructorId) || availability.isFetching}>Check availability</button>
         </form>
-        <p className={styles.muted}>Use the instructor assigned to a one-to-one course. Instructor directory search is not available for Advisor accounts yet.</p>
+
         {availability.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(availability.error, 'Instructor availability could not be loaded.')}</p> : null}
         {availability.data !== undefined ? <div className={styles.compactResult}><RecordSummaryList value={availability.data} emptyMessage="No availability is recorded for this instructor."/></div> : null}
-      </section>
-    </main>
+      </CollapsibleSection>
+      <OwnedCourses/>
+    </div>
   );
 };
 

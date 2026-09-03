@@ -1,3 +1,4 @@
+import type {AdvisorStudentFilters, AdvisorInstructor, AdvisorOwnedCourse, AdvisorOwnedCourseFilters, AdvisorConversationSummary, AdvisorStudentHub} from '../types/advisorWorkspace';
 import {
   AdvisingPage,
   AdvisorStudentProfileResponse,
@@ -45,8 +46,16 @@ export class AdvisorApiService {
     if (apiClient) this.apiClient = apiClient;
   }
 
-  listStudents(page = 0, size = 20): Promise<ApiResponse<AdvisingPage<AdvisorStudentSummaryResponse>>> {
-    return this.apiClient.get('/v2/advisor/students', {params: {page, size}});
+  listStudents(page = 0, size = 20, filters: AdvisorStudentFilters = {}): Promise<ApiResponse<AdvisingPage<AdvisorStudentSummaryResponse>>> {
+    return this.apiClient.get('/v2/advisor/students', {params: {page, size, ...filters}});
+  }
+
+  listInstructors(params: {q?: string; page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<AdvisorInstructor>>> {
+    return this.apiClient.get('/v2/advisor/instructors', {params});
+  }
+
+  listOwnedCourses(params: AdvisorOwnedCourseFilters = {}): Promise<ApiResponse<AdvisingPage<AdvisorOwnedCourse>>> {
+    return this.apiClient.get('/v2/advisor/courses', {params});
   }
 
   getStudentIntake(studentUserId: number): Promise<ApiResponse<StudentIntakeResponse>> {
@@ -150,7 +159,7 @@ export class AdvisorApiService {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/courses`);
   }
 
-  searchGroupCourseOptions(studentUserId: number, params: {query?: string; page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<GroupCourseOptionResponse>>> {
+  searchGroupCourseOptions(studentUserId: number, params: {q?: string; page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<GroupCourseOptionResponse>>> {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/course-options`, {params});
   }
 
@@ -238,7 +247,7 @@ export class AdvisorApiService {
     return this.apiClient.get('/v2/advisor/dashboard');
   }
 
-  getStudentHub(studentUserId: number): Promise<ApiResponse<AdvisingOpenApiRead>> {
+  getStudentHub(studentUserId: number): Promise<ApiResponse<AdvisorStudentHub>> {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/hub`);
   }
 
@@ -246,8 +255,8 @@ export class AdvisorApiService {
     return this.apiClient.get(`/v2/advisor/students/${studentUserId}/student-reports`, {params: {page, size}});
   }
 
-  listConversations(page = 0, size = 20): Promise<ApiResponse<AdvisingOpenApiRead>> {
-    return this.apiClient.get('/v2/advisor/conversations', {params: {page, size}});
+  listConversations(page = 0, size = 20, filters: {q?: string; unreadOnly?: boolean} = {}): Promise<ApiResponse<AdvisingPage<AdvisorConversationSummary>>> {
+    return this.apiClient.get('/v2/advisor/conversations', {params: {page, size, ...filters}});
   }
 
   listConversationMessages(studentUserId: number, beforeId?: number): Promise<ApiResponse<AdvisingOpenApiRead>> {
@@ -313,7 +322,7 @@ export class AdvisorApiService {
     return this.getConversationAttachment(`/v2/student/advisor-conversation/attachments/${attachmentId}/download`);
   }
 
-  listActionTasks(params: {status?: string; category?: string; page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<AdvisorActionTaskResponse>>> {
+  listActionTasks(params: {status?: string; priority?: string; type?: string; studentType?: string; studentUserId?: number; page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<AdvisorActionTaskResponse>>> {
     return this.apiClient.get('/v2/advisor/action-tasks', {params});
   }
 

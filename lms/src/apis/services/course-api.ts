@@ -33,13 +33,13 @@ import {
 
 export class CourseApiService {
   private apiClient = V2ApiClient;
-  
+
   constructor(apiClient?: typeof V2ApiClient) {
     if (apiClient) {
       this.apiClient = apiClient;
     }
   }
-  
+
   /**
    * Browses courses across the tenant.
    *
@@ -55,7 +55,7 @@ export class CourseApiService {
       throw error;
     }
   }
-  
+
   /** The course's recurring weekly schedule. Visible to any enrolled member. */
   async getCourseSessions(courseId: number): Promise<ApiResponse<CourseSession[]>> {
     try {
@@ -66,8 +66,8 @@ export class CourseApiService {
     }
   }
 
-  async createCourseSession(courseId: number, request: CourseSessionPayload): Promise<ApiResponse<CourseSession>> {
-    return this.apiClient.post(`/v2/courses/${courseId}/sessions`, request, idempotent());
+  async createCourseSession(courseId: number, request: CourseSessionPayload, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseSession>> {
+    return this.apiClient.post(`/v2/courses/${courseId}/sessions`, request, idempotent(key));
   }
 
   async updateCourseSession(courseId: number, sessionId: number, request: CourseSessionPayload): Promise<ApiResponse<CourseSession>> {
@@ -133,8 +133,8 @@ export class CourseApiService {
   }
 
   /** Creates an Active course using the current v2 contract. */
-  async createCourse(request: CreateCourseRequest): Promise<ApiResponse<CourseResponse>> {
-    return this.apiClient.post<CourseResponse>('/v2/courses', request, idempotent());
+  async createCourse(request: CreateCourseRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseResponse>> {
+    return this.apiClient.post<CourseResponse>('/v2/courses', request, idempotent(key));
   }
 
   /**
@@ -607,7 +607,7 @@ export class CourseApiService {
       idempotent(idempotencyKey)
     );
   }
-  
+
   /**
    * Edits a course. Course Manager only.
    *

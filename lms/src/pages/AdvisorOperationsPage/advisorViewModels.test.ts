@@ -21,7 +21,7 @@ describe('Advisor view models', () => {
   });
 
   it('turns conversation summaries into student-first inbox rows', () => {
-    expect(advisorConversationViews([{studentUserId: 560, studentName: 'Student One', unreadCount: 2, threadId: 7}]))
+    expect(advisorConversationViews([{studentUserId: 560, studentFirstName: 'Student', studentLastName: 'One', unreadCount: 2, threadId: 7}]))
       .toEqual([{studentUserId: 560, studentName: 'Student One', unreadCount: 2, hasThread: true}]);
   });
 

@@ -1,3 +1,4 @@
+import {formatPersonName} from '@/utils/personName';
 import type {AdvisorConversationAttachmentResponse, AdvisorConversationMessageResponse} from '@/apis';
 
 type UnknownRecord = Record<string, unknown>;
@@ -72,7 +73,7 @@ export const advisorConversationViews = (value: unknown): AdvisorConversationSum
     if (studentUserId == null) return [];
     return [{
       studentUserId,
-      studentName: readString(record, 'studentName', 'name') ?? `Student #${studentUserId}`,
+      studentName: formatPersonName({firstName: readString(record, 'studentFirstName'), middleName: readString(record, 'studentMiddleName'), lastName: readString(record, 'studentLastName')}, `Student #${studentUserId}`),
       latestPreview: readString(record, 'latestPreview'),
       latestAt: readString(record, 'latestAt'),
       unreadCount: readNumber(record, 'unreadCount') ?? 0,

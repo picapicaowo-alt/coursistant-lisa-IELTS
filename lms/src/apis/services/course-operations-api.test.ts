@@ -64,15 +64,15 @@ describe('CourseOperationsApiService', () => {
     expect(client.put).toHaveBeenCalledWith('/v2/tenant/courses/3/owner', {ownerAdvisorUserId: 44, expectedOwnershipVersion: 2, reason: 'Coverage'});
   });
 
-  it('uses the advisor schedule and availability contracts without invented list parameters', async () => {
+  it('uses the advisor schedule pagination and availability contracts', async () => {
     client.get.mockResolvedValue({status: 200, data: {}});
     client.post.mockResolvedValue({status: 200, data: {}});
 
-    await service.listAdvisorScheduleRequests();
+    await service.listAdvisorScheduleRequests({page: 1, size: 20, requestType: 'ABSENCE', studentUserId: 9});
     await service.getAdvisorInstructorAvailability(44);
     await service.decideAdvisorScheduleRequest(19, {decision: 'APPROVE', expectedVersion: 3}, 'decision-19');
 
-    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/advisor/schedule-requests');
+    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/advisor/schedule-requests', {params: {page: 1, size: 20, requestType: 'ABSENCE', studentUserId: 9}});
     expect(client.get).toHaveBeenNthCalledWith(2, '/v2/advisor/instructors/44/availability');
     expect(client.post).toHaveBeenCalledWith(
       '/v2/advisor/schedule-requests/19/decision',
