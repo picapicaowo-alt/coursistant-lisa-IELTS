@@ -1,0 +1,61 @@
+{
+  "recordedAtUtc": "2026-09-03T16:05:51.584151+00:00",
+  "baseline": [
+    {
+      "command": "npm run lint:ci",
+      "status": "passed",
+      "log": "/tmp/xlearn-material-lint.log",
+      "logSha256": "2d900f156a768698f121eabc98a3ebc543deb798c1759baf3078716ec44d8b63"
+    },
+    {
+      "command": "npm run typecheck",
+      "status": "passed",
+      "log": "/tmp/xlearn-material-types.log",
+      "logSha256": "e7f565cee4d54f11dd1b6903002840f56cb07385faef58ac2dbf0631d4dc89f3"
+    },
+    {
+      "command": "npm run typecheck:production",
+      "status": "passed",
+      "log": "/tmp/xlearn-material-production-types.log",
+      "logSha256": "b0136c2504a8de0295909046dfb18484ecf9d4ea8775579d6543ef80b3ca96c7"
+    },
+    {
+      "command": "npm run test:run -- --maxWorkers=4",
+      "status": "passed",
+      "log": "/tmp/xlearn-material-units.log",
+      "logSha256": "98309d211f667a74960d3098833a4f77e4e916e9fb5ffcac2785bf70825eccc3"
+    },
+    {
+      "command": "npm run build",
+      "status": "passed",
+      "log": "/tmp/xlearn-material-build.log",
+      "logSha256": "82d8580b67bc0eb7de3376bd2b2ab1c0c06c9b69aa8a9744534e45150f2ac5c2"
+    },
+    {
+      "command": "CI=1 PLAYWRIGHT_PORT=4190 npm run test:e2e -- --workers=4 --retries=0",
+      "status": "passed",
+      "log": "/tmp/xlearn-material-e2e.log",
+      "logSha256": "14d48482fc65c3d459b6914d735fb15884599e1967c4c3eebef791f37c46ad6f"
+    }
+  ],
+  "unitFiles": 130,
+  "unitTests": 542,
+  "browserTests": 86,
+  "browserPort": 4190,
+  "browserRetries": 0,
+  "browserFilters": null,
+  "authenticatedLiveCourseAcceptance": false,
+  "releaseTarget": "Dev 8085 only",
+  "screenshots": [
+    {
+      "viewportWidth": 390,
+      "path": "/tmp/xlearn-material-followup/pdf-390.png",
+      "sha256": "ebab7945c10079b30c09c6c7c023dd53d4e1342b054a4e5c802360e22c27e572"
+    },
+    {
+      "viewportWidth": 1440,
+      "path": "/tmp/xlearn-material-followup/pdf-1440.png",
+      "sha256": "dc2d13ea0296821ab101d9d4a27a484c6b58311d508b2758bc70183693697cbf"
+    }
+  ]
+}

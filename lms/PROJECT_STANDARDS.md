@@ -223,6 +223,15 @@ Historical normalized-store designs in `STATE_MANAGEMENT.md` / `ARCHITECTURE.md`
 - A new UI kit needs the architecture decision described in section 1 and a
   shared integration boundary; page-level experimental imports are not allowed.
 - Keep interactive affordances keyboard-reachable; do not rely on color alone for state.
+- Follow supplied Figma composition, spacing, action hierarchy and semantic
+  colors. The frame-to-route/API registry is
+  `../docs/final-figma-review-2026-09-03.md`; missing contracts are recorded there
+  rather than filled with invented records or successful-looking controls.
+- Without a direct Figma reference, compose the desktop workspace on a responsive
+  12-column grid with dominant and supporting regions. Use full-width modules
+  when the task needs them, preserve intentional whitespace, and collapse columns
+  at smaller breakpoints. Do not collect unrelated feature pages under Dashboard
+  or use centered vertical card stacks as the desktop default.
 
 ---
 
