@@ -47,6 +47,34 @@
   }
 }
 
+.tenantHeader {
+  flex-shrink: 0;
+  min-height: 5.25rem;
+  padding-inline: clamp(1.5rem, 3vw, 3.5rem);
+  border-bottom: 1px solid t.$border-default;
+
+  .workspaceContext {
+    display: flex;
+    align-items: center;
+    gap: .625rem;
+
+    strong {
+      padding: .25rem .75rem;
+      border-radius: .375rem;
+      background: t.$surface-subtle;
+      font-size: t.$font-size-body;
+    }
+  }
+
+  .profileCopy { width: auto; max-width: 12rem; }
+
+  @media (max-width: 700px) {
+    min-height: 4.25rem;
+    padding-inline: 1rem;
+    .workspaceContext > span { display: none; }
+  }
+}
+
 .workspaceContext {
   display: grid;
   min-width: 0;

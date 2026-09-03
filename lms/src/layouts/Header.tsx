@@ -94,7 +94,7 @@ const Header = () => {
   };
 
   return (
-    <header className={styles.header}>
+    <header className={`${styles.header} ${isTenantAdmin ? styles.tenantHeader : ''}`}>
       {canSearchCourses ? (
         <form
           className={styles.search}
@@ -114,8 +114,8 @@ const Header = () => {
         </form>
       ) : (
         <div className={styles.workspaceContext}>
-          <span>Workspace</span>
-          <strong>{pathname === APP_ROUTE_PATHS.parent ? PARENT_SECTIONS[getParentSection(new URLSearchParams(search))].label : getWorkspaceLabel(pathname, instructor)}</strong>
+          <span>Workspace{isTenantAdmin ? ':' : ''}</span>
+          <strong>{isTenantAdmin ? 'Administration' : pathname === APP_ROUTE_PATHS.parent ? PARENT_SECTIONS[getParentSection(new URLSearchParams(search))].label : getWorkspaceLabel(pathname, instructor)}</strong>
         </div>
       )}
 
@@ -125,7 +125,7 @@ const Header = () => {
           <UserAvatar className={styles.avatar} src={profileImage}/>
           <div className={styles.profileCopy}>
             <strong>{name}</strong>
-            <span>{email}</span>
+            <span>{isTenantAdmin ? 'Tenant Administrator' : email}</span>
           </div>
           <button
             ref={menuButtonRef}

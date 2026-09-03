@@ -1,0 +1,44 @@
+.dateTimeField {
+  flex: 1 1 18.5rem !important;
+  min-width: min(100%, 18.5rem) !important;
+  max-width: 26rem;
+  // Reserve the calendar button even when shared form input padding wins the cascade.
+  input {
+    padding-right: 2.9rem !important;
+  }
+}
+@media (max-width: 700px) {
+  .dateTimeField {
+    flex-basis: 100% !important;
+    max-width: none;
+  }
+}
+.advanced {
+  width: 100%;
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+}
+.advanced summary {
+  cursor: pointer;
+  padding: t.$space-2 0;
+}
+.advanced > div {
+  padding-top: t.$space-3;
+}
+.change {
+  max-width: 20rem;
+  font-size: t.$font-size-body;
+}
+.change summary {
+  cursor: pointer;
+  color: t.$action-primary;
+  white-space: nowrap;
+  padding-block: 0.6rem;
+}
+.change pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: t.$space-3;
+  background: t.$surface-subtle;
+  border-radius: t.$radius-sm;
+}

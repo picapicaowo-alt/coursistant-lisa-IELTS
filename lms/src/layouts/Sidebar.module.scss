@@ -101,6 +101,25 @@
   object-fit: contain;
 }
 
+// Tenant administration follows the supplied white, wider desktop rail.
+// Other role workspaces and the user's collapsed navigation keep their sizing.
+.sidebar[data-workspace='tenant'] {
+  background: t.$surface-canvas;
+  border-right: 1px solid t.$border-default;
+
+  @media (min-width: 701px) {
+    &:not([data-collapsed]) {
+      width: clamp(13.5rem, 16vw, 17.5rem);
+      min-width: clamp(13.5rem, 16vw, 17.5rem);
+      padding-inline: 1.25rem;
+    }
+
+    .desktopNavigation { margin-top: 2.75rem; }
+    .navigationItem { min-height: 3.125rem; border-radius: .75rem; }
+    .logo { padding-inline: .625rem; }
+  }
+}
+
 @media (max-width: 700px) {
   .sidebar {
     position: fixed;

@@ -21,6 +21,24 @@
   padding: 0 1rem;
 }
 
+.filterPicker {
+  width: auto;
+  max-width: 100%;
+
+  .trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-width: 12rem;
+    border: 1px solid t.$border-default;
+    background: t.$surface-canvas;
+    color: t.$content-primary;
+    font-weight: t.$fw-medium;
+    border-radius: t.$radius-sm;
+  }
+}
+
 .selection {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;

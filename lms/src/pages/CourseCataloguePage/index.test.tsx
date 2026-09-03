@@ -92,13 +92,13 @@ describe('CourseCataloguePage for platform administrators', () => {
         <MemoryRouter initialEntries={['/course']}>
           <Routes>
             <Route path="/course" element={<CourseCataloguePage/>}/>
-            <Route path="/admin/intakes" element={<div>Tenant intake home</div>}/>
+            <Route path="/admin/dashboard" element={<div>Tenant dashboard</div>}/>
           </Routes>
         </MemoryRouter>
       </QueryClientProvider>
     );
 
-    expect(await screen.findByText('Tenant intake home')).toBeInTheDocument();
+    expect(await screen.findByText('Tenant dashboard')).toBeInTheDocument();
     expect(mocks.browseCourses).not.toHaveBeenCalled();
     expect(mocks.getMyCourses).not.toHaveBeenCalled();
   });

@@ -1,4 +1,5 @@
 import type {LoginAccountType, LoginResponse, UserLevel} from '@/apis';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {
   canAccessDashboard,
   isAdvisorAccount,
@@ -26,10 +27,10 @@ export const isTenantAdminRole = (role: LoginAccountType): boolean =>
 /**
  * Post-login home. Counsellor and Advisor get the new advising verticals.
  * Other USER accounts keep the course LMS. Non-USER accounts keep /course,
- * except TENANT_ADMIN which now lands on intake operations.
+ * Tenant Admin lands on its tenant-safe administration overview.
  */
 export const getSignedInHomePath = (user: Pick<LoginResponse, 'role' | 'level'>): string => {
-  if (isTenantAdminAccount(user)) return '/admin/intakes';
+  if (isTenantAdminAccount(user)) return APP_ROUTE_PATHS.adminDashboard;
   if (isSystemAdminAccount(user)) return '/course';
   if (isCounsellorAccount(user)) return '/counsellor';
   if (isAdvisorAccount(user)) return '/advisor/students';

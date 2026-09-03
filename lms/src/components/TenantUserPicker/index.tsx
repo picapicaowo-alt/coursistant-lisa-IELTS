@@ -1,6 +1,6 @@
 import {FormEvent, useMemo, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {Search, UserRoundCheck, X} from 'lucide-react';
+import {ChevronDown, Search, UserRoundCheck, X} from 'lucide-react';
 import type {ManagedUser, UserLevel} from '@/apis';
 import {unwrapData} from '@/apis';
 import {adminApiService} from '@/apis/services/admin-api';
@@ -10,6 +10,8 @@ import styles from './index.module.scss';
 const PAGE_SIZE = 20;
 
 interface TenantUserPickerProps {
+  variant?: 'action' | 'filter';
+  includeAllAccounts?: boolean;
   description: string;
   levels: UserLevel[];
   onSelect: (user: ManagedUser) => void;
@@ -19,6 +21,8 @@ interface TenantUserPickerProps {
 }
 
 export const TenantUserPicker = ({
+  variant = 'action',
+  includeAllAccounts = false,
   description,
   levels,
   onSelect,
@@ -34,12 +38,12 @@ export const TenantUserPicker = ({
   const [pendingSelection, setPendingSelection] = useState<ManagedUser | null>(selectedUser ?? null);
 
   const results = useQuery({
-    queryKey: ['tenant', 'user-picker', levels, query, page, PAGE_SIZE],
+    queryKey: ['tenant', 'user-picker', includeAllAccounts, levels, query, page, PAGE_SIZE],
     queryFn: async () => unwrapData(await adminApiService.listTenantUsers({
       q: query || undefined,
-      role: 'USER',
-      levels,
-      status: 'ACTIVE',
+      role: includeAllAccounts ? undefined : 'USER',
+      levels: includeAllAccounts ? undefined : levels,
+      status: includeAllAccounts ? undefined : 'ACTIVE',
       page,
       size: PAGE_SIZE,
     }), 'tenantUserPicker'),
@@ -74,14 +78,14 @@ export const TenantUserPicker = ({
   const searchId = `${title.replace(/\s+/g, '-').toLowerCase()}-search`;
 
   return (
-    <div className={styles.picker}>
+    <div className={`${styles.picker} ${variant === 'filter' ? styles.filterPicker : ''}`}>
       {selectedUser ? (
         <div className={styles.selection}>
           <UserRoundCheck aria-hidden="true" size={19}/>
           <span><strong>{formatPersonName(selectedUser, `User #${selectedUser.id}`)}</strong><small>{selectedUser.email} · {selectedUser.level}</small></span>
           <button type="button" className={styles.changeButton} onClick={open}>Change</button>
         </div>
-      ) : <button type="button" className={styles.trigger} onClick={open}>{triggerLabel}</button>}
+      ) : <button type="button" className={styles.trigger} onClick={open}>{triggerLabel}{variant === 'filter' ? <ChevronDown size={16}/> : null}</button>}
 
       <dialog className={styles.dialog} ref={dialogRef} onClose={() => { setIsOpen(false); setPendingSelection(selectedUser ?? null); }}>
         <div className={styles.dialogHeader}>
@@ -96,7 +100,7 @@ export const TenantUserPicker = ({
         <div className={styles.results} aria-busy={isPending}>
           {isPending ? <p className={styles.status} role="status">Loading eligible people…</p> : null}
           {isError ? <div className={styles.error} role="alert"><p>Eligible people could not be loaded.</p><button type="button" onClick={() => void results.refetch()}>Try again</button></div> : null}
-          {!isPending && !isError && users.length === 0 ? <p className={styles.status}>No active users match this search.</p> : null}
+          {!isPending && !isError && users.length === 0 ? <p className={styles.status}>No {includeAllAccounts ? '' : 'active '}users match this search.</p> : null}
           {users.map(user => (
             <label className={pendingSelection?.id === user.id ? styles.selectedRow : styles.row} key={user.id}>
               <input type="radio" name="tenant-user" checked={pendingSelection?.id === user.id} onChange={() => setPendingSelection(user)}/>

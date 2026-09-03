@@ -150,6 +150,7 @@ const Sidebar: React.FC = () => {
     });
   });
   if (isTenantAdminAccount(user)) {
+    addItem({to: APP_ROUTE_PATHS.adminDashboard, label: 'Dashboard', icon: LayoutDashboard, active: pathname === APP_ROUTE_PATHS.adminDashboard});
     addItem({
       to: APP_ROUTE_PATHS.adminIntakes,
       label: 'Intakes',
@@ -162,12 +163,15 @@ const Sidebar: React.FC = () => {
       to: APP_ROUTE_PATHS.admin,
       label: isTenantAdminAccount(user) ? 'Governance' : 'Admin Console',
       icon: Settings,
-      active: pathname === '/admin' || (pathname.startsWith('/admin/') && !pathname.startsWith('/admin/intakes') && !pathname.startsWith('/admin/students')),
+      active: pathname === APP_ROUTE_PATHS.admin,
     });
   }
 
   if (instructor && !advisor) {
     const order: string[] = [APP_ROUTE_PATHS.home, APP_ROUTE_PATHS.course, APP_ROUTE_PATHS.myOperations, APP_ROUTE_PATHS.mockExams, APP_ROUTE_PATHS.aibot, APP_ROUTE_PATHS.calendar, APP_ROUTE_PATHS.advisorOperations, APP_ROUTE_PATHS.advisorStudents, APP_ROUTE_PATHS.advisorMessages];
+    navigationItems.sort((a, b) => order.indexOf(a.to) - order.indexOf(b.to));
+  } else if (isTenantAdminAccount(user)) {
+    const order: string[] = [APP_ROUTE_PATHS.adminDashboard, APP_ROUTE_PATHS.admin, APP_ROUTE_PATHS.mockExams, APP_ROUTE_PATHS.adminIntakes];
     navigationItems.sort((a, b) => order.indexOf(a.to) - order.indexOf(b.to));
   } else if (canUseAdminConsole) {
     const adminIndex = navigationItems.findIndex(item => item.to === APP_ROUTE_PATHS.admin);
@@ -182,7 +186,7 @@ const Sidebar: React.FC = () => {
   }, [pathname, hash, search]);
 
   return (
-    <aside className={styles.sidebar} data-collapsed={collapsed || undefined} aria-label="Primary navigation">
+    <aside className={styles.sidebar} data-collapsed={collapsed || undefined} data-workspace={isTenantAdminAccount(user) ? 'tenant' : undefined} aria-label="Primary navigation">
       <Link to={homePath} className={styles.logo} aria-label={t('sidebar.dashboard')}>
         <img src="/icons/figma-dashboard/logo-mark.svg" alt=""/>
         <img className={styles.wordmark} src="/icons/figma-dashboard/logo-wordmark.svg" alt="X—LEARN"/>

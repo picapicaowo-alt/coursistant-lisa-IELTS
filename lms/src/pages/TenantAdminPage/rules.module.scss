@@ -1,0 +1,146 @@
+.modePicker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: t.$space-4;
+  border: 0;
+  margin: 0 0 t.$space-3;
+  padding: 0;
+}
+.modePicker legend {
+  margin-bottom: t.$space-3;
+  font-weight: t.$fw-semibold;
+}
+.modePicker > label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: t.$space-3;
+  background: t.$surface-canvas;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  padding: t.$space-4;
+  cursor: pointer;
+}
+.modePicker label:has(:checked) {
+  border-color: t.$action-primary;
+  background: rgba(t.$surface-brand-subtle, 0.3);
+}
+.modePicker input,
+.toggle input {
+  accent-color: t.$action-primary;
+  width: 1.15rem;
+  height: 1.15rem;
+}
+.modePicker strong,
+.modePicker small {
+  display: block;
+}
+.modePicker strong {
+  color: t.$content-primary;
+  font-weight: t.$fw-semibold;
+}
+.modePicker small {
+  margin-top: 0.3rem;
+  line-height: 1.5;
+  color: t.$content-secondary;
+}
+.rules {
+  display: grid;
+  gap: t.$space-4;
+}
+.rule {
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md;
+  background: t.$surface-canvas;
+}
+.rule summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: t.$space-6;
+  padding: t.$space-6;
+  cursor: pointer;
+  list-style: none;
+}
+.rule summary::-webkit-details-marker {
+  display: none;
+}
+.rule summary strong,
+.rule summary small {
+  display: block;
+}
+.rule summary strong {
+  font-size: t.$font-size-subhead;
+  font-weight: t.$fw-semibold;
+}
+.rule summary small {
+  margin-top: t.$space-2;
+  color: t.$content-secondary;
+  line-height: 1.6;
+}
+.ruleMeta {
+  display: flex;
+  align-items: center;
+  gap: t.$space-5;
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+  white-space: nowrap;
+}
+.fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 13rem), 1fr));
+  gap: t.$space-5;
+  border: 0;
+  border-top: 1px solid t.$border-default;
+  padding: t.$space-6;
+  margin: 0;
+}
+.fields .toggle {
+  flex-direction: row;
+  align-items: center;
+}
+.description {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+}
+.unsaved {
+  color: t.$feedback-warning;
+}
+.checkState {
+  color: t.$content-secondary;
+}
+.checkState[data-enabled="true"] {
+  color: t.$feedback-success;
+}
+.modeHint {
+  margin: 0;
+  padding: 0 t.$space-6 t.$space-5;
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+}
+@media (max-width: 700px) {
+  .modePicker {
+    gap: t.$space-2;
+  }
+  .modePicker > label {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    padding: t.$space-3 t.$space-2;
+    gap: t.$space-2;
+  }
+  .modePicker small {
+    display: none;
+  }
+  .rule summary {
+    padding: t.$space-5;
+    flex-wrap: wrap;
+    gap: t.$space-3;
+  }
+  .ruleMeta {
+    justify-content: space-between;
+    width: 100%;
+  }
+}

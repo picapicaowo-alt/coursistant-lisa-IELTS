@@ -124,7 +124,7 @@ for (const scenario of [
   {level: 'ADVISOR', denied: '/admin', home: '/advisor/students'},
   {level: 'COUNSELLOR', denied: '/advisor/operations', home: '/counsellor'},
   {level: 'PARENT', denied: '/course/31/assignments/21/grading', home: '/parent'},
-  {level: 'NOT_APPLICABLE', role: 'TENANT_ADMIN', denied: '/advisor/students/41/profile', home: '/admin/intakes'},
+  {level: 'NOT_APPLICABLE', role: 'TENANT_ADMIN', denied: '/advisor/students/41/profile', home: '/admin/dashboard'},
 ]) {
   test(`${scenario.level} cannot enter another role's workspace or call its APIs`, async ({page}) => {
     await signInFixture(page, scenario.level, scenario.role);

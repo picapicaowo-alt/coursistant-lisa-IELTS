@@ -513,9 +513,9 @@ test('tenant intake rows, filters, management panel, and advisor dialog stay ali
   expect(Math.abs((viewBox!.y + viewBox!.height / 2) - (manageBox!.y + manageBox!.height / 2))).toBeLessThan(2);
 
   await manage.click();
-  await expect(page.getByRole('heading', {name: 'Alex Chen'})).toBeVisible();
+  await expect(page.getByRole('dialog', {name: 'Intake management'}).getByText('Alex Chen', {exact: true})).toBeVisible();
   await page.getByRole('button', {name: 'Choose advisor'}).click();
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByRole('dialog').last();
   await expect(dialog).toBeVisible();
   const dialogBox = await dialog.boundingBox();
   const viewport = page.viewportSize();
@@ -547,7 +547,7 @@ test('tenant admin never sees or requests the system course catalogue', async ({
   await expect(page.getByRole('link', {name: 'Courses'})).toHaveCount(0);
 
   await page.goto('/course');
-  await expect(page).toHaveURL(/\/admin\/intakes$/);
+  await expect(page).toHaveURL(/\/admin\/dashboard$/);
   await expect.poll(() => courseCatalogueRequests).toBe(0);
 });
 
@@ -602,7 +602,7 @@ test('tenant admin can complete governance work using only the handoff routes', 
 
   await page.goto('/admin');
   await expect(page.getByRole('heading', {name: 'Tenant governance'})).toBeVisible();
-  await openSection(page, 'User directory');
+  await page.getByRole('button', {name: 'People', exact: true}).click();
   await expect(page.getByText('Ivy Instructor')).toBeVisible();
   await page.getByLabel('Search by name or email').fill('ivy@example.test');
   await page.getByRole('button', {name: 'Apply filters'}).click();
@@ -610,28 +610,27 @@ test('tenant admin can complete governance work using only the handoff routes', 
   await expect(page.getByRole('link', {name: 'Courses'})).toHaveCount(0);
 
   await page.getByRole('button', {name: 'Course ownership'}).click();
-  await openSection(page, 'Course ownership');
-  await expect(page.getByText('IELTS-71 · Academic Writing')).toBeVisible();
-  await page.getByRole('button', {name: /IELTS-71 · Academic Writing/}).click();
+  await expect(page.getByText('Academic Writing', {exact: true})).toBeVisible();
+  await page.getByRole('button', {name: 'Transfer owner of Academic Writing'}).click();
   await page.getByRole('button', {name: 'Choose eligible advisor'}).click();
-  await page.getByText('Ari Advisor', {exact: true}).click();
+  await page.getByRole('dialog').last().getByText('Ari Advisor', {exact: true}).click();
   await page.getByRole('button', {name: 'Use selected person'}).click();
   await page.getByLabel('Reason').fill('Coverage handover');
   await page.getByRole('button', {name: 'Review transfer'}).click();
   await page.getByRole('button', {name: 'Confirm transfer'}).click();
   await expect(page.getByText(/Ownership transferred to Ari Advisor/)).toBeVisible();
+  await page.keyboard.press('Escape');
 
   await page.getByRole('button', {name: 'Alert rules'}).click();
-  await openSection(page, 'Tenant alert rules');
   await page.getByText('Tenant override', {exact: true}).click();
+  await page.getByText('Learning inactivity', {exact: true}).click();
   await page.getByLabel('Inactivity (days)').fill('7');
   await page.getByRole('button', {name: 'Save alert rules'}).click();
   await expect(page.getByText('Alert rules saved from the latest server response.')).toBeVisible();
   expect(alertPutHeaders['idempotency-key']).toBeUndefined();
 
   await page.getByRole('button', {name: 'Audit'}).click();
-  await openSection(page, 'Governance audit');
-  await expect(page.getByText('MANAGED_USER_CREATED')).toBeVisible();
+  await expect(page.getByRole('cell', {name: /Managed user created/})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('tenant-governance.png'), fullPage: true});
 
   expect(requestedPaths.some(path => path.endsWith('/v2/courses'))).toBe(false);
@@ -688,17 +687,17 @@ test('tenant admin reviews protected mock-exam media and publishes only after th
   });
 
   await page.goto('/mock-exams');
-  await expect(page.getByRole('heading', {name: 'Build and release IELTS papers'})).toBeVisible();
-  await openSection(page, 'Compose exam content');
-  await openSection(page, 'IELTS Academic A');
-  await expect(page.getByRole('tab', {name: /Listening · Read only/})).toBeVisible();
+  await expect(page.getByRole('heading', {name: 'Mock exam templates'})).toBeVisible();
+  await page.getByRole('button', {name: 'Open template', exact: true}).click();
   await expect(page.getByRole('button', {name: 'Copy to new draft'})).toBeVisible();
   await expect(page.getByRole('button', {name: 'Delete draft'})).toBeVisible();
-  await expect(page.getByText(/Saved sections are read only under the current create-only API/)).toBeVisible();
+  await page.getByRole('button', {name: 'View section', exact: true}).first().click();
+  await expect(page.getByText(/This saved section is read only/)).toBeVisible();
   await page.getByRole('button', {name: 'Load audio'}).click();
   await expect(page.locator('audio')).toBeVisible();
   await expect.poll(() => audioRequests).toBe(1);
 
+  await page.getByRole('button', {name: 'Back to version', exact: true}).click();
   await page.getByRole('button', {name: 'Publish complete draft'}).click();
   await expect.poll(() => publishRequests).toBe(1);
   expect(sectionRequests).toEqual(expect.arrayContaining(['listening', 'reading', 'writing']));
@@ -726,11 +725,11 @@ test('creating a mock-exam draft opens the new version builder immediately', asy
   });
 
   await page.goto('/mock-exams');
-  await openSection(page, 'Template versions');
+  await page.getByRole('button', {name: 'New template', exact: true}).click();
   await page.getByLabel('Internal label').fill('Academic B');
-  await page.getByLabel('Candidate title').fill('IELTS Academic B');
-  await page.getByRole('button', {name: 'Create and open draft'}).click();
-  const builder = page.getByRole('heading', {name: 'Compose exam content'});
+  await page.getByLabel('Candidate-facing title').fill('IELTS Academic B');
+  await page.getByRole('button', {name: 'Create draft', exact: true}).click();
+  const builder = page.getByRole('heading', {name: 'IELTS Academic B', exact: true});
   await expect(builder).toBeVisible();
   await expect(builder).toBeInViewport();
   await expect(page.getByRole('button', {name: 'Delete draft'})).toBeVisible();

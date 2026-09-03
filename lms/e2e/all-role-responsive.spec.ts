@@ -71,7 +71,8 @@ for (const subject of cases) {
       expect(geometry.left).toBeGreaterThanOrEqual(0);
       expect(geometry.right).toBeLessThanOrEqual(width);
       expect(geometry.font).toBeGreaterThanOrEqual(28);
-      expect(geometry.font).toBeLessThanOrEqual(32);
+      // The approved tenant frames use a larger 40px desktop masthead.
+      expect(geometry.font).toBeLessThanOrEqual(subject.name === 'tenant-admin' ? 40 : 32);
       if (width === 390 || width === 1440) await page.screenshot({path: testInfo.outputPath(`${subject.name}-${width}.png`), fullPage: true});
     }
     expect(errors).toEqual([]);

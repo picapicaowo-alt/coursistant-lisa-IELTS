@@ -120,7 +120,7 @@ test('directory refresh preserves filters and visibly updates records', async ({
   await expect(page.getByRole('region', {name: 'User directory'}).getByText('Rachel Wong')).toBeVisible();
   await expect(page.getByRole('button', {name: 'Refresh directory'})).toBeEnabled();
   await page.getByRole('button', {name: 'Refresh directory'}).click();
-  await expect(page.getByRole('button', {name: 'Refreshing…'})).toBeDisabled();
+  await expect(page.getByRole('button', {name: 'Refresh directory'})).toBeDisabled();
   await expect(page.getByText('Directory refreshed.', {exact: false})).toBeVisible();
   await expect(page.getByText('Rachel Updated')).toBeVisible();
   expect(queries.at(-1)?.get('q')).toBe('Rachel');
