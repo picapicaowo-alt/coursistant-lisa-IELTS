@@ -523,9 +523,9 @@
 .readinessSummary { display: grid; grid-template-columns: auto 1fr; gap: t.$space-4; align-items: center; }
 .readinessMark { display: grid; width: 3rem; height: 3rem; place-items: center; border-radius: t.$radius-round; background: t.$surface-muted; color: t.$content-secondary; font-weight: t.$fw-bold; }
 .readinessMark[data-ready] { background: t.$feedback-success-surface; color: t.$feedback-success; }
-.readinessSummary strong,
-.readinessSummary span { display: block; }
-.readinessSummary span { margin-top: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.readinessSummary > div strong,
+.readinessSummary > div span { display: block; }
+.readinessSummary > div span { margin-top: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; }
 .checkList,
 .blockerList { display: grid; gap: t.$space-3; margin: 0; padding: 0; list-style: none; }
 .checkList li,

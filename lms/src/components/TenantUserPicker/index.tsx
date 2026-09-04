@@ -1,6 +1,7 @@
 import {FormEvent, useMemo, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {ChevronDown, Search, UserRoundCheck, X} from 'lucide-react';
+import {createPortal} from 'react-dom';
 import type {ManagedUser, UserLevel} from '@/apis';
 import {unwrapData} from '@/apis';
 import {adminApiService} from '@/apis/services/admin-api';
@@ -67,6 +68,8 @@ export const TenantUserPicker = ({
   };
   const submitSearch = (event: FormEvent) => {
     event.preventDefault();
+    // Portal events still bubble through React; searching must not submit the owner form.
+    event.stopPropagation();
     setPage(0);
     setQuery(searchDraft.trim());
   };
@@ -87,7 +90,9 @@ export const TenantUserPicker = ({
         </div>
       ) : <button type="button" className={styles.trigger} onClick={open}>{triggerLabel}{variant === 'filter' ? <ChevronDown size={16}/> : null}</button>}
 
-      <dialog className={styles.dialog} ref={dialogRef} aria-labelledby={`${searchId}-title`} onClose={() => { setIsOpen(false); setPendingSelection(selectedUser ?? null); }}>
+      {createPortal(<dialog className={styles.dialog} ref={dialogRef} aria-labelledby={`${searchId}-title`}
+        onCancel={event => event.stopPropagation()}
+        onClose={() => { setIsOpen(false); setPendingSelection(selectedUser ?? null); }}>
         <div className={styles.dialogHeader}>
           <div><h2 id={`${searchId}-title`}>{title}</h2><p>{description}</p></div>
           <button type="button" className={styles.iconButton} aria-label="Close selector" onClick={close}><X size={20}/></button>
@@ -119,7 +124,7 @@ export const TenantUserPicker = ({
           <button type="button" className={styles.cancelButton} onClick={close}>Cancel</button>
           <button type="button" className={styles.confirmButton} disabled={!pendingSelection} onClick={confirm}>Use selected person</button>
         </div>
-      </dialog>
+      </dialog>, document.body)}
     </div>
   );
 };

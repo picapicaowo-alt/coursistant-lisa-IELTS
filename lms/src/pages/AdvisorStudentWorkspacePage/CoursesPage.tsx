@@ -22,6 +22,7 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import cStyles from './CoursesPage.module.scss';
 import {CourseSummaryDialog} from './CourseSummaryDialog';
+import {EnrollmentDialog, type EnrollmentAction} from './EnrollmentDialog';
 
 const scheduleLabel = (dayOfWeek?: string, startTime?: string, endTime?: string) => {
   if (!dayOfWeek && !startTime) return null;
@@ -49,7 +50,7 @@ const CoursesPage: React.FC = () => {
   const [courseSearch, setCourseSearch] = useState('');
   const deferredCourseSearch = useDeferredValue(courseSearch.trim());
   const [alignmentNotes, setAlignmentNotes] = useState('');
-  const [withdrawReasons, setWithdrawReasons] = useState<Record<number, string>>({});
+  const [enrollmentCourse, setEnrollmentCourse] = useState<AdvisorStudentCourseResponse>();
   const [oneOnOne, setOneOnOne] = useState({
     title: '',
     instructorId: '',
@@ -207,10 +208,10 @@ const CoursesPage: React.FC = () => {
 
   const transition = useMutation({
     meta: {advisingStudentId: id},
-    mutationFn: async ({action, course}: {action: 'ready' | 'publish' | 'reconfirm' | 'complete' | 'withdraw'; course: AdvisorStudentCourseResponse}) => {
+    mutationFn: async ({action, course, reason}: {action: EnrollmentAction; course: AdvisorStudentCourseResponse; reason?: string}) => {
       const courseId = course.courseId;
       if (courseId == null) throw new Error('Course response is missing courseId');
-      if (action === 'withdraw' && (!withdrawReasons[courseId]?.trim() || course.courseLinkVersion == null)) {
+      if (action === 'withdraw' && (!reason?.trim() || course.courseLinkVersion == null)) {
         throw new Error('Provide a withdrawal reason and reload the current enrollment.');
       }
       if (action === 'ready')
@@ -239,11 +240,14 @@ const CoursesPage: React.FC = () => {
         );
       return idempotency.run(
         'withdrawGroupCourse',
-        [id, courseId, {expectedCourseLinkVersion: course.courseLinkVersion, reason: withdrawReasons[courseId]?.trim()}] satisfies Parameters<typeof advisorApiService.withdrawGroupCourse>,
+        [id, courseId, {expectedCourseLinkVersion: course.courseLinkVersion, reason: reason?.trim()}] satisfies Parameters<typeof advisorApiService.withdrawGroupCourse>,
         (key, args) => advisorApiService.withdrawGroupCourse(...args, key)
       );
     },
-    onSuccess: refresh,
+    onSuccess: async () => {
+      setEnrollmentCourse(undefined);
+      await refresh();
+    },
   });
 
   const updateOneOnOne = useMutation({
@@ -333,6 +337,11 @@ const CoursesPage: React.FC = () => {
   const reloadVersions = async () => {
     const [latestPlan, latestCourses] = await Promise.all([plan.refetch(), courses.refetch()]);
     if (latestPlan.isError || latestCourses.isError) return;
+    if (enrollmentCourse) {
+      // Advance the reviewed enrollment only after an explicit conflict reload.
+      const latestEnrollment = latestCourses.data?.find(course => course.courseId === enrollmentCourse.courseId);
+      setEnrollmentCourse(latestEnrollment && !['COMPLETED', 'HIDDEN'].includes(latestEnrollment.lifecycleStatus ?? '') && latestEnrollment.status !== 'WITHDRAWN' ? latestEnrollment : undefined);
+    }
     const selected = latestCourses.data?.find(course => String(course.courseId) === courseEdit.courseId);
     if (selected?.courseLaunchVersion != null)
       setCourseEdit(current => ({...current, expectedVersion: String(selected.courseLaunchVersion)}));
@@ -437,75 +446,7 @@ const CoursesPage: React.FC = () => {
               actions={<>
                 <button type="button" onClick={() => setSelectedCourse(course)}>View Course</button>
                 {!['COMPLETED', 'HIDDEN'].includes(course.lifecycleStatus ?? '') && course.status !== 'WITHDRAWN' ? (
-                  <details className={styles.lifecycleActions}><summary>Manage enrollment</summary><div>
-                    {course.deliveryMode === 'ONE_ON_ONE' && course.courseId != null ? (
-                      <button
-                        className={styles.secondary}
-                        onClick={() => {
-                          setEditorReveal(current => current + 1);
-                          setCourseEdit(current => ({
-                            ...current,
-                            courseId: String(course.courseId),
-                            expectedVersion:
-                              course.courseLaunchVersion == null ? '' : String(course.courseLaunchVersion),
-                            instructorId: course.instructorUserId == null ? '' : String(course.instructorUserId),
-                            type: COURSE_SESSION_TYPES.find(type => type === primarySchedule?.type) ?? COURSE_SESSION_TYPES[0],
-                            dayOfWeek: COURSE_SESSION_DAYS.find(day => day.value === primarySchedule?.dayOfWeek)?.value ?? COURSE_SESSION_DAYS[0].value,
-                            startTime: primarySchedule?.startTime?.slice(0, 5) ?? '',
-                            endTime: primarySchedule?.endTime?.slice(0, 5) ?? '',
-                            location: primarySchedule?.location ?? '',
-                          }));
-                        }}
-                      >
-                        Edit schedule
-                      </button>
-                    ) : null}
-                    <button
-                      disabled={needsReload || transition.isPending || !plan.data || course.courseLinkVersion == null}
-                      className={styles.secondary}
-                      onClick={() => transition.mutate({action: 'reconfirm', course})}
-                    >
-                      Reconfirm
-                    </button>
-                    {course.deliveryMode === 'ONE_ON_ONE' && course.launchState === 'DRAFT' ? (
-                      <button
-                        disabled={needsReload || transition.isPending || course.courseLaunchVersion == null}
-                        className={styles.secondary}
-                        onClick={() => transition.mutate({action: 'ready', course})}
-                      >
-                        Ready
-                      </button>
-                    ) : null}
-                    {course.deliveryMode === 'ONE_ON_ONE' && course.launchState === 'READY' ? (
-                      <button
-                        disabled={needsReload || transition.isPending || course.courseLaunchVersion == null}
-                        className={styles.primary}
-                        onClick={() => transition.mutate({action: 'publish', course})}
-                      >
-                        Publish
-                      </button>
-                    ) : null}
-                    <button
-                      disabled={needsReload || transition.isPending || course.completionVersion == null}
-                      className={styles.secondary}
-                      onClick={() => transition.mutate({action: 'complete', course})}
-                    >
-                      Complete
-                    </button>
-                    {course.deliveryMode === 'GROUP' ? (
-                      <label>
-                        Reason for withdrawal
-                        <input maxLength={1000} value={withdrawReasons[course.courseId!] ?? ''} onChange={event => setWithdrawReasons(current => ({...current, [course.courseId!]: event.target.value}))} />
-                      <button
-                        disabled={needsReload || transition.isPending || course.courseLinkVersion == null || !withdrawReasons[course.courseId!]?.trim()}
-                        className={styles.danger}
-                        onClick={() => transition.mutate({action: 'withdraw', course})}
-                      >
-                        Withdraw
-                      </button>
-                      </label>
-                    ) : null}
-                  </div></details>
+                  <button type="button" data-variant="secondary" onClick={() => {if (!needsReload) transition.reset(); setEnrollmentCourse(course);}}>Manage enrollment</button>
                 ) : (
                   <span className={styles.readOnlyBadge}>{course.lifecycleStatus || course.status}</span>
                 )}
@@ -517,6 +458,27 @@ const CoursesPage: React.FC = () => {
       </section>
 
       {selectedCourse ? <CourseSummaryDialog course={selectedCourse} onClose={() => setSelectedCourse(undefined)}/> : null}
+      {enrollmentCourse ? <EnrollmentDialog course={enrollmentCourse} pending={transition.isPending}
+        needsReload={needsReload} hasPlan={Boolean(plan.data)}
+        error={transition.isError ? advisingErrorMessage(transition.error, 'Enrollment could not be updated.') : undefined}
+        onReload={() => void reloadVersions()} onClose={() => setEnrollmentCourse(undefined)}
+        onAction={(action, reason) => {if (!transition.isPending) transition.mutate({action, course: enrollmentCourse, reason});}}
+        onEditSchedule={() => {
+          const primarySchedule = enrollmentCourse.schedule?.[0];
+          setEditorReveal(current => current + 1);
+          setCourseEdit(current => ({
+            ...current,
+            courseId: String(enrollmentCourse.courseId),
+            expectedVersion: enrollmentCourse.courseLaunchVersion == null ? '' : String(enrollmentCourse.courseLaunchVersion),
+            instructorId: enrollmentCourse.instructorUserId == null ? '' : String(enrollmentCourse.instructorUserId),
+            type: COURSE_SESSION_TYPES.find(type => type === primarySchedule?.type) ?? COURSE_SESSION_TYPES[0],
+            dayOfWeek: COURSE_SESSION_DAYS.find(day => day.value === primarySchedule?.dayOfWeek)?.value ?? COURSE_SESSION_DAYS[0].value,
+            startTime: primarySchedule?.startTime?.slice(0, 5) ?? '',
+            endTime: primarySchedule?.endTime?.slice(0, 5) ?? '',
+            location: primarySchedule?.location ?? '',
+          }));
+          setEnrollmentCourse(undefined);
+        }}/>: null}
       <CollapsibleSection title="Update a one-to-one course" revealKey={editorReveal}>
         {!courseEdit.courseId ? (
           <div className={styles.emptyState}>

@@ -87,6 +87,7 @@ for (const width of [1440, 390]) {
     await page.getByRole('button', {name: 'Edit schedule'}).click();
     await expect(sectionTrigger(page, 'Update a one-to-one course').locator('..')).toHaveAttribute('open', '');
     await sectionTrigger(page, 'Update a one-to-one course').click();
+    await page.locator('article').filter({has: page.getByRole('heading', {name: courses[1].title})}).getByRole('button', {name: 'Manage enrollment'}).click();
     await page.getByRole('button', {name: 'Edit schedule'}).click();
     await expect(sectionTrigger(page, 'Update a one-to-one course').locator('..')).toHaveAttribute('open', '');
     await sectionTrigger(page, 'Update a one-to-one course').click();

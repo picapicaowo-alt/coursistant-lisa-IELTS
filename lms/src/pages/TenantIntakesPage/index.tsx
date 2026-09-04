@@ -32,7 +32,7 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
 import {getApiErrorCode} from '@/utils/apiError';
-import {CreateIntakeDialog} from './CreateIntakeDialog';
+import {CreateIntakeDialog} from '@/components/StudentIntakeFormFields/CreateIntakeDialog';
 
 const PAGE_SIZE = TENANT_PAGE_SIZE;
 
