@@ -374,7 +374,7 @@ for (const width of [1752, 1440, 1024, 390]) {
   });
 }
 
-for (const width of [1440, 390]) {
+for (const width of [1440, 768, 390, 320]) {
   test(`complete Reading file import previews and posts once at ${width}px`, async ({
     page,
   }) => {
@@ -384,20 +384,40 @@ for (const width of [1440, 390]) {
     await page
       .getByRole('button', {name: 'Import Reading JSON', exact: true})
       .click();
-    await page
-      .getByLabel('Reading JSON file · up to 2 MB')
-      .setInputFiles({
-        name: 'reading.json',
-        mimeType: 'application/json',
-        buffer: Buffer.from(JSON.stringify(importedReading)),
-      });
-    await expect(
-      page.getByLabel('Or paste complete Reading JSON'),
-    ).toHaveValue(/Libraries serve/);
+    await page.getByLabel('Reading JSON file · up to 2 MB').setInputFiles({
+      name: 'reading.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify(importedReading)),
+    });
+    await expect(page.getByLabel('Or paste complete Reading JSON')).toHaveValue(
+      /Libraries serve/,
+    );
     await page
       .getByRole('button', {name: 'Validate JSON', exact: true})
       .click();
     await expect(page.getByText('Ready to load', {exact: false})).toBeVisible();
+    const importGeometry = await page
+      .getByRole('region', {name: 'Import complete Reading JSON'})
+      .evaluate((panel) => ({
+        overflow: panel.scrollWidth - panel.clientWidth,
+        fieldWidth: panel.querySelector('textarea')!.getBoundingClientRect()
+          .width,
+        availableWidth:
+          panel.clientWidth -
+          2 * parseFloat(getComputedStyle(panel).paddingLeft),
+      }));
+    expect(importGeometry.overflow).toBeLessThanOrEqual(1);
+    expect(importGeometry.fieldWidth).toBeCloseTo(
+      importGeometry.availableWidth,
+      0,
+    );
+    await mkdir('.impeccable/review/mock-authoring-import', {recursive: true});
+    await page
+      .getByRole('button', {name: 'Load into editor', exact: true})
+      .scrollIntoViewIfNeeded();
+    await page.screenshot({
+      path: `.impeccable/review/mock-authoring-import/import-${width}.png`,
+    });
     expect(writes).toEqual([]);
     expect(
       await page.evaluate(

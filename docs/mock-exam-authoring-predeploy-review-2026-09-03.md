@@ -24,14 +24,15 @@ The user subsequently added complete Reading JSON import to this same release. M
 1. Imported top-level `id` could be miscounted as a question number during automatic range updates. Number extraction now follows only active schema-marked answer slots; root metadata, answer keys and dormant text-cell IDs are ignored and preserved. Regression tests cover this at schema and editing levels.
 2. Matching-style options could share a key, making student responses ambiguous. Duplicate option labels are rejected for matching, headings and sentence endings.
 3. Diagram help text referred to an image control “below” after Media moved above it. Copy now identifies the Media section without a stale directional reference.
+4. Visual inspection found an unstyled narrow JSON input and clipped phone copy in the new import panel. It now inherits the shared form styles and uses shrinkable grid tracks. Regression checks measure the panel's own overflow and full-width textarea at 1440, 768, 390 and 320 px; confirmation captures were inspected.
 
 ## Local validation
 
 - Clean isolated `npm ci`: passed; lockfile unchanged.
 - `npm run lint:ci`, `npm run typecheck`, `npm run typecheck:production`: passed.
-- `npm run test:run`: **142 files / 629 tests passed**, including all 23 guided renderer cases.
+- `npm run test:run -- --maxWorkers=4`: **144 files / 651 tests passed**, including all 23 guided renderer cases and 12 JSON import cases, after incorporating the latest merged main (`d61f5d1`).
 - `npm run build`: passed.
-- `npm run build:dev`: passed. Full Dev-build preview E2E: **169 passed**, including small-screen/long-content cases.
+- `npm run build:dev`: passed. Full Dev-build preview E2E: **184 passed**. After the import-panel CSS correction, all **4** file-import flows passed at 1440/768/390/320 px, including edit/reload, explicit one-POST save, retained answer metadata, sparse ordering and internal geometry checks. The combined CI suite now contains 186 tests.
 - Impeccable static detector: no findings. Manual review scores: accessibility 3/4, performance 3/4, theming 3/4, responsive design 3/4, implementation integrity 4/4 (16/20). These are review judgments, not WCAG certification: screen-reader acceptance, exhaustive zoom/device coverage, dark mode and runtime performance profiling were not completed.
 - `git diff --check`: passed.
 

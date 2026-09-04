@@ -187,7 +187,7 @@ export function ReadingImport({
           <div className={ui.sectionHeading}>
             <h2>Import a complete Reading section</h2>
           </div>
-          <div className={styles.fields}>
+          <div className={`${ui.form} ${styles.fields}`}>
             <p>
               Upload a JSON file or paste the Reading request body. After
               validation, load all passages and question groups into the editor.

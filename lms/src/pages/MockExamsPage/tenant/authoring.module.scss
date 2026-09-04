@@ -40,6 +40,7 @@
 }
 .importTools {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   overflow-wrap: anywhere;
   justify-items: start;
   gap: t.$space-5;
@@ -91,6 +92,7 @@
 }
 .fields {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: t.$space-6;
   min-width: 0;
 }
