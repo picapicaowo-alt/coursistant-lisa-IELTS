@@ -175,6 +175,10 @@ export function TenantSectionComposer({
   };
   return (
     <div className={authoring.composer}>
+      {section !== 'writing' ? <div className={authoring.notice} role="note">
+        <strong>Correct answers are required before saving.</strong>
+        <p>The question form prepares the content students will see. Include verified answer keys in your imported or advanced question data; a preview alone does not mean the paper is ready to save or assign.</p>
+      </div> : null}
       {section === 'reading' && !review ? (
         <ReadingImport
           templateId={templateId}

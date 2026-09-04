@@ -33,6 +33,16 @@ describe('Counsellor dashboard interactions', () => {
     parentMocks.listCounsellorParentLinks.mockResolvedValue(response([]));
   });
 
+  it('shows a retryable error for malformed pages without NaN pagination or a false empty queue', async () => {
+    mocks.listStudentIntakes.mockResolvedValue(response([]));
+    mocks.listAdvisors.mockResolvedValue(response({items: [], page: 0, size: 0, total: 0}));
+    renderPage();
+    await waitFor(() => expect(screen.getAllByRole('alert')).toHaveLength(2));
+    expect(screen.queryByText(/NaN/)).not.toBeInTheDocument();
+    expect(screen.queryByText('No unassigned intakes')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('button', {name: 'Try again'})).toHaveLength(2);
+  });
+
   it('keeps count explanations contextual and only links the available queue', async () => {
     renderPage();
     expect(await screen.findByRole('link', {name: /1 Unassigned/})).toHaveAttribute('href', '/counsellor/intakes');

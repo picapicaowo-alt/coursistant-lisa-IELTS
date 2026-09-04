@@ -4,6 +4,7 @@ import {Bell, ChevronDown, LogOut, Settings, ShieldCheck, UserRound, type Lucide
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
+import {useProfileIdentity} from '@/hooks/useProfileIdentity';
 import NotificationCenter from '../components/NotificationCenter';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {getParentSection, parentHref, PARENT_SECTIONS} from '@/configs/parentNavigation';
@@ -42,15 +43,16 @@ const getWorkspaceLabel = (pathname: string, instructor: boolean): string => {
 const Header = () => {
   const {t} = useTranslation();
   const {user, logout} = useAuth();
+  const identity = useProfileIdentity(user);
   const {pathname, search} = useLocation();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const name = user?.name || 'Your profile';
+  const name = identity.name || 'Your profile';
   const email = user?.email;
-  const profileImage = user?.avatar;
+  const profileImage = identity.avatar;
   const canUseAdminConsole = user ? canAccessAdminConsole(user) : false;
   const isTenantAdmin = user?.role === 'TENANT_ADMIN';
   const canSearchCourses = user ? canAccessCourseCatalogue(user) && user.role === 'USER' : false;

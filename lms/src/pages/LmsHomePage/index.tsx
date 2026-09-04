@@ -6,6 +6,7 @@ import {Dashboard} from "@/pages/LmsHomePage/components/Dashboard";
 import {useRequiredAuth} from "@/contexts/RequiredAuthContext";
 import {getSignedInHomePath} from '@/utils/signedInHomePath';
 import {isInstructorLevel} from '@/utils/roleCapabilities';
+import {useProfileIdentity} from '@/hooks/useProfileIdentity';
 
 const LMSHome: React.FC = () => {
   const {user} = useRequiredAuth();
@@ -18,13 +19,14 @@ const LMSHome: React.FC = () => {
 
 const UserDashboard: React.FC = () => {
   const {user} = useRequiredAuth();
+  const identity = useProfileIdentity(user);
   const instructor = isInstructorLevel(user);
   
   return (
     <section className={styles.dashboardPage} aria-labelledby="dashboard-title">
       <header className={styles.welcomeHeader}>
-        <UserAvatar src={user.avatar} className={styles.welcomeAvatar}/>
-        <h1 id="dashboard-title">Welcome back, {user.name || (instructor ? 'instructor' : 'learner')}!</h1>
+        <UserAvatar src={identity.avatar} className={styles.welcomeAvatar}/>
+        <h1 id="dashboard-title">Welcome back, {identity.name || (instructor ? 'instructor' : 'learner')}!</h1>
       </header>
       <Dashboard audience={instructor ? 'instructor' : 'student'}/>
     </section>

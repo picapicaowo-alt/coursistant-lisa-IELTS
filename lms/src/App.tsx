@@ -31,11 +31,8 @@ const QuizEditorPage = lazy(() => import('./pages/QuizEditorPage'));
 const QuizGradingPage = lazy(() => import('./pages/QuizGradingPage'));
 const CourseGradesPage = lazy(() => import('./pages/CourseGradesPage'));
 const CalendarPage = lazy(() => import('./pages/CalendarPage'));
-const Post = lazy(() => import("./pages/post"));
-const PostDetail = lazy(() => import("./sections/posts/post-detail"));
 const Roster = lazy(() => import("./pages/RosterPage"));
 const Profile = lazy(() => import("./pages/profile"));
-const CreateContent = lazy(() => import("./sections/dashboard/new-content/create-content"));
 const AIBot = lazy(() => import("./pages/aibot"));
 const Settings = lazy(() => import("./pages/settings"));
 const Login = lazy(() => import("@/pages/LoginPage"));
@@ -150,12 +147,13 @@ const App = () => {
               </Route>
               <Route path={APP_ROUTE_PATHS.calendar} element={<RequireRoleAccess capability="calendar"><CalendarPage/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.myOperations} element={<RequireRoleAccess capability="myOperations"><MyOperationsPage/></RequireRoleAccess>}/>
-              <Route path={APP_ROUTE_PATHS.post} element={<RequireRoleAccess capability="courses"><Post/></RequireRoleAccess>}/>
-              <Route path={APP_ROUTE_PATHS.postPostId} element={<RequireRoleAccess capability="courses"><PostDetail/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.post} element={<RequireRoleAccess capability="courses"><Navigate to={APP_ROUTE_PATHS.course} replace/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.postPostId} element={<RequireRoleAccess capability="courses"><Navigate to={APP_ROUTE_PATHS.course} replace/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.roster} element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.rosterCourseId} element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.profile} element={<RequireRoleAccess capability="selfProfile"><Profile/></RequireRoleAccess>}/>
-              <Route path={APP_ROUTE_PATHS.createContentType} element={<RequireRoleAccess capability="courseAuthoring"><CreateContent/></RequireRoleAccess>}/>
+              {/* Legacy creation links have no course identity; select a course to use its real editors. */}
+              <Route path={APP_ROUTE_PATHS.createContentType} element={<RequireRoleAccess capability="courseAuthoring"><Navigate to={APP_ROUTE_PATHS.course} replace/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.aibot} element={<RequireRoleAccess capability="aiWorkspace"><AIBot/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.settings} element={<Settings/>}/>
               <Route path={APP_ROUTE_PATHS.admin} element={<RequireRoleAccess capability="adminConsole"><AdminLandingPage/></RequireRoleAccess>}/>

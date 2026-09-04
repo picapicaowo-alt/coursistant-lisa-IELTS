@@ -59,7 +59,7 @@ function DashboardCourses() {
   return <WorkspaceSection title="My courses" appearance="record" meta={viewAll(APP_ROUTE_PATHS.course)} className={s.courses} bodyClassName={s.courseBody}>
     <LearningQueryState query={{...query, isPending: query.isLoading}}/>
     {!query.isLoading && !query.isError && !query.courses.length ? <LearningEmpty icon={BookOpen} title="No active courses" description="Your enrolled courses will appear here."/> : null}
-    <div className={s.courseStrip} ref={strip} aria-label="Active courses">{query.courses.map(course => <DashboardCourseCard key={course.id} course={course}/>)}</div>
+    <div className={s.courseStrip} data-course-count={Math.min(query.courses.length, PREVIEW_LIMIT)} ref={strip} aria-label="Active courses">{query.courses.map(course => <DashboardCourseCard key={course.id} course={course}/>)}</div>
     {position.previous || position.next ? <nav className={s.carouselNav} aria-label="Course cards"><button type="button" aria-label="Previous courses" disabled={!position.previous} onClick={() => move(-1)}><ChevronLeft size={18}/></button><span>{query.courses.length} active courses</span><button type="button" aria-label="Next courses" disabled={!position.next} onClick={() => move(1)}><ChevronRight size={18}/></button></nav> : null}
   </WorkspaceSection>;
 }

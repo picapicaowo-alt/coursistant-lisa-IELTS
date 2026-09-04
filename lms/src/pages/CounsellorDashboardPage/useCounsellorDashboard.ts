@@ -1,11 +1,19 @@
 import {useEffect, useState} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {unwrapData} from '@/apis';
+import {ApiResponseDataError, unwrapData, type AdvisingPage} from '@/apis';
 import {counsellorApiService} from '@/apis/services/counsellor-api';
 import {parentApiService} from '@/apis/services/parent-api';
 import {parentLinkQueryKeys} from '@/components/ParentLinksPanel/queryKeys';
 import {isNotFound} from '@/utils/apiError';
 import {advisingQueryKeys} from '../advising/queryKeys';
+
+function requirePage<T>(data: AdvisingPage<T>): AdvisingPage<T> {
+  if (!data || !Array.isArray(data.items) || !Number.isSafeInteger(data.page) || data.page < 0 ||
+    !Number.isSafeInteger(data.size) || data.size <= 0 || !Number.isSafeInteger(data.total) || data.total < 0) {
+    throw new ApiResponseDataError('The server returned an invalid directory page.');
+  }
+  return data;
+}
 
 export function useCounsellorDashboard(intakePageSize: number, advisorPageSize: number) {
   const client = useQueryClient();
@@ -21,11 +29,11 @@ export function useCounsellorDashboard(intakePageSize: number, advisorPageSize: 
   });
   const intakes = useQuery({
     queryKey: advisingQueryKeys.counsellorIntakes(intakePage, intakePageSize),
-    queryFn: async () => unwrapData(await counsellorApiService.listStudentIntakes(intakePage, intakePageSize), 'listIntakes'),
+    queryFn: async () => requirePage(unwrapData(await counsellorApiService.listStudentIntakes(intakePage, intakePageSize), 'listIntakes')),
   });
   const advisors = useQuery({
     queryKey: advisingQueryKeys.counsellorAdvisors(advisorPage, advisorPageSize),
-    queryFn: async () => unwrapData(await counsellorApiService.listAdvisors(advisorPage, advisorPageSize), 'listAdvisors'),
+    queryFn: async () => requirePage(unwrapData(await counsellorApiService.listAdvisors(advisorPage, advisorPageSize), 'listAdvisors')),
   });
   // Selection belongs to the current page. Never retain the previous student's
   // details while another page or identity is loading.

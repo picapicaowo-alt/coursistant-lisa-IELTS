@@ -264,3 +264,11 @@ export const WEEKDAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY',
 export type ScheduleRequestType = typeof SCHEDULE_REQUEST_TYPES[number];
 
 export type CourseOperationRead = unknown;
+
+/** Student-wide published-report feed uses zero-based pagination. */
+export interface MyPublishedReportParams {
+  reportType?: 'MID_TERM' | 'FINAL';
+  courseId?: number;
+  page?: number;
+  size?: number;
+}

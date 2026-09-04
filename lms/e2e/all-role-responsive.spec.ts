@@ -28,7 +28,8 @@ async function fixture(page: Page, level: string, role = 'USER') {
       const q = url.searchParams.get('q')?.toLowerCase() ?? '';
       const items = students.filter(student => `${student.firstName} ${student.lastName} ${student.email}`.toLowerCase().includes(q));
       data = {items, page: 0, size: 20, total: items.length};
-    } else if (path === '/v2/counsellor/dashboard') data = {createdCount: 12, assignedCount: 8, unassignedCount: 4};
+    } else if (path === '/v2/counsellor/student-intakes' || path === '/v2/counsellor/advisors') data = {items: [], page: Number(url.searchParams.get('page') || 0), size: Number(url.searchParams.get('size') || 20), total: 0};
+    else if (path === '/v2/counsellor/dashboard') data = {createdCount: 12, assignedCount: 8, unassignedCount: 4};
     else if (path === '/v2/parent/linked-students') data = {items: [{studentUserId: 301}], page: 0, size: 20, total: 1};
     else if (path === '/v2/tenant/users') data = {items: [{id: 51, firstName: 'Ivy', lastName: 'Lee', email: 'ivy.lee@example.test', role: 'USER', level: 'INSTRUCTOR', status: 'ACTIVE'}], page: 0, size: 20, total: 1};
     else if (path.endsWith('/me/courses')) data = {items: courses, page: 0, size: 100, total: courses.length};
@@ -76,6 +77,7 @@ for (const subject of cases) {
       expect(geometry.font).toBeLessThanOrEqual(maximumTitleSize);
       if (width === 390 || width === 1440) await page.screenshot({path: testInfo.outputPath(`${subject.name}-${width}.png`), fullPage: true});
     }
+    await expect(page.getByText(/NaN/)).toHaveCount(0);
     expect(errors).toEqual([]);
     expect(writes).toEqual([]);
   });
