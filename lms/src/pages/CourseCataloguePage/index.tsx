@@ -138,7 +138,7 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
             // Archiving is a Course Manager action. A TA never qualifies, no
             // matter which permission flags it holds, so this checks the
             // enrolment role rather than any of them.
-            canManage={!isUserAccount || ('courseRole' in course && (course.courseRole ?? course.role) === 'Instructor')}
+            canManage={!('launchState' in course && course.launchState) && (!isUserAccount || ('courseRole' in course && (course.courseRole ?? course.role) === 'Instructor'))}
             showOperations={canAccessCourseOperations(user, 'courseRole' in course ? course.courseRole ?? course.role : null)}
             showDelivery={isAdvisorAccount(user)}
           />
