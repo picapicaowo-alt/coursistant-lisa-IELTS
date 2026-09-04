@@ -28,6 +28,7 @@ import {QuestionPreview} from './QuestionPreview';
 import {PassageEditor} from './PassageEditor';
 import {SectionReview} from './SectionReview';
 import {QuestionRangeFields} from './QuestionRangeFields';
+import {ReadingImport} from './ReadingImport';
 import ui from '@/components/TenantWorkspace/workspace.module.scss';
 import styles from './tenant.module.scss';
 import authoring from './authoring.module.scss';
@@ -174,6 +175,19 @@ export function TenantSectionComposer({
   };
   return (
     <div className={authoring.composer}>
+      {section === 'reading' && !review ? (
+        <ReadingImport
+          templateId={templateId}
+          versionId={versionId}
+          draft={draft}
+          disabled={contentBusy}
+          onApply={(imported) => {
+            update(imported);
+            setActive(0);
+            setShowIssues(false);
+          }}
+        />
+      ) : null}
       <div
         className={styles.partNav}
         aria-label={`${meta.label} ${meta.unit.toLowerCase()} navigation`}
@@ -198,6 +212,15 @@ export function TenantSectionComposer({
           disabled={save.isPending}
           onClick={() => {
             const added = newUnit();
+            if (
+              section === 'reading' &&
+              draft.units.some((item) => item.seq !== undefined)
+            )
+              added.seq =
+                draft.units.reduce(
+                  (max, item, index) => Math.max(max, item.seq ?? index + 1),
+                  0,
+                ) + 1;
             added.questions[0].start = String(nextQuestionNumber);
             added.questions[0].end = String(nextQuestionNumber);
             update((current) => ({
@@ -522,6 +545,17 @@ export function TenantSectionComposer({
                     className={`${ui.textButton} ${authoring.addGroup}`}
                     onClick={() => {
                       const added = newQuestion();
+                      if (
+                        unit.questions.some(
+                          (item) => item.sortOrder !== undefined,
+                        )
+                      )
+                        added.sortOrder =
+                          unit.questions.reduce(
+                            (max, item, index) =>
+                              Math.max(max, item.sortOrder ?? index + 1),
+                            0,
+                          ) + 1;
                       added.start = String(nextQuestionNumber);
                       added.end = String(nextQuestionNumber);
                       changeUnit((current) => ({

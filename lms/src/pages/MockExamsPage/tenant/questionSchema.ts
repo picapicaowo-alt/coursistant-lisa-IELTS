@@ -472,9 +472,13 @@ export function contentErrors(
     content.questions.forEach(checkOptions);
   if (kind === 'multiSelect') checkOptions(content);
   const keyedOptions =
-    kind === 'matching' ? content.choices :
-    kind === 'headings' ? content.headings :
-    kind === 'sentenceEndings' ? content.endings : undefined;
+    kind === 'matching'
+      ? content.choices
+      : kind === 'headings'
+        ? content.headings
+        : kind === 'sentenceEndings'
+          ? content.endings
+          : undefined;
   if (Array.isArray(keyedOptions)) {
     const keys = keyedOptions.map((option) =>
       isRecord(option) ? String(option.key).trim() : '',

@@ -2,6 +2,59 @@ import {expect, test, type Page} from '@playwright/test';
 import {mkdir} from 'node:fs/promises';
 
 const basePath = '/mock-exams?template=48&version=480';
+const importedReading = {
+  totalMinutes: 60,
+  passages: [
+    {
+      seq: 3,
+      shortLabel: 'Community libraries',
+      title: 'A shared library',
+      intro: 'Read carefully.',
+      paragraphs: ['Libraries serve their communities.'],
+      questions: [
+        {
+          sortOrder: 7,
+          kind: 'tfng',
+          title: 'Question 1',
+          instruction: 'Choose an answer.',
+          questionStart: 1,
+          questionEnd: 1,
+          payload: {
+            questions: [
+              {
+                id: 1,
+                statement: 'Libraries serve communities.',
+                answer: ['TRUE'],
+              },
+            ],
+            metadata: {retain: true},
+          },
+        },
+      ],
+    },
+    {
+      seq: 9,
+      shortLabel: 'Second passage',
+      title: 'Transport',
+      intro: '',
+      paragraphs: ['A bus connects the towns.'],
+      questions: [
+        {
+          sortOrder: 2,
+          kind: 'backend_custom',
+          title: 'Question 2',
+          instruction: 'Read the question.',
+          questionStart: 2,
+          questionEnd: 2,
+          payload: {
+            questions: [{id: 2, answer: ['bus']}],
+            backendMetadata: {retain: true},
+          },
+        },
+      ],
+    },
+  ],
+};
 const envelope = (data: unknown) => ({code: 'SUCCESS', status: 200, data});
 async function install(page: Page) {
   await page.addInitScript(() => {
@@ -101,19 +154,39 @@ async function install(page: Page) {
 }
 
 for (const width of [320, 768]) {
-  test(`long multilingual content remains usable at ${width}px`, async ({page}) => {
+  test(`long multilingual content remains usable at ${width}px`, async ({
+    page,
+  }) => {
     await install(page);
     await page.setViewportSize({width, height: 1000});
     await page.goto(`${basePath}&section=listening`);
-    await page.getByLabel('Part name', {exact: true}).fill('听力练习 — Universität accommodation registration 📝 '.repeat(8));
-    await page.getByLabel('Question type', {exact: true}).selectOption('formCompletion');
-    await page.getByLabel('Form / Form heading').fill('Community registration '.repeat(30));
-    await page.getByLabel('Instructions for students').fill('请完整阅读说明。 Überprüfen Sie Ihre Antworten. '.repeat(20));
+    await page
+      .getByLabel('Part name', {exact: true})
+      .fill('听力练习 — Universität accommodation registration 📝 '.repeat(8));
+    await page
+      .getByLabel('Question type', {exact: true})
+      .selectOption('formCompletion');
+    await page
+      .getByLabel('Form / Form heading')
+      .fill('Community registration '.repeat(30));
+    await page
+      .getByLabel('Instructions for students')
+      .fill('请完整阅读说明。 Überprüfen Sie Ihre Antworten. '.repeat(20));
     await expect(page.getByLabel('Question type', {exact: true})).toBeEnabled();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
-    await page.getByRole('button', {name: 'Review & save', exact: true}).click();
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - innerWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await page
+      .getByRole('button', {name: 'Review & save', exact: true})
+      .click();
     await expect(page.getByRole('alert').first()).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - innerWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
   });
 }
 
@@ -300,6 +373,126 @@ for (const width of [1752, 1440, 1024, 390]) {
     expect(errors).toEqual([]);
   });
 }
+
+for (const width of [1440, 390]) {
+  test(`complete Reading file import previews and posts once at ${width}px`, async ({
+    page,
+  }) => {
+    const {writes, unexpected} = await install(page);
+    await page.setViewportSize({width, height: 1000});
+    await page.goto(`${basePath}&section=reading`);
+    await page
+      .getByRole('button', {name: 'Import Reading JSON', exact: true})
+      .click();
+    await page
+      .getByLabel('Reading JSON file · up to 2 MB')
+      .setInputFiles({
+        name: 'reading.json',
+        mimeType: 'application/json',
+        buffer: Buffer.from(JSON.stringify(importedReading)),
+      });
+    await expect(
+      page.getByLabel('Or paste complete Reading JSON'),
+    ).toHaveValue(/Libraries serve/);
+    await page
+      .getByRole('button', {name: 'Validate JSON', exact: true})
+      .click();
+    await expect(page.getByText('Ready to load', {exact: false})).toBeVisible();
+    expect(writes).toEqual([]);
+    expect(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth - innerWidth,
+      ),
+    ).toBeLessThanOrEqual(1);
+    await page
+      .getByRole('button', {name: 'Load into editor', exact: true})
+      .click();
+    await expect(page.getByLabel('Passage title')).toHaveValue(
+      'A shared library',
+    );
+    await expect(page.getByLabel('Question type', {exact: true})).toHaveValue(
+      'tfng',
+    );
+    expect(writes).toEqual([]);
+    await page.reload();
+    await expect(page.getByLabel('Passage title')).toHaveValue(
+      'A shared library',
+    );
+    await page.getByLabel('Passage title').fill('A shared library — reviewed');
+    await page
+      .getByRole('button', {name: 'Review & save', exact: true})
+      .click();
+    await expect(
+      page.getByRole('region', {name: 'Review section submission'}),
+    ).toContainText('Second passage');
+    expect(writes).toEqual([]);
+    await page
+      .getByRole('button', {name: 'Confirm and create section'})
+      .click();
+    await expect(
+      page.getByText('This saved section is read only.', {exact: false}),
+    ).toBeVisible();
+    expect(writes).toHaveLength(1);
+    const expected = structuredClone(importedReading);
+    expected.passages[0].title = 'A shared library — reviewed';
+    expect(writes[0]).toEqual({
+      path: '/v2/tenant/mock-exam-templates/48/versions/480/reading',
+      body: expected,
+    });
+    expect(unexpected).toEqual([]);
+  });
+}
+
+test('Reading paste import protects existing work and rejects invalid media references', async ({
+  page,
+}) => {
+  const {writes} = await install(page);
+  await page.goto(`${basePath}&section=reading`);
+  await page.getByLabel('Passage title').fill('Keep my draft');
+  await page
+    .getByRole('button', {name: 'Import Reading JSON', exact: true})
+    .click();
+  await page.getByLabel('Or paste complete Reading JSON').fill('{bad');
+  await page.getByRole('button', {name: 'Validate JSON', exact: true}).click();
+  await expect(page.getByRole('alert')).toContainText('JSON cannot be read');
+  await expect(
+    page.getByRole('button', {name: 'Load into editor'}),
+  ).toHaveCount(0);
+  await page
+    .getByLabel('Or paste complete Reading JSON')
+    .fill(JSON.stringify(importedReading));
+  await page.getByRole('button', {name: 'Validate JSON', exact: true}).click();
+  page.once('dialog', (dialog) => dialog.dismiss());
+  await page
+    .getByRole('button', {name: 'Load into editor', exact: true})
+    .click();
+  await expect(page.getByLabel('Passage title')).toHaveValue('Keep my draft');
+  const withImage = {
+    ...importedReading,
+    passages: importedReading.passages.map((passage) => ({
+      ...passage,
+      questions: passage.questions.map((group) => ({
+        ...group,
+        imageMediaId: 999,
+      })),
+    })),
+  };
+  await page
+    .getByLabel('Or paste complete Reading JSON')
+    .fill(JSON.stringify(withImage));
+  await page.getByRole('button', {name: 'Validate JSON', exact: true}).click();
+  page.once('dialog', (dialog) => dialog.accept());
+  await page
+    .getByRole('button', {name: 'Load into editor', exact: true})
+    .click();
+  await expect(page.getByRole('alert')).toContainText(
+    'not an available Reading image in this version',
+  );
+  await expect(page.getByLabel('Passage title')).toHaveValue('Keep my draft');
+  await page.getByRole('button', {name: 'Cancel import'}).click();
+  await expect(page.getByLabel('Passage title')).toHaveValue('Keep my draft');
+  expect(writes).toEqual([]);
+});
 
 test('reading and writing use text fields and retain drafts across section navigation', async ({
   page,

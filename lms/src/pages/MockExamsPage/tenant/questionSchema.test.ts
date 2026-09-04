@@ -20,12 +20,15 @@ import {
 describe('question authoring schemas', () => {
   it('does not count dormant answer IDs when a cell is switched to text', () => {
     expect(
-      questionNumbers({
-        steps: [
-          {type: 'text', id: 1, value: 'Read the instructions'},
-          {type: 'gap', id: 2},
-        ],
-      }, questionDefinition('reading', 'flowchart')?.schema),
+      questionNumbers(
+        {
+          steps: [
+            {type: 'text', id: 1, value: 'Read the instructions'},
+            {type: 'gap', id: 2},
+          ],
+        },
+        questionDefinition('reading', 'flowchart')?.schema,
+      ),
     ).toEqual([2]);
   });
   it('uses the existing section-specific renderer codes', () => {
@@ -93,20 +96,28 @@ describe('question authoring schemas', () => {
     expect(parseContent(JSON.stringify(payload))).toEqual(payload);
     expect(parseContent('{')).toBeUndefined();
     expect(
-      questionNumbers({
-        id: 123,
-        questions: [{id: 2}],
-        answers: [{id: 88}],
-        metadata: {id: 99},
-      }, questionDefinition('reading', 'shortAnswer')?.schema),
+      questionNumbers(
+        {
+          id: 123,
+          questions: [{id: 2}],
+          answers: [{id: 88}],
+          metadata: {id: 99},
+        },
+        questionDefinition('reading', 'shortAnswer')?.schema,
+      ),
     ).toEqual([2]);
   });
   it('rejects duplicated matching option keys used by the student renderer', () => {
-    expect(contentErrors('reading', 'matching', {
-      listLabel: 'Choose a place',
-      choices: [{key: 'A', text: 'Library'}, {key: 'A', text: 'Office'}],
-      questions: [{id: 1, statement: 'Borrow a book'}],
-    })).toContain('Use a different label for each answer option.');
+    expect(
+      contentErrors('reading', 'matching', {
+        listLabel: 'Choose a place',
+        choices: [
+          {key: 'A', text: 'Library'},
+          {key: 'A', text: 'Office'},
+        ],
+        questions: [{id: 1, statement: 'Borrow a book'}],
+      }),
+    ).toContain('Use a different label for each answer option.');
   });
 });
 

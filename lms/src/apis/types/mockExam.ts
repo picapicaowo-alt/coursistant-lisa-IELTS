@@ -129,7 +129,8 @@ export interface CreateMockExamPassageQuestionRequest extends CreateMockExamList
 
 export interface CreateMockExamPassageRequest {
   intro: string;
-  paragraphs: unknown[];
+  /** The consumed OpenAPI permits structured JsonNode content, not only arrays. */
+  paragraphs: unknown;
   questions: CreateMockExamPassageQuestionRequest[];
   seq: number;
   shortLabel: string;

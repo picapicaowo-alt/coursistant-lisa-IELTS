@@ -38,6 +38,28 @@
 .layout {
   min-width: 0;
 }
+.importTools {
+  display: grid;
+  overflow-wrap: anywhere;
+  justify-items: start;
+  gap: t.$space-5;
+  margin-bottom: t.$space-8;
+  min-width: 0;
+}
+.importTools > section {
+  width: 100%;
+  min-width: 0;
+}
+.importExample {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: t.$font-size-body;
+}
+.importSummary {
+  display: grid;
+  gap: t.$space-3;
+  overflow-wrap: anywhere;
+}
 .layout > form {
   gap: t.$space-10;
 }

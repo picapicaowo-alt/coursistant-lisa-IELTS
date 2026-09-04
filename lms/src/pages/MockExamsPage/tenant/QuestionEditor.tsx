@@ -33,7 +33,10 @@ export function QuestionEditor({
   const [advanced, setAdvanced] = useState(false);
   const [pendingKind, setPendingKind] = useState<string | null>(null);
   const nextNumber = () =>
-    Math.max(suggestedNumber - 1, ...questionNumbers(content, definition?.schema)) + 1;
+    Math.max(
+      suggestedNumber - 1,
+      ...questionNumbers(content, definition?.schema),
+    ) + 1;
   const updateContent = (value: unknown) => {
     const numbers = questionNumbers(value, definition?.schema);
     onChange({

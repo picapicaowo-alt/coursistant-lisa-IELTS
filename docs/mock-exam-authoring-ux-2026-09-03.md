@@ -10,6 +10,18 @@ This is **frontend display/content authoring**, not a newly specified grading co
 
 ## User workflow
 
+### Two Reading entry points
+
+Reading supports both manual authoring and **Import Reading JSON** (a `.json` file or pasted complete request body). Both produce the same editable section draft and use the same review/confirmation and single `createTenantReading` POST. Selecting a file is a browser-local read, not a server upload or autosave.
+
+The import panel validates syntax, size (2 MB browser guard), API integer fields, ordering uniqueness, question ranges and known content shapes before offering **Load into editor**. Nonempty Reading drafts require explicit replacement confirmation. Other sections and uploaded media are unchanged. Referenced images are verified through the existing current-version media list immediately before loading; unavailable or wrong-kind IDs block replacement.
+
+Imported `seq` / `sortOrder` values remain stable, including non-contiguous values. The editor presents them in sequence order and assigns new entries a new maximum order rather than colliding with imported values. `payload` and structured `paragraphs` JsonNode content are retained. The frontend request type now reflects OpenAPI's generic paragraph JsonNode instead of assuming only string arrays. Unknown fields outside those JsonNode containers produce a visible error instead of being silently discarded. Missing/empty optional display text uses the editor's existing defaults; imports are not a byte-for-byte JSON transport.
+
+Custom kinds remain in Advanced data with a compatibility warning; they are not automatically renamed. Import validation does not establish answer-key or scoring correctness. After loading, admins may edit manually, preview, and explicitly confirm the complete Reading save. Failure preserves the draft for retry; success makes the saved section read-only.
+
+### Manual editing and final save
+
 1. Create or open the existing template draft and choose Listening, Reading or Writing.
 2. Set the whole-section duration. Part/Passage/Task display names default to their sequence and remain customizable. Defaults are applied to outgoing requests without marking a pristine local draft as edited.
 3. Select a question type. Guided types reveal content fields, repeatable question/option/blank rows, and automatic range updates. Add further groups and parts as needed. Reading paragraphs use ordinary text fields; Writing retains its prompt, minimum words and optional image.

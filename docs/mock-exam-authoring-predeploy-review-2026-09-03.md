@@ -2,6 +2,8 @@
 
 Scope: Tenant Admin authoring only, released through the independent IELTS frontend to Dev 8085. The release branch starts at `7f8291c` and excludes unrelated changes in the shared working checkout. No backend, environment, proxy, credential, package manifest or lockfile changes.
 
+The user subsequently added complete Reading JSON import to this same release. Merge/deployment were held while that addition was implemented. The initial CI found an optional-schema narrowing error in a new preview test; the test now captures a checked schema before its callback. Refreshed release checks are required before merging the extended scope.
+
 ## Review outcome
 
 | Area | Evidence and result |
@@ -12,6 +14,7 @@ Scope: Tenant Admin authoring only, released through the independent IELTS front
 | API requests | Checked against `docs/api/mockexam.openapi.yaml` and existing service tests: template/version lifecycle, whole-section POSTs, multipart media upload, authenticated blob preview and scoped media deletion. No saved-section PUT/PATCH exists and none was added. |
 | Authorization | Existing Tenant Admin route guard, account/template/version-scoped drafts and tenant routes remain intact. The server remains the authorization authority. Fixtures cannot establish live permission acceptance. |
 | Data preservation | Unknown/imported data and nested answer metadata survive display edits. Type replacement and draft discard require confirmation. Discard does not delete uploads or another section's draft. |
+| Complete Reading JSON import | File and paste entry points validate and populate the same manual editor. Loading is not a backend save. Whole-section POST remains unchanged; image IDs must exist as uploaded Reading images in the current version. Sparse sequence/order values, custom payloads, nested answers and structured paragraph JsonNode are retained. Unknown request-level fields fail visibly rather than being dropped. |
 | Failure/concurrency | Failed saves retain the same draft for retry; hidden-part validation navigates to errors. Existing content-write locks and identity-based delayed-media safeguards remain intact. Saved sections are read-only. |
 | Preview | Uses existing student renderers and local answer state; preview answers are never submitted. Schema projection prevents extra imported fields overriding preview identity/content. Protected media uses the existing authenticated preview route. |
 | Responsive layout | Full guided save/retry flow tested at 1752, 1440, 1024 and 390 px. Additional 320/768 px long Chinese, German and emoji content tests verify no page overflow before/after validation. Typography, control height and alignment are asserted. Desktop and phone captures inspected. |

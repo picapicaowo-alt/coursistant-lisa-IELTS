@@ -52,6 +52,8 @@ export function isSection(value: string | null): value is Section {
 }
 export interface QuestionDraft {
   draftId: string;
+  /** Imported API ordering is retained, including non-contiguous values. */
+  sortOrder?: number;
   title: string;
   instruction: string;
   kind: string;
@@ -62,6 +64,7 @@ export interface QuestionDraft {
 }
 export interface UnitDraft {
   draftId: string;
+  seq?: number;
   label: string;
   title: string;
   intro: string;
@@ -145,7 +148,8 @@ export const tenantContentWriteKey = (templateId: number, versionId: number) =>
 
 function positiveInteger(value: string, label: string): number {
   const number = Number(value);
-  if (!Number.isInteger(number) || number <= 0)
+  // Create-section numeric fields are int32 in the consumed OpenAPI.
+  if (!Number.isInteger(number) || number <= 0 || number > 2 ** 31 - 1)
     throw new Error(`${label} must be a positive whole number.`);
   return number;
 }
@@ -208,15 +212,18 @@ export function sectionIssues(
     }
     if (section === 'reading') {
       const paragraphs = parseContent(unit.paragraphs);
-      if (!Array.isArray(paragraphs))
+      if (paragraphs === undefined)
         add(
-          'Passage paragraphs must be a JSON array. Check Advanced paragraph data.',
+          'Passage content is not valid JSON. Check Advanced paragraph data.',
         );
       else if (
-        !paragraphs.length ||
-        paragraphs.some(
-          (paragraph) => typeof paragraph === 'string' && !paragraph.trim(),
-        )
+        paragraphs === null ||
+        paragraphs === '' ||
+        (Array.isArray(paragraphs) &&
+          (!paragraphs.length ||
+            paragraphs.some(
+              (paragraph) => typeof paragraph === 'string' && !paragraph.trim(),
+            )))
       )
         add('Add the passage text and complete each paragraph.');
     }
@@ -282,7 +289,10 @@ function questionPayload(question: QuestionDraft, index: number) {
     throw new Error('The last question number must not precede the first.');
   if (!question.kind.trim()) throw new Error('Select a question type.');
   return {
-    sortOrder: index + 1,
+    sortOrder: positiveInteger(
+      String(question.sortOrder ?? index + 1),
+      'Question group order',
+    ),
     title: questionTitle(question),
     instruction: question.instruction.trim(),
     kind: question.kind.trim(),
@@ -318,10 +328,8 @@ export function readingPayload(
         unit.paragraphs,
         `Passage ${index + 1} paragraphs`,
       );
-      if (!Array.isArray(paragraphs))
-        throw new Error('Reading paragraphs must be a JSON array.');
       return {
-        seq: index + 1,
+        seq: positiveInteger(String(unit.seq ?? index + 1), 'Passage sequence'),
         shortLabel: unitName('reading', unit, index),
         title: unit.title.trim(),
         intro: unit.intro.trim(),

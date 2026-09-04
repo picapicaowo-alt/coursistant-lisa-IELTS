@@ -118,7 +118,9 @@ describe('friendly question editor', () => {
       fields: [{id: 1, label: 'Full name', answer: ['Alice']}],
       scoring: {version: 2},
     });
-    expect(JSON.parse(screen.getByTestId('question').textContent ?? '{}')).toMatchObject({start: '1', end: '1'});
+    expect(
+      JSON.parse(screen.getByTestId('question').textContent ?? '{}'),
+    ).toMatchObject({start: '1', end: '1'});
   });
   it('requires confirmation before changing a populated type and cancel keeps everything', () => {
     const initial = {
@@ -165,7 +167,7 @@ describe('friendly question editor', () => {
         }}
       />,
     );
-    expect(screen.getByLabelText('Paragraph data (JSON array)')).toHaveValue(
+    expect(screen.getByLabelText('Paragraph data (JSON)')).toHaveValue(
       '[{"text":"Keep formatting"}]',
     );
   });

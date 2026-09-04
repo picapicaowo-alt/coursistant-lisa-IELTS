@@ -47,7 +47,7 @@ export function PassageEditor({
           here.
         </p>
         <label>
-          <span>Paragraph data (JSON array)</span>
+          <span>Paragraph data (JSON)</span>
           <textarea
             className={styles.code}
             value={value}

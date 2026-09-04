@@ -16,15 +16,19 @@ function example(field: Field, nextId: () => number, index = 0): unknown {
     case 'choice':
       return field.choices[0];
     case 'object':
-      return Object.fromEntries(Object.entries(field.fields).map(([key, item]) =>
-        [key, example(item, nextId, index)],
-      ));
+      return Object.fromEntries(
+        Object.entries(field.fields).map(([key, item]) => [
+          key,
+          example(item, nextId, index),
+        ]),
+      );
     case 'list':
       return Array.from({length: field.min ?? 1}, (_, position) =>
         example(field.item, nextId, position),
       );
     case 'variant': {
-      const type = 'gap' in field.variants ? 'gap' : Object.keys(field.variants)[0];
+      const type =
+        'gap' in field.variants ? 'gap' : Object.keys(field.variants)[0];
       const content = example(field.variants[type], nextId, index);
       return {type, ...(isRecord(content) ? content : {})};
     }
@@ -34,16 +38,28 @@ function example(field: Field, nextId: () => number, index = 0): unknown {
 describe('all guided question types', () => {
   for (const subject of ['listening', 'reading'] as const) {
     for (const definition of QUESTION_TYPES[subject]) {
-      if (!('schema' in definition)) continue;
+      if (!('schema' in definition) || !definition.schema) continue;
+      const schema = definition.schema;
       it(`validates and renders ${subject} ${definition.kind}`, () => {
         let id = 1;
-        const content = example(definition.schema, () => id++);
+        const content = example(schema, () => id++);
         expect(contentErrors(subject, definition.kind, content)).toEqual([]);
-        const {container} = render(<QuestionPreview subject={subject} question={{
-          ...newQuestion(), kind: definition.kind, title: 'Preview test',
-          start: '1', end: String(id - 1), payload: JSON.stringify(content),
-        }} />);
-        expect(screen.getByRole('heading', {name: 'Preview test'})).toBeVisible();
+        const {container} = render(
+          <QuestionPreview
+            subject={subject}
+            question={{
+              ...newQuestion(),
+              kind: definition.kind,
+              title: 'Preview test',
+              start: '1',
+              end: String(id - 1),
+              payload: JSON.stringify(content),
+            }}
+          />,
+        );
+        expect(
+          screen.getByRole('heading', {name: 'Preview test'}),
+        ).toBeVisible();
         expect(container.querySelector('input, select, button')).not.toBeNull();
       });
     }
