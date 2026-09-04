@@ -31,6 +31,10 @@ Browser tests verify the rectangular boundary at 1448, 1280, 1024 and 768px; mob
 
 The first full browser run exposed two test interactions that needed updating: opening the new mobile summary and using the textbox's accessible name after feedback success. These were corrected, retaining the behavior assertions; the final full run is green. Browser smoke confirmed the rendered login controls and no framework error overlay.
 
+## Latest-main integration
+
+The candidate incorporates `origin/main` at `d61f5d1e7020b7f97d2ea4285d692b09d0454e21` (shared course cards), preserving the newer Dev release. The integrated tree passed lint, both TypeScript checks, **140 unit-test files / 604 tests**, production and Dev builds, and **176 browser tests with retries disabled**. A higher-concurrency run hit the cumulative 30-second limit in the existing 18-screen Tenant visual test (175 passed); that group passed alone and the final complete suite passed with two workers, with no production change or weakened assertion.
+
 ## Remaining boundaries and inherited risk
 
 - `npm ci` reports **five inherited moderate dependency advisories**. A fresh bounded `npm audit` retry timed out at the registry audit service. No dependency fix/upgrade or lockfile change is included. This is not a vulnerability-free claim; the existing dependency review is documented in `tenant-admin-predeploy-review-2026-09-03.md`.
