@@ -33,7 +33,7 @@ function DashboardCourseCard({course}: {course: DashboardCourse}) {
   const progress = useStudentProgress(true);
   const sessions = useQuery({queryKey: ['course-sessions', course.id], queryFn: async () => unwrapData(await courseApiService.getCourseSessions(course.id), 'course sessions'), staleTime: 300_000, retry: false});
   const session = sessions.data?.[0];
-  return <CourseIdentityCard compact courseId={course.id} title={course.title || course.courseCode}
+  return <CourseIdentityCard courseId={course.id} title={course.title || course.courseCode}
     icon={<BookOpen size={23} aria-hidden="true"/>} code={course.courseCode} instructor={course.instructorName ?? undefined}
     metadata={<span className={s.schedule}><CalendarDays size={15} aria-hidden="true"/>{sessions.isError ? <button type="button" onClick={() => void sessions.refetch()}>Retry schedule</button> : session ? `${DAY_LABELS[session.dayOfWeek] ?? session.dayOfWeek} · ${session.startTime.slice(0, 5)}–${session.endTime.slice(0, 5)}` : sessions.isPending ? 'Loading schedule…' : 'No schedule published'}</span>}
     actions={<Link to={generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(course.id)})} aria-label={`${course.title}: View course`}>View course <ChevronRight size={14} aria-hidden="true"/></Link>}>
@@ -59,7 +59,7 @@ function DashboardCourses() {
   return <WorkspaceSection title="My courses" appearance="record" meta={viewAll(APP_ROUTE_PATHS.course)} className={s.courses} bodyClassName={s.courseBody}>
     <LearningQueryState query={{...query, isPending: query.isLoading}}/>
     {!query.isLoading && !query.isError && !query.courses.length ? <LearningEmpty icon={BookOpen} title="No active courses" description="Your enrolled courses will appear here."/> : null}
-    <div className={s.courseStrip} data-course-count={Math.min(query.courses.length, PREVIEW_LIMIT)} ref={strip} aria-label="Active courses">{query.courses.map(course => <DashboardCourseCard key={course.id} course={course}/>)}</div>
+    <div className={s.courseStrip} ref={strip} aria-label="Active courses">{query.courses.map(course => <DashboardCourseCard key={course.id} course={course}/>)}</div>
     {position.previous || position.next ? <nav className={s.carouselNav} aria-label="Course cards"><button type="button" aria-label="Previous courses" disabled={!position.previous} onClick={() => move(-1)}><ChevronLeft size={18}/></button><span>{query.courses.length} active courses</span><button type="button" aria-label="Next courses" disabled={!position.next} onClick={() => move(1)}><ChevronRight size={18}/></button></nav> : null}
   </WorkspaceSection>;
 }
