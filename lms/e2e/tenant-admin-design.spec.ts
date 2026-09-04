@@ -179,18 +179,17 @@ test('composer keeps tab drafts and submits every part once then becomes read on
   await page.getByLabel('Listening duration (minutes)', {exact: false}).fill('40');
   for (const index of [0, 1]) {
     if (index) await page.getByRole('button', {name: 'Add part', exact: true}).click();
-    await page.getByLabel('Part label', {exact: true}).fill(`Part ${index + 1}`);
-    await page.getByLabel('First question number', {exact: true}).fill(String(index * 10 + 1));
-    await page.getByLabel('Last question number', {exact: true}).fill(String(index * 10 + 10));
-    await page.getByLabel('Question group title', {exact: true}).fill('Complete the notes');
-    await page.getByLabel('Question kind', {exact: true}).fill('form_completion');
+    await page.getByLabel('Part name', {exact: true}).fill(`Part ${index + 1}`);
+    await page.getByLabel('Question type', {exact: true}).selectOption('formCompletion');
+    await page.getByLabel('Form / Form heading', {exact: true}).fill('Booking form');
+    await page.getByLabel('Form / Form fields 1 / Field label', {exact: true}).fill('Full name');
     await page.getByRole('radio').check();
   }
   await page.reload();
-  await expect(page.getByLabel('Part label', {exact: true})).toHaveValue('Part 1');
+  await expect(page.getByLabel('Part name', {exact: true})).toHaveValue('Part 1');
   await page.getByRole('button', {name: 'Part 2', exact: true}).click();
-  await expect(page.getByLabel('Part label', {exact: true})).toHaveValue('Part 2');
-  await page.getByRole('button', {name: 'Review complete section', exact: true}).click();
+  await expect(page.getByLabel('Part name', {exact: true})).toHaveValue('Part 2');
+  await page.getByRole('button', {name: 'Review & save', exact: true}).click();
   await expect(page.getByText('Submit all 2 parts?')).toBeVisible();
   expect(requests.filter(request => request.method === 'POST')).toHaveLength(0);
   await page.getByRole('button', {name: 'Confirm and create section'}).click();
@@ -214,24 +213,24 @@ test('delayed upload stays with its originating part and preserves intervening e
     await route.fulfill({status: 201, json: envelope({mediaId: 11, kind: 'LISTENING_AUDIO', status: 'UPLOADED'})});
   });
   await page.goto('/mock-exams?template=48&version=480&section=listening');
-  await page.getByLabel('Part label', {exact: true}).fill('Original part');
+  await page.getByLabel('Part name', {exact: true}).fill('Original part');
   await page.getByLabel('Choose media file').setInputFiles({name: 'test.mp3', mimeType: 'audio/mpeg', buffer: Buffer.from('isolated upload fixture')});
   await page.getByRole('button', {name: 'Upload and use', exact: true}).click();
   await expect.poll(() => uploadStarted).toBe(true);
-  await page.getByLabel('Part label', {exact: true}).fill('Edited while uploading');
+  await page.getByLabel('Part name', {exact: true}).fill('Edited while uploading');
   await page.getByRole('button', {name: 'Add part', exact: true}).click();
-  await page.getByLabel('Part label', {exact: true}).fill('Second part');
-  await expect(page.getByRole('button', {name: 'Review complete section', exact: true})).toBeDisabled();
+  await page.getByLabel('Part name', {exact: true}).fill('Second part');
+  await expect(page.getByRole('button', {name: 'Review & save', exact: true})).toBeDisabled();
   finishUpload!();
-  await expect(page.getByRole('button', {name: 'Review complete section', exact: true})).toBeEnabled();
+  await expect(page.getByRole('button', {name: 'Review & save', exact: true})).toBeEnabled();
   await expect(page.getByRole('radio')).not.toBeChecked();
-  await expect(page.getByLabel('Part label', {exact: true})).toHaveValue('Second part');
+  await expect(page.getByLabel('Part name', {exact: true})).toHaveValue('Second part');
   await page.getByRole('button', {name: 'Part 1', exact: true}).click();
   await expect(page.getByRole('radio')).toBeChecked();
-  await expect(page.getByLabel('Part label', {exact: true})).toHaveValue('Edited while uploading');
+  await expect(page.getByLabel('Part name', {exact: true})).toHaveValue('Edited while uploading');
   await page.reload();
   await expect(page.getByRole('radio')).toBeChecked();
-  await expect(page.getByLabel('Part label', {exact: true})).toHaveValue('Edited while uploading');
+  await expect(page.getByLabel('Part name', {exact: true})).toHaveValue('Edited while uploading');
 });
 
 for (const [section, unit, kind] of [['listening', 'Part', 'LISTENING_AUDIO'], ['reading', 'Passage', 'READING_IMAGE'], ['writing', 'Task', 'WRITING_IMAGE']]) {
@@ -295,7 +294,7 @@ test('an in-flight reading upload keeps its question identity when another group
   });
   await page.goto('/mock-exams?template=48&version=480&section=reading');
   await page.getByRole('button', {name: 'Add question group', exact: true}).click();
-  await page.getByLabel('Question group title', {exact: true}).nth(1).fill('Keep this group');
+  await page.getByLabel('Question group title (optional)', {exact: true}).nth(1).fill('Keep this group');
   await page.getByLabel('Choose media file').nth(1).setInputFiles({name: 'question.png', mimeType: 'image/png', buffer: Buffer.from('isolated upload fixture')});
   await page.getByRole('button', {name: 'Upload and use', exact: true}).click();
   await expect.poll(() => Boolean(finishUpload)).toBe(true);
@@ -303,8 +302,8 @@ test('an in-flight reading upload keeps its question identity when another group
   await page.getByRole('button', {name: 'Remove group', exact: true}).first().click();
   finishUpload!();
   await expect(page.getByRole('radio')).toBeChecked();
-  await expect(page.getByLabel('Question group title', {exact: true})).toHaveValue('Keep this group');
+  await expect(page.getByLabel('Question group title (optional)', {exact: true})).toHaveValue('Keep this group');
   await page.reload();
   await expect(page.getByRole('radio')).toBeChecked();
-  await expect(page.getByLabel('Question group title', {exact: true})).toHaveValue('Keep this group');
+  await expect(page.getByLabel('Question group title (optional)', {exact: true})).toHaveValue('Keep this group');
 });

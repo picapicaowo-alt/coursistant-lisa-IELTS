@@ -34,6 +34,8 @@ import styles from './tenant.module.scss';
 
 export function TenantTemplateEditor({templateId}: {templateId: number}) {
   const [params, setParams] = useSearchParams();
+  const requestedSection = params.get('section');
+  const activeSection = isSection(requestedSection) ? requestedSection : null;
   const template = useQuery({
     queryKey: ['mock-exams', 'tenant', 'template', templateId],
     queryFn: async () =>
@@ -54,25 +56,61 @@ export function TenantTemplateEditor({templateId}: {templateId: number}) {
       mutationKey: tenantContentWriteKey(templateId, version?.id ?? 0),
     }) > 0;
   return (
-    <div className={ui.page}>
-      <button
-        type="button"
-        className={ui.textButton}
-        disabled={contentBusy}
-        onClick={() => setParams({})}
+    <div className={`${ui.page} ${activeSection ? styles.composerPage : ''}`}>
+      {!activeSection ? (
+        <button
+          type="button"
+          className={ui.textButton}
+          disabled={contentBusy}
+          onClick={() => setParams({})}
+        >
+          <ArrowLeft size={17} />
+          Mock exam templates
+        </button>
+      ) : null}
+      <header
+        className={`${ui.pageHeader} ${activeSection ? styles.composerHeading : styles.editorHeading}`}
       >
-        <ArrowLeft size={17} />
-        Mock exam templates
-      </button>
-      <header className={`${ui.pageHeader} ${styles.editorHeading}`}>
         <div>
           <h1>{template.data?.title || 'Mock exam template'}</h1>
-          <p>
-            Template #{templateId}
-            {version
-              ? ` · Version ${version.versionNo ?? '—'} · ${readableValue(version.status)}`
-              : ''}
-          </p>
+          {activeSection ? (
+            <nav
+              className={styles.composerBreadcrumb}
+              aria-label="Exam breadcrumb"
+            >
+              <button
+                type="button"
+                disabled={contentBusy}
+                onClick={() => setParams({})}
+              >
+                Mock exam templates
+              </button>
+              <span aria-hidden="true">›</span>
+              <button
+                type="button"
+                disabled={contentBusy}
+                onClick={() =>
+                  setParams({
+                    template: String(templateId),
+                    version: String(version?.id ?? ''),
+                  })
+                }
+              >
+                {template.data?.label || 'Version overview'}
+              </button>
+              <span aria-hidden="true">›</span>
+              <span aria-current="page">
+                {SECTION_META[activeSection].label}
+              </span>
+            </nav>
+          ) : (
+            <p>
+              Template #{templateId}
+              {version
+                ? ` · Version ${version.versionNo ?? '—'} · ${readableValue(version.status)}`
+                : ''}
+            </p>
+          )}
         </div>
         {versions.length ? (
           <label className={styles.versionSelect}>
@@ -233,12 +271,16 @@ function VersionWorkspace({
             changing this version.
           </p>
         ) : null}
-        <p className={storageAvailable ? ui.hint : ui.inlineError}>
-          {storageAvailable
-            ? 'Unsaved work is kept in this browser tab, including when you switch sections. Submit a complete section to save it to the server.'
-            : 'Browser draft storage is unavailable. Keep this page open until your section is submitted.'}
-        </p>
-        <nav className={ui.tabs} aria-label="Exam sections">
+        {!storageAvailable ? (
+          <p className={ui.inlineError}>
+            Browser draft storage is unavailable. Keep this page open until your
+            section is submitted.
+          </p>
+        ) : null}
+        <nav
+          className={`${ui.tabs} ${styles.composerTabs}`}
+          aria-label="Exam sections"
+        >
           {SECTIONS.map((item) => (
             <button
               key={item}

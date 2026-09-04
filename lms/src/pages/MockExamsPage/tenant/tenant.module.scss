@@ -71,6 +71,13 @@
 .editorHeading {
   margin-top: t.$space-5;
 }
+.composerPage {
+  padding-top: t.$space-12;
+}
+.composerHeading {
+  margin-top: 0;
+  margin-bottom: t.$space-8;
+}
 .versionSelect {
   display: grid;
   gap: t.$space-2;
@@ -153,7 +160,41 @@
   align-items: center;
   flex-wrap: wrap;
   gap: t.$space-2;
-  margin-bottom: t.$space-8;
+  margin-bottom: t.$space-10;
+}
+.composerBreadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: t.$space-2;
+  margin-top: t.$space-3;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body-lg;
+  line-height: 1.65;
+}
+.composerBreadcrumb button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.composerBreadcrumb button:hover {
+  color: t.$action-primary;
+  text-decoration: underline;
+}
+.composerTabs {
+  border-bottom: 1px solid t.$border-default;
+  gap: 0;
+  margin-bottom: t.$space-10;
+}
+.composerTabs button {
+  min-width: 8.5rem;
+  justify-content: center;
+  padding-inline: t.$space-6;
+  font-size: t.$font-size-subhead;
 }
 .partNav button {
   display: inline-flex;
@@ -175,12 +216,14 @@
 }
 .composerFields {
   display: grid;
-  gap: t.$space-6;
+  gap: t.$space-10;
   margin: 0;
   padding: 0;
   border: 0;
   min-width: 0;
 }
+.composerFields[hidden] { display: none; }
+.composerFooter[hidden] { display: none; }
 .payload {
   font-family: ui-monospace, SFMono-Regular, monospace !important;
   min-height: 10rem !important;
@@ -192,15 +235,18 @@
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: t.$space-4;
+  gap: t.$space-5;
   background: t.$surface-canvas;
   border-top: 1px solid t.$border-default;
-  padding: t.$space-4 t.$space-5;
+  padding: t.$space-6 t.$space-8;
   border-radius: t.$radius-sm;
 }
 .media {
   display: grid;
   gap: t.$space-4;
+}
+.media > button {
+  justify-self: start;
 }
 .dropzone {
   display: flex;
@@ -281,6 +327,15 @@
   }
 }
 @media (max-width: 700px) {
+  .composerPage {
+    padding-top: t.$space-8;
+  }
+  .composerTabs button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding-inline: t.$space-3;
+    font-size: t.$font-size-body-lg;
+  }
   .sectionHeader {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);

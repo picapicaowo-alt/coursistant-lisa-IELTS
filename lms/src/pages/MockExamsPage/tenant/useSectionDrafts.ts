@@ -20,6 +20,9 @@ const emptyDrafts = (): Drafts => ({
 const isMediaId = (value: unknown) =>
   value === null ||
   (typeof value === 'number' && Number.isInteger(value) && value > 0);
+const isOptionalOrder = (value: unknown) =>
+  value === undefined ||
+  (typeof value === 'number' && Number.isSafeInteger(value) && value > 0);
 
 function isDraft(value: unknown): value is SectionDraft {
   return (
@@ -30,6 +33,7 @@ function isDraft(value: unknown): value is SectionDraft {
     value.units.every(
       (unit) =>
         isRecord(unit) &&
+        isOptionalOrder(unit.seq) &&
         ['label', 'title', 'intro', 'paragraphs', 'prompt', 'minWords'].every(
           (key) => typeof unit[key] === 'string',
         ) &&
@@ -39,6 +43,7 @@ function isDraft(value: unknown): value is SectionDraft {
         unit.questions.every(
           (question) =>
             isRecord(question) &&
+            isOptionalOrder(question.sortOrder) &&
             ['title', 'instruction', 'kind', 'payload', 'start', 'end'].every(
               (key) => typeof question[key] === 'string',
             ) &&
