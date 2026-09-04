@@ -15,6 +15,7 @@ The confirmed frontend defects below are repaired. This release is **not a sign-
 | Original working directory | `118883c652226bc586da47872c590f03d64605ff`, dirty | 129 tracked files differed in effective content from fetched main; 11 missing; 216 local-only source-tree files, including 142 numbered copies. Preserved without reset or release. |
 | Initial GitHub main | `19bddb155aea9b388c1e9c819bf5a2e804fad69a` | Built in a separate worktree; all 743 static files matched Dev public HTTP content by SHA-256. |
 | Concurrent main update | `f24b168075056b1b261ac859eee8459b50e02b8d` | Mock Exam assignment polish from PR #34; incorporated before final regression checks. |
+| Concurrent operations update | `4d55252` (PR #35) | Person picker, intake/enrollment dialogs and course readiness fixes incorporated and revalidated. |
 | This change | `codex/delivery-readiness-audit` | Isolated frontend worktree; clean merged-main artifact is the only release input. Final release evidence is recorded separately. |
 
 Public `/REVISION` returns the SPA fallback. Server-side REVISION metadata plus artifact hashes are required to establish the running revision. `/api/v3/api-docs` returned 500; the 11 checked-in OpenAPI files remain the consumed authority.
@@ -65,7 +66,7 @@ The real Student material Preview opened a protected blob tab. The browser secur
 ## External handoff
 
 1. Supply a redacted successful Reading and Listening creation body, correct-answer location/types/enums, scoring rules, and confirmation that student projections exclude keys. Existing Reading POST: `/v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/reading`.
-2. Recheck the previously recorded Instructor grading-items 500 using the real Instructor session; this audit had only a saved Student session.
+2. The concurrently merged [Instructor handoff](instructor-grading-calendar-handoff-2026-09-03.md) records fresh real `grading-items?page=0&size=100` HTTP 500 and `personal-events?fromUtc=…&toUtc=…` HTTP 403. Both request shapes conform to the current contract. Confirm the intended personal-event permissions and repair the grading read externally; repeat the affected Instructor flows. This audit itself had only a saved Student session.
 3. Complete one real designated test lifecycle across Counsellor, Advisor, Instructor, Student and Parent, including persist/reload and unauthorized-role checks, before labeling the system fully accepted for operational use.
 
 No backend, database, API proxy values, demo credentials, USC 8084 or production environment was changed.
@@ -73,3 +74,5 @@ No backend, database, API proxy values, demo credentials, USC 8084 or production
 ## Final pre-merge validation
 
 On the branch rebased onto `f24b1680`: `npm run lint:ci`, `npm run typecheck`, `npm run typecheck:production`, `npm run test:run -- --maxWorkers=4`, `npm run build`, `CI=1 PLAYWRIGHT_PORT=4475 npm run test:e2e -- --workers=2 --retries=0`, and `npm run build:dev` all passed. Results: **147 unit test files / 685 tests; 224 Chromium E2E tests, zero retries**. Independent Bugbot source review found no confirmed new regression. React review checked shared query reuse, conditional fetching, component state and existing abstractions. No dependency or lockfile changes.
+
+After incorporating PR #35 (`4d55252`), the complete lint/typecheck/unit/production-build/E2E baseline passed again: **685 unit tests and 235 E2E tests, zero retries**. Final deployment and artifact checks are tracked in the release evidence supplied with this audit.
