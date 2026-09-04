@@ -200,7 +200,13 @@ export const READING_IMPORT_EXAMPLE = {
           questionStart: 1,
           questionEnd: 1,
           payload: {
-            questions: [{id: 1, statement: 'Replace this example statement.'}],
+            questions: [
+              {
+                id: 1,
+                statement: 'Replace this example statement.',
+                answer: 'True',
+              },
+            ],
           },
         },
       ],

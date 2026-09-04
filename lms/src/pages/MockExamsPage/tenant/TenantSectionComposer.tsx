@@ -177,7 +177,7 @@ export function TenantSectionComposer({
     <div className={authoring.composer}>
       {section !== 'writing' ? <div className={authoring.notice} role="note">
         <strong>Correct answers are required before saving.</strong>
-        <p>The question form prepares the content students will see. Include verified answer keys in your imported or advanced question data; a preview alone does not mean the paper is ready to save or assign.</p>
+        <p>Enter official accepted answers in the question form, or include verified answer keys in imported or advanced question data. A preview alone does not mean the paper is ready to save or assign.</p>
       </div> : null}
       {section === 'reading' && !review ? (
         <ReadingImport
@@ -658,9 +658,9 @@ export function TenantSectionComposer({
                 }}
               />
               {section !== 'writing' ? <p className={authoring.notice}>
-                Content checks do not verify an answer key or scoring. Confirm
-                those with your content team before publishing. The supplied API
-                does not define their format.
+                Answer-key format checks do not verify which answers are correct or
+                how the backend scores them. Confirm the official answers with
+                your content team before publishing.
               </p> : <p className={authoring.notice}>Writing responses are reviewed by the instructor selected when the exam is assigned.</p>}
               <p>
                 This creates the complete {meta.label.toLowerCase()} section.

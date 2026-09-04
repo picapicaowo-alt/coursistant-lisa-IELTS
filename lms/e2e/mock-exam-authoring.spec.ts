@@ -24,7 +24,7 @@ const importedReading = {
               {
                 id: 1,
                 statement: 'Libraries serve communities.',
-                answer: ['TRUE'],
+                answer: 'TRUE',
               },
             ],
             metadata: {retain: true},
@@ -47,7 +47,7 @@ const importedReading = {
           questionStart: 2,
           questionEnd: 2,
           payload: {
-            questions: [{id: 2, answer: ['bus']}],
+            questions: [{id: 2, answer: 'bus'}],
             backendMetadata: {retain: true},
           },
         },
@@ -217,6 +217,8 @@ for (const width of [1752, 1440, 1024, 390]) {
     await page
       .getByLabel('Form / Form fields 2 / Field label')
       .fill('Contact number');
+    await page.getByLabel('Form / Form fields 1 / Official accepted answers').fill('Alice\nAlice Smith');
+    await page.getByLabel('Form / Form fields 2 / Official accepted answers').fill('123456');
     await page.getByRole('radio').check();
     await page.getByText('Preview this question group', {exact: true}).click();
     await page
@@ -326,7 +328,7 @@ for (const width of [1752, 1440, 1024, 390]) {
     });
     await expect(review).toBeVisible();
     await expect(review).toContainText('Questions 1–2');
-    await expect(review).toContainText('answer key or scoring');
+    await expect(review).toContainText('Answer-key format checks');
     await expect(page.getByLabel('Question type', {exact: true})).toBeHidden();
     await page.screenshot({path: `${directory}/review-${width}.png`});
     failSave();
@@ -360,8 +362,8 @@ for (const width of [1752, 1440, 1024, 390]) {
               payload: {
                 formTitle: 'Community centre registration',
                 fields: [
-                  {id: 1, label: 'Full name'},
-                  {id: 2, label: 'Contact number'},
+                  {id: 1, label: 'Full name', answers: ['Alice', 'Alice Smith']},
+                  {id: 2, label: 'Contact number', answer: '123456'},
                 ],
               },
             },
@@ -654,6 +656,7 @@ test('reading and writing use text fields and retain drafts across section navig
   await page
     .getByLabel('Statements / Statements 1 / Statement text')
     .fill('The library is open to the community.');
+  await page.getByLabel('Statements / Statements 1 / Official accepted answers').fill('True');
   await page.reload();
   await expect(
     page.getByLabel('Passage paragraphs 1', {exact: true}),
@@ -755,4 +758,31 @@ test('review finds hidden-part errors and changing a type never silently clears 
     'Keep this heading',
   );
   expect(writes).toEqual([]);
+});
+
+test('official answers reject invalid input and save equivalent alternatives through retry', async ({page}) => {
+  const {writes, failSave} = await install(page);
+  await page.goto(`${basePath}&section=listening`);
+  await page.getByLabel('Listening duration (minutes)', {exact: false}).fill('40');
+  await page.getByLabel('Question type', {exact: true}).selectOption('shortAnswer');
+  await page.getByLabel('Short-answer questions / Questions 1 / Question text').fill('What process?');
+  await page.getByRole('radio').check();
+  const answers = page.getByLabel('Short-answer questions / Questions 1 / Official accepted answers');
+  await answers.fill('fermentation\nfermentation');
+  await page.getByRole('button', {name: 'Review & save', exact: true}).click();
+  await expect(page.getByRole('region', {name: 'Review section submission'})).toHaveCount(0);
+  expect(writes).toEqual([]);
+  await answers.fill('fermentation\nfermentation process');
+  await page.getByRole('button', {name: 'Review & save', exact: true}).click();
+  failSave();
+  await page.getByRole('button', {name: 'Confirm and create section'}).click();
+  await expect(page.getByRole('alert')).toBeVisible();
+  await page.getByRole('button', {name: 'Confirm and create section'}).click();
+  await expect(page.getByText('This saved section is read only.', {exact: false})).toBeVisible();
+  expect(writes).toHaveLength(2);
+  expect(writes[0].body).toEqual(writes[1].body);
+  expect(writes[1].body).toMatchObject({parts: [{sections: [{payload: {
+    questions: [{id: 1, prompt: 'What process?', answers: ['fermentation', 'fermentation process']}],
+  }}]}]});
+  expect(JSON.stringify(writes[1].body)).not.toContain('"answer":');
 });
