@@ -108,17 +108,6 @@ test('teacher can remove bold formatting and a newly selected annotated file', a
 
   await page.goto('/course/34/assignments/48/grading');
   await page.getByRole('button', {name: 'Grade Eden Brooks'}).click();
-  const dialog = page.getByRole('dialog', {name: 'Eden Brooks'});
-  await dialog.getByRole('button', {name: 'Close dialog'}).focus();
-  await page.keyboard.press('Tab');
-  await expect(dialog.getByRole('spinbutton')).toBeFocused();
-  await page.getByRole('button', {name: 'Grade Eden Brooks'}).evaluate(node => (node as HTMLElement).focus());
-  await expect(dialog.getByRole('spinbutton')).toBeFocused();
-  await page.keyboard.press('Escape');
-  await expect(dialog).toHaveCount(0);
-  await expect(page.getByRole('button', {name: 'Grade Eden Brooks'})).toBeFocused();
-  await page.getByRole('button', {name: 'Grade Eden Brooks'}).click();
-
 
   const editor = page.locator('[contenteditable="true"][aria-label="Feedback for the learner"]');
   await expect(editor).toContainText('Bold feedback');

@@ -384,7 +384,6 @@
   gap: t.$space-2;
 }
 .dialog {
-  overscroll-behavior: contain;
   width: min(42rem, calc(100vw - 2rem));
   max-height: calc(100dvh - 2rem);
   padding: 0;

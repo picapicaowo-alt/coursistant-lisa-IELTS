@@ -1,20 +1,45 @@
-.actionButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  width: t.$control-height-md;
-  height: t.$control-height-md;
-  border: 0;
-  border-radius: t.$radius-control-sm;
-  background: t.$surface-subtle;
-  color: t.$content-secondary;
-  cursor: pointer;
-  transition: background-color .16s ease, color .16s ease;
-  &:hover { background: t.$surface-muted; }
-  &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
-  svg { display: block; }
-  &.delete { color: t.$feedback-danger; &:hover { background: t.$feedback-danger-surface; } }
-  &.edit { color: t.$action-primary; &:hover { background: t.$surface-brand-subtle; } }
-  &.view { color: t.$feedback-info; &:hover { background: t.$feedback-info-surface; } }
+﻿.actionButton {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: none;
+    background: #F1F5F9;
+    color: t.$content-secondary;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    svg {
+        display: block;
+    }
+    
+    &.delete {
+        color: #f67c7c;
+        
+        &:hover {
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+    }
+    
+    &.edit {
+        color: #729ee5;
+        
+        &:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+    }
+    
+    &.view {
+        color: #5fcba5;
+        
+        &:hover {
+            background-color: rgba(16, 185, 129, 0.1);
+        }
+    }
 }

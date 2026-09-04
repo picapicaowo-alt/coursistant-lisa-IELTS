@@ -23,12 +23,12 @@
     margin-bottom: 0.5rem;
     color: t.$content-primary;
     background: transparent;
-
+    
     &:focus {
         outline: none;
         box-shadow: 0 2px 0 0 t.$action-primary;
     }
-
+    
     &::placeholder {
         color: t.$content-placeholder;
         font-weight: 600;
@@ -44,12 +44,12 @@
     font-size: 0.875rem;
     width: 100%;
     max-width: 300px;
-
+    
     &:focus {
         border-color: t.$action-primary;
         box-shadow: 0 0 0 3px rgba(86, 111, 232, 0.1);
     }
-
+    
     &:invalid {
         border-color: #fc8181;
     }
@@ -62,14 +62,14 @@
     background-color: white;
     font-size: 0.875rem;
     cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
+    transition: all 0.2s;
     width: 100%;
     max-width: 200px;
-
+    
     &:hover {
         border-color: t.$border-strong;
     }
-
+    
     &:focus {
         border-color: t.$action-primary;
         box-shadow: 0 0 0 3px rgba(86, 111, 232, 0.1);

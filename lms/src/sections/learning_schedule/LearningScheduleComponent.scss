@@ -87,7 +87,7 @@
 
   span {
     color: t.$content-primary;
-    font-size: t.$font-size-caption;
+    font-size: .6875rem;
     line-height: 1.25rem;
   }
 }
@@ -107,7 +107,7 @@
     border-radius: .625rem;
     background: transparent;
     color: t.$content-primary;
-    font-size: t.$font-size-caption;
+    font-size: .6875rem;
 
     &[data-outside='true'] {
       color: t.$slate-400;
@@ -195,7 +195,7 @@
   }
 
   small {
-    font-size: t.$font-size-caption;
+    font-size: .6875rem;
     line-height: .875rem;
   }
 
@@ -206,7 +206,7 @@
 
   em {
     color: t.$slate-400;
-    font-size: t.$font-size-caption;
+    font-size: .6875rem;
     font-style: normal;
     line-height: 1rem;
   }

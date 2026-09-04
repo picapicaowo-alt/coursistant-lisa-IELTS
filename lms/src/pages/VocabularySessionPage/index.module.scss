@@ -21,7 +21,7 @@
   &[role='button']:focus-visible {outline: 3px solid t.$brand-subtle; outline-offset: 4px; border-color: t.$brand;}
 }
 .cardPrompt {padding: clamp(2rem, 7vw, 5rem); display: grid; place-content: center; text-align: center; h1 {margin: 0.5rem 0; font-size: clamp(3rem, 9vw, 6.5rem); line-height: 0.98; letter-spacing: -0.065em;} p {margin: 0.5rem 0 0; color: t.$text-muted;}}
-.partOfSpeech {width: fit-content; margin: 0 auto; padding: 0.35rem 0.65rem; border-radius: t.$radius-pill; background: t.$brand-subtle; color: t.$brand; font-size: t.$font-size-caption; font-weight: t.$fw-bold; text-transform: uppercase; letter-spacing: 0.06em;}
+.partOfSpeech {width: fit-content; margin: 0 auto; padding: 0.35rem 0.65rem; border-radius: t.$radius-pill; background: t.$brand-subtle; color: t.$brand; font-size: 0.72rem; font-weight: t.$fw-bold; text-transform: uppercase; letter-spacing: 0.06em;}
 .flipPrompt {width: fit-content; margin: 1.15rem auto 0; padding: 0.65rem 0.9rem; border-radius: t.$radius-pill; background: t.$brand-subtle; color: t.$brand; display: inline-flex; align-items: center; gap: 0.45rem; font-size: t.$fs-caption; font-weight: t.$fw-bold;}
 .revealed {grid-template-columns: minmax(14rem, 0.85fr) minmax(18rem, 1.15fr); .cardPrompt {border-right: 1px solid t.$border; background: t.$subcard-bg; h1 {font-size: clamp(2.6rem, 7vw, 5rem);}}}
 .answer {padding: clamp(1.5rem, 4vw, 3rem); display: flex; flex-direction: column; justify-content: center;}
@@ -31,8 +31,8 @@
 .controls {width: min(100%, 54rem); margin: auto auto 0;}
 .ratingPanel {display: grid; gap: 0.55rem;}
 .ratingInstruction {margin: 0; color: t.$text-muted; text-align: center; font-size: t.$fs-caption;}
-.ratingGroup {display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; button {min-height: 4.4rem; padding: 0.75rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; color: t.$text; display: flex; align-items: center; gap: 0.55rem; text-align: left; cursor: pointer; transition: transform 120ms ease, border-color 120ms ease, opacity 120ms ease; &:not(:disabled):hover {transform: translateY(-2px);} &:disabled {opacity: 0.45; cursor: not-allowed;} strong, small {display: block;} small {margin-top: 0.1rem; color: t.$text-muted; font-size: t.$font-size-caption;}}}
-.key {width: 1.35rem; height: 1.35rem; border: 1px solid t.$border; border-radius: 0.35rem; color: t.$text-muted; display: grid; place-content: center; font-size: t.$font-size-caption;}
+.ratingGroup {display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.65rem; button {min-height: 4.4rem; padding: 0.75rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; color: t.$text; display: flex; align-items: center; gap: 0.55rem; text-align: left; cursor: pointer; transition: transform 120ms ease, border-color 120ms ease, opacity 120ms ease; &:not(:disabled):hover {transform: translateY(-2px);} &:disabled {opacity: 0.45; cursor: not-allowed;} strong, small {display: block;} small {margin-top: 0.1rem; color: t.$text-muted; font-size: 0.68rem;}}}
+.key {width: 1.35rem; height: 1.35rem; border: 1px solid t.$border; border-radius: 0.35rem; color: t.$text-muted; display: grid; place-content: center; font-size: 0.66rem;}
 .know_well {svg {color: t.$success;} &:hover {border-color: t.$success !important;}}
 .kind_of_know {svg {color: t.$warning;} &:hover {border-color: t.$warning !important;}}
 .dont_remember {svg {color: t.$danger;} &:hover {border-color: t.$danger !important;}}
@@ -43,7 +43,7 @@
 .resultCard {width: min(52rem, calc(100vw - 2rem)); padding: clamp(1.5rem, 5vw, 4rem); border-radius: t.$radius-card-lg; background: t.$card-bg; text-align: center; box-shadow: t.$shadow-card; h1 {margin: 0.65rem auto; max-width: 40rem; font-size: clamp(2rem, 5vw, 3.6rem); letter-spacing: -0.045em;} > p {max-width: 38rem; margin: 0 auto; color: t.$text-muted; line-height: 1.65;}}
 .resultIcon {width: 4.5rem; height: 4.5rem; margin: 0 auto 1rem; border-radius: 50%; background: t.$success-subtle; color: t.$success; display: grid; place-content: center; svg {width: 2rem; height: 2rem;}}
 .kicker {color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-bold; letter-spacing: 0.08em; text-transform: uppercase;}
-.resultStats {margin: 2rem 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem; div {padding: 1rem 0.5rem; border-radius: t.$radius-control; background: t.$subcard-bg;} dt {color: t.$text-muted; font-size: t.$font-size-caption; text-transform: uppercase; letter-spacing: 0.05em;} dd {margin: 0.3rem 0 0; font-size: 1.35rem; font-weight: t.$fw-bold;}}
+.resultStats {margin: 2rem 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.65rem; div {padding: 1rem 0.5rem; border-radius: t.$radius-control; background: t.$subcard-bg;} dt {color: t.$text-muted; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em;} dd {margin: 0.3rem 0 0; font-size: 1.35rem; font-weight: t.$fw-bold;}}
 .resultActions {display: flex; justify-content: center; gap: 0.65rem; button {min-height: 3rem; padding: 0 1rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; color: t.$text; font-weight: t.$fw-semibold; cursor: pointer;} .primary {border-color: t.$brand; background: t.$brand; color: t.$card-bg; display: inline-flex; align-items: center; gap: 0.5rem;}}
 
 @media (max-width: 700px) {

@@ -28,19 +28,19 @@
     text-align: left;
     color: #1e293b;
     background: white;
-
+    
     &:focus {
         outline: none;
         border-color: #3b82f6;
         box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
-
+    
     &:disabled {
         background-color: t.$surface-subtle;
         color: t.$content-placeholder;
         cursor: not-allowed;
     }
-
+    
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
         -webkit-appearance: none;
@@ -93,16 +93,16 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+    transition: all 0.15s ease;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-
+    
     &:hover:not(:disabled) {
         background-color: #2563eb;
     }
-
+    
     &:disabled {
         background-color: #cbd5e1;
         cursor: not-allowed;
@@ -136,13 +136,13 @@
     display: flex;
     align-items: baseline;
     gap: 4px;
-
+    
     & span:first-child {
         font-size: 20px;
         font-weight: 700;
         color: #3b82f6;
     }
-
+    
     & span:last-child {
         color: t.$content-placeholder;
         font-size: 14px;

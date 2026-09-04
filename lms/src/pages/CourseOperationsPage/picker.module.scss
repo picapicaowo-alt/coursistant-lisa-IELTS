@@ -1,0 +1,42 @@
+.picker {
+  position: relative;
+  width: 21rem;
+  max-width: 100%;
+  flex: 0 1 21rem;
+}
+.options {
+  position: absolute;
+  top: calc(100% + t.$space-2);
+  left: 0;
+  z-index: 5;
+  width: 100%;
+  min-width: min(19rem, 75vw);
+  max-height: 22rem;
+  overflow-y: auto;
+  padding: t.$space-3;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-canvas;
+  box-shadow: t.$shadow-popover;
+}
+.option {
+  display: grid;
+  gap: t.$space-1;
+  width: 100%;
+  min-height: t.$touch-target;
+  padding: t.$space-3;
+  border: 0;
+  border-radius: t.$radius-xs;
+  background: transparent;
+  color: t.$content-primary;
+  text-align: left;
+  cursor: pointer;
+}
+.option:hover,
+.option:focus-visible {
+  background: t.$surface-status-active;
+}
+.option small {
+  color: t.$content-secondary;
+  overflow-wrap: anywhere;
+}
