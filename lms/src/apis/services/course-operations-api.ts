@@ -127,8 +127,12 @@ export class CourseOperationsApiService {
     return this.apiClient.get(`/v2/courses/${courseId}/discussion/posts/${postId}/replies`, {params: {page, size}});
   }
 
-  createDiscussionReply(courseId: number, postId: number, body: string, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseOperationRead>> {
-    return this.apiClient.post(`/v2/courses/${courseId}/discussion/posts/${postId}/replies`, {body}, idempotent(key));
+  createDiscussionReply(courseId: number, postId: number, body: string, key: string = crypto.randomUUID(), files: File[] = []): Promise<ApiResponse<CourseOperationRead>> {
+    if (!files.length) return this.apiClient.post(`/v2/courses/${courseId}/discussion/posts/${postId}/replies`, {body}, idempotent(key));
+    const form = new FormData();
+    form.append('body', body);
+    files.forEach(file => form.append('files', file));
+    return this.apiClient.post(`/v2/courses/${courseId}/discussion/posts/${postId}/replies`, form, idempotent(key));
   }
 
   private async getDiscussionAttachment(courseId: number, postId: number, attachmentId: number, action: 'preview' | 'download'): Promise<Blob> {
@@ -244,7 +248,7 @@ export class CourseOperationsApiService {
   }
 
   getMyAlerts(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/alerts'); }
-  getMyAttendance(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/attendance'); }
+  getMyAttendance(params: {from?: string; to?: string; courseId?: number} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/attendance', {params}); }
   getMyCalendar(params: {from?: string; to?: string; timezone?: string} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/calendar', {params}); }
   getMyProgress(): Promise<ApiResponse<StudentProgressResponse>> { return this.apiClient.get('/v2/me/progress'); }
   getMyScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/schedule-requests', {params})); }

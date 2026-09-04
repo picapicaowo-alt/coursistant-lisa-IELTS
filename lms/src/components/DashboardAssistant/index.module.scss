@@ -32,7 +32,8 @@
   display: grid;
   gap: t.$space-3;
   margin: t.$space-6 t.$space-1 0;
-  button { min-height: t.$touch-target; padding: t.$space-3 t.$space-5; border: 0; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-ink; font-size: t.$font-size-body-lg; line-height: t.$line-height-body; text-align: left; cursor: pointer; }
+  button { display: flex; align-items: center; gap: t.$space-3; min-height: t.$touch-target; padding: t.$space-3 t.$space-5; border: 0; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-ink; font-size: t.$font-size-body-lg; line-height: t.$line-height-body; text-align: left; cursor: pointer; }
+  svg { color: t.$action-primary; flex-shrink: 0; }
   button:hover, button:focus-visible { box-shadow: t.$shadow-selected; }
 }
 

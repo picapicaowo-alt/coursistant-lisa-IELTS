@@ -78,7 +78,7 @@ test('student dashboard fills its fluid workspace from mobile through ultra-wide
     {width: 390, height: 844, columns: 1},
     {width: 768, height: 1024, columns: 1},
     {width: 1024, height: 768, columns: 1},
-    {width: 1280, height: 800, columns: 2},
+    {width: 1280, height: 800, columns: 1},
     {width: 1440, height: 900, columns: 2},
     {width: 1710, height: 811, columns: 2},
     {width: 1920, height: 1080, columns: 2},
@@ -99,7 +99,9 @@ test('student dashboard fills its fluid workspace from mobile through ultra-wide
         - Number.parseFloat(pageStyle.paddingRight);
       return {
         unusedInlineSpace: available - dashboardRect.width,
-        columnCount: getComputedStyle(element).gridTemplateColumns.split(' ').filter(Boolean).length,
+        // Count visible column positions: mobile uses a vertical flex layout,
+        // whose unused grid-template value does not describe rendered geometry.
+        columnCount: new Set(Array.from(element.children, child => Math.round(child.getBoundingClientRect().left))).size,
       };
     });
 

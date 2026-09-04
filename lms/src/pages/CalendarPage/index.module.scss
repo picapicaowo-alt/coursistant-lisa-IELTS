@@ -84,3 +84,6 @@
 .eventDialog[data-anchored] .dateFields {grid-template-columns:1fr;}
 
 .eventDialog input {padding-block:.55rem; padding-left:.75rem;}
+
+// Study Plan owns the surrounding page gutters when this calendar is embedded.
+.embedded { padding: 0; min-height: 0; }

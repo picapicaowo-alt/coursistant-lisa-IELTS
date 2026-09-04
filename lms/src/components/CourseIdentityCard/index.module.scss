@@ -36,6 +36,13 @@
 }
 
 .top { display: flex; align-items: center; gap: t.$space-3; min-width: 0; min-height: t.$space-6; }
+.identityIcon { display: grid; place-items: center; align-self: flex-start; width: t.$space-10; height: t.$space-10; color: t.$action-primary; background: t.$surface-brand-subtle; border-radius: t.$radius-control; }
+.compact { padding: t.$space-4; gap: t.$space-3; }
+.compact .heading :is(h2, h3) { font-size: t.$font-size-body-lg; line-height: 1.5; }
+.compact .instructor { font-size: t.$font-size-caption; }
+.compact .footer { padding-top: t.$space-3; gap: t.$space-3; }
+.compact .actions > :is(a, button) { background: transparent; color: t.$action-primary; border-color: t.$border-default; font-size: t.$font-size-caption; }
+.compact .actions > :is(a, button):hover { background: t.$surface-brand-subtle; }
 .status { display: flex; flex-wrap: wrap; gap: t.$space-2; min-width: 0; }
 .code { min-width: 0; margin-left: auto; overflow-wrap: anywhere; text-align: right; color: t.$content-secondary; font-size: t.$font-size-caption; }
 .menu { flex-shrink: 0; margin-block: calc(-1 * t.$space-2); }

@@ -64,10 +64,11 @@ const Container: React.FC = () => {
   }, [access.canGrade, access.isResolved, setRole]);
 
   return (
-    <div className={`${styles.container} ${access.isInstructor && workspaceMode === 'view' && !readingMaterial ? styles.instructorOverview : ''}`}>
+    <div className={`${styles.container} ${(access.isInstructor || access.isStudent) && workspaceMode === 'view' && !readingMaterial ? styles.instructorOverview : ''}`}>
       {workspaceMode !== "detailWorkspace" && !readingMaterial && (
         <PageHeader
           instructorView={access.isInstructor}
+          studentView={access.isStudent}
           canEditCourse={access.canEditCourse}
           canManageMaterials={access.canUploadMaterials}
         />

@@ -17,13 +17,14 @@ import './LearningScheduleComponent.scss';
 
 const DATE_KEY = 'yyyy-MM-dd';
 
-const LearningScheduleComponent: React.FC = () => {
+const LearningScheduleComponent: React.FC<{spacious?: boolean}> = ({spacious = false}) => {
   const {activities, isLoading, isError, refetch} = useDashboardActivities();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [dateSelected, setDateSelected] = useState(false);
 
   const activityDates = useMemo(() => new Set(activities.map(activity => activity.date)), [activities]);
-  const upcoming = activities.slice(0, 3);
+  const upcoming = (dateSelected ? activities.filter(activity => activity.date === format(selectedDate, DATE_KEY)) : activities).slice(0, 3);
 
   const calendarDays = useMemo(() => {
     const monthStart = startOfMonth(currentMonth);
@@ -35,7 +36,7 @@ const LearningScheduleComponent: React.FC = () => {
   }, [currentMonth]);
 
   return (
-    <div className="learning-schedule">
+    <div className={`learning-schedule${spacious ? ' learning-schedule--spacious' : ''}`}>
       <header className="learning-schedule__header">
         <h2>Learning Schedule</h2>
         <Link to="/calendar" aria-label="Open full calendar">
@@ -70,7 +71,7 @@ const LearningScheduleComponent: React.FC = () => {
                 className={selected ? 'is-selected' : undefined}
                 data-outside={outside || undefined}
                 data-has-activity={activityDates.has(dateKey) || undefined}
-                onClick={() => setSelectedDate(day)}
+                onClick={() => {setSelectedDate(day); setDateSelected(true);}}
                 aria-label={format(day, 'EEEE, MMMM d, yyyy')}
                 aria-pressed={selected}
               >
@@ -82,6 +83,7 @@ const LearningScheduleComponent: React.FC = () => {
       </div>
 
       <div className="learning-schedule__timeline">
+        {dateSelected ? <button className="learning-schedule__reset" type="button" onClick={() => setDateSelected(false)}>Show upcoming classes</button> : null}
         {isLoading ? <p className="learning-schedule__status">Loading schedule…</p> : null}
         {isError ? (
           <p className="learning-schedule__status" role="alert">
@@ -89,7 +91,7 @@ const LearningScheduleComponent: React.FC = () => {
           </p>
         ) : null}
         {!isLoading && !isError && upcoming.length === 0 ? (
-          <p className="learning-schedule__status">No sessions in the next {ACTIVITY_WINDOW_DAYS} days.</p>
+          <p className="learning-schedule__status">{dateSelected ? `No loaded sessions for ${format(selectedDate, 'MMM d')}. Open the full calendar to see other dates.` : `No sessions in the next ${ACTIVITY_WINDOW_DAYS} days.`}</p>
         ) : null}
         {!isLoading && !isError ? upcoming.map((activity, index) => (
           <Link

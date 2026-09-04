@@ -38,7 +38,7 @@ describe('Dashboard region states', () => {
   beforeEach(() => {
     useQueryMock.mockImplementation(({queryKey}: {queryKey: string[]}) => {
       if (queryKey.includes('advising-study-plan')) {
-        return {data: undefined, isPending: false, isError: true, refetch: vi.fn()};
+        return {data: undefined, isPending: false, isError: true, error: new Error('This section could not be loaded.'), refetch: vi.fn()};
       }
       if (queryKey.includes('mock-exams')) {
         return {data: {items: []}, isPending: false, isError: false, refetch: vi.fn()};
@@ -50,7 +50,7 @@ describe('Dashboard region states', () => {
   it('keeps loading, error, and empty states independent across panels', () => {
     render(<MemoryRouter><Dashboard/></MemoryRouter>);
 
-    expect(screen.getByText('No active courses. Visit My Courses to view your enrolments.')).toBeInTheDocument();
+    expect(screen.getByText('No active courses')).toBeInTheDocument();
     expect(screen.getByText('This section could not be loaded.')).toBeInTheDocument();
     expect(screen.getByText('No mock exams have been assigned.')).toBeInTheDocument();
     expect(screen.getByText('Loading…')).toBeInTheDocument();

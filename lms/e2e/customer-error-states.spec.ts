@@ -73,10 +73,12 @@ test('Student course and calendar read failures never masquerade as empty record
     await page.route(`**${endpoint}**`, route => route.fulfill({status: 500, json: failed}));
   }
   await page.goto('/my-operations');
-  await page.getByRole('combobox', {name: 'Course', exact: true}).selectOption('71');
-  await expect(page.getByRole('alert').filter({hasText: 'Calendar could not be loaded.'})).toBeVisible();
+  await page.getByRole('combobox', {name: 'Learning course', exact: true}).selectOption('71');
+  await page.getByRole('button', {name: 'View details', exact: true}).click();
+  await expect(page.getByRole('region', {name: 'Course hours', exact: true}).getByRole('alert')).toBeVisible();
+  await expect(page.getByRole('region', {name: 'Published reports', exact: true}).getByRole('alert')).toBeVisible();
   await expect(page.getByText(/No purchased-hours record|No published reports\.|No selectable class occurrence/)).toHaveCount(0);
-  await page.getByRole('navigation', {name: 'Operations sections'}).getByRole('button', {name: 'calendar', exact: true}).click();
+  await page.getByRole('navigation', {name: 'Learning views'}).getByRole('button', {name: 'Calendar', exact: true}).click();
   await expect(page.getByText('No calendar items are available.')).toHaveCount(0);
   await expect(page.getByRole('alert').filter({hasText: 'Course hours could not be loaded.'})).toHaveCount(0);
 });
@@ -86,12 +88,13 @@ for (const code of ['COURSE_HOURS_NOT_FOUND', 'COURSE_NOT_FOUND']) {
     await fixture(page);
     await page.route('**/v2/me/courses/71/hours', route => route.fulfill({status: 404, json: {status: 404, code, message: 'Missing record'}}));
     await page.goto('/my-operations');
-    await page.getByRole('combobox', {name: 'Course', exact: true}).selectOption('71');
+    await page.getByRole('combobox', {name: 'Learning course', exact: true}).selectOption('71');
+  await page.getByRole('button', {name: 'View details', exact: true}).click();
     if (code === 'COURSE_HOURS_NOT_FOUND') {
       await expect(page.getByText('No course hours have been added yet.')).toBeVisible();
-      await expect(page.getByRole('button', {name: 'Retry course hours'})).toHaveCount(0);
+      await expect(page.getByRole('region', {name: 'Course hours', exact: true}).getByRole('alert')).toHaveCount(0);
     } else {
-      await expect(page.getByRole('button', {name: 'Retry course hours'})).toBeVisible();
+      await expect(page.getByRole('region', {name: 'Course hours', exact: true}).getByRole('alert')).toBeVisible();
       await expect(page.getByText('No course hours have been added yet.')).toHaveCount(0);
     }
   });

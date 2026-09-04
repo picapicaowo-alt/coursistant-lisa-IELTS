@@ -1,0 +1,61 @@
+.dashboard { display: grid; grid-template-columns: minmax(0, 2fr) minmax(17rem, 1fr); gap: t.$space-6; align-items: start; max-width: t.$workspace-max-inline-size; color: t.$content-primary; }
+.main { container: student-dashboard-main / inline-size; }
+.main, .side { display: grid; min-width: 0; gap: t.$space-5; align-content: start; }
+.main { grid-column: 1; grid-row: 1; }
+.side { grid-column: 2; grid-row: 1; }
+.schedulePanel { min-width: 0; border: 1px solid t.$border-default; border-radius: t.$radius-card-lg; background: t.$surface-raised; }
+.textLink { display: inline-flex; align-items: center; gap: t.$space-1; color: t.$action-primary; text-decoration: none; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; min-height: t.$touch-target; }
+.courses { container: dashboard-courses / inline-size; }
+.courseBody { gap: t.$space-2; }
+.courseStrip { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 2 * #{t.$space-4}) / 3); gap: t.$space-4; overflow-x: auto; padding: t.$space-1; margin: calc(-1 * t.$space-1); scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: t.$border-strong transparent; }
+.courseStrip > article { scroll-snap-align: start; }
+.courseStrip > article:nth-child(3n + 2) > div:first-child > div:first-child { color: t.$feedback-success; background: t.$type-green-subtle; }
+.courseStrip > article:nth-child(3n + 3) > div:first-child > div:first-child { color: t.$feedback-info; background: t.$type-cyan-subtle; }
+.schedule { display: flex; align-items: flex-start; gap: t.$space-2; line-height: 1.6; }
+.schedule svg { flex-shrink: 0; margin-top: t.$space-1; }
+.schedule button { color: t.$action-primary; border: 0; background: transparent; padding: 0; cursor: pointer; }
+.carouselNav { display: flex; align-items: center; justify-content: center; gap: t.$space-4; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.carouselNav button { display: grid; place-items: center; min-width: t.$touch-target; min-height: t.$touch-target; border: 0; border-radius: t.$radius-control; color: t.$action-primary; background: transparent; cursor: pointer; }
+.carouselNav button:disabled { color: t.$content-secondary; opacity: .4; cursor: default; }
+.taskList { display: grid; }
+.task { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: t.$space-3; padding: t.$space-4 0; border-bottom: 1px solid t.$border-default; text-decoration: none; color: inherit; }
+.task:first-child { padding-top: t.$space-1; }
+.task:last-child { border-bottom: 0; padding-bottom: t.$space-1; }
+.taskIcon { color: t.$content-secondary; align-self: start; margin-top: t.$space-1; }
+.taskIcon[data-complete] { color: t.$feedback-success; }
+.taskCopy, .taskMeta { display: grid; min-width: 0; gap: t.$space-2; }
+.taskCopy strong { font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; line-height: 1.5; overflow-wrap: anywhere; }
+.taskCopy small { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: 1.5; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; overflow: hidden; }
+.taskMeta { justify-items: end; }
+.taskMeta small { font-size: t.$font-size-caption; color: t.$content-secondary; }
+.taskAction { display: flex; align-items: center; gap: t.$space-1; grid-column: 2 / -1; color: t.$action-primary; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; }
+.task:hover .taskCopy strong { color: t.$action-primary; }
+.showMore { justify-self: center; background: transparent; border: 0; min-height: t.$touch-target; color: t.$action-primary; font: inherit; font-size: t.$font-size-caption; cursor: pointer; }
+.examList { display: grid; gap: t.$space-3; }
+.exam { display: flex; align-items: center; gap: t.$space-3; padding: t.$space-3; border-radius: t.$radius-control; background: t.$surface-subtle; color: inherit; text-decoration: none; }
+.exam > span:nth-child(2) { display: grid; min-width: 0; gap: t.$space-2; flex: 1; }
+.exam strong { font-size: t.$font-size-body; overflow-wrap: anywhere; }
+.examIcon { color: t.$action-primary; }
+.alertList { display: grid; gap: t.$space-3; }
+.alertList a { display: flex; gap: t.$space-3; align-items: center; min-height: t.$touch-target; color: t.$content-primary; text-decoration: none; font-size: t.$font-size-body; line-height: 1.6; }
+.alertList span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+.alertList svg { flex-shrink: 0; color: t.$action-primary; }
+.dashboard :is(a, button):focus-visible { outline: 2px solid t.$action-primary; outline-offset: 3px; }
+@container dashboard-courses (max-width: 43rem) { .courseStrip { grid-auto-columns: calc((100% - #{t.$space-4}) / 2); } }
+@container dashboard-courses (max-width: 27rem) { .courseStrip { grid-auto-columns: 100%; } }
+@container dashboard-workspace (max-width: 72rem) {
+  .dashboard { grid-template-columns: minmax(0, 1fr); }
+  .side { grid-column: 1 / -1; grid-row: 2; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+}
+@container dashboard-workspace (max-width: 48rem) {
+  .dashboard { display: flex; flex-direction: column; }
+  .main, .side { width: 100%; }
+  .side { grid-template-columns: 1fr; }
+  .exam { flex-wrap: wrap; }
+}
+@container student-dashboard-main (min-width: 34rem) {
+  .task { grid-template-columns: auto minmax(0, 1fr) 7.25rem 7rem; }
+  .taskAction { grid-column: auto; justify-content: flex-end; }
+}
+
+.dashboard .main section > header, .dashboard .side section > header { align-items: center; }
