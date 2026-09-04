@@ -1,0 +1,86 @@
+[
+  {
+    "supplied": "auth.openapi(3).yaml",
+    "consumed": "docs/api/auth.openapi.yaml",
+    "sha256": "d5086ed83d58fcc9e0dd2c2b00025551bf5f2c8f183ad15a40bb4a5a9557107f",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "user.openapi(1).yaml",
+    "consumed": "docs/api/user.openapi.yaml",
+    "sha256": "31835e7357c7f5d8518e71998376f45a5b138e83550e3b91c2b9cfcd96f2cc3a",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "course.openapi(3).yaml",
+    "consumed": "docs/api/course.openapi.yaml",
+    "sha256": "1667b615470aff6e1dfa60f7bc33a42a7787c5e04a96c65362b65cddf4d9b513",
+    "byteMatch": true,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "assignment.openapi(1).yaml",
+    "consumed": "docs/api/assignment.openapi.yaml",
+    "sha256": "994318d3995fbab6163086dd33b74ac94df41b62ce3a92fdd22f1fa138db7865",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "notification.openapi(2).yaml",
+    "consumed": "docs/api/notification.openapi.yaml",
+    "sha256": "93676a25035dc80ba02273bd97b01c705fec38b7095b477b45e199cfa016054b",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "mockexam.openapi(3).yaml",
+    "consumed": "docs/api/mockexam.openapi.yaml",
+    "sha256": "666850a47dd48b50d5739f47dc61afcd40be084a519af6689651f015de9461b3",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "advising.openapi(3).yaml",
+    "consumed": "docs/api/advising.openapi.yaml",
+    "sha256": "3c4f7cbc038a06595c3afb4f6f2f2159883bcd4b9961030441570ad2af75b3de",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "parent.openapi(3).yaml",
+    "consumed": "docs/api/parent.openapi.yaml",
+    "sha256": "c8130dc3794ff043c365f953a565af2bc1ced97c9dcbc593ba15eb2cea41c644",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "frontend-handoff-instructor-student-parent(1).md",
+    "consumed": "docs/frontend-handoff-instructor-student-parent.md",
+    "sha256": "770f4a4d87713ab169b60b342777e1a8e97cf02b209d87169c1bf7219a4d8341",
+    "byteMatch": true,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "instructor-frontend-handoff(1).md",
+    "consumed": "docs/instructor-frontend-handoff.md",
+    "sha256": "6d80dfef8493f28d85d159ebfb2a2a2c0aeea9a58e525ab76eba1edb84008bfa",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "student-frontend-handoff(1).md",
+    "consumed": "docs/student-frontend-handoff.md",
+    "sha256": "3a5574e7aee85786cf25ea11569cd8c9976cd28b93345d5e6c69abe697dc9c01",
+    "byteMatch": true,
+    "normalizedLineEndingMatch": true
+  },
+  {
+    "supplied": "parent-frontend-handoff(1).md",
+    "consumed": "docs/parent-frontend-handoff.md",
+    "sha256": "793b7058db1450d9dd546bbe7420f0b22b8469a1e0767e482e001e7ca09929a5",
+    "byteMatch": false,
+    "normalizedLineEndingMatch": true
+  }
+]

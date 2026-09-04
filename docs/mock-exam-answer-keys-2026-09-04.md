@@ -30,8 +30,9 @@ The checked-in `docs/api/mockexam.openapi.yaml` and the latest fetched frontend
 `JsonNode` question payloads, without `answer` / `answers` / `answersByQuestion`
 properties or equivalent-answer normalization rules. The implementation uses the
 explicit API-owner rules supplied in this task for those fields. No OpenAPI
-content was fabricated or overwritten. The frontend contract needs the updated
-payload documentation when supplied. Existing create-only section routes and
+content was fabricated or overwritten. The newly supplied `mockexam.openapi(3).yaml` matches this consumed snapshot
+after line-ending normalization and also omits these payload fields. The
+frontend contract needs the updated payload documentation when supplied. Existing create-only section routes and
 read-only saved sections remain unchanged.
 
 ## Save-error regression and release validation

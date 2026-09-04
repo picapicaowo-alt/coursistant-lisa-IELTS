@@ -1,0 +1,68 @@
+{
+  "evidenceBoundary": "Previously captured authenticated Dev responses; no new authenticated request was executed in this contract-review turn. Browser was signed out.",
+  "materialUpload": {
+    "method": "POST",
+    "path": "/v2/courses/344/weeks/291/materials",
+    "status": 403,
+    "request": {
+      "files": [
+        "qa-writing-response.pdf"
+      ]
+    },
+    "response": {
+      "status": 403,
+      "code": "FORBIDDEN",
+      "data": null,
+      "message": "Only Course Manager or Active TA can upload materials",
+      "timestamp": "2026-09-04T08:30:19.238140144Z"
+    }
+  },
+  "advisorCourseReads": [
+    {
+      "role": "advisor",
+      "path": "/v2/advisor/courses/344/delivery-config",
+      "status": 200,
+      "response": {
+        "status": 200,
+        "code": "SUCCESS",
+        "data": {
+          "courseId": 344,
+          "deliveryMode": "GROUP",
+          "capacity": 2,
+          "catalogCode": "QA-ORDER",
+          "launchState": "READY",
+          "courseLaunchVersion": 1,
+          "blockers": []
+        },
+        "message": "Success",
+        "timestamp": "2026-09-04T07:55:34.998663465Z"
+      }
+    },
+    {
+      "role": "advisor",
+      "path": "/v2/courses/344/session-occurrences?from=2026-09-14&to=2026-10-12&includeHistory=false",
+      "status": 404,
+      "response": {
+        "status": 404,
+        "code": "COURSE_NOT_FOUND",
+        "data": null,
+        "message": "Course does not exist",
+        "timestamp": "2026-09-04T07:55:35.195629517Z"
+      }
+    }
+  ],
+  "reportStudentPicker": {
+    "method": "GET",
+    "path": "/v2/courses/341/members?courseRole=Student&q=Emily&page=0&size=10",
+    "status": 403,
+    "code": "ACCESS_DENIED",
+    "source": "2026-09-04 live-role acceptance report and 22-instructor-report-student-picker-denied.txt",
+    "rawResponseEnvelopeAvailable": false
+  },
+  "postPublishOccurrences": {
+    "source": "51-postpublish-course-dates-still-unavailable.txt",
+    "observedCourseState": "Published",
+    "observedUI": "Class dates could not be loaded.",
+    "newRawHttpCaptureAvailable": false
+  }
+}
