@@ -7,16 +7,16 @@
   --color-border: #{t.$border-default};
   --color-background: #{t.$surface-raised};
   --color-background-hover: #{t.$surface-subtle};
-
+  
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 1.5rem;
   --spacing-lg: 2rem;
   --spacing-xl: 2.5rem;
-
+  
   --border-radius: 0.6rem;
   --border-width: 1.5px;
-
+  
   --font-family: #{t.$font-family};
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
@@ -58,7 +58,7 @@
   cursor: pointer;
   flex-shrink: 0;
   margin-top: 0.125rem;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+  transition: all 0.2s ease;
 
   &:hover {
     background: var(--color-background-hover);
@@ -108,7 +108,6 @@
   background: none;
   border: none;
   outline: none;
-  &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
   font-size: var(--font-size-lg);
   color: var(--color-text-primary);
   padding-bottom: var(--spacing-xs);
@@ -180,7 +179,7 @@
   width: 100%;
   flex-direction: column;
   gap: var(--spacing-xs);
-
+  
   label {
     color: var(--color-text-primary);
     font-family: var(--font-family);
@@ -188,7 +187,7 @@
     font-weight: 500;
     line-height: 1.43;
   }
-
+  
   input {
     width: 100%;
     border: 1px solid var(--color-border);
@@ -198,10 +197,9 @@
     background: var(--color-background);
     color: var(--color-text-primary);
     outline: none;
-  &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
     transition: border 0.2s;
     font-family: var(--font-family);
-
+    
     &:focus {
       border: var(--border-width) solid var(--color-primary);
     }
@@ -223,8 +221,8 @@
   gap: var(--spacing-xs);
   font-size: var(--font-size-base);
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
-
+  transition: all 0.2s ease;
+  
   &:hover {
     background: var(--color-primary);
     color: var(--color-background);
@@ -247,7 +245,6 @@
     background: var(--color-background);
     color: var(--color-text-primary);
     outline: none;
-  &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: var(--font-family);
 

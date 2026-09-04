@@ -124,7 +124,7 @@
     padding: 0.5rem 1rem;
     border-radius: 0.75rem;
     border: 1px solid t.$border-default;
-    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
+    transition: all 0.3s;
 
     &:hover {
         background-color: t.$border-default;
@@ -139,7 +139,7 @@
     padding: 0.5rem 1rem;
     border-radius: 0.75rem;
     border: none;
-    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
+    transition: all 0.3s;
 
     &:hover {
         background-color: rgba(86, 111, 232, 0.8);
@@ -175,4 +175,4 @@
     font-weight: 400;
     margin-left: 0;
     line-height: 1.5;
-}
+} 

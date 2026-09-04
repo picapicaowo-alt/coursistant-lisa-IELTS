@@ -14,7 +14,7 @@ export const IconButton: React.FC<IconButtonProps & { type?: 'delete' | 'edit' |
                                                                                                type = 'delete',
                                                                                              }) => {
   const iconWidth = `${Math.round(width * 2 / 3)}`;
-
+  
   const getIcon = () => {
     switch (type) {
       case 'delete':
@@ -37,16 +37,14 @@ export const IconButton: React.FC<IconButtonProps & { type?: 'delete' | 'edit' |
         return null;
     }
   };
-
+  
   return (
     <button
       className={`${styles.actionButton} ${styles[type]}`}
       onClick={onClick}
-      type="button"
-      aria-label={title}
       title={title}
     >
-      <svg aria-hidden="true" width={iconWidth} height={iconWidth} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg width={iconWidth} height={iconWidth} viewBox={`0 0 ${width} ${width}`} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         {getIcon()}
       </svg>
     </button>

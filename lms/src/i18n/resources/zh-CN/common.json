@@ -26,41 +26,5 @@
   "common": {
     "yes": "是",
     "no": "否"
-  },
-  "people": {
-    "nameUnavailable": "姓名不可用",
-    "userFallback": "用户 #{{id}}",
-    "studentFallback": "学生 #{{id}}",
-    "instructor": "教师",
-    "selectedInstructor": "已选教师 #{{id}}",
-    "instructorLoadError": "无法加载教师列表。",
-    "instructorPages": "教师列表分页",
-    "courseStudents": "搜索课程学生",
-    "studentLoadError": "无法加载课程学生列表。",
-    "students": "学生",
-    "searchPlaceholder": "按姓名或邮箱搜索…",
-    "selectRequired": "请从结果中选择{{label}}。",
-    "clear": "清除{{label}}",
-    "showOptions": "显示{{label}}选项",
-    "results": "{{label}}搜索结果",
-    "searching": "正在搜索…",
-    "retry": "重试",
-    "noMatches": "没有匹配的人员。"
-  },
-  "intake": {
-    "reviewThenAssign": "核对学生资料和家长访问权限，然后继续分配顾问。",
-    "saved": "更改已保存。",
-    "saving": "正在保存…",
-    "continueToAssignment": "继续分配顾问",
-    "saveAndContinue": "保存并继续分配顾问",
-    "searchAdvisors": "按姓名或邮箱搜索顾问",
-    "nameOrEmail": "姓名或邮箱…",
-    "clearAdvisorSearch": "清除顾问搜索",
-    "pageSearchHelp": "搜索当前页的顾问。",
-    "chooseAdvisor": "选择顾问",
-    "noAdvisorMatches": "当前页没有匹配该姓名或邮箱的顾问。"
-  },
-  "accessibility": {
-    "skipToContent": "跳转到正文"
   }
 }

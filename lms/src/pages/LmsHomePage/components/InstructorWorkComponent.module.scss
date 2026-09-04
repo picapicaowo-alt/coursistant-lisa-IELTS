@@ -8,14 +8,14 @@
 .columns > section { min-width: 0; }
 .sectionTitle { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
 .sectionTitle h3 { font-size: 0.88rem; font-weight: 700; }
-.sectionTitle span { display: grid; min-width: 1.35rem; height: 1.35rem; place-items: center; border-radius: t.$radius-round; background: t.$surface-brand-subtle; color: t.$action-primary; font-size: t.$font-size-caption; font-weight: 700; }
+.sectionTitle span { display: grid; min-width: 1.35rem; height: 1.35rem; place-items: center; border-radius: t.$radius-round; background: t.$surface-brand-subtle; color: t.$action-primary; font-size: 0.7rem; font-weight: 700; }
 .list { display: grid; gap: 0.4rem; }
 .item { display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; min-width: 0; padding: 0.58rem; border: 1px solid t.$border-default; border-radius: 0.55rem; color: t.$content-primary; text-decoration: none; }
 .item:hover { border-color: t.$border-interactive; background: t.$surface-brand-subtle; }
 .itemMain { display: grid; min-width: 0; gap: 0.12rem; }
 .itemMain strong { overflow: hidden; font-size: 0.78rem; text-overflow: ellipsis; white-space: nowrap; }
-.itemMain small { overflow: hidden; color: t.$content-secondary; font-size: t.$font-size-caption; text-overflow: ellipsis; white-space: nowrap; }
-.count { display: grid; flex: 0 0 auto; min-width: 1.75rem; height: 1.75rem; place-items: center; border-radius: 0.45rem; background: t.$action-primary; color: t.$content-on-color; font-size: t.$font-size-caption; font-weight: 700; }
+.itemMain small { overflow: hidden; color: t.$content-secondary; font-size: 0.68rem; text-overflow: ellipsis; white-space: nowrap; }
+.count { display: grid; flex: 0 0 auto; min-width: 1.75rem; height: 1.75rem; place-items: center; border-radius: 0.45rem; background: t.$action-primary; color: t.$content-on-color; font-size: 0.72rem; font-weight: 700; }
 .empty, .inlineError { padding: 1rem 0.35rem; color: t.$content-secondary; font-size: 0.76rem; }
 .inlineError { color: t.$feedback-danger; }
 

@@ -114,7 +114,7 @@
     border-radius: t.$radius-pill;
     background: t.$brand-subtle;
     color: t.$brand;
-    font-size: t.$font-size-caption;
+    font-size: 0.7rem;
     font-weight: t.$fw-semibold;
 
     &[data-status='upcoming'],
@@ -250,7 +250,7 @@
     flex: 0 0 auto;
     min-width: 2.6rem;
     text-align: center;
-    font-size: t.$font-size-caption;
+    font-size: 0.65rem;
     font-weight: t.$fw-semibold;
     padding: 0.25rem 0.4rem;
     border-radius: t.$radius-control-sm;
@@ -319,7 +319,7 @@
         border-radius: t.$radius-control-sm;
         background: t.$card-bg;
         color: t.$brand;
-        font-size: t.$font-size-caption;
+        font-size: 0.72rem;
         font-weight: t.$fw-semibold;
         cursor: pointer;
 
@@ -536,7 +536,7 @@
 }
 
 .chipType {
-    font-size: t.$font-size-caption;
+    font-size: 0.7rem;
     font-weight: t.$fw-semibold;
     color: t.$text;
 }

@@ -1,4 +1,3 @@
-import {advisingErrorMessage} from '@/pages/advising/advisingErrors';
 import {useEffect, useRef, useState, type SetStateAction} from 'react';
 import {
   useIsMutating,
@@ -7,6 +6,7 @@ import {
 } from '@tanstack/react-query';
 import {ChevronLeft, ChevronRight, Plus} from 'lucide-react';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
+import {getApiErrorMessage} from '@/utils/apiError';
 import {
   SECTION_META,
   listeningPayload,
@@ -625,7 +625,7 @@ export function TenantSectionComposer({
           {!review && (error || save.error) ? (
             <p className={ui.inlineError} role="alert">
               {error ||
-                advisingErrorMessage(
+                getApiErrorMessage(
                   save.error,
                   'The section could not be created. Your draft is preserved.',
                 )}
@@ -669,7 +669,7 @@ export function TenantSectionComposer({
               </p>
               {save.error ? (
                 <p className={ui.inlineError} role="alert">
-                  {advisingErrorMessage(
+                  {getApiErrorMessage(
                     save.error,
                     'The section could not be created. Your draft is preserved. Try again when ready.',
                   )}

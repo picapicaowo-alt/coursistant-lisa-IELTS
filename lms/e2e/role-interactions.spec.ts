@@ -222,8 +222,9 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
   await page.screenshot({path: testInfo.outputPath('advisor-mock-exam-sections.png'), fullPage: true});
   await page.getByRole('combobox', {name: 'Select student'}).selectOption('301');
   await page.getByLabel('Published template').selectOption('45');
-  await page.getByRole('combobox', {name: 'Writing instructor'}).fill('Writing');
-  await page.getByRole('option', {name: /Writing Instructor/}).click();
+  await page.locator('summary').filter({hasText: 'Search for available instructors'}).click();
+  await page.getByRole('searchbox', {name: 'Search instructors'}).fill('Writing');
+  await page.getByRole('combobox', {name: 'Writing instructor'}).selectOption('501');
   await page.getByRole('button', {name: 'Assign Exam'}).click();
   await expect.poll(() => assignmentRequests).toBe(1);
   await expect(page.getByRole('link', {name: 'Vocabulary'})).toHaveCount(0);
@@ -448,8 +449,6 @@ test('counsellor completes intake, parent link, edit, and first advisor handover
   await openSection(page, 'Learning context');
   await page.getByLabel('Course request *').fill('IELTS writing and speaking support');
   await page.getByRole('button', {name: 'Save changes'}).click();
-  await expect(page).toHaveURL(/\/counsellor\/intakes\/99$/);
-  await page.getByRole('link', {name: 'Continue to advisor assignment'}).click();
   await expect(page).toHaveURL(/\/counsellor\/intakes\/99\/assign$/);
   await expect(page.getByText('Ari Advisor', {exact: true})).toBeVisible();
   await page.getByRole('radio').check();

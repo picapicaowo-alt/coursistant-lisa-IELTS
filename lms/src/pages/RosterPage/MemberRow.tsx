@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {CourseMember, TaPermissions} from '@/apis';
-import {TeachingDialog} from '@/components/TeachingWorkspace';
 import {formatPersonName} from '@/utils/personName';
 import styles from './index.module.scss';
 
@@ -64,7 +63,12 @@ export const MemberRow: React.FC<MemberRowProps> = ({member, onWithdraw, onPromo
       </td>
     </tr>
     {permissionOpen ? createPortal(
-          <TeachingDialog title="TA permissions" description={displayName} busy={isBusy} onClose={() => setPermissionOpen(false)}>
+          <div className={styles.dialogBackdrop} role="presentation" onMouseDown={() => setPermissionOpen(false)}>
+            <section className={styles.permissionDialog} role="dialog" aria-modal="true" aria-labelledby={`ta-permissions-${member.userId}`} onMouseDown={event => event.stopPropagation()}>
+              <div className={styles.dialogHeader}>
+                <div><h2 id={`ta-permissions-${member.userId}`}>TA permissions</h2><p>{displayName}</p></div>
+                <button type="button" className={styles.closeButton} aria-label="Close permissions" onClick={() => setPermissionOpen(false)}>×</button>
+              </div>
               <div className={styles.permissionList}>
                 {PERMISSION_OPTIONS.map(option => (
                   <label key={option.key} className={styles.permissionOption}>
@@ -77,7 +81,8 @@ export const MemberRow: React.FC<MemberRowProps> = ({member, onWithdraw, onPromo
                 <button type="button" onClick={() => setPermissionOpen(false)}>Cancel</button>
                 <button type="button" className={styles.primary} disabled={isBusy} onClick={savePermissions}>Save permissions</button>
               </div>
-          </TeachingDialog>,
+            </section>
+          </div>,
           document.body,
         ) : null}
   </>;

@@ -59,7 +59,7 @@
   border-radius: t.$radius-card-lg;
   background: t.$surface-raised;
   box-shadow: 0 1px 3px transparent;
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+  transition: all 0.15s ease;
 
   &:hover {
     border-color: t.$border-strong;
@@ -100,7 +100,7 @@
       }
 
       small {
-        font-size: t.$font-size-caption;
+        font-size: 0.725rem;
         color: t.$text-muted;
       }
     }
@@ -127,14 +127,14 @@
       border-radius: 4px;
       background: t.$neutral-fill;
       color: t.$text-muted;
-      font-size: t.$font-size-caption;
+      font-size: 0.7rem;
       font-weight: 600;
     }
 
     .statusTag {
       padding: 0.15rem 0.5rem;
       border-radius: 4px;
-      font-size: t.$font-size-caption;
+      font-size: 0.7rem;
       font-weight: 600;
 
       &[data-status='IN_PROGRESS'] {
@@ -166,7 +166,7 @@
       gap: 0.1rem;
 
       span {
-        font-size: t.$font-size-caption;
+        font-size: 0.675rem;
         color: t.$text-placeholder;
       }
 
@@ -334,7 +334,7 @@
     font-weight: 500;
     cursor: pointer;
     text-align: left;
-    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
+    transition: all 0.15s ease;
 
     &:hover {
       border-color: t.$border-strong;
@@ -414,7 +414,7 @@
           border-radius: 4px;
           background: t.$feedback-info-surface;
           color: t.$feedback-info;
-          font-size: t.$font-size-caption;
+          font-size: 0.675rem;
           font-weight: 500;
         }
       }
