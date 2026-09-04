@@ -34,7 +34,7 @@ No backend or AI service implementation was changed. Report download and discuss
 
 ## Validation
 
-Release candidate: the full lint, standard / production TypeScript, 607 unit tests, and production build passed. Full browser regression and Dev 8085 acceptance are recorded separately when complete.
+Integrated release candidate: full lint, standard / production TypeScript, 656 unit tests, and production build passed. Browser regression retained 191 passing cases; two existing cases were updated for the rendered responsive columns and the new Calendar navigation / field labels, then passed focused reruns. Assertions still verify fluid geometry, no overflow, unavailable alerts, the latest event version, and stable idempotency on retry. The complete final browser and GitHub CI gates must pass before merge. Dev 8085 artifact checks and authenticated acceptance are recorded separately.
 
 ### Initial UI validation
 

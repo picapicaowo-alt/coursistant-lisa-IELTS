@@ -107,9 +107,9 @@ test('student operations distinguish unavailable alerts and preserve event detai
   await page.getByRole('navigation', {name: 'Learning views'}).getByRole('button', {name: 'Calendar', exact: true}).click();
   await page.getByRole('button', {name: /^Study session/}).first().click();
   await page.getByRole('button', {name: 'Edit event', exact: true}).click();
-  await expect(page.getByRole('textbox', {name: 'Title', exact: true})).toHaveValue('Study session');
+  await expect(page.getByRole('textbox', {name: 'Event title', exact: true})).toHaveValue('Study session');
   expect(reads.some(path => path.endsWith('/personal-events/71'))).toBe(true);
-  await page.getByRole('textbox', {name: 'Title', exact: true}).fill('Revised study session');
+  await page.getByRole('textbox', {name: 'Event title', exact: true}).fill('Revised study session');
   await page.getByRole('button', {name: 'Save changes', exact: true}).click();
   await expect(page.getByRole('alert').filter({hasText: 'Event update unavailable'})).toBeVisible();
   await page.getByRole('button', {name: 'Save changes', exact: true}).click();
