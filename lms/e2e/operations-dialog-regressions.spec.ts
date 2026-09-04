@@ -176,11 +176,12 @@ test('owner picker keeps radio, identity and role in one row inside an owner for
     const row = dialog.locator('label').filter({hasText: 'Daniel Example'});
     await row.click();
     const radio = await row.getByRole('radio').boundingBox();
-    const identity = await row.locator('span').boundingBox();
-    const role = await row.locator('em').boundingBox();
-    expect(radio!.x + radio!.width).toBeLessThan(identity!.x);
-    expect(identity!.x + identity!.width).toBeLessThan(role!.x);
-    expect(Math.abs(radio!.y + radio!.height / 2 - (role!.y + role!.height / 2))).toBeLessThan(2);
+    const identity = await row.locator('strong').boundingBox();
+    const avatar = await row.locator('svg').boundingBox();
+    expect(avatar!.x + avatar!.width).toBeLessThan(identity!.x);
+    expect(identity!.x + identity!.width).toBeLessThan(radio!.x);
+    expect(radio!.width).toBeLessThanOrEqual(20);
+    expect(Math.abs(radio!.y + radio!.height / 2 - (avatar!.y + avatar!.height / 2))).toBeLessThan(2);
     await expect(dialog.getByRole('button', {name: 'Use selected person'})).toBeInViewport();
     await page.screenshot({path: info.outputPath(`picker-${width}.png`)});
   }

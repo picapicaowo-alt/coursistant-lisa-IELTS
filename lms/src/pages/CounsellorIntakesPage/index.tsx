@@ -6,6 +6,8 @@ import {counsellorApiService} from '@/apis/services/counsellor-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {assignmentPath, intakePath} from '../CounsellorDashboardPage/presentation';
 import {formatPersonName} from '@/utils/personName';
 
 const PAGE_SIZE = 20;
@@ -28,7 +30,7 @@ const CounsellorIntakesPage: React.FC = () => {
           <h1>Unassigned intakes</h1>
           <p className={styles.lede}>Only OPEN intakes you created in this tenant, before the first advisor assignment.</p>
         </div>
-        <Link className={styles.primary} to="/counsellor/intakes/new">Create student</Link>
+        <Link className={styles.primary} to={APP_ROUTE_PATHS.counsellorIntakesNew}>Create student</Link>
       </header>
       {query.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(query.error, 'Intakes could not be loaded.')}</p> : null}
       {query.isPending ? <p className={styles.status}>Loading intakes…</p> : null}
@@ -43,8 +45,8 @@ const CounsellorIntakesPage: React.FC = () => {
                 <small>{intake.studentType} · version {intake.intakeVersion}</small>
               </div>
               <div className={styles.actions}>
-                <Link className={styles.link} to={`/counsellor/intakes/${intake.intakeId}`}>Edit</Link>
-                <Link className={styles.primary} to={`/counsellor/intakes/${intake.intakeId}/assign`}>Assign advisor</Link>
+                <Link className={styles.link} to={intakePath(intake.intakeId)}>Edit</Link>
+                <Link className={styles.primary} to={assignmentPath(intake.intakeId)}>Assign advisor</Link>
               </div>
             </article>
           ))}

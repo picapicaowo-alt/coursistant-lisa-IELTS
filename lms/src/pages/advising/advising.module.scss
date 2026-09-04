@@ -265,7 +265,16 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: .5rem;
+  gap: t.$space-3;
+}
+
+.actions > .link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: t.$control-height-md;
+  padding-inline: t.$space-3;
+  border-radius: t.$radius-control-sm;
 }
 
 .form {
@@ -274,7 +283,7 @@
   max-width: t.$workspace-form-max-width;
 }
 
-.form label,
+.form label:not(:has(input[type='radio'], input[type='checkbox'])),
 .pickerField {
   display: grid;
   min-width: 0;
@@ -284,7 +293,7 @@
   font-weight: t.$fw-semibold;
 }
 
-.form input,
+.form input:not([type='radio']):not([type='checkbox']),
 .form select,
 .form textarea {
   width: 100%;
@@ -335,7 +344,7 @@
 .form textarea:focus-visible,
 .page button:focus-visible,
 .page a:focus-visible {
-  outline: 3px solid t.$brand-subtle;
+  outline: 2px solid t.$action-primary;
   outline-offset: 2px;
 }
 
@@ -348,11 +357,19 @@
   gap: .4rem;
   min-height: 2.75rem;
   padding: 0 .9rem;
+  font: inherit;
+  line-height: t.$line-height-body;
+  text-decoration: none;
   border-radius: t.$radius-control-sm;
   font-weight: t.$fw-semibold;
   cursor: pointer;
   touch-action: manipulation;
+  transition: background-color .16s ease, border-color .16s ease;
 }
+
+.primary:hover:not(:disabled) { background: t.$action-primary-hover; border-color: t.$action-primary-hover; }
+.secondary:hover:not(:disabled), .actions > .link:hover { background: t.$surface-subtle; border-color: t.$border-interactive; }
+.link:hover { text-decoration: underline; }
 
 .iconOnly {
   display: grid;
@@ -1147,11 +1164,22 @@
 }
 
 .formActions {
+  grid-column: 1 / -1;
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
   gap: t.$space-3;
   padding-top: t.$space-2;
+}
+
+.form input:is([type='radio'], [type='checkbox']) {
+  flex: 0 0 auto;
+  width: 1.125rem;
+  height: 1.125rem;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  accent-color: t.$action-primary;
 }
 
 .recordDisclosure,

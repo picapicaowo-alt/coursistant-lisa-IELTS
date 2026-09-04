@@ -22,17 +22,17 @@
     border: none;
     padding: 0.5rem;
     border-radius: 0.375rem;
-    transition: all 0.2s ease;
-    
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+
     &::placeholder {
         color: t.$content-placeholder;
         font-weight: 500;
     }
-    
+
     &:hover {
         background: t.$surface-subtle;
     }
-    
+
     &:focus {
         outline: none;
         background: white;
@@ -47,16 +47,16 @@
     border: none;
     padding: 0.5rem;
     border-radius: 0.375rem;
-    transition: all 0.2s ease;
-    
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+
     &::placeholder {
         color: t.$content-placeholder;
     }
-    
+
     &:hover {
         background: t.$surface-subtle;
     }
-    
+
     &:focus {
         outline: none;
         background: white;
@@ -78,17 +78,17 @@
     border: 1px solid t.$border-default;
     border-radius: 0.75rem;
     resize: vertical;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     line-height: 1.5;
-    
+
     &::placeholder {
         color: t.$content-placeholder;
     }
-    
+
     &:hover {
         border-color: t.$border-strong;
     }
-    
+
     &:focus {
         outline: none;
         border-color: t.$action-primary;

@@ -1,0 +1,28 @@
+.person {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+  min-width: 0;
+  text-align: left;
+}
+
+.person .avatar {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.copy {
+  display: grid;
+  gap: t.$space-1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+
+  strong { color: t.$content-primary; font-size: t.$font-size-body; font-weight: t.$fw-semibold; line-height: 1.5; }
+  small { color: t.$content-secondary; font-size: t.$font-size-caption; font-weight: t.$fw-regular; line-height: 1.5; }
+}
+
+.person[data-compact] .copy {
+  gap: 0;
+  > :is(strong, small) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.4; }
+}

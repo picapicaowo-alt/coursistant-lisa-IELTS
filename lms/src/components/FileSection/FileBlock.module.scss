@@ -29,35 +29,35 @@ $spacing-xl: 1.25rem;
     padding: $spacing-md $spacing-lg;
     background-color: white;
     cursor: default;
-    transition: all 0.2s ease-in-out;
-    
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+
     &:hover {
         background-color: $bg-hover;
     }
-    
+
     &.uploading {
         border-color: $blue-medium;
         background-color: $blue-light;
     }
-    
+
     &.error {
         border-color: $red-medium;
         background-color: $red-light;
     }
-    
+
     .fileIcon {
         width: 2rem;
         height: 2rem;
         object-fit: contain;
     }
-    
+
     .fileInfo {
         display: flex;
         flex-direction: column;
         flex: 1;
         min-width: 0;
     }
-    
+
     .fileName {
         font-weight: 500;
         font-size: 0.875rem;
@@ -66,20 +66,20 @@ $spacing-xl: 1.25rem;
         overflow: hidden;
         text-overflow: ellipsis;
     }
-    
+
     .fileSize {
         font-size: 0.75rem;
         color: $text-secondary;
         margin-top: 0.125rem;
     }
-    
+
     .uploadProgress {
         display: flex;
         align-items: center;
         gap: $spacing-sm;
         margin-top: $spacing-sm;
     }
-    
+
     .progressBar {
         flex: 1;
         height: 0.25rem;
@@ -87,12 +87,12 @@ $spacing-xl: 1.25rem;
         border-radius: 0.125rem;
         overflow: hidden;
     }
-    
+
     .progressFill {
         height: 100%;
         background-color: $blue-medium;
     }
-    
+
     .progressText {
         font-size: 0.75rem;
         color: $blue-medium;
@@ -100,7 +100,7 @@ $spacing-xl: 1.25rem;
         min-width: 2.5rem;
         text-align: right;
     }
-    
+
     .errorMessage {
         font-size: 0.75rem;
         color: $red-medium;
@@ -129,18 +129,18 @@ $spacing-xl: 1.25rem;
     border: none;
     padding: $spacing-xs;
     border-radius: 50%;
-    transition: all 0.2s ease-in-out;
-    
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+
     &:hover:not(:disabled) {
         color: color.adjust($red-medium, $lightness: -10%);
         background-color: $red-light;
     }
-    
+
     &:disabled {
         opacity: 0.4;
         cursor: not-allowed;
     }
-    
+
     svg {
         width: 1rem;
         height: 1rem;
@@ -154,13 +154,13 @@ $spacing-xl: 1.25rem;
     border: none;
     padding: $spacing-xs;
     border-radius: 50%;
-    transition: all 0.2s ease-in-out;
-    
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+
     &:hover {
         color: color.adjust($blue-medium, $lightness: -10%);
         background-color: $blue-light;
     }
-    
+
     svg {
         width: 1rem;
         height: 1rem;

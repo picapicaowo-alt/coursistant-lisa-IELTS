@@ -1,6 +1,6 @@
 import {FormEvent, useEffect, useMemo, useRef, useState} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {ArrowLeft, CheckCircle2, Download, FileText, MessageSquare, RotateCcw, Search, Trash2, Upload, X} from 'lucide-react';
+import {ArrowLeft, CheckCircle2, Download, FileText, MessageSquare, RotateCcw, Search, Trash2, Upload} from 'lucide-react';
 import {Link, useParams} from 'react-router-dom';
 import type {GradingRosterItem, UpsertGradePayload} from '@/apis';
 import {unwrapData} from '@/apis';
@@ -10,6 +10,7 @@ import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdemp
 import {saveBlob} from '@/utils/downloadBlob';
 import {formatUtcTimestamp} from '@/utils/datetime';
 import {formatPersonName} from '@/utils/personName';
+import {TeachingDialog} from '@/components/TeachingWorkspace';
 import {StudentSubmissionHistory} from '@/pages/AssignmentDetailPage/StudentSubmissionHistory';
 import {RichTextEditor} from '@/components/RichTextEditor';
 import {buildGradeSelection, rosterRowKey} from './gradeSelection';
@@ -150,20 +151,8 @@ export const GradeDialog = ({
   };
 
   return (
-    <div className={styles.backdrop} role="presentation" onMouseDown={event => {
-      if (event.target === event.currentTarget && !isSaving) onClose();
-    }}>
-      <form className={styles.gradeDialog} role="dialog" aria-modal="true" aria-labelledby="grade-dialog-title" onSubmit={submit}>
-        <header>
-          <div>
-            <p>Grade submission</p>
-            <h2 id="grade-dialog-title">{getDisplayName(row)}</h2>
-          </div>
-          <button type="button" onClick={onClose} disabled={isSaving} aria-label="Close grade editor">
-            <X size={20}/>
-          </button>
-        </header>
-
+    <TeachingDialog title={getDisplayName(row)} description="Grade submission" busy={isSaving} onClose={onClose}>
+      <form className={styles.gradeDialog} onSubmit={submit}>
         <section className={styles.submittedFiles} aria-labelledby="submitted-files-title">
           <div className={styles.submittedFilesHeader}>
             <div>
@@ -322,7 +311,7 @@ export const GradeDialog = ({
           </button>
         </footer>
       </form>
-    </div>
+    </TeachingDialog>
   );
 };
 

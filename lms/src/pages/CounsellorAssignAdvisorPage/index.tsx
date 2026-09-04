@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {FormEvent, useDeferredValue, useMemo, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -9,13 +10,16 @@ import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {formatPersonName} from '@/utils/personName';
-import {Search} from 'lucide-react';
+import {Search, X} from 'lucide-react';
+import {PersonSelectRow} from '@/components/PersonSelectRow';
+import local from './index.module.scss';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {intakePath} from '../CounsellorDashboardPage/presentation';
+import {ADVISOR_LEVEL_LABELS, intakePath} from '../CounsellorDashboardPage/presentation';
 
 const PAGE_SIZE = 100;
 
 const CounsellorAssignAdvisorPage: React.FC = () => {
+  const {t} = useTranslation('common');
   const {intakeId} = useParams();
   const numericId = Number(intakeId);
   const navigate = useNavigate();
@@ -68,6 +72,7 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
+    if (assign.isPending || !intake.data || !advisorUserId) return;
     assign.mutate();
   };
 
@@ -94,42 +99,38 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
       {assign.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(assign.error, 'Assignment failed.')}</p> : null}
       {intake.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(intake.error, 'Intake could not be loaded.')}</p> : null}
       <section className={styles.card}>
-        <form className={styles.form} onSubmit={onSubmit}>
-          <label className={styles.advisorSearch}><span>Search advisors by name or email</span><div><Search size={18}/><input aria-label="Search advisors by name or email" value={search} onChange={event => setSearch(event.target.value)} placeholder="Name or email"/></div><small>Search advisors on this page.</small></label>
+        <form className={local.form} onSubmit={onSubmit}>
+          <div className={local.search}>
+            <label htmlFor="advisor-search">{t('intake.searchAdvisors')}</label>
+            <div><Search size={18} aria-hidden="true"/><input id="advisor-search" name="advisor-search" type="search" autoComplete="off" value={search} onChange={event => {setSearch(event.target.value); setAdvisorUserId('');}} placeholder={t('intake.nameOrEmail')}/>
+              {search ? <button type="button" aria-label={t('intake.clearAdvisorSearch')} onClick={() => setSearch('')}><X size={18} aria-hidden="true"/></button> : null}
+            </div>
+            <small>{t('intake.pageSearchHelp')}</small>
+          </div>
           {advisors.isPending ? <p className={styles.status} role="status">Loading eligible advisors…</p> : null}
           {advisors.isError ? <div className={styles.error} role="alert"><p>{advisingErrorMessage(advisors.error, 'Eligible advisors could not be loaded.')}</p><button type="button" className={styles.secondary} onClick={() => void advisors.refetch()}>Try again</button></div> : null}
-          <div className={styles.list}>
-            {visibleAdvisors.map(advisor => (
-              <label key={advisor.advisorUserId} className={styles.row}>
-                <div className={styles.identity}>
-                  <strong>{formatPersonName(advisor, `Advisor #${advisor.advisorUserId}`)}</strong>
-                  <span>{advisor.email}</span>
-                  <small>{advisor.level}</small>
-                </div>
-                <input
-                  type="radio"
-                  name="advisor"
-                  value={advisor.advisorUserId}
-                  checked={advisorUserId === String(advisor.advisorUserId)}
-                  onChange={event => setAdvisorUserId(event.target.value)}
-                />
-              </label>
-            ))}
-          </div>
+          <fieldset className={local.list}>
+            <legend>{t('intake.chooseAdvisor')}</legend>
+            {visibleAdvisors.map(advisor => <PersonSelectRow key={advisor.advisorUserId}
+              person={{...advisor, id: advisor.advisorUserId}} roleLabel={ADVISOR_LEVEL_LABELS[advisor.level]}
+              name="advisor" value={String(advisor.advisorUserId)} selected={advisorUserId === String(advisor.advisorUserId)}
+              disabled={assign.isPending} onSelect={() => setAdvisorUserId(String(advisor.advisorUserId))}/>
+            )}
+          </fieldset>
           {!advisors.isPending && !advisors.isError && visibleAdvisors.length === 0 ? (
-            <p className={styles.status}>{search.trim() ? 'No advisor on this page matches that name or email.' : 'This tenant has no active advisors.'}</p>
+            <p className={styles.status}>{search.trim() ? t('intake.noAdvisorMatches') : 'This tenant has no active advisors.'}</p>
           ) : null}
           {advisors.data && advisors.data.total > PAGE_SIZE ? (
-            <nav className={styles.pagination}>
-              <button type="button" className={styles.secondary} disabled={page === 0} onClick={() => setPage(page - 1)}>Previous</button>
+            <nav className={styles.pagination} aria-label="Advisor pages">
+              <button type="button" className={styles.secondary} disabled={page === 0} onClick={() => {setPage(page - 1); setAdvisorUserId('');}}>Previous</button>
               <span>Page {page + 1} · {advisors.data.total} eligible advisors</span>
-              <button type="button" className={styles.secondary} disabled={(page + 1) * PAGE_SIZE >= advisors.data.total} onClick={() => setPage(page + 1)}>Next</button>
+              <button type="button" className={styles.secondary} disabled={(page + 1) * PAGE_SIZE >= advisors.data.total} onClick={() => {setPage(page + 1); setAdvisorUserId('');}}>Next</button>
             </nav>
           ) : null}
           <p className={styles.fieldHelp}>Assigning an Advisor completes the handover. This intake will leave your queue, and you will no longer be able to edit its record or parent links.</p>
-          <button className={styles.primary} disabled={assign.isPending || !Number(advisorUserId) || !intake.data}>
+          <div className={styles.formActions}><button className={styles.primary} disabled={assign.isPending || !Number(advisorUserId) || !intake.data || advisors.isError || !visibleAdvisors.some(advisor => String(advisor.advisorUserId) === advisorUserId)}>
             {assign.isPending ? 'Assigning…' : 'Assign advisor'}
-          </button>
+          </button></div>
         </form>
       </section>
     </div>

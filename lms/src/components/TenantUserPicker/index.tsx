@@ -1,3 +1,4 @@
+import {PersonSelectRow} from '@/components/PersonSelectRow';
 import {FormEvent, useMemo, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {ChevronDown, Search, UserRoundCheck, X} from 'lucide-react';
@@ -106,13 +107,9 @@ export const TenantUserPicker = ({
           {isPending ? <p className={styles.status} role="status">Loading eligible people…</p> : null}
           {isError ? <div className={styles.error} role="alert"><p>Eligible people could not be loaded.</p><button type="button" onClick={() => void results.refetch()}>Try again</button></div> : null}
           {!isPending && !isError && users.length === 0 ? <p className={styles.status}>No {includeAllAccounts ? '' : 'active '}users match this search.</p> : null}
-          {users.map(user => (
-            <label className={pendingSelection?.id === user.id ? styles.selectedRow : styles.row} key={user.id}>
-              <input type="radio" name="tenant-user" checked={pendingSelection?.id === user.id} onChange={() => setPendingSelection(user)}/>
-              <span><strong>{formatPersonName(user, `User #${user.id}`)}</strong><small>{user.email}</small></span>
-              <em>{user.level}</em>
-            </label>
-          ))}
+          {users.map(user => <PersonSelectRow key={user.id} person={user} roleLabel={user.level}
+            name={`${searchId}-person`} value={String(user.id)} selected={pendingSelection?.id === user.id}
+            onSelect={() => setPendingSelection(user)}/>)}
         </div>
 
         <div className={styles.pagination}>

@@ -40,7 +40,7 @@
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 
     &:hover {
       background: t.$surface-subtle;
@@ -69,7 +69,7 @@
   border: 1px solid t.$border;
   border-radius: t.$radius-card-lg;
   background: t.$surface-raised;
-  transition: all 0.15s ease;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 
   &:hover {
     border-color: t.$border-strong;
@@ -92,7 +92,7 @@
     flex-wrap: wrap;
 
     .phaseNumber {
-      font-size: 0.725rem;
+      font-size: t.$font-size-caption;
       font-weight: 700;
       letter-spacing: 0.05em;
       color: t.$text-muted;
@@ -105,7 +105,7 @@
     .statusPill {
       padding: 0.15rem 0.5rem;
       border-radius: 9999px;
-      font-size: 0.7rem;
+      font-size: t.$font-size-caption;
       font-weight: 600;
 
       &[data-status='completed'] {
@@ -190,7 +190,7 @@
     font-weight: 500;
     cursor: pointer;
     border: none;
-    transition: all 0.15s ease;
+    transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 
     &[data-variant='primary'] {
       background: t.$brand;
@@ -259,7 +259,7 @@
         border-radius: 9999px;
         background: t.$feedback-danger-surface;
         color: t.$feedback-danger;
-        font-size: 0.725rem;
+        font-size: t.$font-size-caption;
         font-weight: 600;
       }
     }
@@ -297,7 +297,7 @@
         border-radius: 4px;
         background: t.$brand-subtle;
         color: t.$brand;
-        font-size: 0.7rem;
+        font-size: t.$font-size-caption;
         font-weight: 500;
       }
     }
@@ -328,7 +328,7 @@
         font-size: 0.775rem;
         font-weight: 500;
         cursor: pointer;
-        transition: all 0.15s ease;
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
       }
 
       .rejectBtn {
@@ -432,7 +432,7 @@
       font-size: 0.775rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease, opacity 0.15s ease;
 
       &:hover {
         border-color: t.$border-strong;
@@ -502,7 +502,7 @@
   display: inline-flex;
   padding: 0.15rem 0.5rem;
   border-radius: 9999px;
-  font-size: 0.725rem;
+  font-size: t.$font-size-caption;
   font-weight: 600;
 
   &[data-status='IN_PROGRESS'] {
