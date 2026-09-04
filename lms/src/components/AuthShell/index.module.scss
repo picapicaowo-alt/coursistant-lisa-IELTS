@@ -31,12 +31,22 @@
   background: t.$action-primary url('/icons/figma-auth/pattern.svg') center / 76% auto repeat-y;
 }
 .artwork {
+  container-type: inline-size;
   width: min(100%, 56dvh);
   // Scale artwork with available height on wide, short screens.
   // Cap only the decorative artwork, never the page canvas or form columns.
   max-width: 48rem;
   padding-bottom: 12%;
-  > p { max-width: 23ch; margin: 0 0 t.$space-6; color: t.$content-on-color; font-size: clamp(1.25rem, 2.25vw, 2rem); font-weight: t.$fw-bold; line-height: 1.25; }
+  > p {
+    margin: 0 0 t.$space-6;
+    color: t.$content-on-color;
+    // Size the headline against the artwork so each sentence fits its own line.
+    font-size: clamp(1rem, 8.4cqi, 3rem);
+    font-weight: t.$fw-bold;
+    line-height: 1.18;
+    letter-spacing: -0.025em;
+    white-space: pre-line;
+  }
 }
 .productPreview { position: relative; }
 .dashboard { display: block; width: 100%; border-radius: t.$radius-md; }

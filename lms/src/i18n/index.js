@@ -8,6 +8,7 @@ import enCourse from "./resources/en/course.json";
 import enDetailWorkspace from "./resources/en/detailWorkspace.json";
 
 import zhTraditionalCommon from "./resources/zh-TW/common.json";
+import zhTraditionalAuth from "./resources/zh-TW/auth.json";
 
 import zhCommon from "./resources/zh-CN/common.json";
 import zhAuth from "./resources/zh-CN/auth.json";
@@ -37,7 +38,7 @@ i18n
         course: enCourse,
         detailWorkspace: enDetailWorkspace
       },
-      "zh-TW": {common: zhTraditionalCommon},
+      "zh-TW": {common: zhTraditionalCommon, auth: zhTraditionalAuth},
       "zh-CN": {
          common: zhCommon,
          auth: zhAuth,
