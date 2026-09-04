@@ -40,3 +40,15 @@
     padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
   }
 }
+.skipLink {
+  position: fixed;
+  z-index: 1000;
+  top: t.$space-3;
+  left: t.$space-3;
+  padding: t.$space-3 t.$space-4;
+  border-radius: t.$radius-control;
+  background: t.$action-primary;
+  color: t.$content-on-color;
+  transform: translateY(-200%);
+  &:focus { transform: translateY(0); }
+}

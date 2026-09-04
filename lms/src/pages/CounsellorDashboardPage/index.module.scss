@@ -121,13 +121,8 @@ a.metricValue svg { color: t.$action-primary; }
 .timestamps > div { display: flex; justify-content: space-between; gap: t.$space-2; }
 .timestamps dd { text-align: right; font-variant-numeric: tabular-nums; }
 .advisorList { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); list-style: none; padding: 0; margin: 0; min-height: 0; }
-.advisorList li { min-width: 0; display: flex; align-items: center; gap: t.$space-2; padding: t.$space-2 t.$space-3; }
+.advisorList li { min-width: 0; display: flex; align-items: center; gap: t.$space-2; padding: t.$space-1 t.$space-3; }
 .advisorList li + li { border-left: 1px solid t.$border-default; }
-.advisorIcon { display: grid; place-items: center; width: t.$touch-target; height: t.$touch-target; flex-shrink: 0; border-radius: t.$radius-pill; background: t.$surface-muted; color: t.$content-secondary; }
-.advisorList li > div { display: grid; min-width: 0; }
-.advisorList strong, .advisorList span:not(.advisorIcon), .advisorList small { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.advisorList strong { font-weight: t.$fw-semibold; }
-.advisorList span:not(.advisorIcon), .advisorList small { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
 .feedback { padding: t.$space-3; color: t.$content-secondary; }
 .feedback[role='alert'] { color: t.$feedback-danger; }
 .feedback p + button { margin-top: t.$space-1; }

@@ -227,7 +227,7 @@
         border-radius: t.$radius-control-sm;
         background: t.$card-bg;
         color: t.$brand;
-        font-size: 0.72rem;
+        font-size: t.$font-size-caption;
         font-weight: t.$fw-semibold;
         cursor: pointer;
 

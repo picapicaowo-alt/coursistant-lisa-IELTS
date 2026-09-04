@@ -307,37 +307,6 @@
   font-size: t.$font-size-body;
   margin-top: 0.2rem;
 }
-.person {
-  display: flex;
-  align-items: center;
-  gap: t.$space-3;
-  min-width: 0;
-  text-align: left;
-}
-.person > span {
-  min-width: 0;
-  overflow-wrap: anywhere;
-}
-.person strong,
-.person small {
-  display: block;
-}
-.person strong {
-  font-weight: t.$fw-semibold;
-  color: t.$content-primary;
-}
-.person small {
-  color: t.$content-secondary;
-  font-size: t.$font-size-body;
-  line-height: 1.4;
-}
-.avatar {
-  width: 2.5rem;
-  height: 2.5rem;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: t.$surface-muted;
-}
 .personButton {
   display: block;
   border: 0;

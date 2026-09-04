@@ -7,6 +7,8 @@ import enAuth from "./resources/en/auth.json";
 import enCourse from "./resources/en/course.json";
 import enDetailWorkspace from "./resources/en/detailWorkspace.json";
 
+import zhTraditionalCommon from "./resources/zh-TW/common.json";
+
 import zhCommon from "./resources/zh-CN/common.json";
 import zhAuth from "./resources/zh-CN/auth.json";
 import zhCourse from "./resources/zh-CN/course.json";
@@ -29,12 +31,13 @@ i18n
   .use(initReactI18next) // Passes i18n to react-i18next
   .init({
     resources: {
-      en: { 
+      en: {
         common: enCommon,
         auth: enAuth,
         course: enCourse,
         detailWorkspace: enDetailWorkspace
       },
+      "zh-TW": {common: zhTraditionalCommon},
       "zh-CN": {
          common: zhCommon,
          auth: zhAuth,

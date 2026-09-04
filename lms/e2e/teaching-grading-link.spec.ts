@@ -65,7 +65,8 @@ test('Advisor reads paginated conversations and searches instructors through Adv
   await page.getByRole('navigation', {name: 'Conversation pages'}).getByRole('button', {name: 'Next'}).click();
   await expect(page.getByRole('complementary', {name: 'Student conversations', exact: true}).getByText('Second Student', {exact: true})).toBeVisible();
   await page.getByRole('link', {name: 'Scheduling', exact: true}).first().click();
-  await expect(page.getByRole('option', {name: 'Ivy Instructor · ivy@example.test'}).first()).toBeAttached();
+  await page.getByRole('combobox', {name: 'Instructor', exact: true}).click();
+  await expect(page.getByRole('option', {name: /Ivy Instructor/}).first()).toBeVisible();
   expect(requests.some(path => path.includes('/tenant/users'))).toBe(false);
   await page.screenshot({path: testInfo.outputPath('advisor-updated-operations.png'), fullPage: true});
   await page.setViewportSize({width: 390, height: 844});

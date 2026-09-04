@@ -154,9 +154,9 @@ test('Course downloads, roster search and availability retain existing API flows
   await page.goto('/course/71/operations?section=reports');
   await page.getByRole('button', {name: 'Create new report'}).click();
   const dialog = page.getByRole('dialog');
-  await dialog.getByRole('textbox', {name: 'Search course students'}).fill('Chloe');
+  await dialog.getByRole('combobox', {name: 'Search course students'}).fill('Chloe');
   await expect.poll(() => requests.some(url => url.pathname.endsWith('/members') && url.searchParams.get('q') === 'Chloe' && url.searchParams.get('courseRole') === 'Student')).toBe(true);
-  await dialog.getByRole('button', {name: 'Chloe Henderson'}).click();
+  await dialog.getByRole('option', {name: /Chloe Henderson/}).click();
   await dialog.getByRole('textbox', {name: 'Overall summary'}).fill('A thoughtful response with clear evidence.');
   await dialog.getByRole('button', {name: 'Save draft'}).click();
   await expect(page.getByText('Report draft saved.')).toBeVisible();

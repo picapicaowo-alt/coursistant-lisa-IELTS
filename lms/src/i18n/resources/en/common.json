@@ -26,5 +26,41 @@
   "common": {
     "yes": "Yes",
     "no": "No"
+  },
+  "people": {
+    "nameUnavailable": "Name unavailable",
+    "userFallback": "User #{{id}}",
+    "studentFallback": "Student #{{id}}",
+    "instructor": "Instructor",
+    "selectedInstructor": "Selected instructor #{{id}}",
+    "instructorLoadError": "Instructors could not be loaded.",
+    "instructorPages": "Instructor pages",
+    "courseStudents": "Search course students",
+    "studentLoadError": "Course students could not be loaded.",
+    "students": "Students",
+    "searchPlaceholder": "Search by name or email…",
+    "selectRequired": "Select {{label}} from the results.",
+    "clear": "Clear {{label}}",
+    "showOptions": "Show {{label}} options",
+    "results": "{{label}} results",
+    "searching": "Searching…",
+    "retry": "Try again",
+    "noMatches": "No matching people."
+  },
+  "intake": {
+    "reviewThenAssign": "Review the student’s details and parent access, then continue to advisor assignment.",
+    "saved": "Changes saved.",
+    "saving": "Saving…",
+    "continueToAssignment": "Continue to advisor assignment",
+    "saveAndContinue": "Save and continue to advisor assignment",
+    "searchAdvisors": "Search advisors by name or email",
+    "nameOrEmail": "Name or email…",
+    "clearAdvisorSearch": "Clear advisor search",
+    "pageSearchHelp": "Search advisors on this page.",
+    "chooseAdvisor": "Choose an advisor",
+    "noAdvisorMatches": "No advisor on this page matches that name or email."
+  },
+  "accessibility": {
+    "skipToContent": "Skip to content"
   }
 }
