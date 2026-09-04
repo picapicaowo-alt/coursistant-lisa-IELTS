@@ -6,6 +6,12 @@ import type {
   MockExamMediaKind,
   MockExamTemplateVersionSummary,
 } from '@/apis';
+import {
+  contentErrors,
+  parseContent,
+  questionDefinition,
+  questionNumbers,
+} from './questionSchema';
 
 export const SECTION_META = {
   listening: {
@@ -150,6 +156,122 @@ function json(value: string, label: string): unknown {
     throw new Error(`${label} must be valid JSON.`);
   }
 }
+export function unitName(
+  section: Section,
+  unit: UnitDraft,
+  index: number,
+): string {
+  return (
+    (section === 'writing' ? unit.title : unit.label).trim() ||
+    `${SECTION_META[section].unit} ${index + 1}`
+  );
+}
+export function questionTitle(question: QuestionDraft): string {
+  return (
+    question.title.trim() ||
+    (question.start && question.end
+      ? `Questions ${question.start}–${question.end}`
+      : 'Questions')
+  );
+}
+export interface DraftIssue {
+  unitIndex: number | null;
+  groupIndex?: number;
+  message: string;
+}
+/** Validate every unit (including hidden ones) before the create-only write.
+ * These are frontend content-safety checks, not backend scoring acceptance. */
+export function sectionIssues(
+  section: Section,
+  draft: SectionDraft,
+): DraftIssue[] {
+  const issues: DraftIssue[] = [];
+  if (!Number.isSafeInteger(Number(draft.minutes)) || Number(draft.minutes) < 1)
+    issues.push({
+      unitIndex: null,
+      message: 'Enter the section duration in whole minutes.',
+    });
+  const seen: {start: number; end: number}[] = [];
+  draft.units.forEach((unit, unitIndex) => {
+    const add = (message: string, groupIndex?: number) =>
+      issues.push({unitIndex, groupIndex, message});
+    if (section === 'listening' && !unit.mediaId)
+      add('Upload and select audio for this part.');
+    if (section === 'writing') {
+      if (!unit.prompt.trim()) add('Enter the writing prompt.');
+      if (
+        !Number.isSafeInteger(Number(unit.minWords)) ||
+        Number(unit.minWords) < 1
+      )
+        add('Enter a minimum word count.');
+      return;
+    }
+    if (section === 'reading') {
+      const paragraphs = parseContent(unit.paragraphs);
+      if (!Array.isArray(paragraphs))
+        add(
+          'Passage paragraphs must be a JSON array. Check Advanced paragraph data.',
+        );
+      else if (
+        !paragraphs.length ||
+        paragraphs.some(
+          (paragraph) => typeof paragraph === 'string' && !paragraph.trim(),
+        )
+      )
+        add('Add the passage text and complete each paragraph.');
+    }
+    unit.questions.forEach((question, groupIndex) => {
+      const start = Number(question.start),
+        end = Number(question.end);
+      if (!question.kind.trim()) add('Select a question type.', groupIndex);
+      if (
+        !Number.isSafeInteger(start) ||
+        start < 1 ||
+        !Number.isSafeInteger(end) ||
+        end < start
+      )
+        add('Check the first and last question numbers.', groupIndex);
+      const value = parseContent(question.payload);
+      if (value === undefined)
+        add(
+          'Question data is not valid JSON. Check Advanced data.',
+          groupIndex,
+        );
+      else {
+        contentErrors(section, question.kind, value).forEach((message) =>
+          add(message, groupIndex),
+        );
+        const schema = questionDefinition(section, question.kind)?.schema;
+        if (schema) {
+          const numbers = questionNumbers(value, schema);
+          if (
+            numbers.length &&
+            (Math.min(...numbers) !== start || Math.max(...numbers) !== end)
+          )
+            add(
+              'The group range must match the question numbers in its content.',
+              groupIndex,
+            );
+        }
+      }
+      // Compare ranges without allocating arrays from user-supplied large values.
+      if (
+        Number.isSafeInteger(start) &&
+        Number.isSafeInteger(end) &&
+        start > 0 &&
+        end >= start
+      ) {
+        if (seen.some((prior) => start <= prior.end && end >= prior.start))
+          add(
+            'This question range overlaps an earlier group. Use unique question numbers.',
+            groupIndex,
+          );
+        seen.push({start, end});
+      }
+    });
+  });
+  return issues;
+}
 function questionPayload(question: QuestionDraft, index: number) {
   const questionStart = positiveInteger(
     question.start,
@@ -158,13 +280,10 @@ function questionPayload(question: QuestionDraft, index: number) {
   const questionEnd = positiveInteger(question.end, 'Last question number');
   if (questionEnd < questionStart)
     throw new Error('The last question number must not precede the first.');
-  if (!question.kind.trim())
-    throw new Error('Enter the contract question kind.');
-  if (!question.title.trim())
-    throw new Error('Enter a title for every question group.');
+  if (!question.kind.trim()) throw new Error('Select a question type.');
   return {
     sortOrder: index + 1,
-    title: question.title.trim(),
+    title: questionTitle(question),
     instruction: question.instruction.trim(),
     kind: question.kind.trim(),
     payload: json(question.payload, 'Question payload'),
@@ -178,13 +297,11 @@ export function listeningPayload(
   return {
     totalMinutes: positiveInteger(draft.minutes, 'Section duration'),
     parts: draft.units.map((unit, index) => {
-      if (!unit.label.trim())
-        throw new Error(`Enter a label for Part ${index + 1}.`);
       if (!unit.mediaId)
         throw new Error(`Upload and select audio for Part ${index + 1}.`);
       return {
         seq: index + 1,
-        label: unit.label.trim(),
+        label: unitName('listening', unit, index),
         audioMediaId: unit.mediaId,
         sections: unit.questions.map(questionPayload),
       };
@@ -197,8 +314,6 @@ export function readingPayload(
   return {
     totalMinutes: positiveInteger(draft.minutes, 'Section duration'),
     passages: draft.units.map((unit, index) => {
-      if (!unit.label.trim())
-        throw new Error(`Enter a label for Passage ${index + 1}.`);
       const paragraphs = json(
         unit.paragraphs,
         `Passage ${index + 1} paragraphs`,
@@ -207,7 +322,7 @@ export function readingPayload(
         throw new Error('Reading paragraphs must be a JSON array.');
       return {
         seq: index + 1,
-        shortLabel: unit.label.trim(),
+        shortLabel: unitName('reading', unit, index),
         title: unit.title.trim(),
         intro: unit.intro.trim(),
         paragraphs,
@@ -225,12 +340,12 @@ export function writingPayload(
   return {
     totalMinutes: positiveInteger(draft.minutes, 'Section duration'),
     tasks: draft.units.map((unit, index) => {
-      if (!unit.title.trim() || !unit.prompt.trim())
-        throw new Error(`Enter a title and prompt for Task ${index + 1}.`);
+      if (!unit.prompt.trim())
+        throw new Error(`Enter a prompt for Task ${index + 1}.`);
       return {
         seq: index + 1,
         taskKey: `task-${index + 1}`,
-        title: unit.title.trim(),
+        title: unitName('writing', unit, index),
         prompt: unit.prompt.trim(),
         minWords: positiveInteger(unit.minWords, 'Minimum words'),
         ...(unit.mediaId ? {imageMediaId: unit.mediaId} : {}),

@@ -1,0 +1,228 @@
+.composer {
+  font-size: t.$font-size-body-lg;
+  line-height: 1.65;
+}
+// Keep this comfortable authoring scale local; governance tables and the
+// student runner retain their own density and control sizing.
+.composer label {
+  font-size: t.$font-size-body-lg;
+  line-height: 1.65;
+}
+.composer label > span {
+  color: t.$content-secondary;
+}
+.composer input:not([type='radio']):not([type='checkbox']),
+.composer select,
+.composer textarea {
+  font-size: t.$font-size-body-lg;
+  line-height: 1.5;
+  min-height: calc(t.$control-height-lg + t.$space-1);
+  padding: t.$space-3 t.$space-4;
+  border-color: t.$border-strong;
+}
+.composer button {
+  font-size: t.$font-size-body;
+  line-height: 1.5;
+}
+.composer p {
+  margin-block: 0;
+}
+.composer .surface {
+  padding: clamp(1.5rem, 2.5vw, 2.5rem);
+}
+.surface h2 {
+  font-size: t.$font-size-headline;
+  line-height: t.$line-height-headline;
+  font-weight: t.$fw-semibold;
+}
+.layout {
+  min-width: 0;
+}
+.layout > form {
+  gap: t.$space-10;
+}
+.settingsGrid {
+  gap: t.$space-6 t.$space-8;
+  align-items: start;
+}
+.surface > div:first-child:has(> h2) {
+  margin-bottom: t.$space-8;
+}
+.mediaLabel {
+  font-size: t.$font-size-body-lg;
+  font-weight: t.$fw-medium;
+  color: t.$content-secondary;
+  padding-bottom: t.$space-3;
+}
+.groupTitle {
+  font-size: t.$font-size-subhead;
+  font-weight: t.$fw-semibold;
+  margin: 0 0 t.$space-6;
+}
+.addGroup {
+  justify-self: start;
+}
+.saveHint {
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: 1.65;
+}
+.fields {
+  display: grid;
+  gap: t.$space-6;
+  min-width: 0;
+}
+.fields textarea {
+  min-height: 7rem;
+  resize: vertical;
+}
+.fields small {
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: 1.65;
+}
+.collection {
+  border: 0;
+  padding: t.$space-5 0 0;
+  margin: t.$space-3 0 0;
+  min-width: 0;
+}
+.collection > legend {
+  color: t.$content-primary;
+  font-weight: t.$fw-semibold;
+  font-size: t.$font-size-body-lg;
+  padding-right: t.$space-3;
+}
+.collectionItem {
+  padding-block: t.$space-4 t.$space-8;
+}
+.collectionItem + .collectionItem {
+  border-top: 1px solid t.$border-default;
+}
+.collectionItem .collection {
+  margin-left: 0;
+}
+.itemHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-3;
+  margin-bottom: t.$space-5;
+}
+.itemHeading strong {
+  font-size: t.$font-size-body;
+  color: t.$content-primary;
+}
+.advanced {
+  border-top: 1px solid t.$border-default;
+  margin-top: t.$space-4;
+  padding-top: t.$space-4;
+}
+.advanced summary {
+  cursor: pointer;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-medium;
+  line-height: 1.65;
+  padding-block: t.$space-3;
+  min-height: 2.75rem;
+}
+.advanced > label {
+  margin-block: t.$space-6 0;
+}
+.advanced[open] > summary + * {
+  margin-top: t.$space-4;
+}
+.advanced[open] > p + div {
+  margin-top: t.$space-6;
+}
+.code {
+  font-family: ui-monospace, SFMono-Regular, monospace !important;
+  min-height: 12rem !important;
+}
+.fields label:has(> input[type='number']) {
+  max-width: 12rem;
+}
+.notice {
+  background: t.$feedback-warning-surface;
+  color: t.$feedback-warning;
+  padding: t.$space-5 t.$space-6;
+  border-radius: t.$radius-sm;
+  font-size: t.$font-size-body;
+  line-height: 1.75;
+}
+.notice p {
+  margin-block: t.$space-2;
+}
+.review {
+  display: grid;
+  gap: t.$space-6;
+}
+.review h3 {
+  margin: 0;
+  font-size: t.$font-size-subhead;
+  line-height: t.$line-height-subhead;
+  font-weight: t.$fw-semibold;
+}
+.review p {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.reviewRow {
+  padding-block: t.$space-6;
+  border-top: 1px solid t.$border-default;
+}
+.preview {
+  margin-top: t.$space-6;
+  border-top: 1px solid t.$border-default;
+  padding-top: t.$space-6;
+  overflow-wrap: anywhere;
+}
+.preview :global(h2) {
+  font-size: t.$font-size-subhead;
+  margin-bottom: t.$space-3;
+}
+.preview :global(h3) {
+  font-size: t.$font-size-body;
+}
+.preview :global(input:not([type='radio']):not([type='checkbox'])) {
+  width: 8rem;
+  max-width: 100%;
+  margin: t.$space-2;
+}
+.preview :global(label) {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: t.$space-2;
+  padding: t.$space-2;
+}
+.preview :global(img) {
+  display: none;
+}
+.preview :global(table) {
+  width: 100%;
+  border-collapse: collapse;
+}
+.preview :global(td),
+.preview :global(th) {
+  padding: t.$space-3;
+  border: 1px solid t.$border-default;
+}
+.preview :global(.lq-table),
+.preview :global(.q-table) {
+  display: block;
+  overflow-x: auto;
+}
+.preview :global(.tfng-options),
+.preview :global(.mcq-item__options) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-2;
+}
+@media (max-width: 700px) {
+  .composer .surface,
+  .notice {
+    padding: t.$space-5;
+  }
+}
