@@ -46,6 +46,9 @@ export interface UpcomingActivity {
 // ---------------------------------------------------------------- Student
 
 export interface PrimaryInstructor {
+  instructorFirstName?: string | null;
+  instructorMiddleName?: string | null;
+  instructorLastName?: string | null;
   userId: number;
   name?: string;
   email?: string;

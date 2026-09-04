@@ -1,4 +1,4 @@
-import type {CourseRole} from './dashboard';
+import type {CourseRole, PrimaryInstructor} from './dashboard';
 import type {UserLevel} from './login';
 
 /**
@@ -17,11 +17,7 @@ export interface CourseSummary {
   title: string;
   state: 'Active' | 'Archived';
   instructorId: number | null;
-  primaryInstructor: {
-    userId: number;
-    name?: string;
-    email?: string;
-  } | null;
+  primaryInstructor: PrimaryInstructor | null;
 }
 
 /** `GET /v2/courses` returns this page object, not a bare array. */
@@ -54,11 +50,7 @@ export interface CourseResponse {
   description: string | null;
   location: string | null;
   instructorId: number | null;
-  primaryInstructor: {
-    userId: number;
-    name?: string;
-    email?: string;
-  } | null;
+  primaryInstructor: PrimaryInstructor | null;
   state: 'Active' | 'Archived';
   status: 'Active' | 'Archived';
   archivedAt: string | null;

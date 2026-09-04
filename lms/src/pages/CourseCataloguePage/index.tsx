@@ -1,3 +1,4 @@
+import {formatInstructorName} from '@/utils/personName';
 import React, {Suspense, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import styles from "./index.module.scss";
@@ -130,7 +131,7 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
             courseCode={course.courseCode}
             title={course.title}
             state={course.state}
-            instructorName={course.primaryInstructor?.name ?? null}
+            instructorName={formatInstructorName(course.primaryInstructor) || null}
             progress={studentProgress.data?.courses?.find(item => item.courseId === course.id)}
             progressLoading={studentProgress.isFetching}
             progressFailed={studentProgress.isError}
