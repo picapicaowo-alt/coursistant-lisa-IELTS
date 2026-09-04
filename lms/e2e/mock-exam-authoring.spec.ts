@@ -385,39 +385,57 @@ for (const width of [1440, 768, 390, 320]) {
     await page
       .getByRole('button', {name: 'Import Reading JSON', exact: true})
       .click();
+    const importDialog = page.getByRole('dialog', {
+      name: 'Import Reading JSON',
+      exact: true,
+    });
+    await expect(importDialog).toBeVisible();
+    await expect(
+      importDialog.getByText('Drag & drop a JSON file', {exact: true}),
+    ).toBeVisible();
+    await expect(page.getByLabel('Or paste complete Reading JSON')).toHaveCount(
+      0,
+    );
+    await mkdir('.impeccable/review/mock-import-dialog', {recursive: true});
+    await page.screenshot({
+      path: `.impeccable/review/mock-import-dialog/upload-${width}.png`,
+    });
     await page.getByLabel('Reading JSON file · up to 2 MB').setInputFiles({
       name: 'reading.json',
       mimeType: 'application/json',
       buffer: Buffer.from(JSON.stringify(importedReading)),
     });
-    await expect(page.getByLabel('Or paste complete Reading JSON')).toHaveValue(
-      /Libraries serve/,
-    );
+    await expect(
+      importDialog.getByText('reading.json', {exact: true}),
+    ).toBeVisible();
+    await expect(
+      importDialog.getByText('Loaded locally', {exact: false}).first(),
+    ).toBeVisible();
     await page
       .getByRole('button', {name: 'Validate JSON', exact: true})
       .click();
     await expect(page.getByText('Ready to load', {exact: false})).toBeVisible();
-    const importGeometry = await page
-      .getByRole('region', {name: 'Import complete Reading JSON'})
-      .evaluate((panel) => ({
-        overflow: panel.scrollWidth - panel.clientWidth,
-        fieldWidth: panel.querySelector('textarea')!.getBoundingClientRect()
-          .width,
-        availableWidth:
-          panel.clientWidth -
-          2 * parseFloat(getComputedStyle(panel).paddingLeft),
-      }));
+    const importGeometry = await importDialog.evaluate((panel) => ({
+      overflow: panel.scrollWidth - panel.clientWidth,
+      left: panel.getBoundingClientRect().left,
+      right: panel.getBoundingClientRect().right,
+      top: panel.getBoundingClientRect().top,
+      bottom: panel.getBoundingClientRect().bottom,
+      modal: panel.matches(':modal'),
+      bodyOverflow: document.body.style.overflow,
+    }));
     expect(importGeometry.overflow).toBeLessThanOrEqual(1);
-    expect(importGeometry.fieldWidth).toBeCloseTo(
-      importGeometry.availableWidth,
-      0,
-    );
-    await mkdir('.impeccable/review/mock-authoring-import', {recursive: true});
+    expect(importGeometry.left).toBeGreaterThanOrEqual(8);
+    expect(importGeometry.right).toBeLessThanOrEqual(width - 8);
+    expect(importGeometry.top).toBeGreaterThanOrEqual(8);
+    expect(importGeometry.bottom).toBeLessThanOrEqual(992);
+    expect(importGeometry.modal).toBe(true);
+    expect(importGeometry.bodyOverflow).toBe('hidden');
     await page
       .getByRole('button', {name: 'Load into editor', exact: true})
       .scrollIntoViewIfNeeded();
     await page.screenshot({
-      path: `.impeccable/review/mock-authoring-import/import-${width}.png`,
+      path: `.impeccable/review/mock-import-dialog/validated-${width}.png`,
     });
     expect(writes).toEqual([]);
     expect(
@@ -428,6 +446,7 @@ for (const width of [1440, 768, 390, 320]) {
     await page
       .getByRole('button', {name: 'Load into editor', exact: true})
       .click();
+    await expect(importDialog).toHaveCount(0);
     await expect(page.getByLabel('Passage title')).toHaveValue(
       'A shared library',
     );
@@ -464,6 +483,109 @@ for (const width of [1440, 768, 390, 320]) {
   });
 }
 
+for (const width of [1440, 390]) {
+  test(`Reading import modal preserves input and keyboard focus at ${width}px`, async ({
+    page,
+  }) => {
+    const {writes} = await install(page);
+    await page.setViewportSize({width, height: 720});
+    await page.goto(`${basePath}&section=reading`);
+    await page.getByLabel('Passage title').fill('Keep my draft');
+    const trigger = page.getByRole('button', {
+      name: 'Import Reading JSON',
+      exact: true,
+    });
+    await trigger.click();
+    const dialog = page.getByRole('dialog', {
+      name: 'Import Reading JSON',
+      exact: true,
+    });
+    const fileInput = page.getByLabel('Reading JSON file · up to 2 MB');
+    await expect(
+      dialog.getByRole('button', {name: 'Close JSON import'}),
+    ).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(
+      dialog.getByRole('button', {name: 'Upload file', exact: true}),
+    ).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(
+      dialog.getByRole('button', {name: 'Paste JSON', exact: true}),
+    ).toBeFocused();
+    await fileInput.setInputFiles({
+      name: 'notes.txt',
+      mimeType: 'text/plain',
+      buffer: Buffer.from('{}'),
+    });
+    await expect(dialog.getByRole('alert')).toContainText(
+      'Choose a .json file',
+    );
+    await expect(
+      dialog.getByRole('button', {name: 'Validate JSON'}),
+    ).toBeDisabled();
+
+    const dropData = await page.evaluateHandle((body) => {
+      const transfer = new DataTransfer();
+      transfer.items.add(
+        new File([JSON.stringify(body)], 'reading-dropped.json', {
+          type: 'application/json',
+        }),
+      );
+      return transfer;
+    }, importedReading);
+    await dialog
+      .getByLabel('Reading JSON upload area')
+      .dispatchEvent('drop', {dataTransfer: dropData});
+    await dropData.dispose();
+    await expect(
+      dialog.getByText('reading-dropped.json', {exact: true}),
+    ).toBeVisible();
+    await dialog.getByRole('button', {name: 'Paste JSON', exact: true}).click();
+    const paste = dialog.getByLabel('Or paste complete Reading JSON');
+    await paste.fill(JSON.stringify(importedReading, null, 2));
+    await dialog
+      .getByRole('button', {name: 'Validate JSON', exact: true})
+      .click();
+    const fieldGeometry = await paste.evaluate((field) => ({
+      width: field.getBoundingClientRect().width,
+      labelWidth: field.parentElement!.getBoundingClientRect().width,
+      fontSize: getComputedStyle(field).fontSize,
+    }));
+    expect(fieldGeometry.width).toBeCloseTo(fieldGeometry.labelWidth, 0);
+    expect(fieldGeometry.fontSize).toBe('16px');
+    await mkdir('.impeccable/review/mock-import-dialog', {recursive: true});
+    await page.screenshot({
+      path: `.impeccable/review/mock-import-dialog/paste-${width}.png`,
+    });
+    await page.keyboard.press('Escape');
+    await expect(dialog).toHaveCount(0);
+    await expect(trigger).toBeFocused();
+    await expect(page.getByLabel('Passage title')).toHaveValue('Keep my draft');
+    expect(await page.evaluate(() => document.body.style.overflow)).not.toBe(
+      'hidden',
+    );
+    await trigger.click();
+    await expect(paste).toHaveValue(JSON.stringify(importedReading, null, 2));
+    await dialog
+      .getByRole('button', {name: 'Upload file', exact: true})
+      .click();
+    await expect(
+      dialog.getByText('reading-dropped.json', {exact: true}),
+    ).toBeVisible();
+    await dialog
+      .getByRole('button', {name: 'Remove file', exact: true})
+      .click();
+    await expect(
+      dialog.getByText('reading-dropped.json', {exact: true}),
+    ).toHaveCount(0);
+    await expect(
+      dialog.getByRole('button', {name: 'Validate JSON', exact: true}),
+    ).toBeDisabled();
+    await dialog.getByRole('button', {name: 'Cancel import'}).click();
+    expect(writes).toEqual([]);
+  });
+}
+
 test('Reading paste import protects existing work and rejects invalid media references', async ({
   page,
 }) => {
@@ -473,6 +595,7 @@ test('Reading paste import protects existing work and rejects invalid media refe
   await page
     .getByRole('button', {name: 'Import Reading JSON', exact: true})
     .click();
+  await page.getByRole('button', {name: 'Paste JSON', exact: true}).click();
   await page.getByLabel('Or paste complete Reading JSON').fill('{bad');
   await page.getByRole('button', {name: 'Validate JSON', exact: true}).click();
   await expect(page.getByRole('alert')).toContainText('JSON cannot be read');
