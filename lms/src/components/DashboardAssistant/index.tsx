@@ -1,6 +1,9 @@
 import {prompts, type Audience} from './prompts';
 import {useId, useRef, useState} from 'react';
 import styles from './index.module.scss';
+import {Lightbulb, NotebookPen, Mic, GraduationCap} from 'lucide-react';
+
+const studentPromptIcons = [Lightbulb, NotebookPen, Mic, GraduationCap];
 
 /** API integration is supplied by the owning feature. An absent adapter never sends a simulated request. */
 export function DashboardAssistant({audience, onPrompt, className}: {audience: Audience; onPrompt?: (prompt: string) => void; className?: string}) {
@@ -16,7 +19,7 @@ export function DashboardAssistant({audience, onPrompt, className}: {audience: A
       <button type="button" aria-label="Start a new chat" onClick={() => {setDraft(''); input.current?.focus();}}><img src="/icons/figma-dashboard/add.svg" alt=""/></button>
     </header>
     <div className={styles.chatIntro}><p>Hi there!</p><strong>How can I help you with your {context} today?</strong></div>
-    <div className={styles.quickPrompts}>{prompts[audience].map(prompt => <button type="button" key={prompt} onClick={() => {setDraft(prompt); input.current?.focus();}}>{prompt}</button>)}</div>
+    <div className={styles.quickPrompts}>{prompts[audience].map((prompt, index) => {const Icon = audience === 'student' ? studentPromptIcons[index] : undefined; return <button type="button" key={prompt} onClick={() => {setDraft(prompt); input.current?.focus();}}>{Icon ? <Icon size={20} aria-hidden="true"/> : null}<span>{prompt}</span></button>;})}</div>
     <div className={styles.composerArea}>
       {!onPrompt ? <p className={styles.integrationStatus} id={statusId}>AI assistance is coming soon. You can prepare a question here.</p> : null}
       <form className={styles.chatComposer} onSubmit={event => {event.preventDefault(); if (draft.trim()) onPrompt?.(draft.trim());}}>

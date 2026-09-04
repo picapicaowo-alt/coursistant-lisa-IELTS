@@ -7,6 +7,8 @@ import styles from './index.module.scss';
 interface CourseIdentityCardProps {
   courseId: string | number;
   title: string;
+  compact?: boolean;
+  icon?: ReactNode;
   headingLevel?: 2 | 3;
   code?: string | null;
   status?: ReactNode;
@@ -22,15 +24,16 @@ interface CourseIdentityCardProps {
 }
 
 /** Presentation only: callers retain their own contracts, capabilities and mutations. */
-export function CourseIdentityCard({courseId, title, headingLevel = 3, code, status, metadata, instructor, instructorAvatar, progress, children, footer, actions, menu}: CourseIdentityCardProps) {
+export function CourseIdentityCard({courseId, title, compact = false, icon, headingLevel = 3, code, status, metadata, instructor, instructorAvatar, progress, children, footer, actions, menu}: CourseIdentityCardProps) {
   const titleId = useId();
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
   const completed = progress?.completed;
   const total = progress?.total;
   const validProgress = completed != null && total != null && Number.isFinite(completed) && Number.isFinite(total) && total > 0 && completed >= 0 && completed <= total;
 
-  return <article className={styles.card} aria-labelledby={titleId} data-course-card={courseId}>
-    {status || code || menu ? <div className={styles.top}>
+  return <article className={`${styles.card} ${compact ? styles.compact : ''}`} aria-labelledby={titleId} data-course-card={courseId}>
+    {icon || status || code || menu ? <div className={styles.top}>
+      {icon ? <div className={styles.identityIcon}>{icon}</div> : null}
       {status ? <div className={styles.status}>{status}</div> : null}
       {code ? <span className={styles.code}>{code}</span> : null}
       {menu ? <div className={styles.menu}>{menu}</div> : null}

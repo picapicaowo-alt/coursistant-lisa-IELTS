@@ -362,3 +362,9 @@
 .skill meter { grid-column: 2; grid-row: 2; }
 .skill > small { grid-column: 1; grid-row: 2; }
 @media (max-width: t.$breakpoint-shell-mobile) { .goal { grid-template-columns: minmax(0, 1fr); } .goal > * { grid-column: 1; } .progress { grid-row: auto; } }
+
+// Student summary and task views use the same readable rhythm as Learning overview.
+.taskOverview p, .taskRow { font-size: t.$font-size-body; line-height: 1.65; }
+.taskBoard h3 { font-size: t.$font-size-body-lg; margin-block: t.$space-5; }
+.taskRow { padding: t.$space-5 t.$space-3; gap: t.$space-4; }
+.tasksRail p { font-size: t.$font-size-body; line-height: 1.7; }
