@@ -107,17 +107,20 @@ test('course filtering, pagination, list view and details follow Student lifecyc
   });
   await page.goto('/course');
   await expect(page.locator('[data-course-card="71"]')).toBeVisible();
+  expect(queries.at(-1)?.get('courseView')).toBe('CURRENT');
+  expect(queries.at(-1)?.has('state')).toBe(false);
   await page.getByRole('button', {name: 'Next course page'}).click();
   await expect(page.locator('[data-course-card="72"]')).toBeVisible();
   await page.getByRole('button', {name: 'Completed', exact: true}).click();
+  await expect.poll(() => queries.at(-1)?.get('courseView')).toBe('COMPLETED');
   await expect(page.locator('[data-course-card]')).toHaveCount(0);
   expect(queries.at(-1)?.get('page')).toBe('0');
   await page.getByRole('button', {name: 'Current', exact: true}).click();
   await expect(page.locator('[data-course-card="71"]')).toBeVisible();
   await page.getByRole('button', {name: 'List view'}).click();
   await expect(page.locator('[data-view="list"]')).toBeVisible();
-  expect(queries.at(-1)?.get('courseView')).toBe('CURRENT');
-  expect(queries.at(-1)?.has('state')).toBe(false);
+  // Returning to Current can reuse its fresh cache without a second request.
+  await expect(page.getByRole('button', {name: 'Current', exact: true})).toHaveAttribute('aria-pressed', 'true');
   await page.getByRole('link', {name: 'View details', exact: true}).click();
   await expect(page).toHaveURL(/\/course\/71$/);
 });
