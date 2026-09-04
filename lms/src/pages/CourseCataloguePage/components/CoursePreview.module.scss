@@ -1,141 +1,3 @@
-// Course card — see docs/design/11-my-course-list.png.
-// Header (instructor), title, a two-column meta row, a dotted divider, then
-// View details with the actions menu on the right.
-
-.courseItem {
-    display: flex;
-    flex-direction: column;
-    background-color: t.$surface-raised;
-    border: 1px solid t.$border;
-    border-radius: t.$radius-card-lg;
-    padding: t.$workspace-panel-padding;
-    min-width: 0;
-    gap: t.$space-4;
-    box-shadow: none;
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
-
-    &:hover {
-        border-color: t.$border-strong;
-    }
-}
-
-.courseHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    min-height: t.$control-size;
-
-}
-
-.instructorInfo {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-}
-
-.avatarContainer {
-    width: t.$control-size;
-    height: t.$control-size;
-    border-radius: t.$radius-pill;
-    overflow: hidden;
-    flex-shrink: 0;
-}
-
-.avatar {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.instructorName {
-    font-size: t.$fs-label;
-    font-weight: 500;
-    color: t.$text;
-}
-
-.instructorRole {
-    font-size: t.$fs-caption;
-    color: t.$text-muted;
-}
-
-.courseContent {
-    display: flex;
-    flex-direction: column;
-    // Pushes the meta row to the bottom so cards line up even when a course
-    // has no sessions to show.
-    flex: 1;
-    gap: t.$space-4;
-}
-
-.courseTitle {
-    margin: 0;
-    overflow-wrap: anywhere;
-    font-size: t.$fs-course-name;
-    font-weight: t.$fw-bold;
-    color: t.$content-primary;
-    line-height: t.$line-height-headline;
-}
-
-.courseMeta {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.75rem;
-    margin-top: auto;
-}
-
-.metaItem {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    min-width: 0;
-}
-
-.metaLabel {
-    font-size: t.$fs-label;
-    font-weight: t.$fw-semibold;
-    color: t.$text;
-}
-
-.metaValue {
-    font-size: t.$fs-caption;
-    color: t.$text-muted;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.courseFooter {
-
-    flex-wrap: wrap;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.5rem;
-    margin-top: 1.25rem;
-    padding-top: 1rem;
-    border-top: 1px dashed t.$border;
-}
-
-.viewDetails {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    padding: t.$space-2 t.$space-4;
-    min-height: t.$touch-target;
-    border-radius: t.$radius-control;
-    background-color: t.$action-primary;
-    color: t.$content-on-color;
-    font-size: t.$font-size-body;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.15s, color 0.15s;
-
-    &:hover {
-        background-color: t.$brand;
-        color: t.$content-on-color;
-    }
-}
-
 .menuAnchor {
     position: relative;
 }
@@ -161,7 +23,7 @@
 .menu {
     position: absolute;
     right: 0;
-    bottom: calc(100% + 0.4rem);
+    top: calc(100% + t.$space-1);
     z-index: 10;
     min-width: 11rem;
     padding: 0.35rem;
@@ -170,10 +32,11 @@
     background-color: t.$surface-raised;
     border: 1px solid t.$border;
     border-radius: t.$radius-control;
-    box-shadow: 0 8px 24px rgba(t.$text, 0.12);
+    box-shadow: t.$shadow-popover;
 }
 
 .menuItem {
+    min-height: t.$touch-target;
     text-align: left;
     padding: 0.5rem 0.7rem;
     border-radius: t.$radius-control-sm;
@@ -209,6 +72,7 @@
 }
 
 .confirmDelete button {
+    min-height: t.$touch-target;
     padding: 0.35rem;
     border-radius: t.$radius-control-sm;
     color: t.$text;
@@ -227,40 +91,11 @@
     color: t.$danger;
 }
 
-.courseState { display: inline-flex; width: fit-content; padding: t.$space-1 t.$space-2; border-radius: t.$radius-xs; background: t.$surface-brand-subtle; color: t.$action-primary; font-size: t.$font-size-caption; }
-.progressUnavailable { display: grid; gap: t.$space-2; margin-top: t.$space-6; color: t.$content-secondary; font-size: t.$font-size-caption; }
-.scheduleSummary { display: flex; flex: 1 1 9rem; align-items: center; gap: t.$space-2; min-width: 0; }
-.scheduleSummary img { width: t.$space-6; height: t.$space-6; }
-.scheduleSummary > div { display: grid; min-width: 0; gap: t.$space-1; font-size: t.$font-size-caption; }
-.scheduleSummary span, .scheduleSummary small { color: t.$content-secondary; }
-.scheduleSummary strong { font-weight: t.$fw-medium; overflow-wrap: anywhere; }
-.courseFooter { margin-inline: calc(-1 * t.$workspace-panel-padding); padding: t.$space-5 t.$workspace-panel-padding 0; }
 
-.badges {display:flex; align-items:center; flex-wrap:wrap; gap:t.$space-2;}
-.courseCode {font-size:t.$fs-caption; color:t.$content-secondary;}
-
-.instructorCard {
-    position: relative;
-    border-top: 5px solid t.$action-primary;
-    padding: t.$space-6;
-    gap: t.$space-5;
-    box-shadow: 0 4px 14px rgba(t.$text, .04);
-    .courseHeader[hidden] { display: none; }
-    .courseContent { gap: t.$space-2; }
-    .courseTitle { font-size: t.$font-size-headline; line-height: 1.4; }
-    .courseFooter { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: stretch; gap: t.$space-3; margin: 0; padding: t.$space-4 0 0; border-top: 1px solid t.$border-default; }
-    .viewDetails { justify-content: center; text-align: center; padding-inline: t.$space-2; font-size: t.$font-size-body; border: 1px solid t.$action-primary; font-weight: t.$fw-semibold; }
-    .viewDetails > span { display: none; }
-    .outlineAction { background: t.$surface-raised; color: t.$action-primary; &:hover { background: t.$surface-brand-subtle; } }
-    .menuAnchor { position: absolute; right: t.$space-3; top: t.$space-3; }
-    .menu { top: 100%; bottom: auto; }
-    &:has(.menuAnchor) .teachingTop { padding-right: t.$space-8; }
-}
-.teachingTop { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; }
-.teachingInstructor { display: flex; align-items: flex-start; gap: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-body; svg { flex-shrink: 0; margin-top: 2px; } }
-.teachingSchedule { grid-column: 1 / -1; display: grid; gap: t.$space-3; padding-bottom: t.$space-2; font-size: t.$font-size-body;
-    > div { display: flex; gap: t.$space-3; align-items: flex-start; min-width: 0; }
-    svg { color: t.$content-secondary; flex-shrink: 0; }
-    span { overflow-wrap: anywhere; }
-    > div + div { color: t.$content-secondary; }
+.schedule { display: grid; gap: t.$space-3; font-size: t.$font-size-body;
+  > div { display: flex; gap: t.$space-3; align-items: flex-start; min-width: 0; }
+  svg { color: t.$content-secondary; flex-shrink: 0; }
+  span { overflow-wrap: anywhere; }
+  > div + div { color: t.$content-secondary; }
+  button { min-height: t.$touch-target; color: t.$action-primary; text-decoration: underline; cursor: pointer; }
 }

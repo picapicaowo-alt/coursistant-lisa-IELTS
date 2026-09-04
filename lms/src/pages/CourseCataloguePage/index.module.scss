@@ -1,9 +1,8 @@
-@use '../../styles/workspace' as workspace;
-.pageContainer.instructorPage { background: t.$surface-subtle; padding: clamp(1.5rem, 3vw, 3rem); .tabsContainer { margin-bottom: t.$space-8; flex-wrap: wrap; } .tab { border: 1px solid t.$border-default; border-radius: t.$radius-pill; background: t.$surface-raised; &.active { background: t.$content-primary; border-color: t.$content-primary; color: t.$content-on-color; } } }
 .eyebrow { margin: 0 0 t.$space-3; color: t.$content-secondary; font-size: t.$font-size-caption; text-transform: uppercase; font-weight: t.$fw-semibold; span { margin-inline: t.$space-3; } }
 .pageTitle { margin: 0 0 t.$space-6; font-size: t.$workspace-title-size; font-weight: t.$fw-bold; line-height: t.$line-height-title-1; }
 
 .pageContainer {
+    background: t.$surface-subtle;
     min-height: calc(100dvh - t.$shell-header-height);
     padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16;
     display: flex;
@@ -17,10 +16,11 @@
 
 .tabsContainer {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: t.$space-2;
     padding: 0;
-    margin-bottom: t.$space-6;
+    margin-bottom: t.$space-8;
     border: 0;
     border-radius: 0;
     background: transparent;
@@ -35,14 +35,16 @@
     color: t.$content-secondary;
     position: relative;
     transition: color t.$duration-fast t.$ease-out, background-color t.$duration-fast t.$ease-out;
-    border-radius: t.$radius-sm;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-pill;
+    background: t.$surface-raised;
     
     &:hover {
         color: t.$content-primary;
         background-color: t.$surface-subtle;
     }
     
-    &.active { color: t.$content-primary; background: t.$surface-muted; }
+    &.active { color: t.$content-on-color; background: t.$content-primary; border-color: t.$content-primary; }
 }
 
 .tabLabel {
@@ -87,19 +89,8 @@
     line-height: 1;
 }
 
-.courseGrid {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    > * { @include workspace.region(4, 6); }
-    gap: t.$space-6;
-    margin-bottom: t.$space-8;
-    
-    @media (max-width: 768px) {
-        grid-template-columns: repeat(12, minmax(0, 1fr));
-    }
-}
-
 .paginationContainer {
+    margin-top: t.$space-8;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -180,7 +171,6 @@
 
     .tabsContainer {
         align-items: stretch;
-        overflow-x: auto;
     }
 
     .tab {
@@ -205,7 +195,6 @@
     font-size: t.$fs-label;
 }
 
-.courseList { display: grid; grid-template-columns: minmax(0, 1fr); gap: t.$space-5; margin-bottom: t.$space-8; }
 .viewToggle { display: flex; flex-shrink: 0; padding: t.$space-1; background: t.$surface-subtle; border-radius: t.$radius-sm; }
 .viewToggle button { display: grid; width: t.$touch-target; height: t.$touch-target; place-items: center; border: 0; border-radius: t.$radius-xs; background: transparent; }
 .viewToggle button[aria-pressed='true'] { background: t.$surface-muted; }

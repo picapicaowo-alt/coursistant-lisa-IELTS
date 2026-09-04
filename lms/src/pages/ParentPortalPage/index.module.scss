@@ -30,17 +30,11 @@
 .studyPlan, .learningProfile { align-self: stretch; }
 
 .textLink { display: inline-flex; min-height: t.$touch-target; align-items: center; gap: t.$space-1; color: t.$action-primary; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; text-decoration: none; }
-.courseList { display: grid; }
-.courseRow { min-width: 0; padding-block: t.$space-5; }
-.courseRow:first-child { padding-top: 0; }
-.courseRow:last-child { padding-bottom: 0; }
-.courseRow + .courseRow { border-top: 1px solid t.$border-default; }
-.overviewCourses .courseRow h3 { margin-top: t.$space-4; font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
 .rowHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: t.$space-3; flex-wrap: wrap; }
 .rowHeading > :first-child { flex: 1; min-width: min(100%, 12rem); }
 .rowHeading h3 { margin: 0; color: t.$content-primary; font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; line-height: t.$line-height-subhead; }
 .rowHeading p, .meta { margin: t.$space-2 0 0; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-body; overflow-wrap: anywhere; }
-.courseProgress { margin-top: t.$space-8; }
+.courseProgress { min-width: 0; }
 .courseProgress > div { display: flex; align-items: end; justify-content: space-between; gap: t.$space-3; margin-bottom: t.$space-3; font-size: t.$font-size-body; font-weight: t.$fw-medium; }
 .courseProgress strong { color: t.$action-primary; font-size: t.$font-size-title-2; line-height: t.$line-height-title-2; font-variant-numeric: tabular-nums; }
 .courseProgress progress, .examResult progress { display: block; width: 100%; height: t.$space-2; appearance: none; overflow: hidden; border: 0; border-radius: t.$radius-pill; background: t.$surface-muted; }
