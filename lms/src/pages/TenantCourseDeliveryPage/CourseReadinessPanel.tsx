@@ -1,12 +1,13 @@
 import {AlertCircle, Check, LoaderCircle} from 'lucide-react';
-import type {CourseDeliveryConfigResponse, CourseResponse, CourseSession} from '@/apis';
+import type {CourseDeliveryConfigResponse, CourseReadinessBlocker, CourseResponse, CourseSession} from '@/apis';
 import {courseLaunchLabel} from '../advising/courseManagement';
 import styles from '../advising/CourseManagement.module.scss';
 
-export function CourseReadinessPanel({course, sessions, config, loading, transitionPending, canReady, canPublish, onReady, onPublish}: {
+export function CourseReadinessPanel({course, sessions, config, blockers, loading, transitionPending, canReady, canPublish, onReady, onPublish}: {
   course?: CourseResponse;
   sessions?: CourseSession[];
   config: CourseDeliveryConfigResponse | null | undefined;
+  blockers: CourseReadinessBlocker[];
   loading: boolean;
   transitionPending: boolean;
   canReady: boolean;
@@ -14,7 +15,6 @@ export function CourseReadinessPanel({course, sessions, config, loading, transit
   onReady: () => void;
   onPublish: () => void;
 }) {
-  const blockers = config?.blockers ?? [];
   const state = config?.launchState;
   const hasConfig = Boolean(config?.catalogCode && config.capacity);
   const checks = [

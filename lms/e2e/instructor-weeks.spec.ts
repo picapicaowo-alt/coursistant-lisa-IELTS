@@ -525,3 +525,24 @@ test('configured delivery keeps instructor week authoring independent of course 
   await expect(page.getByText('Persist the instructional overview independently of delivery configuration.', {exact: true})).toBeVisible();
   expect(writes.filter(item => item.method === 'POST')).toEqual([expect.objectContaining({path: '/v2/courses/71/weeks', body: {title: 'Configured course teaching week', summary: 'Persist the instructional overview independently of delivery configuration.'}})]);
 });
+
+test('configured course instructor can upload the required syllabus without course administration', async ({page}) => {
+  await weeksFixture(page, 1);
+  await page.route('**/v2/me/courses?*', route => route.fulfill({json: reply({items: [{...course, launchState: 'READY'}], total: 1, page: 0, size: 100})}));
+  let uploaded = false;
+  await page.route('**/v2/courses/71/syllabus', route => {
+    if (route.request().method() === 'POST') {
+      expect(route.request().headers()['content-type']).toContain('multipart/form-data');
+      expect(route.request().postDataBuffer()?.toString()).toContain('name="file"');
+      uploaded = true;
+    }
+    return route.fulfill({json: reply(uploaded ? {posted: true, versionId: 91, originalFilename: 'syllabus.pdf', sizeBytes: 28, canRestorePrevious: false} : {posted: false, canRestorePrevious: false})});
+  });
+  await page.goto('/course/71?tab=syllabus');
+  await expect(page.getByRole('button', {name: 'Edit course', exact: true})).toHaveCount(0);
+  await page.locator('input[type="file"]').setInputFiles({name: 'syllabus.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\nQA syllabus\n%%EOF')});
+  await expect(page.getByText('syllabus.pdf', {exact: true})).toBeVisible();
+  await page.reload();
+  await expect(page.getByText('syllabus.pdf', {exact: true})).toBeVisible();
+  expect(uploaded).toBe(true);
+});

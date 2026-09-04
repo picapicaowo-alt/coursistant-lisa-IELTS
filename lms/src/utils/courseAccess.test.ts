@@ -59,7 +59,7 @@ describe('deriveCourseAccess', () => {
     expect(access).toMatchObject({
       isTa: true,
       canEditCourse: false,
-      canManageWeeks: false,
+      canManageTeachingContent: false,
       canConfigureAssignments: false,
       canGrade: true,
       canReleaseGrades: false,
@@ -82,7 +82,7 @@ describe('deriveCourseAccess', () => {
 
     expect(access).toMatchObject({
       isStudent: true,
-      canManageWeeks: false,
+      canManageTeachingContent: false,
       canGrade: false,
       canUploadMaterials: false,
       canSubmitAssignments: true,
@@ -92,7 +92,7 @@ describe('deriveCourseAccess', () => {
   it.each(['DRAFT', 'READY', 'PUBLISHED'] as const)('keeps instructor week authoring available for %s delivery', launchState => {
     expect(deriveCourseAccess(membership({courseRole: 'Instructor', role: 'Instructor', launchState}))).toMatchObject({
       canEditCourse: false,
-      canManageWeeks: true,
+      canManageTeachingContent: true,
     });
   });
 });

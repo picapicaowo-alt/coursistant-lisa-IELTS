@@ -18,7 +18,7 @@ function CourseDeliveryWorkspace({id}: {id: number}) {
   const [params, setParams] = useSearchParams();
   const requestedView = params.get('view');
   const view = DELIVERY_VIEWS.find(item => item === requestedView) ?? 'delivery';
-  const {course, config, sessions, draft, setDraft, save, transition, reload, canEdit, canReady, canPublish, canSchedule, canGenerateDates, reloadRequired, error} = useCourseDelivery(id);
+  const {course, config, sessions, draft, setDraft, save, transition, reload, readinessBlockers, canEdit, canReady, canPublish, canSchedule, canGenerateDates, reloadRequired, error} = useCourseDelivery(id);
   const setView = (next: DeliveryView) => setParams(current => {current.set('view', next); return current;});
   const primarySession = sessions.data?.[0];
   const primaryWeekday = primarySession ? COURSE_SESSION_DAYS.find(day => day.value === primarySession.dayOfWeek)?.label ?? primarySession.dayOfWeek : '';
@@ -49,6 +49,7 @@ function CourseDeliveryWorkspace({id}: {id: number}) {
     </header>
     <div className={styles.detailBody} id="course-section" role="tabpanel" aria-labelledby={`course-tab-${view}`}>
       {error ? <p className={styles.error} role="alert">{advisingErrorMessage(error, 'Course management data could not be loaded or updated.')} {course.isError || config.isError || sessions.isError ? <button type="button" className={styles.ghostButton} onClick={() => {if (course.isError) void course.refetch(); else {void config.refetch(); if (sessions.isError) void sessions.refetch();}}}>Retry</button> : null}</p> : null}
+      {view === 'schedule' && transition.error && readinessBlockers.length > 0 ? <ul className={styles.blockerList} aria-label="Readiness blockers">{readinessBlockers.map((blocker, index) => <li key={`${blocker.code}-${index}`}>{blocker.message || blocker.code?.replace(/_/g, ' ')}</li>)}</ul> : null}
       {reloadRequired ? <div className={styles.notice} role="alert">Your input is preserved, but this course changed elsewhere. <button type="button" className={styles.ghostButton} onClick={() => void reload()}>Load latest delivery version</button></div> : null}
       {course.isPending || (course.isSuccess && config.isPending) ? <p role="status" className={styles.helper}>Loading course delivery…</p> : null}
       {course.isSuccess && config.isSuccess ? <>
@@ -58,7 +59,7 @@ function CourseDeliveryWorkspace({id}: {id: number}) {
           <div className={styles.mainColumn}>
             {view === 'overview' ? <CourseDeliveryOverview course={course.data} config={config.data} sessions={sessions.isError ? undefined : sessions.data} sessionsPending={sessions.isPending} onView={setView} /> : <><CourseDeliveryForm config={config.data} draft={draft} pending={save.isPending} canEdit={canEdit} onDraft={setDraft} onSubmit={() => save.mutateAsync()} /><CourseDeliverySummary course={course.data} sessions={sessions.isError ? undefined : sessions.data} sessionsPending={sessions.isPending} onViewSchedule={() => setView('schedule')} /></>}
           </div>
-          <div className={styles.sideColumn}><CourseReadinessPanel course={course.data} sessions={sessions.isError ? undefined : sessions.data} config={config.data} loading={config.isFetching || sessions.isPending} transitionPending={transition.isPending} canReady={canReady} canPublish={canPublish} onReady={() => transition.mutate('ready')} onPublish={() => transition.mutate('publish')} /></div>
+          <div className={styles.sideColumn}><CourseReadinessPanel course={course.data} sessions={sessions.isError ? undefined : sessions.data} config={config.data} blockers={readinessBlockers} loading={config.isFetching || sessions.isPending} transitionPending={transition.isPending} canReady={canReady} canPublish={canPublish} onReady={() => transition.mutate('ready')} onPublish={() => transition.mutate('publish')} /></div>
         </div>}
       </> : null}
     </div>
