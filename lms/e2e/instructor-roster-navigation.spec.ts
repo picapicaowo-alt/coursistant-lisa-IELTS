@@ -27,7 +27,7 @@ async function instructorFixture(page: Page, courseRole = 'Instructor') {
 test('instructor opens the learner roster, reads names, filters and returns to the course list', async ({page}) => {
   const requests = await instructorFixture(page);
   await page.goto('/course');
-  await page.getByRole('button', {name: 'Course operations', exact: true}).click();
+  await page.getByRole('link', {name: 'Course operations', exact: true}).click();
   await expect(page).toHaveURL(/\/course\/71\/operations$/);
   await page.getByRole('link', {name: 'Learner roster', exact: true}).click();
   await expect(page).toHaveURL(/\/roster\/71$/);
@@ -53,7 +53,7 @@ test('instructor opens the learner roster, reads names, filters and returns to t
   await expect(page).toHaveURL(/\/course\/71\/operations$/);
   await page.getByRole('link', {name: 'Back to courses', exact: true}).click();
   await expect(page).toHaveURL(/\/course$/);
-  await expect(page.getByRole('button', {name: 'Course operations', exact: true})).toBeVisible();
+  await expect(page.getByRole('link', {name: 'Course operations', exact: true})).toBeVisible();
 });
 
 test('a roster opened from course overview returns there, then back to the catalogue', async ({page}) => {

@@ -19,6 +19,7 @@ import {
 import {useStudentProgress} from '@/hooks/useStudentProgress';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {getSignedInHomePath} from '@/utils/signedInHomePath';
+import {CourseCardGrid} from '@/components/CourseIdentityCard/CourseCardGrid';
 
 const CourseCataloguePage: React.FC = () => {
   const {t} = useTranslation("course");
@@ -35,7 +36,7 @@ const CourseCataloguePage: React.FC = () => {
   }
   
   return (
-    <div className={`${styles.pageContainer} ${user.level === 'INSTRUCTOR' ? styles.instructorPage : ''}`}>
+    <div className={styles.pageContainer}>
       <div className={styles.contentContainer}>
         {user.level === 'INSTRUCTOR' ? <p className={styles.eyebrow}>Course operations <span>/</span> My courses</p> : null}
         <h1 className={styles.pageTitle}>{isUserAccount ? t("list.tabs.myCourses") : 'Courses'}</h1>
@@ -117,7 +118,7 @@ const CoursesList: React.FC<{state?: CourseState; view: 'grid' | 'list'}> = ({st
 
   return (
     <React.Fragment>
-      <div className={view === 'list' ? styles.courseList : styles.courseGrid}>
+      <CourseCardGrid view={view}>
         {courses.map((course) => (
           <CoursePreview
             key={course.id}
@@ -130,7 +131,6 @@ const CoursesList: React.FC<{state?: CourseState; view: 'grid' | 'list'}> = ({st
             progressLoading={studentProgress.isFetching}
             progressFailed={studentProgress.isError}
             showProgress={isStudentAccount(user)}
-            instructorView={user.level === 'INSTRUCTOR'}
             // Archiving is a Course Manager action. A TA never qualifies, no
             // matter which permission flags it holds, so this checks the
             // enrolment role rather than any of them.
@@ -139,7 +139,7 @@ const CoursesList: React.FC<{state?: CourseState; view: 'grid' | 'list'}> = ({st
             showDelivery={isAdvisorAccount(user)}
           />
         ))}
-      </div>
+      </CourseCardGrid>
 
       {totalPages > 1 && (
         <div className={styles.paginationContainer}>

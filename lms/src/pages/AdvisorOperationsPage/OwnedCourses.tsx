@@ -6,6 +6,8 @@ import {unwrapData} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {ADVISOR_PAGE_SIZE, type AdvisorOwnedCourseFilters} from '@/apis/types/advisorWorkspace';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {CourseIdentityCard} from '@/components/CourseIdentityCard';
+import {CourseCardGrid} from '@/components/CourseIdentityCard/CourseCardGrid';
 import {formatPersonName} from '@/utils/personName';
 import {AdvisingPagination} from '../advising/AdvisingPagination';
 import {advisingErrorMessage} from '../advising/advisingErrors';
@@ -60,25 +62,22 @@ export function OwnedCourses({onCreate}: {onCreate?: () => void}) {
     </section>
     {courses.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(courses.error, 'Owned courses could not be loaded.')} <button type="button" className={styles.ghostButton} onClick={() => void courses.refetch()}>Retry</button></p> : null}
     {courses.isPending ? <p role="status" className={styles.helper}>Loading courses…</p> : null}
-    <section className={styles.courseGrid} data-view={view} aria-label="Courses you own" aria-busy={courses.isPending}>
+    <CourseCardGrid view={view} label="Courses you own" busy={courses.isPending}>
       {courses.data?.items.map(course => {
         const instructorName = course.primaryInstructor ? formatPersonName({firstName: course.primaryInstructor.instructorFirstName, middleName: course.primaryInstructor.instructorMiddleName, lastName: course.primaryInstructor.instructorLastName}) : '';
-        return <article key={course.courseId} className={styles.courseCard}>
-          <header className={styles.courseHeader}>
-            <div className={styles.courseTitleRow}><span className={styles.statusBadge} data-state={course.launchState}>{courseLaunchLabel(course.launchState)}</span><span className={styles.courseCode} title={course.catalogCode || course.courseCode}>{course.catalogCode || course.courseCode || `Course ${course.courseId}`}</span></div>
-            <h2>{course.title || course.courseCode || `Course #${course.courseId}`}</h2>
-            <p>{course.lifecycleState || 'Lifecycle not provided'}</p>
-          </header>
-          <dl className={styles.factList}>
+        return <CourseIdentityCard key={course.courseId} courseId={course.courseId}
+          title={course.title || course.courseCode || `Course #${course.courseId}`} headingLevel={2}
+          code={course.catalogCode || course.courseCode || `Course ${course.courseId}`}
+          status={<span className={styles.statusBadge} data-state={course.launchState}>{courseLaunchLabel(course.launchState)}</span>}
+          instructor={instructorName || course.primaryInstructor?.email || 'Instructor not assigned'}
+          metadata={course.lifecycleState || 'Lifecycle not provided'}
+          footer={<dl className={styles.factList}>
             <div><dt><UsersRound size={16} aria-hidden="true" /></dt><dd>{course.activeStudents ?? '—'} / {course.capacity ?? '—'} students enrolled</dd></div>
             <div><dt><BookOpen size={16} aria-hidden="true" /></dt><dd>{course.catalogCode ? `${course.catalogCode} delivery` : 'Delivery details not configured'}</dd></div>
             <div><dt><CalendarDays size={16} aria-hidden="true" /></dt><dd>{courseTermLabel(course)}</dd></div>
-          </dl>
-          <footer className={styles.cardActions}>
-            <span className={styles.instructor}><span className={styles.instructorAvatar} aria-hidden="true">{instructorName.charAt(0) || '—'}</span><span>{instructorName || course.primaryInstructor?.email || 'Instructor not assigned'}</span></span>
-            <span className={styles.cardActionGroup}><Link className={styles.linkButton} to={`${generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(course.courseId)})}?view=delivery`}>Manage delivery</Link></span>
-          </footer>
-        </article>;
+          </dl>}
+          actions={<Link to={`${generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(course.courseId)})}?view=delivery`}>Manage delivery</Link>}
+        />;
       })}
       {view === 'grid' && !courses.isPending && !courses.isError ? <button type="button" className={styles.createCourseCard} onClick={onCreate}>
         <span className={styles.createCourseIcon}><Plus size={22} aria-hidden="true" /></span>
@@ -86,7 +85,7 @@ export function OwnedCourses({onCreate}: {onCreate?: () => void}) {
         <span>Set up course identity, term, instructor, and delivery.</span>
       </button> : null}
       {!courses.isPending && !courses.isError && courses.data?.items.length === 0 && (filters.q || filters.launchState || filters.lifecycleState) ? <div className={styles.emptyState}><BookOpen size={26} aria-hidden="true" /><h2>No matching courses</h2><p>Adjust or clear the current filters.</p></div> : null}
-    </section>
+    </CourseCardGrid>
     <AdvisingPagination label="Owned course pages" page={filters.page ?? 0} total={courses.data?.total ?? 0} onPage={page => setFilters(current => ({...current, page}))} />
     <section className={styles.summaryBar} aria-label="At-a-glance operational summary">
       <div className={styles.summaryLead}><Activity size={20} aria-hidden="true" />At-a-glance operational summary</div>

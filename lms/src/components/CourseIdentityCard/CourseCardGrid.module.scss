@@ -1,0 +1,6 @@
+.container { container-type: inline-size; min-width: 0; width: 100%; }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: t.$space-6; align-items: stretch; }
+.grid > * { grid-column: span 4; min-width: 0; }
+@container (max-width: 70rem) { .grid > * { grid-column: span 6; } }
+@container (max-width: 44rem) { .grid > * { grid-column: 1 / -1; } }
+.grid[data-view='list'] > * { grid-column: 1 / -1; }
