@@ -101,7 +101,7 @@ test('student operations distinguish unavailable alerts and preserve event detai
     await route.fulfill({json: response(data)});
   });
   await page.goto('/my-operations');
-  await expect(page.getByRole('alert').filter({hasText: 'Alerts temporarily unavailable'})).toBeVisible();
+  await expect(page.getByRole('alert').filter({hasText: 'Alerts could not be loaded.'})).toBeVisible();
   await expect(page.getByText('No active alerts.', {exact: true})).toHaveCount(0);
   await page.getByRole('navigation', {name: 'Operations sections'}).getByRole('button', {name: 'calendar', exact: true}).click();
   await openSection(page, 'Personal events');
@@ -110,7 +110,7 @@ test('student operations distinguish unavailable alerts and preserve event detai
   expect(reads.some(path => path.endsWith('/personal-events/71'))).toBe(true);
   await page.getByRole('textbox', {name: 'Title', exact: true}).fill('Revised study session');
   await page.getByRole('button', {name: 'Save changes', exact: true}).click();
-  await expect(page.getByRole('alert').filter({hasText: 'Event update unavailable'})).toBeVisible();
+  await expect(page.getByRole('alert').filter({hasText: 'The event could not be saved. Your entries are preserved.'})).toBeVisible();
   await page.getByRole('button', {name: 'Save changes', exact: true}).click();
   await expect.poll(() => writes.length).toBe(2);
   expect(writes[0].body).toMatchObject({expectedVersion: 4, title: 'Revised study session'});

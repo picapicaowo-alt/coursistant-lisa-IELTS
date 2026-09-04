@@ -256,7 +256,7 @@ export function TenantSectionComposer({
                   />
                 </label>
                 <label>
-                  <span>Paragraphs (contract JSON array)</span>
+                  <span>Paragraphs (JSON array)</span>
                   <textarea
                     className={styles.payload}
                     value={unit.paragraphs}
@@ -386,7 +386,7 @@ export function TenantSectionComposer({
                         onChange={(event) =>
                           patchQuestion(index, {kind: event.target.value})
                         }
-                        placeholder="Enter the supported contract kind"
+                        placeholder="Enter the question type"
                       />
                     </label>
                     <label>

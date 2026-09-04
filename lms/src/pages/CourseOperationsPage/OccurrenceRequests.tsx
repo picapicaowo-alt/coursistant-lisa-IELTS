@@ -43,7 +43,7 @@ export function ScheduleReview({
     mutationFn: () => {
       if (version == null)
         throw new Error(
-          "The request version is unavailable. Reload the request before reviewing it.",
+          "Reopen this request before reviewing it.",
         );
       const payload = {
         decision,
@@ -100,8 +100,7 @@ export function ScheduleReview({
       ) : null}
       {version == null ? (
         <p className={`${s.notice} ${s.full}`}>
-          The server did not return a version. Review is unavailable until this
-          request can be safely updated.
+          Reopen this request to load the latest details before reviewing it.
         </p>
       ) : null}
       <div className={s.full}>

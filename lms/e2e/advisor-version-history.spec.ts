@@ -26,7 +26,7 @@ test('Advisor reads historic plan snapshots without changing the current draft o
 
   await page.goto('/advisor/students/301/profile');
   await expect(page.getByText('Current version 2', {exact: true})).toBeVisible();
-  await expect(page.getByText(/Earlier profile versions are not available/)).toBeVisible();
+  await expect(page.getByText(/Earlier profile versions are not available/)).toHaveCount(0);
   expect(reads.some(path => /profile\/(revisions|history)/.test(path))).toBe(false);
 
   await page.goto('/advisor/students/301/study-plan');

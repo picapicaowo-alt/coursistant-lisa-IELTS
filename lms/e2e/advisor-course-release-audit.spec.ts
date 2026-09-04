@@ -1,29 +1,51 @@
 import {expect, test, type Page} from '@playwright/test';
 import {fixture, reply} from './workspace-fixtures';
 
-test('release audit: unavailable occurrence reads hide the dated workspace without hiding recurring sessions', async ({page}, info) => {
+test('release audit: class dates load on demand and failures stay in their own section', async ({page}, info) => {
   await setupCourse(page);
   let unavailable = true;
-  await page.route('**/v2/courses/71/session-occurrences?*', route => route.fulfill(unavailable
-    ? {status: 500, json: {code: 'INTERNAL_ERROR', message: 'Course does not exist'}}
-    : {json: reply([{occurrenceId: 99, occurrenceDate: '2030-09-04', startTime: '14:00', endTime: '15:30', location: 'Room 302', status: 'SCHEDULED'}])}));
+  let reads = 0;
+  await page.route('**/v2/courses/71/session-occurrences?*', route => {
+    reads++;
+    return route.fulfill(unavailable
+      ? {status: 500, json: {code: 'INTERNAL_ERROR', message: 'Course does not exist'}}
+      : {json: reply([{occurrenceId: 99, occurrenceDate: '2030-09-04', startTime: '14:00', endTime: '15:30', location: 'Room 302', status: 'SCHEDULED'}])});
+  });
   await page.goto('/advisor/courses/71/delivery?view=schedule');
-  await expect(page.getByRole('alert')).toContainText('Dated occurrences are currently unavailable');
+  const dates = page.getByRole('button', {name: 'View class dates'});
+  await expect(dates).toBeVisible();
   await expect(page.getByRole('region', {name: 'Recurring sessions'}).getByRole('article')).toHaveCount(1);
-  await expect(page.getByRole('heading', {name: 'Course occurrences', exact: true})).toHaveCount(0);
-  await expect(page.getByRole('button', {name: 'Generate dates'})).toHaveCount(0);
-  await expect(page.getByText('Course does not exist', {exact: true})).toHaveCount(0);
+  await expect(page.getByRole('alert')).toHaveCount(0);
+  expect(reads).toBe(0);
   for (const width of [1440, 390]) {
     await page.setViewportSize({width, height: 1000});
     const geometry = await page.getByRole('main').evaluate(main => ({available: main.clientWidth, content: main.scrollWidth}));
     expect(geometry.content).toBeLessThanOrEqual(geometry.available);
-    await page.screenshot({path: info.outputPath(`unavailable-occurrences-${width}.png`), fullPage: true, animations: 'disabled'});
+    await page.screenshot({path: info.outputPath(`schedule-on-demand-${width}.png`), fullPage: true, animations: 'disabled'});
   }
+  await dates.click();
+  const section = page.getByRole('region', {name: 'Course occurrences'});
+  await expect(section.getByRole('alert')).toContainText('Class dates could not be loaded.');
+  await expect(page.getByRole('button', {name: 'Generate dates'})).toHaveCount(0);
+  await expect(page.getByText('Course does not exist', {exact: true})).toHaveCount(0);
+  await expect(page.getByText('No occurrences were returned for this period.')).toHaveCount(0);
   unavailable = false;
-  await page.getByRole('button', {name: 'Retry dated schedule'}).click();
-  await expect(page.getByRole('heading', {name: 'Course occurrences', exact: true})).toBeVisible();
+  await section.getByRole('button', {name: 'Try again'}).click();
+  await expect(section.getByRole('alert')).toHaveCount(0);
   await expect(page.getByRole('button', {name: 'Generate dates'})).toBeEnabled();
   await expect(page.getByRole('cell', {name: 'SCHEDULED'})).toBeVisible();
+  expect(reads).toBe(2);
+});
+
+test('release audit: denied class dates remain a permission state, not an empty schedule', async ({page}) => {
+  await setupCourse(page);
+  await page.route('**/v2/courses/71/session-occurrences?*', route => route.fulfill({status: 403, json: {code: 'ACCESS_DENIED', message: 'Access denied'}}));
+  await page.goto('/advisor/courses/71/delivery?view=schedule');
+  await page.getByRole('button', {name: 'View class dates'}).click();
+  await expect(page.getByRole('region', {name: 'Course occurrences'}).getByRole('alert')).toContainText('You do not have permission');
+  await expect(page.getByText('No occurrences were returned for this period.')).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Generate dates'})).toHaveCount(0);
+  await expect(page.getByRole('region', {name: 'Recurring sessions'}).getByRole('article')).toHaveCount(1);
 });
 
 test('release audit: failed schedule writes retry idempotently and block launch across tabs', async ({page}) => {
@@ -38,6 +60,7 @@ test('release audit: failed schedule writes retry idempotently and block launch 
     return route.fulfill({json: reply([])});
   });
   await page.goto('/advisor/courses/71/delivery?view=schedule');
+  await page.getByRole('button', {name: 'View class dates'}).click();
   await page.getByRole('button', {name: 'Generate dates'}).click();
   await page.getByRole('button', {name: 'Generate occurrences', exact: true}).click();
   await expect(page.getByRole('alert')).toContainText('Your input is preserved');
@@ -155,6 +178,7 @@ test('release audit: direct schedule load generates course-local term dates thro
     return route.fulfill({json: reply([])});
   });
   await page.goto('/advisor/courses/71/delivery?view=schedule');
+  await page.getByRole('button', {name: 'View class dates'}).click();
   await page.getByRole('button', {name: 'Generate dates'}).click();
   await page.getByRole('button', {name: 'Generate occurrences', exact: true}).click();
   await expect(page.getByRole('heading', {name: 'Generate dated occurrences'})).toHaveCount(0);

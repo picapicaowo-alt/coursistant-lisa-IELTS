@@ -254,7 +254,7 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
         <span><strong>{humanize(item.dayOfWeek)}</strong><small>{formatTime(item.startTime)}–{formatTime(item.endTime)}</small><small>{item.effectiveFrom || item.effectiveTo ? `${formatDate(item.effectiveFrom) ?? 'Now'}–${formatDate(item.effectiveTo) ?? 'Ongoing'}` : 'Ongoing'} · {item.timezone || timezone}</small></span>
         <span className={styles.rowActions}><button type="button" onClick={() => { setEditorReveal(current => current + 1); setSelectedIndex(index); setDraft({...item}); setSaved(false); }}><Pencil size={16} aria-hidden="true"/> Edit</button><button type="button" className={styles.textDanger} onClick={() => { setWindows(current => current.filter((_, itemIndex) => itemIndex !== index)); if (selectedIndex === index) { setSelectedIndex(null); setDraft(emptyWindow(timezone)); } setSaved(false); }}><Trash2 size={16} aria-hidden="true"/> Remove</button></span>
       </article>)}</div>}
-      {exceptions.length > 0 ? <div className={styles.exceptionNotice}><strong>{exceptions.length} date exception{exceptions.length === 1 ? '' : 's'} will be preserved</strong><span>This contract supports saving existing exceptions, but does not yet identify their business labels. No exception is deleted when weekly hours are changed.</span></div> : null}
+      {exceptions.length > 0 ? <div className={styles.exceptionNotice}><strong>{exceptions.length} date exception{exceptions.length === 1 ? '' : 's'} will be preserved</strong><span>Your date exceptions stay unchanged when you save weekly hours.</span></div> : null}
     </WorkspaceSection>
 
     <CollapsibleSection title={selectedIndex == null ? 'Add teaching window' : 'Edit teaching window'} headingId="availability-editor-title" revealKey={editorReveal} summary="Set a recurring day and the dates when this window applies.">
@@ -273,7 +273,7 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
         <span>{windows.length} window{windows.length === 1 ? '' : 's'} ready to save</span>
         <button type="button" className={styles.primary} disabled={reloadRequired || mutation.isPending || version == null} onClick={() => mutation.mutate()}>{mutation.isPending ? 'Saving…' : 'Save all availability'}</button>
       </div>
-      {version == null ? <p className={styles.formMessage} role="alert">The backend response did not provide the version required for a safe update.</p> : null}
+      {version == null ? <p className={styles.formMessage} role="alert">Reload your availability before saving changes.</p> : null}
       {saved ? <p className={styles.successMessage} role="status">Availability saved.</p> : null}
       {errorMessage ? <div className={styles.inlineAlert} role="alert"><span>{errorMessage}</span>{reloadRequired ? <button type="button" onClick={() => void availability.refetch().then(result => {if (result.data && !result.isError) {setVersion(result.data.version ?? result.data.availabilityVersion ?? null); setReloadRequired(false); mutation.reset();}})}>Reload latest</button> : null}</div> : null}
   </div>;

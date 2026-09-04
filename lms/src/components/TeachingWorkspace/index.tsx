@@ -71,12 +71,14 @@ export function TeachingDialog({
 export function TeachingState({
   loading,
   error,
+  errorMessage = "This section could not be loaded.",
   empty,
   onRetry,
   compact = false,
 }: {
   loading?: boolean;
   error?: unknown;
+  errorMessage?: string;
   empty?: string;
   onRetry?: () => void;
   compact?: boolean;
@@ -93,7 +95,7 @@ export function TeachingState({
     return (
       <div className={className} role="alert">
         <AlertCircle size={24} />
-        <p>{getApiErrorMessage(error, "This section could not be loaded.")}</p>
+        <p>{getApiErrorMessage(error, errorMessage)}</p>
         {onRetry ? (
           <button type="button" className={styles.secondary} onClick={onRetry}>
             Try again

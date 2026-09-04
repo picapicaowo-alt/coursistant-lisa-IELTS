@@ -211,11 +211,8 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
         description="Turn the student's target into a dated strategy, then break it into checkpoints and concrete tasks."
         meta={!missing ? <span className={styles.versionBadge}>Version {planQuery.data?.plan?.studyPlanVersion}</span> : undefined}
       /> : null}
-      {planQuery.data?.plan?.profileChangedSincePlanUpdate ? (
-        <p className={styles.warn} role="status">The profile changed after this plan. Saving will require the current profile version.</p>
-      ) : null}
-      {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your edits are preserved. Reload the latest record and review before saving again.</p><button type="button" className={styles.secondary} onClick={() => void planQuery.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.plan.studyPlanVersion); setReviewedProfileVersion(result.data.profileContext.currentProfileVersion ?? result.data.plan.basedOnProfileVersion); setReloadRequired(false);}})}>Load latest record</button></div> : null}
-      {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'Study plan could not be saved.')}</p> : null}
+      {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your edits are preserved. Reload the latest record and review before saving again.</p><button type="button" className={styles.secondary} onClick={() => void planQuery.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.plan.studyPlanVersion); setReviewedProfileVersion(result.data.profileContext.currentProfileVersion ?? result.data.plan.basedOnProfileVersion); setReloadRequired(false); save.reset();}})}>Load latest record</button></div> : null}
+      {save.isError && !reloadRequired ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'Study plan could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Study plan saved.</p> : null}
       {!missing && !isEditing && planQuery.data?.plan ? <LearningJourney plan={planQuery.data.plan} studentUserId={id} checkpointTarget={checkpointTarget} taskTarget={taskTarget} onEdit={(checkpointId, taskId) => {if (checkpointId || taskId) {const next = new URLSearchParams(searchParams); if (checkpointId) next.set('checkpointId', String(checkpointId)); if (taskId) next.set('advisorTaskId', String(taskId)); setSearchParams(next);} setIsEditing(true);}}/> : null}
       {missing || isEditing ? <form className={`${styles.form} ${layout.planForm}`} onSubmit={(event: FormEvent) => { event.preventDefault(); save.mutate(); }}>

@@ -180,7 +180,7 @@ const TenantIntakesPage: React.FC = () => {
         throw new Error('Select an eligible advisor.');
       if (selected.assignmentVersion == null)
         throw new Error(
-          'The current assignment version is unavailable. Refresh the intake before reassigning.',
+          'Refresh the intake before reassigning the advisor.',
         );
       const payload = {
         advisorUserId: advisor.id,

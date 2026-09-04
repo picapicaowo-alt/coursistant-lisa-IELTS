@@ -22,6 +22,11 @@ export interface ApiError {
   details?: Record<string, unknown>;
 }
 
+/** Diagnostic context for a malformed read; UI uses its operation-specific message. */
+export class ApiResponseDataError extends Error {
+  readonly name = 'ApiResponseDataError';
+}
+
 /**
  * Headers for a write that requires an `Idempotency-Key`.
  *
@@ -47,7 +52,7 @@ export function idempotent(key: string = crypto.randomUUID()): {headers: Record<
  */
 export function unwrapData<T>(response: ApiResponse<T>, context: string): T {
   if (response.data == null) {
-    throw new Error(
+    throw new ApiResponseDataError(
       `${context}: response had no data (status ${response.status}, code ${response.code})`
     );
   }

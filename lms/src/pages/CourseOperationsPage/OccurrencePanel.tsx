@@ -255,7 +255,7 @@ function OccurrenceDetails({
     mutationFn: () => {
       if (detail.data?.version == null)
         throw new Error(
-          "The current class version is unavailable. Reload before cancelling.",
+          "Reopen this class before cancelling it.",
         );
       return checkpoint.run(
         "cancel-occurrence",
@@ -317,8 +317,7 @@ function OccurrenceDetails({
               ) : null}
               {detail.data?.version == null ? (
                 <p className={s.notice}>
-                  The server did not provide the version needed for a safe
-                  schedule change.
+                  Reopen this class to load the latest details before changing its schedule.
                 </p>
               ) : null}
               <TeachingError error={cancel.error} />

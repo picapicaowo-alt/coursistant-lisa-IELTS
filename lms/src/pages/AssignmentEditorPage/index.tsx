@@ -270,7 +270,7 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
       if (saved) {
         const expectedVersion = saved.version;
         if (typeof expectedVersion !== 'number' || !Number.isInteger(expectedVersion)) {
-          setError('The assignment version is unavailable. Reload the editor before saving changes.');
+          setError('Reload the assignment before saving changes.');
           return;
         }
         const recordRequest: PatchAssignmentPayload = {

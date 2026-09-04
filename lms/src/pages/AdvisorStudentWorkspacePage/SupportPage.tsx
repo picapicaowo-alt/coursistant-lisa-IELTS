@@ -613,7 +613,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
 
       {/* Advanced Record Lookup */}
       <CollapsibleSection title="Advanced record lookup">
-        <p className={styles.muted}>Use backend record identifiers only when handling a specific task, occurrence, or report.</p>
+        <p className={styles.muted}>Look up a specific task, class, or report by its reference number.</p>
         <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(18rem, 1fr))', gap: '1.5rem'}}>
           <form
             className={styles.form}

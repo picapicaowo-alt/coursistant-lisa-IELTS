@@ -224,6 +224,7 @@ function TeachingOverview() {
           <TeachingState compact
             loading={today.isPending}
             error={today.error}
+            errorMessage="Today’s classes could not be loaded."
             empty="No classes scheduled for today."
             onRetry={() => void today.refetch()}
           />
@@ -310,6 +311,7 @@ function TeachingOverview() {
         ) : queue.isError || grading.isError ? (
           <TeachingState compact
             error={queue.error || grading.error}
+            errorMessage="Grading queue could not be loaded."
             onRetry={() => {
               void queue.refetch();
               void grading.refetch();
@@ -333,6 +335,7 @@ function TeachingOverview() {
           <TeachingState compact
             loading={support.isPending}
             error={support.error}
+            errorMessage="Student support details could not be loaded."
             empty="No students currently flagged for support."
             onRetry={() => void support.refetch()}
           />
@@ -367,6 +370,7 @@ function TeachingOverview() {
           <TeachingState compact
             loading={alerts.isPending}
             error={alerts.error}
+            errorMessage="Teaching alerts could not be loaded."
             empty="No teaching alerts right now."
             onRetry={() => void alerts.refetch()}
           />
@@ -408,6 +412,7 @@ function TeachingOverview() {
           <TeachingState compact
             loading={courses.isPending}
             error={courses.error}
+            errorMessage="Your teaching courses could not be loaded."
             empty="No teaching courses assigned yet."
             onRetry={() => void courses.refetch()}
           />
@@ -440,6 +445,7 @@ function TeachingOverview() {
           <TeachingState compact
             loading={requests.isPending}
             error={requests.error}
+            errorMessage="Schedule requests could not be loaded."
             empty="No schedule requests to review."
             onRetry={() => void requests.refetch()}
           />
