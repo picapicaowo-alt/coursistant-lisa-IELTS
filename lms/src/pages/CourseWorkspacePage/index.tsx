@@ -76,7 +76,7 @@ const Container: React.FC = () => {
       <PageBody
         instructorView={access.isInstructor}
         canEditCourse={access.canEditCourse}
-        canManageWeeks={access.canManageWeeks}
+        canManageTeachingContent={access.canManageTeachingContent}
         canCreateAssignments={access.canConfigureAssignments}
         canManageMaterials={access.canUploadMaterials}
         canManageEvents={access.canManageCourseEvents}

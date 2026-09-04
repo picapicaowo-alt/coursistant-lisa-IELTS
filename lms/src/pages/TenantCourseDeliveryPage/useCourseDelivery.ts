@@ -1,16 +1,24 @@
 import {useEffect, useState} from 'react';
 import {useIsMutating, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {unwrapData, type CourseDeliveryConfigResponse} from '@/apis';
+import {unwrapData, type CourseDeliveryConfigResponse, type CourseReadinessBlocker} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {courseApiService} from '@/apis/services/course-api';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
-import {getApiErrorCode, isNotFound} from '@/utils/apiError';
+import {getApiErrorCode, isApiError, isNotFound, isRecord} from '@/utils/apiError';
 import {courseManagementKeys as keys, hasVersionedGroupConfig, validDeliveryDraft} from '../advising/courseManagement';
 import type {DeliveryDraft} from './CourseDeliveryForm';
 
 const toDraft = (config?: CourseDeliveryConfigResponse | null): DeliveryDraft => ({
   catalogCode: config?.catalogCode ?? '', capacity: config?.capacity == null ? '' : String(config.capacity),
 });
+
+function transitionBlockers(error: unknown): CourseReadinessBlocker[] | undefined {
+  if (getApiErrorCode(error) !== 'COURSE_NOT_READY' || !isApiError(error) || !isRecord(error.details) || !Array.isArray(error.details.data)) return undefined;
+  return error.details.data.filter(isRecord).map(item => ({
+    code: typeof item.code === 'string' ? item.code : undefined,
+    message: typeof item.message === 'string' ? item.message : undefined,
+  })).filter(item => item.code || item.message);
+}
 
 export function useCourseDelivery(id: number) {
   const client = useQueryClient();
@@ -66,8 +74,10 @@ export function useCourseDelivery(id: number) {
       return unwrapData(await idempotency.run('putCourseDeliveryConfig', [id, {catalogCode: draft.catalogCode.trim(), capacity: Number(draft.capacity), expectedCourseLaunchVersion: reviewedVersion}] satisfies Parameters<typeof advisorApiService.putCourseDeliveryConfig>, (key, args) => advisorApiService.putCourseDeliveryConfig(...args, key)), 'advisorPutCourseDeliveryConfig');
     }, onError, onSuccess: acceptConfig,
   });
-  const canReady = groupConfig && !reloadRequired && !versionChanged && !save.isPending && !schedulePending && config.data?.launchState !== 'PUBLISHED' && Boolean(config.data?.catalogCode && config.data.capacity);
-  const canPublish = canReady && config.data?.launchState === 'READY';
+  const canTransition = groupConfig && !reloadRequired && !versionChanged && !save.isPending && !schedulePending && Boolean(config.data?.catalogCode && config.data.capacity);
+  // Readiness is a DRAFT → READY transition, not a repeatable validation read.
+  const canReady = canTransition && config.data?.launchState === 'DRAFT';
+  const canPublish = canTransition && config.data?.launchState === 'READY';
   const transition = useMutation({
     mutationFn: async (action: 'ready' | 'publish') => {
       if (!(action === 'ready' ? canReady : canPublish)) throw new Error('Load and review the current group-course configuration first.');
@@ -82,6 +92,8 @@ export function useCourseDelivery(id: number) {
   };
   return {
     course, config, sessions, draft, setDraft, save, transition, reload,
+    // A publish rejection can carry newer requirements than the config read.
+    readinessBlockers: transitionBlockers(transition.error) ?? config.data?.blockers ?? [],
     canEdit: canSaveDelivery && !transition.isPending,
     canReady: canReady && !transition.isPending,
     canPublish: canPublish && !transition.isPending,

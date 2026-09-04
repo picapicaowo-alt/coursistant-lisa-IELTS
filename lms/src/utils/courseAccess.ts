@@ -13,7 +13,7 @@ export interface CourseAccess {
   isTa: boolean;
   isStudent: boolean;
   canEditCourse: boolean;
-  canManageWeeks: boolean;
+  canManageTeachingContent: boolean;
   canConfigureAssignments: boolean;
   canGrade: boolean;
   canReleaseGrades: boolean;
@@ -30,7 +30,7 @@ export const NO_COURSE_ACCESS: CourseAccess = {
   isTa: false,
   isStudent: false,
   canEditCourse: false,
-  canManageWeeks: false,
+  canManageTeachingContent: false,
   canConfigureAssignments: false,
   canGrade: false,
   canReleaseGrades: false,
@@ -58,8 +58,8 @@ export const deriveCourseAccess = (membership?: MyCourse): CourseAccess => {
     // Configured training courses are orchestrated by their owner Advisor.
     canEditCourse: isInstructor && !membership.launchState,
     // Delivery orchestration locks course administration, not the Instructor's
-    // documented week/lecture authoring endpoints.
-    canManageWeeks: isInstructor,
+    // documented week and syllabus authoring endpoints.
+    canManageTeachingContent: isInstructor,
     canConfigureAssignments: isInstructor,
     // TA permissions are course-scoped flags and never carry to another course.
     canGrade: isInstructor || (isTa && membership.canGrade === true),

@@ -397,3 +397,49 @@ test('new group courses prepare recurring sessions before delivery locks their t
   await expect(page.getByRole('button', {name: 'Generate dates'})).toBeEnabled();
   expect(mutations).toEqual(['session', 'configure']);
 });
+
+test('ready courses can publish without repeating the draft readiness transition', async ({page}) => {
+  await setupCourse(page);
+  let launchState = 'DRAFT';
+  const writes: Array<{path: string; body: unknown}> = [];
+  const config = () => ({courseId: 71, deliveryMode: 'GROUP', catalogCode: 'IELTS', capacity: 16, launchState, courseLaunchVersion: launchState === 'DRAFT' ? 2 : launchState === 'READY' ? 3 : 4, blockers: []});
+  await page.route('**/v2/advisor/courses/71/delivery-config', route => route.fulfill({json: reply(config())}));
+  await page.route('**/v2/advisor/courses/71/launch/*', route => {
+    const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
+    writes.push({path, body: route.request().postDataJSON()});
+    launchState = path.endsWith('/ready') ? 'READY' : 'PUBLISHED';
+    return route.fulfill({json: reply(config())});
+  });
+  await page.goto('/advisor/courses/71/delivery?view=delivery');
+  await page.getByRole('button', {name: 'Validate readiness', exact: true}).click();
+  await expect(page.getByRole('button', {name: /Validate readiness|Validate again|Check readiness/})).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole('button', {name: /Validate readiness|Validate again|Check readiness/})).toHaveCount(0);
+  await page.getByRole('complementary', {name: 'Course readiness'}).getByRole('button', {name: 'Publish course', exact: true}).click();
+  await expect(page.getByRole('complementary', {name: 'Course readiness'})).toContainText('Published');
+  expect(writes).toEqual([
+    {path: '/v2/advisor/courses/71/launch/ready', body: {expectedCourseLaunchVersion: 2}},
+    {path: '/v2/advisor/courses/71/launch/publish', body: {expectedCourseLaunchVersion: 3}},
+  ]);
+});
+
+test('publish rejection exposes current readiness blockers across delivery views', async ({page}) => {
+  await setupCourse(page);
+  let missingSyllabus = true;
+  await page.route('**/v2/advisor/courses/71/delivery-config', route => route.fulfill({json: reply({courseId: 71, deliveryMode: 'GROUP', catalogCode: 'IELTS', capacity: 16, launchState: 'READY', courseLaunchVersion: 3, blockers: []})}));
+  await page.route('**/v2/advisor/courses/71/launch/publish', route => route.fulfill(missingSyllabus
+    ? {status: 409, json: {code: 'COURSE_NOT_READY', message: 'Course is not ready', data: [{code: 'SYLLABUS_REQUIRED', message: 'Current Syllabus is required'}]}}
+    : {json: reply({courseId: 71, deliveryMode: 'GROUP', catalogCode: 'IELTS', capacity: 16, launchState: 'PUBLISHED', courseLaunchVersion: 4, blockers: []})}));
+  await page.goto('/advisor/courses/71/delivery?view=schedule');
+  await page.getByRole('button', {name: 'Publish course', exact: true}).click();
+  await expect(page.getByRole('list', {name: 'Readiness blockers'})).toContainText('Current Syllabus is required');
+  await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
+  const panel = page.getByRole('complementary', {name: 'Course readiness'});
+  await expect(panel.getByRole('list', {name: 'Readiness blockers'})).toContainText('Current Syllabus is required');
+  await expect(panel).not.toContainText('No outstanding requirements.');
+  await expect(panel).not.toContainText('Ready for publication');
+  missingSyllabus = false;
+  await panel.getByRole('button', {name: 'Publish course', exact: true}).click();
+  await expect(panel).toContainText('Course published');
+  await expect(page.getByRole('list', {name: 'Readiness blockers'})).toHaveCount(0);
+});
