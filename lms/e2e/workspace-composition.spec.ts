@@ -274,20 +274,19 @@ test('schedule version conflicts stay blocked after a failed reload', async ({pa
   expect(writes).toBe(1);
 });
 
-test('registration advances through account, details and verification without losing input', async ({page}, info) => {
-  await page.goto('/signup');
-  await page.getByLabel('Email', {exact: true}).fill('learner@example.test');
-  await page.getByLabel('Institution ID', {exact: true}).fill('1');
-  await page.getByRole('button', {name: 'Continue', exact: true}).click();
-  await page.getByLabel('First name', {exact: true}).fill('Alex');
-  await page.getByLabel('Last name', {exact: true}).fill('Chen');
-  await page.getByLabel('Password', {exact: true}).fill('Registration9');
-  await page.getByLabel('Confirm password', {exact: true}).fill('Registration9');
-  await page.getByRole('button', {name: 'Continue', exact: true}).click();
-  await expect(page.getByLabel('Verification code', {exact: true})).toBeVisible();
-  for (const width of [390, 1440]) {await noOverflow(page, width); await page.screenshot({path: info.outputPath(`registration-verification-${width}.png`), fullPage: true});}
-  await page.getByRole('button', {name: 'Back', exact: true}).click();
-  await expect(page.getByLabel('First name', {exact: true})).toHaveValue('Alex');
-  await page.getByRole('button', {name: 'Back', exact: true}).click();
-  await expect(page.getByLabel('Email', {exact: true})).toHaveValue('learner@example.test');
+test('public registration links are hidden and bookmarked signup returns to login', async ({page}) => {
+  const registrationRequests: string[] = [];
+  await page.route('**/v1/auth/**', route => {
+    registrationRequests.push(route.request().url());
+    return route.abort();
+  });
+  await page.goto('/signup?invitation=legacy');
+  await expect(page).toHaveURL(/\/login$/);
+  await expect(page.getByRole('heading', {name: 'Welcome to X-Learn', exact: true})).toBeVisible();
+  await expect(page.locator('a[href="/signup"]')).toHaveCount(0);
+  await expect(page.getByLabel('Verification code', {exact: true})).toHaveCount(0);
+  await page.getByRole('link', {name: 'Forgot password?', exact: true}).click();
+  await expect(page.getByRole('heading', {name: 'Forgot password?', exact: true})).toBeVisible();
+  await expect(page.locator('a[href="/signup"]')).toHaveCount(0);
+  expect(registrationRequests).toEqual([]);
 });
