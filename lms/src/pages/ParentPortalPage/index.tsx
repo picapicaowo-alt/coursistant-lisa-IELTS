@@ -17,6 +17,7 @@ import {parentStudentName, asRecord, parentText} from './parentPresentation';
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLinkedStudents } from "./useLinkedStudents";
+import {formatPersonName} from '@/utils/personName';
 import { ParentAcademicSections } from "./ParentAcademicSections";
 import parentStyles from "./index.module.scss";
 import {
@@ -30,6 +31,7 @@ import {
   unwrapData,
   type ParentConversationMessageResponse,
   type ParentNotification,
+  type ParentStudentSummary,
 } from "@/apis";
 import { parentApiService } from "@/apis/services/parent-api";
 import { advisingErrorMessage } from "../advising/advisingErrors";
@@ -78,8 +80,9 @@ const numberField = (
 const ParentStudentWorkspace: React.FC<{
   studentUserId: number;
   studentIds: number[];
+  students: ParentStudentSummary[];
   onStudentChange: (id: number) => void;
-}> = ({ studentUserId, studentIds, onStudentChange }) => {
+}> = ({ studentUserId, studentIds, students, onStudentChange }) => {
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [notificationPage, setNotificationPage] = useState(0);
@@ -365,12 +368,12 @@ const ParentStudentWorkspace: React.FC<{
             >
               {studentIds.map((id) => (
                 <option value={id} key={id}>
-                  {parentStudentName(queryClient.getQueryData(['parent', id, 'section', 'dashboard', 0]), `Student #${id}`)}
+                  {formatPersonName(students.find(student => student.studentUserId === id), parentStudentName(queryClient.getQueryData(['parent', id, 'section', 'dashboard', 0]), `Student #${id}`))}
                 </option>
               ))}
             </select>
             <ChevronDown size={17} aria-hidden="true"/>
-          </label> : <strong>{parentStudentName(studentSummary.data, `Student #${studentUserId}`)}</strong>}
+          </label> : <strong>{formatPersonName(students.find(student => student.studentUserId === studentUserId), parentStudentName(studentSummary.data, `Student #${studentUserId}`))}</strong>}
         {parentText(asRecord(asRecord(studentSummary.data)?.student), 'email') ? <><span className={parentStyles.studentDivider} aria-hidden="true">·</span><span>{parentText(asRecord(asRecord(studentSummary.data)?.student), 'email')}</span></> : null}
       </div>
 
@@ -749,6 +752,7 @@ const ParentPortalPage: React.FC = () => {
         key={selectedId}
         studentUserId={selectedId}
         studentIds={ids}
+        students={linked.data ?? []}
         onStudentChange={(id) =>
           setParams((current) => {
             const next = new URLSearchParams(current);

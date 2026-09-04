@@ -51,7 +51,7 @@ describe('FileSection', () => {
       );
       
       expect(screen.getByText(/test-file.pdf/)).toBeInTheDocument();
-      expect(screen.getByText(/1.0 MB/)).toBeInTheDocument();
+      expect(screen.getByText(/1 KB/)).toBeInTheDocument();
       expect(screen.getByRole('button', {name: /drag and drop/i})).toBeInTheDocument();
     });
     
@@ -65,7 +65,7 @@ describe('FileSection', () => {
       );
       
       expect(screen.getByText(/test-file.pdf/)).toBeInTheDocument();
-      expect(screen.getByText(/1.0 MB/)).toBeInTheDocument();
+      expect(screen.getByText(/1 KB/)).toBeInTheDocument();
     });
     
     it('renders empty state when no files', () => {
@@ -244,6 +244,19 @@ describe('FileSection', () => {
       });
     });
     
+    it('removes failed temporary uploads locally without deleting a server file', async () => {
+      const onDelete = vi.fn();
+      mockUploadFunction.mockRejectedValue(new Error('Upload failed'));
+      const {container} = render(<FileSection files={[]} uploadFunction={mockUploadFunction} onUploaded={mockOnUploaded} onDelete={onDelete}/>);
+      const input = await simulateFileInputChange(container, createTestFile());
+      fireEvent.change(input);
+      await screen.findByText('Upload failed');
+      fireEvent.click(screen.getByRole('button', {name: 'Delete test.pdf'}));
+      await waitFor(() => expect(screen.queryByText('Upload failed')).not.toBeInTheDocument());
+      expect(onDelete).not.toHaveBeenCalled();
+      expect(mockOnUploaded).not.toHaveBeenCalled();
+    });
+
     it('calls onUploaded callback with correct data on successful upload', async () => {
       const mockFile = createTestFile();
       mockUploadFunction.mockResolvedValue('uploaded-file-id');

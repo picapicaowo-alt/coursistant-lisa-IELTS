@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {ArrowRight, CalendarDays, Globe2, MapPin, Plus} from 'lucide-react';
-import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
+import {useIsMutating, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {unwrapData, type CourseResponse, type CourseSession, type CourseSessionPayload} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
@@ -30,8 +30,10 @@ function SessionFields({draft, onChange}: {draft: CourseSessionPayload; onChange
   </>;
 }
 
-export function OwnerCourseSchedule({courseId, course, readOnly}: {courseId: number; course: CourseResponse; readOnly: boolean}) {
+export function OwnerCourseSchedule({courseId, course, readOnly, canGenerateDates}: {courseId: number; course: CourseResponse; readOnly: boolean; canGenerateDates: boolean}) {
   const client = useQueryClient();
+  // Schedule writes survive tab changes; block new actions after this view remounts.
+  const schedulePending = useIsMutating({mutationKey: keys.scheduleWrites(courseId)}) > 0;
   const idempotency = useIdempotencyCheckpoint();
   const [draft, setDraft] = useState<CourseSessionPayload>(emptySession);
   const [editing, setEditing] = useState<{id: number; draft: CourseSessionPayload} | null>(null);
@@ -71,12 +73,12 @@ export function OwnerCourseSchedule({courseId, course, readOnly}: {courseId: num
   const generate = useMutation({
     mutationKey: keys.scheduleWrites(courseId),
     mutationFn: async () => {
-      if (!canWrite || !occurrences.isSuccess || !range.from || !range.to || range.to < range.from) throw new Error('Load the schedule and select a valid date range first.');
+      if (!canGenerateDates || !sessions.isSuccess || !occurrences.isSuccess || !range.from || !range.to || range.to < range.from) throw new Error('Load the schedule and select a valid date range first.');
       return idempotency.run('owner-generate-occurrences', [courseId, range] as const, async (key, args) => unwrapData(await courseOperationsApiService.generateSessionOccurrences(...args, key), 'generateSessionOccurrences'));
     },
     onSuccess: async () => {setGenerationOpen(false); await refreshSchedule();},
   });
-  const busy = create.isPending || update.isPending || generate.isPending;
+  const busy = schedulePending || create.isPending || update.isPending || generate.isPending;
   // Occurrence reads can fail independently of a successfully loaded course and weekly schedule.
   const error = sessions.error || create.error || update.error || generate.error;
   const visibleOccurrences = showAllOccurrences ? occurrences.data : occurrences.data?.slice(0, 8);
@@ -114,14 +116,14 @@ export function OwnerCourseSchedule({courseId, course, readOnly}: {courseId: num
       </form>
     </section> : null}
 
-    {datesOpen && !readOnly && !occurrences.isError && generationOpen ? <section className={styles.editorPanel} aria-labelledby="generate-occurrences-title">
+    {datesOpen && canGenerateDates && !occurrences.isError && generationOpen ? <section className={styles.editorPanel} aria-labelledby="generate-occurrences-title">
       <header className={styles.panelHeader}><div><h2 id="generate-occurrences-title">Generate dated occurrences</h2><p>Create calendar dates after the recurring pattern is complete.</p></div></header>
-      <form className={styles.formGrid} onSubmit={event => {event.preventDefault(); if (canWrite && !busy) generate.mutate();}}><label className={styles.field}>Generate from<EnglishDateInput required value={range.from} onChangeValue={from => setRange(current => ({...current, from}))} /></label><label className={styles.field}>Generate through<EnglishDateInput required value={range.to} onChangeValue={to => setRange(current => ({...current, to}))} /></label><div className={styles.formActions}><button type="button" className={styles.secondaryButton} onClick={() => setGenerationOpen(false)}>Cancel</button><button type="submit" className={styles.primaryButton} disabled={!canWrite || busy || !range.from || !range.to || range.to < range.from || !sessions.data?.length}>{generate.isPending ? 'Generating…' : 'Generate occurrences'}</button></div></form>
+      <form className={styles.formGrid} onSubmit={event => {event.preventDefault(); if (canGenerateDates && !busy) generate.mutate();}}><label className={styles.field}>Generate from<EnglishDateInput required value={range.from} onChangeValue={from => setRange(current => ({...current, from}))} /></label><label className={styles.field}>Generate through<EnglishDateInput required value={range.to} onChangeValue={to => setRange(current => ({...current, to}))} /></label><div className={styles.formActions}><button type="button" className={styles.secondaryButton} onClick={() => setGenerationOpen(false)}>Cancel</button><button type="submit" className={styles.primaryButton} disabled={!canGenerateDates || busy || !range.from || !range.to || range.to < range.from || !sessions.data?.length}>{generate.isPending ? 'Generating…' : 'Generate occurrences'}</button></div></form>
     </section> : null}
 
     <button type="button" className={styles.textAction} aria-expanded={datesOpen} aria-controls="course-class-dates" onClick={() => setDatesOpen(current => !current)}>{datesOpen ? 'Hide class dates' : 'View class dates'}<CalendarDays size={16} aria-hidden="true" /></button>
     {datesOpen ? <section id="course-class-dates" className={styles.occurrenceTableWrap} aria-labelledby="upcoming-occurrences-title">
-      <header className={styles.panelHeader}><div><h2 id="upcoming-occurrences-title">Course occurrences</h2></div>{!readOnly && occurrences.isSuccess ? <button type="button" className={styles.secondaryButton} disabled={busy || !sessions.data?.length} onClick={() => {setRange(termRange); setGenerationOpen(true);}}>Generate dates</button> : null}</header>
+      <header className={styles.panelHeader}><div><h2 id="upcoming-occurrences-title">Course occurrences</h2></div>{canGenerateDates && occurrences.isSuccess ? <button type="button" className={styles.secondaryButton} disabled={busy || !sessions.data?.length} onClick={() => {setRange(termRange); setGenerationOpen(true);}}>Generate dates</button> : null}</header>
       {occurrences.isPending ? <p role="status" className={styles.helper}>Loading course occurrences…</p> : null}
       {occurrences.isError ? <p className={styles.helper} role="alert">{datesError} <button type="button" className={styles.textAction} disabled={occurrences.isFetching} onClick={() => void occurrences.refetch()}>{occurrences.isFetching ? 'Loading…' : 'Try again'}</button></p> : null}
       {visibleOccurrences?.length ? <table className={styles.occurrenceTable}><thead><tr><th>Date</th><th>Time</th><th>Location</th><th>Status</th></tr></thead><tbody>{visibleOccurrences.map(item => {

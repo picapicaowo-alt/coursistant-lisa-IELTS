@@ -31,7 +31,7 @@ test("parent sees later linked students, nested academic data and independent le
       const page = Number(url.searchParams.get("page") ?? 0);
       linkedPages.push(page);
       data = {
-        items: [{ studentUserId: page === 0 ? 301 : 302 }],
+        items: [{ studentUserId: page === 0 ? 301 : 302, firstName: page === 0 ? "Alex" : "Robin", lastName: "Chen" }],
         page,
         size: 1,
         total: 2,
@@ -85,6 +85,8 @@ test("parent sees later linked students, nested academic data and independent le
     page.getByRole("combobox", { name: "Student", exact: true }),
   ).toHaveValue("301");
   expect(linkedPages).toEqual([0, 1]);
+  await expect(page.getByRole("option", {name: "Robin Chen", exact: true})).toBeAttached();
+  expect(reads.some(path => path.includes("/students/302/dashboard"))).toBe(false);
   await expect(page.getByText("Draft an introduction")).toBeVisible();
   await page.getByRole("link", { name: "Attendance & hours", exact: true }).click();
   await expect(

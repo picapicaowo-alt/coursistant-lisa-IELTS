@@ -1,3 +1,4 @@
+import {formatInstructorName} from '@/utils/personName';
 import type {CourseDeliveryConfigResponse, CourseResponse, CourseSession} from '@/apis';
 import {courseDeliveryLabel, courseTermLabel} from '../advising/courseManagement';
 import styles from '../advising/CourseManagement.module.scss';
@@ -18,7 +19,7 @@ export function CourseDeliveryOverview({course, config, sessions, sessionsPendin
         <div><dt>Delivery type</dt><dd>{courseDeliveryLabel(config?.deliveryMode)}</dd></div>
         <div><dt>Capacity</dt><dd>{config?.capacity == null ? 'Not configured' : `${config.capacity} students`}</dd></div>
         <div><dt>Term</dt><dd>{course ? courseTermLabel(course) : 'Loading…'}</dd></div>
-        <div><dt>Primary instructor</dt><dd>{course?.primaryInstructor?.name || course?.primaryInstructor?.email || 'Not assigned'}</dd></div>
+        <div><dt>Primary instructor</dt><dd>{formatInstructorName(course?.primaryInstructor, course?.primaryInstructor?.email || 'Not assigned')}</dd></div>
       </dl>
     </section>
     <section className={styles.panel} aria-labelledby="schedule-summary-title">

@@ -8,6 +8,13 @@ const service = new AdvisorApiService(client as unknown as typeof V2ApiClient);
 describe('AdvisorApiService', () => {
   beforeEach(() => vi.clearAllMocks());
 
+  it('loads subsequent cohort pages for assignment pickers using the returned page size', async () => {
+    client.get.mockResolvedValueOnce({code: 'SUCCESS', data: {items: [{studentUserId: 41}], page: 0, size: 1, total: 2}})
+      .mockResolvedValueOnce({code: 'SUCCESS', data: {items: [{studentUserId: 42}], page: 1, size: 1, total: 2}});
+    expect((await service.listAllStudents()).data).toEqual([{studentUserId: 41}, {studentUserId: 42}]);
+    expect(client.get).toHaveBeenNthCalledWith(2, '/v2/advisor/students', {params: {page: 1, size: 1}});
+  });
+
   it('lists current-assignment students and intake', async () => {
     client.get.mockResolvedValue({status: 200, data: {items: []}});
     await service.listStudents(0, 20);

@@ -28,7 +28,7 @@ $spacing-xl: 1.25rem;
     border-radius: $rounded;
     padding: $spacing-md $spacing-lg;
     background-color: white;
-    cursor: pointer;
+    cursor: default;
     transition: all 0.2s ease-in-out;
     
     &:hover {

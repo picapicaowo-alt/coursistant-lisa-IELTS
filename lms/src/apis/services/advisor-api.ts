@@ -1,4 +1,5 @@
 import type {AdvisorStudentFilters, AdvisorInstructor, AdvisorOwnedCourse, AdvisorOwnedCourseFilters, AdvisorConversationSummary, AdvisorStudentHub} from '../types/advisorWorkspace';
+import {readCollection} from './readCollection';
 import {
   AdvisingPage,
   AdvisorStudentProfileResponse,
@@ -48,6 +49,11 @@ export class AdvisorApiService {
 
   listStudents(page = 0, size = 20, filters: AdvisorStudentFilters = {}): Promise<ApiResponse<AdvisingPage<AdvisorStudentSummaryResponse>>> {
     return this.apiClient.get('/v2/advisor/students', {params: {page, size, ...filters}});
+  }
+
+  /** Assignment pickers must include students beyond the directory's first page. */
+  listAllStudents(): Promise<ApiResponse<AdvisorStudentSummaryResponse[]>> {
+    return readCollection(({page, size}) => this.listStudents(page, size));
   }
 
   listInstructors(params: {q?: string; page?: number; size?: number} = {}): Promise<ApiResponse<AdvisingPage<AdvisorInstructor>>> {

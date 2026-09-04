@@ -337,6 +337,9 @@ export type GradeStatus = 'Ungraded' | 'Entered' | 'Released' | string;
 
 export interface GradingRosterItem {
   studentUserId?: number;
+  studentFirstName?: string | null;
+  studentMiddleName?: string | null;
+  studentLastName?: string | null;
   studentName?: string;
   studentEmail?: string;
   groupId?: number;

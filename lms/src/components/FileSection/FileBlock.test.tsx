@@ -18,8 +18,9 @@ vi.mock('react-i18next', () => ({
   })
 }));
 
-vi.mock('@/utils/file-utils', () => ({
-  getFileIcon: (ext: string) => `/icons/${ext.toLowerCase()}.png`
+vi.mock('@/utils/file-utils', async importOriginal => ({
+  ...await importOriginal<typeof import('@/utils/file-utils')>(),
+  getFileIcon: (ext: string) => `/icons/${ext.toLowerCase()}.png`,
 }));
 
 describe('FileBlock', () => {
@@ -40,7 +41,7 @@ describe('FileBlock', () => {
       render(<FileBlock block={baseFile}/>);
       
       expect(screen.getByText(/test-file.pdf/)).toBeInTheDocument();
-      expect(screen.getByText('1.0 MB')).toBeInTheDocument();
+      expect(screen.getByText('1 KB')).toBeInTheDocument();
     });
     
     it('shows file icon with correct attributes', () => {
@@ -149,7 +150,7 @@ describe('FileBlock', () => {
   describe('Action Buttons', () => {
     const onDelete = vi.fn().mockResolvedValue(undefined);
 
-    it('shows retry button when in error state', () => {
+    it('explains the supported retry action after an upload error', () => {
       const errorFile: FileView = {
         ...baseFile,
         uploadStatus: 'error',
@@ -158,9 +159,8 @@ describe('FileBlock', () => {
       
       render(<FileBlock block={errorFile}/>);
       
-      const retryButton = screen.getByTitle('Retry');
-      expect(retryButton).toBeInTheDocument();
-      expect(retryButton.querySelector('svg')).toBeInTheDocument();
+      expect(screen.getByText('Choose the file again to retry.')).toBeInTheDocument();
+      expect(screen.queryByTitle('Retry')).not.toBeInTheDocument();
     });
     
     it('hides retry button when not in error state', () => {
@@ -197,20 +197,6 @@ describe('FileBlock', () => {
       
       const deleteButton = screen.getByTitle('Delete file');
       expect(deleteButton).not.toBeDisabled();
-    });
-    
-    it('handles retry button click', () => {
-      const errorFile: FileView = {
-        ...baseFile,
-        uploadStatus: 'error',
-        errorMessage: 'Upload failed'
-      };
-      
-      render(<FileBlock block={errorFile}/>);
-      
-      // We can't easily test the click handler since it's internal to the component
-      // But we can at least verify the button exists and is accessible
-      expect(screen.getByTitle('Retry')).toBeInTheDocument();
     });
     
     it('handles delete button click', async () => {

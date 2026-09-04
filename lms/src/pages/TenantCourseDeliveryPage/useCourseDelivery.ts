@@ -47,6 +47,9 @@ export function useCourseDelivery(id: number) {
   const knownConfig = course.isSuccess && config.isSuccess && !config.isFetching && draftLoaded;
   const groupConfig = knownConfig && hasVersionedGroupConfig(config.data);
   const canEdit = knownConfig && (config.data === null || groupConfig) && !reloadRequired && !versionChanged && !schedulePending;
+  // Dev locks recurring templates once delivery is configured. Prepare at least
+  // one session first so new group courses cannot enter an unschedulable draft.
+  const canSaveDelivery = canEdit && (config.data !== null || (sessions.isSuccess && !sessions.isFetching && sessions.data.length > 0));
   const acceptConfig = async (next: CourseDeliveryConfigResponse) => {
     client.setQueryData(keys.delivery(id), next);
     setReviewedVersion(next.courseLaunchVersion);
@@ -59,7 +62,7 @@ export function useCourseDelivery(id: number) {
   };
   const save = useMutation({
     mutationFn: async () => {
-      if (!canEdit || !validDeliveryDraft(draft)) throw new Error('Load the current delivery details and enter a valid catalog code and capacity.');
+      if (!canSaveDelivery || !validDeliveryDraft(draft)) throw new Error('Add a recurring session, then enter a valid catalog code and capacity.');
       return unwrapData(await idempotency.run('putCourseDeliveryConfig', [id, {catalogCode: draft.catalogCode.trim(), capacity: Number(draft.capacity), expectedCourseLaunchVersion: reviewedVersion}] satisfies Parameters<typeof advisorApiService.putCourseDeliveryConfig>, (key, args) => advisorApiService.putCourseDeliveryConfig(...args, key)), 'advisorPutCourseDeliveryConfig');
     }, onError, onSuccess: acceptConfig,
   });
@@ -79,10 +82,11 @@ export function useCourseDelivery(id: number) {
   };
   return {
     course, config, sessions, draft, setDraft, save, transition, reload,
-    canEdit: canEdit && !transition.isPending,
+    canEdit: canSaveDelivery && !transition.isPending,
     canReady: canReady && !transition.isPending,
     canPublish: canPublish && !transition.isPending,
-    canSchedule: groupConfig && config.data?.launchState !== 'PUBLISHED' && !reloadRequired && !versionChanged && !transition.isPending && !save.isPending,
+    canSchedule: knownConfig && config.data === null && !reloadRequired && !versionChanged && !transition.isPending && !save.isPending,
+    canGenerateDates: groupConfig && config.data?.launchState !== 'PUBLISHED' && !reloadRequired && !versionChanged && !transition.isPending && !save.isPending,
     reloadRequired: reloadRequired || versionChanged,
     error: course.error || config.error || sessions.error || save.error || transition.error,
   };

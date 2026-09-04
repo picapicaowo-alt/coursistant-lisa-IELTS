@@ -68,7 +68,12 @@ test('release audit: failed schedule writes retry idempotently and block launch 
   await page.getByRole('button', {name: 'Generate occurrences', exact: true}).click();
   await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
   await expect(page.getByRole('button', {name: 'Validate readiness'})).toBeDisabled();
+  await page.getByRole('tab', {name: 'Schedule', exact: true}).click();
+  await page.getByRole('button', {name: 'View class dates'}).click();
+  await expect(page.getByRole('button', {name: 'Generate dates'})).toBeDisabled();
   releaseRequest();
+  await expect(page.getByRole('button', {name: 'Generate dates'})).toBeEnabled();
+  await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
   await expect(page.getByRole('button', {name: 'Validate readiness'})).toBeEnabled();
   expect(keys).toHaveLength(2);
   expect(keys[0]).toBeTruthy();
@@ -147,7 +152,7 @@ test('release audit: only the precise config-not-found response enables first co
       await expect(page.getByLabel('Catalog code', {exact: true})).toBeVisible();
       await expect(page.getByRole('button', {name: 'Configure delivery'})).toBeDisabled();
       await page.getByRole('tab', {name: 'Schedule', exact: true}).click();
-      await expect(page.getByRole('button', {name: 'Add session', exact: true})).toHaveCount(0);
+      await expect(page.getByRole('button', {name: 'Add session', exact: true})).toBeEnabled();
     }
   }
 });
@@ -187,6 +192,7 @@ test('release audit: direct schedule load generates course-local term dates thro
 
 test('release audit: recurring edit and duplicate use complete templates and distinct idempotent operations', async ({page}) => {
   await setupCourse(page);
+  await page.route('**/v2/advisor/courses/71/delivery-config', route => route.fulfill({status: 404, json: {code: 'COURSE_DELIVERY_CONFIG_NOT_FOUND'}}));
   const writes: Array<{method: string; body: unknown; key?: string}> = [];
   const session = {id: 31, courseId: 71, type: 'Lecture', dayOfWeek: 'WED', startTime: '14:00:00', endTime: '15:30:00', location: 'Room 302', timezone: 'Asia/Singapore'};
   await page.route('**/v2/courses/71/sessions*', route => {
@@ -352,4 +358,42 @@ test('release audit: maximum-length catalog codes stay within course cards', asy
     });
     expect(codeBox!.x + codeBox!.width, JSON.stringify(containers)).toBeLessThanOrEqual(cardBox!.x + cardBox!.width);
   }
+});
+
+test('new group courses prepare recurring sessions before delivery locks their templates', async ({page}) => {
+  await setupCourse(page);
+  let configured = false;
+  const sessions: Array<{id: number; type: string; dayOfWeek: string; startTime: string; endTime: string}> = [];
+  const mutations: string[] = [];
+  await page.route('**/v2/advisor/courses/71/delivery-config', route => {
+    if (route.request().method() === 'PUT') {configured = true; mutations.push('configure');}
+    return configured
+      ? route.fulfill({json: reply({courseId: 71, deliveryMode: 'GROUP', catalogCode: 'QA-WR', capacity: 2, launchState: 'DRAFT', courseLaunchVersion: 0})})
+      : route.fulfill({status: 404, json: {code: 'COURSE_DELIVERY_CONFIG_NOT_FOUND'}});
+  });
+  await page.route('**/v2/courses/71/sessions', route => {
+    if (route.request().method() === 'POST') {
+      expect(configured).toBe(false);
+      mutations.push('session');
+      sessions.push({id: 32, ...route.request().postDataJSON()});
+    }
+    return route.fulfill({json: reply(route.request().method() === 'GET' ? sessions : sessions.at(-1))});
+  });
+  await page.goto('/advisor/courses/71/delivery');
+  await page.getByLabel('Catalog code', {exact: true}).fill('QA-WR');
+  await page.getByLabel('Capacity', {exact: true}).fill('2');
+  await expect(page.getByRole('button', {name: 'Configure delivery', exact: true})).toBeDisabled();
+  await page.getByRole('button', {name: 'Set up schedule', exact: true}).click();
+  await page.getByRole('button', {name: 'Add session', exact: true}).click();
+  await page.getByRole('textbox', {name: 'Start time Open time picker', exact: true}).fill('11:00 AM');
+  await page.getByRole('textbox', {name: 'End time Open time picker', exact: true}).fill('11:30 AM');
+  await page.getByRole('region', {name: 'Add recurring session'}).getByRole('button', {name: 'Add session', exact: true}).click();
+  await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
+  await page.getByRole('button', {name: 'Configure delivery', exact: true}).click();
+  await expect(page.getByText('Version 0', {exact: true})).toBeVisible();
+  await page.getByRole('tab', {name: 'Schedule', exact: true}).click();
+  await expect(page.getByRole('button', {name: 'Add session', exact: true})).toHaveCount(0);
+  await page.getByRole('button', {name: 'View class dates', exact: true}).click();
+  await expect(page.getByRole('button', {name: 'Generate dates'})).toBeEnabled();
+  expect(mutations).toEqual(['session', 'configure']);
 });

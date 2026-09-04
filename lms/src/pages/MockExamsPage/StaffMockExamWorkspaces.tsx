@@ -20,6 +20,7 @@ import {
 import { unwrapData } from "@/apis";
 import { advisorApiService } from "@/apis/services/advisor-api";
 import { mockExamApiService } from "@/apis/services/mock-exam-api";
+import { formatPersonName } from "@/utils/personName";
 import { RecordSummaryList } from "@/components/RecordSummaryList";
 import { advisingErrorMessage } from "../advising/advisingErrors";
 import {
@@ -200,9 +201,9 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
     queryKey: ["advisor", "students", "mock-exam-assignment"],
     retry: false,
     queryFn: async () =>
-      unwrapData(await advisorApiService.listStudents(), "advisorStudents"),
+      unwrapData(await advisorApiService.listAllStudents(), "advisorStudents"),
   });
-  const studentRows = runtimeItems(students.data);
+  const studentRows = students.data ?? [];
   const [studentId, setStudentId] = useState("");
   const [assignmentCount, setAssignmentCount] = useState<number>();
   const [templateId, setTemplateId] = useState("");
@@ -278,11 +279,11 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               >
                 <option value="">Choose a student from your cohort</option>
                 {studentRows.map((student) => {
-                  const id = idFrom(student, "studentUserId", "userId");
+                  const id = student.studentUserId;
                   return id ? (
                     <option value={id} key={id}>
-                      {recordLabel(student, `Student ${id}`)} ·{" "}
-                      {runtimeString(student, "email") || `ID ${id}`}
+                      {formatPersonName(student, `Student ${id}`)} ·{" "}
+                      {student.email || `ID ${id}`}
                     </option>
                   ) : null;
                 })}
@@ -290,6 +291,9 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               <ChevronDown size={18} aria-hidden="true"/>
               </span>
             </label>
+            {students.isSuccess && studentRows.length === 0 ? (
+              <p className={styles.full} role="status">No students are assigned to you yet. Ask a counsellor to complete the advisor handover.</p>
+            ) : null}
             <label className={styles.full}>
               <span>Published template</span>
               <span className={assignStyles.selectControl}>
@@ -312,6 +316,9 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               <ChevronDown size={18} aria-hidden="true"/>
               </span>
             </label>
+            {templates.length === 0 ? (
+              <p className={styles.full} role="status">No published papers are available. A tenant administrator must publish a complete mock exam before you can assign it.</p>
+            ) : null}
             {templateId ? (
               <div className={styles.full} aria-label="Selected paper details">
                 {selectedTemplate.isPending ? (
