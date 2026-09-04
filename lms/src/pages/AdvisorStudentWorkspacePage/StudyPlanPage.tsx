@@ -216,7 +216,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
       {save.isSuccess ? <p className={styles.success} role="status">Study plan saved.</p> : null}
       {!missing && !isEditing && planQuery.data?.plan ? <LearningJourney plan={planQuery.data.plan} studentUserId={id} checkpointTarget={checkpointTarget} taskTarget={taskTarget} onEdit={(checkpointId, taskId) => {if (checkpointId || taskId) {const next = new URLSearchParams(searchParams); if (checkpointId) next.set('checkpointId', String(checkpointId)); if (taskId) next.set('advisorTaskId', String(taskId)); setSearchParams(next);} setIsEditing(true);}}/> : null}
       {missing || isEditing ? <form className={`${styles.form} ${layout.planForm}`} onSubmit={(event: FormEvent) => { event.preventDefault(); save.mutate(); }}>
-        <WorkspaceSection title="Plan direction" headingLevel={3} summary={form.strategySummary || 'Set the strategy and plan dates'}>
+        <WorkspaceSection appearance="record" title="Plan direction" headingLevel={3} summary={form.strategySummary || 'Set the strategy and plan dates'}>
           <p>Keep the strategy concise enough to scan, while making the start and end dates explicit.</p>
           <div className={styles.formGrid}>
             <label className={styles.spanTwo}><span>Strategy</span><textarea required value={form.strategySummary} onChange={event => setForm(current => ({...current, strategySummary: event.target.value}))}/></label>
@@ -224,7 +224,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
             <label><span>End date</span><EnglishDateInput required value={form.planEndDate} onChangeValue={planEndDate => setForm(current => ({...current, planEndDate}))}/></label>
           </div>
         </WorkspaceSection>
-        <WorkspaceSection title="Checkpoints and tasks" headingLevel={3} count={form.checkpoints.length} summary="Milestones, due dates and student actions">
+        <WorkspaceSection appearance="record" title="Checkpoints and tasks" headingLevel={3} count={form.checkpoints.length} summary="Milestones, due dates and student actions">
           <p>Expand the milestones and tasks you want to work on. Each can stay open independently.</p>
           {form.checkpoints.map((checkpoint, index) => (
             <CollapsibleSection key={`${checkpoint.position}-${index}`} title={checkpoint.description.trim() || `Checkpoint ${index + 1}`} headingLevel={4} summary={`${checkpoint.dueDate ? `Due ${checkpoint.dueDate}` : 'Due date not set'} · ${(checkpoint.tasks ?? []).length} tasks`} revealKey={addedCheckpoint === index ? index + 1 : checkpoint.id === checkpointTarget || checkpoint.tasks?.some(task => task.id === taskTarget) ? checkpointTarget || taskTarget : undefined}>

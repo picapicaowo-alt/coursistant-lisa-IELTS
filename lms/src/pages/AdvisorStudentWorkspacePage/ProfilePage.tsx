@@ -185,26 +185,24 @@ const AdvisorStudentProfilePage: React.FC = () => {
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'Profile could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Profile saved.</p> : null}
       <form className={`${styles.form} ${layout.profileForm}`} onSubmit={onSubmit}>
-        <WorkspaceSection title="Student context" headingLevel={3} summary={form.academicBackground || 'Background, contact and baseline assessment'}>
-          <p>Summarize information that helps future planning. Leave optional fields blank when the information is not yet known.</p>
-          <div className={styles.formGrid}>
+        <WorkspaceSection title="Student context" headingLevel={3} appearance="record" className={layout.profileCard}>
+          <div className={`${layout.profileFields} ${layout.contextFields}`}>
             <label><span>Contact phone</span><input value={form.contactPhone} onChange={event => setForm(current => ({...current, contactPhone: event.target.value}))}/></label>
-            <label className={styles.spanTwo}><span>Academic background</span><textarea value={form.academicBackground} onChange={event => setForm(current => ({...current, academicBackground: event.target.value}))}/></label>
+            <label className={layout.fullField}><span>Academic background</span><textarea value={form.academicBackground} onChange={event => setForm(current => ({...current, academicBackground: event.target.value}))}/></label>
             <label><span>Prior test experience</span><textarea value={form.priorTestExperience} onChange={event => setForm(current => ({...current, priorTestExperience: event.target.value}))}/></label>
             <label><span>Baseline assessment</span><textarea value={form.baselineAssessment} onChange={event => setForm(current => ({...current, baselineAssessment: event.target.value}))}/></label>
           </div>
         </WorkspaceSection>
-        <WorkspaceSection title="Primary target" headingLevel={3} summary={[form.targetMetric, form.targetValue, form.targetDate].filter(Boolean).join(' · ') || 'Set a goal and target date'}>
-          <p>Define the overall outcome. Individual skills and their current-to-target gaps are recorded in the next section.</p>
-          <div className={styles.formGrid}>
-            <label className={styles.spanTwo}><span>Target goal</span><input value={form.targetGoal} onChange={event => setForm(current => ({...current, targetGoal: event.target.value}))}/></label>
+        <WorkspaceSection appearance="record" className={layout.profileCard} title="Primary target" headingLevel={3} summary={[form.targetMetric, form.targetValue, form.targetDate].filter(Boolean).join(' · ') || 'Set a goal and target date'}>
+          <div className={layout.profileFields}>
+            <label className={layout.fullField}><span>Target goal</span><input value={form.targetGoal} onChange={event => setForm(current => ({...current, targetGoal: event.target.value}))}/></label>
             <label><span>Target metric</span><input value={form.targetMetric} onChange={event => setForm(current => ({...current, targetMetric: event.target.value}))}/></label>
             <label><span>Target value</span><input value={form.targetValue} onChange={event => setForm(current => ({...current, targetValue: event.target.value}))}/></label>
-            <label><span>Target date</span><EnglishDateInput value={form.targetDate} onChangeValue={targetDate => setForm(current => ({...current, targetDate}))}/></label>
-            <label className={styles.spanTwo}><span>Advisor interpretation</span><textarea value={form.advisorInterpretation} onChange={event => setForm(current => ({...current, advisorInterpretation: event.target.value}))}/></label>
+            <label className={layout.fullField}><span>Target date</span><EnglishDateInput value={form.targetDate} onChangeValue={targetDate => setForm(current => ({...current, targetDate}))}/></label>
+            <label className={layout.fullField}><span>Advisor interpretation</span><textarea value={form.advisorInterpretation} onChange={event => setForm(current => ({...current, advisorInterpretation: event.target.value}))}/></label>
           </div>
         </WorkspaceSection>
-        <WorkspaceSection title="Measured skills" headingLevel={3} summary={`${form.skills.length} measured ${form.skills.length === 1 ? 'skill' : 'skills'}`}>
+        <WorkspaceSection appearance="record" title="Measured skills" headingLevel={3} summary={`${form.skills.length} measured ${form.skills.length === 1 ? 'skill' : 'skills'}`}>
           <p>Use one skill per measurable area. The code is a stable record identifier; the display name is the label people will understand.</p>
           {form.skills.map((skill, index) => (
             <CollapsibleSection key={`${skill.position}-${index}`} title={skill.displayName || `Skill ${index + 1}`} headingLevel={4} revealKey={addedSkill === index ? index + 1 : undefined} summary={[skill.scale, skill.currentValue ? `Current ${skill.currentValue}` : '', skill.targetValue ? `Target ${skill.targetValue}` : ''].filter(Boolean).join(' · ') || 'Add a name and measurement'}>
@@ -214,18 +212,18 @@ const AdvisorStudentProfilePage: React.FC = () => {
                 <label><span>Measurement scale</span><input value={skill.scale} onChange={event => setSkill(index, {scale: event.target.value})}/><small className={styles.fieldHelp}>The scoring system used for both current and target values.</small></label>
                 <label><span>Current value</span><input value={skill.currentValue} onChange={event => setSkill(index, {currentValue: event.target.value})}/></label>
                 <label><span>Target value</span><input value={skill.targetValue} onChange={event => setSkill(index, {targetValue: event.target.value})}/></label>
-                <label className={styles.spanTwo}><span>Gap summary</span><textarea value={skill.gapSummary} onChange={event => setSkill(index, {gapSummary: event.target.value})}/><small className={styles.fieldHelp}>Explain what needs to improve between the current and target values.</small></label>
+                <label className={layout.fullField}><span>Gap summary</span><textarea value={skill.gapSummary} onChange={event => setSkill(index, {gapSummary: event.target.value})}/><small className={styles.fieldHelp}>Explain what needs to improve between the current and target values.</small></label>
               </div>
               {form.skills.length > 1 ? <div className={styles.recordActions}><button type="button" className={styles.textDanger} onClick={() => removeSkill(index)}>Remove skill</button></div> : null}
             </CollapsibleSection>
           ))}
           <button type="button" className={styles.secondary} onClick={() => { setAddedSkill(form.skills.length); setForm(current => ({...current, skills: [...current.skills, emptySkill(current.skills.length + 1)]})); }}>Add another skill</button>
         </WorkspaceSection>
-        <CollapsibleSection title="Private advisor notes" headingLevel={3} summary={'Visible to Advisors only'}>
+        <WorkspaceSection appearance="record" title="Private advisor notes" headingLevel={3} meta={<span className={styles.readOnlyBadge}>Advisors only</span>}>
           <p>This field stays in the Advisor view. Students and Tenant Admins do not receive it.</p>
-          <label><span>Private notes</span><textarea value={form.advisorPrivateNotes} onChange={event => setForm(current => ({...current, advisorPrivateNotes: event.target.value}))}/></label>
-        </CollapsibleSection>
-        <div className={styles.formActions}><button className={styles.primary} disabled={save.isPending || reloadRequired}>{save.isPending ? 'Saving…' : missing ? 'Create profile' : 'Save profile'}</button></div>
+          <label><span>Private notes</span><textarea className={layout.privateNotes} value={form.advisorPrivateNotes} onChange={event => setForm(current => ({...current, advisorPrivateNotes: event.target.value}))}/></label>
+        </WorkspaceSection>
+        <div className={layout.profileActions}><button className={styles.primary} disabled={save.isPending || reloadRequired}>{save.isPending ? 'Saving…' : missing ? 'Create profile' : 'Save profile'}</button></div>
       </form>
     </div>
   );

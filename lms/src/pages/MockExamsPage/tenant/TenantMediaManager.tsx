@@ -166,7 +166,7 @@ export function TenantMediaManager({
         <div className={ui.actions}>
           <button
             type="button"
-            className={ui.secondaryButton}
+            className={ui.primaryButton}
             disabled={contentBusy}
             onClick={() => input.current?.click()}
           >

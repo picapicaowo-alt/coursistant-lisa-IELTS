@@ -38,9 +38,47 @@
   color: t.$content-secondary;
   font-variant-numeric: tabular-nums;
 }
+.headingIdentity {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+  min-width: 0;
+}
+.headingIcon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 t.$touch-target;
+  width: t.$touch-target;
+  height: t.$touch-target;
+  border-radius: t.$radius-pill;
+  color: t.$action-primary;
+  background: t.$surface-brand-subtle;
+}
+.record {
+  display: flex;
+  flex-direction: column;
+  border-radius: t.$radius-card-lg;
+  .header {
+    align-items: flex-start;
+    padding: t.$space-6 t.$space-6 0;
+    border: 0;
+    h2, h3, h4 { font-weight: t.$fw-bold; }
+    p { font-size: t.$font-size-body; line-height: 1.55; margin-top: t.$space-2; }
+  }
+  .body { flex: 1; align-content: start; padding: t.$space-5 t.$space-6 t.$space-6; }
+  .count {
+    border-radius: t.$radius-pill;
+    background: t.$surface-muted;
+    padding: 0 t.$space-2;
+    font-size: t.$font-size-body;
+    font-weight: t.$fw-semibold;
+  }
+}
 @media (max-width: 700px) {
   .header,
   .body {
     padding: t.$space-4;
   }
+  .record .header { padding: t.$space-5 t.$space-4 0; }
+  .record .body { padding: t.$space-4; }
 }

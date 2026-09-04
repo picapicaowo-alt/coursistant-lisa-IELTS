@@ -13,6 +13,7 @@ export const TENANT_PATHS = {
   createAccount: `${APP_ROUTE_PATHS.admin}?action=create`,
   intakes: APP_ROUTE_PATHS.adminIntakes,
   createIntake: `${APP_ROUTE_PATHS.adminIntakes}?action=create`,
+  manageIntake: (intakeId: number) => `${APP_ROUTE_PATHS.adminIntakes}?manage=${intakeId}`,
   templates: APP_ROUTE_PATHS.mockExams,
   createTemplate: `${APP_ROUTE_PATHS.mockExams}?action=create`,
   student: (id: number) => generatePath(APP_ROUTE_PATHS.adminStudentsStudentUserId, {studentUserId: String(id)}),

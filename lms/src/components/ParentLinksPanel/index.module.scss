@@ -1,0 +1,98 @@
+.content {
+  container: parent-panel / inline-size;
+  display: grid;
+  gap: t.$space-5;
+  min-width: 0;
+}
+.description {
+  margin: 0;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: 1.55;
+}
+.empty {
+  display: grid;
+  justify-items: center;
+  gap: t.$space-2;
+  padding: t.$space-8 t.$space-4;
+  border-radius: t.$radius-lg;
+  background: t.$surface-subtle;
+  text-align: center;
+  color: t.$content-secondary;
+}
+.empty strong {
+  color: t.$content-primary;
+  font-size: t.$font-size-body-lg;
+}
+.empty span {
+  font-size: t.$font-size-body;
+  line-height: 1.55;
+}
+.empty svg {
+  margin-bottom: t.$space-2;
+}
+.emptyCompact {
+  grid-template-columns: t.$touch-target minmax(0, 1fr);
+  column-gap: t.$space-4;
+  justify-items: start;
+  text-align: left;
+  padding: t.$space-5;
+}
+.emptyCompact .emptyIcon {
+  grid-row: 1 / 3;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: t.$touch-target;
+  height: t.$touch-target;
+  border-radius: t.$radius-pill;
+  background: t.$surface-brand-subtle;
+  color: t.$action-primary;
+  svg { margin: 0; }
+}
+.formFields,
+.stackedFields {
+  display: grid;
+  min-width: 0;
+  gap: t.$space-3 t.$space-5;
+  label { min-width: 0; }
+}
+// Reflow by panel width, not viewport: the picker also appears in narrow drawers.
+@container parent-panel (min-width: 28rem) {
+  .formFields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(3, auto);
+    grid-auto-flow: column;
+    align-items: start;
+  }
+  .formFields .relationshipNote { grid-row: span 2; }
+}
+.content form {
+  gap: t.$space-3;
+}
+.content label {
+  gap: t.$space-1;
+  font-size: t.$font-size-body;
+}
+.content form input {
+  height: t.$touch-target;
+  padding: t.$space-2 t.$space-3;
+}
+.content :is(input, select, textarea) {
+  min-height: t.$touch-target;
+  font-size: t.$font-size-body-lg;
+  border-radius: t.$radius-control;
+}
+.content button {
+  min-height: t.$touch-target;
+  font-size: t.$font-size-body;
+  border-radius: t.$radius-control;
+}
+.content article {
+  flex-wrap: wrap;
+  overflow-wrap: anywhere;
+}
+.content :is(input, select, textarea, button):focus-visible {
+  outline: 2px solid t.$action-primary;
+  outline-offset: 3px;
+}
