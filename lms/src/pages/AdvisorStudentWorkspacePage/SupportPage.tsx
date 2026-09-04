@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Link, useParams, useSearchParams} from 'react-router-dom';
+import React, {useEffect, useId, useRef, useState} from 'react';
+import {generatePath, Link, useParams, useSearchParams} from 'react-router-dom';
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
   Send,
@@ -10,6 +10,7 @@ import {
   FileText,
 } from 'lucide-react';
 import {unwrapData} from '@/apis';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
 import {RecordSummaryList} from '@/components/RecordSummaryList';
@@ -20,6 +21,9 @@ import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/down
 import {getApiErrorCode} from '@/utils/apiError';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {AdvisingPagination} from '../advising/AdvisingPagination';
+import {advisingQueryKeys} from '../advising/queryKeys';
+import {SupportReportList} from './SupportReportList';
+import {TenantDrawer} from '@/components/TenantWorkspace/TenantDrawer';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {
   advisorConversationMessageViews,
@@ -41,6 +45,8 @@ const formatDateTime = (value?: string): string => {
 const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = ({studentId, conversationOnly = false}) => {
   const {studentUserId} = useParams();
   const {user} = useAuth();
+  const fileInputId = useId();
+  const fileInput = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState<unknown>();
   const id = studentId ?? Number(studentUserId);
   const queryClient = useQueryClient();
@@ -52,6 +58,8 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
   const [messageFiles, setMessageFiles] = useState<File[]>([]);
   const [fileInputKey, setFileInputKey] = useState(0);
   const [selectedCourseId, setSelectedCourseId] = useState(searchParams.get('courseId') ?? '');
+  const previousCourseSelection = useRef(selectedCourseId);
+  const [openedReport, setOpenedReport] = useState<{courseId: number; reportId: number}>();
   const hoursInitializedFor = useRef<number | null>(null);
   const [hoursReloadRequired, setHoursReloadRequired] = useState(false);
   const [hoursForm, setHoursForm] = useState({purchasedMinutes: '', expectedVersion: '', reason: ''});
@@ -91,6 +99,14 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
     enabled: Number.isInteger(id) && id > 0 && !conversationOnly,
     retry: false,
   });
+  const plan = useQuery({
+    meta: {advisingStudentId: id},
+    queryKey: advisingQueryKeys.advisorStudyPlan(id),
+    queryFn: async () => unwrapData(await advisorApiService.getStudyPlan(id), 'advisorStudyPlan'),
+    enabled: Number.isInteger(id) && id > 0 && !conversationOnly,
+    retry: false,
+  });
+  const planTasks = plan.data?.plan?.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []) ?? [];
   const messages = useInfiniteQuery({
     meta: {advisingStudentId: id},
     queryKey: ['advisor', 'student-conversation', id],
@@ -122,6 +138,17 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
     enabled: positiveId(selectedCourseId) && !conversationOnly,
     retry: false,
   });
+
+  useEffect(() => {
+    // Preserve an initial deep-linked report; reset dependent drafts only on a course change.
+    if (previousCourseSelection.current === selectedCourseId) return;
+    previousCourseSelection.current = selectedCourseId;
+    hoursInitializedFor.current = null;
+    setHoursForm({purchasedMinutes: '', expectedVersion: '', reason: ''});
+    setHoursReloadRequired(false);
+    setCourseReportPage(0);
+    setAdvanced(current => ({...current, occurrenceId: '', reportId: ''}));
+  }, [selectedCourseId]);
 
   useEffect(() => {
     if (!hours.data || hoursInitializedFor.current === courseId) return;
@@ -213,6 +240,12 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
         ] satisfies Parameters<typeof advisorApiService.feedbackAdvisorTask>,
         (key, args) => advisorApiService.feedbackAdvisorTask(...args, key)
       ),
+    onSuccess: async result => {
+      const updated = unwrapData(result, 'advisorTaskFeedback');
+      setAdvanced(current => current.taskId === String(updated.id) && updated.version != null
+        ? {...current, taskVersion: String(updated.version)} : current);
+      await queryClient.invalidateQueries({queryKey: advisingQueryKeys.advisorStudyPlan(id)});
+    },
   });
 
   const occurrenceAttendance = useQuery({
@@ -238,6 +271,16 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
     enabled: positiveId(selectedCourseId) && positiveId(advanced.reportId),
     retry: false,
   });
+  const selectedReport = useQuery({
+    meta: {advisingStudentId: id},
+    queryKey: ['advisor', 'published-course-report', id, openedReport?.courseId, openedReport?.reportId],
+    queryFn: async () => {
+      if (!openedReport) throw new Error('Select a report to view.');
+      return unwrapData(await courseOperationsApiService.getAdvisorPublishedCourseReport(id, openedReport.courseId, openedReport.reportId), 'advisorPublishedCourseReport');
+    },
+    enabled: Boolean(openedReport),
+    retry: false,
+  });
 
   const conversationRows = [
     ...new Map((messages.data?.pages.flat() ?? []).map(message => [message.messageId, message])).values(),
@@ -260,7 +303,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
   };
 
   const conversationContent = (
-        <div className={s.conversationCard}>
+        <div className={`${s.conversationCard} ${conversationOnly ? s.standalone : ''}`}>
           <div className={s.messageStream} aria-label="Message history">
             {messages.isPending ? <p className={styles.status}>Loading conversation…</p> : null}
 
@@ -395,17 +438,19 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
 
             <div className={s.composerActions}>
               <div className={s.fileInputWrapper}>
-                <label className={s.attachButton}>
+                <button type="button" className={s.attachButton} onClick={() => fileInput.current?.click()}>
                   <Paperclip size={14} aria-hidden="true" />
                   Attach files
+                </button>
                   <input
+                    ref={fileInput}
+                    aria-label="Attach message files"
                     key={fileInputKey}
-                    id="advisor-message-files"
+                    id={fileInputId}
                     type="file"
                     multiple
                     onChange={event => setMessageFiles(Array.from(event.target.files ?? []))}
                   />
-                </label>
               </div>
 
               <button
@@ -430,12 +475,12 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
         </p>
       ) : null}
 
-      <WorkspaceSection title="Conversation" id="conversation" meta={<span className={s.countBadge}>{conversationRows.length}</span>}>{conversationContent}</WorkspaceSection>
+      <WorkspaceSection appearance="record" title="Conversation" id="conversation" meta={<span className={s.countBadge}>{conversationRows.length}</span>}>{conversationContent}</WorkspaceSection>
 
 
       {/* Reports and attendance remain visible beside one another on desktop. */}
       <div className={s.mainGrid}>
-        <WorkspaceSection
+        <WorkspaceSection appearance="record"
           title="Reports"
           meta={
             <span className={s.countBadge}>
@@ -446,13 +491,14 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
           {studentReports.isPending ? <p className={styles.status}>Loading reports…</p> : null}
           {!studentReports.isPending && !studentReports.isError && contractItems(studentReports.data).length === 0 ? (
             <div className={s.emptyBlock}>
+              <FileText size={32} aria-hidden="true"/>
               <strong>No published reports</strong>
               <span>Reports become visible here after publication.</span>
             </div>
           ) : null}
           {contractItems(studentReports.data).length > 0 ? (
             <div className={styles.compactResult}>
-              <RecordSummaryList value={studentReports.data} />
+              <SupportReportList value={studentReports.data} onOpen={(courseId, reportId) => setOpenedReport({courseId, reportId})}/>
             </div>
           ) : null}
           <AdvisingPagination
@@ -463,13 +509,14 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
           />
         </WorkspaceSection>
 
-        <WorkspaceSection
+        <WorkspaceSection appearance="record"
           title="Learning history"
           meta={<span className={s.countBadge}>{contractItems(attendance.data).length}</span>}
         >
           {attendance.isPending ? <p className={styles.status}>Loading attendance…</p> : null}
           {!attendance.isPending && !attendance.isError && contractItems(attendance.data).length === 0 ? (
             <div className={s.emptyBlock}>
+              <Clock size={32} aria-hidden="true"/>
               <strong>No attendance records</strong>
               <span>Recorded course attendance will appear here.</span>
             </div>
@@ -483,19 +530,19 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
       </div>
 
       {/* Course Hours & Reports */}
-      <WorkspaceSection title="Course hours &amp; reports" id="course-support">
+      <WorkspaceSection appearance="record" title="Course hours &amp; reports" id="course-support">
         {(courses.data?.length ?? 0) === 0 ? (
           <div className={s.emptyBlock}>
             <strong>No linked courses</strong>
             <span>Link or create a course before managing hours and course reports.</span>
-            <Link className={styles.secondaryLink} to={`/advisor/students/${id}/courses`}>
+            <Link className={styles.secondaryLink} to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdCourses, {studentUserId: String(id)})}>
               Open courses
             </Link>
           </div>
         ) : (
           <label className={s.coursePickerLabel}>
             Course
-            <select value={selectedCourseId} onChange={event => setSelectedCourseId(event.target.value)}>
+            <select value={selectedCourseId} disabled={saveHours.isPending} onChange={event => {setSelectedCourseId(event.target.value); saveHours.reset();}}>
               <option value="">Select a course</option>
               {(courses.data ?? []).map((item, index) => (
                 <option key={item.courseId ?? index} value={item.courseId}>
@@ -507,15 +554,15 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
         )}
 
         {positiveId(selectedCourseId) ? (
-          <div style={{marginTop: '1rem'}}>
+          <div className={s.courseSupport}>
             <div className={s.hoursWidget}>
               <div className={s.hourStat}>
-                <strong>{hoursForm.purchasedMinutes || 0}m</strong>
-                <span>Purchased minutes ({Math.round(Number(hoursForm.purchasedMinutes || 0) / 60)}h)</span>
+                <strong>{hours.isPending ? '…' : hours.isError || !hoursForm.purchasedMinutes ? '—' : `${hoursForm.purchasedMinutes}m`}</strong>
+                <span>Purchased minutes</span>
               </div>
               <div className={s.hourStat}>
-                <strong>v{hoursForm.expectedVersion || '1'}</strong>
-                <span>Record version</span>
+                <strong>{hours.isSuccess ? contractRecordNumber(hours.data, 'remainingMinutes') ?? '—' : '—'}</strong>
+                <span>Remaining minutes</span>
               </div>
             </div>
 
@@ -527,7 +574,8 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                   className={styles.secondary}
                   onClick={() =>
                     void hours.refetch().then(result => {
-                      const version = contractRecordNumber(result.data, 'version');
+                      if (previousCourseSelection.current !== selectedCourseId) return;
+                      const version = contractRecordNumber(result.data, 'hoursVersion', 'version');
                       if (!result.isError && version != null) {
                         setHoursForm(current => ({...current, expectedVersion: String(version)}));
                         setHoursReloadRequired(false);
@@ -573,7 +621,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
               <button
                 className={styles.primary}
                 disabled={
-                  hoursReloadRequired ||
+                  hoursReloadRequired || hours.isPending || hours.isError ||
                   !hoursForm.reason.trim() ||
                   !hoursForm.purchasedMinutes ||
                   !hoursForm.expectedVersion ||
@@ -596,14 +644,14 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                 <p className={styles.error}>{advisingErrorMessage(courseReports.error, 'Course reports could not be loaded.')}</p>
               ) : null}
               {!courseReports.isPending && !courseReports.isError && contractItems(courseReports.data).length === 0 ? (
-                <div className={s.emptyBlock} style={{padding: '1rem'}}>
+                <div className={s.emptyBlock}>
                   <strong>No published course reports</strong>
                   <span>Reports for this course will appear here.</span>
                 </div>
               ) : null}
               {contractItems(courseReports.data).length > 0 ? (
                 <div className={styles.compactResult}>
-                  <RecordSummaryList value={courseReports.data} />
+                  <SupportReportList value={courseReports.data} courseId={courseId} onOpen={(courseId, reportId) => setOpenedReport({courseId, reportId})}/>
                 </div>
               ) : null}
             </div>
@@ -611,10 +659,13 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
         ) : null}
       </WorkspaceSection>
 
-      {/* Advanced Record Lookup */}
+      {saveHours.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(saveHours.error, 'Purchased hours could not be saved.')}</p> : null}
+      {saveHours.isSuccess ? <p className={styles.success} role="status">Purchased hours saved.</p> : null}
+
+      {/* Optional reference lookups remain available without crowding the daily workflow. */}
       <CollapsibleSection title="Advanced record lookup">
-        <p className={styles.muted}>Use backend record identifiers only when handling a specific task, occurrence, or report.</p>
-        <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(18rem, 1fr))', gap: '1.5rem'}}>
+        <p className={styles.muted}>Look up a specific task, class, or report by its reference number.</p>
+        <div className={s.advancedGrid}>
           <form
             className={styles.form}
             onSubmit={event => {
@@ -624,22 +675,19 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
           >
             <h4>Task feedback</h4>
             <label>
-              Task ID
-              <input
-                inputMode="numeric"
+              Learning plan task
+              <select
                 value={advanced.taskId}
-                onChange={event => setAdvanced(current => ({...current, taskId: event.target.value}))}
-              />
+                onChange={event => {const task = planTasks.find(task => String(task.id) === event.target.value); setAdvanced(current => ({...current, taskId: event.target.value, taskVersion: task?.version == null ? '' : String(task.version), feedback: task?.advisorFeedback ?? ''})); taskFeedback.reset();}}
+              ><option value="">Choose a task</option>{planTasks.filter(task => task.id != null).map(task => <option key={task.id} value={task.id}>{task.title || `Task #${task.id}`}</option>)}</select>
             </label>
-            <label>
-              Record version
-              <input
-                type="number"
-                min="0"
-                value={advanced.taskVersion}
-                onChange={event => setAdvanced(current => ({...current, taskVersion: event.target.value}))}
-              />
-            </label>
+            {plan.isError ? <p className={styles.error} role="alert">Tasks could not be loaded. <button type="button" onClick={() => void plan.refetch()}>Retry tasks</button></p> : null}
+            {taskFeedback.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskFeedback.error, 'Feedback could not be saved.')} <button type="button" onClick={() => void plan.refetch().then(result => {
+              if (result.isError) return;
+              const reviewedTask = result.data?.plan?.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []).find(task => String(task.id) === advanced.taskId);
+              if (reviewedTask?.version != null) {setAdvanced(current => current.taskId === String(reviewedTask.id) ? {...current, taskVersion: String(reviewedTask.version)} : current); taskFeedback.reset();}
+            })}>Load latest task version</button></p> : null}
+            {taskFeedback.isSuccess ? <p className={styles.success} role="status">Feedback saved.</p> : null}
             <label>
               Feedback
               <textarea
@@ -696,12 +744,15 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
       </CollapsibleSection>
 
       {hub.data !== undefined ? (
-        <WorkspaceSection title="Student support summary">
+        <CollapsibleSection title="Student support summary">
           <div className={styles.compactResult}>
             <RecordSummaryList value={hub.data} />
           </div>
-        </WorkspaceSection>
+        </CollapsibleSection>
       ) : null}
+      {openedReport ? <TenantDrawer title="Published report" onClose={() => setOpenedReport(undefined)}>
+        {selectedReport.isPending ? <p role="status">Loading report…</p> : selectedReport.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(selectedReport.error, 'Report could not be loaded.')} <button type="button" onClick={() => void selectedReport.refetch()}>Retry report</button></p> : <RecordSummaryList value={selectedReport.data}/>}
+      </TenantDrawer> : null}
     </div>
   );
 };

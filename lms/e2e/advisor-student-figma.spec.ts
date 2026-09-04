@@ -44,6 +44,8 @@ test('journey and progress reflow without exposing unknown-state request actions
     await page.setViewportSize({width, height: 1024});
     await expectNoViewportOverflow(page);
     const summary = page.getByLabel('Student profile summary');
+    const overview = summary.getByRole('button', {name: 'Learning overview'});
+    if (await overview.isVisible() && await overview.getAttribute('aria-expanded') === 'false') await overview.click();
     const circle = summary.getByRole('progressbar', {name: 'Advisor task completion'});
     const outer = await summary.boundingBox();
     const inner = await circle.boundingBox();

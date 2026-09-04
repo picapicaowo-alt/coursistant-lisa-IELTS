@@ -11,14 +11,13 @@ import ui from '@/components/TenantWorkspace/workspace.module.scss';
 import {
   IntakeAssignmentStatus,
   IntakeLifecycleStatus,
-  type ManagedUser,
   type PatchStudentIntakeRequest,
   type StudentIntakeResponse,
   type TenantIntakeListParams,
   unwrapData,
 } from '@/apis';
 import {StudentIntakeFormFields} from '@/components/StudentIntakeFormFields';
-import {TenantUserPicker} from '@/components/TenantUserPicker';
+import {IntakeAssignmentEditor} from '@/components/TenantWorkspace/IntakeAssignmentEditor';
 import {
   emptyStudentIntakeForm,
   type StudentIntakeFormValue,
@@ -68,15 +67,22 @@ const TenantIntakesPage: React.FC = () => {
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [page, setPage] = useState(0);
-  const [draftFilters, setDraftFilters] = useState<FilterDraft>(emptyFilters);
-  const [filters, setFilters] = useState<FilterDraft>(emptyFilters);
+  const pageParam = Number(searchParams.get('page') ?? 0);
+  const [page, updatePage] = useState(Number.isInteger(pageParam) && pageParam >= 0 ? pageParam : 0);
+  const initialFilters: FilterDraft = {
+    q: searchParams.get('q') ?? '',
+    lifecycleStatus: searchParams.get('lifecycleStatus') === 'OPEN' ? 'OPEN' : searchParams.get('lifecycleStatus') === 'CANCELLED' ? 'CANCELLED' : '',
+    assignmentStatus: searchParams.get('assignmentStatus') === 'ASSIGNED' ? 'ASSIGNED' : searchParams.get('assignmentStatus') === 'UNASSIGNED' ? 'UNASSIGNED' : '',
+    searchBy: searchParams.get('searchBy') === 'intakeId' ? 'intakeId' : searchParams.get('searchBy') === 'studentUserId' ? 'studentUserId' : 'q',
+  };
+  const [draftFilters, setDraftFilters] = useState<FilterDraft>(initialFilters);
+  const [filters, setFilters] = useState<FilterDraft>(initialFilters);
   const [createOpen, setCreateOpen] = useState(
     searchParams.get('action') === 'create',
   );
-  const [selectedIntakeId, setSelectedIntakeId] = useState<number | null>(null);
-  const [advisor, setAdvisor] = useState<ManagedUser | null>(null);
-  const [reason, setReason] = useState('');
+  const managedId = Number(searchParams.get('manage'));
+  const [selectedIntakeId, setSelectedIntakeId] = useState<number | null>(Number.isInteger(managedId) && managedId > 0 ? managedId : null);
+  const [assignmentPending, setAssignmentPending] = useState(false);
   const [createForm, setCreateForm] = useState(emptyStudentIntakeForm);
   const [editForm, setEditForm] = useState<StudentIntakeFormValue>(
     emptyStudentIntakeForm,
@@ -125,7 +131,21 @@ const TenantIntakesPage: React.FC = () => {
   );
   const closeCreate = () => {
     setCreateOpen(false);
-    setSearchParams({}, {replace: true});
+    setSearchParams(current => {current.delete('action'); return current;}, {replace: true});
+  };
+  const syncListLocation = (nextFilters: FilterDraft, nextPage: number) => {
+    const params = new URLSearchParams();
+    if (nextPage) params.set('page', String(nextPage));
+    if (nextFilters.q) params.set('q', nextFilters.q);
+    if (nextFilters.searchBy !== 'q') params.set('searchBy', nextFilters.searchBy);
+    if (nextFilters.lifecycleStatus) params.set('lifecycleStatus', nextFilters.lifecycleStatus);
+    if (nextFilters.assignmentStatus) params.set('assignmentStatus', nextFilters.assignmentStatus);
+    setSearchParams(params, {replace: true});
+  };
+  const setPage = (next: number | ((current: number) => number)) => {
+    const nextPage = typeof next === 'function' ? next(page) : next;
+    updatePage(nextPage);
+    syncListLocation(filters, nextPage);
   };
 
   useEffect(() => {
@@ -148,90 +168,6 @@ const TenantIntakesPage: React.FC = () => {
     ]);
   };
 
-  const assign = useMutation({
-    mutationFn: async () => {
-      if (!selected || !advisor) throw new Error('Select an eligible advisor.');
-      const payload = {
-        advisorUserId: advisor.id,
-        expectedIntakeVersion: selected.intakeVersion,
-      };
-      const key = idempotency.keyFor(
-        `tenant-assign-${selected.intakeId}`,
-        idempotencyFingerprint(payload),
-      );
-      return unwrapData(
-        await tenantAdvisingApiService.assignAdvisor(
-          selected.intakeId,
-          payload,
-          key,
-        ),
-        'tenantAssign',
-      );
-    },
-    onSuccess: async () => {
-      setAdvisor(null);
-      setReason('');
-      await refresh();
-    },
-  });
-  const reassign = useMutation({
-    mutationFn: async () => {
-      if (!selected?.studentUserId || !advisor)
-        throw new Error('Select an eligible advisor.');
-      if (selected.assignmentVersion == null)
-        throw new Error(
-          'The current assignment version is unavailable. Refresh the intake before reassigning.',
-        );
-      const payload = {
-        advisorUserId: advisor.id,
-        expectedAssignmentVersion: selected.assignmentVersion,
-        ...(reason.trim() ? {reason: reason.trim()} : {}),
-      };
-      const key = idempotency.keyFor(
-        `tenant-reassign-${selected.studentUserId}`,
-        idempotencyFingerprint(payload),
-      );
-      return unwrapData(
-        await tenantAdvisingApiService.reassignAdvisor(
-          selected.studentUserId,
-          payload,
-          key,
-        ),
-        'tenantReassign',
-      );
-    },
-    onSuccess: async () => {
-      setAdvisor(null);
-      setReason('');
-      await refresh();
-    },
-  });
-  const cancel = useMutation({
-    mutationFn: async () => {
-      if (!selected) throw new Error('Select an intake.');
-      const payload = {
-        expectedIntakeVersion: selected.intakeVersion,
-        reason: reason.trim(),
-      };
-      const key = idempotency.keyFor(
-        `tenant-cancel-${selected.intakeId}`,
-        idempotencyFingerprint(payload),
-      );
-      return unwrapData(
-        await tenantAdvisingApiService.cancelStudentIntake(
-          selected.intakeId,
-          payload,
-          key,
-        ),
-        'tenantCancel',
-      );
-    },
-    onSuccess: async () => {
-      setAdvisor(null);
-      setReason('');
-      await refresh();
-    },
-  });
   const patchIntake = useMutation({
     mutationFn: async () => {
       if (!selected) throw new Error('Select an intake.');
@@ -314,15 +250,13 @@ const TenantIntakesPage: React.FC = () => {
   });
 
   const busy =
-    assign.isPending ||
-    reassign.isPending ||
-    cancel.isPending ||
+    assignmentPending ||
     patchIntake.isPending ||
     createIntake.isPending;
   const mutationError =
-    assign.error || reassign.error || cancel.error || patchIntake.error;
+    patchIntake.error;
   const intakeConflict =
-    getApiErrorCode(patchIntake.error || assign.error || cancel.error) ===
+    getApiErrorCode(patchIntake.error) ===
     'STUDENT_INTAKE_VERSION_CONFLICT';
   const hasIntakeChanges = Boolean(
     selected &&
@@ -334,32 +268,23 @@ const TenantIntakesPage: React.FC = () => {
       editForm.contactPhone.trim() !== (selected.contactPhone ?? '') ||
       editForm.basicBackground.trim() !== (selected.basicBackground ?? '')),
   );
-  const onAssign = (event: FormEvent) => {
-    event.preventDefault();
-    clearOperationErrors();
-    if (selected?.assignmentStatus === 'ASSIGNED') reassign.mutate();
-    else assign.mutate();
-  };
   const applyFilters = (event: FormEvent) => {
     event.preventDefault();
-    setPage(0);
+    updatePage(0);
     setFilters({...draftFilters, q: draftFilters.q.trim()});
+    syncListLocation({...draftFilters, q: draftFilters.q.trim()}, 0);
   };
   const clearFilters = () => {
     setDraftFilters(emptyFilters);
     setFilters(emptyFilters);
-    setPage(0);
+    updatePage(0);
+    syncListLocation(emptyFilters, 0);
   };
   const manage = (intakeId: number) => {
     clearOperationErrors();
     setSelectedIntakeId(intakeId);
-    setAdvisor(null);
-    setReason('');
   };
   const clearOperationErrors = () => {
-    assign.reset();
-    reassign.reset();
-    cancel.reset();
     patchIntake.reset();
   };
 
@@ -577,6 +502,7 @@ const TenantIntakesPage: React.FC = () => {
                         <Link
                           className={ui.textButton}
                           to={TENANT_PATHS.student(intake.studentUserId)}
+                          state={{returnTo: `${TENANT_PATHS.intakes}${searchParams.size ? `?${searchParams}` : ''}`}}
                         >
                           View record
                         </Link>
@@ -628,7 +554,7 @@ const TenantIntakesPage: React.FC = () => {
               : `Intake #${selectedIntakeId}`
           }
           busy={busy}
-          onClose={() => setSelectedIntakeId(null)}
+          onClose={() => {setSelectedIntakeId(null); setSearchParams(current => {current.delete('manage'); return current;}, {replace: true});}}
         >
           {mutationError && !intakeConflict ? (
             <p className={styles.error} role="alert">
@@ -712,77 +638,8 @@ const TenantIntakesPage: React.FC = () => {
                 )}
               </section>
               <section>
-                <h3>
-                  {selected.assignmentStatus === 'ASSIGNED'
-                    ? 'Reassign advisor'
-                    : 'Assign advisor'}
-                </h3>
-                {selected.lifecycleStatus === 'CANCELLED' ? (
-                  <p className={styles.status}>
-                    Cancelled intakes cannot be assigned or edited.
-                  </p>
-                ) : (
-                  <form className={styles.form} onSubmit={onAssign}>
-                    <div className={styles.pickerField}>
-                      <span>Eligible advisor</span>
-                      <TenantUserPicker
-                        title={
-                          selected.assignmentStatus === 'ASSIGNED'
-                            ? 'Choose the replacement advisor'
-                            : 'Choose an advisor'
-                        }
-                        description="Searches active Advisor and Instructor Advisor identities in this tenant."
-                        triggerLabel="Choose advisor"
-                        levels={['ADVISOR', 'INSTRUCTOR_ADVISOR']}
-                        selectedUser={advisor}
-                        onSelect={setAdvisor}
-                      />
-                    </div>
-                    <label>
-                      <span>
-                        Reason{' '}
-                        {selected.assignmentStatus === 'UNASSIGNED'
-                          ? '(required only when cancelling)'
-                          : '(recommended for reassignment)'}
-                      </span>
-                      <textarea
-                        value={reason}
-                        onChange={(event) => setReason(event.target.value)}
-                      />
-                    </label>
-                    <div className={styles.actions}>
-                      <button
-                        className={styles.primary}
-                        disabled={busy || !advisor}
-                      >
-                        {busy
-                          ? 'Saving…'
-                          : selected.assignmentStatus === 'ASSIGNED'
-                            ? 'Reassign advisor'
-                            : 'Assign advisor'}
-                      </button>
-                      {selected.assignmentStatus === 'UNASSIGNED' ? (
-                        <button
-                          type="button"
-                          className={styles.danger}
-                          disabled={busy || !reason.trim()}
-                          onClick={() => {
-                            if (
-                              window.confirm(
-                                'Cancel this intake? It will no longer be available for assignment.',
-                              )
-                            ) {
-                              clearOperationErrors();
-                              cancel.mutate();
-                            }
-                          }}
-                        >
-                          Cancel intake
-                        </button>
-                      ) : null}
-                    </div>
-                  </form>
-                )}
+                <h3>{selected.assignmentStatus === 'ASSIGNED' ? 'Reassign advisor' : 'Assign advisor'}</h3>
+                <IntakeAssignmentEditor key={selected.intakeId} intake={selected} onUpdated={refresh} onPendingChange={setAssignmentPending}/>
               </section>
             </div>
           ) : null}
