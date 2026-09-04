@@ -261,7 +261,7 @@ function TeachingOverview() {
         meta={
           !queue.isPending &&
           !grading.isPending &&
-          (!queue.isError || !grading.isError) ? (
+          (groups.length > 0 || (!queue.isError && !grading.isError)) ? (
             <TeachingBadge value="PENDING">{count} pending</TeachingBadge>
           ) : null
         }

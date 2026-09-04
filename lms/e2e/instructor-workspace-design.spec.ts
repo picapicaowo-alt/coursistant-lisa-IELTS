@@ -21,6 +21,16 @@ test('Pending report saves freeze inputs and preserve the submitted snapshot', a
   await expect(page.getByText('Report draft saved.', {exact: true})).toBeVisible();
 });
 
+test('An unavailable grading queue with an empty fallback never claims zero pending', async ({page}) => {
+  await instructorFixture(page);
+  await page.route('**/v2/me/teaching/grading-queue', route => route.fulfill({status: 500, json: {status: 500, message: 'Internal server error'}}));
+  await page.goto('/my-operations');
+  const queue = page.getByRole('region', {name: 'Grading queue'});
+  await expect(queue.getByRole('alert')).toBeVisible();
+  await expect(queue.getByText('0 pending', {exact: true})).toHaveCount(0);
+  await expect(queue.getByText(/All caught up/)).toHaveCount(0);
+});
+
 test('An unresolved grading projection never appears as an empty queue', async ({page}) => {
   await instructorFixture(page);
   let finish: (() => void) | undefined;
