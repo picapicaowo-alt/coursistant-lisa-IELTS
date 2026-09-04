@@ -1,5 +1,11 @@
 # Mock exam authoring: guided frontend workflow
 
+Update (September 4): ordinary Reading/Listening answer-key editing and validation
+now follow the supplied single/equivalent-answer rules. See
+[mock-exam-answer-keys-2026-09-04.md](mock-exam-answer-keys-2026-09-04.md).
+That update supersedes the answer-key limitations described in this historical
+implementation record; the generic OpenAPI payload documentation gap remains.
+
 ## Scope and acceptance boundary
 
 The implementation-stage evidence below predates the release request. See `mock-exam-authoring-predeploy-review-2026-09-03.md` for the subsequent isolated release audit and its acceptance boundaries.

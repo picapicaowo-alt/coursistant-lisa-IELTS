@@ -1,4 +1,4 @@
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {describe, expect, it} from 'vitest';
 import {isRecord} from '@/utils/apiError';
 import {QuestionPreview} from './QuestionPreview';
@@ -36,6 +36,18 @@ function example(field: Field, nextId: () => number, index = 0): unknown {
 }
 
 describe('all guided question types', () => {
+  it('keeps official alternatives out of the student preview and takes one response string', () => {
+    const content = {questions: [{id: 9, prompt: 'What material?', answers: ['cow dung', 'dung cow']}]};
+    const question = {...newQuestion(), kind: 'shortAnswer', start: '9', end: '9', payload: JSON.stringify(content)};
+    const {container} = render(<QuestionPreview subject="reading" question={question} />);
+    const input = screen.getByRole('textbox', {name: 'Question 9'});
+    expect(input).toHaveValue('');
+    expect(container).not.toHaveTextContent('cow dung');
+    expect(container).not.toHaveTextContent('dung cow');
+    fireEvent.change(input, {target: {value: 'Student response'}});
+    expect(input).toHaveValue('Student response');
+    expect(JSON.parse(question.payload)).toEqual(content);
+  });
   for (const subject of ['listening', 'reading'] as const) {
     for (const definition of QUESTION_TYPES[subject]) {
       if (!('schema' in definition) || !definition.schema) continue;

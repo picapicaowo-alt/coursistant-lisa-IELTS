@@ -153,8 +153,9 @@ export function QuestionEditor({
         <summary>Advanced data and answer keys</summary>
         <p className={ui.hint}>
           For imported content, custom types and existing answer keys. Extra
-          fields are preserved when you edit the form. Answer-key and scoring
-          formats are not specified by the supplied API.
+          fields are preserved when you edit the form. Ordinary questions
+          require either answer (one string) or answers (official equivalent
+          strings). Multiple-selection questions retain answersByQuestion.
         </p>
         <label>
           <span>Question type code</span>

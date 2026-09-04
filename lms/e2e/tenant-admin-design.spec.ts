@@ -183,6 +183,7 @@ test('composer keeps tab drafts and submits every part once then becomes read on
     await page.getByLabel('Question type', {exact: true}).selectOption('formCompletion');
     await page.getByLabel('Form / Form heading', {exact: true}).fill('Booking form');
     await page.getByLabel('Form / Form fields 1 / Field label', {exact: true}).fill('Full name');
+    await page.getByLabel('Form / Form fields 1 / Official accepted answers', {exact: true}).fill('Alice Smith');
     await page.getByRole('radio').check();
   }
   await page.reload();

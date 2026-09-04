@@ -161,7 +161,7 @@ describe('whole-section checks and defaults', () => {
     draft.units[0].mediaId = 11;
     const content = {
       formTitle: 'Booking',
-      fields: [{id: 1, label: 'Name', answer: ['Alice']}],
+      fields: [{id: 1, label: 'Name', answer: 'Alice'}],
       grading: {version: 2},
     };
     draft.units[0].questions[0] = {

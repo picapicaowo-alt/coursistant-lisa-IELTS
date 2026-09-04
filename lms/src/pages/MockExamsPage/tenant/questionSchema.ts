@@ -141,9 +141,11 @@ export interface QuestionDefinition {
   label: string;
   description: string;
   schema?: Field;
+  /** Advanced types can validate known answer slots without enabling a form. */
+  answerSchema?: Field;
 }
 // These are existing student-renderer shapes, NOT a claim that the generic
-// OpenAPI specifies authoring/answer-key validation. Do not add grading fields.
+// OpenAPI specifies each payload shape. Answer-key rules live in answerKeys.ts.
 const sharedDefinitions = [
   {
     kind: 'mcq',
@@ -227,6 +229,9 @@ export const QUESTION_TYPES = {
     },
     {
       kind: 'planMap',
+      answerSchema: object('Map labels', {
+        labels: list('Labels', object('Label', {id})),
+      }),
       label: 'Plan / map labelling · advanced',
       description:
         'Use an existing, verified payload. Listening image authoring is not defined in the supplied API.',

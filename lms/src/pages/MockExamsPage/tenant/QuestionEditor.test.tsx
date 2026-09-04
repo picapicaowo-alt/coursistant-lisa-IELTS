@@ -89,6 +89,77 @@ describe('friendly question editor', () => {
       {id: 2, label: ''},
     ]);
   });
+  it('switches between single and equivalent answers without retaining the other key', () => {
+    render(
+      <Editor
+        initial={{
+          ...newQuestion(),
+          kind: 'shortAnswer',
+          payload: JSON.stringify({
+            questions: [
+              {
+                id: 9,
+                prompt: 'What?',
+                answer: 'fermentation',
+                metadata: 'keep',
+              },
+            ],
+          }),
+        }}
+      />,
+    );
+    const input = screen.getByLabelText(
+      'Short-answer questions / Questions 1 / Official accepted answers',
+    );
+    const payload = () =>
+      JSON.parse(
+        JSON.parse(screen.getByTestId('question').textContent ?? '{}').payload,
+      );
+    fireEvent.change(input, {
+      target: {value: 'fermentation\nfermentation process'},
+    });
+    expect(payload().questions[0]).toEqual({
+      id: 9,
+      prompt: 'What?',
+      answers: ['fermentation', 'fermentation process'],
+      metadata: 'keep',
+    });
+    fireEvent.change(input, {target: {value: 'cow dung'}});
+    expect(payload().questions[0]).toEqual({
+      id: 9,
+      prompt: 'What?',
+      answer: 'cow dung',
+      metadata: 'keep',
+    });
+    fireEvent.change(input, {target: {value: 'cow dung\ncow dung'}});
+    expect(screen.getByRole('alert')).toHaveTextContent('duplicate');
+  });
+  it('preserves conflicting imported keys and asks for correction in Advanced data', () => {
+    const content = {
+      questions: [{id: 9, prompt: 'What?', answer: 'one', answers: ['two']}],
+    };
+    render(
+      <Editor
+        initial={{
+          ...newQuestion(),
+          kind: 'shortAnswer',
+          payload: JSON.stringify(content),
+        }}
+      />,
+    );
+    expect(screen.getByRole('alert')).toHaveTextContent('never both');
+    fireEvent.change(
+      screen.getByLabelText(
+        'Short-answer questions / Questions 1 / Question text',
+      ),
+      {target: {value: 'Updated'}},
+    );
+    expect(
+      JSON.parse(
+        JSON.parse(screen.getByTestId('question').textContent ?? '{}').payload,
+      ).questions[0],
+    ).toEqual({...content.questions[0], prompt: 'Updated'});
+  });
   it('retains nested answers and unknown fields when editing display text', () => {
     render(
       <Editor

@@ -1,3 +1,4 @@
+import {objectiveAnswerErrors} from './answerKeys';
 import {BookOpenText, Headphones, PenLine} from 'lucide-react';
 import type {
   CreateMockExamListeningRequest,
@@ -248,7 +249,13 @@ export function sectionIssues(
         contentErrors(section, question.kind, value).forEach((message) =>
           add(message, groupIndex),
         );
-        const schema = questionDefinition(section, question.kind)?.schema;
+        const definition = questionDefinition(section, question.kind);
+        const schema = definition?.schema;
+        const answerSchema = definition?.answerSchema ?? schema;
+        if (answerSchema)
+          objectiveAnswerErrors(answerSchema, value).forEach((message) =>
+            add(message, groupIndex),
+          );
         if (schema) {
           const numbers = questionNumbers(value, schema);
           if (
@@ -279,7 +286,16 @@ export function sectionIssues(
   });
   return issues;
 }
-function questionPayload(question: QuestionDraft, index: number) {
+function questionPayload(
+  question: QuestionDraft,
+  index: number,
+  section: 'reading' | 'listening',
+) {
+  const payload = json(question.payload, 'Question payload');
+  const definition = questionDefinition(section, question.kind);
+  const schema = definition?.answerSchema ?? definition?.schema;
+  const errors = schema ? objectiveAnswerErrors(schema, payload) : [];
+  if (errors.length) throw new Error(errors.join(' '));
   const questionStart = positiveInteger(
     question.start,
     'First question number',
@@ -296,7 +312,7 @@ function questionPayload(question: QuestionDraft, index: number) {
     title: questionTitle(question),
     instruction: question.instruction.trim(),
     kind: question.kind.trim(),
-    payload: json(question.payload, 'Question payload'),
+    payload,
     questionStart,
     questionEnd,
   };
@@ -313,7 +329,9 @@ export function listeningPayload(
         seq: index + 1,
         label: unitName('listening', unit, index),
         audioMediaId: unit.mediaId,
-        sections: unit.questions.map(questionPayload),
+        sections: unit.questions.map((question, i) =>
+          questionPayload(question, i, 'listening'),
+        ),
       };
     }),
   };
@@ -335,7 +353,7 @@ export function readingPayload(
         intro: unit.intro.trim(),
         paragraphs,
         questions: unit.questions.map((question, i) => ({
-          ...questionPayload(question, i),
+          ...questionPayload(question, i, 'reading'),
           ...(question.mediaId ? {imageMediaId: question.mediaId} : {}),
         })),
       };

@@ -2,6 +2,8 @@ import {useId} from 'react';
 import {Plus, Trash2} from 'lucide-react';
 import {isRecord} from '@/utils/apiError';
 import {emptyValue, type Field} from './questionSchema';
+import {hasAnswerSlot} from './answerKeys';
+import {AnswerKeyFields} from './AnswerKeyFields';
 import ui from '@/components/TenantWorkspace/workspace.module.scss';
 import styles from './authoring.module.scss';
 
@@ -33,6 +35,9 @@ export function ContentFields({
             path={`${path} / ${child.label}`}
           />
         ))}
+        {hasAnswerSlot(field) ? (
+          <AnswerKeyFields value={record} onChange={onChange} path={path} />
+        ) : null}
       </div>
     );
   }
