@@ -61,7 +61,7 @@ test('reports use the student-wide zero-based feed and explicit report course id
   await expect(page.getByText('No published reports.', {exact: true})).toHaveCount(0);
 });
 
-test('login without a display name resolves the structured profile and compact dashboard uses its width', async ({page}, info) => {
+test('login without a display name resolves the structured profile and preserves a single course slot', async ({page}, info) => {
   await student(page);
   await page.setViewportSize({width: 1155, height: 900});
   await page.goto('/');
@@ -70,7 +70,8 @@ test('login without a display name resolves the structured profile and compact d
   const strip = page.getByLabel('Active courses');
   const card = strip.locator('article');
   const bounds = await strip.boundingBox();
-  expect((await card.boundingBox())!.width).toBeGreaterThan(bounds!.width * 0.9);
+  expect((await card.boundingBox())!.width).toBeLessThan(bounds!.width * 0.51);
+  expect((await card.boundingBox())!.width).toBeGreaterThan(bounds!.width * 0.4);
   const side = await page.getByRole('complementary', {name: 'Schedule and alerts'}).boundingBox();
   expect(side!.x).toBeGreaterThan(bounds!.x);
   await page.screenshot({path: info.outputPath('student-home-1155.png'), fullPage: true});
