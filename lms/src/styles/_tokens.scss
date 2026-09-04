@@ -212,6 +212,12 @@ $shadow-popover: 0 12px 32px rgba($slate-700, .14);
 $shadow-selected: 0 0 0 1px $action-primary, 0 2px 8px rgba($action-primary, .1);
 $shadow-dashboard-card: 0 1px 2px rgba($slate-700, .04);
 
+// Shared course identity surfaces, based on the Instructor My Courses card.
+$course-card-accent: $action-primary;
+$course-card-accent-size: .3125rem;
+$course-card-shadow: 0 4px 14px rgba($slate-700, .04);
+$course-card-shadow-hover: 0 8px 24px rgba($slate-700, .08);
+
 $duration-fast: 140ms;
 $duration-standard: 200ms;
 $ease-out: cubic-bezier(.16, 1, .3, 1);

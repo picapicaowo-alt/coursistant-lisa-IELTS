@@ -1,14 +1,14 @@
-import {UserAvatar} from '@/components/UserAvatar';
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './CoursePreview.module.scss';
-import {useNavigate, generatePath} from "react-router-dom";
+import {Link, generatePath} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {courseApiService} from "@/apis/services/course-api";
-import {CourseSession, CourseState, type CourseProgressResponse} from "@/apis";
+import {CourseSession, CourseState, unwrapData, type CourseProgressResponse} from "@/apis";
 import {AssignmentProgress} from '@/components/AssignmentProgress';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {CalendarDays, MapPin, UserRound} from 'lucide-react';
+import {CalendarDays, Ellipsis, MapPin} from 'lucide-react';
+import {CourseIdentityCard} from '@/components/CourseIdentityCard';
 import {TeachingBadge} from '@/components/TeachingWorkspace';
 
 interface CoursePreviewProps {
@@ -28,7 +28,6 @@ interface CoursePreviewProps {
   progressLoading?: boolean;
   progressFailed?: boolean;
   showProgress?: boolean;
-  instructorView?: boolean;
 }
 
 const DAY_LABEL: Record<CourseSession['dayOfWeek'], string> = {
@@ -62,11 +61,9 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
                                                               canManage,
                                                               showOperations,
                                                               showDelivery = false,
-                                                              instructorView = false,
                                                               avatarUrl,
                                                               progress, progressLoading, progressFailed, showProgress = true,
                                                             }) => {
-  const navigate = useNavigate();
   const {t} = useTranslation("course");
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -75,7 +72,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
 
   const {data: sessions, isPending: schedulePending, isError: scheduleError, refetch: retrySchedule} = useQuery({
     queryKey: ['course-sessions', id],
-    queryFn: async () => (await courseApiService.getCourseSessions(id)).data ?? [],
+    queryFn: async () => unwrapData(await courseApiService.getCourseSessions(id), 'getCourseSessions'),
     staleTime: 5 * 60 * 1000,
     gcTime: 5 * 60 * 1000,
     // A missing schedule must not turn into a retry storm across every card.
@@ -114,7 +111,11 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
   });
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen) {
+      setConfirmDelete(false);
+      return;
+    }
+    menuRef.current?.querySelector<HTMLButtonElement>('[role="menuitem"]')?.focus();
     const onPointerDown = (event: PointerEvent) => {
       if (!menuRef.current?.contains(event.target as Node)) setMenuOpen(false);
     };
@@ -125,57 +126,46 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
   const firstSession = sessions?.[0];
 
   return (
-    <article className={`${styles.courseItem} ${instructorView ? styles.instructorCard : ''}`}>
-      {instructorView ? <div className={styles.teachingTop}><TeachingBadge value={state}>{state}</TeachingBadge><span className={styles.courseCode}>{courseCode}</span></div> : null}
-      <div className={styles.courseHeader} hidden={instructorView}>
-        {(
-          <div className={styles.instructorInfo}>
-            <div className={styles.avatarContainer}>
-              <UserAvatar src={avatarUrl} className={styles.avatar}/>
-            </div>
-            <div>
-              <div className={styles.instructorName}>{instructorName || 'Instructor not assigned'}</div>
-              <div className={styles.instructorRole}>{t("card.instructor")}</div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className={styles.courseContent}>
-        <h2 className={styles.courseTitle}>{title || courseCode}</h2>
-        {instructorView ? <div className={styles.teachingInstructor}><UserRound size={17} aria-hidden="true"/><span>{instructorName || 'Instructor not assigned'}</span></div> : <div className={styles.badges}><span className={styles.courseState}>{state}</span><span className={styles.courseCode}>{courseCode}</span></div>}
-        {showProgress ? <div className={styles.progressUnavailable}><AssignmentProgress progress={progress} loading={progressLoading} failed={progressFailed}/></div> : null}
-      </div>
-      <div className={styles.courseFooter}>
-        {instructorView ? <div className={styles.teachingSchedule}><div><CalendarDays size={18} aria-hidden="true"/><span>{scheduleError ? <button type="button" onClick={() => void retrySchedule()}>Retry schedule</button> : firstSession ? `Weekly class, ${DAY_LABEL[firstSession.dayOfWeek]} ${toClockTime(firstSession.startTime)}` : state === 'Archived' ? 'Archived course' : schedulePending ? 'Loading schedule…' : 'No schedule published'}</span></div><div><MapPin size={18} aria-hidden="true"/><span>{firstSession?.location || 'Location not provided'}</span></div></div> : <div className={styles.scheduleSummary}><img src="/icons/figma-dashboard/calendar.svg" alt=""/><div><span>Weekly class</span>
-          {scheduleError ? <button type="button" onClick={() => void retrySchedule()}>Retry schedule</button> : firstSession ? <><strong>{DAY_LABEL[firstSession.dayOfWeek]} {toClockTime(firstSession.startTime)}</strong>{firstSession.location ? <small>{firstSession.location}</small> : null}</> : <strong>{state === 'Archived' ? 'Archived course' : schedulePending ? 'Loading…' : 'No schedule published'}</strong>}
-        </div></div>}
-        <button
-          type="button"
-          className={`${styles.viewDetails} ${instructorView ? styles.outlineAction : ''}`}
-          onClick={() => navigate(generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(id)}))}
-        >
+    <CourseIdentityCard
+      courseId={id}
+      title={title || courseCode}
+      headingLevel={2}
+      code={courseCode}
+      status={<TeachingBadge value={state}>{state}</TeachingBadge>}
+      instructor={instructorName || 'Instructor not assigned'}
+      instructorAvatar={avatarUrl}
+      footer={<div className={styles.schedule}>
+        <div><CalendarDays size={18} aria-hidden="true"/><span>
+          {scheduleError ? <button type="button" onClick={() => void retrySchedule()}>Retry schedule</button>
+            : firstSession ? `Weekly class, ${DAY_LABEL[firstSession.dayOfWeek]} ${toClockTime(firstSession.startTime)}`
+            : state === 'Archived' ? 'Archived course'
+            : schedulePending ? 'Loading schedule…' : 'No schedule published'}
+        </span></div>
+        <div><MapPin size={18} aria-hidden="true"/><span>{firstSession?.location || 'Location not provided'}</span></div>
+      </div>}
+      actions={<>
+        <Link data-variant={showOperations || showDelivery ? 'secondary' : undefined}
+          to={generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(id)})}>
           {t("card.viewDetails")}
-          <span aria-hidden="true">›</span>
-        </button>
-        {showOperations ? (
-          <button type="button" className={styles.viewDetails} onClick={() => navigate(generatePath(APP_ROUTE_PATHS.courseCourseIdOperations, {courseId: String(id)}))}>
-            Course operations
-          </button>
-        ) : null}
-        {showDelivery ? (
-          <button type="button" className={styles.viewDetails} onClick={() => navigate(generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(id)}))}>
-            Delivery setup
-          </button>
-        ) : null}
-
-        {/* The design also offers Share Courses and Delete Course. Sharing has
-            no endpoint, and deleting is not how a course is retired: it only
-            works on a course with no dependencies at all, and INV-05 requires
-            submissions and grades to survive every V1 action. Archive is the
-            real lifecycle step (open-decisions.md B-2). */}
-        {canManage && (
-          <div className={styles.menuAnchor} ref={menuRef}>
+        </Link>
+        {showOperations ? <Link to={generatePath(APP_ROUTE_PATHS.courseCourseIdOperations, {courseId: String(id)})}>Course operations</Link> : null}
+        {showDelivery ? <Link to={generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(id)})}>Delivery setup</Link> : null}
+      </>}
+        menu={canManage ? (
+          <div className={styles.menuAnchor} ref={menuRef} onKeyDown={event => {
+            if (event.key === 'Escape') {
+              event.preventDefault();
+              setMenuOpen(false);
+              menuRef.current?.querySelector('button')?.focus();
+            } else if (menuOpen && ['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) {
+              event.preventDefault();
+              const items = Array.from(menuRef.current?.querySelectorAll<HTMLButtonElement>('[role="menuitem"]:not(:disabled)') ?? []);
+              const current = items.indexOf(document.activeElement as HTMLButtonElement);
+              const next = event.key === 'Home' ? 0 : event.key === 'End' ? items.length - 1
+                : (current + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+              items[next]?.focus();
+            }
+          }}>
             <button
               type="button"
               className={styles.menuButton}
@@ -184,7 +174,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
               aria-expanded={menuOpen}
               aria-label={t("card.moreActions")}
             >
-              ⋯
+              <Ellipsis size={18} aria-hidden="true"/>
             </button>
 
             {menuOpen && (
@@ -201,8 +191,8 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
                     {confirmDelete ? (
                       <div className={styles.confirmDelete}>
                         <p>Delete permanently?</p>
-                        <button type="button" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? 'Deleting…' : 'Confirm'}</button>
-                        <button type="button" onClick={() => setConfirmDelete(false)}>Cancel</button>
+                        <button type="button" role="menuitem" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? 'Deleting…' : 'Confirm'}</button>
+                        <button type="button" role="menuitem" onClick={() => setConfirmDelete(false)}>Cancel</button>
                       </div>
                     ) : <button type="button" role="menuitem" className={`${styles.menuItem} ${styles.dangerItem}`} onClick={() => setConfirmDelete(true)}>Delete permanently</button>}
                   </>
@@ -210,12 +200,12 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
               </div>
             )}
           </div>
-        )}
-      </div>
-
+        ) : null}
+    >
+      {showProgress ? <AssignmentProgress progress={progress} loading={progressLoading} failed={progressFailed}/> : null}
       {(archive.isError || unarchive.isError || remove.isError) && (
         <p className={styles.error} role="alert">{remove.isError ? 'This course could not be deleted. Courses with enrolments or coursework must be retained.' : archive.isError ? t("card.archiveFailed") : 'The course could not be restored.'}</p>
       )}
-    </article>
+    </CourseIdentityCard>
   );
 };

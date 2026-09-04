@@ -450,7 +450,8 @@
 .cardSchedule > span { display: grid; gap: t.$space-1; min-width: 0; }
 .cardSchedule small { color: t.$content-secondary; font-size: t.$font-size-caption; }
 .cardSchedule strong { color: t.$content-primary; font-size: t.$font-size-caption; font-weight: t.$fw-medium; overflow-wrap: anywhere; }
-.cardSchedule > .scheduleLocation { grid-column: 2; display: inline-flex; align-items: center; overflow-wrap: anywhere; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.cardSchedule > .scheduleLocation { grid-column: 2; display: inline-flex; align-items: flex-start; gap: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-caption; overflow-wrap: anywhere; }
+.scheduleLocation svg { flex-shrink: 0; }
 
 .dialogFooter {
   display: flex;

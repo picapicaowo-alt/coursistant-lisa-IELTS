@@ -1,17 +1,97 @@
-.card { align-self: start; background: t.$surface-raised; border-color: t.$border-default; border-radius: t.$radius-lg; }
-.card h3 { color: t.$content-primary; font-size: t.$font-size-headline; line-height: t.$line-height-headline; }
-.identity { display: grid; gap: t.$space-3; margin-top: t.$space-2; color: t.$content-primary; }
-.code { font-size: t.$font-size-caption; }
-.metadata { display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-4; font-size: t.$font-size-caption; line-height: t.$line-height-caption; color: t.$content-secondary; }
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: t.$space-5;
+  padding: t.$space-6;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-card-lg;
+  background: t.$surface-raised;
+  box-shadow: t.$course-card-shadow;
+  transition: border-color t.$duration-standard t.$ease-out, box-shadow t.$duration-standard t.$ease-out;
 
-.identityCard { display: flex; flex-direction: column; gap: t.$space-4; padding: t.$space-6; min-width: 0; border: 1px solid t.$border-default; height: 100%; }
-.identityCard h3 { margin: 0; font-size: t.$fs-course-name; line-height: 1.35; overflow-wrap: anywhere; }
-.instructor { display: flex; align-items: center; gap: t.$space-3; }
-.instructor > span { display: grid; place-items: center; width: t.$touch-target; height: t.$touch-target; border: 1px solid t.$border-default; background: t.$surface-muted; border-radius: t.$radius-pill; }
-.instructor > div { display: grid; gap: t.$space-1; }
-.instructor strong { font-weight: t.$fw-medium; }
-.instructor small { color: t.$content-secondary; }
-.progress { display: grid; gap: t.$space-2; margin-top: auto; padding-top: t.$space-4; font-size: t.$font-size-caption; color: t.$content-secondary; }
-.progress strong { color: t.$content-primary; font-weight: t.$fw-medium; }
-.progress progress { height: t.$space-2; width: 100%; accent-color: t.$feedback-success; }
-.identityCard footer { border-top: 1px dashed t.$border-default; padding-top: t.$space-4; }
+  // Overlay the accent instead of changing border width: hover never moves content.
+  // Do not clip the card; the caller's actions menu must escape its bounds.
+  &::before {
+    position: absolute;
+    inset: -1px -1px auto;
+    height: calc(t.$radius-card-lg + t.$course-card-accent-size);
+    border-top: t.$course-card-accent-size solid t.$course-card-accent;
+    border-radius: t.$radius-card-lg t.$radius-card-lg 0 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity t.$duration-standard t.$ease-out;
+    content: '';
+  }
+
+  &:focus-within { border-color: t.$border-interactive; box-shadow: t.$course-card-shadow-hover; }
+  &:focus-within::before { opacity: 1; }
+  :is(a, button, summary):focus-visible { outline: 3px solid t.$focus-ring; outline-offset: 2px; }
+}
+
+@media (hover: hover) {
+  .card:hover { border-color: t.$border-strong; box-shadow: t.$course-card-shadow-hover; }
+  .card:hover::before { opacity: 1; }
+}
+
+.top { display: flex; align-items: center; gap: t.$space-3; min-width: 0; min-height: t.$space-6; }
+.status { display: flex; flex-wrap: wrap; gap: t.$space-2; min-width: 0; }
+.code { min-width: 0; margin-left: auto; overflow-wrap: anywhere; text-align: right; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.menu { flex-shrink: 0; margin-block: calc(-1 * t.$space-2); }
+.heading { display: grid; gap: t.$space-2; min-width: 0; }
+.heading :is(h2, h3) { margin: 0; color: t.$content-primary; font-size: t.$font-size-headline; font-weight: t.$fw-bold; line-height: t.$line-height-headline; overflow-wrap: anywhere; }
+.instructor { display: flex; align-items: flex-start; gap: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-body; }
+.instructor svg { flex-shrink: 0; margin-top: 2px; }
+.instructor span { min-width: 0; overflow-wrap: anywhere; }
+.avatar { width: t.$space-6; height: t.$space-6; object-fit: cover; border-radius: t.$radius-pill; }
+.metadata { display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-4; overflow-wrap: anywhere; font-size: t.$font-size-caption; line-height: t.$line-height-caption; color: t.$content-secondary; }
+.progress > span { display: flex; flex-wrap: wrap; justify-content: space-between; gap: t.$space-2; }
+.footer { display: grid; gap: t.$space-4; margin-top: auto; padding-top: t.$space-4; border-top: 1px solid t.$border-default; }
+.actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: t.$space-3; }
+.actions > :is(a, button, details) { flex: 1 1 9rem; min-width: 0; }
+.actions > details > summary {
+  min-height: t.$touch-target;
+  padding: t.$space-2;
+  align-content: center;
+  border: 1px solid t.$action-primary;
+  border-radius: t.$radius-control;
+  background: t.$surface-raised;
+  color: t.$action-primary;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-semibold;
+  line-height: t.$line-height-body;
+  text-align: center;
+  list-style-position: inside;
+  cursor: pointer;
+  &:hover { background: t.$surface-brand-subtle; }
+}
+.actions > details > div { display: flex; flex-wrap: wrap; gap: t.$space-2; padding-top: t.$space-3; }
+.actions > details > div > * { min-width: 0; max-width: 100%; }
+.actions > :is(a, button) {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-height: t.$touch-target;
+  padding: t.$space-2;
+  border: 1px solid t.$action-primary;
+  border-radius: t.$radius-control;
+  background: t.$action-primary;
+  color: t.$content-on-color;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-semibold;
+  line-height: t.$line-height-body;
+  text-align: center;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+  transition: background-color t.$duration-fast t.$ease-out;
+  &:hover:not(:disabled) { background: t.$action-primary-hover; }
+  &[data-variant='secondary'] { background: t.$surface-raised; color: t.$action-primary; }
+  &[data-variant='secondary']:hover:not(:disabled) { background: t.$surface-brand-subtle; }
+  &:disabled { opacity: .55; cursor: not-allowed; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .card::before, .actions > :is(a, button) { transition: none; }
+}
