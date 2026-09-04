@@ -12,6 +12,7 @@ import {ATTENDANCE_STATUSES, SCHEDULE_DECISIONS, SCHEDULE_REQUEST_TYPES} from '@
 import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/downloadBlob';
 import {canAccessCourseOperations} from '@/utils/roleCapabilities';
 import styles from './index.module.scss';
+import {InstructorCourseOperations} from './InstructorCourseOperations';
 
 type Section = 'occurrences' | 'attendance' | 'reports' | 'discussion' | 'content' | 'enrolment';
 type CourseReportType = '' | 'MID_TERM' | 'FINAL';
@@ -19,7 +20,7 @@ type CourseReportType = '' | 'MID_TERM' | 'FINAL';
 const positive = (value: string): number => Number(value);
 const validId = (value: string): boolean => Number.isInteger(Number(value)) && Number(value) > 0;
 
-const CourseOperationsPage: React.FC = () => {
+const LegacyCourseOperationsPage: React.FC = () => {
   const {courseId} = useParams();
   const id = Number(courseId);
   const access = useCourseAccess(Number.isInteger(id) ? id : null);
@@ -284,6 +285,16 @@ const CourseOperationsPage: React.FC = () => {
       ) : null}
     </main>
   );
+};
+
+// Keep existing TA/admin workflows and their course-level capability boundaries intact.
+const CourseOperationsPage: React.FC = () => {
+  const {courseId} = useParams();
+  const id = Number(courseId);
+  const access = useCourseAccess(Number.isSafeInteger(id) && id > 0 ? id : null);
+  return access.isInstructor && id > 0
+    ? <InstructorCourseOperations key={id} courseId={id} title={access.membership?.title || access.membership?.courseCode || `Course ${id}`}/>
+    : <LegacyCourseOperationsPage/>;
 };
 
 export default CourseOperationsPage;

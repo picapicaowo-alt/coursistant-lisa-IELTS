@@ -8,6 +8,8 @@ import {courseApiService} from "@/apis/services/course-api";
 import {CourseSession, CourseState, type CourseProgressResponse} from "@/apis";
 import {AssignmentProgress} from '@/components/AssignmentProgress';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {CalendarDays, MapPin, UserRound} from 'lucide-react';
+import {TeachingBadge} from '@/components/TeachingWorkspace';
 
 interface CoursePreviewProps {
   id: number;
@@ -26,6 +28,7 @@ interface CoursePreviewProps {
   progressLoading?: boolean;
   progressFailed?: boolean;
   showProgress?: boolean;
+  instructorView?: boolean;
 }
 
 const DAY_LABEL: Record<CourseSession['dayOfWeek'], string> = {
@@ -59,6 +62,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
                                                               canManage,
                                                               showOperations,
                                                               showDelivery = false,
+                                                              instructorView = false,
                                                               avatarUrl,
                                                               progress, progressLoading, progressFailed, showProgress = true,
                                                             }) => {
@@ -121,8 +125,9 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
   const firstSession = sessions?.[0];
 
   return (
-    <article className={styles.courseItem}>
-      <div className={styles.courseHeader}>
+    <article className={`${styles.courseItem} ${instructorView ? styles.instructorCard : ''}`}>
+      {instructorView ? <div className={styles.teachingTop}><TeachingBadge value={state}>{state}</TeachingBadge><span className={styles.courseCode}>{courseCode}</span></div> : null}
+      <div className={styles.courseHeader} hidden={instructorView}>
         {(
           <div className={styles.instructorInfo}>
             <div className={styles.avatarContainer}>
@@ -138,16 +143,16 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
 
       <div className={styles.courseContent}>
         <h2 className={styles.courseTitle}>{title || courseCode}</h2>
-        <div className={styles.badges}><span className={styles.courseState}>{state}</span><span className={styles.courseCode}>{courseCode}</span></div>
+        {instructorView ? <div className={styles.teachingInstructor}><UserRound size={17} aria-hidden="true"/><span>{instructorName || 'Instructor not assigned'}</span></div> : <div className={styles.badges}><span className={styles.courseState}>{state}</span><span className={styles.courseCode}>{courseCode}</span></div>}
         {showProgress ? <div className={styles.progressUnavailable}><AssignmentProgress progress={progress} loading={progressLoading} failed={progressFailed}/></div> : null}
       </div>
       <div className={styles.courseFooter}>
-        <div className={styles.scheduleSummary}><img src="/icons/figma-dashboard/calendar.svg" alt=""/><div><span>Weekly class</span>
+        {instructorView ? <div className={styles.teachingSchedule}><div><CalendarDays size={18} aria-hidden="true"/><span>{scheduleError ? <button type="button" onClick={() => void retrySchedule()}>Retry schedule</button> : firstSession ? `Weekly class, ${DAY_LABEL[firstSession.dayOfWeek]} ${toClockTime(firstSession.startTime)}` : state === 'Archived' ? 'Archived course' : schedulePending ? 'Loading schedule…' : 'No schedule published'}</span></div><div><MapPin size={18} aria-hidden="true"/><span>{firstSession?.location || 'Location not provided'}</span></div></div> : <div className={styles.scheduleSummary}><img src="/icons/figma-dashboard/calendar.svg" alt=""/><div><span>Weekly class</span>
           {scheduleError ? <button type="button" onClick={() => void retrySchedule()}>Retry schedule</button> : firstSession ? <><strong>{DAY_LABEL[firstSession.dayOfWeek]} {toClockTime(firstSession.startTime)}</strong>{firstSession.location ? <small>{firstSession.location}</small> : null}</> : <strong>{state === 'Archived' ? 'Archived course' : schedulePending ? 'Loading…' : 'No schedule published'}</strong>}
-        </div></div>
+        </div></div>}
         <button
           type="button"
-          className={styles.viewDetails}
+          className={`${styles.viewDetails} ${instructorView ? styles.outlineAction : ''}`}
           onClick={() => navigate(generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(id)}))}
         >
           {t("card.viewDetails")}

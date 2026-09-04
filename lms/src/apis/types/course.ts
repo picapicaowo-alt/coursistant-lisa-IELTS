@@ -77,6 +77,8 @@ export interface CourseMaterial {
   courseId: number;
   materialType: MaterialType;
   displayName: string;
+  createdAt?: string;
+  teachingType?: 'DOCUMENT' | 'IMAGE' | 'AUDIO' | 'VIDEO' | 'ARCHIVE' | 'LINK';
   /** Zero-based, ascending. */
   orderPosition: number;
   originalFilename: string | null;
@@ -104,6 +106,8 @@ export interface CourseWeek {
   id: number;
   courseId: number;
   title: string;
+  lectureId?: number;
+  lectureNumber?: number;
   /** Zero-based, ascending. */
   orderPosition: number;
   state: 'Draft' | 'Published';

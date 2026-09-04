@@ -6,6 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   BookOpenText,
+  CircleCheck,
+  TextCursor,
   Headphones,
   Image as ImageIcon,
   PenLine,
@@ -394,23 +396,21 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
   const [gradeId, setGradeId] = useState<number | null>(() =>
     rows[0] ? idFrom(rows[0], "gradeId", "writingGradeId") : null,
   );
+  const [submitting, setSubmitting] = useState(false);
   return (
-    <div className={styles.workspace}>
+    <div className={`${styles.workspace} ${styles.instructorWorkspace}`}>
       <section className={styles.hero}>
         <div>
+          <div className={styles.queueEyebrow}><span>Assigned review queue</span><span>{rows.length} queue items</span></div>
           <h1>Read the script. Return a clear result.</h1>
           <p>
             Work from the assigned queue, inspect the complete submission, then
             record a score and candidate-facing feedback.
           </p>
         </div>
-        <div className={styles.metric}>
-          <strong>{rows.length}</strong>
-          <span>queue items</span>
-        </div>
       </section>
-      <div className={styles.queueLayout}>
-        <WorkspaceSection title="Writing submissions">
+      <div className={`${styles.queueLayout} ${rows.length ? styles.hasSubmissions : ''}`}>
+        <WorkspaceSection title="Writing submissions" className={styles.reviewPanel} bodyClassName={styles.reviewBody}>
           {rows.length ? (
             <div className={styles.cardList}>
               {rows.map((row, index) => {
@@ -425,6 +425,8 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
                       setGradeId(id);
                     }}
                     key={id}
+                    aria-pressed={gradeId === id}
+                    disabled={submitting}
                   >
                     <span className={styles.cardTopline}>
                       {runtimeString(row, "status") || "Awaiting review"}
@@ -442,16 +444,17 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
               })}
             </div>
           ) : (
-            <Empty>No writing submissions are waiting for review.</Empty>
+            <div className={styles.reviewEmpty}><span className={styles.caughtUpIcon}><CircleCheck size={27}/></span><h3>All caught up!</h3><p>No writing submissions are waiting for review in this pool.</p></div>
           )}
         </WorkspaceSection>
         <WorkspaceSection
           title={gradeId ? `Submission #${gradeId}` : "Select a submission"}
+          className={styles.reviewPanel} bodyClassName={styles.reviewBody}
         >
           {gradeId ? (
-            <WritingGradeReview key={gradeId} gradeId={gradeId}/>
+            <WritingGradeReview key={gradeId} gradeId={gradeId} onBusy={setSubmitting}/>
           ) : (
-            <Empty>Choose a queue item to begin grading.</Empty>
+            <div className={styles.reviewEmpty}><span className={styles.readyIcon}><TextCursor size={27}/></span><h3>Ready to review</h3><p>Choose a queue item to begin grading.</p></div>
           )}
         </WorkspaceSection>
       </div>

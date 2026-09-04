@@ -43,7 +43,7 @@ async function fixture(page: Page, level: string, role = 'USER') {
 const cases = [
   {name: 'student', level: 'STUDENT', path: '/my-plan', title: 'Study plan'},
   {name: 'advisor', level: 'ADVISOR', path: '/advisor/students', title: 'Students List'},
-  {name: 'instructor', level: 'INSTRUCTOR', path: '/my-operations', title: 'Teaching operations'},
+  {name: 'instructor', level: 'INSTRUCTOR', path: '/my-operations', title: 'Teaching Operations'},
   {name: 'combined-instructor-advisor', level: 'INSTRUCTOR_ADVISOR', path: '/my-operations', title: 'Teaching operations'},
   {name: 'counsellor', level: 'COUNSELLOR', path: '/counsellor', title: 'Intake dashboard'},
   {name: 'parent', level: 'PARENT', path: '/parent', title: 'Student progress'},
@@ -71,8 +71,9 @@ for (const subject of cases) {
       expect(geometry.left).toBeGreaterThanOrEqual(0);
       expect(geometry.right).toBeLessThanOrEqual(width);
       expect(geometry.font).toBeGreaterThanOrEqual(28);
-      // The approved tenant frames use a larger 40px desktop masthead.
-      expect(geometry.font).toBeLessThanOrEqual(subject.name === 'tenant-admin' ? 40 : 32);
+      // Approved tenant/instructor frames use larger desktop mastheads.
+      const maximumTitleSize = subject.name === 'tenant-admin' ? 40 : subject.name === 'instructor' ? 36 : 32;
+      expect(geometry.font).toBeLessThanOrEqual(maximumTitleSize);
       if (width === 390 || width === 1440) await page.screenshot({path: testInfo.outputPath(`${subject.name}-${width}.png`), fullPage: true});
     }
     expect(errors).toEqual([]);

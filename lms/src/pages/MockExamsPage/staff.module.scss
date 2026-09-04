@@ -720,3 +720,25 @@
 .recordButton span { color: t.$content-secondary; font-size: t.$font-size-caption; }
 .recordButton[aria-pressed='true'] { border-color: t.$action-primary; background: t.$surface-brand-subtle; }
 .recordButton:disabled { cursor: not-allowed; opacity: .55; }
+.workspace.instructorWorkspace {
+  background: t.$surface-subtle; padding: clamp(1.5rem, 3vw, 3rem); gap: t.$space-10; align-content: start;
+  .hero { border: 0; padding: 0; h1 { font-size: clamp(1.8rem, 2.7vw, 2.75rem); font-weight: t.$fw-bold; letter-spacing: -.025em; } p:last-child { margin-top: t.$space-4; font-size: t.$font-size-body; max-width: 68ch; } }
+  .queueLayout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-6; align-items: stretch; }
+  .hasSubmissions { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); }
+  .reviewPanel { min-width: 0; display: flex; flex-direction: column; gap: t.$space-5; padding: clamp(1.25rem, 2.4vw, 2rem); border: 1px solid t.$border-default; border-radius: t.$radius-card-lg; background: t.$surface-raised; > header { border: 0; padding: 0; h2 { font-size: t.$font-size-headline; } } }
+  .reviewBody { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .reviewEmpty h3 { font-weight: t.$fw-semibold; }
+  .reviewEmpty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: t.$space-8; min-height: clamp(20rem, 48vh, 35rem); border-radius: t.$radius-control; background: t.$surface-subtle; h3 { font-size: t.$font-size-body; margin: t.$space-5 0 t.$space-2; } p { max-width: 36ch; color: t.$content-secondary; line-height: t.$line-height-body; margin: 0; } }
+  .selectedCard { border-color: t.$action-primary; background: t.$surface-brand-subtle; box-shadow: none; }
+  .selectCard:hover { border-color: t.$action-primary; box-shadow: none; }
+  .selectCard, .selectedCard { gap: t.$space-3; strong { color: t.$content-primary; } }
+  .cardTopline { color: t.$content-secondary; letter-spacing: 0; text-transform: none; font-size: t.$font-size-caption; }
+  .script { max-height: none; overflow: visible; background: t.$surface-subtle; border-radius: t.$radius-control; }
+  .compactForm { border-top: 1px solid t.$border-default; padding-top: t.$space-6; gap: t.$space-4; h3 { color: t.$content-primary; font-size: t.$font-size-headline; } }
+  .primary { background: t.$action-primary; color: t.$content-on-color; box-shadow: none; justify-self: start; min-height: t.$touch-target; }
+  @media (max-width: 65rem) { .queueLayout, .hasSubmissions { grid-template-columns: minmax(0, 1fr); } .reviewEmpty { min-height: 17rem; } }
+}
+.queueEyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: t.$space-3; margin-bottom: t.$space-4; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; color: t.$action-primary; > span:first-child { text-transform: uppercase; } > span + span { padding: t.$space-1 t.$space-2; background: t.$surface-brand-subtle; border-radius: t.$radius-pill; } }
+.caughtUpIcon, .readyIcon { display: grid; place-items: center; width: 4rem; height: 4rem; border-radius: t.$radius-pill; }
+.caughtUpIcon { background: t.$feedback-success-surface; color: t.$feedback-success; }
+.readyIcon { background: t.$surface-brand-subtle; color: t.$action-primary; }

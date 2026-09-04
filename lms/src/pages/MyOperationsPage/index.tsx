@@ -16,6 +16,7 @@ import {canUseStudentLearningOperations, canUseTeachingOperations} from '@/utils
 import {getSignedInHomePath} from '@/utils/signedInHomePath';
 import {TeacherOperationsSections} from './TeacherOperationsSections';
 import styles from './index.module.scss';
+import {InstructorOperationsPage} from './InstructorOperationsPage';
 
 type Section = 'overview' | 'calendar' | 'teaching' | 'availability';
 type UnknownRecord = Record<string, unknown>;
@@ -29,7 +30,7 @@ const records = (value: unknown): UnknownRecord[] => {
 const numeric = (record: UnknownRecord, ...keys: string[]): number | undefined => { for (const key of keys) if (typeof record[key] === 'number') return record[key] as number; return undefined; };
 const textual = (record: UnknownRecord, ...keys: string[]): string | undefined => { for (const key of keys) if (typeof record[key] === 'string' && String(record[key]).trim()) return record[key] as string; return undefined; };
 
-const MyOperationsPage: React.FC<{embedded?: boolean}> = ({embedded = false}) => {
+const LegacyMyOperationsPage: React.FC<{embedded?: boolean}> = ({embedded = false}) => {
   const {user} = useRequiredAuth();
   const student = canUseStudentLearningOperations(user);
   const instructor = canUseTeachingOperations(user);
@@ -142,4 +143,8 @@ const MyOperationsPage: React.FC<{embedded?: boolean}> = ({embedded = false}) =>
   );
 };
 
+const MyOperationsPage: React.FC<{embedded?: boolean}> = ({embedded = false}) => {
+  const {user} = useRequiredAuth();
+  return !embedded && user.role === 'USER' && user.level === 'INSTRUCTOR' ? <InstructorOperationsPage/> : <LegacyMyOperationsPage embedded={embedded}/>;
+};
 export default MyOperationsPage;

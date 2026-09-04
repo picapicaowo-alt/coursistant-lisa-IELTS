@@ -103,7 +103,7 @@
 
 // Tenant administration follows the supplied white, wider desktop rail.
 // Other role workspaces and the user's collapsed navigation keep their sizing.
-.sidebar[data-workspace='tenant'] {
+.sidebar:is([data-workspace='tenant'], [data-workspace='instructor']) {
   background: t.$surface-canvas;
   border-right: 1px solid t.$border-default;
 

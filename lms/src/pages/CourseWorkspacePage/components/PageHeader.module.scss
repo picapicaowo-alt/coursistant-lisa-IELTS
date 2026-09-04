@@ -143,3 +143,9 @@
     box-shadow: none;
     transform: none;
 }
+.workspaceHeader.instructorHeader { background: t.$surface-subtle; border-bottom: 0; padding: t.$space-4 clamp(1.5rem, 3vw, 3rem) 0;
+  box-shadow: none;
+  .backButton { width: auto; gap: t.$space-2; color: t.$action-primary; font-size: t.$font-size-caption; background: transparent; border-color: transparent; padding-left: 0; }
+  .titleContainer[hidden] { display: none; }
+  .headerActions { margin-left: auto; }
+}

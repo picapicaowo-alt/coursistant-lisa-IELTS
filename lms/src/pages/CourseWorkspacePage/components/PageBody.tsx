@@ -6,6 +6,7 @@ import {CourseEditView} from "./CourseEditView";
 import {useCourseWorkspaceStore} from "../stores/useCourseWorkspaceStore";
 
 interface PageBodyProps {
+  instructorView?: boolean;
   canEditCourse?: boolean;
   canCreateAssignments?: boolean;
   canManageMaterials?: boolean;
@@ -16,6 +17,7 @@ interface PageBodyProps {
 }
 
 export const PageBody: React.FC<PageBodyProps> = ({
+  instructorView = false,
   canEditCourse = false,
   canCreateAssignments = false,
   canManageMaterials = false,
@@ -52,8 +54,10 @@ export const PageBody: React.FC<PageBodyProps> = ({
   }
 
   return (
-    <div className={styles.contentArea}>
+    <div className={`${styles.contentArea} ${instructorView ? styles.instructorBody : ''}`}>
       <CourseDetailView
+        key={instructorView ? 'instructor' : 'standard'}
+        instructorView={instructorView}
         canCreateAssignments={canCreateAssignments}
         canManageEvents={canManageEvents}
         canManageGroups={canManageGroups}

@@ -1,0 +1,166 @@
+.sessionPicker {
+  max-width: 38rem;
+  margin-bottom: t.$space-5;
+}
+.actionBar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: t.$space-4;
+  margin: t.$space-4 0 t.$space-6;
+  font-size: t.$font-size-body;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: t.$space-6;
+  margin-bottom: t.$space-6;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-md;
+  background: t.$surface-subtle;
+}
+.metrics > div {
+  display: grid;
+  gap: t.$space-2;
+  padding-inline: t.$space-5;
+}
+.metrics > div + div {
+  border-left: 1px solid t.$border-default;
+}
+.metrics > div:first-child {
+  padding-left: 0;
+}
+.metrics span {
+  text-transform: uppercase;
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+  font-weight: t.$fw-semibold;
+}
+.metrics strong {
+  font-size: t.$font-size-title-1;
+  font-weight: t.$fw-bold;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.metrics small {
+  font-size: t.$font-size-subhead;
+}
+.metrics [data-status="PRESENT"] :is(strong, span) {
+  color: t.$feedback-success;
+}
+.metrics [data-status="LATE"] :is(strong, span) {
+  color: t.$feedback-warning;
+}
+.metrics [data-status="ABSENT"] :is(strong, span) {
+  color: t.$feedback-danger;
+}
+.statusToggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  padding: t.$space-1;
+  background: t.$surface-subtle;
+  border-radius: t.$radius-sm;
+  gap: t.$space-1;
+}
+.statusToggle button {
+  min-height: t.$touch-target;
+  border: 0;
+  border-radius: t.$radius-xs;
+  padding: t.$space-2 t.$space-3;
+  color: t.$content-secondary;
+  background: transparent;
+  font: inherit;
+  font-weight: t.$fw-medium;
+  cursor: pointer;
+}
+.statusToggle button[aria-pressed="true"] {
+  color: t.$content-on-color;
+  background: t.$content-secondary;
+}
+.statusToggle button[aria-pressed="true"][data-status="PRESENT"] {
+  background: t.$feedback-success;
+}
+.statusToggle button[aria-pressed="true"][data-status="LATE"] {
+  background: t.$feedback-warning;
+}
+.statusToggle button[aria-pressed="true"][data-status="ABSENT"] {
+  background: t.$feedback-danger;
+}
+.studentName {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: t.$content-primary;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  text-align: left;
+  cursor: pointer;
+}
+.studentName:hover {
+  color: t.$action-primary;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.roster th:last-child,
+.roster td:last-child {
+  text-align: right;
+}
+@media (max-width: 64rem) {
+  .metrics {
+    padding: t.$space-4;
+  }
+  .metrics > div {
+    padding-inline: t.$space-3;
+  }
+  .metrics strong {
+    font-size: t.$font-size-title-2;
+  }
+  .metrics small {
+    display: block;
+    font-size: t.$font-size-caption;
+  }
+}
+@media (max-width: 48rem) {
+  .metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: t.$space-5;
+  }
+  .metrics > div,
+  .metrics > div:first-child {
+    padding: 0;
+  }
+  .metrics > div + div {
+    border: 0;
+  }
+  .roster,
+  .roster tbody,
+  .roster tr,
+  .roster td {
+    display: block;
+  }
+  .roster thead {
+    display: none;
+  }
+  .roster td {
+    padding: t.$space-4;
+    border: 0;
+  }
+  .roster td + td {
+    padding-top: 0;
+    text-align: left;
+  }
+  .roster tr + tr {
+    border-top: 1px solid t.$border-default;
+  }
+  .statusToggle {
+    display: flex;
+  }
+  .statusToggle button {
+    flex: 1;
+    padding-inline: t.$space-2;
+    font-size: t.$font-size-caption;
+  }
+}
+.attendancePanel { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: t.$space-6; > * { grid-column: 1 / -1; } .sessionPicker { grid-column: 1; grid-row: 1; } .actionBar { grid-column: 2; grid-row: 1; align-self: end; margin: 0 0 t.$space-5; flex-direction: column; align-items: flex-end; gap: t.$space-2; } }
+@media (max-width: 75rem) { .attendancePanel { grid-template-columns: minmax(0, 1fr); .sessionPicker, .actionBar { grid-column: 1; grid-row: auto; } .actionBar { flex-direction: row; } } }
