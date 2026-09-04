@@ -97,26 +97,27 @@ for (const surface of surfaces) {
   });
 }
 
-test('course filtering, pagination, list view and details keep their original requests', async ({page}) => {
+test('course filtering, pagination, list view and details follow Student lifecycle filters', async ({page}) => {
   await setup(page, 'STUDENT');
   const queries: URLSearchParams[] = [];
   await page.route('**/v2/me/courses?*', route => {
     const query = new URL(route.request().url()).searchParams;
     queries.push(query);
-    return route.fulfill({json: reply({items: query.get('state') === 'Archived' ? [] : [{...course, id: query.get('page') === '1' ? 72 : 71}], page: Number(query.get('page')), size: 20, total: 21})});
+    return route.fulfill({json: reply({items: query.get('courseView') === 'COMPLETED' ? [] : [{...course, id: query.get('page') === '1' ? 72 : 71}], page: Number(query.get('page')), size: 20, total: 21})});
   });
   await page.goto('/course');
   await expect(page.locator('[data-course-card="71"]')).toBeVisible();
   await page.getByRole('button', {name: 'Next course page'}).click();
   await expect(page.locator('[data-course-card="72"]')).toBeVisible();
-  await page.getByRole('button', {name: 'Archived', exact: true}).click();
+  await page.getByRole('button', {name: 'Completed', exact: true}).click();
   await expect(page.locator('[data-course-card]')).toHaveCount(0);
   expect(queries.at(-1)?.get('page')).toBe('0');
-  await page.getByRole('button', {name: 'Active', exact: true}).click();
+  await page.getByRole('button', {name: 'Current', exact: true}).click();
   await expect(page.locator('[data-course-card="71"]')).toBeVisible();
   await page.getByRole('button', {name: 'List view'}).click();
   await expect(page.locator('[data-view="list"]')).toBeVisible();
-  expect(queries.at(-1)?.get('state')).toBe('Active');
+  expect(queries.at(-1)?.get('courseView')).toBe('CURRENT');
+  expect(queries.at(-1)?.has('state')).toBe(false);
   await page.getByRole('link', {name: 'View details', exact: true}).click();
   await expect(page).toHaveURL(/\/course\/71$/);
 });
