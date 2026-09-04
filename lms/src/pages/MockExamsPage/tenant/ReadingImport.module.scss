@@ -1,0 +1,212 @@
+.dialog {
+  width: min(t.$workspace-compact-max-inline-size, calc(100% - #{t.$space-10}));
+  max-width: none;
+  max-height: calc(100dvh - #{t.$space-10});
+  margin: auto;
+  padding: 0;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-modal;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+  font-size: t.$font-size-body-lg;
+  line-height: 1.6;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+
+  &::backdrop {
+    background: t.$surface-modal-backdrop;
+  }
+  &[open] {
+    display: flex;
+    flex-direction: column;
+  }
+  :is(button, textarea, summary):focus-visible {
+    outline: 2px solid t.$action-primary;
+    outline-offset: 2px;
+  }
+  button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  button {
+    font-size: t.$font-size-body-lg;
+  }
+}
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: t.$space-5;
+  padding: t.$space-8 t.$space-8 t.$space-6;
+  flex-shrink: 0;
+  h2 {
+    margin: 0 0 t.$space-3;
+    font-size: t.$font-size-headline;
+    line-height: t.$line-height-headline;
+    font-weight: t.$fw-semibold;
+  }
+  p {
+    color: t.$content-secondary;
+    max-width: t.$reading-max-width;
+  }
+}
+.close {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: t.$touch-target;
+  height: t.$touch-target;
+  padding: 0;
+  border: 0;
+  border-radius: t.$radius-control;
+  background: transparent;
+  color: t.$content-secondary;
+  cursor: pointer;
+  &:hover {
+    background: t.$surface-subtle;
+    color: t.$content-primary;
+  }
+}
+.body {
+  min-width: 0;
+  min-height: 0;
+  padding: 0 t.$space-8 t.$space-8;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: t.$space-6;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
+  > label {
+    min-width: 0;
+  }
+  textarea {
+    width: 100%;
+  }
+}
+.modes {
+  display: flex;
+  gap: t.$space-6;
+  border-bottom: 1px solid t.$border-default;
+  button {
+    min-height: t.$touch-target;
+    padding: t.$space-2 t.$space-1 t.$space-3;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    color: t.$content-secondary;
+    background: transparent;
+    font: inherit;
+    font-weight: t.$fw-semibold;
+    cursor: pointer;
+    &[aria-pressed='true'] {
+      color: t.$action-primary;
+      border-bottom-color: t.$action-primary;
+    }
+    &:hover {
+      color: t.$action-primary;
+    }
+  }
+}
+.upload {
+  display: grid;
+  gap: t.$space-4;
+  min-width: 0;
+}
+.dropzone {
+  justify-content: center;
+  padding-block: t.$space-10;
+  &[data-dragging='true'] {
+    border-color: t.$action-primary;
+    background: t.$surface-brand-subtle;
+  }
+  > strong {
+    font-weight: t.$fw-semibold;
+  }
+  > small {
+    font-size: t.$font-size-body;
+  }
+}
+.fileRow {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+  padding: t.$space-4;
+  border-radius: t.$radius-sm;
+  background: t.$surface-subtle;
+  > svg {
+    flex-shrink: 0;
+    color: t.$action-primary;
+  }
+  > div {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    gap: t.$space-1;
+  }
+  strong {
+    font-size: t.$font-size-body-lg;
+    font-weight: t.$fw-medium;
+  }
+  small {
+    color: t.$content-secondary;
+    font-size: t.$font-size-body;
+  }
+}
+.remove {
+  min-height: t.$touch-target;
+  padding: t.$space-2;
+  border: 0;
+  border-radius: t.$radius-control;
+  background: transparent;
+  color: t.$feedback-danger;
+  font: inherit;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.footer {
+  display: grid;
+  gap: t.$space-4;
+  flex-shrink: 0;
+  padding: t.$space-5 t.$space-8 t.$space-6;
+  border-top: 1px solid t.$border-default;
+  p {
+    color: t.$content-secondary;
+    font-size: t.$font-size-body;
+  }
+}
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+}
+@media (max-width: 700px) {
+  .dialog {
+    width: calc(100% - #{t.$space-4});
+    max-height: calc(100dvh - #{t.$space-4});
+  }
+  .header {
+    padding: t.$space-5;
+    gap: t.$space-2;
+  }
+  .body {
+    padding: 0 t.$space-5 t.$space-6;
+  }
+  .footer {
+    padding: t.$space-4 t.$space-5;
+  }
+  .fileRow {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+  .remove {
+    grid-column: 2;
+    justify-self: start;
+    padding-inline: 0;
+  }
+  .actions > button {
+    flex: 1 1 auto;
+  }
+}
