@@ -18,18 +18,17 @@ const zipFilename = (week: CourseWeek) => {
   return `${safeTitle || `week-${week.id}`}-materials.zip`;
 };
 
-/**
- * The Course Content card — the selected week and what is in it.
- *
- * The design shows a paragraph of description under the title. A week has no
- * description field; it holds materials. So the card lists those instead of
- * leaving the space blank or padding it with text the course never wrote.
- */
-export const ContentCard: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: number) => void; compact?: boolean}> = ({week, onOpenMaterial, compact}) => (
-  <ContentCardBody week={week} onOpenMaterial={onOpenMaterial} compact={compact}/>
-);
+interface ContentCardProps {
+  week: CourseWeek | null;
+  onOpenMaterial?: (id: number) => void;
+  compact?: boolean;
+  label?: string;
+}
 
-const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: number) => void; compact?: boolean}> = ({week, onOpenMaterial, compact}) => {
+/** Read-only material actions; the enclosing week workspace owns its overview. */
+export const ContentCard: React.FC<ContentCardProps> = (props) => <ContentCardBody {...props}/>;
+
+const ContentCardBody: React.FC<ContentCardProps> = ({week, onOpenMaterial, compact, label = 'Course Content'}) => {
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -95,9 +94,9 @@ const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: 
   };
 
   return (
-    <section className={styles.card}>
+    <section className={styles.card} data-material-list={compact || undefined}>
       <div className={styles.cardHeader}>
-        <p className={styles.cardLabel}>Course Content</p>
+        <div><h3 className={styles.cardLabel}>{label}</h3>{compact ? <p className={styles.cardEmpty}>{week?.materials.length ?? 0} {(week?.materials.length ?? 0) === 1 ? 'material' : 'materials'}</p> : null}</div>
         {week?.materials.some(material => material.materialType === 'FILE') ? (
           <button
             type="button"
@@ -122,7 +121,7 @@ const ContentCardBody: React.FC<{week: CourseWeek | null; onOpenMaterial?: (id: 
           ) : (
             <ul className={styles.materialList}>
               {week.materials.map((material) => (
-                <li key={material.id} className={styles.material}>
+                <li key={material.id} className={styles.material} data-material-type={material.teachingType || material.materialType}>
                   <span className={styles.materialIcon} aria-hidden="true">
                     {compact ? material.materialType === 'LINK' ? <ExternalLink size={20}/> : <FileText size={20}/> : material.materialType === 'LINK' ? 'LINK' : (material.extension ?? 'file').toUpperCase()}
                   </span>

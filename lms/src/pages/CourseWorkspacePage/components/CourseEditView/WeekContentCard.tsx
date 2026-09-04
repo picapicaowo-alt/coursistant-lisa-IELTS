@@ -12,6 +12,7 @@ import {
   Plus,
   Trash2,
   Upload,
+  MoreHorizontal,
 } from 'lucide-react';
 import type {CourseMaterial, CourseWeek} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
@@ -27,6 +28,7 @@ interface WeekContentCardProps {
   canEditStructure: boolean;
   canUploadMaterials: boolean;
   onChanged: () => void;
+  compactControls?: boolean;
 }
 
 interface UploadAttempt {
@@ -53,6 +55,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
   canEditStructure,
   canUploadMaterials,
   onChanged,
+  compactControls = false,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const idempotency = useIdempotencyCheckpoint();
@@ -226,7 +229,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
   };
 
   return (
-    <section className={styles.card}>
+    <section className={styles.card} data-material-editor={compactControls || undefined}>
       <div className={styles.cardHeader}>
         <div>
           <p className={styles.cardLabel}>Course Content</p>
@@ -290,6 +293,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                     {editingId === material.id ? (
                       <input
                         className={`${editStyles.weekInput} ${editStyles.materialNameInput}`}
+                        aria-label={`Material name for ${material.displayName}`}
                         value={editingName}
                         autoFocus
                         onChange={event => setEditingName(event.target.value)}
@@ -314,7 +318,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                       </span>
                     )}
 
-                    <span className={editStyles.materialControls}>
+                    <MaterialActionDisclosure compact={compactControls} name={material.displayName}><span className={editStyles.materialControls}>
                       {canEditStructure ? (
                         <>
                           {material.publicationState === 'PUBLISHED' ? (
@@ -325,7 +329,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                               aria-label={`Unpublish ${material.displayName}`}
                               title="Unpublish material"
                             >
-                              <EyeOff size={15}/>
+                              <EyeOff size={15}/>{compactControls ? 'Unpublish' : null}
                             </button>
                           ) : (
                             <button
@@ -335,7 +339,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                               aria-label={`Publish ${material.displayName}`}
                               title="Publish material"
                             >
-                              <Eye size={15}/>
+                              <Eye size={15}/>{compactControls ? 'Publish' : null}
                             </button>
                           )}
                           <button
@@ -345,7 +349,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                             aria-label={`Move ${material.displayName} up`}
                             title="Move up"
                           >
-                            <ArrowUp size={15}/>
+                            <ArrowUp size={15}/>{compactControls ? 'Move up' : null}
                           </button>
                           <button
                             type="button"
@@ -354,7 +358,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                             aria-label={`Move ${material.displayName} down`}
                             title="Move down"
                           >
-                            <ArrowDown size={15}/>
+                            <ArrowDown size={15}/>{compactControls ? 'Move down' : null}
                           </button>
                           <button
                             type="button"
@@ -365,7 +369,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                             aria-label={`Rename ${material.displayName}`}
                             title="Rename"
                           >
-                            <Pencil size={15}/>
+                            <Pencil size={15}/>{compactControls ? 'Rename' : null}
                           </button>
                           {weeks.length > 1 ? (
                             <label className={editStyles.moveControl} title="Move to another week">
@@ -411,11 +415,11 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                             aria-label={`Delete ${material.displayName}`}
                             title="Delete"
                           >
-                            <Trash2 size={15}/>
+                            <Trash2 size={15}/>{compactControls ? 'Delete' : null}
                           </button>
                         )
                       ) : null}
-                    </span>
+                    </span></MaterialActionDisclosure>
                   </li>
                 );
               })}
@@ -423,7 +427,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
           )}
 
           {canUploadMaterials ? (
-            <form
+            <LinkDisclosure compact={compactControls}><form
               className={editStyles.linkForm}
               onSubmit={event => {
                 event.preventDefault();
@@ -462,7 +466,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                 <LinkIcon size={15}/>
                 {addLink.isPending ? 'Adding…' : 'Add link'}
               </button>
-            </form>
+            </form></LinkDisclosure>
           ) : null}
         </>
       )}
@@ -471,3 +475,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
     </section>
   );
 };
+
+function MaterialActionDisclosure({compact, name, children}: {compact: boolean; name: string; children: React.ReactNode}) {
+  if (!compact) return children;
+  return <details className={editStyles.actionDisclosure} onKeyDown={event => {if (event.key === 'Escape') {event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus();}}} onBlur={event => {if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false;}}><summary aria-label={`Manage ${name}`}><MoreHorizontal size={20}/></summary>{children}</details>;
+}
+
+function LinkDisclosure({compact, children}: {compact: boolean; children: React.ReactNode}) {
+  return compact ? <details className={editStyles.linkDisclosure}><summary>Add external link</summary>{children}</details> : children;
+}

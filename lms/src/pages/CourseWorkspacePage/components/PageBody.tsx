@@ -3,6 +3,7 @@ import {useParams} from "react-router-dom";
 import styles from "./PageBody.module.scss";
 import {CourseDetailView} from "./CourseDetailView";
 import {CourseEditView} from "./CourseEditView";
+import {InstructorCourseView} from './InstructorCourseView';
 import {useCourseWorkspaceStore} from "../stores/useCourseWorkspaceStore";
 
 interface PageBodyProps {
@@ -39,6 +40,14 @@ export const PageBody: React.FC<PageBodyProps> = ({
         </p>
       </div>
     );
+  }
+
+  if (instructorView) {
+    return <div className={`${styles.contentArea} ${styles.instructorBody}`}><InstructorCourseView
+      canEditCourse={canEditCourse} canManageMaterials={canManageMaterials}
+      canCreateAssignments={canCreateAssignments} canManageEvents={canManageEvents}
+      canManageGroups={canManageGroups} canPostAnnouncements={canPostAnnouncements}
+    /></div>;
   }
 
   if (workspaceMode === "edit" && canOpenEditor) {

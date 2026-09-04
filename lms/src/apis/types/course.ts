@@ -98,6 +98,8 @@ export interface CourseWeek {
   id: number;
   courseId: number;
   title: string;
+  /** Optional on older read projections; never substitute generated overview text. */
+  summary?: string | null;
   lectureId?: number;
   lectureNumber?: number;
   /** Zero-based, ascending. */
@@ -107,6 +109,12 @@ export interface CourseWeek {
   materials: CourseMaterial[];
   createdAt: string;
   updatedAt: string;
+}
+
+/** CreateWeekRequest / RenameWeekRequest in the consumed course contract. */
+export interface CourseWeekPayload {
+  title?: string;
+  summary?: string;
 }
 
 export interface CourseAnnouncement {

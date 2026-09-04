@@ -20,6 +20,7 @@ import {
   CourseSummary,
   CreateCourseRequest,
   CourseWeek,
+  CourseWeekPayload,
   CreateGroupSetPayload,
   idempotent,
   MemberQueryParams,
@@ -661,12 +662,13 @@ export class CourseApiService {
   async createWeek(
     courseId: number,
     title: string,
-    idempotencyKey: string = crypto.randomUUID()
+    idempotencyKey: string = crypto.randomUUID(),
+    summary?: string,
   ): Promise<ApiResponse<CourseWeek>> {
     try {
       return await this.apiClient.post<CourseWeek>(
         `/v2/courses/${courseId}/weeks`,
-        {title},
+        {title, ...(summary === undefined ? {} : {summary})},
         idempotent(idempotencyKey)
       );
     } catch (error) {
@@ -690,6 +692,11 @@ export class CourseApiService {
       console.error(`Failed to rename week: ${weekId}`, error);
       throw error;
     }
+  }
+
+  /** Partial writes preserve fields not edited by the teacher. */
+  async updateWeek(courseId: number, weekId: number, request: CourseWeekPayload, key: string): Promise<ApiResponse<CourseWeek>> {
+    return this.apiClient.patch<CourseWeek>(`/v2/courses/${courseId}/weeks/${weekId}`, request, idempotent(key));
   }
 
   /** Only an empty week can be deleted; one holding materials is refused. */
