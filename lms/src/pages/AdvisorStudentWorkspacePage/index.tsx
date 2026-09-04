@@ -1,11 +1,11 @@
-import {SkillIcon} from '@/components/SkillIcon';
-import React from 'react';
+import React, {useId, useState} from 'react';
 import {generatePath, Link, NavLink, Outlet, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {
   ArrowLeft,
   MessageSquare,
   Calendar,
+  ChevronDown,
 } from 'lucide-react';
 import {unwrapData} from '@/apis';
 import {UserAvatar} from '@/components/UserAvatar';
@@ -24,6 +24,8 @@ import layout from './index.module.scss';
 const AdvisorStudentLayout: React.FC = () => {
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
+  const summaryId = useId();
+  const [summaryExpanded, setSummaryExpanded] = useState(false);
   useAssignmentBoundary(id);
 
   const intake = useQuery({
@@ -50,7 +52,8 @@ const AdvisorStudentLayout: React.FC = () => {
     retry: false,
   });
   const tasks = plan.data?.plan?.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []) ?? [];
-  const completion = tasks.length ? tasks.filter(task => task.status === TASK_STATUS.completed).length / tasks.length * 100 : null;
+  const completedTasks = tasks.filter(task => task.status === TASK_STATUS.completed).length;
+  const completion = tasks.length ? completedTasks / tasks.length * 100 : null;
 
   const name = formatPersonName(intake.data, `Student #${id}`);
   const studentIdFormatted = `ID: ${id}`;
@@ -72,8 +75,8 @@ const AdvisorStudentLayout: React.FC = () => {
         <span>Back to Students</span>
       </Link>
 
-      {/* Figma Student Profile Header Card */}
       <header className={layout.studentSummary} aria-label="Student profile summary">
+        <div className={layout.identityRow}>
         <UserAvatar userId={intake.data ? id : undefined} className={layout.avatarLarge}/>
         <div className={layout.nameBlock}>
           <h1>{name}</h1>
@@ -88,6 +91,9 @@ const AdvisorStudentLayout: React.FC = () => {
         <Link className={layout.messageBtn} to={`${APP_ROUTE_PATHS.advisorMessages}?studentUserId=${id}`}>
           <MessageSquare size={20} aria-hidden="true" /><span>Message</span>
         </Link>
+        </div>
+        <button type="button" className={layout.summaryToggle} aria-expanded={summaryExpanded} aria-controls={summaryId} onClick={() => setSummaryExpanded(current => !current)}>Learning overview<ChevronDown size={18} aria-hidden="true"/></button>
+        <div className={layout.learningSummary} id={summaryId} data-expanded={summaryExpanded}>
         <div className={layout.targetScoreCard}>
           <div className={layout.scoresLine}>
             <div><span>Baseline assessment</span><strong className={layout.baselineValue}>{profile.data?.baselineAssessment || 'Not assessed'}</strong></div>
@@ -96,17 +102,22 @@ const AdvisorStudentLayout: React.FC = () => {
           </div>
           <span className={layout.targetDate}><Calendar size={20} aria-hidden="true" />Target date · {profile.data?.targetDate ? formatPlanDate(profile.data.targetDate) : 'Not set'}</span>
         </div>
-        <div className={layout.progress}><ProgressRing value={completion} label="Advisor task completion" /></div>
+        <div className={layout.progress}>
+          <ProgressRing value={completion} label="Advisor task completion" compact />
+          <div><strong>Plan progress</strong><span>{plan.isPending ? 'Loading plan…' : plan.isError ? 'Plan unavailable' : tasks.length ? `${completedTasks} of ${tasks.length} tasks completed` : 'No tasks yet'}</span></div>
+        </div>
         <div className={layout.skillCardsGrid}>
           {skills.map((skill, index) => (
             <div className={layout.skillCard} key={skill.skillCode ?? index}>
-              <SkillIcon code={skill.skillCode} size={28}/>
-              <span>{skill.displayName || skill.skillCode} Current</span>
+              <span>{skill.displayName || skill.skillCode}</span>
               <strong>{skill.currentValue || '—'}</strong>
+              {skill.targetValue ? <small>Target {skill.targetValue}</small> : null}
             </div>
           ))}
           {!skills.length ? <p className={layout.skillEmpty}>{profile.isPending ? 'Loading assessments…' : 'No skill assessments yet.'}</p> : null}
         </div>
+        </div>
+        {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">Profile summary could not be loaded. <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
       </header>
 
       {intake.isError ? (

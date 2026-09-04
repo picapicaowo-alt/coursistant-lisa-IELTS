@@ -87,9 +87,9 @@ export const TenantUserPicker = ({
         </div>
       ) : <button type="button" className={styles.trigger} onClick={open}>{triggerLabel}{variant === 'filter' ? <ChevronDown size={16}/> : null}</button>}
 
-      <dialog className={styles.dialog} ref={dialogRef} onClose={() => { setIsOpen(false); setPendingSelection(selectedUser ?? null); }}>
+      <dialog className={styles.dialog} ref={dialogRef} aria-labelledby={`${searchId}-title`} onClose={() => { setIsOpen(false); setPendingSelection(selectedUser ?? null); }}>
         <div className={styles.dialogHeader}>
-          <div><h2>{title}</h2><p>{description}</p></div>
+          <div><h2 id={`${searchId}-title`}>{title}</h2><p>{description}</p></div>
           <button type="button" className={styles.iconButton} aria-label="Close selector" onClick={close}><X size={20}/></button>
         </div>
         <form className={styles.search} role="search" onSubmit={submitSearch}>

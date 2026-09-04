@@ -9,7 +9,7 @@ import styles from '../advising/advising.module.scss';
 import layout from './index.module.scss';
 import {formatPersonName} from '@/utils/personName';
 import {ParentLinksPanel} from '@/components/ParentLinksPanel';
-import {WorkspaceSectionHeader} from '@/components/WorkspaceSectionHeader';
+import {WorkspaceSection} from '@/components/WorkspaceSection';
 
 const AdvisorStudentIntakePage: React.FC = () => {
   const {studentUserId} = useParams();
@@ -29,23 +29,22 @@ const AdvisorStudentIntakePage: React.FC = () => {
 
   return (
     <div className={layout.intakeGrid}>
-    <section className={`${styles.card} ${layout.intakeMain}`}>
-      <WorkspaceSectionHeader
+    <WorkspaceSection appearance="record" className={layout.intakeMain}
         title="Counsellor intake"
-        description="The intake captures the student's starting context at handover. It is read-only for Advisors."
         meta={<span className={styles.readOnlyBadge}>Read only</span>}
-      />
-      <dl className={styles.readonly}>
-        <dt>Name</dt><dd>{formatPersonName(intake, '—')}</dd>
-        <dt>Email</dt><dd>{intake.email || '—'}</dd>
-        <dt>Student type</dt><dd>{intake.studentType || '—'}</dd>
-        <dt>Course request</dt><dd>{intake.courseRequest || '—'}</dd>
-        <dt>Phone</dt><dd>{intake.contactPhone || '—'}</dd>
-        <dt>Background</dt><dd>{intake.basicBackground || '—'}</dd>
-        <dt>Assignment</dt><dd>{intake.assignmentStatus} · version {intake.assignmentVersion ?? '—'}</dd>
+      >
+      <p className={layout.intakeDescription}>The intake captures the student&apos;s starting context at handover. It is read-only for Advisors.</p>
+      <dl className={layout.intakeRecord}>
+        <div><dt>Name</dt><dd>{formatPersonName(intake, '—')}</dd></div>
+        <div><dt>Email</dt><dd>{intake.email || '—'}</dd></div>
+        <div><dt>Student type</dt><dd>{intake.studentType || '—'}</dd></div>
+        <div><dt>Course request</dt><dd>{intake.courseRequest || '—'}</dd></div>
+        <div><dt>Phone</dt><dd>{intake.contactPhone || '—'}</dd></div>
+        <div><dt>Background</dt><dd>{intake.basicBackground || '—'}</dd></div>
+        <div><dt>Assignment</dt><dd>{intake.assignmentStatus === 'ASSIGNED' ? 'Assigned' : 'Unassigned'} · version {intake.assignmentVersion ?? '—'}</dd></div>
       </dl>
-    </section>
-    <div className={layout.intakeSide}><ParentLinksPanel scope="advisor" subjectId={id}/></div>
+    </WorkspaceSection>
+    <div className={layout.intakeSide}><ParentLinksPanel scope="advisor" subjectId={id} presentation="panel"/></div>
     </div>
   );
 };

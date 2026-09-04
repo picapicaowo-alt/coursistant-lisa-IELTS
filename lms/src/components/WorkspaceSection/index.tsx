@@ -13,6 +13,8 @@ export function WorkspaceSection({
   className,
   bodyClassName,
   headingLevel = 2,
+  appearance = 'default',
+  icon,
 }: {
   title: string;
   summary?: ReactNode;
@@ -24,6 +26,8 @@ export function WorkspaceSection({
   className?: string;
   bodyClassName?: string;
   headingLevel?: 2 | 3 | 4;
+  appearance?: 'default' | 'record';
+  icon?: ReactNode;
 }) {
   const generatedId = useId();
   const titleId = headingId || generatedId;
@@ -32,12 +36,15 @@ export function WorkspaceSection({
     <section
       id={id}
       aria-labelledby={titleId}
-      className={[styles.section, className].filter(Boolean).join(' ')}
+      className={[styles.section, appearance === 'record' && styles.record, className].filter(Boolean).join(' ')}
     >
       <header className={styles.header}>
-        <div>
-          <Heading id={titleId}>{title}</Heading>
-          {summary ? <p>{summary}</p> : null}
+        <div className={styles.headingIdentity}>
+          {icon ? <span className={styles.headingIcon} aria-hidden="true">{icon}</span> : null}
+          <div>
+            <Heading id={titleId}>{title}</Heading>
+            {summary ? <p>{summary}</p> : null}
+          </div>
         </div>
         {count != null ? <span className={styles.count}>{count}</span> : null}
         {meta}

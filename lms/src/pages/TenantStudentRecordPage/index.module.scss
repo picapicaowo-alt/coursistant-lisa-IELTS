@@ -1,0 +1,86 @@
+@use "../../styles/workspace" as workspace;
+.grid {
+  @include workspace.grid;
+  align-items: stretch;
+}
+.main {
+  @include workspace.region(6, 6);
+}
+.side {
+  @include workspace.region(6, 6);
+}
+.main,
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: t.$space-6;
+}
+// Each column fills the shared row; content can grow without fixed card heights.
+.main > section:last-child,
+.side > section:first-child {
+  flex: 1;
+}
+.intakeBody {
+  display: flex;
+  flex-direction: column;
+  > .facts { flex: 1; display: grid; }
+}
+.intakeBody .facts > div {
+  align-items: center;
+}
+.facts {
+  margin: 0;
+  min-width: 0;
+}
+.facts > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: t.$space-4;
+  padding-block: t.$space-3;
+  border-bottom: 1px solid t.$border-default;
+}
+.facts > div:first-child {
+  padding-top: 0;
+}
+.facts > div:last-child {
+  border: 0;
+  padding-bottom: 0;
+}
+.facts dt {
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+}
+.facts dd {
+  margin: 0;
+  font-size: t.$font-size-body-lg;
+  overflow-wrap: anywhere;
+}
+.facts [data-tone="ACTIVE"] {
+  color: t.$feedback-success;
+  background: t.$feedback-success-surface;
+}
+.facts [data-tone="DISABLED"] {
+  color: t.$feedback-danger;
+  background: t.$feedback-danger-surface;
+}
+.description {
+  margin: 0;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+  line-height: 1.55;
+}
+.empty {
+  background: t.$surface-subtle;
+  padding: t.$space-5;
+  border-radius: t.$radius-control;
+}
+.empty p {
+  color: t.$content-secondary;
+  margin-bottom: 0;
+}
+@media (max-width: t.$breakpoint-shell-mobile) {
+  .facts > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: t.$space-1;
+  }
+}

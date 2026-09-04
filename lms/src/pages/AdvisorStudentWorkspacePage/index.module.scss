@@ -1,98 +1,490 @@
-@use '../../styles/workspace' as workspace;
-.workspace { min-width: 0; width: 100%; }
-.back { display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; margin-bottom: t.$space-4; color: t.$content-secondary; text-decoration: none; }
-.studentSummary {
-  @include workspace.grid;
-  grid-template-columns: 6rem repeat(11, minmax(0, 1fr));
+@use "../../styles/workspace" as workspace;
+
+.workspace {
+  min-width: 0;
+  width: 100%;
+  min-height: 100%;
+  background: t.$surface-dashboard-card;
+  font-size: t.$font-size-body-lg;
+  line-height: 1.5;
+  ::selection {
+    background: t.$surface-brand-subtle;
+  }
+  :is(a, button, input, textarea, select):focus-visible {
+    outline: 2px solid t.$action-primary;
+    outline-offset: 3px;
+  }
+  progress {
+    accent-color: t.$action-primary;
+    border: 0;
+    border-radius: t.$radius-pill;
+    height: t.$space-2;
+    overflow: hidden;
+  }
+  progress::-webkit-progress-bar {
+    background: t.$border-default;
+  }
+  progress::-webkit-progress-value {
+    background: t.$action-primary;
+  }
+  progress::-moz-progress-bar {
+    background: t.$action-primary;
+  }
+}
+.back {
+  display: inline-flex;
   align-items: center;
-  padding: t.$workspace-panel-padding;
+  gap: t.$space-3;
+  min-height: t.$touch-target;
   margin-bottom: t.$space-6;
+  color: t.$action-primary;
+  font-weight: t.$fw-medium;
+  text-decoration: none;
+}
+.back:hover {
+  text-decoration: underline;
+  text-underline-offset: t.$space-1;
+}
+.studentSummary {
+  padding: t.$space-6;
+  margin-bottom: t.$space-5;
   border: 1px solid t.$border-default;
   border-radius: t.$radius-card-lg;
   background: t.$surface-raised;
 }
-.avatarLarge { grid-column: 1; grid-row: 1 / 3; align-self: start; display: grid; place-items: center; width: 6rem; aspect-ratio: 1; border: t.$space-1 solid t.$border-default; border-radius: 50%; background: t.$brand-subtle; color: t.$action-primary; font-size: clamp(1.5rem, 3vw, 3rem); font-weight: t.$fw-bold; }
-.nameBlock { grid-column: 2 / 5; display: grid; gap: t.$space-1; overflow-wrap: anywhere; }
-.nameBlock h1 { margin: 0; font-size: t.$workspace-title-size; font-weight: t.$fw-semibold; line-height: t.$line-height-title-1; }
-.nameBlock small { color: t.$content-secondary; }
-.metadata { grid-column: 5 / 10; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: t.$space-4; margin: 0; }
-.metadata dt { font-size: t.$fs-caption; color: t.$content-secondary; margin-bottom: t.$space-1; }
-.metadata dd { margin: 0; font-weight: t.$fw-semibold; overflow-wrap: anywhere; }
-.messageBtn { grid-column: 10 / 13; justify-self: end; display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; padding: t.$space-2 t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; text-decoration: none; }
-.messageBtn:hover { background: t.$surface-subtle; border-color: t.$action-primary; }
-.targetScoreCard { grid-column: 2 / 5; display: grid; gap: t.$space-5; }
-.scoresLine { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: t.$space-3; align-items: center; }
-.scoresLine > div { display: grid; gap: t.$space-2; }
-.scoresLine span, .targetDate { color: t.$content-secondary; font-size: t.$fs-caption; }
-.scoresLine strong { font-size: clamp(1.15rem, 1.8vw, 2rem); line-height: 1.25; overflow-wrap: anywhere; }
-.scoresLine .targetValue { color: t.$action-primary; }
-.scoresLine .baselineValue { font-size: t.$font-size-body; font-weight: t.$fw-medium; line-height: 1.5; overflow-wrap: break-word; }
-.targetDate { display: flex; align-items: center; gap: t.$space-2; }
-.progress { grid-column: 5 / 7; display: grid; justify-items: center; }
-.skillCardsGrid { grid-column: 7 / 13; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: t.$space-3; align-self: stretch; border-left: 1px solid t.$border-default; padding-left: t.$space-5; }
-.skillCard { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: t.$space-2; border-radius: t.$radius-lg; background: t.$surface-subtle; padding: t.$space-4 t.$space-2; overflow-wrap: anywhere; }
-.skillCard svg { color: t.$action-primary; margin-bottom: t.$space-2; }
-.skillCard span { font-size: t.$fs-caption; color: t.$content-secondary; }
-.skillCard strong { font-size: t.$font-size-headline; }
-.skillEmpty { grid-column: 1 / -1; align-self: center; color: t.$content-secondary; }
-.tabs { display: flex; gap: t.$space-6; border-bottom: 1px dashed t.$border-default; margin-bottom: t.$space-6; overflow-x: auto; }
-.tabs a { display: inline-flex; align-items: center; min-height: t.$touch-target; padding: t.$space-3 0; border-bottom: 3px solid transparent; color: t.$content-secondary; text-decoration: none; white-space: nowrap; }
-.tabs a[aria-current='page'] { color: t.$action-primary; border-bottom-color: t.$action-primary; }
-.tabs a:nth-child(4) { margin-left: auto; }
-.intakeGrid { @include workspace.grid; }
-.intakeMain { @include workspace.region(8, 7); }
-.intakeSide { @include workspace.region(4, 5); }
+.identityRow {
+  display: flex;
+  align-items: center;
+  gap: t.$space-5;
+  padding-bottom: t.$space-6;
+}
+.avatarLarge {
+  width: 5rem;
+  height: 5rem;
+  flex: 0 0 5rem;
+  border: 2px solid t.$border-default;
+  border-radius: t.$radius-lg;
+}
+.nameBlock {
+  min-width: 0;
+  flex: 1;
+  display: grid;
+  gap: t.$space-1;
+  overflow-wrap: anywhere;
+}
+.nameBlock h1 {
+  margin: 0;
+  font-size: t.$font-size-title-2;
+  font-weight: t.$fw-bold;
+  line-height: 1.25;
+}
+.nameBlock > span,
+.nameBlock small {
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+}
+.metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-5;
+  margin: 0 t.$space-5 0 0;
+}
+.metadata dt {
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+  margin-bottom: t.$space-1;
+}
+.metadata dd {
+  margin: 0;
+  font-weight: t.$fw-semibold;
+  font-size: t.$font-size-body;
+}
+.messageBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-2;
+  flex-shrink: 0;
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-4;
+  border: 1px solid t.$action-primary;
+  border-radius: t.$radius-control;
+  color: t.$action-primary;
+  font-weight: t.$fw-semibold;
+  text-decoration: none;
+}
+.messageBtn:hover {
+  background: t.$surface-brand-subtle;
+}
+.summaryToggle {
+  display: none;
+}
+.learningSummary {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 2.5fr) minmax(0, 5.5fr);
+  align-items: center;
+  gap: t.$space-6;
+  border-top: 1px solid t.$border-default;
+  padding-top: t.$space-6;
+}
+.targetScoreCard {
+  display: grid;
+  gap: t.$space-3;
+  min-width: 0;
+}
+.scoresLine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: t.$space-3;
+  align-items: center;
+}
+.scoresLine > div {
+  display: grid;
+  gap: t.$space-1;
+  min-width: 0;
+}
+.scoresLine span,
+.targetDate {
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+}
+.scoresLine strong {
+  font-size: t.$font-size-title-2;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.scoresLine .targetValue {
+  color: t.$action-primary;
+}
+.scoresLine .baselineValue {
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-medium;
+  line-height: 1.5;
+}
+.targetDate {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+}
+.targetDate svg {
+  flex-shrink: 0;
+}
+.progress {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+  padding-inline: t.$space-4;
+  border-inline: 1px solid t.$border-default;
+}
+.progress > div:last-child {
+  display: grid;
+  gap: t.$space-1;
+  min-width: 0;
+}
+.progress strong {
+  font-size: t.$font-size-body;
+}
+.progress span {
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+}
+.skillCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 5.5rem), 1fr));
+  gap: t.$space-2;
+  min-width: 0;
+}
+.skillCard {
+  display: grid;
+  align-content: center;
+  gap: t.$space-1;
+  min-width: 0;
+  padding: t.$space-3;
+  background: t.$surface-subtle;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-lg;
+  overflow-wrap: anywhere;
+}
+.skillCard span,
+.skillCard small {
+  font-size: t.$font-size-caption;
+  color: t.$content-secondary;
+}
+.skillCard strong {
+  font-size: t.$font-size-headline;
+  font-variant-numeric: tabular-nums;
+}
+.skillEmpty {
+  grid-column: 1 / -1;
+  color: t.$content-secondary;
+  font-size: t.$font-size-body;
+}
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-2 t.$space-6;
+  margin-bottom: t.$space-6;
+  border-bottom: 1px solid t.$border-default;
+}
+.tabs a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: t.$touch-target;
+  padding: t.$space-3 t.$space-2;
+  border-bottom: 3px solid transparent;
+  color: t.$content-secondary;
+  text-decoration: none;
+  font-size: t.$font-size-subhead;
+  font-weight: t.$fw-medium;
+  white-space: nowrap;
+}
+.tabs a:hover {
+  color: t.$action-primary;
+  background: t.$surface-brand-subtle;
+  border-radius: t.$radius-sm t.$radius-sm 0 0;
+}
+.tabs a[aria-current="page"] {
+  color: t.$action-primary;
+  font-weight: t.$fw-bold;
+  border-bottom-color: t.$action-primary;
+}
+.intakeGrid {
+  @include workspace.grid;
+}
+.intakeMain {
+  @include workspace.region(8, 7);
+}
+.intakeSide {
+  @include workspace.region(4, 5);
+}
+.intakeDescription {
+  margin: 0;
+  color: t.$content-secondary;
+}
+.intakeRecord {
+  display: grid;
+  margin: 0;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  overflow: hidden;
+}
+.intakeRecord > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(0, 3fr);
+  gap: t.$space-4;
+  padding: t.$space-4;
+}
+.intakeRecord > div:nth-child(odd) {
+  background: t.$surface-subtle;
+}
+.intakeRecord > div + div {
+  border-top: 1px solid t.$border-default;
+}
+.intakeRecord dt {
+  color: t.$content-secondary;
+  font-weight: t.$fw-semibold;
+}
+.intakeRecord dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.support {
+  display: grid;
+  gap: t.$space-6;
+  min-width: 0;
+}
+.profileForm {
+  @include workspace.grid;
+  align-items: stretch;
+  > section {
+    @include workspace.region(6, 6);
+    margin: 0;
+  }
+  > div,
+  > p {
+    grid-column: 1 / -1;
+  }
+}
+// Grid stretching, not fixed heights, keeps the paired cards aligned when copy wraps.
+.profileCard {
+  align-self: stretch;
+}
+.profileFields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: t.$space-5 t.$space-4;
+}
+.profileFields > label {
+  min-width: 0;
+}
+.fullField {
+  grid-column: 1 / -1;
+}
+.contextFields {
+  grid-template-columns: minmax(0, 1fr);
+}
+.profileForm label {
+  font-size: t.$font-size-body;
+  color: t.$content-secondary;
+  gap: t.$space-2;
+}
+.profileForm :is(input, textarea, select) {
+  font-size: t.$font-size-body-lg;
+  border-radius: t.$radius-control;
+  background: t.$surface-canvas;
+  color: t.$content-primary;
+}
+.profileForm input {
+  min-height: t.$touch-target;
+}
+.profileForm textarea {
+  min-height: 5rem;
+}
+.profileForm p {
+  line-height: 1.55;
+}
+.workspace h2 {
+  font-weight: t.$fw-bold;
+}
+.profileForm .privateNotes {
+  min-height: 10rem;
+}
+.profileActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: t.$space-3;
+  padding-block: t.$space-2;
+}
+.planForm {
+  @include workspace.grid;
+  > section:first-child {
+    @include workspace.region(4, 12);
+  }
+  > section:nth-child(2) {
+    @include workspace.region(8, 12);
+  }
+  > div {
+    grid-column: 1 / -1;
+  }
+}
 @media (max-width: 80rem) {
-  .studentSummary { grid-template-columns: 6rem repeat(11, minmax(0, 1fr)); }
-  .avatarLarge { grid-column: 1; grid-row: 1; }
-  .nameBlock { grid-column: 2 / 7; }
-  .metadata { grid-column: 7 / 13; }
-  .messageBtn { grid-column: 1; grid-row: 2; justify-self: start; padding-inline: t.$space-3; }
-  .messageBtn span { position: absolute; width: 1px; height: 1px; clip-path: inset(50%); overflow: hidden; }
-  .targetScoreCard { grid-column: 2 / 7; }
-  .progress { grid-column: 7 / 9; }
-  .skillCardsGrid { grid-column: 9 / 13; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .metadata {
+    gap: t.$space-3;
+    margin: 0;
+  }
+  .learningSummary {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .progress {
+    border-right: 0;
+  }
+  .skillCardsGrid {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 7rem), 1fr));
+  }
 }
 @media (max-width: t.$breakpoint-dashboard-single) {
-  .studentSummary { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-  .avatarLarge { grid-column: 1 / 3; width: 5rem; }
-  .nameBlock { grid-column: 3 / 10; }
-  .messageBtn { grid-column: 10 / 13; grid-row: 1; justify-self: end; }
-  .metadata { grid-column: 1 / -1; }
-  .targetScoreCard { grid-column: 1 / 6; }
-  .progress { grid-column: 6 / 9; }
-  .skillCardsGrid { grid-column: 9 / 13; }
+  .identityRow {
+    flex-wrap: wrap;
+  }
+  .nameBlock {
+    flex-basis: calc(100% - 7rem);
+  }
+  .metadata {
+    flex: 1;
+  }
+  .tabs {
+    column-gap: t.$space-3;
+  }
 }
 @media (max-width: t.$breakpoint-shell-mobile) {
-  .back { margin-bottom:t.$space-2; }
-  .studentSummary { gap:t.$space-3; padding:t.$space-4; margin-bottom:t.$space-4; }
-  .avatarLarge { grid-column:1/3; width:3rem; }
-  .nameBlock { grid-column:3/11; }
-  .nameBlock h1 { font-size:t.$font-size-subhead; }
-  .nameBlock small { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
-  .messageBtn { grid-column:11/13; grid-row:1; padding:t.$space-2; }
-  .messageBtn span { position:absolute; width:1px; height:1px; clip-path:inset(50%); overflow:hidden; }
-  .metadata { grid-column:1/-1; gap:t.$space-2; }
-  .metadata dd { font-size:t.$fs-caption; }
-  .targetScoreCard { grid-column:1/9; gap:t.$space-3; }
-  .scoresLine { gap:t.$space-2; }
-  .scoresLine > div { gap:t.$space-1; }
-  .progress { grid-column:9/13; }
-  .skillCardsGrid { grid-column:1/-1; grid-template-columns:repeat(4,minmax(0,1fr)); gap:t.$space-2; border:0; padding:0; }
-  .skillCard { gap:t.$space-1; padding:t.$space-3 t.$space-1; border-radius:t.$radius-control; }
-  .skillCard svg { width:1.25rem; height:1.25rem; margin:0; }
-  .skillCard span { font-size:t.$font-size-caption; }
-  .skillCard strong { font-size:t.$font-size-subhead; }
-  .tabs { gap:t.$space-4; }
+  .back {
+    margin-bottom: t.$space-3;
+  }
+  .studentSummary {
+    padding: t.$space-4;
+  }
+  .identityRow {
+    gap: t.$space-3;
+    padding-bottom: t.$space-4;
+  }
+  .avatarLarge {
+    width: 3.5rem;
+    height: 3.5rem;
+    flex-basis: 3.5rem;
+  }
+  .nameBlock {
+    flex-basis: calc(100% - 5rem);
+  }
+  .nameBlock h1 {
+    font-size: t.$font-size-headline;
+  }
+  .metadata {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    flex-basis: 100%;
+  }
+  .messageBtn {
+    width: 100%;
+  }
+  .summaryToggle {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    min-height: t.$touch-target;
+    border: 0;
+    border-top: 1px solid t.$border-default;
+    background: transparent;
+    color: t.$action-primary;
+    padding: t.$space-3 0 0;
+    font: inherit;
+    font-weight: t.$fw-semibold;
+  }
+  .summaryToggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+  .learningSummary[data-expanded="false"] {
+    display: none;
+  }
+  .learningSummary {
+    grid-template-columns: minmax(0, 1fr);
+    gap: t.$space-4;
+    padding-top: t.$space-4;
+  }
+  .progress {
+    border: 0;
+    padding: 0;
+  }
+  .skillCardsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: t.$space-1;
+    border: 0;
+  }
+  .tabs a {
+    font-size: t.$font-size-body-lg;
+    white-space: normal;
+    text-align: center;
+    background: t.$surface-raised;
+    border-radius: t.$radius-sm;
+  }
+  .tabs a[aria-current="page"] {
+    background: t.$surface-brand-subtle;
+  }
+  .intakeRecord > div {
+    grid-template-columns: minmax(0, 1fr);
+    gap: t.$space-1;
+  }
+  .profileFields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .profileActions > button {
+    width: 100%;
+  }
 }
-
-.support { display: grid; gap: t.$workspace-section-gap; width: 100%; min-width: 0; > div { @include workspace.grid; > * { @include workspace.region(6, 6); } } }
-.profileForm { @include workspace.grid; > section, > details { @include workspace.region(6, 6); margin: 0; } > div, > p { grid-column: 1 / -1; } }
-
-@media (max-width: 22rem) {
-  .targetScoreCard, .progress { grid-column: 1 / -1; }
-  .progress { justify-self: center; min-width: 7rem; }
-  .skillCardsGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-.planForm { @include workspace.grid; > section:first-child { @include workspace.region(4, 12); } > section:nth-child(2) { @include workspace.region(8, 12); } > div { grid-column: 1 / -1; } }
