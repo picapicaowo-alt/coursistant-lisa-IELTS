@@ -124,7 +124,7 @@ Running 100 tests using 4 workers
   ✘   94 [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes (30.0s)
 
 
-  1) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px 
+  1) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px
 
     Error: expect(locator).toContainText(expected) failed
 
@@ -151,7 +151,7 @@ Running 100 tests using 4 workers
 
     Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/mock-exam-authoring-guided-2dbed--review-and-retry-at-1752px-chromium/error-context.md
 
-  2) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px 
+  2) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px
 
     Error: expect(locator).toContainText(expected) failed
 
@@ -178,7 +178,7 @@ Running 100 tests using 4 workers
 
     Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/mock-exam-authoring-guided-11d3b--review-and-retry-at-1440px-chromium/error-context.md
 
-  3) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px 
+  3) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px
 
     Error: expect(locator).toContainText(expected) failed
 
@@ -205,7 +205,7 @@ Running 100 tests using 4 workers
 
     Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/mock-exam-authoring-guided-dab9d--review-and-retry-at-1024px-chromium/error-context.md
 
-  4) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px 
+  4) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px
 
     Error: expect(locator).toContainText(expected) failed
 
@@ -232,7 +232,7 @@ Running 100 tests using 4 workers
 
     Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/mock-exam-authoring-guided-d609a-w-review-and-retry-at-390px-chromium/error-context.md
 
-  5) [chromium] › e2e/rich-text-formatting.spec.ts:11:1 › teacher can remove bold formatting and a newly selected annotated file 
+  5) [chromium] › e2e/rich-text-formatting.spec.ts:11:1 › teacher can remove bold formatting and a newly selected annotated file
 
     Error: expect(locator).toBeFocused() failed
 
@@ -259,7 +259,7 @@ Running 100 tests using 4 workers
 
     Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/rich-text-formatting-teach-80fb9-wly-selected-annotated-file-chromium/error-context.md
 
-  6) [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes 
+  6) [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes
 
     Test timeout of 30000ms exceeded.
 
@@ -276,7 +276,7 @@ Running 100 tests using 4 workers
 
     Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/uiux-consistency-instructo-9ca60-entity-across-query-changes-chromium/error-context.md
 
-  7) [chromium] › e2e/uiux-consistency.spec.ts:150:1 › TA permissions reuse the modal focus and small-screen behavior 
+  7) [chromium] › e2e/uiux-consistency.spec.ts:150:1 › TA permissions reuse the modal focus and small-screen behavior
 
     Error: expect(locator).toBeFocused() failed
 
@@ -304,11 +304,11 @@ Running 100 tests using 4 workers
     Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/uiux-consistency-TA-permis-5ee5f-s-and-small-screen-behavior-chromium/error-context.md
 
   7 failed
-    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px 
-    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px 
-    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px 
-    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px 
-    [chromium] › e2e/rich-text-formatting.spec.ts:11:1 › teacher can remove bold formatting and a newly selected annotated file 
-    [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes 
-    [chromium] › e2e/uiux-consistency.spec.ts:150:1 › TA permissions reuse the modal focus and small-screen behavior 
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px
+    [chromium] › e2e/rich-text-formatting.spec.ts:11:1 › teacher can remove bold formatting and a newly selected annotated file
+    [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes
+    [chromium] › e2e/uiux-consistency.spec.ts:150:1 › TA permissions reuse the modal focus and small-screen behavior
   93 passed (1.4m)
