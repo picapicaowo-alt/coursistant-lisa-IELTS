@@ -1,13 +1,11 @@
-import {UserAvatar} from '@/components/UserAvatar';
+import {CourseIdentityCard} from '@/components/CourseIdentityCard';
 import {Link, generatePath} from 'react-router-dom';
 import {DashboardCourse} from '@/pages/LmsHomePage/types';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import styles from './CourseCard.module.scss';
 
 export default function CourseCard({id, courseCode, title, instructorName, instructorAvatar}: DashboardCourse) {
-  return <article className={styles.card}>
-    <h3>{title || courseCode}</h3>
-    {instructorName ? <div className={styles.instructor}><UserAvatar src={instructorAvatar}/><span>{instructorName}<small>Instructor</small></span></div> : null}
-    <footer><Link to={generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(id)})}>View details<span aria-hidden="true">›</span></Link></footer>
-  </article>;
+  return <CourseIdentityCard courseId={id} title={title || courseCode} code={courseCode}
+    instructor={instructorName || 'Instructor not assigned'} instructorAvatar={instructorAvatar}
+    actions={<Link to={generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(id)})}>View details</Link>}
+  />;
 }
