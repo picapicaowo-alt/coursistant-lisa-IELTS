@@ -397,3 +397,28 @@ test('new group courses prepare recurring sessions before delivery locks their t
   await expect(page.getByRole('button', {name: 'Generate dates'})).toBeEnabled();
   expect(mutations).toEqual(['session', 'configure']);
 });
+
+test('ready courses can publish without repeating the draft readiness transition', async ({page}) => {
+  await setupCourse(page);
+  let launchState = 'DRAFT';
+  const writes: Array<{path: string; body: unknown}> = [];
+  const config = () => ({courseId: 71, deliveryMode: 'GROUP', catalogCode: 'IELTS', capacity: 16, launchState, courseLaunchVersion: launchState === 'DRAFT' ? 2 : launchState === 'READY' ? 3 : 4, blockers: []});
+  await page.route('**/v2/advisor/courses/71/delivery-config', route => route.fulfill({json: reply(config())}));
+  await page.route('**/v2/advisor/courses/71/launch/*', route => {
+    const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
+    writes.push({path, body: route.request().postDataJSON()});
+    launchState = path.endsWith('/ready') ? 'READY' : 'PUBLISHED';
+    return route.fulfill({json: reply(config())});
+  });
+  await page.goto('/advisor/courses/71/delivery?view=delivery');
+  await page.getByRole('button', {name: 'Validate readiness', exact: true}).click();
+  await expect(page.getByRole('button', {name: /Validate readiness|Validate again|Check readiness/})).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole('button', {name: /Validate readiness|Validate again|Check readiness/})).toHaveCount(0);
+  await page.getByRole('complementary', {name: 'Course readiness'}).getByRole('button', {name: 'Publish course', exact: true}).click();
+  await expect(page.getByRole('complementary', {name: 'Course readiness'})).toContainText('Published');
+  expect(writes).toEqual([
+    {path: '/v2/advisor/courses/71/launch/ready', body: {expectedCourseLaunchVersion: 2}},
+    {path: '/v2/advisor/courses/71/launch/publish', body: {expectedCourseLaunchVersion: 3}},
+  ]);
+});

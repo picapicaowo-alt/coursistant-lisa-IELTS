@@ -41,7 +41,7 @@ export function CourseReadinessPanel({course, sessions, config, loading, transit
         {blockers.map((blocker, index) => <li key={`${blocker.code ?? 'blocker'}-${index}`}><AlertCircle size={16} aria-hidden="true" /><span><strong>{blocker.code?.replace(/_/g, ' ') || 'Course requirement'}</strong><br />{blocker.message || 'This requirement is not complete.'}</span></li>)}
       </ul> : <div className={styles.readyNote}><strong>Readiness blockers</strong>{!state || state === 'DRAFT' ? 'Check readiness before publishing.' : 'No outstanding requirements.'}</div>}
       {config?.deliveryMode === 'GROUP' && state !== 'PUBLISHED' ? <div className={styles.readinessActions}>
-        <button type="button" className={styles.secondaryButton} onClick={onReady} disabled={!canReady}>Validate again</button>
+        {config?.launchState === 'DRAFT' ? <button type="button" className={styles.secondaryButton} onClick={onReady} disabled={!canReady}>Check readiness</button> : null}
         <button type="button" className={styles.primaryButton} onClick={onPublish} disabled={!canPublish}>{transitionPending ? 'Updating…' : 'Publish course'}</button>
       </div> : null}
     </>}

@@ -66,8 +66,10 @@ export function useCourseDelivery(id: number) {
       return unwrapData(await idempotency.run('putCourseDeliveryConfig', [id, {catalogCode: draft.catalogCode.trim(), capacity: Number(draft.capacity), expectedCourseLaunchVersion: reviewedVersion}] satisfies Parameters<typeof advisorApiService.putCourseDeliveryConfig>, (key, args) => advisorApiService.putCourseDeliveryConfig(...args, key)), 'advisorPutCourseDeliveryConfig');
     }, onError, onSuccess: acceptConfig,
   });
-  const canReady = groupConfig && !reloadRequired && !versionChanged && !save.isPending && !schedulePending && config.data?.launchState !== 'PUBLISHED' && Boolean(config.data?.catalogCode && config.data.capacity);
-  const canPublish = canReady && config.data?.launchState === 'READY';
+  const canTransition = groupConfig && !reloadRequired && !versionChanged && !save.isPending && !schedulePending && Boolean(config.data?.catalogCode && config.data.capacity);
+  // Readiness is a DRAFT → READY transition, not a repeatable validation read.
+  const canReady = canTransition && config.data?.launchState === 'DRAFT';
+  const canPublish = canTransition && config.data?.launchState === 'READY';
   const transition = useMutation({
     mutationFn: async (action: 'ready' | 'publish') => {
       if (!(action === 'ready' ? canReady : canPublish)) throw new Error('Load and review the current group-course configuration first.');
