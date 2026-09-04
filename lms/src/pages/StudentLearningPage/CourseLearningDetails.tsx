@@ -23,14 +23,7 @@ export function CourseLearningDetails({courseId}: {courseId: number}) {
   const hours = useQuery({queryKey: ['student-learning', courseId, 'hours'], queryFn: async () => record(unwrapData(await api.getMyCourseHours(courseId), 'course hours')), retry: false});
   const hoursNotConfigured = isNotFound(hours.error) && getApiErrorCode(hours.error) === 'COURSE_HOURS_NOT_FOUND';
   const reports = useQuery({queryKey: ['student-learning', courseId, 'reports', page], queryFn: async () => recordPage(unwrapData(await api.listMyPublishedCourseReports(courseId, page + 1, LEARNING_PAGE_SIZE), 'published reports')), enabled: tab === 'reports', retry: false});
-  const report = useQuery({queryKey: ['student-learning', courseId, 'report', reportId], queryFn: async () => record(unwrapData(await api.getMyPublishedCourseReport(courseId, reportId!), 'published report')), enabled: reportId != null, retry: false});
-  const snapshotValue = report.data?.performanceSnapshot;
-  const snapshot = snapshotValue && typeof snapshotValue === 'object' && !Array.isArray(snapshotValue) ? record(snapshotValue) : undefined;
-  if (reportId != null) return <WorkspaceSection title={textValue(report.data ?? {}, 'title') || 'Published report'} summary={textValue(report.data ?? {}, 'publishedAt') ? `Published ${learningDate(textValue(report.data!, 'publishedAt'))}` : undefined} appearance="record" meta={<button className={common.textButton} onClick={() => setReportId(undefined)} type="button"><ArrowLeft size={16}/> Back to reports</button>}>
-    <LearningQueryState query={report}/>
-    {report.isSuccess ? <div className={s.report}>{REPORT_SECTIONS.map(section => textValue(report.data, section.key) ? <section key={section.key}><h3>{section.label}</h3><p>{textValue(report.data, section.key)}</p></section> : null)}{!REPORT_SECTIONS.some(section => textValue(report.data, section.key)) ? <LearningEmpty icon={FileText} title="No written evaluation is available."/> : null}</div> : null}
-    {snapshot ? <section className={s.snapshot}><h3>Performance at publication</h3><dl>{[{key: 'completedSessionCount', label: 'Classes completed'}, {key: 'presentCount', label: 'Present'}, {key: 'absentCount', label: 'Absent'}, {key: 'approvedAbsenceCount', label: 'Approved absences'}, {key: 'unapprovedAbsenceCount', label: 'Unapproved absences'}, {key: 'assignmentCount', label: 'Assignments'}, {key: 'submittedCount', label: 'Submitted'}, {key: 'releasedGradeCount', label: 'Released grades'}, {key: 'releasedScoreAverage', label: 'Average released score'}].map(({key, label}) => typeof snapshot[key] === 'number' ? <div key={key}><dt>{label}</dt><dd>{snapshot[key]}</dd></div> : null)}</dl></section> : null}
-  </WorkspaceSection>;
+  if (reportId != null) return <PublishedReportDetail courseId={courseId} reportId={reportId} onBack={() => setReportId(undefined)}/>;
   return <div className={s.details}>
     <WorkspaceSection title="Course hours" appearance="record" className={s.hours}>
       {hoursNotConfigured ? <LearningEmpty title="No course hours have been added yet."/> : <LearningQueryState query={hours} errorMessage="Course hours could not be loaded."/>}
@@ -66,4 +59,15 @@ function CourseScheduleChanges({courseId}: {courseId: number}) {
       {submitted ? <><p className={s.note} role="status">Your request has been submitted.</p><p className={s.note}>Check Schedule requests for the status of your request.</p></> : selected && selectedId ? <ScheduleChangeForm key={selectedId} courseId={courseId} occurrenceId={selectedId} occurrence={selected} onSubmitted={() => {setSelectedId(undefined); setSubmitted(true);}}/> : <LearningEmpty icon={BookOpen} title="Select a class to get started" description="Your request will be linked to the class you choose."/>}
     </WorkspaceSection>
   </div>;
+}
+
+export function PublishedReportDetail({courseId, reportId, onBack}: {courseId: number; reportId: number; onBack: () => void}) {
+  const report = useQuery({queryKey: ['student-learning', courseId, 'report', reportId], queryFn: async () => record(unwrapData(await api.getMyPublishedCourseReport(courseId, reportId), 'published report')), retry: false});
+  const snapshotValue = report.data?.performanceSnapshot;
+  const snapshot = snapshotValue && typeof snapshotValue === 'object' && !Array.isArray(snapshotValue) ? record(snapshotValue) : undefined;
+  return <WorkspaceSection title={textValue(report.data ?? {}, 'title') || 'Published report'} summary={textValue(report.data ?? {}, 'publishedAt') ? `Published ${learningDate(textValue(report.data!, 'publishedAt'))}` : undefined} appearance="record" meta={<button className={common.textButton} onClick={onBack} type="button"><ArrowLeft size={16}/> Back to reports</button>}>
+    <LearningQueryState query={report}/>
+    {report.isSuccess ? <div className={s.report}>{REPORT_SECTIONS.map(section => textValue(report.data, section.key) ? <section key={section.key}><h3>{section.label}</h3><p>{textValue(report.data, section.key)}</p></section> : null)}{!REPORT_SECTIONS.some(section => textValue(report.data, section.key)) ? <LearningEmpty icon={FileText} title="No written evaluation is available."/> : null}</div> : null}
+    {snapshot ? <section className={s.snapshot}><h3>Performance at publication</h3><dl>{[{key: 'completedSessionCount', label: 'Classes completed'}, {key: 'presentCount', label: 'Present'}, {key: 'absentCount', label: 'Absent'}, {key: 'approvedAbsenceCount', label: 'Approved absences'}, {key: 'unapprovedAbsenceCount', label: 'Unapproved absences'}, {key: 'assignmentCount', label: 'Assignments'}, {key: 'submittedCount', label: 'Submitted'}, {key: 'releasedGradeCount', label: 'Released grades'}, {key: 'releasedScoreAverage', label: 'Average released score'}].map(({key, label}) => typeof snapshot[key] === 'number' ? <div key={key}><dt>{label}</dt><dd>{snapshot[key]}</dd></div> : null)}</dl></section> : null}
+  </WorkspaceSection>;
 }

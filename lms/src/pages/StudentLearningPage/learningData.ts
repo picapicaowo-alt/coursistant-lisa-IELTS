@@ -6,8 +6,8 @@ import {calendarLocalFields} from '@/utils/datetime';
 
 export const LEARNING_PREVIEW_SIZE = 3;
 export const LEARNING_PAGE_SIZE = 10;
-export type LearningDetail = 'attendance' | 'work' | 'requests' | 'alerts' | 'course';
-export const DETAIL_LABELS: Record<LearningDetail, string> = {alerts: 'Alerts', attendance: 'Attendance', work: 'Work queue', requests: 'Schedule requests', course: 'Course details'};
+export type LearningDetail = 'attendance' | 'work' | 'requests' | 'alerts' | 'course' | 'reports';
+export const DETAIL_LABELS: Record<LearningDetail, string> = {alerts: 'Alerts', attendance: 'Attendance', work: 'Work queue', requests: 'Schedule requests', course: 'Course details', reports: 'Published reports'};
 
 /** Schedule proposals use the course timezone, even when the feed uses UTC instants. */
 export function scheduleOccurrence(item: OperationRecord): OperationRecord {

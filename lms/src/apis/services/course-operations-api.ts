@@ -6,6 +6,7 @@ import type {
   CourseOperationRead,
   CourseOwnershipListParams,
   CourseStudentReportListParams,
+  MyPublishedReportParams,
   CreateOccurrenceRequest,
   CreateScheduleRequestRequest,
   GenerateOccurrencesRequest,
@@ -225,6 +226,10 @@ export class CourseOperationsApiService {
       {expectedVersion},
       idempotent(key),
     );
+  }
+
+  listMyPublishedReports(params: MyPublishedReportParams = {}): Promise<ApiResponse<CourseOperationRead>> {
+    return this.apiClient.get('/v2/me/student-reports', {params});
   }
 
   listMyPublishedCourseReports(courseId: number, page = 0, size = 20): Promise<ApiResponse<CourseOperationRead>> {

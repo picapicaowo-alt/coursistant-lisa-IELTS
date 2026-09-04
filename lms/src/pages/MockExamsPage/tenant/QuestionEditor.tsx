@@ -150,7 +150,7 @@ export function QuestionEditor({
         onToggle={(event) => setAdvanced(event.currentTarget.open)}
         className={styles.advanced}
       >
-        <summary>Advanced data {guided ? '(optional)' : ''}</summary>
+        <summary>Advanced data and answer keys</summary>
         <p className={ui.hint}>
           For imported content, custom types and existing answer keys. Extra
           fields are preserved when you edit the form. Answer-key and scoring

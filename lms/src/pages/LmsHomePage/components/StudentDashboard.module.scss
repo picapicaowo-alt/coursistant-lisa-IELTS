@@ -8,6 +8,8 @@
 .courses { container: dashboard-courses / inline-size; }
 .courseBody { gap: t.$space-2; }
 .courseStrip { display: grid; grid-auto-flow: column; grid-auto-columns: calc((100% - 2 * #{t.$space-4}) / 3); gap: t.$space-4; overflow-x: auto; padding: t.$space-1; margin: calc(-1 * t.$space-1); scroll-snap-type: x mandatory; scrollbar-width: thin; scrollbar-color: t.$border-strong transparent; }
+.courseStrip[data-course-count='1'] { grid-auto-columns: 100%; }
+.courseStrip[data-course-count='2'] { grid-auto-columns: calc((100% - #{t.$space-4}) / 2); }
 .courseStrip > article { scroll-snap-align: start; }
 .courseStrip > article:nth-child(3n + 2) > div:first-child > div:first-child { color: t.$feedback-success; background: t.$type-green-subtle; }
 .courseStrip > article:nth-child(3n + 3) > div:first-child > div:first-child { color: t.$feedback-info; background: t.$type-cyan-subtle; }
@@ -42,8 +44,8 @@
 .alertList svg { flex-shrink: 0; color: t.$action-primary; }
 .dashboard :is(a, button):focus-visible { outline: 2px solid t.$action-primary; outline-offset: 3px; }
 @container dashboard-courses (max-width: 43rem) { .courseStrip { grid-auto-columns: calc((100% - #{t.$space-4}) / 2); } }
-@container dashboard-courses (max-width: 27rem) { .courseStrip { grid-auto-columns: 100%; } }
-@container dashboard-workspace (max-width: 72rem) {
+@container dashboard-courses (max-width: 27rem) { .courseStrip[data-course-count] { grid-auto-columns: 100%; } }
+@container dashboard-workspace (max-width: 56rem) {
   .dashboard { grid-template-columns: minmax(0, 1fr); }
   .side { grid-column: 1 / -1; grid-row: 2; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
 }

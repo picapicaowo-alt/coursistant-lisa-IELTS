@@ -35,7 +35,13 @@
 .selectedClass span, .note { color: t.$content-secondary; font-size: t.$font-size-body; line-height: 1.6; margin: 0; }
 .error { color: t.$feedback-danger; }
 @container learning-workspace (max-width: 52rem) { .scheduleLayout { grid-template-columns: 1fr; } }
-@container learning-workspace (max-width: 38rem) { .balances { gap: t.$space-3; } .balances dd span { display: block; margin: t.$space-1 0 0; } .report { grid-template-columns: 1fr; } .reports article { flex-wrap: wrap; } .reports button { margin-left: auto; } }
+@container learning-workspace (max-width: 38rem) {
+  .balances { gap: t.$space-3; }
+  .balances dd span { display: block; margin: t.$space-1 0 0; }
+  .report { grid-template-columns: 1fr; }
+  .reports article { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; }
+  .reports button { grid-column: 2; justify-self: start; }
+}
 
 .snapshot h3 { font-size: t.$font-size-body-lg; }
 .snapshot dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: t.$space-6; }

@@ -15,6 +15,7 @@ import {APP_ROUTE_PATHS, STUDY_PLAN_QUERY_PARAMS} from '@/configs/routePaths';
 import {recordPage, optionalNumber, textValue, type OperationRecord} from '@/utils/operationRecords';
 import {assignmentSummary, attendanceData, courseRecords, DETAIL_LABELS, LEARNING_PAGE_SIZE, LEARNING_PREVIEW_SIZE, learningDate, learningWorkDestination, type LearningDetail} from './learningData';
 import {CourseLearningDetails} from './CourseLearningDetails';
+import {PublishedReports} from './PublishedReports';
 import s from './index.module.scss';
 
 const CalendarPage = lazy(() => import('@/pages/CalendarPage'));
@@ -61,7 +62,7 @@ export default function StudentLearningPage() {
     <nav className={s.tabs} aria-label="Learning views">{(['overview', 'calendar'] as const).map(value => <button key={value} type="button" aria-pressed={tab === value} onClick={() => {setTab(value); openDetail();}}>{value === 'overview' ? 'Overview' : 'Calendar'}</button>)}</nav>
     {tab === 'calendar' ? <Suspense fallback={<p role="status">Loading calendar…</p>}><CalendarPage embedded courseId={courseId}/></Suspense> : detail ? <>
       <header className={s.detailHeader}><button type="button" className={s.textButton} onClick={() => openDetail()}><ArrowLeft size={17}/> Back to overview</button><h3>{DETAIL_LABELS[detail]}</h3>{visibleCourse ? <p>{visibleCourse.title || visibleCourse.courseCode}</p> : null}</header>
-      {detail === 'course' ? courseId ? <CourseLearningDetails key={courseId} courseId={courseId}/> : <LearningEmpty title="Choose a course" description="Select a course above to see hours, reports, and schedule options."/> : <WorkspaceSection title={DETAIL_LABELS[detail]} headingLevel={4} appearance="record">
+      {detail === 'reports' ? <PublishedReports key={courseId ?? 'all'} courseId={courseId}/> : detail === 'course' ? courseId ? <CourseLearningDetails key={courseId} courseId={courseId}/> : <LearningEmpty title="Choose a course" description="Select a course above to see hours, reports, and schedule options."/> : <WorkspaceSection title={DETAIL_LABELS[detail]} headingLevel={4} appearance="record">
         <LearningQueryState query={detailQuery} errorMessage={`${DETAIL_LABELS[detail]} could not be loaded.`}/>
         {detailQuery.isSuccess ? <><OperationRows kind={detail} items={detailPage}/><TeachingPagination label={DETAIL_LABELS[detail]} page={page} size={LEARNING_PAGE_SIZE} total={detailItems.length} count={detailPage.length} onChange={setPage}/></> : null}
       </WorkspaceSection>}
@@ -81,7 +82,7 @@ export default function StudentLearningPage() {
         {alerts.isSuccess ? <div className={s.alerts}>{alerts.data.slice(0, LEARNING_PREVIEW_SIZE).map((item, index) => <article key={optionalNumber(item, 'id') ?? index}><Bell size={18}/><div><strong>{textValue(item, 'title', 'message', 'type') || 'Learning update'}</strong>{textValue(item, 'createdAt') ? <small>{learningDate(textValue(item, 'createdAt'))}</small> : null}</div></article>)}</div> : null}
         {alerts.isSuccess && alerts.data.length > LEARNING_PREVIEW_SIZE ? detailButton('alerts') : null}
       </WorkspaceSection>
-      <section className={s.courseEntry} aria-label="Course reports and schedule changes"><div><h3>Need reports or schedule changes?</h3><p>Choose a course to view your hours, read published reports, or request a change.</p></div><div className={s.entryActions}>{coursePicker('Course details selection')}<button className={s.primary} type="button" disabled={!courseId} onClick={() => openDetail('course')}>View details <ArrowRight size={17}/></button></div></section>
+      <section className={s.courseEntry} aria-label="Course reports and schedule changes"><div><h3>Need reports or schedule changes?</h3><p>Read published reports across your courses, or choose a course for hours and schedule changes.</p></div><div className={s.entryActions}><button className={s.textButton} type="button" onClick={() => openDetail('reports')}>View published reports <ArrowRight size={17}/></button>{coursePicker('Course details selection')}<button className={s.primary} type="button" disabled={!courseId} onClick={() => openDetail('course')}>View details <ArrowRight size={17}/></button></div></section>
       <div className={s.supportGrid}>
         <WorkspaceSection title="Attendance" appearance="record" meta={detailButton('attendance')}>
           <LearningQueryState query={attendance}/>
