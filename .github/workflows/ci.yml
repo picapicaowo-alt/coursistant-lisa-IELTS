@@ -1,5 +1,9 @@
 name: CI
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [main]
@@ -12,6 +16,7 @@ defaults:
 jobs:
   frontend:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -19,13 +24,34 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: lms/package-lock.json
-      - run: npm ci
-      - run: npm run lint:ci
-      - run: npm run typecheck
-      - run: npm run typecheck:production
-      - run: npm run test:run
-      - run: npm run build
+      - name: Install locked dependencies (no inline audit)
+        run: npm run deps:ci
+      - run: npm run ci:step -- typecheck:ci-tools
+      - run: npm run ci:step -- test:ci-tools
+      - run: npm run ci:step -- lint:ci
+      - run: npm run ci:step -- typecheck
+      - run: npm run ci:step -- typecheck:production
+      - run: npm run ci:step -- test:run
+      - run: npm run ci:step -- build
       - run: npx playwright install --with-deps chromium
-      - run: npm run test:e2e
+      - run: npm run ci:step -- test:e2e
         env:
           CI: true
+  dependency-audit:
+    # No dependency installation or dependency on frontend: network trouble cannot delay its checks.
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+      - name: Audit lockfile (bounded; unavailable is not clean)
+        run: npm run deps:audit
+      - name: Preserve audit result even on failure
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dependency-audit
+          path: lms/artifacts/ci/
+          retention-days: 14
