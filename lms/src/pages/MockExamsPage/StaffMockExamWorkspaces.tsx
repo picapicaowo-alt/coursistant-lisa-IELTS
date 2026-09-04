@@ -11,8 +11,11 @@ import {
   Headphones,
   Image as ImageIcon,
   PenLine,
-  Send,
-  Users,
+  Check,
+  ChevronDown,
+  FileText,
+  Inbox,
+  UserRound,
 } from "lucide-react";
 import { unwrapData } from "@/apis";
 import { advisorApiService } from "@/apis/services/advisor-api";
@@ -28,6 +31,7 @@ import {
   type RuntimeRecord,
 } from "./staffRuntime";
 import styles from "./staff.module.scss";
+import assignStyles from "./assign.module.scss";
 import {
   useIdempotencyCheckpoint,
 } from "@/hooks/useIdempotencyCheckpoint";
@@ -52,10 +56,6 @@ function ErrorNotice({
       {advisingErrorMessage(error, fallback)}
     </p>
   ) : null;
-}
-
-function Empty({ children }: { children: string }) {
-  return <p className={styles.empty}>{children}</p>;
 }
 
 function idFrom(record: RuntimeRecord, ...keys: string[]): number | null {
@@ -204,6 +204,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
   });
   const studentRows = runtimeItems(students.data);
   const [studentId, setStudentId] = useState("");
+  const [assignmentCount, setAssignmentCount] = useState<number>();
   const [templateId, setTemplateId] = useState("");
   const [instructorId, setInstructorId] = useState("");
   const [sections, setSections] = useState<Record<Section, boolean>>({
@@ -248,41 +249,34 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
       }),
   });
   return (
-    <div className={styles.workspace}>
-      <section className={styles.hero}>
+    <div className={assignStyles.workspace}>
+      <section className={assignStyles.hero}>
         <div>
           <h1>Match students to published papers</h1>
           <p>
-            Select from your assigned students, choose the exam sections, and
-            review every prior assignment before creating another.
+            Assign mock exams to students, choose the exam sections, and review every prior assignment history.
           </p>
         </div>
-        <div className={styles.metric}>
-          <strong>{templates.length}</strong>
-          <span>published</span>
-        </div>
       </section>
-      <div className={styles.twoColumn}>
-        <WorkspaceSection title="Prepare a mock exam">
-          <div className={styles.panelHeading}>
-            <div></div>
-            <Users size={22} />
-          </div>
+      <div className={assignStyles.columns}>
+        <WorkspaceSection title="Prepare a mock exam" className={assignStyles.panel} bodyClassName={assignStyles.panelBody}>
           <form
-            className={styles.editorForm}
+            className={assignStyles.form}
             onSubmit={(event) => {
               event.preventDefault();
               assign.mutate();
             }}
           >
             <label className={styles.full}>
-              <span>Student</span>
+              <span>Select student</span>
+              <span className={assignStyles.selectControl}>
+              <UserRound size={20} aria-hidden="true"/>
               <select
                 required
                 value={studentId}
-                onChange={(event) => setStudentId(event.target.value)}
+                onChange={(event) => {setStudentId(event.target.value); setAssignmentCount(undefined);}}
               >
-                <option value="">Select assigned student</option>
+                <option value="">Choose a student from your cohort</option>
                 {studentRows.map((student) => {
                   const id = idFrom(student, "studentUserId", "userId");
                   return id ? (
@@ -293,15 +287,19 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
                   ) : null;
                 })}
               </select>
+              <ChevronDown size={18} aria-hidden="true"/>
+              </span>
             </label>
             <label className={styles.full}>
               <span>Published template</span>
+              <span className={assignStyles.selectControl}>
+              <FileText size={20} aria-hidden="true"/>
               <select
                 required
                 value={templateId}
                 onChange={(event) => setTemplateId(event.target.value)}
               >
-                <option value="">Select paper</option>
+                <option value="">Select exam template</option>
                 {templates.map((template) => (
                   <option value={template.id} key={template.id}>
                     {template.title ||
@@ -311,6 +309,8 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
                   </option>
                 ))}
               </select>
+              <ChevronDown size={18} aria-hidden="true"/>
+              </span>
             </label>
             {templateId ? (
               <div className={styles.full} aria-label="Selected paper details">
@@ -328,7 +328,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
             ) : null}
             <fieldset className={styles.full}>
               <legend>Assigned sections</legend>
-              <div className={styles.checkGrid}>
+              <div className={assignStyles.sections}>
                 {(Object.keys(SECTION_META) as Section[]).map((section) => (
                   <label key={section}>
                     <input
@@ -341,6 +341,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
                         }))
                       }
                     />
+                    <Check size={18} aria-hidden="true"/>
                     <span>{SECTION_META[section].label}</span>
                   </label>
                 ))}
@@ -350,6 +351,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               {sections.writing ? (
                 <AdvisorInstructorPicker
                   required
+                  appearance="disclosure"
                   label="Writing instructor"
                   value={instructorId}
                   onChange={setInstructorId}
@@ -358,15 +360,14 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
             </div>
             <div className={styles.formActions}>
               <button
-                className={styles.primary}
+                className={assignStyles.assignButton}
                 disabled={
-                  assign.isPending ||
+                  assign.isPending || !studentId || !templateId ||
                   (sections.writing && !instructorId) ||
                   !Object.values(sections).some(Boolean)
                 }
               >
-                <Send size={16} />
-                {assign.isPending ? "Assigning…" : "Assign exam"}
+                {assign.isPending ? "Assigning…" : "Assign Exam"}
               </button>
             </div>
           </form>
@@ -375,12 +376,23 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
             fallback="The assignment could not be completed."
           />
         </WorkspaceSection>
-        <WorkspaceSection title="Assigned papers">
+        <WorkspaceSection title="Assigned papers" className={assignStyles.panel} bodyClassName={assignStyles.panelBody}
+          meta={!studentId || assignmentCount != null ? <span className={assignStyles.count}>{studentId ? assignmentCount : 0} Assigned</span> : undefined}>
           {!studentId ? (
-            <Empty>Select a student to review assignment history.</Empty>
+            <div className={assignStyles.empty}>
+              <span className={assignStyles.emptyIcon}><Inbox size={28} aria-hidden="true"/></span>
+              <h3>No Active Assignments</h3>
+              <p>Select a student from the form on the left to review their complete assignment history and assign new mock exams.</p>
+            </div>
           ) : (
             <ObserverMockExams
               key={studentId}
+              onCountChange={setAssignmentCount}
+              emptyState={<div className={assignStyles.empty}>
+                <span className={assignStyles.emptyIcon}><Inbox size={28} aria-hidden="true"/></span>
+                <h3>No assigned papers yet</h3>
+                <p>Choose a published template and exam sections to assign this student their first mock exam.</p>
+              </div>}
               scope="advisor"
               studentUserId={Number(studentId)}
             />

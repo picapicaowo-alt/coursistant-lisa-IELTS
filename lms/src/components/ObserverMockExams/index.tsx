@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react';
+import {useEffect, useRef, useState, type ReactNode} from 'react';
 import {CalendarDays, ClipboardCheck, FileCheck2, X} from 'lucide-react';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -11,7 +11,7 @@ import styles from './index.module.scss';
 const PAGE_SIZE = 20;
 
 /** Observer detail stays in the current role; it never links to a student attempt. */
-export const ObserverMockExams = ({scope, studentUserId}: {scope: 'advisor' | 'parent'; studentUserId: number}) => {
+export const ObserverMockExams = ({scope, studentUserId, onCountChange, emptyState}: {scope: 'advisor' | 'parent'; studentUserId: number; onCountChange?: (count: number | undefined) => void; emptyState?: ReactNode}) => {
   const dialog = useRef<HTMLDialogElement>(null);
   const [page, setPage] = useState(0);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -29,13 +29,16 @@ export const ObserverMockExams = ({scope, studentUserId}: {scope: 'advisor' | 'p
     retry: false,
   });
   const allRows = normalizeStudentExams(list.data);
+  useEffect(() => {
+    onCountChange?.(list.isSuccess ? allRows.length : undefined);
+  }, [onCountChange, list.isSuccess, allRows.length]);
   const rows = allRows.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
   const exam = detail.data;
   useEffect(() => {if (selectedId != null) dialog.current?.showModal();}, [selectedId]);
   return <div className={styles.workspace} data-scope={scope}>
     {list.isPending ? <p role="status">Loading assigned papers…</p> : null}
     {list.isError ? <div role="alert"><p>{getApiErrorMessage(list.error, 'Assigned papers could not be loaded.')}</p><button onClick={() => void list.refetch()}>Retry</button></div> : null}
-    {list.isSuccess && rows.length === 0 ? <p>No assigned mock exams.</p> : null}
+    {list.isSuccess && rows.length === 0 ? emptyState ?? <p>No assigned mock exams.</p> : null}
     <div className={styles.paperGrid}>{rows.map(row => {
       const sectionResults = row.sections.filter(section => row.results[section]);
       return <article className={styles.record} key={row.id}>

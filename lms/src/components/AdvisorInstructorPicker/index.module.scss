@@ -1,0 +1,38 @@
+.picker { display: grid; gap: t.$space-3; min-width: 0; }
+.label { color: t.$content-secondary; font-size: t.$font-size-body; font-weight: t.$fw-semibold; text-transform: uppercase; }
+.disclosure {
+  min-width: 0;
+
+  > summary {
+    display: flex;
+    align-items: center;
+    gap: t.$space-3;
+    min-height: 3.25rem;
+    padding: t.$space-3 t.$space-4;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-control;
+    background: t.$surface-raised;
+    color: t.$content-secondary;
+    font-size: t.$font-size-body-lg;
+    list-style: none;
+    cursor: pointer;
+
+    &::-webkit-details-marker { display: none; }
+    span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    svg { flex-shrink: 0; }
+    &:focus-visible { outline: 3px solid t.$focus-ring; outline-offset: 2px; }
+  }
+
+  &[open] > summary > svg:last-child { transform: rotate(180deg); }
+}
+.options {
+  margin-top: t.$space-3;
+  padding: t.$space-4;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  background: t.$surface-subtle;
+
+  > fieldset > legend { display: none; }
+  label { display: grid; gap: t.$space-2; font-size: t.$font-size-body; }
+  input, select { min-width: 0; width: 100%; font: inherit; }
+}

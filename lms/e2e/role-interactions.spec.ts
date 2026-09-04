@@ -206,6 +206,13 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
 
   await page.goto('/mock-exams');
   await expect(page.getByRole('heading', {name: 'Match students to published papers'})).toBeVisible();
+  await page.setViewportSize({width: 1600, height: 1000});
+  await expect(page.getByText('No Active Assignments', {exact: true})).toBeVisible();
+  await page.screenshot({path: testInfo.outputPath('advisor-mock-exam-empty-desktop.png'), fullPage: true});
+  await page.setViewportSize({width: 390, height: 844});
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({path: testInfo.outputPath('advisor-mock-exam-empty-mobile.png'), fullPage: true});
+  await page.setViewportSize({width: 1600, height: 1000});
   await openSection(page, 'Prepare a mock exam');
   const sectionCheckbox = page.getByRole('checkbox', {name: 'Listening'});
   const sectionCheckboxBox = await sectionCheckbox.boundingBox();
@@ -213,10 +220,12 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
   expect(sectionCheckboxBox?.height).toBeLessThanOrEqual(22);
   await page.getByRole('group', {name: 'Assigned sections'}).scrollIntoViewIfNeeded();
   await page.screenshot({path: testInfo.outputPath('advisor-mock-exam-sections.png'), fullPage: true});
-  await page.getByRole('combobox', {name: /^Student/}).selectOption('301');
+  await page.getByRole('combobox', {name: 'Select student'}).selectOption('301');
   await page.getByLabel('Published template').selectOption('45');
+  await page.locator('summary').filter({hasText: 'Search for available instructors'}).click();
+  await page.getByRole('searchbox', {name: 'Search instructors'}).fill('Writing');
   await page.getByRole('combobox', {name: 'Writing instructor'}).selectOption('501');
-  await page.getByRole('button', {name: 'Assign exam'}).click();
+  await page.getByRole('button', {name: 'Assign Exam'}).click();
   await expect.poll(() => assignmentRequests).toBe(1);
   await expect(page.getByRole('link', {name: 'Vocabulary'})).toHaveCount(0);
 
