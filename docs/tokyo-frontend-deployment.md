@@ -44,4 +44,3 @@ The existing legacy chat-cookie cleanup includes old domain strings. It only exp
 A successful build, fixture test or HTTP 200 is not authenticated business acceptance. Publish release and test evidence separately, without tokens, cookies or passwords.
 
 This workflow changes only frontend objects and CloudFront cache state. It does not change CloudFront routing, backend services, IAM, databases or infrastructure configuration.
-

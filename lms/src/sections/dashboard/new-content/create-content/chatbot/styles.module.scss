@@ -52,14 +52,14 @@
             background: rgba(237, 242, 247, 1);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
-          
+
             color: rgba(113, 128, 150, 1);
             font-weight: 500;
             font-size: 1.2rem;
-          
+
             cursor: pointer;
             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
-          
+
             &:hover {
               background: rgba(255, 255, 255, 0.75);
             }
@@ -106,7 +106,7 @@
                     margin: 0;
                     margin-left: 0.3rem;
                 }
-                
+
             }
             .chatInputMessage {
                 .chatTextarea {
@@ -124,7 +124,7 @@
                     overflow-y: auto;
                     letter-spacing: 0.05em;
                 }
-                
+
                 .chatTextarea::placeholder {
                     color: t.$content-placeholder;
                 }

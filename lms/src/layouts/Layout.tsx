@@ -14,7 +14,7 @@ const Layout: React.FC = () => {
   const location = useLocation();
   const {user} = useRequiredAuth();
   const mainContentRef = React.useRef<HTMLElement | null>(null);
-  
+
   // Course overview uses the application shell for students and instructors.
   // Opening a material keeps the focused reading experience.
   const courseOverview = user.role === 'USER' && (user.level === 'INSTRUCTOR' || user.level === 'STUDENT')
@@ -28,7 +28,7 @@ const Layout: React.FC = () => {
     // open halfway down (and hide the AI Workplace heading).
     if (mainContentRef.current) mainContentRef.current.scrollTop = 0;
   }, [location.pathname, showLayout]);
-  
+
   return (
     <div className={styles.layoutContainer}>
       <a className={styles.skipLink} href="#main-content">{t('accessibility.skipToContent')}</a>

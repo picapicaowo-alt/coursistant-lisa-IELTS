@@ -31,7 +31,7 @@ i18n
   .use(initReactI18next) // Passes i18n to react-i18next
   .init({
     resources: {
-      en: { 
+      en: {
         common: enCommon,
         auth: enAuth,
         course: enCourse,

@@ -40,4 +40,3 @@ describe('training frontend deployment environments', () => {
     expect(env.VITE_BASE_PORT).toBe('8083');
   });
 });
-

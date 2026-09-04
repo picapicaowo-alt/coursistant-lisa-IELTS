@@ -8,12 +8,12 @@
     border: 1px solid t.$border-default;
     transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
     width: 100%;
-    
+
     &:hover {
         border-color: t.$border-strong;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
-    
+
     &:focus-within {
         border-color: t.$action-primary;
         box-shadow: 0 0 0 3px rgba(86, 111, 232, 0.1);

@@ -4,14 +4,14 @@
     flex-direction: column;
     height: 100%;
     font-family: t.$font-family;
-    
+
     .chatHeader {
         margin-top: 1rem;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        
+
         .chatMenu {
             width: 32px;
             height: 32px;
@@ -20,51 +20,51 @@
             cursor: pointer;
             margin-left: 10px;
         }
-        
+
         .chatTitle {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
         }
-        
+
         .glassButton {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            
+
             padding: 0.6rem 0.6rem;
             border-radius: 1rem;
-            
+
             background: rgba(237, 242, 247, 1);
             backdrop-filter: blur(6px);
             -webkit-backdrop-filter: blur(6px);
-            
+
             color: rgba(113, 128, 150, 1);
             font-weight: 500;
             font-size: 1.2rem;
-            
+
             cursor: pointer;
             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
-            
+
             &:hover {
                 background: rgba(255, 255, 255, 0.75);
             }
         }
     }
-    
+
     .spacer {
         flex: 1;
     }
-    
+
     .horizontalLine {
         width: 100%;
         height: 1px;
         border: 1px dashed rgba(226, 232, 240, 1);
         margin: 1rem auto;
     }
-    
+
     .chatInputContainer {
         width: 100%;
         display: flex;
@@ -73,7 +73,7 @@
         border-radius: 1rem;
         padding: 0.7rem;
         margin: 0.1rem auto;
-        
+
         .chatCourse {
             display: flex;
             align-items: center;
@@ -83,20 +83,20 @@
             padding: 0.2rem 0.3rem;
             width: 100px;
             cursor: pointer;
-            
+
             .chatCourseIcon {
                 margin-left: -0.2rem;
             }
-            
+
             p {
                 font-size: 0.7rem;
                 color: t.$action-primary;
                 margin: 0;
                 margin-left: 0.3rem;
             }
-            
+
         }
-        
+
         .chatInputMessage {
             .chatTextarea {
                 border: none;
@@ -113,26 +113,26 @@
                 overflow-y: auto;
                 letter-spacing: 0.05em;
             }
-            
+
             .chatTextarea::placeholder {
                 color: t.$content-placeholder;
             }
         }
-        
+
         .chatFooter {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            
+
             .chatFooterIcon {
                 cursor: pointer;
                 margin-right: 5px;
             }
-            
+
             .spacer {
                 flex: 1;
             }
-            
+
             .chatFooterSend {
                 cursor: pointer;
                 background-color: t.$action-primary;
@@ -144,11 +144,11 @@
                 justify-content: center;
                 font-size: 0.9rem;
                 transition: background-color 0.3s ease;
-                
+
                 img {
                     margin-left: 0.5rem;
                 }
-                
+
                 &:hover {
                     background-color: #4983FF;
                 }

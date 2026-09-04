@@ -3,11 +3,11 @@
     border-bottom: 1px solid #F1F5F9;
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
-    
+
     &:hover {
         background: t.$surface-subtle;
     }
-    
+
     &.active {
         background: t.$surface-brand-tint;
         border: 1px solid rgba(t.$action-primary, .28);
@@ -29,7 +29,7 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    
+
     svg {
         width: 20px;
         height: 20px;
@@ -107,13 +107,13 @@
     justify-content: center;
     gap: 0.5rem;
     transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
-    
+
     &:hover {
         background: #F1F5F9;
         border-color: t.$content-placeholder;
         color: #475569;
     }
-    
+
     &:focus {
         outline: none;
         border-color: t.$action-primary;

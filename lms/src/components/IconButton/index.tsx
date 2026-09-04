@@ -14,7 +14,7 @@ export const IconButton: React.FC<IconButtonProps & { type?: 'delete' | 'edit' |
                                                                                                type = 'delete',
                                                                                              }) => {
   const iconWidth = `${Math.round(width * 2 / 3)}`;
-  
+
   const getIcon = () => {
     switch (type) {
       case 'delete':
@@ -37,7 +37,7 @@ export const IconButton: React.FC<IconButtonProps & { type?: 'delete' | 'edit' |
         return null;
     }
   };
-  
+
   return (
     <button
       className={`${styles.actionButton} ${styles[type]}`}
