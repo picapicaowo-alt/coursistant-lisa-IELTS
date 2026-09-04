@@ -60,6 +60,7 @@ test('a roster opened from course overview returns there, then back to the catal
   await instructorFixture(page);
   await page.goto('/course/71');
   await page.getByRole('button', {name: 'Schedule & Groups', exact: true}).click();
+  await page.getByRole('button', {name: 'Members', exact: true}).click();
   await page.getByRole('link', {name: 'Manage roster', exact: true}).click();
   await expect(page.getByRole('cell', {name: 'Alex Mei Chen', exact: true})).toBeVisible();
   await page.getByRole('link', {name: 'Back to course', exact: false}).click();

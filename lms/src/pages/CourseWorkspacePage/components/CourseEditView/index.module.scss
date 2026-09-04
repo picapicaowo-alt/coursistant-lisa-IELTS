@@ -355,3 +355,25 @@
         }
     }
 }
+
+// The instructor's focused workspace reveals one material's management tools at a time.
+.actionDisclosure {
+    position: relative;
+    margin-left: auto;
+    flex: 0 0 auto;
+    > summary { display: grid; place-items: center; width: t.$touch-target; height: t.$touch-target; list-style: none; color: t.$content-secondary; cursor: pointer; &::-webkit-details-marker { display: none; } }
+    .materialControls { position: absolute; z-index: 4; right: 0; top: 100%; display: flex; flex-direction: column; align-items: stretch; width: 13rem; padding: t.$space-2; gap: t.$space-1; background: t.$surface-raised; box-shadow: t.$shadow-sm; border-radius: t.$radius-control-sm; }
+    .materialControls > button, .moveControl, .deleteConfirm > button { min-height: t.$touch-target; justify-content: flex-start; gap: t.$space-3; padding: t.$space-2 t.$space-3; border: 0; font-size: t.$font-size-body; }
+    .moveControl { select { max-width: 100%; min-width: 0; min-height: t.$touch-target; } }
+    .deleteConfirm { flex-wrap: wrap; }
+}
+.linkDisclosure { margin-top: t.$space-5; padding-top: t.$space-4; border-top: 1px solid t.$border-default;
+    > summary { color: t.$action-primary; cursor: pointer; min-height: t.$touch-target; padding-block: t.$space-3; font-size: t.$font-size-body; }
+    .linkForm { grid-template-columns: minmax(0, 1fr); border-top: 0; padding-top: 0; margin-top: t.$space-2; }
+    .linkFormTitle { display: none; }
+}
+
+@media (max-width: 48rem) {
+    .actionDisclosure[open] { grid-column: 1 / -1; width: 100%; > summary { margin-left: auto; } }
+    .actionDisclosure .materialControls { position: static; width: 100%; padding: t.$space-2 0; box-shadow: none; border-top: 1px solid t.$border-default; }
+}

@@ -196,8 +196,13 @@ for (const width of [2560, 1920, 1600, 1440, 1024, 768, 390, 320]) {
       expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), name).toBeLessThanOrEqual(1);
       if (name === 'detail') {
         await expect(page.getByRole('button', {name: 'Preview Syllabus & Research Framework'})).toBeVisible();
-        await page.getByRole('button', {name: /Final Draft Editing/}).scrollIntoViewIfNeeded();
-        await expect(page.getByRole('button', {name: /Final Draft Editing/})).toBeInViewport();
+        if (width <= 768) {
+          await page.getByRole('combobox', {name: 'Selected week', exact: true}).selectOption('85');
+          await expect(page.getByRole('region', {name: 'Selected week'}).getByRole('heading', {name: /Final Draft Editing/})).toBeVisible();
+        } else {
+          await page.getByRole('button', {name: /Final Draft Editing/}).scrollIntoViewIfNeeded();
+          await expect(page.getByRole('button', {name: /Final Draft Editing/})).toBeInViewport();
+        }
         await page.getByRole('heading', {name: title, exact: true, level: 1}).scrollIntoViewIfNeeded();
         await page.getByRole('main').first().evaluate(element => {element.scrollTop = 0;});
       }

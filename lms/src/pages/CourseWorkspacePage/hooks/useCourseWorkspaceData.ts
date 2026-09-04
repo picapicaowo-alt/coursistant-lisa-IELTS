@@ -33,6 +33,8 @@ export interface CourseWorkspaceData {
   isUnavailable: boolean;
   sessionsFailed: boolean;
   assignmentsFailed: boolean;
+  assignmentsLoading?: boolean;
+  quizzesLoading?: boolean;
   quizzesFailed: boolean;
   eventsFailed: boolean;
   groupSetsFailed: boolean;
@@ -147,6 +149,8 @@ export const useCourseWorkspaceData = (): CourseWorkspaceData => {
     ),
     sessionsFailed: sessions.isError,
     assignmentsFailed: assignments.isError,
+    assignmentsLoading: assignments.isPending,
+    quizzesLoading: quizzes.isPending,
     quizzesFailed: quizzes.isError,
     eventsFailed: events.isError,
     groupSetsFailed: groupSets.isError,
