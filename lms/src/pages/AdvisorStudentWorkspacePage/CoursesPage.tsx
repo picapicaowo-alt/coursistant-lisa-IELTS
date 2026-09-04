@@ -10,6 +10,8 @@ import {advisorApiService} from '@/apis/services/advisor-api';
 import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {CourseIdentityCard} from '@/components/CourseIdentityCard';
+import {CourseCardGrid} from '@/components/CourseIdentityCard/CourseCardGrid';
+import {AdvisingBadge} from '@/components/AdvisingBadge';
 import {EnglishDateInput, EnglishTimeInput} from '@/components/EnglishDateInput';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {getApiErrorCode} from '@/utils/apiError';
@@ -391,7 +393,7 @@ const CoursesPage: React.FC = () => {
         {courses.isPending ? <p className={styles.status}>Loading courses…</p> : null}
         {courses.data?.length === 0 ? <p className={styles.status}>No course is linked to this study plan.</p> : null}
 
-        <div className={styles.courseCardGrid}>
+        <CourseCardGrid>
           {(courses.data ?? []).map((course, index) => {
             const primarySchedule = course.schedule?.[0];
             const formattedSchedule = scheduleLabel(
@@ -405,6 +407,7 @@ const CoursesPage: React.FC = () => {
               courseId={course.courseId ?? index}
               title={course.title || course.courseCode || `Course #${course.courseId}`}
               code={course.courseCode}
+              status={<AdvisingBadge kind="status" value={course.launchState || course.status || ''} label={course.launchState || course.status || 'Status unavailable'}/>}
               instructor={formatPersonName({firstName: course.instructorFirstName, middleName: course.instructorMiddleName, lastName: course.instructorLastName}, 'Instructor not assigned')}
               progress={{completed: course.lectureCompleted, total: course.lectureTotal}}
               metadata={
@@ -416,11 +419,9 @@ const CoursesPage: React.FC = () => {
                         ? 'Group course'
                         : 'Course'}
                   </span>
-                  <span>{course.launchState || course.status || 'Status unavailable'}</span>
                 </>
               }
-            >
-              <div className={cStyles.cardSchedule}>
+              footer={<div className={cStyles.cardSchedule}>
                 <CalendarClock size={17} aria-hidden="true" />
                 <span>
                   <small>Weekly schedule</small>
@@ -432,9 +433,9 @@ const CoursesPage: React.FC = () => {
                     {primarySchedule.location}
                   </span>
                 ) : null}
-              </div>
-              <div className={styles.actions}>
-                <button type="button" className={styles.primary} onClick={() => setSelectedCourse(course)}>View Course</button>
+              </div>}
+              actions={<>
+                <button type="button" onClick={() => setSelectedCourse(course)}>View Course</button>
                 {!['COMPLETED', 'HIDDEN'].includes(course.lifecycleStatus ?? '') && course.status !== 'WITHDRAWN' ? (
                   <details className={styles.lifecycleActions}><summary>Manage enrollment</summary><div>
                     {course.deliveryMode === 'ONE_ON_ONE' && course.courseId != null ? (
@@ -508,11 +509,11 @@ const CoursesPage: React.FC = () => {
                 ) : (
                   <span className={styles.readOnlyBadge}>{course.lifecycleStatus || course.status}</span>
                 )}
-              </div>
-            </CourseIdentityCard>
+              </>}
+            />
             );
           })}
-        </div>
+        </CourseCardGrid>
       </section>
 
       {selectedCourse ? <CourseSummaryDialog course={selectedCourse} onClose={() => setSelectedCourse(undefined)}/> : null}

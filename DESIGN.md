@@ -228,6 +228,30 @@ Large gradients are rare and purposeful: the profile cover signals identity, ass
 - Use subtle fills for nested records instead of stacking shadows. Assistant cards may use the established cool tint; exam-library cards use the same neutral surfaces and section-category colors.
 - Loading, empty, error, and partial-data states occupy the same structural region as successful content so the layout does not jump or misrepresent absence.
 
+### Shared course identity cards
+
+The September 3 user-supplied Instructor My Courses screenshot is the visual
+authority for course identity cards across roles. `CourseIdentityCard` owns the
+white surface, rounded silhouette, status/code row, title then instructor,
+optional progress, solid footer divider and aligned primary/secondary actions.
+Its blue-violet top accent appears on hover and focus-within without shifting
+content. The `$course-card-*` tokens own accent and elevation; reduced-motion
+preferences keep the interaction immediate. Course status colors retain their
+existing domain meanings and are independent of the interaction accent.
+
+`CourseCardGrid` uses a container-aware 12-column layout (three, two, then one
+card per row) so nested Advisor/Parent areas adapt to their available width.
+List mode keeps one card per row. The component is presentation-only: each
+caller supplies its existing API data, progress type, status and authorized
+actions. No management action or progress percentage is inferred from a role,
+missing record, or visual reference. Parent cards remain read-only.
+
+This treatment supersedes the earlier course identity tint treatment for these
+course collections only. Dashboard assignment rows, course pickers and schedule
+records keep their task-specific layouts. See
+`docs/shared-course-card-review-2026-09-03.md` for the audited role coverage and
+verification limits.
+
 ### Inputs / Fields
 
 - Standard inputs are 50px high with 16px horizontal padding, a 1px neutral border, and 15px corners.

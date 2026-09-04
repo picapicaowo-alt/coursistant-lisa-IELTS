@@ -20,7 +20,6 @@
 .detailHeading,
 .panelHeader,
 .toolbar,
-.cardActions,
 .summaryBar,
 .statusHeading,
 .sessionActions,
@@ -59,7 +58,6 @@
 .pageHeader p,
 .detailHeading p,
 .panelHeader p,
-.courseHeader p,
 .helper,
 .emptyState p,
 .scheduleSectionHeader p {
@@ -182,8 +180,6 @@
 .filters,
 .viewControls,
 .searchControl,
-.cardActionGroup,
-.instructor,
 .sessionActions > span {
   display: flex;
   align-items: center;
@@ -305,7 +301,6 @@
 .createPanel,
 .panel,
 .readinessPanel,
-.courseCard,
 .summaryBar,
 .sessionCard,
 .editorPanel,
@@ -351,39 +346,6 @@
 .formActions { grid-column: 1 / -1; }
 .formActions { display: flex; justify-content: flex-end; gap: t.$space-3; }
 
-.courseGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: t.$space-5;
-}
-
-.courseGrid[data-view='list'] { grid-template-columns: 1fr; }
-.courseGrid[data-view='list'] .courseCard { grid-template-columns: minmax(17rem, 1.6fr) repeat(2, minmax(10rem, 1fr)); align-items: center; }
-
-.courseCard {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  min-width: 0;
-  align-content: start;
-  gap: t.$space-4;
-  padding: t.$space-6;
-  border-radius: t.$radius-lg;
-}
-
-.courseHeader {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: t.$space-1;
-  padding-bottom: t.$space-4;
-  border-bottom: 1px solid t.$border-default;
-}
-
-.courseTitleRow { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; margin-bottom: t.$space-3; }
-.courseHeader h2 { margin: 0; overflow-wrap: anywhere; color: t.$content-ink; font-size: t.$font-size-headline; font-weight: t.$fw-bold; line-height: t.$line-height-headline; }
-.courseCode { min-width: 0; overflow: hidden; color: t.$content-placeholder; font-size: t.$font-size-caption; text-overflow: ellipsis; white-space: nowrap; }
-.courseTitleRow .statusBadge { flex-shrink: 0; }
-.courseHeader { min-width: 0; }
-
 .statusBadge,
 .statusPill,
 .sessionType {
@@ -420,28 +382,13 @@
 }
 
 .factList dt { display: grid; place-items: center; color: t.$content-placeholder; }
-.factList dd { min-width: 0; margin: 0; overflow: hidden; color: t.$content-primary; font-weight: t.$fw-medium; text-overflow: ellipsis; white-space: nowrap; }
+.factList dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: t.$content-primary; font-weight: t.$fw-medium; }
 
 .detailFacts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .detailFacts div { display: grid; gap: t.$space-1; }
 .detailFacts dt { color: t.$content-secondary; font-size: t.$font-size-caption; }
 .detailFacts dd { min-width: 0; margin: 0; overflow-wrap: anywhere; color: t.$content-primary; font-weight: t.$fw-semibold; }
 
-.courseGrid[data-view='list'] .factList { grid-template-columns: 1fr; }
-.courseGrid[data-view='list'] .cardActions { border-top: 0; }
-
-.cardActions {
-  justify-content: space-between;
-  gap: t.$space-3;
-  min-width: 0;
-  padding-top: t.$space-4;
-  border-top: 1px solid t.$border-default;
-}
-
-.instructor { min-width: 0; gap: t.$space-2; color: t.$content-primary; font-size: t.$font-size-caption; }
-.instructor > span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.instructorAvatar { display: grid; width: 1.75rem; height: 1.75rem; flex: 0 0 auto; place-items: center; border-radius: t.$radius-round; background: t.$surface-muted; color: t.$content-secondary; font-weight: t.$fw-bold; }
-.cardActionGroup { flex: 0 0 auto; gap: t.$space-2; color: t.$content-placeholder; }
 .linkButton { min-height: 2.25rem; padding: 0 t.$space-3; color: t.$action-primary; }
 
 .createCourseCard {
@@ -631,13 +578,10 @@
 .notice { background: t.$feedback-warning-surface; color: t.$feedback-warning; }
 
 @media (max-width: 76rem) {
-  .courseGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .createCourseCard { min-height: 17rem; }
 }
 
 @media (max-width: t.$breakpoint-dashboard-single) {
-  .courseGrid[data-view='list'] .courseCard { grid-template-columns: 1fr; }
-  .courseGrid[data-view='list'] .cardActions { border-top: 1px solid t.$border-default; }
   .summaryBar { align-items: flex-start; flex-direction: column; }
   .summaryMetrics { justify-content: flex-start; }
 }
@@ -659,7 +603,6 @@
   .createMeta { display: none; }
   .formGrid,
   .detailFacts,
-  .courseGrid,
   .sessionGrid,
   .scheduleSummaryRow { grid-template-columns: 1fr; }
   .formGrid > *,
@@ -686,8 +629,6 @@
 
 @media (max-width: 28rem) {
   .filterField { flex-basis: 100%; }
-  .cardActions { align-items: flex-start; flex-direction: column; }
-  .cardActionGroup { width: 100%; justify-content: space-between; }
   .linkButton { flex: 1; }
   .occurrenceTable tr { grid-template-columns: 1fr; }
 }
