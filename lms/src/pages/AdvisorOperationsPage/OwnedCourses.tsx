@@ -79,7 +79,7 @@ export function OwnedCourses({onCreate}: {onCreate?: () => void}) {
           actions={<Link to={`${generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(course.courseId)})}?view=delivery`}>Manage delivery</Link>}
         />;
       })}
-      {view === 'grid' && !courses.isPending && !courses.isError ? <button type="button" className={styles.createCourseCard} onClick={onCreate}>
+      {view === 'grid' && !courses.isPending && !courses.isError ? <button type="button" className={styles.createCourseCard} aria-haspopup="dialog" onClick={onCreate}>
         <span className={styles.createCourseIcon}><Plus size={22} aria-hidden="true" /></span>
         <strong>Create new course</strong>
         <span>Set up course identity, term, instructor, and delivery.</span>

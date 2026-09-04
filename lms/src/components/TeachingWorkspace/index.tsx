@@ -17,12 +17,14 @@ export function TeachingDialog({
   children,
   onClose,
   busy = false,
+  className,
 }: {
   title: string;
   description?: string;
   children: ReactNode;
   onClose: () => void;
   busy?: boolean;
+  className?: string;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
   const heading = useId();
@@ -39,7 +41,7 @@ export function TeachingDialog({
   return (
     <dialog
       ref={ref}
-      className={styles.dialog}
+      className={[styles.dialog, className].filter(Boolean).join(' ')}
       aria-labelledby={heading}
       onCancel={(event) => {
         event.preventDefault();
