@@ -3,7 +3,6 @@ import {generatePath, Link} from 'react-router-dom';
 import {ChevronRight, ChevronDown} from 'lucide-react';
 import type {AdvisorActionTaskResponse, AdvisorStudentSummaryResponse} from '@/apis';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {DashboardAssistant} from '@/components/DashboardAssistant';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {AdvisingBadge} from '@/components/AdvisingBadge';
 import {UserAvatar} from '@/components/UserAvatar';
@@ -21,9 +20,9 @@ const readableReason = (reason: string) => /^[A-Z_]+$/.test(reason)
 
 function formatTaskTime(task: AdvisorActionTaskResponse): string {
   const raw = task.createdAt || task.startedAt;
-  if (!raw) return '9:00 am';
+  if (!raw) return '';
   const date = new Date(raw);
-  if (Number.isNaN(date.getTime())) return '9:00 am';
+  if (Number.isNaN(date.getTime())) return '';
   return date.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true}).toLowerCase();
 }
 
@@ -49,11 +48,10 @@ export function AdvisorDashboardOverview({name, dashboard, students, tasks, conv
     </header>
     {error ? <p role="alert" className={styles.error}>Some dashboard information could not be loaded. <button type="button" onClick={onRetry}>Retry</button></p> : null}
     <div className={styles.grid}>
-      <DashboardAssistant audience="advisor"/>
       <div className={styles.column}>
         <WorkspaceSection title="Need Attention" meta={<ViewAll to={APP_ROUTE_PATHS.advisorStudents}/>} bodyClassName={styles.attentionBody}>
           {attention.length === 0 ? <p className={styles.empty}>{loading ? 'Loading students…' : 'No students currently need attention.'}</p> : attention.slice(0, 5).map((student, index) => <div className={styles.attentionRow} key={student.studentUserId}>
-            <div className={styles.person}><UserAvatar userId={student.studentUserId} className={styles.avatar}/><div><strong>{formatPersonName(student, `Student #${student.studentUserId}`)}</strong><small>{student.targetGoal || 'IELTS | Target: 7.0'}</small></div></div>
+            <div className={styles.person}><UserAvatar userId={student.studentUserId} className={styles.avatar}/><div><strong>{formatPersonName(student, `Student #${student.studentUserId}`)}</strong><small>{student.targetGoal || ''}</small></div></div>
             <AdvisingBadge value={student.highestPriority}/>
             <div className={styles.reason}><span>{student.riskReasons?.[0] ? readableReason(student.riskReasons[0]) : 'Review student progress'}</span>{student.riskReasons && student.riskReasons.length > 1 ? <small>{student.riskReasons.slice(1).map(readableReason).join(' · ')}</small> : null}</div>
             <Link className={styles.viewButton} data-primary={index === 0 || undefined} to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdStudyPlan, {studentUserId: String(student.studentUserId)})}>View</Link>

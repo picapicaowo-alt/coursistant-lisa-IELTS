@@ -12,10 +12,10 @@ describe('ParentApiService', () => {
     client.get.mockResolvedValue({status: 200, data: {}});
     await service.listLinkedStudents(0, 20);
     await service.getStudentDashboard(41);
-    await service.listStudentCalendar(41, 25);
+    await service.listStudentCalendar(41, {from: '2026-09-01', to: '2026-09-15', timezone: 'Asia/Singapore'});
     expect(client.get).toHaveBeenNthCalledWith(1, '/v2/parent/linked-students', {params: {page: 0, size: 20}});
     expect(client.get).toHaveBeenNthCalledWith(2, '/v2/parent/students/41/dashboard');
-    expect(client.get).toHaveBeenNthCalledWith(3, '/v2/parent/students/41/calendar', {params: {limit: 25}});
+    expect(client.get).toHaveBeenNthCalledWith(3, '/v2/parent/students/41/calendar', {params: {from: '2026-09-01', to: '2026-09-15', timezone: 'Asia/Singapore'}});
   });
 
   it('links a parent with an idempotency key', async () => {

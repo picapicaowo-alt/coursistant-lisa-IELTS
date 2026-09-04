@@ -40,10 +40,8 @@ test('advisor sidebar routes operations out of the dashboard', async ({page}, in
   await page.goto('/advisor/operations');
   await expect(page.getByRole('region', {name: 'Action tasks', exact: true})).toHaveCount(0);
   await expect(page.getByLabel('Search conversations')).toHaveCount(0);
-  await expect(page.getByRole('heading', {name: 'New Chat'})).toBeVisible();
-  await page.getByRole('button', {name: 'Prepare a study plan'}).click();
-  await expect(page.getByRole('textbox', {name: 'Ask the advising assistant'})).toHaveValue('Prepare a study plan');
-  await expect(page.getByRole('button', {name: 'Send message', exact: true})).toBeDisabled();
+  await expect(page.getByRole('heading', {name: 'New Chat'})).toHaveCount(0);
+  await expect(page.getByRole('textbox', {name: 'Ask the advising assistant'})).toHaveCount(0);
   await noOverflow(page, 1440);
   await page.getByRole('heading', {name: /Welcome back/}).scrollIntoViewIfNeeded();
   await page.screenshot({path: info.outputPath('advisor-dashboard.png'), fullPage: true});
@@ -194,34 +192,18 @@ test('settings compiles real token colors and saves through the profile API', as
   await page.screenshot({path: info.outputPath('settings-390.png'), fullPage: true});
 });
 
-test('course AI opens beside the current material and closes without losing it', async ({page}, info) => {
+test('course material fills the workspace with no unsupported AI controls', async ({page}, info) => {
   await fixture(page);
-  let requestBody: URLSearchParams | undefined;
-  await page.route('**/study-support/**', route => {
-    requestBody = new URLSearchParams(route.request().postData() || '');
-    return route.fulfill({contentType: 'text/event-stream', body: 'event: answer\ndata: {"answer":"Start with a clear claim."}\n\n'});
-  });
+  let aiRequests = 0;
+  page.on('request', request => { if (request.url().includes('/study-support/')) aiRequests++; });
   await page.goto('/course/71?materialId=121');
-  await expect(page.getByRole('complementary', {name: 'Primary navigation'})).toHaveCount(0);
-  await page.getByRole('button', {name: 'AI Course', exact: true}).click();
-  await expect(page.getByRole('region', {name: 'Course AI assistant'})).toBeVisible();
   await expect(page.getByRole('heading', {name: 'Academic writing guide'})).toBeVisible();
-  await expect(page).toHaveURL(/\/course\/71\?materialId=121$/);
+  await expect(page.getByRole('button', {name: 'AI Course', exact: true})).toHaveCount(0);
   for (const width of [390, 768, 1440, 2560]) {
     await noOverflow(page, width);
-    await expect(page.getByRole('button', {name: 'Close course assistant'})).toBeInViewport();
-    await page.screenshot({path: info.outputPath(`course-ai-sidecar-${width}.png`), fullPage: true});
+    await page.screenshot({path: info.outputPath(`course-material-${width}.png`), fullPage: true});
   }
-  const assistant = page.getByRole('region', {name: 'Course AI assistant'});
-  await assistant.getByRole('button', {name: 'Explain a concept', exact: true}).click();
-  await expect(assistant.getByRole('textbox', {name: 'Ask Study Support'})).toHaveValue('Explain a concept');
-  await assistant.getByRole('button', {name: 'Send', exact: true}).click();
-  await expect(assistant.getByText('Start with a clear claim.', {exact: true})).toBeVisible();
-  expect(requestBody?.get('courseId')).toBe('71');
-  expect(requestBody?.get('query')).toBe('Explain a concept');
-  await page.getByRole('button', {name: 'Close course assistant'}).click();
-  await expect(page.getByRole('region', {name: 'Course AI assistant'})).toHaveCount(0);
-  await expect(page.getByRole('button', {name: 'AI Course', exact: true})).toBeFocused();
+  expect(aiRequests).toBe(0);
 });
 
 test('writing exam confirms, submits actual text and shows the returned success state', async ({page}, info) => {

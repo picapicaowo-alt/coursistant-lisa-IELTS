@@ -48,8 +48,8 @@ export const canCreateCourses = (identity: Identity): boolean =>
 export const canAccessCalendar = (identity: Identity): boolean =>
   hasUserLevel(identity, ['STUDENT', 'INSTRUCTOR', 'INSTRUCTOR_ADVISOR']);
 
-export const canAccessAiWorkspace = (identity: Identity): boolean =>
-  hasUserLevel(identity, ['STUDENT', 'INSTRUCTOR', 'INSTRUCTOR_ADVISOR']);
+/** No AI operation is delivered in the training product's current role contracts. */
+export const canAccessAiWorkspace = (_identity: Identity): boolean => false;
 
 export const canAccessCourseAuthoringTools = (identity: Identity): boolean =>
   isSystemAdminAccount(identity) || isInstructorLevel(identity);

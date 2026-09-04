@@ -1,3 +1,4 @@
+import {calendarLocalFields} from '@/utils/datetime';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {getApiErrorCode, getApiErrorMessage, isNotFound} from '@/utils/apiError';
@@ -112,7 +113,11 @@ const LegacyMyOperationsPage: React.FC<{embedded?: boolean}> = ({embedded = fals
 
   if (student && !embedded) return <Navigate to={STUDENT_LEARNING_PATH} replace/>;
   if (!student && !instructor) return <Navigate to={getSignedInHomePath(user)} replace/>;
-  const calendarRows = records(calendar.data).filter(row => !validCourse || numeric(row, 'courseId') === selectedCourseId);
+  const calendarRows = records(calendar.data).filter(row => (!row.eventType || row.eventType === 'SESSION') && (!validCourse || numeric(row, 'courseId') === selectedCourseId)).map(row => {
+    const start = textual(row, 'startsAtUtc');
+    const local = start ? calendarLocalFields(start, textual(row, 'endsAtUtc'), textual(row, 'timezone') || timezone) : undefined;
+    return local ? {...row, occurrenceDate: local.date, startTime: local.startTime, endTime: local.endTime} : row;
+  });
   const reportRows = records(reports.data);
   const eventRows = records(personalEvents.data);
 

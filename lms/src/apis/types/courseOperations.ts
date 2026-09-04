@@ -103,7 +103,12 @@ export interface TeachingGradingItemResponse {
   assignmentId: number;
   courseCode?: string;
   courseId: number;
-  dueAt?: string;
+  dueAtUtc?: string;
+  dueAtLocal?: string;
+  timezone?: string;
+  submissionType?: 'Individual' | 'Group';
+  groupId?: number;
+  groupName?: string;
   gradingDeepLink?: string;
   status?: string;
   studentFirstName?: string;
@@ -251,7 +256,7 @@ export interface CourseStudentReportListParams {
   size?: number;
 }
 
-export const ATTENDANCE_STATUSES = ['PRESENT', 'ABSENT', 'LATE', 'EXCUSED'] as const;
+export const ATTENDANCE_STATUSES = ['PRESENT', 'ABSENT'] as const;
 export const SCHEDULE_REQUEST_TYPES = ['ABSENCE', 'SCHEDULE_CHANGE'] as const;
 export const SCHEDULE_DECISIONS = ['APPROVE', 'REJECT'] as const;
 export const WEEKDAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const;

@@ -10,7 +10,6 @@ import {ScheduleCard} from "./ScheduleCard";
 import {QuizzesCard} from './QuizzesCard';
 import {EventsCard} from './EventsCard';
 import {GroupsCard} from './GroupsCard';
-import {SyllabusCard} from '../SyllabusCard';
 import {RosterCard} from './RosterCard';
 import {AnnouncementsCard} from './AnnouncementsCard';
 import {GradesCard} from './GradesCard';
@@ -78,7 +77,6 @@ export const CourseDetailView: React.FC<CourseDetailViewProps> = ({instructorVie
               <button type="button" className={styles.unitHeader} aria-expanded={expandedWeekId === week.id} aria-controls={`week-content-${week.id}`} onClick={() => setActiveWeekId(expandedWeekId === week.id ? null : week.id)}><span className={styles.unitNumber}>{index + 1}</span><span><small>{week.materials.length} {week.materials.length === 1 ? 'material' : 'materials'} · {week.state}</small><strong>{week.title}</strong></span><img src="/icons/figma-dashboard/arrow-right.svg" alt=""/></button>
               {expandedWeekId === week.id ? <div id={`week-content-${week.id}`}><ContentCard compact={instructorView} week={week} onOpenMaterial={openMaterial}/></div> : null}
             </section>)}
-            <SyllabusCard courseId={course.id} canManage={canCreateAssignments}/>
           </> : null}
           {activeTab === 'assignments' ? <><AssignmentsCard courseId={course.id} assignments={assignments} failed={assignmentsFailed} canCreate={canCreateAssignments}/><QuizzesCard courseId={course.id} quizzes={quizzes} failed={quizzesFailed} canCreate={canCreateAssignments}/></> : null}
           {activeTab === 'discussion' ? <DiscussionPanel courseId={course.id}/> : null}

@@ -53,7 +53,8 @@ export const deriveCourseAccess = (membership?: MyCourse): CourseAccess => {
     isTa,
     isStudent,
     // Course administration and assignment/quiz authoring are Instructor-only.
-    canEditCourse: isInstructor,
+    // Configured training courses are orchestrated by their owner Advisor.
+    canEditCourse: isInstructor && !membership.launchState,
     canConfigureAssignments: isInstructor,
     // TA permissions are course-scoped flags and never carry to another course.
     canGrade: isInstructor || (isTa && membership.canGrade === true),

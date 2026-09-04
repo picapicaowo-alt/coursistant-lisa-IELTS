@@ -31,7 +31,7 @@ for (const kind of ['server', 'network', 'missing payload'] as const) {
     await instructorFixture(page);
     await page.route('**/v2/me/teaching/grading-queue', route => route.fulfill({json: reply([])}));
     let recovered = false;
-    await page.route('**/v2/me/teaching/grading-items', route => {
+    await page.route('**/v2/me/teaching/grading-items**', route => {
       if (recovered) return route.fulfill({json: reply([])});
       if (kind === 'network') return route.abort('failed');
       return route.fulfill(kind === 'server' ? {status: 500, json: failed} : {json: reply(null)});
@@ -59,7 +59,7 @@ for (const kind of ['server', 'network', 'missing payload'] as const) {
 
 test('Combined instructor/advisor keeps failed teaching reads distinct from empty results', async ({page}) => {
   await fixture(page, 'INSTRUCTOR_ADVISOR', 'Instructor');
-  await page.route('**/v2/me/teaching/grading-items', route => route.fulfill({status: 500, json: failed}));
+  await page.route('**/v2/me/teaching/grading-items**', route => route.fulfill({status: 500, json: failed}));
   await page.goto('/my-operations');
   await expect(page.getByRole('heading', {name: 'Grading queue', exact: true})).toBeVisible();
   await expect(page.getByRole('alert')).toBeVisible();

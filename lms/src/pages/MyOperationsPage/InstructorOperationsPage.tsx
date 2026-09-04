@@ -20,6 +20,7 @@ import CalendarPage from "@/pages/CalendarPage";
 import { TeacherOperationsSections } from "./TeacherOperationsSections";
 import { ScheduleReview } from "../CourseOperationsPage/OccurrenceRequests";
 import {
+  isInstructorScheduleRequestReviewable,
   dateLabel,
   timeRange,
   recordId,
@@ -474,7 +475,7 @@ function TeachingOverview() {
               </span>
               <div className={s.recordActions}>
                 <TeachingBadge value={textValue(item, "status")} />
-                {optionalNumber(item, "courseId") &&
+                {isInstructorScheduleRequestReviewable(item) && optionalNumber(item, "courseId") &&
                 optionalNumber(item, "requestId", "id") ? (
                   <button
                     type="button"

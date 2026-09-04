@@ -37,7 +37,7 @@ test('parent can request absence, read exam results, load older messages, and re
         const cursor = url.searchParams.get('beforeId');
         if (cursor) cursors.push(cursor);
         expect(url.searchParams.has('page')).toBe(false);
-        data = cursor ? [] : [{messageId: 100, body: 'This week’s learning update', senderUserId: 52}];
+        data = {items: cursor ? [] : [{messageId: 100, body: 'This week’s learning update', senderUserId: 52}], hasMore: !cursor, nextBeforeId: cursor ? null : 100};
       }
     }
     await route.fulfill({json: response(data)});

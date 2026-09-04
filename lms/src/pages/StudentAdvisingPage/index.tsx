@@ -17,7 +17,7 @@ import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/down
 import {isNotFound} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
-import {advisorConversationMessageViews} from '../AdvisorOperationsPage/advisorViewModels';
+import {advisorConversationPage} from '../AdvisorOperationsPage/advisorViewModels';
 import styles from '../advising/advising.module.scss';
 
 const StudentAdvisingPage: React.FC = () => {
@@ -43,12 +43,9 @@ const StudentAdvisingPage: React.FC = () => {
   });
   const conversation = useInfiniteQuery({
     queryKey: ['student', 'advisor-conversation'],
-    queryFn: async ({pageParam}) => advisorConversationMessageViews(unwrapData(await advisorApiService.listOwnConversationMessages(pageParam), 'studentAdvisorConversation')),
+    queryFn: async ({pageParam}) => advisorConversationPage(unwrapData(await advisorApiService.listOwnConversationMessages(pageParam), 'studentAdvisorConversation')),
     initialPageParam: undefined as number | undefined,
-    getNextPageParam: lastPage => {
-      const ids = lastPage.flatMap(item => item.messageId == null ? [] : [item.messageId]);
-      return ids.length ? Math.min(...ids) : undefined;
-    },
+    getNextPageParam: (lastPage, _pages, lastCursor) => lastPage.hasMore && lastPage.nextBeforeId != null && (lastCursor == null || lastPage.nextBeforeId < lastCursor) ? lastPage.nextBeforeId : undefined,
     retry: false,
   });
   const taskMutation = useMutation({
@@ -85,7 +82,7 @@ const StudentAdvisingPage: React.FC = () => {
       throw error;
     }
   };
-  const conversationRows = conversation.data?.pages.flat() ?? [];
+  const conversationRows = conversation.data?.pages.flatMap(page => page.items) ?? [];
   const checkpointKey = searchParams.get(STUDY_PLAN_PARAMS.checkpoint);
   const checkpointIndex = plan.data?.plan?.checkpoints?.findIndex((checkpoint, index) => studyPlanRecordKey(checkpoint, index) === checkpointKey) ?? -1;
   const checkpoint = checkpointIndex >= 0 ? plan.data?.plan?.checkpoints?.[checkpointIndex] : undefined;

@@ -143,8 +143,8 @@ const TeachingQueue: React.FC = () => {
     <WorkspaceSection title="Grading queue" headingId="grading-title" summary="Submissions currently waiting for your review." meta={<span className={styles.countBadge}>{grading.isError ? 'Unavailable' : grading.isPending ? '…' : gradingItems.length}</span>}>
 
       {grading.isPending || grading.isError ? <QueryState loading={grading.isPending} error={grading.isError} empty="Nothing is waiting for grading." onRetry={() => void grading.refetch()}/> : gradingItems.length === 0 ? <p className={styles.empty}>Nothing is waiting for grading.</p> : <div className={styles.operationList}>{gradingItems.map((item: TeachingGradingItemResponse) => {
-        const destination = assignmentGradingPath(item.courseId, item.assignmentId);
-        return <Link to={destination} className={styles.operationRow} key={`${item.assignmentId}-${item.studentUserId}`}><span><strong>{item.title}</strong><small>{[formatName(item), item.courseCode, humanize(item.status), item.dueAt ? `Due ${formatDate(item.dueAt)}` : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
+        const destination = registeredDestination(item.gradingDeepLink) ?? assignmentGradingPath(item.courseId, item.assignmentId);
+        return <Link to={destination} className={styles.operationRow} key={`${item.assignmentId}-${item.groupId ?? item.studentUserId}`}><span><strong>{item.title}</strong><small>{[item.groupName || formatName(item), item.courseCode, humanize(item.status), item.dueAtUtc ? `Due ${formatDate(item.dueAtUtc)}` : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
       })}</div>}
     </WorkspaceSection>
 

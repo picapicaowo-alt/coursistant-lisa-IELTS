@@ -144,24 +144,16 @@ paths:
         required: false
         schema:
           type: string
-          maxLength: 120
       - in: query
         name: launchState
         required: false
         schema:
           type: string
-          enum:
-          - DRAFT
-          - READY
-          - PUBLISHED
       - in: query
         name: lifecycleState
         required: false
         schema:
           type: string
-          enum:
-          - Active
-          - Archived
       - in: query
         name: page
         required: false
@@ -182,11 +174,23 @@ paths:
                 $ref: "#/components/schemas/AdvisorOwnedCoursePageApiResponse"
           description: SUCCESS
         "400":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: PARAM_MISSING or BAD_REQUEST
         "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: INVALID_TOKEN
         "403":
-          description: FORBIDDEN, ACCESS_DENIED
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "FORBIDDEN, ACCESS_DENIED"
       tags:
       - AdvisorOwnedCourses
   /v2/advisor/instructors/{instructorUserId}/availability:
@@ -207,10 +211,22 @@ paths:
                 $ref: "#/components/schemas/InstructorAvailabilityApiResponse"
           description: SUCCESS
         "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: INVALID_TOKEN
         "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: ACCESS_DENIED
         "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: USER_NOT_FOUND
       tags:
       - InstructorAvailability
@@ -223,9 +239,6 @@ paths:
         required: false
         schema:
           type: string
-          enum:
-          - ABSENCE
-          - SCHEDULE_CHANGE
       - in: query
         name: studentUserId
         required: false
@@ -252,11 +265,23 @@ paths:
                 $ref: "#/components/schemas/ScheduleRequestPageApiResponse"
           description: SUCCESS
         "400":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: PARAM_MISSING or BAD_REQUEST
         "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: INVALID_TOKEN
         "403":
-          description: FORBIDDEN, ACCESS_DENIED
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "FORBIDDEN, ACCESS_DENIED"
       tags:
       - CourseScheduleRequests
   /v2/advisor/schedule-requests/{requestId}/decision:
@@ -282,12 +307,36 @@ paths:
               schema:
                 $ref: "#/components/schemas/ScheduleRequestApiResponse"
           description: SUCCESS
+        "400":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: PARAM_MISSING or BAD_REQUEST
         "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: INVALID_TOKEN
         "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: ACCESS_DENIED
         "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: SCHEDULE_REQUEST_NOT_FOUND
+        "409":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SCHEDULE_REQUEST_STATE_CONFLICT
       tags:
       - CourseScheduleRequests
   /v2/advisor/students/{studentUserId}/attendance:
@@ -326,12 +375,28 @@ paths:
                 $ref: "#/components/schemas/AttendanceHistoryApiResponse"
           description: SUCCESS
         "400":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: PARAM_MISSING or BAD_REQUEST
         "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: INVALID_TOKEN
         "403":
-          description: FORBIDDEN, ACCESS_DENIED
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "FORBIDDEN, ACCESS_DENIED"
         "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: COURSE_NOT_FOUND
       tags:
       - TeachingOccurrences
@@ -359,11 +424,23 @@ paths:
                 $ref: "#/components/schemas/CourseHoursBalanceApiResponse"
           description: SUCCESS
         "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: INVALID_TOKEN
         "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: ACCESS_DENIED
         "404":
-          description: COURSE_NOT_FOUND, COURSE_HOURS_NOT_FOUND
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "COURSE_NOT_FOUND, COURSE_HOURS_NOT_FOUND"
       tags:
       - CourseHours
     put:
@@ -403,34 +480,35 @@ paths:
           description: OK
         "400":
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: IDEMPOTENCY_KEY_REQUIRED, IDEMPOTENCY_KEY_INVALID, PARAM_MISSING, BAD_REQUEST
+          description: "IDEMPOTENCY_KEY_REQUIRED, IDEMPOTENCY_KEY_INVALID, PARAM_MISSING,\
+            \ BAD_REQUEST"
         "401":
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
           description: INVALID_TOKEN
         "403":
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
           description: ACCESS_DENIED
         "404":
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: COURSE_NOT_FOUND, COURSE_HOURS_NOT_FOUND
+          description: "COURSE_NOT_FOUND, COURSE_HOURS_NOT_FOUND"
         "409":
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: IDEMPOTENCY_KEY_MISMATCH, COURSE_HOURS_VERSION_CONFLICT
+          description: "IDEMPOTENCY_KEY_MISMATCH, COURSE_HOURS_VERSION_CONFLICT"
       tags:
       - CourseHours
   /v2/advisor/students/{studentUserId}/courses/{courseId}/session-occurrences/{occurrenceId}/attendance:
@@ -463,10 +541,22 @@ paths:
                 $ref: "#/components/schemas/AttendanceRowApiResponse"
           description: SUCCESS
         "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: INVALID_TOKEN
         "403":
-          description: FORBIDDEN, ACCESS_DENIED
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: "FORBIDDEN, ACCESS_DENIED"
         "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: COURSE_NOT_FOUND
       tags:
       - TeachingOccurrences
@@ -1928,6 +2018,8 @@ paths:
       - Material links
   /v2/courses/{courseId}/members:
     get:
+      description: "Zero-based page of course members. page defaults to 0, size defaults\
+        \ to 20, size max 100."
       operationId: courseMemberList
       parameters:
       - in: path
@@ -1966,15 +2058,30 @@ paths:
       responses:
         "200":
           content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MemberPageApiResponse"
+          description: SUCCESS
+        "401":
+          content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: INVALID_TOKEN
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED
       summary: List course members with optional filters
       tags:
       - Enrollment
   /v2/courses/{courseId}/schedule-requests/{requestId}/instructor-review:
     post:
+      description: "Actor requirement: active Instructor on this Course. Approves\
+        \ or rejects a SCHEDULE_CHANGE request in PENDING_INSTRUCTOR using expectedVersion\
+        \ CAS."
       operationId: reviewCourseScheduleRequest
       parameters:
       - in: path
@@ -2038,6 +2145,9 @@ paths:
       - CourseScheduleRequests
   /v2/courses/{courseId}/session-occurrences:
     get:
+      description: "Instructor, TA, Student, and owner Advisor can list effective\
+        \ occurrences. Default excludes RESCHEDULED history; includeHistory=true includes\
+        \ it."
       operationId: listSessionOccurrences
       parameters:
       - in: path
@@ -2067,15 +2177,28 @@ paths:
       responses:
         "200":
           content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionOccurrenceListApiResponse"
+          description: SUCCESS
+        "401":
+          content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: INVALID_TOKEN
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED
+      summary: List dated session occurrences
       tags:
       - TeachingOccurrences
     post:
-      description: Creates one dated occurrence after timezone-aware instructor availability
-        validation.
+      description: Owner Advisor-only. Creates one dated occurrence after timezone-aware
+        instructor availability validation. Instructor callers receive 403 ACCESS_DENIED.
       operationId: createSessionOccurrence
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
@@ -2097,6 +2220,13 @@ paths:
               $ref: "#/components/schemas/CreateOccurrenceRequest"
         required: true
       responses:
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED — owner Advisor-only; Instructor cannot create
+            occurrences
         "409":
           content:
             '*/*':
@@ -2107,8 +2237,9 @@ paths:
       - TeachingOccurrences
   /v2/courses/{courseId}/session-occurrences/generate:
     post:
-      description: Generates all template slots transactionally and rejects the batch
-        when any slot is outside instructor availability.
+      description: Owner Advisor-only. Generates all template slots transactionally
+        and rejects the batch when any slot is outside instructor availability. Instructor
+        callers receive 403 ACCESS_DENIED.
       operationId: generateSessionOccurrences
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
@@ -2130,6 +2261,13 @@ paths:
               $ref: "#/components/schemas/GenerateOccurrencesRequest"
         required: true
       responses:
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED — owner Advisor-only; Instructor cannot generate
+            occurrences
         "409":
           content:
             '*/*':
@@ -2140,6 +2278,8 @@ paths:
       - TeachingOccurrences
   /v2/courses/{courseId}/session-occurrences/{occurrenceId}:
     get:
+      description: "Instructor, TA, Student, and owner Advisor can read an occurrence\
+        \ they can see."
       operationId: getSessionOccurrence
       parameters:
       - in: path
@@ -2157,10 +2297,29 @@ paths:
       responses:
         "200":
           content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SessionOccurrenceApiResponse"
+          description: SUCCESS
+        "401":
+          content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: INVALID_TOKEN
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED
+        "404":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: SESSION_OCCURRENCE_NOT_FOUND
+      summary: Get one dated session occurrence
       tags:
       - TeachingOccurrences
   /v2/courses/{courseId}/session-occurrences/{occurrenceId}/attendance:
@@ -2189,6 +2348,8 @@ paths:
       tags:
       - TeachingOccurrences
     put:
+      description: "Actor requirement: active Instructor on this Course. Students\
+        \ cannot write attendance."
       operationId: saveOccurrenceAttendance
       parameters:
       - in: path
@@ -2210,12 +2371,6 @@ paths:
               $ref: "#/components/schemas/SaveAttendanceRequest"
         required: true
       responses:
-        "200":
-          content:
-            '*/*':
-              schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
         "403":
           content:
             application/json:
@@ -2227,17 +2382,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: COURSE_NOT_FOUND, SESSION_OCCURRENCE_NOT_FOUND
+          description: "COURSE_NOT_FOUND, SESSION_OCCURRENCE_NOT_FOUND"
         "409":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: ATTENDANCE_ROSTER_MISMATCH, ATTENDANCE_VERSION_CONFLICT
+          description: "ATTENDANCE_ROSTER_MISMATCH, ATTENDANCE_VERSION_CONFLICT"
       tags:
       - TeachingOccurrences
   /v2/courses/{courseId}/session-occurrences/{occurrenceId}/attendance/me:
     get:
+      description: "Student actor requirement: the caller must be the enrolled student\
+        \ for this occurrence."
       operationId: getOwnOccurrenceAttendance
       parameters:
       - in: path
@@ -2255,10 +2412,10 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/AttendanceRowApiResponse"
+          description: SUCCESS
       tags:
       - TeachingOccurrences
   /v2/courses/{courseId}/session-occurrences/{occurrenceId}/attendance/roster-sync:
@@ -2288,8 +2445,9 @@ paths:
       - TeachingOccurrences
   /v2/courses/{courseId}/session-occurrences/{occurrenceId}/cancel:
     post:
-      description: Cancels only unopened occurrences without attendance; otherwise
-        returns SESSION_OCCURRENCE_NOT_RESCHEDULABLE.
+      description: Owner Advisor-only. Cancels only unopened occurrences without attendance;
+        otherwise returns SESSION_OCCURRENCE_NOT_RESCHEDULABLE. Instructor callers
+        receive 403 ACCESS_DENIED.
       operationId: cancelSessionOccurrence
       parameters:
       - in: path
@@ -2311,6 +2469,13 @@ paths:
               $ref: "#/components/schemas/CancelOccurrenceRequest"
         required: true
       responses:
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED — owner Advisor-only; Instructor cannot cancel
+            occurrences
         "409":
           content:
             '*/*':
@@ -2321,8 +2486,9 @@ paths:
       - TeachingOccurrences
   /v2/courses/{courseId}/session-occurrences/{occurrenceId}/reschedule:
     post:
-      description: Creates an available replacement and preserves the original row
-        as RESCHEDULED. Occurrences with opened attendance cannot be rescheduled.
+      description: Owner Advisor-only. Creates an available replacement and preserves
+        the original row as RESCHEDULED. Occurrences with opened attendance cannot
+        be rescheduled. Instructor callers receive 403 ACCESS_DENIED.
       operationId: rescheduleSessionOccurrence
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
@@ -2350,6 +2516,13 @@ paths:
               $ref: "#/components/schemas/RescheduleOccurrenceRequest"
         required: true
       responses:
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED — owner Advisor-only; Instructor cannot reschedule
+            occurrences
         "409":
           content:
             '*/*':
@@ -2796,13 +2969,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CourseStudentReportApiResponse"
-          description: COURSE_NOT_FOUND, COURSE_REPORT_NOT_FOUND
+          description: "COURSE_NOT_FOUND, COURSE_REPORT_NOT_FOUND"
         "409":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/CourseStudentReportApiResponse"
-          description: COURSE_REPORT_PUBLISHED_READONLY, COURSE_REPORT_VERSION_CONFLICT
+          description: "COURSE_REPORT_PUBLISHED_READONLY, COURSE_REPORT_VERSION_CONFLICT"
       tags:
       - CourseReports
   /v2/courses/{courseId}/student-reports/{reportId}/publish:
@@ -2845,13 +3018,13 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CourseStudentReportApiResponse"
-          description: COURSE_NOT_FOUND, COURSE_REPORT_NOT_FOUND
+          description: "COURSE_NOT_FOUND, COURSE_REPORT_NOT_FOUND"
         "409":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/CourseStudentReportApiResponse"
-          description: COURSE_REPORT_PUBLISHED_READONLY, COURSE_REPORT_VERSION_CONFLICT
+          description: "COURSE_REPORT_PUBLISHED_READONLY, COURSE_REPORT_VERSION_CONFLICT"
       tags:
       - CourseReports
   /v2/courses/{courseId}/students:
@@ -4129,10 +4302,22 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalendarApiResponse"
+          description: SUCCESS
+        "400":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: BAD_REQUEST
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: INVALID_TOKEN
       summary: "Unified Student/Instructor calendar in a half-open [from,to) window"
       tags:
       - MeCalendar
@@ -4145,25 +4330,55 @@ paths:
         required: false
         schema:
           type: string
+          enum: [Active, Archived]
+      - in: query
+        name: courseView
+        required: false
+        schema:
+          type: string
+          enum: [CURRENT, COMPLETED]
       - in: query
         name: page
         required: false
         schema:
           type: integer
           format: int32
+          default: 0
+          minimum: 0
       - in: query
         name: size
         required: false
         schema:
           type: integer
           format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyCoursePageApiResponse"
+          description: SUCCESS
+        "400":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: BAD_REQUEST
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: INVALID_TOKEN
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: FORBIDDEN
       summary: List my enrolled courses
       tags:
       - MeCourses
@@ -4371,15 +4586,129 @@ paths:
   /v2/me/schedule-requests:
     get:
       operationId: meScheduleRequests
+      parameters:
+      - in: query
+        name: requestType
+        required: false
+        schema:
+          type: string
+          enum: [ABSENCE, SCHEDULE_CHANGE]
+      - in: query
+        name: status
+        required: false
+        schema:
+          type: string
+          enum: [PENDING_INSTRUCTOR, PENDING_ADVISOR, APPROVED, REJECTED]
+      - in: query
+        name: courseId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StudentScheduleRequestPageApiResponse"
+          description: SUCCESS
+        "400":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: BAD_REQUEST
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: INVALID_TOKEN
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED
       tags:
       - CourseScheduleRequests
+  /v2/me/student-reports:
+    get:
+      operationId: meListPublishedStudentReports
+      parameters:
+      - in: query
+        name: reportType
+        required: false
+        schema:
+          type: string
+          enum: [MID_TERM, FINAL]
+      - in: query
+        name: courseId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CourseStudentReportPageApiResponse"
+          description: SUCCESS
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: BAD_REQUEST
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: INVALID_TOKEN
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: FORBIDDEN
+      tags:
+      - MeStudentReports
   /v2/me/teaching/activities/upcoming:
     get:
       description: "Dated occurrences override matching recurring template slots.\
@@ -4440,6 +4769,8 @@ paths:
       - Teaching
   /v2/me/teaching/availability:
     get:
+      description: "Actor requirement: Instructor or INSTRUCTOR_ADVISOR reading their\
+        \ own weekly windows. Tenant Admin cannot read another Instructor's availability."
       operationId: meTeachingAvailability
       responses:
         "200":
@@ -4451,6 +4782,8 @@ paths:
       tags:
       - InstructorAvailability
     put:
+      description: "Actor requirement: Instructor or INSTRUCTOR_ADVISOR replacing\
+        \ their own weekly windows with expectedVersion CAS."
       operationId: replaceMeTeachingAvailability
       requestBody:
         content:
@@ -4477,10 +4810,22 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeachingCoursesApiResponse"
+          description: OK
+        "401":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Missing or invalid token (code INVALID_TOKEN)
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Caller is not Instructor level (code ACCESS_DENIED)
       summary: List courses I teach
       tags:
       - Teaching
@@ -4506,9 +4851,45 @@ paths:
       - Teaching
   /v2/me/teaching/grading-items:
     get:
-      description: One row per Assignment × Student. PENDING = submitted without Entered
-        grade; IN_PROGRESS = Entered but not Released; COMPLETED = Released.
+      description: Zero-based page. Individual assignments are one row per Assignment
+        × Student. Group assignments are one row per group. PENDING = submitted without
+        Entered grade; IN_PROGRESS = Entered but not Released; COMPLETED = Released.
+        Sorted urgency → dueAt UTC (null last) → assignmentId → studentUserId → groupId.
+        Use this for per-submission grading; Mock Exam Writing is a separate queue.
       operationId: meTeachingGradingItems
+      parameters:
+      - in: query
+        name: courseId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: status
+        required: false
+        schema:
+          type: string
+          enum:
+          - PENDING
+          - IN_PROGRESS
+          - COMPLETED
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
       responses:
         "200":
           content:
@@ -4516,6 +4897,12 @@ paths:
               schema:
                 $ref: "#/components/schemas/TeachingGradingItemsApiResponse"
           description: OK
+        "400":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: BAD_REQUEST
         "401":
           content:
             application/json:
@@ -4534,28 +4921,89 @@ paths:
   /v2/me/teaching/grading-queue:
     get:
       description: "Assignment and course-bound Quiz items only. Sorted OVERDUE, DUE_TODAY,\
-        \ then UPCOMING. Global Exam is an Assessment dependency and is not listed."
+        \ then UPCOMING. Global Exam is an Assessment dependency and is not listed.\
+        \ Use this for the Dashboard Assignment/Quiz aggregate card; per-student grading\
+        \ uses grading-items. Mock Exam Writing uses a separate Instructor tab."
       operationId: meTeachingGradingQueue
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TeachingGradingQueueApiResponse"
+          description: OK
+        "401":
+          content:
+            application/json:
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: Missing or invalid token (code INVALID_TOKEN)
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: Caller is not Instructor level (code ACCESS_DENIED)
       summary: List grading queue items
       tags:
       - Teaching
   /v2/me/teaching/schedule-requests:
     get:
+      description: "Zero-based page of SCHEDULE_CHANGE requests in PENDING_INSTRUCTOR\
+        \ for courses where the caller is an active Instructor. ABSENCE requests skip\
+        \ this queue. Items include Course, Student, original occurrence, proposed\
+        \ replacement times, and timezone. Actor requirement: Instructor or INSTRUCTOR_ADVISOR."
       operationId: meTeachingScheduleRequests
+      parameters:
+      - in: query
+        name: courseId
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
       responses:
         "200":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstructorScheduleRequestPageApiResponse"
+          description: SUCCESS
+        "400":
           content:
             '*/*':
               schema:
                 $ref: "#/components/schemas/ApiResponse"
-          description: OK
+          description: BAD_REQUEST
+        "401":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: INVALID_TOKEN
+        "403":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: ACCESS_DENIED
+      summary: List Instructor pending schedule-change requests
       tags:
       - CourseScheduleRequests
   /v2/me/teaching/students-needing-support:
@@ -4611,13 +5059,31 @@ paths:
   /v2/me/work-queue:
     get:
       operationId: meWorkQueue
+      parameters:
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
       responses:
         "200":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/StudentWorkQueueApiResponse"
-          description: OK
+          description: SUCCESS
         "401":
           content:
             application/json:
@@ -4664,71 +5130,82 @@ paths:
   /v2/tenant/course-ownerships:
     get:
       operationId: tenantListCourseOwnerships
-      tags: [TenantCourseOwnership]
       parameters:
       - in: query
         name: q
-        schema: { type: string }
+        required: false
+        schema:
+          type: string
       - in: query
         name: ownerAdvisorUserId
-        schema: { type: integer, format: int32 }
+        required: false
+        schema:
+          type: integer
+          format: int32
       - in: query
         name: page
-        schema: { type: integer, format: int32 }
+        required: false
+        schema:
+          type: integer
+          format: int32
       - in: query
         name: size
-        schema: { type: integer, format: int32 }
+        required: false
+        schema:
+          type: integer
+          format: int32
       responses:
         "200":
-          description: Safe course ownership projection
-        "400":
-          description: BAD_REQUEST
-        "401":
-          description: Unauthorized
-        "403":
-          description: FORBIDDEN
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
+          description: OK
+      tags:
+      - TenantCourseOwnership
   /v2/tenant/courses/{courseId}/owner:
-    parameters:
-    - in: path
-      name: courseId
-      required: true
-      schema: { type: integer, format: int32 }
     get:
       operationId: tenantGetCourseOwner
-      tags: [TenantCourseOwnership]
+      parameters:
+      - in: path
+        name: courseId
+        required: true
+        schema:
+          type: integer
+          format: int32
       responses:
         "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: OK
-        "404":
-          description: COURSE_NOT_FOUND
+      tags:
+      - TenantCourseOwnership
     put:
       operationId: tenantTransferCourseOwner
-      tags: [TenantCourseOwnership]
-      requestBody:
+      parameters:
+      - in: path
+        name: courseId
         required: true
+        schema:
+          type: integer
+          format: int32
+      requestBody:
         content:
           application/json:
             schema:
-              type: object
-              required: [ownerAdvisorUserId, expectedOwnershipVersion, reason]
-              properties:
-                ownerAdvisorUserId:
-                  type: integer
-                  format: int32
-                expectedOwnershipVersion:
-                  type: integer
-                  format: int32
-                reason:
-                  type: string
-                  minLength: 1
-                  maxLength: 1000
+              $ref: "#/components/schemas/TransferCourseOwnerRequest"
+        required: true
       responses:
         "200":
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ApiResponse"
           description: OK
-        "400":
-          description: BAD_REQUEST
-        "409":
-          description: CONFLICT
+      tags:
+      - TenantCourseOwnership
 components:
   schemas:
     AdminBatchEnrollRequest:
@@ -4751,55 +5228,29 @@ components:
         userId:
           type: integer
           format: int32
-    ApiResponse:
-      type: object
-      description: Unified JSON envelope for LMS APIs
-      properties:
-        code:
-          type: string
-          description: Stable machine code (ErrorType.name() or SUCCESS)
-          example: SUCCESS
-        data:
-          type: object
-          description: Payload; explicitly null when no payload is available
-          nullable: true
-        message:
-          type: string
-          description: Human-readable message
-          example: Success
-        status:
-          type: integer
-          format: int32
-          description: HTTP status mirrored in body
-          example: 200
-        timestamp:
-          type: string
-          format: date-time
-          description: ISO-8601 timestamp
-          example: 2026-07-23T10:00:00Z
     AdvisorOwnedCourseItem:
       type: object
       properties:
+        activeStudents:
+          type: integer
+          format: int32
+        capacity:
+          type: integer
+          format: int32
+        catalogCode:
+          type: string
+        courseCode:
+          type: string
         courseId:
           type: integer
           format: int32
-        courseCode:
-          type: string
-        title:
-          type: string
-        termStartDate:
-          type: string
-          format: date
-        termEndDate:
-          type: string
-          format: date
-        lifecycleState:
-          type: string
-        launchState:
-          type: string
         courseLaunchVersion:
           type: integer
           format: int32
+        launchState:
+          type: string
+        lifecycleState:
+          type: string
         ownerAdvisorUserId:
           type: integer
           format: int32
@@ -4808,17 +5259,17 @@ components:
           format: int32
         primaryInstructor:
           $ref: "#/components/schemas/PrimaryInstructorSummary"
-        catalogCode:
-          type: string
-        capacity:
-          type: integer
-          format: int32
-        activeStudents:
-          type: integer
-          format: int32
         remainingCapacity:
           type: integer
           format: int32
+        termEndDate:
+          type: string
+          format: date
+        termStartDate:
+          type: string
+          format: date
+        title:
+          type: string
     AdvisorOwnedCoursePage:
       type: object
       properties:
@@ -4846,297 +5297,40 @@ components:
           $ref: "#/components/schemas/AdvisorOwnedCoursePage"
         message:
           type: string
+          example: Success
         status:
           type: integer
           format: int32
+          example: 200
         timestamp:
           type: string
           format: date-time
-    InstructorAvailabilityApiResponse:
+    ApiResponse:
       type: object
-      description: Success envelope wrapping instructor availability
+      description: Unified JSON envelope for LMS APIs
       properties:
         code:
           type: string
+          description: Stable machine code (ErrorType.name() or SUCCESS)
           example: SUCCESS
         data:
-          $ref: "#/components/schemas/InstructorAvailabilityResponse"
+          type: object
+          description: Payload; explicitly null when no payload is available
+          nullable: true
         message:
           type: string
+          description: Human-readable message
+          example: Success
         status:
           type: integer
           format: int32
+          description: HTTP status mirrored in body
+          example: 200
         timestamp:
           type: string
           format: date-time
-    ScheduleRequestPage:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/ScheduleRequestResponse"
-        page:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        total:
-          type: integer
-          format: int64
-    ScheduleRequestPageApiResponse:
-      type: object
-      description: Success envelope wrapping Advisor pending schedule-request page
-      properties:
-        code:
-          type: string
-          example: SUCCESS
-        data:
-          $ref: "#/components/schemas/ScheduleRequestPage"
-        message:
-          type: string
-        status:
-          type: integer
-          format: int32
-        timestamp:
-          type: string
-          format: date-time
-    ScheduleRequestApiResponse:
-      type: object
-      description: Success envelope wrapping a schedule request
-      properties:
-        code:
-          type: string
-          example: SUCCESS
-        data:
-          $ref: "#/components/schemas/ScheduleRequestResponse"
-        message:
-          type: string
-        status:
-          type: integer
-          format: int32
-        timestamp:
-          type: string
-          format: date-time
-    AttendanceHistoryApiResponse:
-      type: object
-      description: Success envelope wrapping Advisor attendance history
-      properties:
-        code:
-          type: string
-          example: SUCCESS
-        data:
-          $ref: "#/components/schemas/AttendanceHistoryResponse"
-        message:
-          type: string
-        status:
-          type: integer
-          format: int32
-        timestamp:
-          type: string
-          format: date-time
-    AttendanceRowApiResponse:
-      type: object
-      description: Success envelope wrapping a student attendance row
-      properties:
-        code:
-          type: string
-          example: SUCCESS
-        data:
-          $ref: "#/components/schemas/AttendanceRowResponse"
-        message:
-          type: string
-        status:
-          type: integer
-          format: int32
-        timestamp:
-          type: string
-          format: date-time
-    CourseHoursBalanceApiResponse:
-      type: object
-      description: Success envelope wrapping course hours balance
-      properties:
-        code:
-          type: string
-          example: SUCCESS
-        data:
-          $ref: "#/components/schemas/CourseHoursBalanceResponse"
-        message:
-          type: string
-        status:
-          type: integer
-          format: int32
-        timestamp:
-          type: string
-          format: date-time
-    InstructorAvailabilityResponse:
-      type: object
-      properties:
-        instructorUserId:
-          type: integer
-          format: int32
-        version:
-          type: integer
-          format: int32
-        windows:
-          type: array
-          items:
-            $ref: "#/components/schemas/AvailabilityWindowRequest"
-        exceptions:
-          type: array
-          items:
-            $ref: "#/components/schemas/AvailabilityExceptionRequest"
-    ScheduleRequestResponse:
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int64
-        courseId:
-          type: integer
-          format: int32
-        occurrenceId:
-          type: integer
-          format: int64
-        studentUserId:
-          type: integer
-          format: int32
-        requestedBy:
-          type: string
-        requestType:
-          type: string
-        status:
-          type: string
-        reason:
-          type: string
-        rejectionReason:
-          type: string
-        proposedOccurrenceDate:
-          type: string
-          format: date
-        proposedStartTime:
-          $ref: "#/components/schemas/LocalTime"
-        proposedEndTime:
-          $ref: "#/components/schemas/LocalTime"
-        replacementOccurrenceId:
-          type: integer
-          format: int64
-        version:
-          type: integer
-          format: int32
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-    AttendanceHistoryResponse:
-      type: object
-      properties:
-        studentUserId:
-          type: integer
-          format: int32
-        presentCount:
-          type: integer
-          format: int32
-        absentCount:
-          type: integer
-          format: int32
-        approvedAbsenceCount:
-          type: integer
-          format: int32
-        unapprovedAbsenceCount:
-          type: integer
-          format: int32
-        missedSessionCount:
-          type: integer
-          format: int32
-        repeatedAbsence:
-          type: boolean
-        items:
-          type: array
-          items:
-            $ref: "#/components/schemas/AttendanceHistoryItemResponse"
-    AttendanceHistoryItemResponse:
-      type: object
-      properties:
-        courseId:
-          type: integer
-          format: int32
-        courseTitle:
-          type: string
-        occurrenceId:
-          type: integer
-          format: int64
-        weekId:
-          type: integer
-          format: int32
-        lectureId:
-          type: integer
-          format: int32
-        lectureNumber:
-          type: integer
-          format: int32
-        occurrenceDate:
-          type: string
-          format: date
-        startTime:
-          $ref: "#/components/schemas/LocalTime"
-        endTime:
-          $ref: "#/components/schemas/LocalTime"
-        timezone:
-          type: string
-        occurrenceStatus:
-          type: string
-        rawStatus:
-          type: string
-        effectiveStatus:
-          type: string
-        ended:
-          type: boolean
-        chargedMinutes:
-          type: integer
-          format: int32
-    AttendanceRowResponse:
-      type: object
-      properties:
-        studentUserId:
-          type: integer
-          format: int32
-        studentFirstName:
-          type: string
-        studentMiddleName:
-          type: string
-        studentLastName:
-          type: string
-        status:
-          type: string
-        rawStatus:
-          type: string
-        effectiveStatus:
-          type: string
-    CourseHoursBalanceResponse:
-      type: object
-      properties:
-        courseId:
-          type: integer
-          format: int32
-        studentUserId:
-          type: integer
-          format: int32
-        purchasedMinutes:
-          type: integer
-          format: int32
-        usedMinutes:
-          type: integer
-          format: int32
-        remainingMinutes:
-          type: integer
-          format: int32
-        version:
-          type: integer
-          format: int32
+          description: ISO-8601 timestamp
+          example: 2026-07-23T10:00:00Z
     AssignMemberRequest:
       type: object
       properties:
@@ -5151,6 +5345,129 @@ components:
       type: object
       properties:
         status:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+    AttendanceHistoryApiResponse:
+      type: object
+      description: Success envelope wrapping Advisor attendance history
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/AttendanceHistoryResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    AttendanceHistoryItemResponse:
+      type: object
+      properties:
+        chargedMinutes:
+          type: integer
+          format: int32
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        effectiveStatus:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        ended:
+          type: boolean
+        lectureId:
+          type: integer
+          format: int32
+        lectureNumber:
+          type: integer
+          format: int32
+        occurrenceDate:
+          type: string
+          format: date
+        occurrenceId:
+          type: integer
+          format: int64
+        occurrenceStatus:
+          type: string
+        rawStatus:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        timezone:
+          type: string
+        weekId:
+          type: integer
+          format: int32
+    AttendanceHistoryResponse:
+      type: object
+      properties:
+        absentCount:
+          type: integer
+          format: int32
+        approvedAbsenceCount:
+          type: integer
+          format: int32
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/AttendanceHistoryItemResponse"
+        missedSessionCount:
+          type: integer
+          format: int32
+        presentCount:
+          type: integer
+          format: int32
+        repeatedAbsence:
+          type: boolean
+        studentUserId:
+          type: integer
+          format: int32
+        unapprovedAbsenceCount:
+          type: integer
+          format: int32
+    AttendanceRowApiResponse:
+      type: object
+      description: Success envelope wrapping a student attendance row
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/AttendanceRowResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    AttendanceRowResponse:
+      type: object
+      properties:
+        effectiveStatus:
+          type: string
+        rawStatus:
+          type: string
+        status:
+          type: string
+        studentFirstName:
+          type: string
+        studentLastName:
+          type: string
+        studentMiddleName:
           type: string
         studentUserId:
           type: integer
@@ -5267,6 +5584,46 @@ components:
         updatedAt:
           type: string
           format: date-time
+        version:
+          type: integer
+          format: int32
+    CourseHoursBalanceApiResponse:
+      type: object
+      description: Success envelope wrapping course hours balance
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/CourseHoursBalanceResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    CourseHoursBalanceResponse:
+      type: object
+      properties:
+        courseId:
+          type: integer
+          format: int32
+        purchasedMinutes:
+          type: integer
+          format: int32
+        remainingMinutes:
+          type: integer
+          format: int32
+        studentUserId:
+          type: integer
+          format: int32
+        usedMinutes:
+          type: integer
+          format: int32
         version:
           type: integer
           format: int32
@@ -5421,9 +5778,9 @@ components:
           type: string
         studentFirstName:
           type: string
-        studentMiddleName:
-          type: string
         studentLastName:
+          type: string
+        studentMiddleName:
           type: string
         studentUserId:
           type: integer
@@ -5469,9 +5826,9 @@ components:
           - PUBLISHED
         studentFirstName:
           type: string
-        studentMiddleName:
-          type: string
         studentLastName:
+          type: string
+        studentMiddleName:
           type: string
         studentUserId:
           type: integer
@@ -5481,6 +5838,56 @@ components:
         updatedAt:
           type: string
           format: date-time
+    CreateAnnouncementRequest:
+      type: object
+      properties:
+        body:
+          type: string
+        title:
+          type: string
+    CreateCourseEventRequest:
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        description:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        location:
+          type: string
+        name:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+    CreateCourseRequest:
+      type: object
+      description: Create a new course
+      properties:
+        courseCode:
+          type: string
+        description:
+          type: string
+        instructorId:
+          type: integer
+          format: int32
+        location:
+          type: string
+        primaryInstructorUserId:
+          type: integer
+          format: int32
+        tenantId:
+          type: integer
+          format: int32
+        termEndDate:
+          type: string
+          format: date
+        termStartDate:
+          type: string
+          format: date
+        title:
+          type: string
     DiscussionAttachmentResponse:
       type: object
       properties:
@@ -5560,56 +5967,6 @@ components:
         parentPostId:
           type: integer
           format: int64
-    CreateAnnouncementRequest:
-      type: object
-      properties:
-        body:
-          type: string
-        title:
-          type: string
-    CreateCourseEventRequest:
-      type: object
-      properties:
-        date:
-          type: string
-          format: date
-        description:
-          type: string
-        endTime:
-          $ref: "#/components/schemas/LocalTime"
-        location:
-          type: string
-        name:
-          type: string
-        startTime:
-          $ref: "#/components/schemas/LocalTime"
-    CreateCourseRequest:
-      type: object
-      description: Create a new course
-      properties:
-        courseCode:
-          type: string
-        description:
-          type: string
-        instructorId:
-          type: integer
-          format: int32
-        location:
-          type: string
-        primaryInstructorUserId:
-          type: integer
-          format: int32
-        tenantId:
-          type: integer
-          format: int32
-        termEndDate:
-          type: string
-          format: date
-        termStartDate:
-          type: string
-          format: date
-        title:
-          type: string
     CreateDiscussionPostRequest:
       type: object
       properties:
@@ -5705,6 +6062,140 @@ components:
         weekId:
           type: integer
           format: int32
+    InstructorAvailabilityApiResponse:
+      type: object
+      description: Success envelope wrapping instructor availability
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/InstructorAvailabilityResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    InstructorAvailabilityResponse:
+      type: object
+      properties:
+        exceptions:
+          type: array
+          items:
+            $ref: "#/components/schemas/AvailabilityExceptionRequest"
+        instructorUserId:
+          type: integer
+          format: int32
+        version:
+          type: integer
+          format: int32
+        windows:
+          type: array
+          items:
+            $ref: "#/components/schemas/AvailabilityWindowRequest"
+    InstructorScheduleRequestItem:
+      type: object
+      properties:
+        courseCode:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        courseTitle:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+        occurrenceDate:
+          type: string
+          format: date
+        occurrenceEndTime:
+          $ref: "#/components/schemas/LocalTime"
+        occurrenceId:
+          type: integer
+          format: int64
+        occurrenceStartTime:
+          $ref: "#/components/schemas/LocalTime"
+        proposedEndTime:
+          $ref: "#/components/schemas/LocalTime"
+        proposedOccurrenceDate:
+          type: string
+          format: date
+        proposedStartTime:
+          $ref: "#/components/schemas/LocalTime"
+        reason:
+          type: string
+        rejectionReason:
+          type: string
+        replacementOccurrenceId:
+          type: integer
+          format: int64
+        requestType:
+          type: string
+        requestedBy:
+          type: string
+        status:
+          type: string
+        studentFirstName:
+          type: string
+        studentLastName:
+          type: string
+        studentMiddleName:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+        timezone:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int32
+    InstructorScheduleRequestPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstructorScheduleRequestItem"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
+    InstructorScheduleRequestPageApiResponse:
+      type: object
+      description: Success envelope wrapping Instructor pending schedule-request page
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/InstructorScheduleRequestPage"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
     LocalTime:
       type: object
       properties:
@@ -5820,6 +6311,92 @@ components:
           type: integer
           format: int32
           description: Origin CourseWeek id; CourseWeek is the Lecture source of truth
+    MemberPageApiResponse:
+      type: object
+      description: Success envelope wrapping course member page
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/MemberPageResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    MemberPageResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MemberResponse"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
+    MemberResponse:
+      type: object
+      properties:
+        active:
+          type: boolean
+        assignmentSubmitFrozen:
+          type: boolean
+        canGrade:
+          type: boolean
+        canManageCourseEvents:
+          type: boolean
+        canManageGroups:
+          type: boolean
+        canPostAnnouncements:
+          type: boolean
+        courseId:
+          type: integer
+          format: int32
+        courseRole:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        enrolledAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int32
+        joinedAt:
+          type: string
+          format: date-time
+        level:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+        userEmail:
+          type: string
+        userFirstName:
+          type: string
+        userId:
+          type: integer
+          format: int32
+        userLastName:
+          type: string
+        userMiddleName:
+          type: string
+        withdrawnAt:
+          type: string
+          format: date-time
     MoveMaterialRequest:
       type: object
       properties:
@@ -5922,6 +6499,20 @@ components:
           type: string
         title:
           type: string
+    PrimaryInstructorSummary:
+      type: object
+      properties:
+        email:
+          type: string
+        instructorFirstName:
+          type: string
+        instructorLastName:
+          type: string
+        instructorMiddleName:
+          type: string
+        userId:
+          type: integer
+          format: int32
     ReassignPrimaryInstructorRequest:
       type: object
       properties:
@@ -5996,6 +6587,25 @@ components:
         expectedAttendanceVersion:
           type: integer
           format: int32
+    ScheduleRequestApiResponse:
+      type: object
+      description: Success envelope wrapping a schedule request
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/ScheduleRequestResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
     ScheduleRequestDecisionRequest:
       type: object
       properties:
@@ -6006,6 +6616,179 @@ components:
           format: int32
         rejectionReason:
           type: string
+    ScheduleRequestPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/ScheduleRequestResponse"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
+    ScheduleRequestPageApiResponse:
+      type: object
+      description: Success envelope wrapping Advisor pending schedule-request page
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/ScheduleRequestPage"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    ScheduleRequestResponse:
+      type: object
+      properties:
+        courseId:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        id:
+          type: integer
+          format: int64
+        occurrenceId:
+          type: integer
+          format: int64
+        proposedEndTime:
+          $ref: "#/components/schemas/LocalTime"
+        proposedOccurrenceDate:
+          type: string
+          format: date
+        proposedStartTime:
+          $ref: "#/components/schemas/LocalTime"
+        reason:
+          type: string
+        rejectionReason:
+          type: string
+        replacementOccurrenceId:
+          type: integer
+          format: int64
+        requestType:
+          type: string
+        requestedBy:
+          type: string
+        status:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+        updatedAt:
+          type: string
+          format: date-time
+        version:
+          type: integer
+          format: int32
+    SessionOccurrenceApiResponse:
+      type: object
+      description: Success envelope wrapping a dated session occurrence
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/SessionOccurrenceResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    SessionOccurrenceListApiResponse:
+      type: object
+      description: Success envelope wrapping dated session occurrences
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/SessionOccurrenceResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    SessionOccurrenceResponse:
+      type: object
+      properties:
+        attendanceVersion:
+          type: integer
+          format: int32
+        courseId:
+          type: integer
+          format: int32
+        current:
+          type: boolean
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        id:
+          type: integer
+          format: int64
+        instructorFirstName:
+          type: string
+        instructorLastName:
+          type: string
+        instructorMiddleName:
+          type: string
+        instructorUserId:
+          type: integer
+          format: int32
+        lectureId:
+          type: integer
+          format: int32
+        lectureNumber:
+          type: integer
+          format: int32
+        occurrenceDate:
+          type: string
+          format: date
+        replacementOccurrenceId:
+          type: integer
+          format: int64
+        rosterOpened:
+          type: boolean
+        sessionId:
+          type: integer
+          format: int32
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        status:
+          type: string
+        timezone:
+          type: string
+        version:
+          type: integer
+          format: int32
+        weekId:
+          type: integer
+          format: int32
     SessionResponse:
       type: object
       description: "Weekly recurring template. It has no occurrence date, so no UTC\
@@ -6068,6 +6851,8 @@ components:
           type: integer
           format: int32
         courseTitle:
+          type: string
+        deepLink:
           type: string
         dueAt:
           type: string
@@ -6135,15 +6920,13 @@ components:
           format: int32
     StudentWorkQueueApiResponse:
       type: object
-      description: Success envelope wrapping student work-queue items
+      description: Success envelope wrapping student work-queue page
       properties:
         code:
           type: string
           example: SUCCESS
         data:
-          type: array
-          items:
-            $ref: "#/components/schemas/StudentWorkQueueItemResponse"
+          $ref: "#/components/schemas/StudentWorkQueuePage"
         message:
           type: string
         status:
@@ -6153,6 +6936,22 @@ components:
         timestamp:
           type: string
           format: date-time
+    StudentWorkQueuePage:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentWorkQueueItemResponse"
     StudentWorkQueueItemResponse:
       type: object
       properties:
@@ -6171,9 +6970,16 @@ components:
           type: string
         deepLink:
           type: string
+        description:
+          type: string
         dueAt:
           type: string
           format: date-time
+        actionAtUtc:
+          type: string
+          format: date-time
+        timezone:
+          type: string
         gradeStatus:
           type: string
         learningType:
@@ -6197,6 +7003,8 @@ components:
           type: string
         status:
           type: string
+        submissionRequirement:
+          type: string
         submissionStatus:
           type: string
         taskId:
@@ -6214,7 +7022,171 @@ components:
         targetGroupId:
           type: integer
           format: int32
+    TeachingCourseResponse:
+      type: object
+      properties:
+        courseCode:
+          type: string
+        endTime:
+          $ref: "#/components/schemas/LocalTime"
+        id:
+          type: integer
+          format: int32
+        lectureNumber:
+          type: integer
+          format: int32
+        role:
+          type: string
+        sessionDate:
+          type: string
+          format: date
+        sessionStatus:
+          type: string
+        startTime:
+          $ref: "#/components/schemas/LocalTime"
+        studentCount:
+          type: integer
+          format: int32
+        timezone:
+          type: string
+        title:
+          type: string
+    TeachingCoursesApiResponse:
+      type: object
+      description: Success envelope wrapping My Classes
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeachingCourseResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    TeachingGradingItemPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeachingGradingItemResponse"
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
     TeachingGradingItemResponse:
+      type: object
+      description: Individual rows include student identity. Group rows include groupId/groupName
+        and null student fields.
+      properties:
+        assignmentId:
+          type: integer
+          format: int32
+        courseCode:
+          type: string
+        courseId:
+          type: integer
+          format: int32
+        dueAtLocal:
+          type: string
+          format: date-time
+        dueAtUtc:
+          type: string
+          format: date-time
+        gradingDeepLink:
+          type: string
+        groupId:
+          type: integer
+          format: int32
+        groupName:
+          type: string
+        status:
+          type: string
+          enum:
+          - PENDING
+          - IN_PROGRESS
+          - COMPLETED
+        studentFirstName:
+          type: string
+        studentLastName:
+          type: string
+        studentMiddleName:
+          type: string
+        studentUserId:
+          type: integer
+          format: int32
+        submissionType:
+          type: string
+          enum:
+          - Individual
+          - Group
+        submittedAt:
+          type: string
+          format: date-time
+        timezone:
+          type: string
+        title:
+          type: string
+        urgency:
+          type: string
+          enum:
+          - OVERDUE
+          - DUE_TODAY
+          - UPCOMING
+    TeachingGradingItemsApiResponse:
+      type: object
+      description: Success envelope wrapping per-student grading item page
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/TeachingGradingItemPage"
+        message:
+          type: string
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    TeachingGradingQueueApiResponse:
+      type: object
+      description: Success envelope wrapping Assignment/Quiz grading queue
+      properties:
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeachingGradingQueueItemResponse"
+        message:
+          type: string
+          example: Success
+        status:
+          type: integer
+          format: int32
+          example: 200
+        timestamp:
+          type: string
+          format: date-time
+    TeachingGradingQueueItemResponse:
       type: object
       properties:
         assignmentId:
@@ -6228,46 +7200,26 @@ components:
         dueAt:
           type: string
           format: date-time
-        gradingDeepLink:
+        kind:
           type: string
-        status:
-          type: string
-        studentFirstName:
-          type: string
-        studentMiddleName:
-          type: string
-        studentLastName:
-          type: string
-        studentUserId:
-          type: integer
-          format: int32
-        submittedAt:
+        oldestWaitingAt:
           type: string
           format: date-time
+        pendingCount:
+          type: integer
+          format: int32
+        quizId:
+          type: integer
+          format: int32
+        timezone:
+          type: string
         title:
           type: string
         urgency:
           type: string
-    TeachingGradingItemsApiResponse:
-      type: object
-      description: Success envelope wrapping per-student grading items
-      properties:
-        code:
-          type: string
-          example: SUCCESS
-        data:
-          type: array
-          items:
-            $ref: "#/components/schemas/TeachingGradingItemResponse"
-        message:
-          type: string
-        status:
+        waitingMinutes:
           type: integer
-          format: int32
-          example: 200
-        timestamp:
-          type: string
-          format: date-time
+          format: int64
     TeachingStudentSupportApiResponse:
       type: object
       description: Success envelope wrapping students needing support
@@ -6304,9 +7256,9 @@ components:
             type: string
         studentFirstName:
           type: string
-        studentMiddleName:
-          type: string
         studentLastName:
+          type: string
+        studentMiddleName:
           type: string
         studentUserId:
           type: integer
@@ -6392,19 +7344,14 @@ components:
         expectedVersion:
           type: integer
           format: int32
-        mode:
-          type: string
-          description: SYSTEM_DEFAULT, TENANT_OVERRIDE, or DISABLED
-          enum:
-          - SYSTEM_DEFAULT
-          - TENANT_OVERRIDE
-          - DISABLED
         gradingDelayDays:
           type: integer
           format: int32
         inactivityDays:
           type: integer
           format: int32
+        mode:
+          type: string
         negativeHoursEnabled:
           type: integer
           format: int32
@@ -6416,6 +7363,17 @@ components:
           format: int32
         performancePercentage:
           type: number
+    TransferCourseOwnerRequest:
+      type: object
+      properties:
+        expectedOwnershipVersion:
+          type: integer
+          format: int32
+        ownerAdvisorUserId:
+          type: integer
+          format: int32
+        reason:
+          type: string
     UpcomingCourseActivityResponse:
       type: object
       description: Concrete future Event or expanded Session occurrence; raw SessionResponse
@@ -6543,79 +7501,85 @@ components:
           format: int32
         weaknesses:
           type: string
-    MemberResponse:
+    CalendarApiResponse:
       type: object
       properties:
-        userFirstName:
-          type: string
-          nullable: true
-        userMiddleName:
-          type: string
-          nullable: true
-        userLastName:
-          type: string
-          nullable: true
-    PrimaryInstructorSummary:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/CalendarResponse" }
+        message: { type: string, example: Success }
+        timestamp: { type: string, format: date-time }
+    CalendarResponse:
       type: object
       properties:
-        instructorFirstName:
-          type: string
-          nullable: true
-        instructorMiddleName:
-          type: string
-          nullable: true
-        instructorLastName:
-          type: string
-          nullable: true
-    MembershipResponse:
+        timezone: { type: string }
+        fromUtc: { type: string, format: date-time }
+        toUtc: { type: string, format: date-time }
+        items:
+          type: array
+          items:
+            type: object
+    MyCoursePageApiResponse:
       type: object
       properties:
-        userFirstName:
-          type: string
-          nullable: true
-        userMiddleName:
-          type: string
-          nullable: true
-        userLastName:
-          type: string
-          nullable: true
-    UngroupedStudentResponse:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/MyCoursePageResponse" }
+        message: { type: string, example: Success }
+        timestamp: { type: string, format: date-time }
+    MyCoursePageResponse:
       type: object
       properties:
-        studentFirstName:
-          type: string
-          nullable: true
-        studentMiddleName:
-          type: string
-          nullable: true
-        studentLastName:
-          type: string
-          nullable: true
-    AnnouncementResponse:
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer, format: int64 }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/MyCourseResponse" }
+    MyCourseResponse:
       type: object
       properties:
-        authorFirstName:
-          type: string
-          nullable: true
-        authorMiddleName:
-          type: string
-          nullable: true
-        authorLastName:
-          type: string
-          nullable: true
-    AnnouncementSummaryResponse:
+        id: { type: integer }
+        courseId: { type: integer }
+        courseCode: { type: string }
+        title: { type: string }
+        lifecycleStatus: { type: string, nullable: true }
+        completedAt: { type: string, format: date-time, nullable: true }
+        lectureTotal: { type: integer, nullable: true }
+        lectureCompleted: { type: integer, nullable: true }
+        courseRole: { type: string }
+        launchState: { type: string, nullable: true }
+        courseType: { type: string, nullable: true }
+    StudentScheduleRequestPageApiResponse:
       type: object
       properties:
-        authorFirstName:
-          type: string
-          nullable: true
-        authorMiddleName:
-          type: string
-          nullable: true
-        authorLastName:
-          type: string
-          nullable: true
-
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/StudentScheduleRequestPage" }
+        message: { type: string, example: Success }
+        timestamp: { type: string, format: date-time }
+    StudentScheduleRequestPage:
+      type: object
+      properties:
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer, format: int64 }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/StudentScheduleRequestItem" }
+    StudentScheduleRequestItem:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        courseId: { type: integer }
+        courseCode: { type: string }
+        courseTitle: { type: string }
+        occurrenceDate: { type: string, format: date }
+        startTime: { $ref: "#/components/schemas/LocalTime" }
+        endTime: { $ref: "#/components/schemas/LocalTime" }
+        timezone: { type: string }
+        requestType: { type: string }
+        status: { type: string }
   securitySchemes:
     bearerAuth:
       bearerFormat: JWT

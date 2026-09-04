@@ -8,7 +8,7 @@ import {
   LoaderCircle,
   X,
 } from "lucide-react";
-import { getApiErrorMessage } from "@/utils/apiError";
+import { getApiErrorMessage, isHttpStatus } from "@/utils/apiError";
 import styles from "./index.module.scss";
 
 export function TeachingDialog({
@@ -96,7 +96,7 @@ export function TeachingState({
       <div className={className} role="alert">
         <AlertCircle size={24} />
         <p>{getApiErrorMessage(error, errorMessage)}</p>
-        {onRetry ? (
+        {onRetry && !isHttpStatus(error, 403) && !isHttpStatus(error, 404) ? (
           <button type="button" className={styles.secondary} onClick={onRetry}>
             Try again
           </button>

@@ -33,9 +33,9 @@ describe('role capabilities', () => {
     ['tenantAdmin', false, false, false, false, false, true, true],
     ['counsellor', false, false, false, false, false, false, false],
     ['advisor', false, false, false, false, false, true, false],
-    ['instructorAdvisor', false, true, true, true, true, true, false],
-    ['instructor', true, true, true, true, true, true, false],
-    ['student', true, true, true, true, true, true, false],
+    ['instructorAdvisor', false, true, true, false, true, true, false],
+    ['instructor', true, true, true, false, true, true, false],
+    ['student', true, true, true, false, true, true, false],
     ['parent', false, false, false, false, false, false, false],
     ['unsupported', false, false, false, false, false, false, false],
   ] as const)(

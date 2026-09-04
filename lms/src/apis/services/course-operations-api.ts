@@ -1,3 +1,4 @@
+import {readCollection, type CollectionPage} from './readCollection';
 import type {
   ApiResponse,
   AdvisingPage,
@@ -246,12 +247,12 @@ export class CourseOperationsApiService {
   getMyAttendance(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/attendance'); }
   getMyCalendar(params: {from?: string; to?: string; timezone?: string} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/calendar', {params}); }
   getMyProgress(): Promise<ApiResponse<StudentProgressResponse>> { return this.apiClient.get('/v2/me/progress'); }
-  getMyScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/schedule-requests'); }
-  getMyWorkQueue(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/work-queue'); }
+  getMyScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/schedule-requests', {params})); }
+  getMyWorkQueue(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/work-queue', {params})); }
   getMyCourseHours(courseId: number): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get(`/v2/me/courses/${courseId}/hours`); }
   getMyTeachingAlerts(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/alerts'); }
-  getMyTeachingGradingItems(): Promise<ApiResponse<TeachingGradingItemResponse[]>> { return this.apiClient.get('/v2/me/teaching/grading-items'); }
-  getMyTeachingScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/schedule-requests'); }
+  getMyTeachingGradingItems(): Promise<ApiResponse<TeachingGradingItemResponse[]>> { return readCollection<TeachingGradingItemResponse>(params => this.apiClient.get('/v2/me/teaching/grading-items', {params})); }
+  getMyTeachingScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/teaching/schedule-requests', {params})); }
   getMyTeachingStudentsNeedingSupport(): Promise<ApiResponse<TeachingStudentSupportResponse[]>> { return this.apiClient.get('/v2/me/teaching/students-needing-support'); }
   getMyTeachingTodayClasses(): Promise<ApiResponse<TeachingTodayClassResponse[]>> { return this.apiClient.get('/v2/me/teaching/today-classes'); }
 
