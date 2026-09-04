@@ -159,7 +159,6 @@ export default function AdvisorStudentExamsPage() {
               </label>
               {sections.writing ? (
                 <AdvisorInstructorPicker
-                  compact
                   label="Writing instructor"
                   value={instructorId}
                   onChange={setInstructorId}

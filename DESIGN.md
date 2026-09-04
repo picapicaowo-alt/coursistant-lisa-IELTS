@@ -317,3 +317,7 @@ All long sections remain independently collapsible and initially closed. History
 ## Figma authority and authentication/detail frames
 
 Figma composition and interaction models take precedence over earlier generic requests for folded sections or colored backgrounds. Source 715:3994 governs authentication: centered left form and a rounded violet product illustration on the right; below the readable two-column threshold only the form remains. The original dashboard and goal artwork are stored locally in `lms/public/icons/figma-auth/`. Source 803:13456 governs the Advisor student summary, skill metrics and underline navigation; source 813:4892 governs the centered task dialog. Learning journey phases are visible cards; long edit forms retain independent disclosure and version-protected saving. Missing server fields are omitted or marked unavailable, never filled with Figma sample data.
+
+## Shared people and action patterns
+
+Use the [UI/UX consistency audit and reuse rules](docs/uiux-consistency-audit-2026-09-04.md) when editing people lists, searchable selectors, form footers or modal dialogs. Prefer `PersonCell`, `PersonSelectRow`, `PersonSearchSelect` and the existing `TeachingDialog`; leave role-scoped queries and mutations in their current owners. Shared form styles must distinguish text inputs from radio and checkbox controls.

@@ -358,7 +358,6 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               {sections.writing ? (
                 <AdvisorInstructorPicker
                   required
-                  appearance="disclosure"
                   label="Writing instructor"
                   value={instructorId}
                   onChange={setInstructorId}

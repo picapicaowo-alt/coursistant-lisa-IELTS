@@ -152,7 +152,7 @@
     flex-wrap: wrap;
     gap: 0.25rem;
     color: t.$text-placeholder !important;
-    font-size: 0.7rem !important;
+    font-size: t.$font-size-caption !important;
     font-weight: t.$fw-regular !important;
 
     a,
@@ -244,7 +244,7 @@
         border: 1px solid t.$border;
         border-radius: t.$radius-control-sm;
         color: t.$brand;
-        font-size: 0.72rem;
+        font-size: t.$font-size-caption;
         font-weight: t.$fw-semibold;
         cursor: pointer;
 
@@ -263,7 +263,7 @@
         grid-column: 1 / -1;
         margin: 0 0 0.15rem;
         color: t.$text-muted;
-        font-size: 0.7rem;
+        font-size: t.$font-size-caption;
         font-weight: t.$fw-semibold;
         letter-spacing: 0.04em;
         text-transform: uppercase;
@@ -292,7 +292,7 @@
 .fileTypeHelp {
     margin-top: 0.4rem;
     color: t.$text-placeholder;
-    font-size: 0.7rem;
+    font-size: t.$font-size-caption;
 }
 
 .titleField,
@@ -333,7 +333,7 @@
     small {
         margin-left: auto;
         color: t.$text-placeholder;
-        font-size: 0.7rem;
+        font-size: t.$font-size-caption;
     }
 
     input {

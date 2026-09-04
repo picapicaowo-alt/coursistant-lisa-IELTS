@@ -1,0 +1,176 @@
+[WebServer] (node:81050) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:81050) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+Running 40 tests using 3 workers
+
+(node:81053) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81054) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81052) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   3 [chromium] › e2e/advisor-create-course-dialog.spec.ts:25:1 › both create entry points open a modal and return focus without moving the course list (965ms)
+  ✓   2 [chromium] › e2e/advisor-create-course-dialog.spec.ts:62:3 › create course modal reflows and keeps every control reachable at 768px (1.2s)
+  ✓   1 [chromium] › e2e/advisor-create-course-dialog.spec.ts:62:3 › create course modal reflows and keeps every control reachable at 1440px (1.2s)
+  ✓   4 [chromium] › e2e/advisor-create-course-dialog.spec.ts:62:3 › create course modal reflows and keeps every control reachable at 390px (675ms)
+  ✓   5 [chromium] › e2e/advisor-create-course-dialog.spec.ts:62:3 › create course modal reflows and keeps every control reachable at 320px (779ms)
+  ✓   6 [chromium] › e2e/advisor-create-course-dialog.spec.ts:94:1 › pending creation blocks dismissal and retries preserve the payload and idempotency key (844ms)
+  ✓   7 [chromium] › e2e/advisor-create-course-dialog.spec.ts:133:1 › date-order validation remains active inside the modal (668ms)
+  ✓   8 [chromium] › e2e/instructor-workspace-design.spec.ts:5:1 › Material links with ambiguous identities remain read-only (333ms)
+  ✓  11 [chromium] › e2e/instructor-workspace-design.spec.ts:71:1 › Missing attendance version never produces a write (285ms)
+  ✓  10 [chromium] › e2e/instructor-workspace-design.spec.ts:60:1 › Attendance conflicts preserve choices and disable repeat stale writes (390ms)
+  ✓  12 [chromium] › e2e/instructor-workspace-design.spec.ts:79:1 › Writing grading keeps the score and feedback workflow (424ms)
+  ✓   9 [chromium] › e2e/instructor-workspace-design.spec.ts:15:1 › Instructor course workflows preserve versions, publishing rules, and protected material actions (1.4s)
+  ✓  13 [chromium] › e2e/instructor-workspace-design.spec.ts:89:1 › Occurrence editors send course-local dates and versioned schedule actions (899ms)
+  ✓  14 [chromium] › e2e/instructor-workspace-design.spec.ts:123:1 › Course downloads, roster search and availability retain existing API flows (1.3s)
+  ✓  15 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 1600px with no horizontal overflow (7.5s)
+  ✓  16 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 1024px with no horizontal overflow (7.5s)
+  ✓  19 [chromium] › e2e/mock-exam-authoring.spec.ts:157:3 › long multilingual content remains usable at 768px (236ms)
+  ✓  18 [chromium] › e2e/mock-exam-authoring.spec.ts:157:3 › long multilingual content remains usable at 320px (339ms)
+  ✓  17 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 390px with no horizontal overflow (7.4s)
+  ✘  21 [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px (5.8s)
+  ✘  20 [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px (5.8s)
+(node:81218) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:81219) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  22 [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px (5.7s)
+(node:81222) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  24 [chromium] › e2e/mock-exam-authoring.spec.ts:381:3 › complete Reading file import previews and posts once at 1440px (804ms)
+  ✓  25 [chromium] › e2e/mock-exam-authoring.spec.ts:381:3 › complete Reading file import previews and posts once at 768px (760ms)
+  ✓  26 [chromium] › e2e/mock-exam-authoring.spec.ts:381:3 › complete Reading file import previews and posts once at 390px (703ms)
+  ✓  27 [chromium] › e2e/mock-exam-authoring.spec.ts:381:3 › complete Reading file import previews and posts once at 320px (762ms)
+  ✓  28 [chromium] › e2e/mock-exam-authoring.spec.ts:489:3 › Reading import modal preserves input and keyboard focus at 1440px (586ms)
+  ✓  29 [chromium] › e2e/mock-exam-authoring.spec.ts:489:3 › Reading import modal preserves input and keyboard focus at 390px (504ms)
+  ✓  30 [chromium] › e2e/mock-exam-authoring.spec.ts:591:1 › Reading paste import protects existing work and rejects invalid media references (595ms)
+  ✓  31 [chromium] › e2e/mock-exam-authoring.spec.ts:643:1 › reading and writing use text fields and retain drafts across section navigation (996ms)
+  ✓  32 [chromium] › e2e/mock-exam-authoring.spec.ts:699:1 › discard confirms its scope, preserves another section and does not delete uploaded media (845ms)
+  ✓  33 [chromium] › e2e/mock-exam-authoring.spec.ts:732:1 › review finds hidden-part errors and changing a type never silently clears content (439ms)
+  ✓  34 [chromium] › e2e/mock-exam-authoring.spec.ts:763:1 › official answers reject invalid input and save equivalent alternatives through retry (539ms)
+  ✓  36 [chromium] › e2e/uiux-consistency.spec.ts:27:1 › queue actions have separate targets; advisor identity, avatar and selection stay aligned (550ms)
+  ✓  35 [chromium] › e2e/rich-text-formatting.spec.ts:11:1 › teacher can remove bold formatting and a newly selected annotated file (1.0s)
+  ✓  37 [chromium] › e2e/uiux-consistency.spec.ts:57:1 › save stays on the form; the primary next step saves dirty data before navigating (498ms)
+  ✘  23 [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px (5.8s)
+  ✓  38 [chromium] › e2e/uiux-consistency.spec.ts:83:1 › instructor combobox searches, selects with keys, clears and dismisses without closing its dialog (957ms)
+(node:81263) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  39 [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes (984ms)
+  ✓  40 [chromium] › e2e/uiux-consistency.spec.ts:152:1 › TA permissions reuse the modal focus and small-screen behavior (300ms)
+
+
+  1) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: not "Synthetic save failure"
+    Received string: "Synthetic save failure; retry the same draft."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toContainText" with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_inlineError_9n1oy_474">Synthetic save failure; retry the same draft.</p>
+           - unexpected value "Synthetic save failure; retry the same draft."
+
+
+      339 |       'Synthetic save failure; retry the same draft.',
+      340 |     );
+    > 341 |     await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
+          |                                               ^
+      342 |     await expect(review).toBeVisible();
+      343 |     await page
+      344 |       .getByRole('button', {name: 'Confirm and create section'})
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/mock-exam-authoring.spec.ts:341:47
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-recheck-results/mock-exam-authoring-guided-2dbed--review-and-retry-at-1752px-chromium/error-context.md
+
+  2) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: not "Synthetic save failure"
+    Received string: "Synthetic save failure; retry the same draft."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toContainText" with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_inlineError_9n1oy_474">Synthetic save failure; retry the same draft.</p>
+           - unexpected value "Synthetic save failure; retry the same draft."
+
+
+      339 |       'Synthetic save failure; retry the same draft.',
+      340 |     );
+    > 341 |     await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
+          |                                               ^
+      342 |     await expect(review).toBeVisible();
+      343 |     await page
+      344 |       .getByRole('button', {name: 'Confirm and create section'})
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/mock-exam-authoring.spec.ts:341:47
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-recheck-results/mock-exam-authoring-guided-11d3b--review-and-retry-at-1440px-chromium/error-context.md
+
+  3) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: not "Synthetic save failure"
+    Received string: "Synthetic save failure; retry the same draft."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toContainText" with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_inlineError_9n1oy_474">Synthetic save failure; retry the same draft.</p>
+           - unexpected value "Synthetic save failure; retry the same draft."
+
+
+      339 |       'Synthetic save failure; retry the same draft.',
+      340 |     );
+    > 341 |     await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
+          |                                               ^
+      342 |     await expect(review).toBeVisible();
+      343 |     await page
+      344 |       .getByRole('button', {name: 'Confirm and create section'})
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/mock-exam-authoring.spec.ts:341:47
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-recheck-results/mock-exam-authoring-guided-dab9d--review-and-retry-at-1024px-chromium/error-context.md
+
+  4) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px
+
+    Error: expect(locator).not.toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: not "Synthetic save failure"
+    Received string: "Synthetic save failure; retry the same draft."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "not toContainText" with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_inlineError_9n1oy_474">Synthetic save failure; retry the same draft.</p>
+           - unexpected value "Synthetic save failure; retry the same draft."
+
+
+      339 |       'Synthetic save failure; retry the same draft.',
+      340 |     );
+    > 341 |     await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
+          |                                               ^
+      342 |     await expect(review).toBeVisible();
+      343 |     await page
+      344 |       .getByRole('button', {name: 'Confirm and create section'})
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/mock-exam-authoring.spec.ts:341:47
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-recheck-results/mock-exam-authoring-guided-d609a-w-review-and-retry-at-390px-chromium/error-context.md
+
+  4 failed
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px
+  36 passed (25.5s)

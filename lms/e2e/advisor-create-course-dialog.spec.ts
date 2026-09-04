@@ -18,7 +18,8 @@ async function fillCourse(dialog: Locator) {
   await dialog.getByLabel('Course title', {exact: true}).fill('Academic Writing');
   await dialog.getByLabel('Term start', {exact: true}).fill('09/01/2030');
   await dialog.getByLabel('Term end', {exact: true}).fill('12/01/2030');
-  await dialog.getByRole('combobox', {name: 'Instructor', exact: true}).selectOption('51');
+  await dialog.getByRole('combobox', {name: 'Instructor', exact: true}).fill('Sarah');
+  await dialog.getByRole('option', {name: /Sarah Chen/}).click();
 }
 
 test('both create entry points open a modal and return focus without moving the course list', async ({page}) => {
@@ -31,7 +32,8 @@ test('both create entry points open a modal and return focus without moving the 
   await expect(page.getByLabel('Course code', {exact: true})).toHaveCount(0);
   await trigger.click();
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole('combobox', {name: 'Instructor', exact: true}).getByRole('option', {name: 'Sarah Chen'})).toHaveCount(1);
+  await dialog.getByRole('combobox', {name: 'Instructor', exact: true}).click();
+  await expect(dialog.getByRole('option', {name: /Sarah Chen/})).toBeVisible();
   await expect(dialog.getByRole('button', {name: 'Create group course', exact: true})).toBeDisabled();
   await dialog.getByRole('button', {name: 'Close dialog'}).focus();
   await page.keyboard.press('Tab');

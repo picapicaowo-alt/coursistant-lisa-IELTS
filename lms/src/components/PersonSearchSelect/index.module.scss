@@ -1,0 +1,86 @@
+.picker {
+  display: grid;
+  gap: t.$space-2;
+  min-width: 0;
+  grid-column: 1 / -1;
+
+  > label { font-size: t.$font-size-body; font-weight: t.$fw-semibold; color: t.$content-primary; }
+}
+
+.control {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  padding-inline: t.$space-3 t.$space-1;
+  min-width: 0;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control-sm;
+  background: t.$surface-canvas;
+  color: t.$content-secondary;
+
+  &:focus-within { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+  > svg { flex: 0 0 auto; }
+}
+
+// Scoped specificity keeps surrounding form rules from resizing the compound input.
+.picker .control input {
+  flex: 1;
+  min-width: 0;
+  width: 100%;
+  min-height: t.$control-height-lg;
+  padding: t.$space-2 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: t.$content-primary;
+  font: inherit;
+  font-size: t.$font-size-body-lg;
+}
+
+.picker .control input:focus-visible { outline: none; }
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  flex: 0 0 t.$control-height-md;
+  width: t.$control-height-md;
+  height: t.$control-height-md;
+  border: 0;
+  border-radius: t.$radius-control-sm;
+  background: transparent;
+  color: t.$content-secondary;
+  &:hover { background: t.$surface-muted; color: t.$action-primary; }
+}
+
+.dropdown {
+  min-width: 0;
+  padding: t.$space-2;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control;
+  background: t.$surface-canvas;
+  box-shadow: t.$shadow-popover;
+}
+
+.results { max-height: min(18rem, 40dvh); overflow-y: auto; overscroll-behavior: contain; }
+
+.option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-3;
+  width: 100%;
+  min-width: 0;
+  padding: t.$space-3;
+  border: 1px solid transparent;
+  border-radius: t.$radius-control-sm;
+  background: transparent;
+  color: t.$content-primary;
+  font: inherit;
+  text-align: left;
+  > svg { flex-shrink: 0; }
+  &:hover, &[data-active='true'] { background: t.$surface-subtle; border-color: t.$border-interactive; }
+  &[aria-selected='true'] { background: t.$surface-brand-subtle; }
+}
+
+.status { margin: 0; padding: t.$space-3; color: t.$content-secondary; font-size: t.$font-size-body; line-height: 1.5; }
+.status button { min-height: t.$control-height-md; margin-left: t.$space-2; color: t.$action-primary; }

@@ -56,7 +56,7 @@
 .resultReviewHeader, .reviewHeaderActions, .resultQuestionHeader, .optionLabels { display: flex; align-items: center; gap: .65rem; }
 .resultReviewHeader { position: sticky; z-index: 1; top: -1.2rem; justify-content: space-between; margin: -1.2rem -1.2rem 1rem; padding: 1.2rem; border-bottom: 1px solid t.$border; background: t.$subcard-bg; }
 .resultReviewHeader p, .resultReviewHeader h3 { margin: 0; }
-.resultReviewHeader p { color: t.$brand; font-size: .7rem; font-weight: t.$fw-semibold; text-transform: uppercase; letter-spacing: .06em; }
+.resultReviewHeader p { color: t.$brand; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; text-transform: uppercase; letter-spacing: .06em; }
 .resultReviewHeader h3 { margin-top: .15rem; font-size: t.$fs-card-title; }
 .resultReviewHeader small { display: block; margin-top: .2rem; color: t.$text-muted; font-size: t.$fs-caption; }
 .reviewHeaderActions label { display: grid; grid-template-columns: auto minmax(10rem, 1fr); align-items: center; gap: .45rem; color: t.$text-muted; font-size: t.$fs-caption; }
@@ -65,19 +65,19 @@
 .closeReviewButton:hover { background: t.$neutral-fill; color: t.$text; }
 .resultSummary { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; }
 .resultSummary > div { display: grid; gap: .15rem; padding: .75rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$card-bg; }
-.resultSummary span { color: t.$text-muted; font-size: .7rem; }
+.resultSummary span { color: t.$text-muted; font-size: t.$font-size-caption; }
 .resultSummary strong { font-size: t.$fs-label; }
 .pendingNotice { margin: .8rem 0 0; color: t.$warning; font-size: t.$fs-caption; font-weight: t.$fw-semibold; }
-.reviewTimestamp { margin: .7rem 0 0; color: t.$text-muted; font-size: .72rem; }
+.reviewTimestamp { margin: .7rem 0 0; color: t.$text-muted; font-size: t.$font-size-caption; }
 .resultQuestions { display: grid; gap: .8rem; margin: 1rem 0 0; padding: 0; list-style: none; }
 .resultQuestions > li { padding: 1rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
 .resultQuestionHeader { align-items: flex-start; justify-content: space-between; }
 .resultQuestionHeader > div { min-width: 0; }
-.resultQuestionHeader > div > span { color: t.$brand; font-size: .7rem; font-weight: t.$fw-semibold; text-transform: uppercase; }
+.resultQuestionHeader > div > span { color: t.$brand; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; text-transform: uppercase; }
 .resultQuestionHeader p { margin: .25rem 0 0; }
 .resultQuestionHeader > strong { flex: 0 0 auto; color: t.$brand; }
 .shortAnswerResult { margin-top: .8rem; padding: .8rem; border-inline-start: 2px solid t.$brand; background: t.$subcard-bg; }
-.shortAnswerResult > span { color: t.$text-muted; font-size: .7rem; font-weight: t.$fw-semibold; text-transform: uppercase; }
+.shortAnswerResult > span { color: t.$text-muted; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; text-transform: uppercase; }
 .shortAnswerResult p { margin: .3rem 0 0; }
 .resultOptions { display: grid; gap: .45rem; margin: .8rem 0 0; padding: 0; list-style: none; }
 .resultOptions > li { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .55rem; padding: .6rem .7rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; }
@@ -86,7 +86,7 @@
 .resultOptions p { margin: 0; }
 .optionIndicator { color: t.$brand; }
 .optionLabels { flex-wrap: wrap; justify-content: flex-end; }
-.optionLabels em { padding: .12rem .4rem; border-radius: t.$radius-pill; background: t.$neutral-fill; color: t.$text-muted; font-size: .64rem; font-style: normal; font-weight: t.$fw-semibold; white-space: nowrap; }
+.optionLabels em { padding: .12rem .4rem; border-radius: t.$radius-pill; background: t.$neutral-fill; color: t.$text-muted; font-size: t.$font-size-caption; font-style: normal; font-weight: t.$fw-semibold; white-space: nowrap; }
 .resultOptions > li[data-correct='true'] .optionLabels em:last-child { background: t.$type-green-subtle; color: t.$type-green; }
 .inlineError { display: flex; align-items: center; justify-content: space-between; gap: 1rem; color: t.$danger; }
 .inlineError button { min-height: 2.5rem; padding: 0 .85rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$card-bg; cursor: pointer; }

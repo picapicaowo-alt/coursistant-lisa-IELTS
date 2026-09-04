@@ -1,0 +1,23 @@
+{
+  "baseMainSha": "60646f296c184a7f5700354f1741f5ccb1266370",
+  "preservedProductionConfigCommit": "d0f400bfa31c4f822da7285da79fc8da3660459a",
+  "checks": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "typecheckProduction": "passed",
+    "unit": {
+      "files": 151,
+      "tests": 737,
+      "result": "passed"
+    },
+    "build": "passed",
+    "browser": {
+      "engine": "Chromium",
+      "tests": 264,
+      "result": "passed",
+      "retries": 0,
+      "data": "Isolated API fixtures; unhandled external DNS blocked"
+    }
+  },
+  "deployment": "Pending GitHub CI and merge. This record is candidate validation only."
+}

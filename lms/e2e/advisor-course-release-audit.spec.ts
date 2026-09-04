@@ -94,7 +94,8 @@ test('release audit: create group course sends the selected instructor and cours
   await page.getByLabel('Course title', {exact: true}).fill('Academic Writing');
   await page.getByLabel('Term start', {exact: true}).fill('09/01/2030');
   await page.getByLabel('Term end', {exact: true}).fill('12/01/2030');
-  await page.getByRole('combobox', {name: 'Instructor', exact: true}).selectOption('51');
+  await page.getByRole('combobox', {name: 'Instructor', exact: true}).fill('Sarah');
+  await page.getByRole('option', {name: /Sarah Chen/}).click();
   await page.getByRole('button', {name: 'Create group course', exact: true}).click();
   await expect(page).toHaveURL(/\/advisor\/courses\/71\/delivery\?view=delivery$/);
   expect(writes).toEqual([{body: {courseCode: 'IELTS-2030', title: 'Academic Writing', termStartDate: '2030-09-01', termEndDate: '2030-12-01', primaryInstructorUserId: 51}, key: expect.any(String)}]);

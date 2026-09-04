@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {FormEvent, useEffect, useRef, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -8,6 +9,8 @@ import {isNotFound, getApiErrorCode} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
+import local from './index.module.scss';
+import {assignmentPath, intakePath} from '../CounsellorDashboardPage/presentation';
 import {ParentLinksPanel} from '@/components/ParentLinksPanel';
 import {StudentIntakeFormFields} from '@/components/StudentIntakeFormFields';
 import {CreateIntakeDialog} from '@/components/StudentIntakeFormFields/CreateIntakeDialog';
@@ -18,7 +21,14 @@ import {
   type StudentIntakeFormValue,
 } from '@/components/StudentIntakeFormFields/model';
 
+const intakeFormValue = (intake: StudentIntakeResponse): StudentIntakeFormValue => ({
+  firstName: intake.firstName ?? '', middleName: intake.middleName ?? '', lastName: intake.lastName ?? '',
+  email: intake.email ?? '', studentType: intake.studentType ?? 'STANDARD', courseRequest: intake.courseRequest ?? '',
+  contactPhone: intake.contactPhone ?? '', basicBackground: intake.basicBackground ?? '',
+});
+
 const CounsellorIntakeFormPage: React.FC = () => {
+  const {t} = useTranslation('common');
   const {intakeId} = useParams();
   const isCreate = !intakeId;
   const numericId = Number(intakeId);
@@ -44,16 +54,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
     setLoadedIntakeId(detail.data.intakeId);
     reviewedIntake.current = detail.data;
     setReviewedVersion(detail.data.intakeVersion);
-    setForm({
-      firstName: detail.data.firstName ?? '',
-      middleName: detail.data.middleName ?? '',
-      lastName: detail.data.lastName ?? '',
-      email: detail.data.email ?? '',
-      studentType: detail.data.studentType ?? 'STANDARD',
-      courseRequest: detail.data.courseRequest ?? '',
-      contactPhone: detail.data.contactPhone ?? '',
-      basicBackground: detail.data.basicBackground ?? '',
-    });
+    setForm(intakeFormValue(detail.data));
   }, [detail.data, loadedIntakeId]);
 
   useEffect(() => {
@@ -61,7 +62,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
   }, [detail.isError, detail.error]);
 
   const save = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (_continueToAssignment: boolean) => {
       if (isCreate) {
         const payload = {
           firstName: form.firstName.trim(),
@@ -92,16 +93,22 @@ const CounsellorIntakeFormPage: React.FC = () => {
       if (isNotFound(error)) setHandover(true);
       if (getApiErrorCode(error) === 'STUDENT_INTAKE_VERSION_CONFLICT') setReloadRequired(true);
     },
-    onSuccess: async intake => {
-      await queryClient.invalidateQueries({queryKey: ['counsellor']});
-      navigate(isCreate ? `/counsellor/intakes/${intake.intakeId}` : `/counsellor/intakes/${numericId}/assign`);
+    onSuccess: async (intake, continueToAssignment) => {
+      reviewedIntake.current = intake;
+      setReviewedVersion(intake.intakeVersion);
+      setForm(intakeFormValue(intake));
+      queryClient.setQueryData(advisingQueryKeys.counsellorIntake(intake.intakeId), intake);
+      await queryClient.invalidateQueries({queryKey: advisingQueryKeys.counsellorAll});
+      if (isCreate) navigate(intakePath(intake.intakeId));
+      else if (continueToAssignment) navigate(assignmentPath(numericId));
     },
   });
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
     if (save.isPending) return;
-    save.mutate();
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    save.mutate(submitter instanceof HTMLButtonElement && submitter.value === 'assign');
   };
 
   const hasChanges = isCreate || !reviewedIntake.current ||
@@ -112,7 +119,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
     return (
       <div className={styles.page}>
         <p className={styles.error} role="alert">This intake is no longer available. After a first assignment the counsellor loses access immediately.</p>
-        <Link className={styles.link} to="/counsellor/intakes">Back to unassigned queue</Link>
+        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>Back to unassigned queue</Link>
       </div>
     );
   }
@@ -130,18 +137,25 @@ const CounsellorIntakeFormPage: React.FC = () => {
         <div>
 
           <h1>{isCreate ? 'Create student intake' : 'Edit intake'}</h1>
-          <p className={styles.lede}>The system creates a USER + STUDENT in this tenant. No password is returned — the student sets one through Forgot password.</p>
+          <p className={styles.lede}>{t('intake.reviewThenAssign')}</p>
         </div>
-        <Link className={styles.link} to="/counsellor/intakes">Back to queue</Link>
+        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>Back to queue</Link>
       </header>
       {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'The intake could not be saved.')}</p> : null}
       {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your changes are preserved. Reload the latest intake before confirming them again.</p><button type="button" className={styles.secondary} onClick={() => void detail.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.intakeVersion); setReloadRequired(false);}})}>Load latest intake</button></div> : null}
       {detail.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(detail.error, 'Intake could not be loaded.')}</p> : null}
       <section className={`${styles.card} ${styles.wideCard}`}>
-        <form className={`${styles.form} ${styles.formColumns}`} onSubmit={onSubmit}>
-          <StudentIntakeFormFields value={form} onChange={setForm} emailDisabled={!isCreate}/>
-          <button className={`${styles.primary} ${styles.fullWidth}`} disabled={!hasChanges || save.isPending || reloadRequired || (!isCreate && !detail.data)}>{save.isPending ? 'Saving…' : isCreate ? 'Create intake' : 'Save changes'}</button>
-          {!isCreate && !hasChanges && detail.data && !reloadRequired ? <Link className={`${styles.secondary} ${styles.fullWidth}`} to={`/counsellor/intakes/${numericId}/assign`}>Continue to advisor assignment</Link> : null}
+        <form className={`${styles.form} ${local.form}`} onSubmit={onSubmit}>
+          <fieldset className={local.fields} disabled={save.isPending || !detail.data}>
+            <StudentIntakeFormFields value={form} onChange={value => {setForm(value); save.reset();}} emailDisabled/>
+          </fieldset>
+          {save.isSuccess ? <p className={local.saved} role="status">{t('intake.saved')}</p> : null}
+          <div className={`${styles.formActions} ${local.actions}`}>
+            <button type="submit" name="intent" value="save" className={styles.secondary} disabled={!hasChanges || save.isPending || reloadRequired || !detail.data}>{save.isPending && !save.variables ? t('intake.saving') : t('actions.saveChanges')}</button>
+            {!hasChanges && detail.data && !reloadRequired && !save.isPending ?
+              <Link className={styles.primary} to={assignmentPath(numericId)}>{t('intake.continueToAssignment')}</Link> :
+              <button type="submit" name="intent" value="assign" className={styles.primary} disabled={save.isPending || reloadRequired || !detail.data}>{save.isPending && save.variables ? t('intake.saving') : t('intake.saveAndContinue')}</button>}
+          </div>
         </form>
       </section>
       {!isCreate ? <ParentLinksPanel scope="counsellor" subjectId={numericId} onUnavailable={() => {setHandover(true); void queryClient.invalidateQueries({queryKey: ['counsellor']});}}/> : null}

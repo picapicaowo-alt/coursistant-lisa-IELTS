@@ -79,7 +79,8 @@ test('one-to-one creation sends contract session enums and versioned payload', a
   const dialog = page.getByRole('dialog', {name: 'Add Course'});
   await dialog.getByRole('button', {name: 'Create 1-on-1 Course', exact: true}).click();
   await dialog.getByRole('textbox', {name: 'Title', exact: true}).fill('Personal writing practice');
-  await dialog.getByRole('combobox', {name: 'Instructor', exact: true}).selectOption('51');
+  await dialog.getByRole('combobox', {name: 'Instructor', exact: true}).click();
+  await dialog.getByRole('option', {name: /Ivy Lee/}).click();
   await dialog.getByRole('textbox', {name: /^Term start/}).fill('09/07/2026');
   await dialog.getByRole('textbox', {name: /^Term end/}).fill('12/07/2026');
   await dialog.getByRole('combobox', {name: 'Session type'}).selectOption('Tutorial');
@@ -285,7 +286,8 @@ test('advisor exam cards and assignment dialog use the supported exam contract',
   await expectNoViewportOverflow(page);
   await page.screenshot({path: testInfo.outputPath('assign-exam-mobile.png')});
   await dialog.getByRole('combobox', {name: 'Exam type'}).selectOption('45');
-  await dialog.getByRole('combobox', {name: 'Writing instructor'}).selectOption('501');
+  await dialog.getByRole('combobox', {name: 'Writing instructor'}).click();
+  await dialog.getByRole('listbox').getByRole('option').first().click();
   await dialog.getByRole('checkbox', {name: 'Reading'}).uncheck();
   await dialog.getByRole('button', {name: 'Assign exam', exact: true}).click();
 

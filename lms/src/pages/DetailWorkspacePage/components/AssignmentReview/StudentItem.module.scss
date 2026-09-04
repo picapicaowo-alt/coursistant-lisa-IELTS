@@ -8,21 +8,21 @@
     border: 1px solid t.$border-default;
     border-radius: 0.5rem;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     text-align: left;
     box-sizing: border-box;
-    
+
     &:hover {
         border-color: t.$border-strong;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
-    
+
     &:focus-visible {
         outline: none;
         border-color: t.$action-primary;
         box-shadow: 0 0 0 3px rgba(86, 111, 232, 0.1);
     }
-    
+
     &.selected {
         background-color: #eff6ff;
         border-color: #3b82f6;

@@ -1,0 +1,14 @@
+
+> lms@0.0.0 test:run
+> vitest run
+
+(node:86867) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ RUN  v4.1.11 /private/tmp/coursistant-uiux-prod-release/lms
+
+
+ Test Files  151 passed (151)
+      Tests  737 passed (737)
+   Start at  10:30:56
+   Duration  13.38s (transform 6.97s, setup 9.43s, import 34.83s, tests 18.52s, environment 37.13s)

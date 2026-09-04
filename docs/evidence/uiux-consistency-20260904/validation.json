@@ -1,0 +1,105 @@
+{
+  "scope": "Local frontend UI/UX audit and fixes; existing dirty workspace preserved.",
+  "date": "2026-09-04",
+  "checks": [
+    {
+      "command": "npm run lint:ci",
+      "result": "passed",
+      "log": "lint.log"
+    },
+    {
+      "command": "npm run typecheck",
+      "result": "passed",
+      "log": "typecheck.log"
+    },
+    {
+      "command": "npm run typecheck:production",
+      "result": "passed",
+      "log": "typecheck-production.log"
+    },
+    {
+      "command": "npm run test:run",
+      "result": "passed",
+      "files": 147,
+      "tests": 697,
+      "log": "unit.log"
+    },
+    {
+      "command": "npm run build",
+      "result": "passed",
+      "log": "build.log"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed"
+    }
+  ],
+  "browser": {
+    "engine": "Chromium",
+    "data": "Isolated API fixtures",
+    "uniqueTestsInBroadReview": 100,
+    "finalOutcome": "All 100 passed across initial and targeted reruns, not a single green 100-test run.",
+    "batches": [
+      {
+        "log": "e2e-initial.log",
+        "passed": 93,
+        "failed": 7
+      },
+      {
+        "log": "e2e-recheck.log",
+        "passed": 36,
+        "failed": 4,
+        "resolves": "The three non-authoring initial failures; includes overlapping regression coverage."
+      },
+      {
+        "log": "e2e-authoring-final.log",
+        "passed": 4,
+        "failed": 0,
+        "resolves": "All four authoring failures, retaining original error-copy assertions."
+      },
+      {
+        "command": "PLAYWRIGHT_PORT=4188 npx playwright test e2e/uiux-consistency.spec.ts e2e/instructor-workspace-design.spec.ts e2e/operations-dialog-regressions.spec.ts --workers=4",
+        "log": "e2e-final-shared-controls.log",
+        "passed": 26,
+        "failed": 0,
+        "scope": "Latest build after shared translation resources and locale-reactive rendering; overlaps the 100 tests."
+      }
+    ],
+    "corrections": "Selection focus ordering and server error presentation fixed in production. Newly added focus assertions now check modal background inertness; query tests recognize cached initial pages."
+  },
+  "localization": {
+    "newSharedCopy": [
+      "en",
+      "zh-CN",
+      "zh-TW"
+    ],
+    "evidence": "PersonSearchSelect/index.test.tsx checks live locale changes, validity, empty states, selected names, key and interpolation parity. Full site localization remains a separate migration."
+  },
+  "staticReview": {
+    "activeModules": 580,
+    "tsxJsx": 259,
+    "styles": 138,
+    "explicitSub12TextOrUnrestrictedTransitionFindings": 0,
+    "entry": "src/main.tsx",
+    "limitations": "Local production import graph; explicit numeric font sizes and transition: all only. Shared tokens separately reviewed. No complete accessibility certification."
+  },
+  "boundaries": {
+    "authenticatedLiveAcceptance": false,
+    "merged": false,
+    "deployed": false,
+    "browsersNotExercised": [
+      "Safari",
+      "Firefox"
+    ],
+    "existingWorkspaceChanges": "Independent i18n migration and other pre-existing changes were observed; this report claims only the listed UI/UX work."
+  },
+  "reviewedCoreSourceSha256": {
+    "lms/src/components/PersonCell/index.tsx": "ac4d12d217d3fd15cec2eb21f23f068cf635b0aa6faba3b91c141e8677bfd22d",
+    "lms/src/components/PersonSelectRow/index.tsx": "b78e0d403bfba7f5de40facf63d84098d69aa56b6d8d919916da0855b5a8f4dd",
+    "lms/src/components/PersonSearchSelect/index.tsx": "7e018e5a62fbf9929a15ccc75ed12c139881f96165a30876cf03184eb2b2bb88",
+    "lms/src/components/AdvisorInstructorPicker/index.tsx": "f7ff0a24de022f4f23882d08f538c150c1a00e6829f26f823526708e47816982",
+    "lms/src/pages/CounsellorAssignAdvisorPage/index.tsx": "06915d7c6a2f2035bbefbca56f53143a889cfd5f382f4e6d9b76f2633e7ec0ef",
+    "lms/src/pages/CounsellorIntakeFormPage/index.tsx": "0367cc0100941235590051ce9fe71ed36119cc309e9e1640649abba0d84abe1a",
+    "lms/dist/index.html": "787db55129be4ccd10c150a685e2d9bf1edafda2d4a100840d45ab39483e835a"
+  }
+}
