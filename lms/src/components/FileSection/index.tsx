@@ -60,15 +60,18 @@ export const FileSection: React.FC<FileSectionProps> = ({
     });
   }, [files]);
 
-  const deleteFile = onDelete
-    ? async (file: FileView) => {
-      await onDelete(file);
+  const deleteFile = async (file: FileView) => {
+      // Failed uploads have only a browser-generated ID. Never send it to the delete API.
+      const failedLocally = pendingFilesRef.current.get(file.id)?.uploadStatus === 'error';
+      if (!failedLocally) {
+        if (!onDelete) return;
+        await onDelete(file);
+      }
       const deletedId = fileId(file);
       setDeletedFileIds(prev => new Set(prev).add(deletedId));
       pendingFilesRef.current.delete(file.id);
       setPendingFiles(prev => prev.filter(pending => fileId(pending) !== deletedId));
-    }
-    : undefined;
+    };
   
   /**
    * Called when a file upload starts
@@ -151,7 +154,7 @@ export const FileSection: React.FC<FileSectionProps> = ({
             key={fileBlock.id}
             block={fileBlock}
             disabled={disabled}
-            onDelete={deleteFile}
+            onDelete={onDelete || pendingFilesRef.current.has(fileBlock.id) ? deleteFile : undefined}
           />
         ))}
       </div>

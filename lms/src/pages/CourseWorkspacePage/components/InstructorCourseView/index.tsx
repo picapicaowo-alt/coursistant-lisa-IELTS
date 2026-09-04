@@ -32,6 +32,7 @@ const TABS = [
 type Tab = (typeof TABS)[number][0];
 export function InstructorCourseView({
   canEditCourse,
+  canManageWeeks,
   canManageMaterials,
   canCreateAssignments,
   canManageEvents,
@@ -39,6 +40,7 @@ export function InstructorCourseView({
   canPostAnnouncements,
 }: {
   canEditCourse: boolean;
+  canManageWeeks: boolean;
   canManageMaterials: boolean;
   canCreateAssignments: boolean;
   canManageEvents: boolean;
@@ -199,7 +201,7 @@ export function InstructorCourseView({
           selectedId={Number(params.get("weekId")) || undefined}
           onSelect={selectWeek}
           onOpenMaterial={openMaterial}
-          canEdit={canEditCourse && writable}
+          canEdit={canManageWeeks && writable}
           canUpload={canManageMaterials && writable}
           currentUserId={user.id}
         />

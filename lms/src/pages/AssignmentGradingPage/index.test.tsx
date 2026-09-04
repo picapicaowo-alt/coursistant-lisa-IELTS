@@ -72,14 +72,14 @@ describe('GradeDialog', () => {
     }));
   });
 
-  it('loads and shows the learner submission files before grading', async () => {
+  it('shows structured learner names and submission files before grading', async () => {
     const queryClient = new QueryClient({defaultOptions: {queries: {retry: false}}});
     render(
       <QueryClientProvider client={queryClient}>
         <GradeDialog
           courseId={34}
           assignmentId={48}
-          row={row}
+          row={{...row, studentName: undefined, studentFirstName: 'Eden', studentMiddleName: 'J', studentLastName: 'Brooks'}}
           pointsPossible={20}
           isSaving={false}
           error={null}
@@ -89,6 +89,7 @@ describe('GradeDialog', () => {
       </QueryClientProvider>
     );
 
+    expect(screen.getByRole('heading', {name: 'Eden J Brooks'})).toBeInTheDocument();
     expect(screen.getByRole('heading', {name: 'Submitted files'})).toBeInTheDocument();
     await waitFor(() => {
       expect(assignmentApiService.listSubmissionVersions).toHaveBeenCalledWith(34, 48, 30);

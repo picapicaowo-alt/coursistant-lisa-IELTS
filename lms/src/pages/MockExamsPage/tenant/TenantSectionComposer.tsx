@@ -657,11 +657,11 @@ export function TenantSectionComposer({
                   setActive(index);
                 }}
               />
-              <p className={authoring.notice}>
+              {section !== 'writing' ? <p className={authoring.notice}>
                 Content checks do not verify an answer key or scoring. Confirm
                 those with your content team before publishing. The supplied API
                 does not define their format.
-              </p>
+              </p> : <p className={authoring.notice}>Writing responses are reviewed by the instructor selected when the exam is assigned.</p>}
               <p>
                 This creates the complete {meta.label.toLowerCase()} section.
                 Once saved, its content is read only. Make any final edits

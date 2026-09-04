@@ -10,6 +10,7 @@ async function student(page: Page, level = 'STUDENT') {
     const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
     let data: unknown = [];
     if (path === '/v2/me/profile') data = {userId: 901, firstName: 'Alex', middleName: 'J', lastName: 'Chen', avatarUrl: null};
+    else if (path === '/v2/advisor/instructors') data = {items: [], total: 0, page: 0, size: 20};
     else if (path === '/v2/me/courses') data = {items: [{id: 71, courseCode: 'WR101', title: 'Academic Writing Studio', role: 'Student', state: 'Active'}], total: 1, page: 0, size: 100};
     else if (path === '/v2/me/attendance') data = {presentCount: 0, absentCount: 0, approvedAbsenceCount: 0, items: []};
     else if (path === '/v2/me/progress') data = {courses: []};
@@ -84,4 +85,44 @@ for (const path of ['/post', '/post/1', '/create/assignment']) test(`legacy ${pa
   await expect(page.getByRole('heading', {name: /My courses/i})).toBeVisible();
   await expect(page.getByText('What is Programming?', {exact: true})).toHaveCount(0);
   await expect(page.getByRole('button', {name: 'New Post'})).toHaveCount(0);
+});
+
+test('tenant header resolves its own directory name without calling a teaching profile', async ({page}) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('user', JSON.stringify({id: 901, userId: 901, email: 'admin@example.test', name: '', role: 'TENANT_ADMIN', level: 'NOT_APPLICABLE', accessToken: 'isolated-readiness-fixture'}));
+    localStorage.setItem('accToken', 'isolated-readiness-fixture');
+  });
+  const forbiddenReads: string[] = [];
+  await page.route('**/v2/**', route => {
+    const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
+    if (path === '/v2/me/profile') forbiddenReads.push(path);
+    const data = path === '/v2/tenant/users/901' ? {id: 901, firstName: 'Morgan', middleName: 'J', lastName: 'Lee'} : [];
+    return route.fulfill({json: success(data)});
+  });
+  await page.goto('/mock-exams');
+  await expect(page.getByRole('banner').getByText('Morgan J Lee', {exact: true})).toBeVisible();
+  expect(forbiddenReads).toEqual([]);
+});
+
+test('mock assignment includes later cohort pages, structured names, and missing-paper guidance', async ({page}, info) => {
+  await student(page, 'ADVISOR');
+  const pages: string[] = [];
+  await page.route('**/v2/advisor/students?*', route => {
+    const pageNumber = new URL(route.request().url()).searchParams.get('page')!;
+    pages.push(pageNumber);
+    const item = pageNumber === '0'
+      ? {studentUserId: 301, firstName: 'Avery', lastName: 'Wong', email: 'avery@example.test'}
+      : {studentUserId: 302, firstName: 'Kai', middleName: 'J', lastName: 'Tan', email: 'kai@example.test'};
+    return route.fulfill({json: success({items: [item], total: 2, page: Number(pageNumber), size: 1})});
+  });
+  await page.goto('/mock-exams');
+  await expect(page.getByRole('option', {name: 'Kai J Tan · kai@example.test'})).toBeAttached();
+  await page.getByRole('combobox', {name: 'Select student'}).selectOption('302');
+  expect(pages).toEqual(['0', '1']);
+  await expect(page.getByText(/No published papers are available/)).toBeVisible();
+  for (const width of [390, 1440]) {
+    await page.setViewportSize({width, height: 960});
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(width);
+    await page.screenshot({path: info.outputPath(`advisor-assignment-${width}.png`), fullPage: true});
+  }
 });

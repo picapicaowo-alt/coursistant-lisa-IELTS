@@ -10,6 +10,7 @@ import {type ParentLearningTab} from '@/configs/parentNavigation';
 import {ParentCourseList} from './ParentCourseList';
 import {ParentStudyPlan} from './ParentStudyPlan';
 import {ParentLearningProfile} from './ParentLearningProfile';
+import {ParentAssignments} from './ParentAssignments';
 
 const LEARNING_SECTIONS = [
   {
@@ -110,7 +111,7 @@ export function ParentAcademicSections({
                   Retry
                 </button>
               </div>
-            ) : key === 'courses' ? <ParentCourseList value={result.data}/> : (
+            ) : key === 'courses' ? <ParentCourseList value={result.data}/> : key === 'assignments' ? <ParentAssignments value={result.data}/> : (
               <RecordSummaryList
                 value={result.data}
                 emptyMessage="No updates are available yet."

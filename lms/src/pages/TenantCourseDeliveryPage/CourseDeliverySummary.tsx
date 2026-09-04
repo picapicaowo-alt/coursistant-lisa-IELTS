@@ -1,3 +1,4 @@
+import {formatInstructorName} from '@/utils/personName';
 import {ArrowRight, FileText} from 'lucide-react';
 import type {CourseResponse, CourseSession} from '@/apis';
 import {COURSE_SESSION_DAYS} from '@/configs/courseSessions';
@@ -25,7 +26,7 @@ export function CourseDeliverySummary({course, sessions, sessionsPending, onView
     </section>
     <section className={styles.panel} aria-labelledby="teaching-workspace-title">
       <header className={styles.panelHeader}><h2 id="teaching-workspace-title">Teaching workspace</h2><span className={styles.mutedMeta}>Instructor managed</span></header>
-      <div className={styles.handoffRow}><span className={styles.fileIcon}><FileText size={19} aria-hidden="true" /></span><span><strong>Materials and assessments</strong><small>{course?.primaryInstructor?.name || course?.primaryInstructor?.email || 'The assigned instructor'} manages teaching content in the existing course workspace.</small></span></div>
+      <div className={styles.handoffRow}><span className={styles.fileIcon}><FileText size={19} aria-hidden="true" /></span><span><strong>Materials and assessments</strong><small>{formatInstructorName(course?.primaryInstructor, course?.primaryInstructor?.email || 'The assigned instructor')} manages teaching content in the existing course workspace.</small></span></div>
     </section>
   </>;
 }

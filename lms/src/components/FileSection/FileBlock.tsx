@@ -2,7 +2,7 @@ import React from 'react';
 import {useTranslation} from 'react-i18next';
 import styles from './FileBlock.module.scss';
 import {FileView} from "@/types";
-import {getFileIcon} from "@/utils/file-utils";
+import {formatFileSize, getFileIcon} from "@/utils/file-utils";
 
 /**
  * FileBlock Component
@@ -25,19 +25,9 @@ export const FileBlock: React.FC<FileBlockProps> = ({
   const [deleteError, setDeleteError] = React.useState<string | null>(null);
   
   const ext = block.filename?.split('.').pop()?.toUpperCase() || '';
-  const fileSize = `${(block.fileSize / 1024).toFixed(1)} MB`;
+  const fileSize = formatFileSize(block.fileSize);
   const isUploading = block.uploadStatus === 'uploading';
   const isError = block.uploadStatus === 'error';
-  
-  const handleFileOpen = () => {
-    if (!isUploading && !isError) {
-      
-    }
-  };
-  
-  const handleRetry = () => {
-    
-  };
   
   const handleDelete = async () => {
     if (!onDelete || isDeleting) return;
@@ -55,7 +45,6 @@ export const FileBlock: React.FC<FileBlockProps> = ({
   return (
     <div
       className={`${styles.fileBlock} ${isUploading ? styles.uploading : ''} ${isError ? styles.error : ''}`}
-      onClick={handleFileOpen}
     >
       <img
         src={getFileIcon(ext)}
@@ -91,25 +80,7 @@ export const FileBlock: React.FC<FileBlockProps> = ({
         )}
       </div>
       <div className={styles.fileActions}>
-        {isError && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRetry();
-            }}
-            className={styles.retryButton}
-            title={t("blockEditor.retryUploadTitle") || "Retry"}
-          >
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-              />
-            </svg>
-          </button>
-        )}
+        {isError && !disabled ? <span className={styles.errorMessage}>Choose the file again to retry.</span> : null}
         {!disabled && onDelete &&
           <button
             type="button"

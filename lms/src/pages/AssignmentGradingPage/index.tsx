@@ -9,6 +9,7 @@ import {useCourseAccess} from '@/hooks/useCourseAccess';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {saveBlob} from '@/utils/downloadBlob';
 import {formatUtcTimestamp} from '@/utils/datetime';
+import {formatPersonName} from '@/utils/personName';
 import {StudentSubmissionHistory} from '@/pages/AssignmentDetailPage/StudentSubmissionHistory';
 import {RichTextEditor} from '@/components/RichTextEditor';
 import {buildGradeSelection, rosterRowKey} from './gradeSelection';
@@ -21,7 +22,11 @@ const parseId = (value?: string) => {
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
 };
 
-const getDisplayName = (row: GradingRosterItem) => row.groupName || row.studentName || 'Unknown learner';
+const getDisplayName = (row: GradingRosterItem) => row.groupName || formatPersonName({
+  firstName: row.studentFirstName,
+  middleName: row.studentMiddleName,
+  lastName: row.studentLastName,
+}, row.studentName || 'Unknown learner');
 const getDisplayEmail = (row: GradingRosterItem) => row.groupId
   ? `${row.memberCount ?? 0} group member(s)`
   : row.studentEmail || 'No email available';
@@ -352,7 +357,7 @@ const AssignmentGradingPage = () => {
     return roster.filter(row => {
       const graded = row.gradeStatus !== 'Ungraded';
       const matchesFilter = filter === 'All' || (filter === 'Graded' ? graded : !graded);
-      const matchesSearch = !needle || [row.studentName, row.studentEmail, row.groupName]
+      const matchesSearch = !needle || [getDisplayName(row), row.studentEmail]
         .some(value => value?.toLowerCase().includes(needle));
       return matchesFilter && matchesSearch;
     });

@@ -509,3 +509,19 @@ test("Unconfirmed new overview cannot repeat creation through Enter", async ({
     ),
   ).toHaveLength(1);
 });
+
+test('configured delivery keeps instructor week authoring independent of course administration', async ({page}) => {
+  const {writes} = await weeksFixture(page, 0);
+  await page.route('**/v2/me/courses?*', route => route.fulfill({json: reply({items: [{...course, launchState: 'READY'}], total: 1, page: 0, size: 100})}));
+  await page.goto('/course/71');
+  await expect(page.getByRole('button', {name: 'Edit course', exact: true})).toHaveCount(0);
+  await page.getByRole('button', {name: 'Add week', exact: true}).click();
+  await page.getByLabel('Week title').fill('Configured course teaching week');
+  await page.getByLabel('Overview (optional)').fill('Persist the instructional overview independently of delivery configuration.');
+  await page.getByRole('button', {name: 'Create week', exact: true}).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole('heading', {name: 'Configured course teaching week', exact: true})).toBeVisible();
+  await expect(page.getByText('Persist the instructional overview independently of delivery configuration.', {exact: true})).toBeVisible();
+  expect(writes.filter(item => item.method === 'POST')).toEqual([expect.objectContaining({path: '/v2/courses/71/weeks', body: {title: 'Configured course teaching week', summary: 'Persist the instructional overview independently of delivery configuration.'}})]);
+});

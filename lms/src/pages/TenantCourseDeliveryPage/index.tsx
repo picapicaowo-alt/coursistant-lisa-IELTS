@@ -1,3 +1,4 @@
+import {formatInstructorName} from '@/utils/personName';
 import {useParams, useSearchParams} from 'react-router-dom';
 import {COURSE_SESSION_DAYS} from '@/configs/courseSessions';
 import {advisingErrorMessage} from '../advising/advisingErrors';
@@ -17,7 +18,7 @@ function CourseDeliveryWorkspace({id}: {id: number}) {
   const [params, setParams] = useSearchParams();
   const requestedView = params.get('view');
   const view = DELIVERY_VIEWS.find(item => item === requestedView) ?? 'delivery';
-  const {course, config, sessions, draft, setDraft, save, transition, reload, canEdit, canReady, canPublish, canSchedule, reloadRequired, error} = useCourseDelivery(id);
+  const {course, config, sessions, draft, setDraft, save, transition, reload, canEdit, canReady, canPublish, canSchedule, canGenerateDates, reloadRequired, error} = useCourseDelivery(id);
   const setView = (next: DeliveryView) => setParams(current => {current.set('view', next); return current;});
   const primarySession = sessions.data?.[0];
   const primaryWeekday = primarySession ? COURSE_SESSION_DAYS.find(day => day.value === primarySession.dayOfWeek)?.label ?? primarySession.dayOfWeek : '';
@@ -31,7 +32,7 @@ function CourseDeliveryWorkspace({id}: {id: number}) {
         <div className={styles.identityCopy}>
           <div className={styles.headingMeta}><h1>{course.data ? `${course.data.courseCode} · ${course.data.title || course.data.name}` : `Course #${id}`}</h1>{config.isSuccess ? <span className={styles.statusBadge} data-state={config.data?.launchState}>{courseLaunchLabel(config.data?.launchState)}</span> : null}</div>
           <p>{courseDeliveryLabel(config.data?.deliveryMode)} · {config.data?.capacity == null ? 'Capacity not set' : `${config.data.capacity} seats`} · {primarySession?.timezone || 'Course timezone not set'}</p>
-          <p>{course.data ? courseTermLabel(course.data) : 'Term unavailable'} · {sessionSummary}{sessions.isSuccess ? ` · ${sessions.data.length} recurring ${sessions.data.length === 1 ? 'session' : 'sessions'}` : ''} · Instructor: {course.data?.primaryInstructor?.name || course.data?.primaryInstructor?.email || 'Not assigned'}</p>
+          <p>{course.data ? courseTermLabel(course.data) : 'Term unavailable'} · {sessionSummary}{sessions.isSuccess ? ` · ${sessions.data.length} recurring ${sessions.data.length === 1 ? 'session' : 'sessions'}` : ''} · Instructor: {formatInstructorName(course.data?.primaryInstructor, course.data?.primaryInstructor?.email || 'Not assigned')}</p>
         </div>
         <div className={styles.headerActions}>
           {config.data?.deliveryMode === 'GROUP' && config.data.launchState === 'READY' ? <button type="button" className={styles.primaryButton} onClick={() => transition.mutate('publish')} disabled={!canPublish}>Publish course</button> : null}
@@ -51,8 +52,9 @@ function CourseDeliveryWorkspace({id}: {id: number}) {
       {reloadRequired ? <div className={styles.notice} role="alert">Your input is preserved, but this course changed elsewhere. <button type="button" className={styles.ghostButton} onClick={() => void reload()}>Load latest delivery version</button></div> : null}
       {course.isPending || (course.isSuccess && config.isPending) ? <p role="status" className={styles.helper}>Loading course delivery…</p> : null}
       {course.isSuccess && config.isSuccess ? <>
+        {config.data === null ? <p className={styles.notice}>Add all recurring sessions before configuring delivery. <button type="button" className={styles.textAction} onClick={() => setView('schedule')}>Set up schedule</button></p> : config.data?.deliveryMode === 'GROUP' && view === 'schedule' ? <p className={styles.notice}>Recurring sessions are locked after delivery configuration. Dated classes can be reviewed below.</p> : null}
         {config.data?.deliveryMode === 'ONE_ON_ONE' ? <p className={styles.notice}>One-on-one delivery is managed from the student workspace. This course is read only here.</p> : null}
-        {view === 'schedule' ? <OwnerCourseSchedule courseId={id} course={course.data} readOnly={!canSchedule} /> : <div className={styles.workspace}>
+        {view === 'schedule' ? <OwnerCourseSchedule courseId={id} course={course.data} readOnly={!canSchedule} canGenerateDates={canGenerateDates} /> : <div className={styles.workspace}>
           <div className={styles.mainColumn}>
             {view === 'overview' ? <CourseDeliveryOverview course={course.data} config={config.data} sessions={sessions.isError ? undefined : sessions.data} sessionsPending={sessions.isPending} onView={setView} /> : <><CourseDeliveryForm config={config.data} draft={draft} pending={save.isPending} canEdit={canEdit} onDraft={setDraft} onSubmit={() => save.mutateAsync()} /><CourseDeliverySummary course={course.data} sessions={sessions.isError ? undefined : sessions.data} sessionsPending={sessions.isPending} onViewSchedule={() => setView('schedule')} /></>}
           </div>
