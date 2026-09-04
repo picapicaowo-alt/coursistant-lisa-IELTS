@@ -1,6 +1,6 @@
 import {useEffect, useRef, type FormEvent} from 'react';
 import {X} from 'lucide-react';
-import {StudentIntakeFormFields} from '@/components/StudentIntakeFormFields';
+import {StudentIntakeFormFields} from './index';
 import type {StudentIntakeFormValue} from '@/components/StudentIntakeFormFields/model';
 import styles from './CreateIntakeDialog.module.scss';
 

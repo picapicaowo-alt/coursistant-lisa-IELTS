@@ -232,11 +232,13 @@ test('long course data, open enrollment controls and touch targets fit a narrow 
   await page.goto('/advisor/students/301/courses');
   const card = page.locator('[data-course-card="71"]');
   await card.getByText('Manage enrollment', {exact: true}).click();
-  await expect(card.getByRole('textbox', {name: 'Reason for withdrawal'})).toBeVisible();
+  const dialog = page.getByRole('dialog', {name: 'Manage enrollment'});
+  await expect(dialog.getByRole('textbox', {name: 'Reason for withdrawal'})).toBeVisible();
+  expect(await dialog.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
   expect(await card.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
-  for (const control of [card.getByRole('button', {name: 'View Course', exact: true}), card.locator('summary')]) {
+  for (const control of [card.getByRole('button', {name: 'View Course', exact: true}), card.getByRole('button', {name: 'Manage enrollment'})]) {
     expect((await control.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   }
-  await expect(card.getByRole('button', {name: 'Withdraw', exact: true})).toBeDisabled();
+  await expect(dialog.getByRole('button', {name: 'Withdraw', exact: true})).toBeDisabled();
 });

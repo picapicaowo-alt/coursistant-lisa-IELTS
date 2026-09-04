@@ -104,6 +104,15 @@
   background: t.$modal-backdrop;
 }
 
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+
+.dialog > :not(.results) {
+  flex-shrink: 0;
+}
+
 .dialogHeader {
   display: flex;
   align-items: flex-start;
@@ -182,7 +191,8 @@
 }
 
 .results {
-  min-height: 230px;
+  flex: 1 1 230px;
+  min-height: 0;
   max-height: 330px;
   padding: .5rem 1rem;
   overflow: auto;
@@ -216,6 +226,17 @@
   font-size: .72rem;
   font-style: normal;
   font-weight: 700;
+  max-width: 10rem;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+
+.results input[type='radio'] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  padding: 0;
+  accent-color: t.$action-primary;
 }
 
 .status,
@@ -293,6 +314,6 @@ button:disabled {
 
   .row em,
   .selectedRow em {
-    display: none;
+    max-width: 6rem;
   }
 }

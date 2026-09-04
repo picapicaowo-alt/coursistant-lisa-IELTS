@@ -10,6 +10,9 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
 import {ParentLinksPanel} from '@/components/ParentLinksPanel';
 import {StudentIntakeFormFields} from '@/components/StudentIntakeFormFields';
+import {CreateIntakeDialog} from '@/components/StudentIntakeFormFields/CreateIntakeDialog';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import CounsellorIntakesPage from '../CounsellorIntakesPage';
 import {
   emptyStudentIntakeForm,
   type StudentIntakeFormValue,
@@ -97,6 +100,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
+    if (save.isPending) return;
     save.mutate();
   };
 
@@ -112,6 +116,13 @@ const CounsellorIntakeFormPage: React.FC = () => {
       </div>
     );
   }
+
+  if (isCreate) return <>
+    <CounsellorIntakesPage/>
+    <CreateIntakeDialog value={form} onChange={setForm} pending={save.isPending}
+      onSubmit={onSubmit} onClose={() => navigate(APP_ROUTE_PATHS.counsellorIntakes, {replace: true})}
+      error={save.isError ? advisingErrorMessage(save.error, 'The intake could not be saved.') : undefined}/>
+  </>;
 
   return (
     <div className={styles.page}>
