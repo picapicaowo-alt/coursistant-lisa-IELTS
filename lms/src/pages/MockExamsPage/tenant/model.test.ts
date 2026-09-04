@@ -91,7 +91,9 @@ describe('Create-only exam composition', () => {
       5,
     );
     reading.units[0].paragraphs = '{}';
-    expect(() => readingPayload(reading)).toThrow('JSON array');
+    expect(readingPayload(reading).passages[0].paragraphs).toEqual({});
+    reading.units[0].paragraphs = '{bad';
+    expect(() => readingPayload(reading)).toThrow('valid JSON');
     const writing = newDraft();
     writing.minutes = '60';
     writing.units = [newUnit(), newUnit()];
