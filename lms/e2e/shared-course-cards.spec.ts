@@ -114,6 +114,7 @@ test('course filtering, pagination, list view and details follow Student lifecyc
   await page.getByRole('button', {name: 'Completed', exact: true}).click();
   await expect.poll(() => queries.at(-1)?.get('courseView')).toBe('COMPLETED');
   await expect(page.locator('[data-course-card]')).toHaveCount(0);
+  await expect(page.getByText('You have no completed courses yet.', {exact: true})).toBeVisible();
   expect(queries.at(-1)?.get('page')).toBe('0');
   await page.getByRole('button', {name: 'Current', exact: true}).click();
   await expect(page.locator('[data-course-card="71"]')).toBeVisible();

@@ -101,7 +101,7 @@ export const CourseUnitsManager: React.FC<CourseUnitsManagerProps> = ({
               </svg>
             </div>
             <p className={styles.emptyText}>
-              {t('list.noCourses')}
+              {t('list.noCourseUnits')}
             </p>
           </div>
         )}

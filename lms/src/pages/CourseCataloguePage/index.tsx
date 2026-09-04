@@ -111,12 +111,10 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
   const courses = data.items ?? [];
   const totalPages = Math.max(1, Math.ceil((data.total ?? 0) / (data.size || PAGE_SIZE)));
 
-  // IA-06 asks every list for a designed empty state. This one is reachable:
-  // a student with no active enrolments lands here straight after signing up.
   if (courses.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <p>{t("list.noCourses")}</p>
+        <p>{t(courseView === 'COMPLETED' ? 'list.noCompletedCourses' : courseView === 'CURRENT' ? 'list.noCurrentCourses' : 'list.noCourses')}</p>
       </div>
     );
   }
