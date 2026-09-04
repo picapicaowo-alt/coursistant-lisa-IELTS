@@ -99,7 +99,9 @@ test('student dashboard fills its fluid workspace from mobile through ultra-wide
         - Number.parseFloat(pageStyle.paddingRight);
       return {
         unusedInlineSpace: available - dashboardRect.width,
-        columnCount: getComputedStyle(element).gridTemplateColumns.split(' ').filter(Boolean).length,
+        // Count visible column positions: mobile uses a vertical flex layout,
+        // whose unused grid-template value does not describe rendered geometry.
+        columnCount: new Set(Array.from(element.children, child => Math.round(child.getBoundingClientRect().left))).size,
       };
     });
 
