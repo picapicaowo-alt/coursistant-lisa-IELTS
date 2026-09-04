@@ -41,7 +41,7 @@
     border-radius: t.$radius-pill;
     background: #b42318;
     color: t.$content-on-color;
-    font-size: 0.65rem;
+    font-size: t.$font-size-caption;
     font-weight: t.$fw-bold;
     line-height: 1;
 }
@@ -81,7 +81,7 @@
     p {
         margin: 0 0 0.1rem;
         color: t.$brand;
-        font-size: 0.7rem;
+        font-size: t.$font-size-caption;
         font-weight: t.$fw-bold;
         letter-spacing: 0.08em;
         text-transform: uppercase;
@@ -126,7 +126,7 @@
     gap: 0.35rem;
     padding: 0 0.55rem;
     color: t.$brand;
-    font-size: 0.72rem;
+    font-size: t.$font-size-caption;
     font-weight: t.$fw-semibold;
 }
 
@@ -235,7 +235,7 @@
     align-items: center;
     gap: 0.35rem 0.55rem;
     color: t.$text-placeholder;
-    font-size: 0.68rem;
+    font-size: t.$font-size-caption;
 }
 
 .unavailable {
@@ -311,7 +311,7 @@
     padding: 0.65rem 1rem;
     background: rgba(t.$danger, 0.08);
     color: t.$danger;
-    font-size: 0.72rem;
+    font-size: t.$font-size-caption;
     text-align: center;
 }
 

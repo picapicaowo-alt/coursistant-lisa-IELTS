@@ -1,0 +1,42 @@
+[WebServer] (node:83643) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:83643) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+Running 26 tests using 4 workers
+
+(node:83646) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83647) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83648) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:83645) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   2 [chromium] › e2e/instructor-workspace-design.spec.ts:71:1 › Missing attendance version never produces a write (545ms)
+  ✓   1 [chromium] › e2e/instructor-workspace-design.spec.ts:5:1 › Material links with ambiguous identities remain read-only (586ms)
+  ✓   4 [chromium] › e2e/instructor-workspace-design.spec.ts:60:1 › Attendance conflicts preserve choices and disable repeat stale writes (635ms)
+  ✓   5 [chromium] › e2e/instructor-workspace-design.spec.ts:79:1 › Writing grading keeps the score and feedback workflow (457ms)
+  ✓   6 [chromium] › e2e/instructor-workspace-design.spec.ts:89:1 › Occurrence editors send course-local dates and versioned schedule actions (1.1s)
+  ✓   3 [chromium] › e2e/instructor-workspace-design.spec.ts:15:1 › Instructor course workflows preserve versions, publishing rules, and protected material actions (1.7s)
+  ✓   7 [chromium] › e2e/instructor-workspace-design.spec.ts:123:1 › Course downloads, roster search and availability retain existing API flows (1.6s)
+  ✓  11 [chromium] › e2e/operations-dialog-regressions.spec.ts:22:3 › enrollment opens a contained modal with a usable reason at 1440px (486ms)
+  ✓  12 [chromium] › e2e/operations-dialog-regressions.spec.ts:48:3 › counsellor create uses the shared intake modal at 1440px (372ms)
+  ✓  13 [chromium] › e2e/operations-dialog-regressions.spec.ts:22:3 › enrollment opens a contained modal with a usable reason at 390px (454ms)
+  ✓  14 [chromium] › e2e/operations-dialog-regressions.spec.ts:48:3 › counsellor create uses the shared intake modal at 390px (393ms)
+  ✓  15 [chromium] › e2e/operations-dialog-regressions.spec.ts:22:3 › enrollment opens a contained modal with a usable reason at 320px (422ms)
+  ✓  16 [chromium] › e2e/operations-dialog-regressions.spec.ts:48:3 › counsellor create uses the shared intake modal at 320px (381ms)
+  ✓  17 [chromium] › e2e/operations-dialog-regressions.spec.ts:70:1 › withdrawal preserves the reason and idempotency key after failure (393ms)
+  ✓  18 [chromium] › e2e/operations-dialog-regressions.spec.ts:94:1 › enrollment conflict requires an explicit reload and preserves the reason (476ms)
+  ✓  19 [chromium] › e2e/operations-dialog-regressions.spec.ts:119:1 › counsellor creation retains its API, pending lock and retry key (379ms)
+  ✓  20 [chromium] › e2e/operations-dialog-regressions.spec.ts:154:1 › owner picker keeps radio, identity and role in one row inside an owner form (757ms)
+  ✓  21 [chromium] › e2e/operations-dialog-regressions.spec.ts:182:1 › course readiness fraction remains centered within its circle (302ms)
+  ✓  22 [chromium] › e2e/uiux-consistency.spec.ts:27:1 › queue actions have separate targets; advisor identity, avatar and selection stay aligned (592ms)
+  ✓  23 [chromium] › e2e/uiux-consistency.spec.ts:57:1 › save stays on the form; the primary next step saves dirty data before navigating (503ms)
+  ✓   8 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 1600px with no horizontal overflow (8.0s)
+  ✓   9 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 1024px with no horizontal overflow (7.6s)
+  ✓  24 [chromium] › e2e/uiux-consistency.spec.ts:83:1 › instructor combobox searches, selects with keys, clears and dismisses without closing its dialog (1.1s)
+  ✓  10 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 390px with no horizontal overflow (7.7s)
+  ✓  26 [chromium] › e2e/uiux-consistency.spec.ts:152:1 › TA permissions reuse the modal focus and small-screen behavior (265ms)
+  ✓  25 [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes (965ms)
+
+  26 passed (10.8s)

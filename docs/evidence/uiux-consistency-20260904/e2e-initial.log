@@ -1,0 +1,314 @@
+[WebServer] (node:80292) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:80292) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+Running 100 tests using 4 workers
+
+(node:80302) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80304) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80303) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:80305) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓    1 [chromium] › e2e/advisor-create-course-dialog.spec.ts:25:1 › both create entry points open a modal and return focus without moving the course list (1.9s)
+  ✓    4 [chromium] › e2e/advisor-create-course-dialog.spec.ts:62:3 › create course modal reflows and keeps every control reachable at 768px (2.2s)
+  ✓    2 [chromium] › e2e/advisor-create-course-dialog.spec.ts:62:3 › create course modal reflows and keeps every control reachable at 1440px (2.3s)
+  ✓    3 [chromium] › e2e/advisor-create-course-dialog.spec.ts:62:3 › create course modal reflows and keeps every control reachable at 390px (2.7s)
+  ✓    5 [chromium] › e2e/advisor-create-course-dialog.spec.ts:62:3 › create course modal reflows and keeps every control reachable at 320px (1.2s)
+  ✓    8 [chromium] › e2e/advisor-student-figma.spec.ts:12:1 › advisor student list keeps the Figma hierarchy across desktop and mobile (429ms)
+  ✓    7 [chromium] › e2e/advisor-create-course-dialog.spec.ts:133:1 › date-order validation remains active inside the modal (1.0s)
+  ✓    6 [chromium] › e2e/advisor-create-course-dialog.spec.ts:94:1 › pending creation blocks dismissal and retries preserve the payload and idempotency key (1.3s)
+  ✓   11 [chromium] › e2e/advisor-student-figma.spec.ts:133:1 › a malformed course page cannot crash the course chooser (784ms)
+  ✓   12 [chromium] › e2e/advisor-student-figma.spec.ts:144:1 › advisor exam cards and assignment dialog use the supported exam contract (979ms)
+  ✓   10 [chromium] › e2e/advisor-student-figma.spec.ts:108:1 › course search distinguishes an empty response from failure and can retry (1.6s)
+  ✓    9 [chromium] › e2e/advisor-student-figma.spec.ts:33:1 › add course loads the first 20 options and course cards expose returned schedules (1.6s)
+  ✓   13 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › student shares the design scale and fits responsive widths (963ms)
+  ✓   14 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › advisor shares the design scale and fits responsive widths (1.1s)
+  ✓   17 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › counsellor shares the design scale and fits responsive widths (1.2s)
+  ✓   15 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › instructor shares the design scale and fits responsive widths (1.5s)
+  ✓   16 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › combined-instructor-advisor shares the design scale and fits responsive widths (1.6s)
+  ✓   18 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › parent shares the design scale and fits responsive widths (940ms)
+  ✓   20 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › system-admin shares the design scale and fits responsive widths (1.0s)
+  ✓   22 [chromium] › e2e/all-role-responsive.spec.ts:84:1 › student list filters still use the contract and opens the registered student route (619ms)
+  ✓   21 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › student-exams shares the design scale and fits responsive widths (1.1s)
+  ✓   19 [chromium] › e2e/all-role-responsive.spec.ts:55:3 › tenant-admin shares the design scale and fits responsive widths (1.6s)
+  ✓   23 [chromium] › e2e/all-role-responsive.spec.ts:95:1 › exam filters use supplied sections and states (1.2s)
+  ✓   24 [chromium] › e2e/all-role-responsive.spec.ts:105:1 › advisor support cards align with the student summary and show primary content without disclosure (1.4s)
+  ✓   25 [chromium] › e2e/counsellor-dashboard.spec.ts:55:1 › counsellor workspace selects records and paginates using only existing reads (1.7s)
+  ✓   27 [chromium] › e2e/counsellor-dashboard.spec.ts:128:1 › small-screen help and parent-link failures keep actions visible (931ms)
+  ✓   28 [chromium] › e2e/counsellor-dashboard.spec.ts:148:1 › empty unassigned queue offers creation without reconstructing assigned students (630ms)
+  ✓   26 [chromium] › e2e/counsellor-dashboard.spec.ts:80:1 › all operational panels and controls fit the available viewport without scrolling (1.9s)
+  ✓   29 [chromium] › e2e/instructor-workspace-design.spec.ts:5:1 › Material links with ambiguous identities remain read-only (664ms)
+  ✓   32 [chromium] › e2e/instructor-workspace-design.spec.ts:71:1 › Missing attendance version never produces a write (603ms)
+  ✓   33 [chromium] › e2e/instructor-workspace-design.spec.ts:79:1 › Writing grading keeps the score and feedback workflow (663ms)
+  ✓   31 [chromium] › e2e/instructor-workspace-design.spec.ts:60:1 › Attendance conflicts preserve choices and disable repeat stale writes (1.3s)
+  ✓   34 [chromium] › e2e/instructor-workspace-design.spec.ts:89:1 › Occurrence editors send course-local dates and versioned schedule actions (1.2s)
+  ✓   30 [chromium] › e2e/instructor-workspace-design.spec.ts:15:1 › Instructor course workflows preserve versions, publishing rules, and protected material actions (2.6s)
+  ✓   35 [chromium] › e2e/instructor-workspace-design.spec.ts:123:1 › Course downloads, roster search and availability retain existing API flows (2.2s)
+  ✓   39 [chromium] › e2e/mock-exam-authoring.spec.ts:157:3 › long multilingual content remains usable at 320px (1.2s)
+  ✓   40 [chromium] › e2e/mock-exam-authoring.spec.ts:157:3 › long multilingual content remains usable at 768px (648ms)
+  ✓   36 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 1600px with no horizontal overflow (9.9s)
+  ✓   37 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 1024px with no horizontal overflow (9.5s)
+  ✓   38 [chromium] › e2e/instructor-workspace-design.spec.ts:149:3 › Instructor surfaces align at 390px with no horizontal overflow (9.4s)
+  ✘   41 [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px (7.2s)
+(node:80424) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   45 [chromium] › e2e/mock-exam-authoring.spec.ts:381:3 › complete Reading file import previews and posts once at 1440px (1.2s)
+  ✓   46 [chromium] › e2e/mock-exam-authoring.spec.ts:381:3 › complete Reading file import previews and posts once at 768px (1.0s)
+  ✓   47 [chromium] › e2e/mock-exam-authoring.spec.ts:381:3 › complete Reading file import previews and posts once at 390px (1.2s)
+  ✘   42 [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px (6.5s)
+  ✘   43 [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px (6.4s)
+(node:80480) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   48 [chromium] › e2e/mock-exam-authoring.spec.ts:381:3 › complete Reading file import previews and posts once at 320px (1.3s)
+(node:80485) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘   44 [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px (6.8s)
+  ✓   49 [chromium] › e2e/mock-exam-authoring.spec.ts:591:1 › Reading paste import protects existing work and rejects invalid media references (1.1s)
+(node:80506) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   50 [chromium] › e2e/mock-exam-authoring.spec.ts:489:3 › Reading import modal preserves input and keyboard focus at 1440px (1.3s)
+  ✓   51 [chromium] › e2e/mock-exam-authoring.spec.ts:489:3 › Reading import modal preserves input and keyboard focus at 390px (1.4s)
+  ✓   54 [chromium] › e2e/mock-exam-authoring.spec.ts:732:1 › review finds hidden-part errors and changing a type never silently clears content (853ms)
+  ✓   55 [chromium] › e2e/mock-exam-authoring.spec.ts:763:1 › official answers reject invalid input and save equivalent alternatives through retry (1.9s)
+  ✓   56 [chromium] › e2e/operations-dialog-regressions.spec.ts:22:3 › enrollment opens a contained modal with a usable reason at 1440px (1.6s)
+  ✓   58 [chromium] › e2e/operations-dialog-regressions.spec.ts:48:3 › counsellor create uses the shared intake modal at 1440px (1.2s)
+  ✓   52 [chromium] › e2e/mock-exam-authoring.spec.ts:699:1 › discard confirms its scope, preserves another section and does not delete uploaded media (4.5s)
+  ✓   57 [chromium] › e2e/operations-dialog-regressions.spec.ts:22:3 › enrollment opens a contained modal with a usable reason at 390px (1.4s)
+  ✓   53 [chromium] › e2e/mock-exam-authoring.spec.ts:643:1 › reading and writing use text fields and retain drafts across section navigation (3.9s)
+  ✓   59 [chromium] › e2e/operations-dialog-regressions.spec.ts:48:3 › counsellor create uses the shared intake modal at 390px (968ms)
+  ✓   61 [chromium] › e2e/operations-dialog-regressions.spec.ts:48:3 › counsellor create uses the shared intake modal at 320px (1.4s)
+  ✓   60 [chromium] › e2e/operations-dialog-regressions.spec.ts:22:3 › enrollment opens a contained modal with a usable reason at 320px (1.8s)
+  ✓   62 [chromium] › e2e/operations-dialog-regressions.spec.ts:70:1 › withdrawal preserves the reason and idempotency key after failure (1.7s)
+  ✓   63 [chromium] › e2e/operations-dialog-regressions.spec.ts:94:1 › enrollment conflict requires an explicit reload and preserves the reason (1.7s)
+  ✓   64 [chromium] › e2e/operations-dialog-regressions.spec.ts:119:1 › counsellor creation retains its API, pending lock and retry key (1.1s)
+  ✓   66 [chromium] › e2e/operations-dialog-regressions.spec.ts:182:1 › course readiness fraction remains centered within its circle (696ms)
+  ✓   65 [chromium] › e2e/operations-dialog-regressions.spec.ts:154:1 › owner picker keeps radio, identity and role in one row inside an owner form (2.2s)
+  ✓   69 [chromium] › e2e/parent-navigation.spec.ts:109:1 › a schedule change uses the selected student and preserves contracted wall-clock values (1.6s)
+  ✓   67 [chromium] › e2e/parent-navigation.spec.ts:41:1 › Parent areas and focused subviews keep student context across navigation and history (2.0s)
+  ✓   71 [chromium] › e2e/quiz-grading.spec.ts:11:1 › teacher reviews quiz results and uses explicit bulk selection (1.1s)
+  ✓   72 [chromium] › e2e/responsive-layout.spec.ts:70:1 › student dashboard fills its fluid workspace from mobile through ultra-wide viewports (1.1s)
+  ✓   70 [chromium] › e2e/parent-pagination.spec.ts:4:1 › parent cursor messages and paginated notifications remain usable after switching sections (1.6s)
+  ✓   75 [chromium] › e2e/role-interactions.spec.ts:52:1 › student can enter both learning products but not advisor operations (1.9s)
+  ✓   76 [chromium] › e2e/role-interactions.spec.ts:87:1 › dashboard quick prompt hands structured context to Study Support (1.3s)
+  ✓   73 [chromium] › e2e/responsive-layout.spec.ts:112:1 › shared shell keeps every role navigation label readable on desktop (5.8s)
+  ✓   77 [chromium] › e2e/role-interactions.spec.ts:123:1 › instructor dashboard uses teaching data and availability edits preserve every record (3.2s)
+  ✘   74 [chromium] › e2e/rich-text-formatting.spec.ts:11:1 › teacher can remove bold formatting and a newly selected annotated file (6.5s)
+  ✓   78 [chromium] › e2e/role-interactions.spec.ts:211:1 › advisor can assign a published mock exam and cannot enter Vocabulary (2.0s)
+(node:80604) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   80 [chromium] › e2e/role-interactions.spec.ts:330:1 › non-student roles remain outside Vocabulary and parent stays outside standalone mock exams (993ms)
+  ✓   82 [chromium] › e2e/role-interactions.spec.ts:340:1 › counsellor dashboard keeps count help contextual and the create form marks contract requirements (1.2s)
+  ✓   79 [chromium] › e2e/role-interactions.spec.ts:262:1 › advisor profile and study-plan editors explain record semantics and progressively disclose detail (3.8s)
+  ✓   81 [chromium] › e2e/role-interactions.spec.ts:313:1 › student advising view presents profile, plan, and tasks with scannable hierarchy (1.3s)
+  ✓   68 [chromium] › e2e/parent-navigation.spec.ts:70:1 › Parent navigation and content fit desktop, tablet and mobile (13.6s)
+  ✓   85 [chromium] › e2e/role-interactions.spec.ts:539:1 › tenant admin never sees or requests the system course catalogue (1.1s)
+  ✓   84 [chromium] › e2e/role-interactions.spec.ts:501:1 › tenant intake rows, filters, management panel, and advisor dialog stay aligned and actionable (1.3s)
+  ✓   83 [chromium] › e2e/role-interactions.spec.ts:361:1 › counsellor completes intake, parent link, edit, and first advisor handover as one workflow (1.8s)
+  ✓   88 [chromium] › e2e/role-interactions.spec.ts:717:1 › creating a mock-exam draft opens the new version builder immediately (1.1s)
+  ✓   87 [chromium] › e2e/role-interactions.spec.ts:654:1 › tenant admin reviews protected mock-exam media and publishes only after three-section preflight (1.3s)
+  ✓   89 [chromium] › e2e/teaching-grading-link.spec.ts:4:1 › Week 1 grading queue opens the registered grading page despite an incompatible backend link (924ms)
+  ✓   86 [chromium] › e2e/role-interactions.spec.ts:564:1 › tenant admin can complete governance work using only the handoff routes (2.9s)
+  ✓   91 [chromium] › e2e/uiux-consistency.spec.ts:27:1 › queue actions have separate targets; advisor identity, avatar and selection stay aligned (1.5s)
+  ✓   92 [chromium] › e2e/uiux-consistency.spec.ts:57:1 › save stays on the form; the primary next step saves dirty data before navigating (1.3s)
+  ✓   90 [chromium] › e2e/teaching-grading-link.spec.ts:36:1 › Advisor reads paginated conversations and searches instructors through Advisor APIs (1.7s)
+  ✓   96 [chromium] › e2e/vocabulary.spec.ts:115:1 › library remains usable without horizontal overflow on mobile (603ms)
+  ✓   93 [chromium] › e2e/uiux-consistency.spec.ts:83:1 › instructor combobox searches, selects with keys, clears and dismisses without closing its dialog (1.7s)
+  ✓   97 [chromium] › e2e/vocabulary.spec.ts:128:1 › resumes a paused session from the library before opening its cards (538ms)
+  ✓   98 [chromium] › e2e/vocabulary.spec.ts:160:1 › test mode requires reveal before rating and hides the LMS shell (697ms)
+  ✓   99 [chromium] › e2e/vocabulary.spec.ts:183:1 › offers recovery when a card action discovers that the session is paused (614ms)
+  ✓  100 [chromium] › e2e/vocabulary.spec.ts:209:1 › identifies and ends the session blocking a different mode (587ms)
+  ✘   95 [chromium] › e2e/uiux-consistency.spec.ts:150:1 › TA permissions reuse the modal focus and small-screen behavior (5.7s)
+  ✘   94 [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes (30.0s)
+
+
+  1) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "The section could not be created. Your draft is preserved."
+    Received string:    "Synthetic save failure; retry the same draft."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_inlineError_9n1oy_474">Synthetic save failure; retry the same draft.</p>
+           - unexpected value "Synthetic save failure; retry the same draft."
+
+
+      336 |       .getByRole('button', {name: 'Confirm and create section'})
+      337 |       .click();
+    > 338 |     await expect(page.getByRole('alert')).toContainText(
+          |                                           ^
+      339 |       'The section could not be created. Your draft is preserved.',
+      340 |     );
+      341 |     await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/mock-exam-authoring.spec.ts:338:43
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/mock-exam-authoring-guided-2dbed--review-and-retry-at-1752px-chromium/error-context.md
+
+  2) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "The section could not be created. Your draft is preserved."
+    Received string:    "Synthetic save failure; retry the same draft."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_inlineError_9n1oy_474">Synthetic save failure; retry the same draft.</p>
+           - unexpected value "Synthetic save failure; retry the same draft."
+
+
+      336 |       .getByRole('button', {name: 'Confirm and create section'})
+      337 |       .click();
+    > 338 |     await expect(page.getByRole('alert')).toContainText(
+          |                                           ^
+      339 |       'The section could not be created. Your draft is preserved.',
+      340 |     );
+      341 |     await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/mock-exam-authoring.spec.ts:338:43
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/mock-exam-authoring-guided-11d3b--review-and-retry-at-1440px-chromium/error-context.md
+
+  3) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "The section could not be created. Your draft is preserved."
+    Received string:    "Synthetic save failure; retry the same draft."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_inlineError_9n1oy_474">Synthetic save failure; retry the same draft.</p>
+           - unexpected value "Synthetic save failure; retry the same draft."
+
+
+      336 |       .getByRole('button', {name: 'Confirm and create section'})
+      337 |       .click();
+    > 338 |     await expect(page.getByRole('alert')).toContainText(
+          |                                           ^
+      339 |       'The section could not be created. Your draft is preserved.',
+      340 |     );
+      341 |     await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/mock-exam-authoring.spec.ts:338:43
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/mock-exam-authoring-guided-dab9d--review-and-retry-at-1024px-chromium/error-context.md
+
+  4) [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px 
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('alert')
+    Expected substring: "The section could not be created. Your draft is preserved."
+    Received string:    "Synthetic save failure; retry the same draft."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_inlineError_9n1oy_474">Synthetic save failure; retry the same draft.</p>
+           - unexpected value "Synthetic save failure; retry the same draft."
+
+
+      336 |       .getByRole('button', {name: 'Confirm and create section'})
+      337 |       .click();
+    > 338 |     await expect(page.getByRole('alert')).toContainText(
+          |                                           ^
+      339 |       'The section could not be created. Your draft is preserved.',
+      340 |     );
+      341 |     await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/mock-exam-authoring.spec.ts:338:43
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/mock-exam-authoring-guided-d609a-w-review-and-retry-at-390px-chromium/error-context.md
+
+  5) [chromium] › e2e/rich-text-formatting.spec.ts:11:1 › teacher can remove bold formatting and a newly selected annotated file 
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('dialog', { name: 'Eden Brooks' }).getByRole('button', { name: 'Save grade' })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" with timeout 5000ms
+      - waiting for getByRole('dialog', { name: 'Eden Brooks' }).getByRole('button', { name: 'Save grade' })
+        14 × locator resolved to <button type="submit" class="_primaryButton_2en1f_70">Save grade</button>
+           - unexpected value "inactive"
+
+
+      112 |   await dialog.getByRole('button', {name: 'Close dialog'}).focus();
+      113 |   await page.keyboard.press('Shift+Tab');
+    > 114 |   await expect(dialog.getByRole('button', {name: 'Save grade'})).toBeFocused();
+          |                                                                  ^
+      115 |   await page.keyboard.press('Escape');
+      116 |   await expect(dialog).toHaveCount(0);
+      117 |   await expect(page.getByRole('button', {name: 'Grade Eden Brooks'})).toBeFocused();
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/rich-text-formatting.spec.ts:114:66
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/rich-text-formatting-teach-80fb9-wly-selected-annotated-file-chromium/error-context.md
+
+  6) [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: page.waitForResponse: Test timeout of 30000ms exceeded.
+
+      135 |   await expect(dialog.getByRole('option', {name: /Sophie Grant/})).toBeVisible();
+      136 |   await dialog.getByRole('navigation', {name: 'Instructor pages'}).getByRole('button', {name: 'Next'}).click();
+    > 137 |   const resetQuery = page.waitForResponse(response => response.url().includes('/advisor/instructors?') && !new URL(response.url()).searchParams.has('q'));
+          |                           ^
+      138 |   await dialog.getByRole('option', {name: /Jordan Lee/}).click();
+      139 |   await resetQuery;
+      140 |   await expect(input).toHaveValue('Jordan Lee');
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/uiux-consistency.spec.ts:137:27
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/uiux-consistency-instructo-9ca60-entity-across-query-changes-chromium/error-context.md
+
+  7) [chromium] › e2e/uiux-consistency.spec.ts:150:1 › TA permissions reuse the modal focus and small-screen behavior 
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('dialog', { name: 'TA permissions' }).getByRole('button', { name: 'Save permissions' })
+    Expected: focused
+    Received: inactive
+    Timeout:  5000ms
+
+    Call log:
+      - Expect "toBeFocused" with timeout 5000ms
+      - waiting for getByRole('dialog', { name: 'TA permissions' }).getByRole('button', { name: 'Save permissions' })
+        14 × locator resolved to <button type="button" class="_primary_303el_45">Save permissions</button>
+           - unexpected value "inactive"
+
+
+      158 |   await close.focus();
+      159 |   await close.press('Shift+Tab');
+    > 160 |   await expect(dialog.getByRole('button', {name: 'Save permissions'})).toBeFocused();
+          |                                                                        ^
+      161 |   await page.setViewportSize({width: 320, height: 568});
+      162 |   await dialog.getByRole('button', {name: 'Save permissions'}).scrollIntoViewIfNeeded();
+      163 |   await expect(dialog.getByRole('button', {name: 'Save permissions'})).toBeInViewport();
+        at /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms/e2e/uiux-consistency.spec.ts:160:72
+
+    Error Context: ../../../../../../tmp/coursistant-uiux-verified-results/uiux-consistency-TA-permis-5ee5f-s-and-small-screen-behavior-chromium/error-context.md
+
+  7 failed
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1752px 
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1440px 
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 1024px 
+    [chromium] › e2e/mock-exam-authoring.spec.ts:194:3 › guided authoring, preview, review and retry at 390px 
+    [chromium] › e2e/rich-text-formatting.spec.ts:11:1 › teacher can remove bold formatting and a newly selected annotated file 
+    [chromium] › e2e/uiux-consistency.spec.ts:117:1 › instructor results preserve pagination, errors and the selected identity across query changes 
+    [chromium] › e2e/uiux-consistency.spec.ts:150:1 › TA permissions reuse the modal focus and small-screen behavior 
+  93 passed (1.4m)

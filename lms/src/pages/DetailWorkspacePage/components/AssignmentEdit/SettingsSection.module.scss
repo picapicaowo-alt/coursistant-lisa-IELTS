@@ -25,7 +25,7 @@
     background: white;
     border-radius: 0.5rem;
     border: 1px solid t.$border-default;
-    transition: all 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
     
     &:hover {
         border-color: t.$border-strong;
@@ -63,7 +63,7 @@
     border: 2px solid t.$border-strong;
     cursor: pointer;
     margin-top: 0.125rem;
-    transition: all 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
     
     &:checked {
         background-color: t.$action-primary;
@@ -95,7 +95,7 @@
     cursor: pointer;
     font-size: 1rem;
     color: #4a5568;
-    transition: all 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
     
     &:hover:not(:disabled) {
         background: t.$surface-subtle;

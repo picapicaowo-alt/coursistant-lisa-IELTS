@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React from "react";
 import Sidebar from "./Sidebar";
 import Header from "./Header";
@@ -9,6 +10,7 @@ import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 
 const Layout: React.FC = () => {
+  const {t} = useTranslation('common');
   const location = useLocation();
   const {user} = useRequiredAuth();
   const mainContentRef = React.useRef<HTMLElement | null>(null);
@@ -29,13 +31,14 @@ const Layout: React.FC = () => {
   
   return (
     <div className={styles.layoutContainer}>
+      <a className={styles.skipLink} href="#main-content">{t('accessibility.skipToContent')}</a>
       {showLayout && <Sidebar/>}
       <div className={`${styles.contentArea} ${showLayout ? styles.withNavigation : ''}`}>
         {showLayout && <Header/>}
         {/* Scoped to the page so a failed route keeps the shell — the user can
             still navigate somewhere else instead of facing a blank window.
             Keyed on the path so moving to another page clears the error. */}
-        <main ref={mainContentRef} className={styles.mainContent}>
+        <main id="main-content" tabIndex={-1} ref={mainContentRef} className={styles.mainContent}>
           <ErrorBoundary resetKey={location.pathname}>
             <Outlet/>
           </ErrorBoundary>

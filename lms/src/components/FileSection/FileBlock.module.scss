@@ -29,7 +29,7 @@ $spacing-xl: 1.25rem;
     padding: $spacing-md $spacing-lg;
     background-color: white;
     cursor: default;
-    transition: all 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
     
     &:hover {
         background-color: $bg-hover;
@@ -129,7 +129,7 @@ $spacing-xl: 1.25rem;
     border: none;
     padding: $spacing-xs;
     border-radius: 50%;
-    transition: all 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
     
     &:hover:not(:disabled) {
         color: color.adjust($red-medium, $lightness: -10%);
@@ -154,7 +154,7 @@ $spacing-xl: 1.25rem;
     border: none;
     padding: $spacing-xs;
     border-radius: 50%;
-    transition: all 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out, color 0.2s ease-in-out, box-shadow 0.2s ease-in-out, transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
     
     &:hover {
         color: color.adjust($blue-medium, $lightness: -10%);

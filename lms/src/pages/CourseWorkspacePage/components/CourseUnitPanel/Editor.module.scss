@@ -22,7 +22,7 @@
     border: none;
     padding: 0.5rem;
     border-radius: 0.375rem;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     
     &::placeholder {
         color: t.$content-placeholder;
@@ -47,7 +47,7 @@
     border: none;
     padding: 0.5rem;
     border-radius: 0.375rem;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     
     &::placeholder {
         color: t.$content-placeholder;
@@ -78,7 +78,7 @@
     border: 1px solid t.$border-default;
     border-radius: 0.75rem;
     resize: vertical;
-    transition: all 0.2s ease;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
     line-height: 1.5;
     
     &::placeholder {

@@ -19,7 +19,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     
     &:hover {
         background: #F1F5F9;
@@ -40,7 +40,7 @@
     cursor: pointer;
     padding: 0.5rem 0.75rem;
     border-radius: 0.75rem;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     
     &:hover {
         background: t.$surface-subtle;
@@ -87,7 +87,7 @@
     font-size: 0.875rem;
     font-weight: 500;
     color: #475569;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     
     &:hover {
         background: t.$surface-subtle;
@@ -105,7 +105,7 @@
     font-size: 0.875rem;
     font-weight: 600;
     color: white;
-    transition: all 0.3s;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s, box-shadow 0.3s, transform 0.3s, opacity 0.3s;
     
     &:hover {
         background: #4A5FD4;

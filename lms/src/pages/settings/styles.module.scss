@@ -58,7 +58,7 @@
   cursor: pointer;
   flex-shrink: 0;
   margin-top: 0.125rem;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
 
   &:hover {
     background: var(--color-background-hover);
@@ -108,6 +108,7 @@
   background: none;
   border: none;
   outline: none;
+  &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
   font-size: var(--font-size-lg);
   color: var(--color-text-primary);
   padding-bottom: var(--spacing-xs);
@@ -197,6 +198,7 @@
     background: var(--color-background);
     color: var(--color-text-primary);
     outline: none;
+  &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
     transition: border 0.2s;
     font-family: var(--font-family);
     
@@ -221,7 +223,7 @@
   gap: var(--spacing-xs);
   font-size: var(--font-size-base);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
   
   &:hover {
     background: var(--color-primary);
@@ -245,6 +247,7 @@
     background: var(--color-background);
     color: var(--color-text-primary);
     outline: none;
+  &:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
     transition: border-color 0.2s, box-shadow 0.2s;
     font-family: var(--font-family);
 

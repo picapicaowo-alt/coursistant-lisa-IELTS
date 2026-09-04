@@ -91,7 +91,8 @@
   width: min(680px, calc(100vw - 2rem));
   max-height: min(760px, calc(100dvh - 2rem));
   padding: 0;
-  overflow: hidden;
+  overflow: auto;
+  overscroll-behavior: contain;
   border: 0;
   border-radius: 16px;
   background: t.$card-bg;
@@ -193,50 +194,12 @@
 .results {
   flex: 1 1 230px;
   min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: t.$space-2;
   max-height: 330px;
   padding: .5rem 1rem;
   overflow: auto;
-}
-
-.row,
-.selectedRow {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: .8rem;
-  min-height: 62px;
-  padding: .7rem .75rem;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  cursor: pointer;
-}
-
-.row:hover {
-  background: t.$subcard-bg;
-}
-
-.selectedRow {
-  border-color: t.$border-interactive;
-  background: t.$brand-subtle;
-}
-
-.row em,
-.selectedRow em {
-  color: t.$text-muted;
-  font-size: .72rem;
-  font-style: normal;
-  font-weight: 700;
-  max-width: 10rem;
-  text-align: right;
-  overflow-wrap: anywhere;
-}
-
-.results input[type='radio'] {
-  width: 1rem;
-  height: 1rem;
-  margin: 0;
-  padding: 0;
-  accent-color: t.$action-primary;
 }
 
 .status,
@@ -312,8 +275,4 @@ button:disabled {
     padding-inline: 1rem;
   }
 
-  .row em,
-  .selectedRow em {
-    max-width: 6rem;
-  }
 }

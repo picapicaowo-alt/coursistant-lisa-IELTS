@@ -20,7 +20,7 @@ $transition-duration: 200ms;
     justify-content: center;
     text-align: center;
     cursor: pointer;
-    transition: all $transition-duration ease;
+    transition: background-color $transition-duration ease, border-color $transition-duration ease, color $transition-duration ease, box-shadow $transition-duration ease, transform $transition-duration ease, opacity $transition-duration ease;
     
     &:hover {
         border-color: $blue-300;

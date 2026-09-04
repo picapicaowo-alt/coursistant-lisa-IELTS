@@ -27,7 +27,7 @@
     padding: 0.625rem 1.5rem;
     border-radius: 0.75rem;
     border: 1px solid t.$border-default;
-    transition: all 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
     
     &:hover:not(:disabled) {
         background-color: t.$border-default;
@@ -53,7 +53,7 @@
     padding: 0.625rem 1.5rem;
     border-radius: 0.75rem;
     border: none;
-    transition: all 0.2s;
+    transition: background-color 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, transform 0.2s, opacity 0.2s;
     min-width: 100px;
     
     &:hover:not(:disabled) {

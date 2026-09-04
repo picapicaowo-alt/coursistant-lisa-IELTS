@@ -1,0 +1,15 @@
+
+> lms@0.0.0 test:run
+> vitest run
+
+(node:82933) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ RUN  v4.1.11 /Users/lisa/Documents/ChatGPT/Coursistant 教培端/lms
+
+
+ Test Files  147 passed (147)
+      Tests  697 passed (697)
+   Start at  10:19:55
+   Duration  13.81s (transform 8.04s, setup 11.43s, import 33.89s, tests 15.47s, environment 42.31s)
+

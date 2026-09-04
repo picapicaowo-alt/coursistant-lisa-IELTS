@@ -133,7 +133,7 @@
   border-radius: t.$radius-pill;
   background: t.$brand-subtle;
   color: t.$brand;
-  font-size: 0.7rem;
+  font-size: t.$font-size-caption;
   font-weight: t.$fw-semibold;
   text-transform: uppercase;
   letter-spacing: 0.06em;
