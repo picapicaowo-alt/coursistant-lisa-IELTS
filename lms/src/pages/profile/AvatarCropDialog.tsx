@@ -68,12 +68,8 @@ export function AvatarCropDialog({
           type: 'image/png',
         }),
       );
-    } catch (failure) {
-      setCropError(
-        failure instanceof Error
-          ? failure.message
-          : 'The image could not be cropped.',
-      );
+    } catch {
+      setCropError('The image could not be cropped. Try selecting it again.');
     } finally {
       setProcessing(false);
     }

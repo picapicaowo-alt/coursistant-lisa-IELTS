@@ -2,6 +2,7 @@ import type {MyCourse} from '@/apis';
 import {generatePath} from 'react-router-dom';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import type {CalendarItem} from './calendarData';
+import {calendarLocalFields} from '@/utils/datetime';
 
 /** Reuse the occurrence fields consumed by Learning operations. A recurring
  * template is not evidence that a class still takes place after rescheduling. */
@@ -30,8 +31,13 @@ export function calendarOccurrences(
     // supply the assignment, quiz and event details below the timetable.
     if (id == null) continue;
     const course = courses.find((course) => course.id === row.courseId);
-    const date = row.occurrenceDate ?? row.date;
-    const {startTime, endTime, timezone} = row;
+    const timezone = envelope?.timezone ?? row.timezone;
+    const local = typeof row.startsAtUtc === 'string' && typeof timezone === 'string'
+      ? calendarLocalFields(row.startsAtUtc, typeof row.endsAtUtc === 'string' ? row.endsAtUtc : undefined, timezone)
+      : undefined;
+    const date = local?.date ?? row.occurrenceDate ?? row.date;
+    const startTime = local?.startTime ?? row.startTime;
+    const endTime = local?.endTime ?? row.endTime;
     if (
       typeof id !== 'number' ||
       !Number.isSafeInteger(id) ||

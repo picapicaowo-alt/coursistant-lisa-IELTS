@@ -34,12 +34,12 @@ export function CourseReadinessPanel({course, sessions, config, loading, transit
     {loading ? <p role="status" className={styles.helper}><LoaderCircle size={16} aria-hidden="true" /> Loading readiness…</p> : <>
       <div className={styles.readinessSummary}>
         <span className={styles.readinessMark} data-ready={ready || undefined} aria-hidden="true">{completed}/{checks.length}</span>
-        <div><strong>{state === 'PUBLISHED' ? 'Course published' : ready ? 'Ready for publication' : 'Configuration in progress'}</strong><span>Configuration summary. The backend determines launch readiness.</span></div>
+        <div><strong>{state === 'PUBLISHED' ? 'Course published' : ready ? 'Ready for publication' : 'Configuration in progress'}</strong><span>Review the course details before publishing.</span></div>
       </div>
       <ul className={styles.checkList} aria-label="Course configuration checks">{checks.map(check => <li key={check.label} data-complete={check.complete || undefined}>{check.complete ? <Check size={12} aria-hidden="true" /> : <AlertCircle size={13} aria-hidden="true" />}<span>{check.label}</span></li>)}</ul>
       {blockers.length > 0 ? <ul className={styles.blockerList} aria-label="Readiness blockers">
         {blockers.map((blocker, index) => <li key={`${blocker.code ?? 'blocker'}-${index}`}><AlertCircle size={16} aria-hidden="true" /><span><strong>{blocker.code?.replace(/_/g, ' ') || 'Course requirement'}</strong><br />{blocker.message || 'This requirement is not complete.'}</span></li>)}
-      </ul> : <div className={styles.readyNote}><strong>Readiness blockers</strong>{!state || state === 'DRAFT' ? 'Validate the current configuration to receive the authoritative result.' : 'No blockers are currently reported by the backend.'}</div>}
+      </ul> : <div className={styles.readyNote}><strong>Readiness blockers</strong>{!state || state === 'DRAFT' ? 'Check readiness before publishing.' : 'No outstanding requirements.'}</div>}
       {config?.deliveryMode === 'GROUP' && state !== 'PUBLISHED' ? <div className={styles.readinessActions}>
         <button type="button" className={styles.secondaryButton} onClick={onReady} disabled={!canReady}>Validate again</button>
         <button type="button" className={styles.primaryButton} onClick={onPublish} disabled={!canPublish}>{transitionPending ? 'Updating…' : 'Publish course'}</button>

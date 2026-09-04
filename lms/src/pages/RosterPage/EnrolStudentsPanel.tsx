@@ -1,6 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {BatchStudentEnrollResponse} from '@/apis';
 import styles from './index.module.scss';
+import {getApiErrorMessage} from '@/utils/apiError';
 
 interface Props {
   onEnrol: (emails: string[]) => void;
@@ -39,7 +40,7 @@ export const EnrolStudentsPanel: React.FC<Props> = ({onEnrol, isPending, result,
         <div className={styles.enrolResult} role="status">
           <p>{result.successCount} added, {result.failureCount} failed.</p>
           {result.items.some(item => item.status === 'ERROR') ? (
-            <ul className={styles.enrolFailures}>{result.items.filter(item => item.status === 'ERROR').map((item, index) => <li key={`${item.userId ?? 'email'}-${index}`}>{item.errorType ?? 'Failed'}{item.message ? ` — ${item.message}` : ''}</li>)}</ul>
+            <ul className={styles.enrolFailures}>{result.items.filter(item => item.status === 'ERROR').map((item, index) => <li key={`${item.userId ?? 'email'}-${index}`}>{getApiErrorMessage(new Error(item.message ?? ''), 'This student could not be added. Please try again.')}</li>)}</ul>
           ) : null}
         </div>
       ) : null}

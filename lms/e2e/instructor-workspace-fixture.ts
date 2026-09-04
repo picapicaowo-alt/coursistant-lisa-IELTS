@@ -83,7 +83,7 @@ export async function instructorFixture(page: Page, options: {emptyMock?: boolea
     else if (path === '/v2/me/teaching/alerts') data = [{type: 'PENDING_GRADING', message: '5 assignment submissions are waiting for review.'}];
     else if (path.endsWith('/schedule-requests')) data = [];
     else if (path === '/v2/me/teaching/availability') data = {version: 1, windows: [{dayOfWeek: 'MON', startTime: '09:00:00', endTime: '17:00:00', timezone: 'America/Los_Angeles'}], exceptions: []};
-    else if (path === '/v2/instructor/mock-exams/writing-grades') data = options.emptyMock ? [] : [{id: 701, title: 'Academic Writing · Task 2', status: 'PENDING', submittedAt: '2026-09-03T10:00:00Z'}];
+    else if (path === '/v2/instructor/mock-exams/writing-grades') data = {page: 0, size: 100, total: options.emptyMock ? 0 : 1, items: options.emptyMock ? [] : [{id: 701, templateTitle: 'Academic Writing · Task 2', status: 'PENDING', submittedAt: '2026-09-03T10:00:00Z'}]};
     else if (path === '/v2/instructor/mock-exams/writing-grades/701') data = {id: 701, studentFirstName: 'Alexandra', studentLastName: 'Vance', script: 'Public libraries remain valuable spaces for learning. Their role now extends beyond access to books: they provide trusted information, quiet study areas and opportunities for community participation. Investment in these services helps residents develop the skills they need throughout their lives.'};
     else return route.fallback();
     return route.fulfill({json: reply(data)});

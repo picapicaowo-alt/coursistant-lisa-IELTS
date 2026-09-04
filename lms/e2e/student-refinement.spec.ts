@@ -46,9 +46,9 @@ test('student dashboard, learning overview, and discussion retain their referenc
   await expect(page.getByRole('region', {name: 'Advisor Tasks'}).getByText('Overdue', {exact: true})).toBeVisible();
   await expect(page.getByRole('link', {name: /Academic Writing Studio: View course/})).toBeVisible();
   await responsiveSnapshot(page, 'dashboard');
-  const assistant = page.getByRole('heading', {name: 'New Chat'});
+  await expect(page.getByRole('heading', {name: 'New Chat'})).toHaveCount(0);
   const coursesRegion = page.getByRole('region', {name: 'My courses', exact: true});
-  expect((await assistant.boundingBox())!.x).toBeLessThan((await coursesRegion.boundingBox())!.x);
+  expect((await coursesRegion.boundingBox())!.x).toBeLessThan((await page.getByRole('complementary', {name: 'Schedule and alerts'}).boundingBox())!.x);
   const card = coursesRegion.locator('article').first();
   const before = await card.boundingBox();
   await card.hover();

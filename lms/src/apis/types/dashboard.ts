@@ -46,6 +46,9 @@ export interface UpcomingActivity {
 // ---------------------------------------------------------------- Student
 
 export interface PrimaryInstructor {
+  instructorFirstName?: string | null;
+  instructorMiddleName?: string | null;
+  instructorLastName?: string | null;
   userId: number;
   name?: string;
   email?: string;
@@ -60,6 +63,11 @@ export interface PrimaryInstructor {
  * parse if the backend drops one.
  */
 export interface MyCourse {
+  launchState?: string | null;
+  lifecycleStatus?: string | null;
+  completedAt?: string | null;
+  lectureTotal?: number | null;
+  lectureCompleted?: number | null;
   id: number;
   courseId: number;
   courseCode: string;
@@ -95,6 +103,7 @@ export interface MyCoursePageResponse {
 }
 
 export interface MyCoursesParams {
+  courseView?: 'CURRENT' | 'COMPLETED';
   state?: CourseState;
   /** Negative values are treated as 0. */
   page?: number;

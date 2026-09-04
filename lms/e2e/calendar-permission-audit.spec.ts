@@ -23,6 +23,7 @@ for (const pagePath of ['/calendar', '/my-operations']) {
     if (pagePath === '/my-operations') await page.getByRole('navigation', {name: 'Operations sections'}).getByRole('button', {name: 'Calendar', exact: true}).click();
     const retry = page.getByRole('button', {name: 'Retry personal events', exact: true});
     await expect(retry).toBeVisible();
+    await expect(page.getByRole('button', {name: '+ Add event', exact: true})).toBeDisabled();
     await expect(page.getByText('Personal events could not be loaded.', {exact: false})).toBeVisible();
     expect(calls).toHaveLength(1);
     expect(calls[0].authenticated).toBe(true);

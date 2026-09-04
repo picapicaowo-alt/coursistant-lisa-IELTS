@@ -1,4 +1,4 @@
-import {ApiError} from '@/apis/types/common';
+import {ApiResponseDataError, type ApiError} from '@/apis/types/common';
 
 export const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
@@ -14,18 +14,28 @@ export const getApiErrorCode = (error: unknown): string | undefined => {
 };
 
 export const getApiErrorMessage = (error: unknown, fallback: string): string => {
+  // Transport/server diagnostics do not tell a learner or staff member what
+  // failed. Keep the original error for diagnostics; show the caller's context.
+  if (isTransportOrServerFailure(error) || error instanceof ApiResponseDataError || error instanceof TypeError || error instanceof SyntaxError) return fallback;
   if (!isApiError(error)) {
-    return error instanceof Error && error.message ? error.message : fallback;
+    return error instanceof Error ? presentErrorMessage(error.message, fallback) : fallback;
   }
   if (isRecord(error.details)) {
     if (typeof error.details.message === 'string' && error.details.message.trim()) {
-      return error.details.message;
+      return presentErrorMessage(error.details.message, fallback);
     }
     if (typeof error.details.messageEn === 'string' && error.details.messageEn.trim()) {
-      return error.details.messageEn;
+      return presentErrorMessage(error.details.messageEn, fallback);
     }
   }
-  return error.message || fallback;
+  return presentErrorMessage(error.message, fallback);
+};
+
+// Some legacy callers pass Error without the HTTP status. Recognize only
+// generic transport diagnostics; preserve useful validation and domain copy.
+const presentErrorMessage = (message: string | undefined, fallback: string): string => {
+  if (!message?.trim()) return fallback;
+  return /^(?:internal server error|network error|failed to fetch|load failed|request failed with status code \d{3})(?:[.!:]|$)/i.test(message.trim()) ? fallback : message;
 };
 
 export const isHttpStatus = (error: unknown, status: number): boolean =>

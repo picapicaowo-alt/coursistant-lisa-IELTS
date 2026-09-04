@@ -35,3 +35,13 @@ describe('Instructor teaching records', () => {
     expect(parsePost({id: 1, body: 'A question\nMore context', authorFirstName: 'Alex', authorLastName: 'Chen'})).toMatchObject({body: 'A question\nMore context', name: 'Alex Chen'});
   });
 });
+
+describe('Instructor schedule request boundary', () => {
+  it('permits only pending Instructor schedule changes, never absence or reviewed requests', async () => {
+    const {isInstructorScheduleRequestReviewable} = await import('./records');
+    expect(isInstructorScheduleRequestReviewable({requestType: 'SCHEDULE_CHANGE', status: 'PENDING_INSTRUCTOR'})).toBe(true);
+    expect(isInstructorScheduleRequestReviewable({requestType: 'ABSENCE', status: 'PENDING_INSTRUCTOR'})).toBe(false);
+    expect(isInstructorScheduleRequestReviewable({requestType: 'SCHEDULE_CHANGE', status: 'PENDING_ADVISOR'})).toBe(false);
+    expect(isInstructorScheduleRequestReviewable({})).toBe(false);
+  });
+});

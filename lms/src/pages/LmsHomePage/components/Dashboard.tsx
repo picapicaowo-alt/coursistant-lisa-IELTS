@@ -1,8 +1,7 @@
 import React, {useMemo, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {generatePath, Link, useNavigate} from 'react-router-dom';
+import {generatePath, Link} from 'react-router-dom';
 import {APP_ROUTE_PATHS, STUDENT_LEARNING_PATH} from '@/configs/routePaths';
-import {DashboardAssistant} from '@/components/DashboardAssistant';
 import {AdvisorTasksPanel} from './AdvisorTasksPanel';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
@@ -82,20 +81,6 @@ const RegionStatus: React.FC<{
     {state === 'error' && onRetry ? <button type="button" onClick={onRetry}>Retry</button> : null}
   </div>
 );
-
-const ChatPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
-  const navigate = useNavigate();
-  const openChat = (message: string) => {
-    if (message.trim()) {
-      const storedCourseId = Number(localStorage.getItem('selectedCourseId') ?? 0);
-      const courseId = Number.isFinite(storedCourseId) ? storedCourseId : 0;
-      sessionStorage.setItem('pendingChat', JSON.stringify({text: message.trim(), courseId}));
-    }
-    navigate(APP_ROUTE_PATHS.aibot);
-  };
-
-  return <DashboardAssistant audience={audience} onPrompt={openChat} className={styles.chatPanel}/>;
-};
 
 const assignmentTone = (row: AssignmentRow): string => {
   const status = row.submissionStatus?.toLowerCase() ?? '';
@@ -239,7 +224,6 @@ const AlertsPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
 
 export const Dashboard: React.FC<{audience?: DashboardAudience}> = ({audience = 'student'}) => audience === 'student' ? <StudentDashboard/> : (
   <section className={styles.dashboard} aria-label={audience === 'instructor' ? 'Teaching dashboard' : 'Student dashboard'}>
-    <ChatPanel audience={audience}/>
     <div className={styles.mainColumn}>
       <CourseWorkPanel/>
       {audience === 'instructor'

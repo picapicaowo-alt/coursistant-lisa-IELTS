@@ -77,14 +77,14 @@ test('student dashboard fills its fluid workspace from mobile through ultra-wide
     {width: 320, height: 760, columns: 1},
     {width: 390, height: 844, columns: 1},
     {width: 768, height: 1024, columns: 1},
-    {width: 1024, height: 768, columns: 2},
-    {width: 1280, height: 800, columns: 2},
-    {width: 1440, height: 900, columns: 3},
-    {width: 1710, height: 811, columns: 3},
-    {width: 1920, height: 1080, columns: 3},
-    {width: 2560, height: 1440, columns: 3},
-    {width: 3420, height: 1622, columns: 3},
-    {width: 3840, height: 2160, columns: 3},
+    {width: 1024, height: 768, columns: 1},
+    {width: 1280, height: 800, columns: 1},
+    {width: 1440, height: 900, columns: 2},
+    {width: 1710, height: 811, columns: 2},
+    {width: 1920, height: 1080, columns: 2},
+    {width: 2560, height: 1440, columns: 2},
+    {width: 3420, height: 1622, columns: 2},
+    {width: 3840, height: 2160, columns: 2},
   ];
 
   for (const viewport of viewports) {

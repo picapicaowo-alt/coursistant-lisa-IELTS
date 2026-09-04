@@ -93,12 +93,11 @@ export interface ParentReportDetail {
 }
 
 /**
- * Several Parent read operations deliberately omit a response schema in the
- * supplied OpenAPI. Keep that boundary honest instead of inventing fields.
+ * Parent read projections are narrowed by the corresponding page presenters.
  */
 export type ParentAcademicRead = unknown;
 
-/** Observed Dev pagination envelope; the supplied OpenAPI leaves this GET schema open. */
+/** ParentConversationMessageCursorPage in the September 2026 contract. */
 export interface ParentConversationMessagePage {
   items: ParentConversationMessageResponse[];
   nextBeforeId?: number | null;

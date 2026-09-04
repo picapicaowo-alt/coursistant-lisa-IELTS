@@ -14,6 +14,11 @@ describe('dated calendar records', () => {
     expect(result.items[0]).toMatchObject({kind: 'Session', startTime: '11:00', path: '/course/37/schedule'});
     expect(calendarOccurrences([occurrence], courses, '2026-09-11', '2026-09-30').items).toEqual([]);
   });
+  it('renders UTC feed sessions in the requested calendar zone across a date boundary', () => {
+    const result = calendarOccurrences({timezone: 'America/Los_Angeles', items: [{eventType: 'SESSION', occurrenceId: 91, courseId: 37, startsAtUtc: '2026-09-14T02:00:00Z', endsAtUtc: '2026-09-14T03:30:00Z', timezone: 'Asia/Singapore'}]}, courses, '2026-09-01', '2026-09-30');
+    expect(result.unavailableCount).toBe(0);
+    expect(result.items[0]).toMatchObject({date: '2026-09-13', startTime: '19:00', endTime: '20:30', timezone: 'America/Los_Angeles'});
+  });
   it('reports incomplete occurrences without filling their missing dates or timezone', () => {
     const result = calendarOccurrences([{...occurrence, timezone: null}, {...occurrence, occurrenceDate: undefined}], courses, '2026-09-01', '2026-09-30');
     expect(result).toEqual({items: [], unavailableCount: 2});

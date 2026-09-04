@@ -146,3 +146,11 @@ export const contractRecordNumber = (value: unknown, ...keys: string[]): number 
   const record = asRecord(value);
   return record ? readNumber(record, ...keys) : undefined;
 };
+
+/** New Student cursor pages own continuation; legacy array responses remain readable during cutover. */
+export function advisorConversationPage(value: unknown) {
+  const items = advisorConversationMessageViews(value);
+  const page = asRecord(value);
+  const nextBeforeId = page ? readNumber(page, 'nextBeforeId') : undefined;
+  return {items, nextBeforeId, hasMore: page?.hasMore === true};
+}

@@ -35,3 +35,12 @@ describe('Advisor view models', () => {
       .toEqual([expect.objectContaining({messageId: 4, attachments: [expect.objectContaining({attachmentId: 6, originalName: 'plan.pdf'})]})]);
   });
 });
+
+describe('student conversation cursor', () => {
+  it('uses the server continuation and respects hasMore=false', async () => {
+    const {advisorConversationPage} = await import('./advisorViewModels');
+    expect(advisorConversationPage({items: [{messageId: 9}], nextBeforeId: 7, hasMore: true})).toMatchObject({nextBeforeId: 7, hasMore: true});
+    expect(advisorConversationPage({items: [{messageId: 9}], nextBeforeId: 7, hasMore: false})).toMatchObject({hasMore: false});
+    expect(advisorConversationPage([{messageId: 9}])).toMatchObject({hasMore: false, nextBeforeId: undefined});
+  });
+});

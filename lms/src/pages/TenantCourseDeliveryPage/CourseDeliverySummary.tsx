@@ -20,7 +20,7 @@ export function CourseDeliverySummary({course, sessions, sessionsPending, onView
         <span className={styles.sessionType} data-type={primary.type}>{primary.type}</span>
         <span className={styles.scheduleSummaryCopy}><strong>Every {weekday} · {formatCourseTime(primary.startTime)} — {formatCourseTime(primary.endTime)}</strong><small>{primary.location || 'Location not provided'} · {primary.timezone || 'Timezone not provided'}</small></span>
         <span className={styles.scheduleSummaryCount}><strong>{sessions?.length ?? 0} recurring {sessions?.length === 1 ? 'slot' : 'slots'}</strong><small>{course ? courseTermLabel(course) : 'Term loading…'}</small></span>
-      </div> : <p className={styles.helper}>{sessions ? 'No recurring sessions have been added.' : 'Schedule unavailable. Retry the schedule read to continue.'}</p>}
+      </div> : <p className={styles.helper}>{sessions ? 'No recurring sessions have been added.' : 'The weekly schedule could not be loaded.'}</p>}
       <button type="button" className={styles.textAction} onClick={onViewSchedule}>View full schedule <ArrowRight size={15} aria-hidden="true" /></button>
     </section>
     <section className={styles.panel} aria-labelledby="teaching-workspace-title">

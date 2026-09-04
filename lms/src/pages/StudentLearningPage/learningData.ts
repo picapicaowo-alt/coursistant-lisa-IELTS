@@ -2,11 +2,20 @@ import {generatePath} from 'react-router-dom';
 import type {StudentProgressResponse} from '@/apis';
 import {APP_ROUTE_PATHS, STUDY_PLAN_QUERY_PARAMS} from '@/configs/routePaths';
 import {record, recordPage, optionalNumber, textValue, type OperationRecord} from '@/utils/operationRecords';
+import {calendarLocalFields} from '@/utils/datetime';
 
 export const LEARNING_PREVIEW_SIZE = 3;
 export const LEARNING_PAGE_SIZE = 10;
 export type LearningDetail = 'attendance' | 'work' | 'requests' | 'alerts' | 'course';
 export const DETAIL_LABELS: Record<LearningDetail, string> = {alerts: 'Alerts', attendance: 'Attendance', work: 'Work queue', requests: 'Schedule requests', course: 'Course details'};
+
+/** Schedule proposals use the course timezone, even when the feed uses UTC instants. */
+export function scheduleOccurrence(item: OperationRecord): OperationRecord {
+  const startsAtUtc = textValue(item, 'startsAtUtc');
+  const timezone = textValue(item, 'timezone');
+  const local = startsAtUtc && timezone ? calendarLocalFields(startsAtUtc, textValue(item, 'endsAtUtc'), timezone) : undefined;
+  return local ? {...item, ...local, occurrenceDate: local.date} : item;
+}
 
 export function assignmentSummary(progress?: StudentProgressResponse, courseId?: number) {
   const source = courseId ? progress?.courses?.find(item => item.courseId === courseId) : progress;

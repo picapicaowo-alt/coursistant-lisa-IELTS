@@ -62,7 +62,7 @@ export default function StudentLearningPage() {
     {tab === 'calendar' ? <Suspense fallback={<p role="status">Loading calendar…</p>}><CalendarPage embedded courseId={courseId}/></Suspense> : detail ? <>
       <header className={s.detailHeader}><button type="button" className={s.textButton} onClick={() => openDetail()}><ArrowLeft size={17}/> Back to overview</button><h3>{DETAIL_LABELS[detail]}</h3>{visibleCourse ? <p>{visibleCourse.title || visibleCourse.courseCode}</p> : null}</header>
       {detail === 'course' ? courseId ? <CourseLearningDetails key={courseId} courseId={courseId}/> : <LearningEmpty title="Choose a course" description="Select a course above to see hours, reports, and schedule options."/> : <WorkspaceSection title={DETAIL_LABELS[detail]} headingLevel={4} appearance="record">
-        <LearningQueryState query={detailQuery}/>
+        <LearningQueryState query={detailQuery} errorMessage={`${DETAIL_LABELS[detail]} could not be loaded.`}/>
         {detailQuery.isSuccess ? <><OperationRows kind={detail} items={detailPage}/><TeachingPagination label={DETAIL_LABELS[detail]} page={page} size={LEARNING_PAGE_SIZE} total={detailItems.length} count={detailPage.length} onChange={setPage}/></> : null}
       </WorkspaceSection>}
     </> : <div className={s.overview}>
@@ -76,7 +76,7 @@ export default function StudentLearningPage() {
         </> : null}
       </WorkspaceSection>
       <WorkspaceSection title="Alerts" summary="Your learning reminders" appearance="record" className={s.alertsPanel} meta={alerts.isSuccess ? <LearningBadge label={`${alerts.data.length} active`}/> : undefined}>
-        <LearningQueryState query={alerts}/>
+        <LearningQueryState query={alerts} errorMessage="Alerts could not be loaded."/>
         {alerts.isSuccess && !alerts.data.length ? <LearningEmpty icon={Bell} title="No active alerts." description="New learning reminders will appear here."/> : null}
         {alerts.isSuccess ? <div className={s.alerts}>{alerts.data.slice(0, LEARNING_PREVIEW_SIZE).map((item, index) => <article key={optionalNumber(item, 'id') ?? index}><Bell size={18}/><div><strong>{textValue(item, 'title', 'message', 'type') || 'Learning update'}</strong>{textValue(item, 'createdAt') ? <small>{learningDate(textValue(item, 'createdAt'))}</small> : null}</div></article>)}</div> : null}
         {alerts.isSuccess && alerts.data.length > LEARNING_PREVIEW_SIZE ? detailButton('alerts') : null}

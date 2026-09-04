@@ -200,8 +200,7 @@ export function PersonalEventEditor({
           ) : null}
           {current && current.version == null ? (
             <p role="alert">
-              The event has no current version. Refresh it before saving
-              changes.
+              Reopen this event to load the latest details before saving changes.
             </p>
           ) : null}
         </fieldset>

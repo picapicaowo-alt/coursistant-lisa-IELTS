@@ -1,6 +1,7 @@
 import React, {useRef, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {ApiError, SyllabusState, unwrapData} from '@/apis';
+import {SyllabusState, unwrapData} from '@/apis';
+import {getApiErrorMessage} from '@/utils/apiError';
 import {courseApiService} from '@/apis/services/course-api';
 import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/downloadBlob';
 import styles from './CourseDetailView/index.module.scss';
@@ -47,8 +48,7 @@ export const SyllabusCard: React.FC<SyllabusCardProps> = ({courseId, canManage})
   const posted = syllabusQuery.data?.posted ? syllabusQuery.data : null;
   const failedWrite = [upload, restore, clear].find(mutation => mutation.isError);
   const failure = fileError ?? (failedWrite
-    ? (((failedWrite.error as unknown) as ApiError)?.details as {message?: string} | undefined)?.message
-      ?? "That didn't work. Please try again."
+    ? getApiErrorMessage(failedWrite.error, 'The syllabus could not be updated. Please try again.')
     : null);
   const writing = upload.isPending || restore.isPending || clear.isPending;
 

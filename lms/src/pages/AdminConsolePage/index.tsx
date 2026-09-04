@@ -711,7 +711,7 @@ const AdminConsolePage: React.FC = () => {
               <p className={styles.status}>Loading users…</p>
             ) : null}
             {(isSystemAdmin ? usersQuery.isError : tenantUsersQuery.isError) ? (
-              <p className={styles.errorMessage}>Users could not be loaded.</p>
+              <p className={styles.errorMessage} role="alert">Users could not be loaded.{' '}<button type="button" onClick={() => void (isSystemAdmin ? usersQuery : tenantUsersQuery).refetch()}>Try again</button></p>
             ) : null}
             <div className={styles.list}>
               {filteredUsers.map((account) => (

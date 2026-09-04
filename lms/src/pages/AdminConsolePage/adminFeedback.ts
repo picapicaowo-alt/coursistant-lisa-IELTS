@@ -1,6 +1,6 @@
 import {getApiErrorMessage, isConflict} from '@/utils/apiError';
 
-const MANAGED_USER_FALLBACK = 'The server rejected the request without an explanation.';
+const MANAGED_USER_FALLBACK = 'Please try again. Your entries are preserved.';
 
 /** Keeps privileged identity errors actionable without guessing at a backend domain code. */
 export const getManagedUserCreateError = (error: unknown): string => {

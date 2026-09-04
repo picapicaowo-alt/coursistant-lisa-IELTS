@@ -8,7 +8,6 @@ import {courseOperationsApiService} from '@/apis/services/course-operations-api'
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {CourseIdentityCard} from '@/components/CourseIdentityCard';
-import {DashboardAssistant} from '@/components/DashboardAssistant';
 import {AssignmentProgress} from '@/components/AssignmentProgress';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {LearningBadge, LearningEmpty, LearningQueryState} from '@/components/LearningWorkspace';
@@ -21,7 +20,6 @@ import {formatPlanDate, TASK_STATUS, taskStatusLabel} from '@/utils/studyPlan';
 import {isNotFound} from '@/utils/apiError';
 import LearningScheduleComponent from '@/sections/learning_schedule/LearningScheduleComponent';
 import {useCourseList} from '../hooks/useCourseList';
-import {useDashboardChat} from '../hooks/useDashboardChat';
 import type {DashboardCourse} from '../types';
 import {dashboardExamActionLabel, resolveDashboardExamRoute} from './dashboardExam';
 import s from './StudentDashboard.module.scss';
@@ -121,10 +119,8 @@ function DashboardAlerts() {
 }
 
 export function StudentDashboard() {
-  const openChat = useDashboardChat();
   return <section className={s.dashboard} aria-label="Student dashboard">
     <div className={s.main}><DashboardCourses/><DashboardTasks/><DashboardExams/></div>
     <aside className={s.side} aria-label="Schedule and alerts"><section className={s.schedulePanel}><LearningScheduleComponent spacious/></section><DashboardAlerts/></aside>
-    <DashboardAssistant audience="student" onPrompt={openChat} className={s.assistant}/>
   </section>;
 }

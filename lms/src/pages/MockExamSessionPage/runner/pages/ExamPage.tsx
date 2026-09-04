@@ -1,3 +1,4 @@
+import {getApiErrorMessage} from '@/utils/apiError';
 import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { submitReading } from '../api/readings'
@@ -165,7 +166,7 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
         totalQuestions: result.totalQuestions,
       })
     } catch (err) {
-      setSubmissionError(err instanceof Error ? err.message : 'Submission failed.')
+      setSubmissionError(getApiErrorMessage(err, 'Your exam could not be submitted. Please try again.'))
     } finally {
       setSubmitting(false)
     }

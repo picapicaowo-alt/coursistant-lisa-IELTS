@@ -95,7 +95,7 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
       {intake.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(intake.error, 'Intake could not be loaded.')}</p> : null}
       <section className={styles.card}>
         <form className={styles.form} onSubmit={onSubmit}>
-          <label className={styles.advisorSearch}><span>Search advisors by name or email</span><div><Search size={18}/><input aria-label="Search advisors by name or email" value={search} onChange={event => setSearch(event.target.value)} placeholder="Name or email"/></div><small>The counsellor contract provides a paged advisor directory; search filters the loaded page.</small></label>
+          <label className={styles.advisorSearch}><span>Search advisors by name or email</span><div><Search size={18}/><input aria-label="Search advisors by name or email" value={search} onChange={event => setSearch(event.target.value)} placeholder="Name or email"/></div><small>Search advisors on this page.</small></label>
           {advisors.isPending ? <p className={styles.status} role="status">Loading eligible advisors…</p> : null}
           {advisors.isError ? <div className={styles.error} role="alert"><p>{advisingErrorMessage(advisors.error, 'Eligible advisors could not be loaded.')}</p><button type="button" className={styles.secondary} onClick={() => void advisors.refetch()}>Try again</button></div> : null}
           <div className={styles.list}>

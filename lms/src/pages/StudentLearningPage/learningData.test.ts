@@ -1,7 +1,10 @@
 import {describe, expect, it} from 'vitest';
-import {assignmentSummary, attendanceData, courseRecords, learningWorkDestination} from './learningData';
+import {assignmentSummary, attendanceData, courseRecords, learningWorkDestination, scheduleOccurrence} from './learningData';
 
 describe('learning data boundaries', () => {
+  it('uses course-local dates and times for UTC schedule proposals', () => {
+    expect(scheduleOccurrence({startsAtUtc: '2026-09-14T02:00:00Z', endsAtUtc: '2026-09-14T03:30:00Z', timezone: 'Asia/Singapore'})).toMatchObject({occurrenceDate: '2026-09-14', startTime: '10:00', endTime: '11:30'});
+  });
   it('distinguishes absent and zero progress from real completion', () => {
     expect(assignmentSummary()).toMatchObject({percent: null});
     expect(assignmentSummary({totalAssignmentCount: 0, completedAssignmentCount: 0})).toMatchObject({percent: null, total: 0});

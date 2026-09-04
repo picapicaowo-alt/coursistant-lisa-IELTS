@@ -29,7 +29,7 @@ test('advisor priority, task transitions and dated schedule use the supplied API
   await expect(attention.getByRole('link', {name: 'View all'})).toHaveCSS('color', 'rgb(72, 53, 235)');
   await expect(page.getByRole('region', {name: 'Tasks Due Today'})).toBeVisible();
   await expect(page.getByRole('combobox', {name: 'Progress time period'})).toHaveValue('week');
-  await expect(page.getByText('9:00 am')).toBeVisible();
+  await expect(page.getByText('9:00 am')).toHaveCount(0);
   await expect(page.getByRole('region', {name: 'Learning Schedule'}).getByRole('link', {name: /Academic writing/})).toHaveAttribute('href', '/advisor/courses/71/delivery');
   await page.getByRole('checkbox', {name: 'Start: Review written response'}).click();
   await expect(page.getByRole('checkbox', {name: 'Resolve: Review written response'})).toBeEnabled();
@@ -37,8 +37,7 @@ test('advisor priority, task transitions and dated schedule use the supplied API
   await expect(page.getByRole('checkbox', {name: 'Completed: Review written response'})).toBeChecked();
   expect(writes.map(write => write.body)).toEqual([{expectedVersion: 4}, {expectedVersion: 5}]);
   expect(writes.every(write => Boolean(write.key))).toBeTruthy();
-  await page.getByRole('button', {name: 'Prepare a study plan', exact: true}).click();
-  await expect(page.getByRole('textbox', {name: 'Ask the advising assistant'})).toHaveCSS('outline-style', 'none');
+  await expect(page.getByRole('textbox', {name: 'Ask the advising assistant'})).toHaveCount(0);
   await page.getByRole('heading', {name: 'Need Attention', exact: true}).click();
   for (const width of [1920, 1440, 768, 390]) {
     await page.setViewportSize({width, height: width < 800 ? 900 : 1080});

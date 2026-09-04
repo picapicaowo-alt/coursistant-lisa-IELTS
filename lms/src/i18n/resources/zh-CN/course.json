@@ -1,7 +1,10 @@
 {
     "list": {
         "title": "我的课程",
-        "noCourses": "你还没有加入任何课程。",
+        "noCourses": "当前视图下暂无课程。",
+        "noCurrentCourses": "你目前没有正在学习的课程。",
+        "noCompletedCourses": "你还没有已完成的课程。",
+        "noCourseUnits": "暂未添加课程单元。",
         "createCourse": "创建课程",
         "joinCourse": "加入课程",
         "tabs": {

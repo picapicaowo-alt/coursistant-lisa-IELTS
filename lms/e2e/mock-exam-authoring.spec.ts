@@ -334,8 +334,9 @@ for (const width of [1752, 1440, 1024, 390]) {
       .getByRole('button', {name: 'Confirm and create section'})
       .click();
     await expect(page.getByRole('alert')).toContainText(
-      'Synthetic save failure',
+      'The section could not be created. Your draft is preserved.',
     );
+    await expect(page.getByRole('alert')).not.toContainText('Synthetic save failure');
     await expect(review).toBeVisible();
     await page
       .getByRole('button', {name: 'Confirm and create section'})

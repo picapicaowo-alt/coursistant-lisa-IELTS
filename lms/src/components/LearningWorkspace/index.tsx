@@ -7,8 +7,8 @@ export function LearningEmpty({title, description, icon: Icon = Inbox}: {title: 
   return <div className={styles.empty}><span className={styles.emptyIcon}><Icon size={25} aria-hidden="true"/></span><strong>{title}</strong>{description ? <p>{description}</p> : null}</div>;
 }
 
-export function LearningQueryState({query}: {query: {isPending: boolean; isError: boolean; error: unknown; refetch: () => unknown}}) {
-  return query.isPending || query.isError ? <TeachingState compact loading={query.isPending} error={query.isError ? query.error ?? new Error('This section could not be loaded.') : undefined} onRetry={() => void query.refetch()}/> : null;
+export function LearningQueryState({query, errorMessage}: {query: {isPending: boolean; isError: boolean; error: unknown; refetch: () => unknown}; errorMessage?: string}) {
+  return query.isPending || query.isError ? <TeachingState compact loading={query.isPending} error={query.isError ? query.error ?? new Error('This section could not be loaded.') : undefined} errorMessage={errorMessage} onRetry={() => void query.refetch()}/> : null;
 }
 
 const complete = new Set(['COMPLETED', 'REACHED_COMPLETED', 'PRESENT', 'APPROVED', 'PUBLISHED', 'ACTIVE']);

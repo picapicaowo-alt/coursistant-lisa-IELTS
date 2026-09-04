@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import {useMutation} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
-import {ApiError, unwrapData} from '@/apis';
+import {unwrapData} from '@/apis';
+import {getApiErrorMessage} from '@/utils/apiError';
 import {courseApiService} from '@/apis/services/course-api';
 import {EnglishDateInput} from '@/components/EnglishDateInput';
 import {RichTextEditor} from '@/components/RichTextEditor';
@@ -63,8 +64,7 @@ const CourseCreatePage: React.FC = () => {
     && !createCourse.isPending,
   );
   const failure = createCourse.isError
-    ? (((createCourse.error as unknown) as ApiError)?.details as {message?: string} | undefined)?.message
-      ?? "Couldn't create the course."
+    ? getApiErrorMessage(createCourse.error, "Couldn't create the course.")
     : null;
 
   return (

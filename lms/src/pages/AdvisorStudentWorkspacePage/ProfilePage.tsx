@@ -181,9 +181,8 @@ const AdvisorStudentProfilePage: React.FC = () => {
         description="Capture the student's starting point, target, and the specific skills you will use to measure progress."
         meta={!missing ? <span className={styles.versionBadge}>Current version {query.data?.profileVersion}</span> : undefined}
       />
-      {!missing ? <p className={styles.muted}>Showing the current profile. Earlier profile versions are not available yet.</p> : null}
       {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your edits are preserved. Reload the latest record and review before saving again.</p><button type="button" className={styles.secondary} onClick={() => void query.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.profileVersion); setReloadRequired(false);}})}>Load latest record</button></div> : null}
-      {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, save.error instanceof Error ? save.error.message : 'Profile could not be saved.')}</p> : null}
+      {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'Profile could not be saved.')}</p> : null}
       {save.isSuccess ? <p className={styles.success} role="status">Profile saved.</p> : null}
       <form className={`${styles.form} ${layout.profileForm}`} onSubmit={onSubmit}>
         <WorkspaceSection title="Student context" headingLevel={3} appearance="record" className={layout.profileCard}>

@@ -248,42 +248,60 @@ paths:
       - AdvisorMockExams
   /v2/instructor/mock-exams/writing-grades:
     get:
+      description: Zero-based page of PENDING Writing grades assigned to the current
+        Instructor. List items include Student structured name and Template/Test Version
+        context; full writing tasks are only returned by the detail GET.
       operationId: listInstructorWritingGrades
+      parameters:
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/InstructorWritingGradePageApiResponse"
+          description: SUCCESS
         "400":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: Bad request
+          description: BAD_REQUEST
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: INVALID_TOKEN
         "403":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: Forbidden
-        "404":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiErrorResponse"
-          description: Not found
-        "409":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiErrorResponse"
-          description: Conflict
+          description: FORBIDDEN
+      summary: List pending Mock Exam Writing grades
       tags:
       - InstructorMockExamWritingGrades
   /v2/instructor/mock-exams/writing-grades/{gradeId}:
     get:
+      description: Returns Student/Template/Test context plus writing tasks. Other
+        Instructor or cross-tenant gradeId is hidden as 404 MOCK_EXAM_NOT_FOUND.
       operationId: getInstructorWritingGrade
       parameters:
       - in: path
@@ -295,37 +313,35 @@ paths:
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
-        "400":
+                $ref: "#/components/schemas/InstructorWritingGradeApiResponse"
+          description: SUCCESS
+        "401":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: Bad request
+          description: INVALID_TOKEN
         "403":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: Forbidden
+          description: FORBIDDEN
         "404":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: Not found
-        "409":
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ApiErrorResponse"
-          description: Conflict
+          description: MOCK_EXAM_NOT_FOUND
+      summary: Get one Mock Exam Writing grade
       tags:
       - InstructorMockExamWritingGrades
     post:
+      description: One-shot grade. Replay with the same Idempotency-Key returns the
+        original result. Already graded returns 409 MOCK_EXAM_WRITING_ALREADY_GRADED.
+        Other Instructor or cross-tenant gradeId is hidden as 404 MOCK_EXAM_NOT_FOUND.
       operationId: gradeInstructorWriting
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
@@ -349,34 +365,40 @@ paths:
       responses:
         "201":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: Created
+                $ref: "#/components/schemas/InstructorWritingGradeApiResponse"
+          description: SUCCESS
         "400":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
           description: Bad request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiErrorResponse"
+          description: INVALID_TOKEN
         "403":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: Forbidden
+          description: FORBIDDEN
         "404":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: Not found
+          description: MOCK_EXAM_NOT_FOUND
         "409":
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApiErrorResponse"
-          description: Conflict
+          description: MOCK_EXAM_WRITING_ALREADY_GRADED
       tags:
       - InstructorMockExamWritingGrades
   /v2/parent/students/{studentUserId}/mock-exams:
@@ -474,13 +496,37 @@ paths:
   /v2/student/mock-exams:
     get:
       operationId: listStudentMockExams
+      parameters:
+      - in: query
+        name: status
+        required: false
+        schema:
+          type: string
+          enum: [READY, IN_PROGRESS, PENDING_WRITING_GRADING, COMPLETED]
+      - in: query
+        name: page
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+          minimum: 0
+      - in: query
+        name: size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+          minimum: 1
+          maximum: 100
       responses:
         "200":
           content:
-            '*/*':
+            application/json:
               schema:
-                $ref: "#/components/schemas/ApiResponse"
-          description: OK
+                $ref: "#/components/schemas/StudentMockExamPageApiResponse"
+          description: SUCCESS
         "400":
           content:
             application/json:
@@ -2634,6 +2680,155 @@ components:
           type: string
         score:
           type: number
+    InstructorWritingGradeQueueItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        studentMockExamId:
+          type: integer
+          format: int64
+        writingSubmissionId:
+          type: integer
+          format: int64
+        studentUserId:
+          type: integer
+          format: int32
+        studentFirstName:
+          type: string
+        studentMiddleName:
+          type: string
+        studentLastName:
+          type: string
+        templateId:
+          type: integer
+          format: int64
+        templateTitle:
+          type: string
+        templateLabel:
+          type: string
+        testVersionId:
+          type: integer
+          format: int64
+        versionNo:
+          type: integer
+          format: int32
+        status:
+          type: string
+        submittedAt:
+          type: string
+          format: date-time
+    InstructorWritingGradePage:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstructorWritingGradeQueueItem"
+    InstructorWritingGradePageApiResponse:
+      type: object
+      description: Success envelope wrapping Instructor Mock Exam Writing grade page
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 200
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/InstructorWritingGradePage"
+        message:
+          type: string
+          example: Success
+        timestamp:
+          type: string
+          format: date-time
+    WritingGradeDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        studentMockExamId:
+          type: integer
+          format: int64
+        writingSubmissionId:
+          type: integer
+          format: int64
+        instructorUserId:
+          type: integer
+          format: int32
+        status:
+          type: string
+        score:
+          type: number
+        feedback:
+          type: string
+        gradedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        tasks:
+          type: array
+          items:
+            $ref: "#/components/schemas/StudentWritingTaskViewDto"
+        studentUserId:
+          type: integer
+          format: int32
+        studentFirstName:
+          type: string
+        studentMiddleName:
+          type: string
+        studentLastName:
+          type: string
+        templateId:
+          type: integer
+          format: int64
+        templateTitle:
+          type: string
+        templateLabel:
+          type: string
+        testVersionId:
+          type: integer
+          format: int64
+        versionNo:
+          type: integer
+          format: int32
+        submittedAt:
+          type: string
+          format: date-time
+    InstructorWritingGradeApiResponse:
+      type: object
+      description: Success envelope wrapping Instructor Mock Exam Writing grade detail
+      properties:
+        status:
+          type: integer
+          format: int32
+          example: 200
+        code:
+          type: string
+          example: SUCCESS
+        data:
+          $ref: "#/components/schemas/WritingGradeDto"
+        message:
+          type: string
+          example: Success
+        timestamp:
+          type: string
+          format: date-time
     JsonNode:
       type: object
     ListeningDetailDto:
@@ -3186,6 +3381,23 @@ components:
         timestamp:
           type: string
           format: date-time
+    StudentMockExamPageApiResponse:
+      type: object
+      properties:
+        status: { type: integer, example: 200 }
+        code: { type: string, example: SUCCESS }
+        data: { $ref: "#/components/schemas/StudentMockExamPage" }
+        message: { type: string, example: Success }
+        timestamp: { type: string, format: date-time }
+    StudentMockExamPage:
+      type: object
+      properties:
+        page: { type: integer }
+        size: { type: integer }
+        total: { type: integer, format: int64 }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/StudentMockExamSummaryDto" }
   securitySchemes:
     bearerAuth:
       bearerFormat: JWT

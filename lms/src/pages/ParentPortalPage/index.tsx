@@ -174,24 +174,12 @@ const ParentStudentWorkspace: React.FC<{
         ),
         "parentMessages",
       );
-      // The live endpoint returns a cursor page; older contracts also returned arrays.
-      return Array.isArray(data)
-        ? {
-            items: data,
-            nextBeforeId: data.length
-              ? Math.min(
-                  ...data.flatMap((item) =>
-                    item.messageId == null ? [] : [item.messageId],
-                  ),
-                )
-              : undefined,
-          }
-        : data;
+      return Array.isArray(data) ? {items: data, hasMore: false, nextBeforeId: undefined} : data;
     },
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage, _pages, lastCursor) => {
       const next = lastPage.nextBeforeId;
-      return lastPage.hasMore !== false &&
+      return lastPage.hasMore === true &&
         next != null &&
         Number.isFinite(next) &&
         (lastCursor == null || next < lastCursor)

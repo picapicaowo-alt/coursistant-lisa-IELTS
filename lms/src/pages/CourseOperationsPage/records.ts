@@ -186,3 +186,7 @@ export function parsePost(value: unknown): DiscussionPost {
     createdAt: textValue(item, "createdAt"),
   };
 }
+
+/** Instructor decisions are limited to the state transition delivered by course OpenAPI. */
+export const isInstructorScheduleRequestReviewable = (request: OperationRecord): boolean =>
+  request.requestType === 'SCHEDULE_CHANGE' && request.status === 'PENDING_INSTRUCTOR';

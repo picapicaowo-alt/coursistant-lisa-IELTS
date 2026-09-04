@@ -74,6 +74,7 @@ test('delivery workspace keeps its 8+4 hierarchy and uses versioned launch actio
   await expect(page.getByRole('heading', {name: 'Delivery details'})).toBeVisible();
 
   await page.getByRole('tab', {name: 'Schedule'}).click();
+  await page.getByRole('button', {name: 'View class dates'}).click();
   await expect(page.getByRole('heading', {name: 'Course occurrences'})).toBeVisible();
   await expect(page.getByRole('complementary', {name: 'Course readiness'})).toHaveCount(0);
   await page.screenshot({path: info.outputPath('course-schedule-1440.png'), fullPage: true});

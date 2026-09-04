@@ -394,7 +394,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
 export function InstructorWorkspace({ value }: { value: unknown }) {
   const rows = runtimeItems(value);
   const [gradeId, setGradeId] = useState<number | null>(() =>
-    rows[0] ? idFrom(rows[0], "gradeId", "writingGradeId") : null,
+    rows[0] ? idFrom(rows[0], "id", "gradeId", "writingGradeId") : null,
   );
   const [submitting, setSubmitting] = useState(false);
   return (
@@ -414,7 +414,7 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
           {rows.length ? (
             <div className={styles.cardList}>
               {rows.map((row, index) => {
-                const id = idFrom(row, "gradeId", "writingGradeId");
+                const id = idFrom(row, "id", "gradeId", "writingGradeId");
                 return id ? (
                   <button
                     type="button"
@@ -433,7 +433,7 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
                       <small>#{id}</small>
                     </span>
                     <strong>
-                      {recordLabel(row, `Writing submission ${index + 1}`)}
+                      {runtimeString(row, "templateTitle") || recordLabel(row, `Writing submission ${index + 1}`)}
                     </strong>
                     <span>
                       {runtimeString(row, "submittedAt", "createdAt") ||

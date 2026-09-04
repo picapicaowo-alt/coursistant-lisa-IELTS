@@ -2,13 +2,13 @@ import React, {useState} from 'react';
 import {generatePath, Link, Navigate, useParams} from 'react-router-dom';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {Field, OperationCard} from '@/components/OperationCard';
-import {EnglishDateInput, EnglishTimeInput} from '@/components/EnglishDateInput';
+import {EnglishDateInput} from '@/components/EnglishDateInput';
 import {courseOperationsApiService} from '@/apis/services/course-operations-api';
 import {assignmentApiService} from '@/apis/services/assignment-api';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {useCourseAccess} from '@/hooks/useCourseAccess';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
-import {ATTENDANCE_STATUSES, SCHEDULE_DECISIONS, SCHEDULE_REQUEST_TYPES} from '@/apis';
+import {ATTENDANCE_STATUSES} from '@/apis';
 import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/downloadBlob';
 import {canAccessCourseOperations} from '@/utils/roleCapabilities';
 import styles from './index.module.scss';
@@ -30,10 +30,10 @@ const LegacyCourseOperationsPage: React.FC = () => {
   const staff = canAccessCourseOperations(user, access.courseRole);
   const [section, setSection] = useState<Section>('occurrences');
   const [occurrenceId, setOccurrenceId] = useState('');
-  const [occurrence, setOccurrence] = useState({sessionId: '', weekId: '', date: '', start: '', end: '', expectedVersion: ''});
+
   const [range, setRange] = useState({from: '', to: '', includeHistory: false});
   const [attendance, setAttendance] = useState({studentUserId: '', status: 'PRESENT', version: ''});
-  const [schedule, setSchedule] = useState({requestId: '', requestType: String(SCHEDULE_REQUEST_TYPES[1]), date: '', start: '', end: '', reason: '', decision: 'APPROVE', version: '', rejectionReason: ''});
+
   const [report, setReport] = useState<{
     reportId: string;
     studentUserId: string;
@@ -109,48 +109,9 @@ const LegacyCourseOperationsPage: React.FC = () => {
           <OperationCard title="Occurrence detail" actionLabel="Load occurrence" disabled={!occurrenceValid} onRun={() => courseOperationsApiService.getSessionOccurrence(id, positive(occurrenceId))}>
             <Field label="Occurrence ID"><input inputMode="numeric" value={occurrenceId} onChange={change => setOccurrenceId(change.target.value)}/></Field>
           </OperationCard>
-          {staff ? <>
-            <OperationCard title="Create occurrence" actionLabel="Create occurrence" disabled={!occurrence.date || !occurrence.start || !occurrence.end} onRun={() => courseOperationsApiService.createSessionOccurrence(id, {sessionId: occurrence.sessionId ? positive(occurrence.sessionId) : undefined, weekId: occurrence.weekId ? positive(occurrence.weekId) : undefined, occurrenceDate: occurrence.date, startTime: occurrence.start, endTime: occurrence.end})}>
-              <Field label="Session ID"><input inputMode="numeric" value={occurrence.sessionId} onChange={change => setOccurrence(current => ({...current, sessionId: change.target.value}))}/></Field>
-              <Field label="Week ID"><input inputMode="numeric" value={occurrence.weekId} onChange={change => setOccurrence(current => ({...current, weekId: change.target.value}))}/></Field>
-              <Field label="Date"><EnglishDateInput value={occurrence.date} onChangeValue={date => setOccurrence(current => ({...current, date}))}/></Field>
-              <Field label="Start"><EnglishTimeInput value={occurrence.start} onChangeValue={start => setOccurrence(current => ({...current, start}))}/></Field>
-              <Field label="End"><EnglishTimeInput value={occurrence.end} onChangeValue={end => setOccurrence(current => ({...current, end}))}/></Field>
-            </OperationCard>
-            <OperationCard title="Generate occurrences" description="Generate occurrences from recurring course sessions." actionLabel="Generate" disabled={!range.from || !range.to} onRun={() => courseOperationsApiService.generateSessionOccurrences(id, {from: range.from, to: range.to, weekId: occurrence.weekId ? positive(occurrence.weekId) : undefined})}>
-              <Field label="From"><EnglishDateInput value={range.from} onChangeValue={from => setRange(current => ({...current, from}))}/></Field>
-              <Field label="To"><EnglishDateInput value={range.to} onChangeValue={to => setRange(current => ({...current, to}))}/></Field>
-              <Field label="Week ID"><input inputMode="numeric" value={occurrence.weekId} onChange={change => setOccurrence(current => ({...current, weekId: change.target.value}))}/></Field>
-            </OperationCard>
-            <OperationCard title="Reschedule occurrence" actionLabel="Reschedule" disabled={!occurrenceValid || !occurrence.expectedVersion || !occurrence.date} onRun={() => courseOperationsApiService.rescheduleSessionOccurrence(id, positive(occurrenceId), {expectedVersion: positive(occurrence.expectedVersion), occurrenceDate: occurrence.date, startTime: occurrence.start || undefined, endTime: occurrence.end || undefined, weekId: occurrence.weekId ? positive(occurrence.weekId) : undefined})}>
-              <Field label="Occurrence ID"><input inputMode="numeric" value={occurrenceId} onChange={change => setOccurrenceId(change.target.value)}/></Field>
-              <Field label="Expected version"><input type="number" min="0" value={occurrence.expectedVersion} onChange={change => setOccurrence(current => ({...current, expectedVersion: change.target.value}))}/></Field>
-              <Field label="New date"><EnglishDateInput value={occurrence.date} onChangeValue={date => setOccurrence(current => ({...current, date}))}/></Field>
-              <Field label="Start"><EnglishTimeInput value={occurrence.start} onChangeValue={start => setOccurrence(current => ({...current, start}))}/></Field>
-              <Field label="End"><EnglishTimeInput value={occurrence.end} onChangeValue={end => setOccurrence(current => ({...current, end}))}/></Field>
-            </OperationCard>
-            <OperationCard title="Cancel occurrence" description="Cancels this occurrence using its current version." actionLabel="Cancel occurrence" tone="danger" disabled={!occurrenceValid || !occurrence.expectedVersion} onRun={() => courseOperationsApiService.cancelSessionOccurrence(id, positive(occurrenceId), positive(occurrence.expectedVersion))}>
-              <Field label="Occurrence ID"><input inputMode="numeric" value={occurrenceId} onChange={change => setOccurrenceId(change.target.value)}/></Field>
-              <Field label="Expected version"><input type="number" min="0" value={occurrence.expectedVersion} onChange={change => setOccurrence(current => ({...current, expectedVersion: change.target.value}))}/></Field>
-            </OperationCard>
-          </> : null}
           <OperationCard title="Occurrence schedule requests" actionLabel="Load requests" disabled={!occurrenceValid} onRun={() => courseOperationsApiService.listCourseScheduleRequests(id, positive(occurrenceId))}>
             <Field label="Occurrence ID"><input inputMode="numeric" value={occurrenceId} onChange={change => setOccurrenceId(change.target.value)}/></Field>
           </OperationCard>
-          <OperationCard title="Request schedule change" actionLabel="Submit request" disabled={!occurrenceValid} onRun={() => courseOperationsApiService.createCourseScheduleRequest(id, positive(occurrenceId), {requestType: schedule.requestType, proposedOccurrenceDate: schedule.date || undefined, proposedStartTime: schedule.start || undefined, proposedEndTime: schedule.end || undefined, reason: schedule.reason || undefined})}>
-            <Field label="Occurrence ID"><input inputMode="numeric" value={occurrenceId} onChange={change => setOccurrenceId(change.target.value)}/></Field>
-            <Field label="Request type"><select value={schedule.requestType} onChange={change => setSchedule(current => ({...current, requestType: change.target.value}))}>{SCHEDULE_REQUEST_TYPES.map(type => <option key={type}>{type}</option>)}</select></Field>
-            <Field label="Proposed date"><EnglishDateInput value={schedule.date} onChangeValue={date => setSchedule(current => ({...current, date}))}/></Field>
-            <Field label="Proposed start"><EnglishTimeInput value={schedule.start} onChangeValue={start => setSchedule(current => ({...current, start}))}/></Field>
-            <Field label="Proposed end"><EnglishTimeInput value={schedule.end} onChangeValue={end => setSchedule(current => ({...current, end}))}/></Field>
-            <Field label="Reason"><textarea value={schedule.reason} onChange={change => setSchedule(current => ({...current, reason: change.target.value}))}/></Field>
-          </OperationCard>
-          {staff ? <OperationCard title="Instructor review" description="Review a schedule request associated with this course." actionLabel="Submit review" disabled={!validId(schedule.requestId) || !schedule.version} onRun={() => courseOperationsApiService.reviewCourseScheduleRequest(id, positive(schedule.requestId), {decision: schedule.decision, expectedVersion: positive(schedule.version), rejectionReason: schedule.rejectionReason || undefined})}>
-            <Field label="Request ID"><input inputMode="numeric" value={schedule.requestId} onChange={change => setSchedule(current => ({...current, requestId: change.target.value}))}/></Field>
-            <Field label="Decision"><select value={schedule.decision} onChange={change => setSchedule(current => ({...current, decision: change.target.value}))}>{SCHEDULE_DECISIONS.map(decision => <option key={decision}>{decision}</option>)}</select></Field>
-            <Field label="Expected version"><input type="number" min="0" value={schedule.version} onChange={change => setSchedule(current => ({...current, version: change.target.value}))}/></Field>
-            <Field label="Rejection reason"><textarea value={schedule.rejectionReason} onChange={change => setSchedule(current => ({...current, rejectionReason: change.target.value}))}/></Field>
-          </OperationCard> : null}
         </div>
       ) : null}
 
@@ -163,7 +124,7 @@ const LegacyCourseOperationsPage: React.FC = () => {
             <OperationCard title="Attendance roster" actionLabel="Load roster" disabled={!occurrenceValid} onRun={() => courseOperationsApiService.getOccurrenceAttendance(id, positive(occurrenceId))}>
               <Field label="Occurrence ID"><input inputMode="numeric" value={occurrenceId} onChange={change => setOccurrenceId(change.target.value)}/></Field>
             </OperationCard>
-            <OperationCard title="Save attendance" description="Updates one learner at a time without inventing roster fields not present in the contract." actionLabel="Save attendance" disabled={!occurrenceValid || !validId(attendance.studentUserId) || !attendance.version} onRun={() => courseOperationsApiService.saveOccurrenceAttendance(id, positive(occurrenceId), {expectedAttendanceVersion: positive(attendance.version), entries: [{studentUserId: positive(attendance.studentUserId), status: attendance.status}]})}>
+            <OperationCard title="Save attendance" description="Record attendance for the selected learner." actionLabel="Save attendance" disabled={!occurrenceValid || !validId(attendance.studentUserId) || !attendance.version} onRun={() => courseOperationsApiService.saveOccurrenceAttendance(id, positive(occurrenceId), {expectedAttendanceVersion: positive(attendance.version), entries: [{studentUserId: positive(attendance.studentUserId), status: attendance.status}]})}>
               <Field label="Occurrence ID"><input inputMode="numeric" value={occurrenceId} onChange={change => setOccurrenceId(change.target.value)}/></Field>
               <Field label="Student user ID"><input inputMode="numeric" value={attendance.studentUserId} onChange={change => setAttendance(current => ({...current, studentUserId: change.target.value}))}/></Field>
               <Field label="Status"><select value={attendance.status} onChange={change => setAttendance(current => ({...current, status: change.target.value}))}>{ATTENDANCE_STATUSES.map(status => <option key={status}>{status}</option>)}</select></Field>

@@ -1,7 +1,10 @@
 {
     "list": {
         "title": "My Courses",
-        "noCourses": "You are not enrolled in any courses yet.",
+        "noCourses": "No courses match this view.",
+        "noCurrentCourses": "You have no current courses.",
+        "noCompletedCourses": "You have no completed courses yet.",
+        "noCourseUnits": "No course units have been added yet.",
         "createCourse": "Create course",
         "joinCourse": "Join course",
         "tabs": {
