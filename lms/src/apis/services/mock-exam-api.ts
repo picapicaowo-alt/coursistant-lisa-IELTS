@@ -1,3 +1,4 @@
+import {readCollection, type CollectionPage} from './readCollection';
 import type {
   ApiResponse,
   CreateMockExamListeningRequest,
@@ -48,7 +49,7 @@ export class MockExamApiService {
   }
 
   listInstructorWritingGrades(): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get('/v2/instructor/mock-exams/writing-grades');
+    return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/instructor/mock-exams/writing-grades', {params}));
   }
 
   getInstructorWritingGrade(gradeId: number): Promise<ApiResponse<MockExamRead>> {
@@ -68,7 +69,7 @@ export class MockExamApiService {
   }
 
   listStudentExams(): Promise<ApiResponse<MockExamRead>> {
-    return this.apiClient.get('/v2/student/mock-exams');
+    return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/student/mock-exams', {params}));
   }
 
   getStudentExam(studentMockExamId: number): Promise<ApiResponse<StudentMockExamDetail>> {

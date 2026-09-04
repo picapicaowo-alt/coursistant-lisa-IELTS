@@ -1,13 +1,14 @@
 import {UserAvatar} from '@/components/UserAvatar';
 import {useEffect, useRef, useState} from 'react';
-import {ChevronDown, LogOut, Settings, ShieldCheck, UserRound, type LucideIcon} from 'lucide-react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {Bell, ChevronDown, LogOut, Settings, ShieldCheck, UserRound, type LucideIcon} from 'lucide-react';
+import {Link, useLocation, useNavigate} from 'react-router-dom';
 import {useTranslation} from 'react-i18next';
 import {useAuth} from '../contexts/AuthContext';
 import NotificationCenter from '../components/NotificationCenter';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {getParentSection, PARENT_SECTIONS} from '@/configs/parentNavigation';
-import {canAccessAdminConsole, canAccessCourseCatalogue, isInstructorLevel} from '@/utils/roleCapabilities';
+import {getParentSection, parentHref, PARENT_SECTIONS} from '@/configs/parentNavigation';
+import {canAccessAdminConsole, canAccessCourseCatalogue, isInstructorLevel, isParentAccount} from '@/utils/roleCapabilities';
+import notificationStyles from '@/components/NotificationCenter/index.module.scss';
 import styles from './Header.module.scss';
 
 interface MenuItem {
@@ -120,7 +121,8 @@ const Header = () => {
       )}
 
       <div className={styles.accountActions}>
-        {user?.role === 'USER' ? <NotificationCenter identity={user ?? undefined}/> : null}
+        {/* Parents have a separate notification contract and inbox in their portal. */}
+        {user && isParentAccount(user) ? <Link className={notificationStyles.bellButton} to={parentHref('notifications', new URLSearchParams(search))} aria-label="Open notifications"><Bell size={20}/></Link> : user?.role === 'USER' ? <NotificationCenter identity={user ?? undefined}/> : null}
         <div className={styles.profile} ref={menuRef}>
           <UserAvatar className={styles.avatar} src={profileImage}/>
           <div className={styles.profileCopy}>

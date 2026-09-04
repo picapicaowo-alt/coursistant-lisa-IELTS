@@ -9,6 +9,18 @@ dayjs.extend(advancedFormat);
 
 const HAS_TIMEZONE = /(Z|[+-]\d{2}:?\d{2})$/i;
 
+/** Calendar feeds carry instants; convert them once into the displayed IANA zone. */
+export function calendarLocalFields(startsAtUtc: string, endsAtUtc: string | undefined, zone: string) {
+  try {
+    const start = dayjs.utc(startsAtUtc).tz(zone);
+    const end = endsAtUtc ? dayjs.utc(endsAtUtc).tz(zone) : undefined;
+    if (!start.isValid() || (end && !end.isValid())) return undefined;
+    return {date: start.format('YYYY-MM-DD'), startTime: start.format('HH:mm'), endTime: end?.format('HH:mm')};
+  } catch {
+    return undefined;
+  }
+}
+
 /**
  * Backend audit/receipt timestamps are UTC, but several legacy DTOs expose
  * them as a zone-less `LocalDateTime`. Normalize those values before handing

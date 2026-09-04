@@ -103,9 +103,8 @@ export function AudioPlayer({
     const audio = audioRef.current
     if (!audio || !ready) return
     if (audio.paused) {
-      void audio.play().catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : 'Unable to play audio'
-        window.alert(`Unable to play audio. ${message}`)
+      void audio.play().catch(() => {
+        window.alert('The audio could not be played. Please try again.')
       })
     } else {
       audio.pause()

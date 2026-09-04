@@ -18,10 +18,10 @@ describe('getManagedUserCreateError', () => {
     );
   });
 
-  it('retains the transport failure when no domain message is available', () => {
+  it('shows recovery guidance for a transport failure', () => {
     expect(getManagedUserCreateError({
       code: 503,
       message: 'Request failed with status code 503',
-    })).toBe('Managed user was not created. Request failed with status code 503');
+    })).toBe('Managed user was not created. Please try again. Your entries are preserved.');
   });
 });

@@ -94,7 +94,7 @@ test("parent sees later linked students, nested academic data and independent le
   ).toBeVisible();
   await expect(
     page.getByRole("region", { name: "Attendance" }).getByRole("alert"),
-  ).toContainText("Attendance temporarily unavailable");
+  ).toContainText("Attendance could not be loaded.");
   for (const width of [320, 768, 1440, 2560]) {
     await page.setViewportSize({ width, height: 1000 });
     expect(
@@ -202,7 +202,7 @@ test("parent report pagination and attachment failures preserve student boundari
     page.getByRole("button", { name: "Send message", exact: true }),
   ).toBeDisabled();
   await expect(page.getByRole("alert")).toContainText(
-    "Conversation temporarily unavailable",
+    "This section could not be loaded.",
   );
   expect(errors).toEqual([]);
   expect(
@@ -287,7 +287,7 @@ test('writing grades keep drafts with their script and reuse the same request on
   await page.getByLabel('Score', {exact: true}).fill('6.5');
   await page.getByLabel('Feedback', {exact: true}).fill('Feedback for the second script');
   await page.getByRole('button', {name: 'Submit result', exact: true}).click();
-  await expect(page.getByRole('alert')).toContainText('Grading temporarily unavailable');
+  await expect(page.getByRole('alert')).toContainText('The writing result could not be submitted.');
   await page.getByRole('button', {name: 'Submit result', exact: true}).click();
   await expect(page.getByRole('status').filter({hasText: 'Writing result submitted.'})).toBeVisible();
   expect(writes).toHaveLength(2);

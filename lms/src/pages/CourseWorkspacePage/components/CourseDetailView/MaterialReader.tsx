@@ -1,6 +1,6 @@
-import {lazy, Suspense, useEffect, useRef, useState} from 'react';
+import {lazy, Suspense, useEffect, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
-import {MessageSquare, Sparkles} from 'lucide-react';
+import {MessageSquare} from 'lucide-react';
 import type {CourseMaterial, CourseWeek} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
 import {assertFileBlob, saveBlob} from '@/utils/downloadBlob';
@@ -8,7 +8,6 @@ import {getApiErrorMessage} from '@/utils/apiError';
 import styles from './MaterialReader.module.scss';
 
 import {embeddedVideoUrl} from './materialVideo';
-const CourseAssistant = lazy(() => import('@/components/ChatContent'));
 const PdfMaterialPreview = lazy(() => import('./PdfMaterialPreview'));
 const safeLink = (value: string | null) => {
   try {
@@ -129,9 +128,7 @@ export function MaterialReader({
   onClose: () => void;
   onDiscussion: () => void;
 }) {
-  const [assistantOpen, setAssistantOpen] = useState(false);
-  const assistantButton = useRef<HTMLButtonElement>(null);
-  const closeAssistant = () => {setAssistantOpen(false); assistantButton.current?.focus();};
+
   const materials = weeks.flatMap((week) => week.materials);
   const index = materials.findIndex((item) => item.id === materialId);
   const material = materials[index];
@@ -228,12 +225,9 @@ export function MaterialReader({
             <button type="button" onClick={onDiscussion}>
               <MessageSquare size={16} aria-hidden="true"/>Discussion
             </button>
-            <button className={styles.assistantToggle} ref={assistantButton} type="button" aria-expanded={assistantOpen} aria-controls="course-assistant" onClick={() => setAssistantOpen(open => !open)}><Sparkles size={16} aria-hidden="true"/>AI Course</button>
           </footer>
         </div>
-        {assistantOpen ? <section id="course-assistant" className={styles.assistant} aria-label="Course AI assistant" onKeyDown={event => {if (event.key === 'Escape') closeAssistant();}}>
-          <Suspense fallback={<p role="status">Loading course assistant…</p>}><CourseAssistant isIntroTop={false} isDashboard={false} isWorkspace isCompact onClose={closeAssistant} courseId={courseId}/></Suspense>
-        </section> : null}
+
       </div>
     </section>
   );

@@ -1,0 +1,9 @@
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: t.$space-3; min-height: 10rem; padding: t.$space-6 t.$space-3; text-align: center; color: t.$content-secondary; }
+.emptyIcon { display: grid; place-items: center; width: t.$space-12; height: t.$space-12; border-radius: t.$radius-pill; background: t.$surface-muted; color: t.$content-secondary; }
+.empty strong { font-size: t.$font-size-body; font-weight: t.$fw-medium; }
+.empty p { max-width: 32ch; margin: 0; font-size: t.$font-size-body; line-height: 1.6; }
+.badge { display: inline-flex; align-items: center; width: fit-content; max-width: 100%; min-height: t.$space-6; padding: t.$space-1 t.$space-2; border-radius: t.$radius-control-sm; color: t.$content-secondary; background: t.$surface-muted; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; line-height: 1.4; overflow-wrap: anywhere; }
+.badge[data-tone='success'] { color: t.$feedback-success; background: t.$type-green-subtle; }
+.badge[data-tone='brand'] { color: t.$action-primary; background: t.$surface-brand-subtle; }
+.badge[data-tone='warning'] { color: t.$feedback-warning; background: t.$type-orange-subtle; }
+.badge[data-tone='danger'] { color: t.$feedback-danger; background: t.$feedback-danger-surface; }

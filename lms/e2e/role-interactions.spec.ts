@@ -84,40 +84,13 @@ test('student can enter both learning products but not advisor operations', asyn
   await expect(page).toHaveURL(/\/$/);
 });
 
-test('dashboard quick prompt hands structured context to Study Support', async ({page}) => {
+test('student dashboard keeps unsupported AI unavailable', async ({page}) => {
   await installIdentity(page, identity('STUDENT'));
-  // Keep this interaction isolated from unrelated dashboard/AI backend state.
-  // More specific routes below are registered later and therefore take precedence.
-  await page.route('**/v2/**', route => route.fulfill({json: response([])}));
-  await page.route('**/v1/auth/refresh-token', route => route.fulfill({json: response('role-interaction-token-refreshed')}));
   await page.route('**/v2/me/courses**', route => route.fulfill({json: response({items: [], page: 0, size: 100, total: 0})}));
-  await page.route('**/v2/me/assignments/upcoming**', route => route.fulfill({json: response([])}));
-  await page.route('**/v2/me/activities/upcoming**', route => route.fulfill({json: response([])}));
-  await page.route('**/v2/me/work-queue', route => route.fulfill({json: response([])}));
-  await page.route('**/v2/student/mock-exams**', route => route.fulfill({json: response([])}));
-  await page.route('**/v2/me/alerts', route => route.fulfill({json: response([])}));
-  let pendingChat: string | undefined;
-  await page.exposeFunction('capturePendingChat', (value: string) => {
-    pendingChat = value;
-  });
-  await page.addInitScript(() => {
-    const originalSetItem = Storage.prototype.setItem;
-    Storage.prototype.setItem = function (key, value) {
-      if (key === 'pendingChat') {
-        void (window as Window & {capturePendingChat: (capturedValue: string) => Promise<void>}).capturePendingChat(value);
-      }
-      originalSetItem.call(this, key, value);
-    };
-  });
   await page.goto('/');
-
-  await page.getByRole('button', {name: 'Explain a concept'}).click();
-  await expect(page.getByRole('textbox', {name: 'Ask the learning assistant'})).toHaveValue('Explain a concept');
-  await page.getByRole('button', {name: 'Send message', exact: true}).click();
-  await expect(page).toHaveURL('/aibot');
-
-  await expect.poll(() => pendingChat).toBeDefined();
-  expect(JSON.parse(pendingChat ?? '{}')).toEqual({text: 'Explain a concept', courseId: 0});
+  await expect(page.getByRole('button', {name: 'Explain a concept'})).toHaveCount(0);
+  await expect(page.getByRole('textbox', {name: 'Ask the learning assistant'})).toHaveCount(0);
+  await expect(page.getByRole('link', {name: 'AI ChatBot'})).toHaveCount(0);
 });
 
 test('instructor dashboard uses teaching data and availability edits preserve every record', async ({page}, testInfo) => {
@@ -172,11 +145,11 @@ test('instructor dashboard uses teaching data and availability edits preserve ev
   await expect(page.getByRole('region', {name: 'Teaching dashboard'})).toBeVisible();
   await expect(page.getByRole('heading', {name: 'Welcome back, Sarah Instructor!'})).toBeVisible();
   await expect(page.getByText('Week 1 Essay').first()).toBeVisible();
-  await expect(page.getByText(/your teaching today/)).toBeVisible();
+  await expect(page.getByText(/your teaching today/)).toHaveCount(0);
   await expect.poll(() => studentOnlyRequests).toEqual([]);
 
-  await page.route('**/v2/me/teaching/grading-items', route => route.fulfill({json: response([])}));
-  await page.route('**/v2/me/teaching/schedule-requests', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/teaching/grading-items**', route => route.fulfill({json: response([])}));
+  await page.route('**/v2/me/teaching/schedule-requests**', route => route.fulfill({json: response([])}));
   await page.route('**/v2/me/teaching/students-needing-support', route => route.fulfill({json: response([])}));
   await page.route('**/v2/me/teaching/today-classes', route => route.fulfill({json: response([])}));
   await page.route('**/v2/me/teaching/availability', async route => {

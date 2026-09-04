@@ -36,7 +36,7 @@ test('An unresolved grading projection never appears as an empty queue', async (
   let finish: (() => void) | undefined;
   const gate = new Promise<void>(resolve => { finish = resolve; });
   await page.route('**/v2/me/teaching/grading-queue', route => route.fulfill({json: reply([])}));
-  await page.route('**/v2/me/teaching/grading-items', async route => {
+  await page.route('**/v2/me/teaching/grading-items**', async route => {
     await gate;
     await route.fulfill({json: reply([])});
   });
@@ -63,16 +63,16 @@ test('Instructor course workflows preserve versions, publishing rules, and prote
   await page.goto('/course/71/operations');
   await expect(page.getByRole('region', {name: 'Session occurrences'}).getByRole('row')).toHaveCount(6);
   await page.getByRole('button', {name: 'Manage Sep 3, 2026 class'}).click();
-  await expect(page.getByRole('button', {name: 'Reschedule', exact: true})).toBeDisabled();
+  await expect(page.getByRole('button', {name: 'Reschedule', exact: true})).toHaveCount(0);
   await page.getByRole('button', {name: 'Take attendance'}).click();
   const alexandra = page.getByRole('group', {name: 'Attendance for Alexandra Vance'});
-  await alexandra.getByRole('button', {name: 'Late', exact: true}).click();
+  await alexandra.getByRole('button', {name: 'Absent', exact: true}).click();
   await page.getByRole('button', {name: 'Reports', exact: true}).click();
   await expect(page.getByRole('dialog', {name: 'Leave unsaved attendance?'})).toBeVisible();
   await page.getByRole('button', {name: 'Keep editing', exact: true}).click();
   await page.getByRole('button', {name: 'Save attendance'}).click();
   await expect(page.getByText('Attendance saved.', {exact: true})).toBeVisible();
-  expect(writes.find(item => item.path.endsWith('/attendance'))?.body).toEqual({expectedAttendanceVersion: 1, entries: [{studentUserId: 301, status: 'LATE'}]});
+  expect(writes.find(item => item.path.endsWith('/attendance'))?.body).toEqual({expectedAttendanceVersion: 1, entries: [{studentUserId: 301, status: 'ABSENT'}]});
   await page.getByRole('button', {name: 'Reports', exact: true}).click();
   const published = page.getByRole('article').filter({hasText: 'Alexandra Vance'});
   await expect(published.getByRole('button', {name: 'View', exact: true})).toBeVisible();
@@ -117,7 +117,7 @@ test('Attendance conflicts preserve choices and disable repeat stale writes', as
 test('Missing attendance version never produces a write', async ({page}) => {
   const {writes} = await instructorFixture(page, {missingVersion: true});
   await page.goto('/course/71/operations?section=attendance');
-  await page.getByRole('group', {name: 'Attendance for Alexandra Vance'}).getByRole('button', {name: 'Late', exact: true}).click();
+  await page.getByRole('group', {name: 'Attendance for Alexandra Vance'}).getByRole('button', {name: 'Absent', exact: true}).click();
   await expect(page.getByRole('button', {name: 'Save attendance'})).toBeDisabled();
   expect(writes).toHaveLength(0);
 });
@@ -132,38 +132,17 @@ test('Writing grading keeps the score and feedback workflow', async ({page}) => 
   expect(writes[0].body).toMatchObject({score: 6.5, feedback: 'Clear position and useful examples. Review cohesion between paragraphs.'});
 });
 
-test('Occurrence editors send course-local dates and versioned schedule actions', async ({page}) => {
+test('Instructor can inspect dates and attendance without Advisor schedule actions', async ({page}) => {
   const {writes} = await instructorFixture(page);
   await page.goto('/course/71/operations');
-  await page.getByRole('button', {name: 'Create occurrence', exact: true}).click();
-  let dialog = page.getByRole('dialog');
-  await dialog.getByRole('textbox', {name: 'Class date', exact: true}).fill('09/30/2026');
-  await dialog.getByRole('textbox', {name: 'Start time', exact: true}).fill('10:00 AM');
-  await dialog.getByRole('textbox', {name: 'End time', exact: true}).fill('11:30 AM');
-  await dialog.getByRole('combobox', {name: 'Lecture (optional)'}).selectOption('81');
-  await dialog.getByRole('button', {name: 'Create occurrence', exact: true}).click();
-  await expect(page.getByText('Class occurrence created.')).toBeVisible();
-  expect(writes[0].body).toEqual({occurrenceDate: '2026-09-30', startTime: '10:00:00', endTime: '11:30:00', weekId: 81});
+  await expect(page.getByRole('region', {name: 'Session occurrences'})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Create occurrence', exact: true})).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Generate from schedule'})).toHaveCount(0);
   await page.getByRole('button', {name: 'Manage Sep 13, 2026 class'}).click();
-  await page.getByRole('button', {name: 'Reschedule', exact: true}).click();
-  dialog = page.getByRole('dialog');
-  await dialog.getByRole('textbox', {name: 'Class date', exact: true}).fill('09/14/2026');
-  await dialog.getByRole('button', {name: 'Save new schedule'}).click();
-  await expect(page.getByText('Class rescheduled.', {exact: true})).toBeVisible();
-  expect(writes.find(item => item.path.endsWith('/reschedule'))?.body).toMatchObject({occurrenceDate: '2026-09-14', expectedVersion: 1});
-  await page.getByRole('button', {name: 'Manage Sep 18, 2026 class'}).click();
-  await page.getByRole('button', {name: 'Cancel occurrence'}).click();
-  await page.getByRole('button', {name: 'Confirm cancellation'}).click();
-  await expect(page.getByText('Class occurrence cancelled.')).toBeVisible();
-  expect(writes.find(item => item.path.endsWith('/cancel'))?.body).toEqual({expectedVersion: 1});
-  await page.getByRole('button', {name: 'Generate from schedule'}).click();
-  dialog = page.getByRole('dialog');
-  await dialog.getByRole('textbox', {name: 'From', exact: true}).fill('10/01/2026');
-  await dialog.getByRole('textbox', {name: 'To', exact: true}).fill('10/31/2026');
-  await dialog.getByRole('button', {name: 'Generate occurrences'}).click();
-  await expect(page.getByText('Occurrences generated from the recurring schedule.')).toBeVisible();
-  expect(writes.find(item => item.path.endsWith('/generate'))?.body).toEqual({from: '2026-10-01', to: '2026-10-31'});
-  expect(writes.every(item => Boolean(item.key))).toBe(true);
+  await expect(page.getByRole('button', {name: 'Reschedule', exact: true})).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Cancel occurrence'})).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Take attendance'})).toBeVisible();
+  expect(writes).toHaveLength(0);
 });
 
 test('Course downloads, roster search and availability retain existing API flows', async ({page}) => {

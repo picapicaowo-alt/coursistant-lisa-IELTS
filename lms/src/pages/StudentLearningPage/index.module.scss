@@ -1,0 +1,84 @@
+.page { container: learning-workspace / inline-size; width: 100%; min-width: 0; color: t.$content-primary; padding-block: t.$space-6; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: t.$space-5; margin-bottom: t.$space-4; }
+.header h2 { margin: 0; font-size: t.$font-size-headline; font-weight: t.$fw-bold; }
+.header p { margin: t.$space-2 0 0; color: t.$content-secondary; font-size: t.$font-size-body-lg; line-height: 1.6; }
+.coursePicker { display: block; min-width: 0; }
+.coursePicker select { width: 100%; max-width: 26rem; min-height: t.$touch-target; padding: t.$space-2 t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-raised; color: t.$content-primary; font: inherit; font-size: t.$font-size-body; text-overflow: ellipsis; }
+.tabs { display: flex; flex-wrap: wrap; gap: t.$space-3; margin-bottom: t.$space-8; }
+.tabs button { min-height: t.$touch-target; padding: t.$space-2 t.$space-4; color: t.$content-secondary; border: 0; border-radius: t.$radius-control-sm; background: transparent; font: inherit; cursor: pointer; }
+.tabs button[aria-pressed='true'] { color: t.$action-primary; background: t.$surface-brand-subtle; font-weight: t.$fw-semibold; }
+.overview { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 3fr); gap: t.$space-6; align-items: start; }
+.progressPanel { grid-column: 1; }
+.overall { display: flex; align-items: center; gap: t.$space-8; padding-bottom: t.$space-6; border-bottom: 1px solid t.$border-default; }
+.overall h3, .courseProgress h3, .courseEntry h3, .checkpoints > h3 { margin: 0; font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; line-height: 1.6; }
+.overall > [role] { width: 7rem; flex: 0 0 7rem; }
+.overall > [role] strong { color: t.$action-primary; font-size: t.$font-size-headline; }
+.overall p { margin: t.$space-2 0; color: t.$content-secondary; line-height: 1.6; }
+.scope { font-size: t.$font-size-caption; color: t.$content-secondary; }
+.courseProgress { grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr)); display: grid; gap: t.$space-6; }
+.courseProgress article { display: grid; gap: t.$space-3; }
+.courseProgress progress { height: t.$space-2; }
+.checkpoints { display: grid; gap: t.$space-3; padding-top: t.$space-3; }
+.checkpoint { display: grid; gap: t.$space-3; padding: t.$space-5; border: 1px solid t.$border-default; border-radius: t.$radius-control; background: t.$surface-subtle; }
+.checkpoint header, .checkpoint footer { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; flex-wrap: wrap; }
+.checkpoint header > span:first-child { display: flex; align-items: center; gap: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-body; font-weight: t.$fw-semibold; }
+.checkpoint header svg { color: t.$feedback-success; }
+.checkpoint p { margin: 0; font-size: t.$font-size-body; line-height: 1.7; }
+.checkpoint footer { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.alertsPanel { grid-column: 2; }
+.alerts { display: grid; gap: t.$space-5; }
+.alerts article { display: flex; gap: t.$space-3; align-items: flex-start; }
+.alerts svg { flex-shrink: 0; margin-top: t.$space-1; color: t.$action-primary; }
+.alerts strong { font-size: t.$font-size-body; font-weight: t.$fw-medium; line-height: 1.6; }
+.alerts small { display: block; margin-top: t.$space-2; font-size: t.$font-size-caption; color: t.$content-secondary; }
+.courseEntry { grid-column: 1; display: grid; gap: t.$space-4; border: 1px solid t.$border-interactive; border-radius: t.$radius-card-lg; padding: t.$space-6; background: t.$surface-assistant-end; }
+.courseEntry h3 { color: t.$action-primary; }
+.courseEntry p { color: t.$content-secondary; font-size: t.$font-size-body; line-height: 1.6; margin: t.$space-1 0 0; }
+.entryActions { display: flex; align-items: center; gap: t.$space-4; }
+.entryActions .coursePicker { flex: 1; }
+.entryActions select { max-width: none; }
+.supportGrid { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: t.$space-6; align-items: start; }
+.primary { display: inline-flex; align-items: center; justify-content: center; gap: t.$space-2; min-height: t.$touch-target; padding: t.$space-2 t.$space-5; border: 0; border-radius: t.$radius-control; color: t.$content-on-color; background: t.$action-primary; font: inherit; font-weight: t.$fw-semibold; cursor: pointer; text-decoration: none; }
+.primary:hover:not(:disabled) { background: t.$action-primary-hover; }
+.primary:disabled { opacity: .5; cursor: not-allowed; }
+.textButton { display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; padding: 0; border: 0; background: transparent; color: t.$action-primary; font: inherit; font-size: t.$font-size-caption; font-weight: t.$fw-semibold; text-decoration: none; cursor: pointer; }
+.textButton svg { flex-shrink: 0; }
+.recordList { display: grid; gap: t.$space-4; }
+.record { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: t.$space-3; padding-bottom: t.$space-4; border-bottom: 1px solid t.$border-default; }
+.record:last-child { padding-bottom: 0; border-bottom: 0; }
+.record > div { display: grid; flex: 1; min-width: 9rem; gap: t.$space-2; }
+.record strong { font-size: t.$font-size-body; line-height: 1.6; font-weight: t.$fw-semibold; overflow-wrap: anywhere; }
+.record a { color: inherit; text-decoration: none; }
+.record a:hover { color: t.$action-primary; }
+.record small { font-size: t.$font-size-caption; color: t.$content-secondary; }
+.record p { flex-basis: 100%; margin: 0; color: t.$content-secondary; font-size: t.$font-size-body; line-height: 1.6; overflow-wrap: anywhere; }
+.attendanceCounts { display: flex; flex-wrap: wrap; gap: t.$space-4; margin: 0 0 t.$space-3; }
+.attendanceCounts div { display: flex; flex-direction: column-reverse; gap: t.$space-1; }
+.attendanceCounts dt { font-size: t.$font-size-caption; color: t.$content-secondary; }
+.attendanceCounts dd { margin: 0; font-size: t.$font-size-headline; font-weight: t.$fw-semibold; color: t.$action-primary; }
+.detailHeader { margin-bottom: t.$space-6; }
+.detailHeader h3 { margin: t.$space-3 0; font-size: t.$font-size-headline; }
+.detailHeader p { color: t.$content-secondary; margin: 0; }
+.page :is(button, a, select, input, textarea):focus-visible { outline: 2px solid t.$action-primary; outline-offset: 3px; }
+.srOnly { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@container learning-workspace (max-width: 62rem) {
+  .overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .progressPanel { grid-column: 1 / -1; }
+  .alertsPanel { grid-column: 1; }
+  .courseEntry { grid-column: 2; }
+  .entryActions { flex-direction: column; align-items: stretch; }
+  .supportGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@container learning-workspace (max-width: 38rem) {
+  .header { align-items: stretch; flex-direction: column; }
+  .header select { max-width: none; }
+  .overview, .supportGrid { grid-template-columns: minmax(0, 1fr); }
+  .progressPanel, .alertsPanel, .courseEntry { grid-column: 1; }
+  .overall { gap: t.$space-4; align-items: flex-start; flex-wrap: wrap; }
+  .courseEntry { padding: t.$space-5; }
+}
+
+.page { background: t.$surface-subtle; padding: t.$space-6; border-radius: t.$radius-card-lg; }
+@container learning-workspace (max-width: 38rem) { .courseProgress { grid-template-columns: 1fr; } }
+
+.page .overview section > header { align-items: center; }

@@ -1,0 +1,43 @@
+.details { display: grid; gap: t.$space-6; }
+.balances { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: t.$space-6; margin: 0; }
+.balances div { display: grid; gap: t.$space-3; padding: t.$space-3 0; }
+.balances dt { color: t.$content-secondary; font-size: t.$font-size-body; }
+.balances dd { margin: 0; color: t.$action-primary; font-size: t.$font-size-headline; font-weight: t.$fw-bold; font-variant-numeric: tabular-nums; }
+.balances dd span { margin-left: t.$space-2; font-size: t.$font-size-body; font-weight: t.$fw-regular; color: t.$content-secondary; }
+.reports { display: grid; gap: t.$space-4; }
+.reports article { display: flex; gap: t.$space-4; align-items: center; padding-block: t.$space-3; border-bottom: 1px solid t.$border-default; }
+.reports article:last-child { border: 0; }
+.reports article > div { flex: 1; min-width: 0; }
+.reports h3 { margin: 0; font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; }
+.reports p { color: t.$content-secondary; margin: t.$space-2 0 0; font-size: t.$font-size-body; }
+.icon { display: grid; place-items: center; flex-shrink: 0; width: t.$space-12; height: t.$space-12; background: t.$surface-brand-subtle; color: t.$action-primary; border-radius: t.$radius-control; }
+.report { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-8; }
+.report section:first-child { grid-column: 1 / -1; }
+.report h3 { margin: 0 0 t.$space-3; font-size: t.$font-size-body-lg; }
+.report p { margin: 0; max-width: 75ch; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.8; font-size: t.$font-size-body-lg; color: t.$content-secondary; }
+.scheduleLayout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: t.$space-6; align-items: start; }
+.monthNavigation { display: flex; align-items: center; justify-content: space-between; gap: t.$space-3; }
+.monthNavigation button { display: grid; place-items: center; min-height: t.$touch-target; min-width: t.$touch-target; background: transparent; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$action-primary; cursor: pointer; }
+.monthNavigation strong { font-size: t.$font-size-body; }
+.classList { display: grid; gap: t.$space-3; }
+.classOption { display: flex; align-items: center; gap: t.$space-4; padding: t.$space-4; background: t.$surface-raised; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; text-align: left; cursor: pointer; }
+.classOption > span { display: grid; flex: 1; min-width: 0; gap: t.$space-2; }
+.classOption svg { flex-shrink: 0; color: t.$action-primary; }
+.classOption strong { font-size: t.$font-size-body; }
+.classOption small { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.classOption[aria-pressed='true'] { background: t.$surface-assistant-end; border-color: t.$action-primary; }
+.form { display: grid; gap: t.$space-5; }
+.form label { display: grid; gap: t.$space-2; min-width: 0; font-size: t.$font-size-body; font-weight: t.$fw-medium; }
+.form :is(input, select, textarea) { width: 100%; min-width: 0; min-height: t.$touch-target; padding: t.$space-3; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; background: t.$surface-raised; font: inherit; }
+.form textarea { resize: vertical; line-height: 1.7; }
+.timeFields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-4; }
+.selectedClass { display: grid; gap: t.$space-2; padding: t.$space-4; border-radius: t.$radius-control; background: t.$surface-subtle; }
+.selectedClass span, .note { color: t.$content-secondary; font-size: t.$font-size-body; line-height: 1.6; margin: 0; }
+.error { color: t.$feedback-danger; }
+@container learning-workspace (max-width: 52rem) { .scheduleLayout { grid-template-columns: 1fr; } }
+@container learning-workspace (max-width: 38rem) { .balances { gap: t.$space-3; } .balances dd span { display: block; margin: t.$space-1 0 0; } .report { grid-template-columns: 1fr; } .reports article { flex-wrap: wrap; } .reports button { margin-left: auto; } }
+
+.snapshot h3 { font-size: t.$font-size-body-lg; }
+.snapshot dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: t.$space-6; }
+.snapshot dt { font-size: t.$font-size-caption; color: t.$content-secondary; }
+.snapshot dd { margin: t.$space-2 0 0; font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; }

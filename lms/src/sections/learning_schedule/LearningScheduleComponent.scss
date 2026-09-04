@@ -240,3 +240,14 @@
     height: t.$touch-target;
   }
 }
+
+.learning-schedule__reset { justify-self: start; min-height: t.$touch-target; padding: 0; border: 0; background: transparent; color: t.$action-primary; font-size: t.$font-size-caption; cursor: pointer; }
+.learning-schedule--spacious {
+  .learning-schedule__header { min-height: 4.5rem; padding: t.$space-4 t.$space-6; border: 0; h2 { font-size: t.$font-size-subhead; font-weight: t.$fw-semibold; } a { width: t.$touch-target; height: t.$touch-target; } }
+  .learning-schedule__calendar { padding: 0 t.$space-5 t.$space-4; }
+  .learning-schedule__month { height: t.$touch-target; button { height: t.$touch-target; } strong { font-size: t.$font-size-body; } }
+  .learning-schedule__days { row-gap: t.$space-2; button { font-size: t.$font-size-caption; width: min(100%, 2.5rem); height: 2.5rem; } }
+  .learning-schedule__weekdays span { font-size: t.$font-size-caption; color: t.$content-secondary; }
+  .learning-schedule__timeline { min-height: 0; padding: t.$space-4 t.$space-6 t.$space-6; gap: t.$space-5; }
+  .learning-schedule__event { min-height: t.$touch-target; strong { font-size: t.$font-size-body; white-space: normal; } small, em { font-size: t.$font-size-caption; } }
+}

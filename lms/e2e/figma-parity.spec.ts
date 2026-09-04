@@ -144,11 +144,11 @@ test('advisor dashboard and students retain distinct workspaces at both breakpoi
   await capture(page, info.outputPath.bind(info), 'advisor-students');
 });
 
-test('student AI presents a focused course-aware learning workspace', async ({page}, info) => {
+test('student has no unsupported AI entry or direct route', async ({page}, info) => {
   await fixture(page);
   await page.goto('/aibot?courseId=71');
-  await expect(page.getByRole('textbox', {name: 'Ask Study Support'})).toBeVisible();
-  await expect(page.getByRole('heading', {name: 'Your personal learning assistant'})).toBeVisible();
-  await expect(page.getByRole('button', {name: course.title, exact: true})).toBeVisible();
-  await capture(page, info.outputPath.bind(info), 'student-ai');
+  await expect(page).not.toHaveURL(/\/aibot/);
+  await expect(page.getByRole('textbox', {name: 'Ask Study Support'})).toHaveCount(0);
+  await expect(page.getByRole('link', {name: 'AI ChatBot'})).toHaveCount(0);
+  await capture(page, info.outputPath.bind(info), 'student-dashboard');
 });

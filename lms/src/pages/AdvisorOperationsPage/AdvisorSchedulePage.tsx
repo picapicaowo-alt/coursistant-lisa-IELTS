@@ -132,7 +132,7 @@ export default function AdvisorSchedulePage() {
             <div className={styles.emptyState}>
               <strong>No schedule requests are waiting</strong>
               <span>
-                Student and parent requests will appear here with the record version required for a safe decision.
+                Student and parent requests will appear here for your review.
               </span>
             </div>
           ) : null}

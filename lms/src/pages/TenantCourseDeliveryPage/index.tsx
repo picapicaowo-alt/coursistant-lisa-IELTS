@@ -23,7 +23,7 @@ function CourseDeliveryWorkspace({id}: {id: number}) {
   const primaryWeekday = primarySession ? COURSE_SESSION_DAYS.find(day => day.value === primarySession.dayOfWeek)?.label ?? primarySession.dayOfWeek : '';
   const sessionSummary = primarySession
     ? `Every ${primaryWeekday} · ${formatCourseTime(primarySession.startTime)}–${formatCourseTime(primarySession.endTime)}`
-    : sessions.isSuccess ? 'Schedule not configured' : 'Schedule unavailable';
+    : sessions.isPending ? 'Loading schedule…' : sessions.isSuccess ? 'Schedule not configured' : 'Schedule unavailable';
 
   return <div className={styles.detailPage}>
     <header className={styles.courseIdentity}>

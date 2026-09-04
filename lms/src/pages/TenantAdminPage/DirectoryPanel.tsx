@@ -247,7 +247,7 @@ export const DirectoryPanel = ({
     mutationFn: async () => {
       if (!reviewedAccount || reviewedAccountVersion == null)
         throw new Error(
-          "The backend did not return accountVersion, so this account cannot be updated safely.",
+          "Reload this account before saving changes.",
         );
       const payload: PatchTenantManagedUserRequest = {
         expectedAccountVersion: reviewedAccountVersion,
@@ -1018,8 +1018,7 @@ export const DirectoryPanel = ({
                   ) : confirmDisable ? (
                     <div className={styles.confirmBox}>
                       <p>
-                        No current responsibility blockers were found. The
-                        backend will check again when you confirm.
+                        This account has no outstanding responsibilities preventing login from being disabled.
                       </p>
                       <div>
                         <button

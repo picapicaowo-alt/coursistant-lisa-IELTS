@@ -50,4 +50,34 @@ describe('reviewed draft versions', () => {
     await waitFor(() => expect(api.updateStudyPlan).toHaveBeenCalled());
     expect(api.updateStudyPlan.mock.calls[0][1]).toMatchObject({expectedProfileVersion: 2, expectedStudyPlanVersion: 3, strategySummary: 'My revised strategy'});
   });
+
+  it('quietly uses the current profile version when a saved plan predates the profile', async () => {
+    api.getStudyPlan.mockResolvedValue(response({...plan, profileContext: {currentProfileVersion: 7}, plan: {...plan.plan, profileChangedSincePlanUpdate: true}}));
+    mount(<StudyPlanPage/>);
+    fireEvent.click(await screen.findByRole('button', {name: 'Edit study plan'}));
+    expect(screen.queryByText(/The profile changed after this plan/)).not.toBeInTheDocument();
+    const field = await screen.findByLabelText(/Strategy/);
+    fireEvent.submit(field.closest('form')!);
+    await waitFor(() => expect(api.updateStudyPlan).toHaveBeenCalled());
+    expect(api.updateStudyPlan.mock.calls[0][1]).toMatchObject({expectedProfileVersion: 7, expectedStudyPlanVersion: 3});
+  });
+
+  it('retains edits and clears the conflict after explicitly loading the latest plan', async () => {
+    api.updateStudyPlan.mockRejectedValueOnce({code: 409, details: {code: 'STUDY_PLAN_VERSION_CONFLICT'}});
+    mount(<StudyPlanPage/>);
+    fireEvent.click(await screen.findByRole('button', {name: 'Edit study plan'}));
+    const field = await screen.findByLabelText(/Strategy/);
+    fireEvent.change(field, {target: {value: 'Preserve my edits'}});
+    fireEvent.submit(field.closest('form')!);
+    const reload = await screen.findByRole('button', {name: 'Load latest record'});
+    expect(screen.getAllByRole('alert')).toHaveLength(1);
+    expect(screen.getByRole('button', {name: 'Save study plan'})).toBeDisabled();
+    api.getStudyPlan.mockResolvedValue(response({...plan, profileContext: {currentProfileVersion: 7}, plan: {...plan.plan, studyPlanVersion: 4}}));
+    fireEvent.click(reload);
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
+    expect(field).toHaveValue('Preserve my edits');
+    fireEvent.submit(field.closest('form')!);
+    await waitFor(() => expect(api.updateStudyPlan).toHaveBeenCalledTimes(2));
+    expect(api.updateStudyPlan.mock.calls[1][1]).toMatchObject({expectedProfileVersion: 7, expectedStudyPlanVersion: 4, strategySummary: 'Preserve my edits'});
+  });
 });

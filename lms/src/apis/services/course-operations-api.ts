@@ -1,3 +1,4 @@
+import {readCollection, type CollectionPage} from './readCollection';
 import type {
   ApiResponse,
   AdvisingPage,
@@ -126,8 +127,12 @@ export class CourseOperationsApiService {
     return this.apiClient.get(`/v2/courses/${courseId}/discussion/posts/${postId}/replies`, {params: {page, size}});
   }
 
-  createDiscussionReply(courseId: number, postId: number, body: string, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseOperationRead>> {
-    return this.apiClient.post(`/v2/courses/${courseId}/discussion/posts/${postId}/replies`, {body}, idempotent(key));
+  createDiscussionReply(courseId: number, postId: number, body: string, key: string = crypto.randomUUID(), files: File[] = []): Promise<ApiResponse<CourseOperationRead>> {
+    if (!files.length) return this.apiClient.post(`/v2/courses/${courseId}/discussion/posts/${postId}/replies`, {body}, idempotent(key));
+    const form = new FormData();
+    form.append('body', body);
+    files.forEach(file => form.append('files', file));
+    return this.apiClient.post(`/v2/courses/${courseId}/discussion/posts/${postId}/replies`, form, idempotent(key));
   }
 
   private async getDiscussionAttachment(courseId: number, postId: number, attachmentId: number, action: 'preview' | 'download'): Promise<Blob> {
@@ -243,15 +248,15 @@ export class CourseOperationsApiService {
   }
 
   getMyAlerts(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/alerts'); }
-  getMyAttendance(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/attendance'); }
+  getMyAttendance(params: {from?: string; to?: string; courseId?: number} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/attendance', {params}); }
   getMyCalendar(params: {from?: string; to?: string; timezone?: string} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/calendar', {params}); }
   getMyProgress(): Promise<ApiResponse<StudentProgressResponse>> { return this.apiClient.get('/v2/me/progress'); }
-  getMyScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/schedule-requests'); }
-  getMyWorkQueue(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/work-queue'); }
+  getMyScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/schedule-requests', {params})); }
+  getMyWorkQueue(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/work-queue', {params})); }
   getMyCourseHours(courseId: number): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get(`/v2/me/courses/${courseId}/hours`); }
   getMyTeachingAlerts(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/alerts'); }
-  getMyTeachingGradingItems(): Promise<ApiResponse<TeachingGradingItemResponse[]>> { return this.apiClient.get('/v2/me/teaching/grading-items'); }
-  getMyTeachingScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/teaching/schedule-requests'); }
+  getMyTeachingGradingItems(): Promise<ApiResponse<TeachingGradingItemResponse[]>> { return readCollection<TeachingGradingItemResponse>(params => this.apiClient.get('/v2/me/teaching/grading-items', {params})); }
+  getMyTeachingScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/teaching/schedule-requests', {params})); }
   getMyTeachingStudentsNeedingSupport(): Promise<ApiResponse<TeachingStudentSupportResponse[]>> { return this.apiClient.get('/v2/me/teaching/students-needing-support'); }
   getMyTeachingTodayClasses(): Promise<ApiResponse<TeachingTodayClassResponse[]>> { return this.apiClient.get('/v2/me/teaching/today-classes'); }
 

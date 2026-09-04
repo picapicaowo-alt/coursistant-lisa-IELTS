@@ -1,3 +1,5 @@
+import {formatPersonName} from '@/utils/personName';
+import {calendarLocalFields} from '@/utils/datetime';
 import {useEffect, useRef, type Dispatch, type SetStateAction} from 'react';
 import {CalendarClock, CalendarDays, Clock3, FilePenLine, MapPin} from 'lucide-react';
 import {SCHEDULE_REQUEST_TYPES, type ScheduleRequestType} from '@/apis';
@@ -29,7 +31,7 @@ export function ParentSchedule({value, history, loading, loadError, draft, setDr
   pending: boolean; error: unknown; success: boolean; onSubmit: () => void;
 }) {
   const data = asRecord(value);
-  const classes = parentRecords(data?.calendar);
+  const classes = parentRecords(data?.calendar).filter(row => !row.eventType || row.eventType === 'SESSION');
   const editor = useRef<HTMLHeadingElement>(null);
   const selected = classes.find(row => String(parentNumber(row, 'courseId')) === draft.courseId && String(parentNumber(row, 'occurrenceId') ?? parentNumber(row, 'sessionOccurrenceId')) === draft.occurrenceId);
   useEffect(() => {if (draft.occurrenceId && !history) editor.current?.focus({preventScroll: false});}, [draft.occurrenceId, history]);
@@ -42,19 +44,24 @@ export function ParentSchedule({value, history, loading, loadError, draft, setDr
         const courseId = parentNumber(row, 'courseId');
         const occurrenceId = parentNumber(row, 'occurrenceId') ?? parentNumber(row, 'sessionOccurrenceId');
         const active = selected === row;
-        const date = parentText(row, 'occurrenceDate') || parentText(row, 'date');
-        const start = parentText(row, 'startTime');
-        const end = parentText(row, 'endTime');
+        const timezone = parentText(row, 'timezone') || Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const startUtc = parentText(row, 'startsAtUtc');
+        const endUtc = parentText(row, 'endsAtUtc');
+        const local = startUtc ? calendarLocalFields(startUtc, endUtc, timezone) : undefined;
+        const date = local?.date || parentText(row, 'occurrenceDate') || parentText(row, 'date');
+        const start = local?.startTime || parentText(row, 'startTime');
+        const end = local?.endTime || parentText(row, 'endTime');
+        const instructor = formatPersonName({firstName: parentText(row, 'instructorFirstName'), middleName: parentText(row, 'instructorMiddleName'), lastName: parentText(row, 'instructorLastName')}, parentText(row, 'instructorName') || '');
         const location = parentText(row, 'location');
         return <article className={styles.classRow} data-selected={active || undefined} key={occurrenceId ?? index}>
           <header className={styles.classHeader}>
             <span className={styles.classIcon}><FilePenLine size={28} aria-hidden="true"/></span>
-            <div><strong>{parentText(row, 'courseTitle') || parentText(row, 'courseCode') || parentText(row, 'title') || 'Scheduled class'}</strong>{parentText(row, 'instructorName') ? <span>Instructor: {parentText(row, 'instructorName')}</span> : null}</div>
+            <div><strong>{parentText(row, 'courseTitle') || parentText(row, 'courseCode') || parentText(row, 'title') || 'Scheduled class'}</strong>{instructor ? <span>Instructor: {instructor}</span> : null}</div>
           </header>
           <dl className={styles.classFacts}>
             <div><CalendarDays size={19} aria-hidden="true"/><span><dt>Date</dt><dd>{date ? parentDate(date) : 'Not provided'}</dd></span></div>
-            <div><Clock3 size={19} aria-hidden="true"/><span><dt>Time</dt><dd>{[parentTime(start), parentTime(end)].filter(Boolean).join(' – ') || 'Not provided'}</dd>{classDuration(start, end) ? <small>{classDuration(start, end)}</small> : null}</span></div>
-            <div><MapPin size={19} aria-hidden="true"/><span><dt>Location</dt><dd>{location || 'Not provided'}</dd></span></div>
+            <div><Clock3 size={19} aria-hidden="true"/><span><dt>Time</dt><dd>{[parentTime(start), parentTime(end)].filter(Boolean).join(' – ') || 'Not provided'}</dd>{classDuration(start, end) ? <small>{classDuration(start, end)}</small> : null}<small>{timezone}</small></span></div>
+            {location ? <div><MapPin size={19} aria-hidden="true"/><span><dt>Location</dt><dd>{location}</dd></span></div> : null}
           </dl>
           {courseId != null && occurrenceId != null ? <button type="button" className={active ? shared.primary : shared.secondary} aria-pressed={active} disabled={pending} onClick={() => setDraft(current => ({...current, courseId: String(courseId), occurrenceId: String(occurrenceId)}))}>{active ? 'Selected class' : 'Request change'}</button> : <p className={styles.meta}>Schedule changes are not available for this class.</p>}
         </article>;

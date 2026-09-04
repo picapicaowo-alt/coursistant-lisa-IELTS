@@ -37,7 +37,7 @@ test('parent can request absence, read exam results, load older messages, and re
         const cursor = url.searchParams.get('beforeId');
         if (cursor) cursors.push(cursor);
         expect(url.searchParams.has('page')).toBe(false);
-        data = cursor ? [] : [{messageId: 100, body: 'This week’s learning update', senderUserId: 52}];
+        data = {items: cursor ? [] : [{messageId: 100, body: 'This week’s learning update', senderUserId: 52}], hasMore: !cursor, nextBeforeId: cursor ? null : 100};
       }
     }
     await route.fulfill({json: response(data)});
@@ -81,6 +81,7 @@ test('parent can request absence, read exam results, load older messages, and re
 
 test('student operations distinguish unavailable alerts and preserve event detail version across a retry', async ({page}) => {
   await signInFixture(page, 'STUDENT');
+  await page.clock.setFixedTime(new Date('2026-09-10T12:00:00'));
   const writes: Array<{key?: string; body: Record<string, unknown>}> = [];
   const reads: string[] = [];
   await page.route('**/v2/**', async route => {
@@ -91,7 +92,7 @@ test('student operations distinguish unavailable alerts and preserve event detai
     if (path.endsWith('/unread-count')) data = {unreadCount: 0};
     else if (path.endsWith('/me/courses')) data = {items: [], page: 0, size: 20, total: 0};
     else if (path.endsWith('/me/alerts')) return route.fulfill({status: 503, json: {status: 503, code: 'UNAVAILABLE', message: 'Alerts temporarily unavailable'}});
-    else if (path.endsWith('/personal-events')) data = [{eventId: 71, title: 'Study session', version: 1}];
+    else if (path.endsWith('/personal-events')) data = [{eventId: 71, title: 'Study session', startsAtLocal: '2026-09-10T10:00:00', endsAtLocal: '2026-09-10T11:00:00', timezone: 'Asia/Singapore', version: 1}];
     else if (path.endsWith('/personal-events/71') && request.method() === 'GET') data = {eventId: 71, title: 'Study session', startsAtLocal: '2026-09-10T10:00:00', endsAtLocal: '2026-09-10T11:00:00', timezone: 'Asia/Singapore', version: 4};
     else if (path.endsWith('/personal-events/71') && request.method() === 'PATCH') {
       writes.push({key: request.headers()['idempotency-key'], body: request.postDataJSON()});
@@ -101,16 +102,16 @@ test('student operations distinguish unavailable alerts and preserve event detai
     await route.fulfill({json: response(data)});
   });
   await page.goto('/my-operations');
-  await expect(page.getByRole('alert').filter({hasText: 'Alerts temporarily unavailable'})).toBeVisible();
+  await expect(page.getByRole('alert').filter({hasText: 'Alerts could not be loaded.'})).toBeVisible();
   await expect(page.getByText('No active alerts.', {exact: true})).toHaveCount(0);
-  await page.getByRole('navigation', {name: 'Operations sections'}).getByRole('button', {name: 'calendar', exact: true}).click();
-  await openSection(page, 'Personal events');
-  await page.getByRole('button', {name: 'Edit', exact: true}).click();
-  await expect(page.getByRole('textbox', {name: 'Title', exact: true})).toHaveValue('Study session');
+  await page.getByRole('navigation', {name: 'Learning views'}).getByRole('button', {name: 'Calendar', exact: true}).click();
+  await page.getByRole('button', {name: /^Study session/}).first().click();
+  await page.getByRole('button', {name: 'Edit event', exact: true}).click();
+  await expect(page.getByRole('textbox', {name: 'Event title', exact: true})).toHaveValue('Study session');
   expect(reads.some(path => path.endsWith('/personal-events/71'))).toBe(true);
-  await page.getByRole('textbox', {name: 'Title', exact: true}).fill('Revised study session');
+  await page.getByRole('textbox', {name: 'Event title', exact: true}).fill('Revised study session');
   await page.getByRole('button', {name: 'Save changes', exact: true}).click();
-  await expect(page.getByRole('alert').filter({hasText: 'Event update unavailable'})).toBeVisible();
+  await expect(page.getByRole('alert').filter({hasText: 'The event could not be saved. Your entries are preserved.'})).toBeVisible();
   await page.getByRole('button', {name: 'Save changes', exact: true}).click();
   await expect.poll(() => writes.length).toBe(2);
   expect(writes[0].body).toMatchObject({expectedVersion: 4, title: 'Revised study session'});

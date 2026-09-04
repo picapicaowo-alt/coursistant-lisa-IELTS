@@ -29,7 +29,7 @@ export function CourseDeliveryOverview({course, config, sessions, sessionsPendin
         <div><dt>Next pattern</dt><dd>{sessions[0].type} · {sessions[0].dayOfWeek} · {sessions[0].startTime.slice(0, 5)}–{sessions[0].endTime.slice(0, 5)}</dd></div>
         <div><dt>Location</dt><dd>{sessions[0].location || 'Not provided'}</dd></div>
         <div><dt>Timezone</dt><dd>{sessions[0].timezone || 'Not provided'}</dd></div>
-      </dl> : !sessionsPending ? <p className={styles.helper}>{sessions ? 'No recurring sessions have been added.' : 'Schedule unavailable. Retry the schedule read to continue.'}</p> : null}
+      </dl> : !sessionsPending ? <p className={styles.helper}>{sessions ? 'No recurring sessions have been added.' : 'The weekly schedule could not be loaded.'}</p> : null}
     </section>
   </>;
 }

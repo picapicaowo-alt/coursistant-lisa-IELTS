@@ -14,7 +14,7 @@ describe('MockExamApiService', () => {
     await service.listStudentExams();
     await service.listAdvisorTemplates();
     await service.listTenantTemplates();
-    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/student/mock-exams');
+    expect(client.get).toHaveBeenNthCalledWith(1, '/v2/student/mock-exams', {params: {page: 0, size: 100}});
     expect(client.get).toHaveBeenNthCalledWith(2, '/v2/advisor/mock-exam-templates');
     expect(client.get).toHaveBeenNthCalledWith(3, '/v2/tenant/mock-exam-templates');
   });

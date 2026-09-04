@@ -13,12 +13,12 @@ const Layout: React.FC = () => {
   const {user} = useRequiredAuth();
   const mainContentRef = React.useRef<HTMLElement | null>(null);
   
-  // Instructor course overview belongs in the teaching shell; the material reader
-  // and other roles retain their existing focused reading experience.
-  const instructorOverview = user.role === 'USER' && user.level === 'INSTRUCTOR'
+  // Course overview uses the application shell for students and instructors.
+  // Opening a material keeps the focused reading experience.
+  const courseOverview = user.role === 'USER' && (user.level === 'INSTRUCTOR' || user.level === 'STUDENT')
     && matchPath({path: APP_ROUTE_PATHS.courseCourseId, end: true}, location.pathname)
     && !new URLSearchParams(location.search).has('materialId');
-  const showLayout = Boolean(instructorOverview) || shouldShowAppShell(location.pathname, location.search);
+  const showLayout = Boolean(courseOverview) || shouldShowAppShell(location.pathname, location.search);
 
   React.useEffect(() => {
     // The shell's main element is the scroll container. React Router reuses it

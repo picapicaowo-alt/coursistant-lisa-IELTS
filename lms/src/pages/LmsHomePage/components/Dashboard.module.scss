@@ -3,7 +3,6 @@
   width: 100%;
   max-width: t.$workspace-max-inline-size;
   grid-template-columns:
-    minmax(t.$dashboard-chat-min-inline-size, .82fr)
     minmax(t.$dashboard-main-min-inline-size, 1.5fr)
     minmax(t.$dashboard-side-min-inline-size, .72fr);
   gap: t.$dashboard-column-gap;
@@ -462,7 +461,7 @@
 
 @container dashboard-workspace (max-width: 68rem) {
   .dashboard {
-    grid-template-columns: minmax(18rem, .78fr) minmax(31rem, 1.25fr);
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
     gap: t.$dashboard-column-gap;
   }
 
@@ -473,8 +472,8 @@
   }
 
   .sideColumn {
-    grid-column: 1 / -1;
-    grid-template-columns: minmax(31rem, 1fr) minmax(16.875rem, .55fr);
+    grid-column: auto;
+    grid-template-columns: minmax(0, 1fr);
   }
 
 }

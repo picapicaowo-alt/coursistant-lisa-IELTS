@@ -1,12 +1,23 @@
-import {Link} from 'react-router-dom';
-import styles from './index.module.scss';
+import {useQuery} from '@tanstack/react-query';
+import {generatePath, Link} from 'react-router-dom';
+import {ArrowRight} from 'lucide-react';
+import {unwrapData} from '@/apis';
+import {assignmentApiService} from '@/apis/services/assignment-api';
+import {WorkspaceSection} from '@/components/WorkspaceSection';
+import {LearningEmpty, LearningQueryState} from '@/components/LearningWorkspace';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {formatGradePoints} from '@/pages/CourseGradesPage/gradeDisplay';
+import s from './GradesCard.module.scss';
 
-export const GradesCard = ({courseId}: {courseId: number}) => (
-  <section className={styles.card}>
-    <div className={styles.cardHeader}>
-      <h2 className={styles.cardTitle}>Grades</h2>
-      <Link to={`/course/${courseId}/grades`} className={styles.addButton}>View grades</Link>
-    </div>
-    <p className={styles.cardEmpty}>See released assignment scores and available quiz results.</p>
-  </section>
-);
+const GRADE_PREVIEW_LIMIT = 3;
+export function GradesCard({courseId}: {courseId: number}) {
+  const query = useQuery({queryKey: ['course-my-grades', courseId], queryFn: async () => unwrapData(await assignmentApiService.listMyGrades(courseId), 'course grades'), retry: false});
+  return <WorkspaceSection title="Grades" appearance="record" meta={<Link className={s.link} to={generatePath(APP_ROUTE_PATHS.courseCourseIdGrades, {courseId: String(courseId)})}>View all <ArrowRight size={15}/></Link>}>
+    <LearningQueryState query={query}/>
+    {query.isSuccess && !query.data.length ? <LearningEmpty title="No grades available yet."/> : null}
+    <div className={s.list}>{query.data?.slice(0, GRADE_PREVIEW_LIMIT).map(item => {
+      const score = item.pointsEarned ?? item.score;
+      return <Link key={item.assignmentId} to={generatePath(APP_ROUTE_PATHS.courseCourseIdAssignmentsAssignmentId, {courseId: String(courseId), assignmentId: String(item.assignmentId)})}><span>{item.assignmentTitle || item.title || 'Assignment'}</span><strong data-released={item.released || undefined}>{item.released && score != null ? `${formatGradePoints(score)}${item.pointsPossible != null ? ` / ${formatGradePoints(item.pointsPossible)}` : ''}` : item.released ? 'Score unavailable' : 'Not released'}</strong></Link>;
+    })}</div>
+  </WorkspaceSection>;
+}

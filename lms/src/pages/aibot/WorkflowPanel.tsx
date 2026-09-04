@@ -16,7 +16,7 @@ import {
   toChatHistory,
   type WorkflowChatMessage,
 } from './workflowConversation';
-import {getApiErrorCode} from '@/utils/apiError';
+import {getApiErrorCode, getApiErrorMessage} from '@/utils/apiError';
 import DynamicThinking from '@/components/DynamicThinking/DynamicThinking';
 import MarkdownMessage from '@/components/MarkdownMessage';
 import {RichTextEditor} from '@/components/RichTextEditor';
@@ -49,8 +49,7 @@ const getErrorMessage = (error: unknown): string => {
   if (code === 'AI_EXAM_LOCKDOWN' || code === 'QUIZ_EXAM_LOCKDOWN') {
     return 'AI assistance is not available while you have an active quiz attempt in progress.';
   }
-  if (error instanceof Error) return error.message;
-  return 'Workflow is temporarily unavailable. Please try again.';
+  return getApiErrorMessage(error, 'Workflow is temporarily unavailable. Please try again.');
 };
 
 interface WorkflowPanelProps {

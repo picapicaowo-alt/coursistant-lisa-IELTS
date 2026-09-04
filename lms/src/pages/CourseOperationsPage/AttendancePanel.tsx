@@ -152,7 +152,7 @@ function AttendanceEditor({
     mutationFn: () => {
       if (snapshot.version == null)
         throw new Error(
-          "Attendance version is unavailable. Reload the roster before saving.",
+          "Reload the attendance roster before saving.",
         );
       return checkpoint.run(
         "save-attendance",

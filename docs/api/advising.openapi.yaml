@@ -1476,15 +1476,22 @@ paths:
       - name: beforeId
         in: query
         schema: { type: integer, format: int64 }
+      - name: size
+        in: query
+        schema: { type: integer, format: int32, default: 50, minimum: 1, maximum: 100 }
       responses:
         "200":
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AdvisorConversationMessageListApiResponse"
+                $ref: "#/components/schemas/AdvisorConversationMessageCursorApiResponse"
+        "400":
+          description: BAD_REQUEST
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
+        "404":
+          description: CONVERSATION_NOT_FOUND
     post:
       operationId: studentSendAdvisorConversationMessage
       tags: [StudentAdvisorConversation]
@@ -2862,6 +2869,23 @@ components:
         data:
           type: array
           items: { $ref: "#/components/schemas/AdvisorConversationMessageResponse" }
+        message: { type: string }
+        timestamp: { type: string, format: date-time }
+    AdvisorConversationMessageCursorPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/AdvisorConversationMessageResponse" }
+        nextBeforeId: { type: integer, format: int64, nullable: true }
+        hasMore: { type: boolean }
+    AdvisorConversationMessageCursorApiResponse:
+      type: object
+      required: [status, code, data]
+      properties:
+        status: { type: integer }
+        code: { type: string }
+        data: { $ref: "#/components/schemas/AdvisorConversationMessageCursorPage" }
         message: { type: string }
         timestamp: { type: string, format: date-time }
     AdvisorConversationReadApiResponse:

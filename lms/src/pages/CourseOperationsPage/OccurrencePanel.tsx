@@ -43,7 +43,9 @@ type Editor =
 export function OccurrencePanel({
   courseId,
   onAttendance,
+  canManageSchedule = false,
 }: {
+  canManageSchedule?: boolean;
   courseId: number;
   onAttendance: (id: number) => void;
 }) {
@@ -88,7 +90,7 @@ export function OccurrencePanel({
             />
           </label>
         </div>
-        <div className={s.toolbarGroup}>
+        {canManageSchedule ? <div className={s.toolbarGroup}>
           <button
             className={s.secondary}
             type="button"
@@ -105,7 +107,7 @@ export function OccurrencePanel({
             <Plus size={18} />
             Create occurrence
           </button>
-        </div>
+        </div> : null}
       </div>
       {showDates ? (
         <div className={s.toolbar}>
@@ -141,7 +143,7 @@ export function OccurrencePanel({
         <TeachingState
           loading={query.isPending}
           error={query.error}
-          empty="No class occurrences in this date range. Create a class or generate dates from your teaching schedule."
+          empty="No classes scheduled in this date range."
           onRetry={() => void query.refetch()}
         />
       ) : (
@@ -209,8 +211,9 @@ export function OccurrencePanel({
           onClose={() => setEditor(undefined)}
           onSaved={finish}
           onAttendance={onAttendance}
+          canManageSchedule={canManageSchedule}
         />
-      ) : editor ? (
+      ) : editor && canManageSchedule ? (
         <OccurrenceEditor
           courseId={courseId}
           mode={editor.kind}
@@ -228,7 +231,9 @@ function OccurrenceDetails({
   onClose,
   onSaved,
   onAttendance,
+  canManageSchedule,
 }: {
+  canManageSchedule: boolean;
   courseId: number;
   occurrence: Occurrence;
   onClose: () => void;
@@ -255,7 +260,7 @@ function OccurrenceDetails({
     mutationFn: () => {
       if (detail.data?.version == null)
         throw new Error(
-          "The current class version is unavailable. Reload before cancelling.",
+          "Reopen this class before cancelling it.",
         );
       return checkpoint.run(
         "cancel-occurrence",
@@ -266,7 +271,7 @@ function OccurrenceDetails({
     },
     onSuccess: () => onSaved("Class occurrence cancelled."),
   });
-  if (mode === "reschedule" && detail.data)
+  if (canManageSchedule && mode === "reschedule" && detail.data)
     return (
       <OccurrenceEditor
         courseId={courseId}
@@ -315,10 +320,9 @@ function OccurrenceDetails({
                   other classes are kept.
                 </p>
               ) : null}
-              {detail.data?.version == null ? (
+              {canManageSchedule && detail.data?.version == null ? (
                 <p className={s.notice}>
-                  The server did not provide the version needed for a safe
-                  schedule change.
+                  Reopen this class to load the latest details before changing its schedule.
                 </p>
               ) : null}
               <TeachingError error={cancel.error} />
@@ -355,7 +359,7 @@ function OccurrenceDetails({
                     >
                       Schedule requests
                     </button>
-                    <button
+                    {canManageSchedule ? <><button
                       type="button"
                       className={`${s.textButton} ${s.dangerText}`}
                       disabled={detail.data?.version == null}
@@ -373,7 +377,7 @@ function OccurrenceDetails({
                       onClick={() => setMode("reschedule")}
                     >
                       Reschedule
-                    </button>
+                    </button></> : null}
                     <button
                       type="button"
                       className={s.primary}

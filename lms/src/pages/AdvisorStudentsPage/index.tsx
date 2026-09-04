@@ -162,6 +162,7 @@ const AdvisorStudentsPage: React.FC = () => {
         {query.isError ? (
           <p className={styles.error} role="alert">
             {advisingErrorMessage(query.error, 'Students could not be loaded.')}
+            {' '}<button type="button" onClick={() => void query.refetch()}>Try again</button>
           </p>
         ) : null}
         {query.isPending ? <p className={styles.status}>Loading students…</p> : null}

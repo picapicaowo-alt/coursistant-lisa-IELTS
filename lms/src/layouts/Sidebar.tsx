@@ -111,7 +111,7 @@ const Sidebar: React.FC = () => {
     addItem({to: APP_ROUTE_PATHS.course, label: 'My Courses', asset: '/icons/figma-dashboard/courses.svg', active: pathname.startsWith('/course')});
     addItem({to: APP_ROUTE_PATHS.myPlan, label: 'Study Plan', asset: '/icons/figma-dashboard/study-plan.svg', active: pathname === '/my-plan'});
     addItem({to: APP_ROUTE_PATHS.mockExams, label: 'Exams', asset: '/icons/figma-dashboard/exams.svg', active: pathname.startsWith('/mock-exams')});
-    addItem({to: APP_ROUTE_PATHS.aibot, label: 'AI ChatBot', asset: '/icons/figma-dashboard/ai-chat.svg', active: pathname.startsWith('/aibot')});
+    if (canAccessAiWorkspace(user)) addItem({to: APP_ROUTE_PATHS.aibot, label: 'AI ChatBot', asset: '/icons/figma-dashboard/ai-chat.svg', active: pathname.startsWith('/aibot')});
     addItem({to: APP_ROUTE_PATHS.calendar, label: 'Calendar', asset: '/icons/figma-dashboard/calendar.svg', active: pathname.startsWith('/calendar')});
     addItem({to: VOCABULARY_PATHS.root, label: 'Vocabulary', icon: BookMarked, active: pathname.startsWith(VOCABULARY_PATHS.root)});
   }
