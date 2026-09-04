@@ -75,10 +75,6 @@ const ForgotPasswordPage = () => {
                     {isSubmitting ? t('forgotPassword.loading') : t('forgotPassword.resetButton')}
                   </button>
                 </form>
-                <p className={styles.footerNote}>
-                  {t('forgotPassword.newUser')}
-                  <Link to="/signup" className={styles.inlineLink}>{t('forgotPassword.createAccountLink')}</Link>
-                </p>
               </>
             ) : null}
 

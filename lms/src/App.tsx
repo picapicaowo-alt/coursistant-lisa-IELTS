@@ -36,7 +36,6 @@ const Profile = lazy(() => import("./pages/profile"));
 const AIBot = lazy(() => import("./pages/aibot"));
 const Settings = lazy(() => import("./pages/settings"));
 const Login = lazy(() => import("@/pages/LoginPage"));
-const Signup = lazy(() => import("./pages/signup/SignUpView"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPasswordPage"));
 const AdminLandingPage = lazy(() => import('./pages/AdminLandingPage'));
 const CounsellorDashboardPage = lazy(() => import('./pages/CounsellorDashboardPage'));
@@ -92,13 +91,8 @@ const App = () => {
                    }
             />
 
-            <Route path={APP_ROUTE_PATHS.signup}
-                   element={
-                     <AuthLayout>
-                       <Signup/>
-                     </AuthLayout>
-                   }
-            />
+            {/* Public self-registration is closed, including bookmarked signup links. */}
+            <Route path={APP_ROUTE_PATHS.signup} element={<Navigate to={APP_ROUTE_PATHS.login} replace/>}/>
 
             <Route path={APP_ROUTE_PATHS.forgotpassword}
                    element={

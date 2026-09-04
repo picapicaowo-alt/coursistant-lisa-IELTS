@@ -1,6 +1,6 @@
 import {expect, test} from '@playwright/test';
 
-for (const route of [{path: '/login', title: 'Welcome to X-Learn'}, {path: '/signup', title: 'Create an account'}, {path: '/forgotpassword', title: 'Forgot password?'}]) {
+for (const route of [{path: '/login', title: 'Welcome to X-Learn'}, {path: '/forgotpassword', title: 'Forgot password?'}]) {
   test(`Figma authentication composition remains usable at every width: ${route.path}`, async ({page}, testInfo) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));

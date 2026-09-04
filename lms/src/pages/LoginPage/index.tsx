@@ -162,18 +162,6 @@ const LoginPage: React.FC = () => {
             </button>
           </form>
 
-          <p className={styles.signupPrompt}>
-            {t('login.noAccount')}
-            <a
-              href="/signup"
-              onClick={event => {
-                event.preventDefault();
-                navigate('/signup');
-              }}
-            >
-              {t('login.signUp')}
-            </a>
-          </p>
     </AuthShell>
   );
 };
