@@ -12,6 +12,7 @@ import {useDashboardAssignments, type AssignmentRow} from '../hooks/useDashboard
 import {dashboardExamActionLabel, resolveDashboardExamRoute} from './dashboardExam';
 import InstructorWorkComponent from './InstructorWorkComponent';
 import styles from './Dashboard.module.scss';
+import {StudentDashboard} from './StudentDashboard';
 
 export type DashboardAudience = 'student' | 'instructor';
 
@@ -236,7 +237,7 @@ const AlertsPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
   );
 };
 
-export const Dashboard: React.FC<{audience?: DashboardAudience}> = ({audience = 'student'}) => (
+export const Dashboard: React.FC<{audience?: DashboardAudience}> = ({audience = 'student'}) => audience === 'student' ? <StudentDashboard/> : (
   <section className={styles.dashboard} aria-label={audience === 'instructor' ? 'Teaching dashboard' : 'Student dashboard'}>
     <ChatPanel audience={audience}/>
     <div className={styles.mainColumn}>

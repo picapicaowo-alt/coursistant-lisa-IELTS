@@ -71,6 +71,7 @@ export function PlanOverview({
               </small>
             </section>
             <WorkspaceSection
+              appearance="record"
               title="Current Skills"
               summary="Current assessments and targets from your learning profile."
             >
@@ -118,6 +119,7 @@ export function PlanOverview({
           </div>
           <div className={styles.journey}>
             <WorkspaceSection
+              appearance="record"
               title="Learning Journey"
               summary={
                 plan?.strategySummary ||
@@ -170,6 +172,7 @@ export function PlanOverview({
               )}
             </WorkspaceSection>
             <WorkspaceSection
+              appearance="record"
               title="Advisor Tasks"
               meta={
                 <button type="button" onClick={() => setView('tasks')}>

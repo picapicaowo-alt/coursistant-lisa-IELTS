@@ -17,6 +17,7 @@ import {getSignedInHomePath} from '@/utils/signedInHomePath';
 import {TeacherOperationsSections} from './TeacherOperationsSections';
 import styles from './index.module.scss';
 import {InstructorOperationsPage} from './InstructorOperationsPage';
+import StudentLearningPage from '@/pages/StudentLearningPage';
 
 type Section = 'overview' | 'calendar' | 'teaching' | 'availability';
 type UnknownRecord = Record<string, unknown>;
@@ -145,6 +146,7 @@ const LegacyMyOperationsPage: React.FC<{embedded?: boolean}> = ({embedded = fals
 
 const MyOperationsPage: React.FC<{embedded?: boolean}> = ({embedded = false}) => {
   const {user} = useRequiredAuth();
+  if (canUseStudentLearningOperations(user)) return embedded ? <StudentLearningPage/> : <Navigate to={STUDENT_LEARNING_PATH} replace/>;
   return !embedded && user.role === 'USER' && user.level === 'INSTRUCTOR' ? <InstructorOperationsPage/> : <LegacyMyOperationsPage embedded={embedded}/>;
 };
 export default MyOperationsPage;
