@@ -41,6 +41,10 @@ export const canAccessCourseCatalogue = (identity: Identity): boolean => {
   return hasUserLevel(identity, ['STUDENT', 'INSTRUCTOR', 'INSTRUCTOR_ADVISOR']);
 };
 
+/** Course enrollment and roster HTTP responses decide access inside the page. */
+export const canAccessCourseRoster = (identity: Identity): boolean =>
+  canAccessCourseCatalogue(identity) || isAdvisorAccount(identity);
+
 /** Generic course creation is system-scoped; Advisor 1:1 creation has its own route. */
 export const canCreateCourses = (identity: Identity): boolean =>
   isSystemAdminAccount(identity);

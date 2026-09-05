@@ -113,6 +113,10 @@ async function weeksFixture(
       const materialId = Number(path.match(/\/materials\/(\d+)/)?.[1]);
       const material = week?.materials.find((item) => item.id === materialId);
       if (material && method === "PATCH") Object.assign(material, body);
+      if (week && method === "DELETE") {
+        week.materials = week.materials.filter(item => item.id !== materialId);
+        return route.fulfill({json: reply(null)});
+      }
       return route.fulfill({ json: reply(material) });
     }
     if (method === "POST" && path.endsWith("/weeks")) {
@@ -361,8 +365,10 @@ for (const width of [1600, 1280, 1024, 390])
       .click();
     await page.getByLabel(/Manage academic-writing-week/).click();
     await expect(
-      page.getByRole("button", { name: /Rename academic-writing/ }),
-    ).toBeVisible();
+      page.getByRole("button", { name: /Rename academic-writing|Publish academic-writing|Unpublish academic-writing/ }),
+    ).toHaveCount(0);
+    await expect(page.getByRole("button", {name: /Delete academic-writing/})).toBeVisible();
+    await expect(page.getByRole("button", {name: "Upload files", exact: true})).toBeVisible();
     expect(
       await page.evaluate(
         () => document.documentElement.scrollWidth - innerWidth,
@@ -397,7 +403,7 @@ test("Overview detail read fills a missing list projection without blocking mate
   ).toBeVisible();
 });
 
-test("Material menu remains operable on a phone and sends a real rename request", async ({
+test("Instructor material menu on a phone deletes only the fixture uploader's own material", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });
@@ -416,28 +422,12 @@ test("Material menu remains operable on a phone and sends a real rename request"
   await page
     .getByLabel("Manage academic-writing-week4.pdf", { exact: true })
     .click();
-  await page
-    .getByRole("button", {
-      name: "Rename academic-writing-week4.pdf",
-      exact: true,
-    })
-    .click();
-  const input = page.getByRole("textbox", {
-    name: "Material name for academic-writing-week4.pdf",
-    exact: true,
-  });
-  await input.fill("Revision guide");
-  await input.press("Enter");
-  await expect(
-    page.getByLabel("Manage Revision guide", { exact: true }),
-  ).toBeVisible();
-  await expect
-    .poll(() => writes.filter((item) => item.method === "PATCH").length)
-    .toBe(1);
-  expect(writes[0]).toMatchObject({
-    path: "/v2/courses/71/weeks/84/materials/124",
-    body: { displayName: "Revision guide" },
-  });
+  await expect(page.getByRole("button", {name: "Rename academic-writing-week4.pdf", exact: true})).toHaveCount(0);
+  await page.getByRole("button", {name: "Delete academic-writing-week4.pdf", exact: true}).click();
+  await page.getByRole("button", {name: "Confirm", exact: true}).click();
+  await expect(page.getByText("No materials in this week yet.", {exact: true})).toBeVisible();
+  expect(writes).toHaveLength(1);
+  expect(writes[0]).toMatchObject({method: "DELETE", path: "/v2/courses/71/weeks/84/materials/124"});
   expect(writes[0].key).toBeTruthy();
 });
 

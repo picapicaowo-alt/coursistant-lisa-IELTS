@@ -2,6 +2,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {describe, expect, it, vi} from 'vitest';
 import type {CourseMember} from '@/apis';
+import '@/i18n';
 import {MemberRow} from './MemberRow';
 
 const ta: CourseMember = {
@@ -18,35 +19,20 @@ const ta: CourseMember = {
   canManageCourseEvents: true,
 };
 
-describe('MemberRow TA permissions', () => {
-  it('edits and submits individual permission flags', async () => {
-    const onUpdatePermissions = vi.fn();
-    const user = userEvent.setup();
+describe('IELTS member actions', () => {
+  it.each([false, true])('never offers TA controls with canManageMembers=%s', canManageMembers => {
+    render(<table><tbody><MemberRow member={ta} canManageMembers={canManageMembers}
+      onWithdraw={vi.fn()} isBusy={false}/></tbody></table>);
+    expect(screen.getByText('Taylor Assistant')).toBeVisible();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
 
-    render(
-      <table><tbody><MemberRow
-        member={ta}
-        onWithdraw={vi.fn()}
-        onPromote={vi.fn()}
-        onDemote={vi.fn()}
-        onUpdatePermissions={onUpdatePermissions}
-        isBusy={false}
-      /></tbody></table>,
-    );
-
-    await user.click(screen.getByRole('button', {name: 'Permissions'}));
-    expect(screen.getByRole('dialog', {name: 'TA permissions'})).not.toBeNull();
-
-    await user.click(screen.getByRole('checkbox', {name: /Manage announcements/}));
-    await user.click(screen.getByRole('checkbox', {name: /Manage groups/}));
-    await user.click(screen.getByRole('button', {name: 'Save permissions'}));
-
-    expect(onUpdatePermissions).toHaveBeenCalledWith({
-      canGrade: true,
-      canPostAnnouncements: true,
-      canManageGroups: true,
-      canManageCourseEvents: true,
-    });
-    expect(screen.queryByRole('dialog')).toBeNull();
+  it('preserves student withdrawal for course managers without TA promotion', async () => {
+    const onWithdraw = vi.fn();
+    render(<table><tbody><MemberRow member={{...ta, courseRole: 'Student', level: 'STUDENT'}}
+      canManageMembers onWithdraw={onWithdraw} isBusy={false}/></tbody></table>);
+    expect(screen.getAllByRole('button')).toHaveLength(1);
+    await userEvent.click(screen.getByRole('button', {name: 'Withdraw'}));
+    expect(onWithdraw).toHaveBeenCalledOnce();
   });
 });

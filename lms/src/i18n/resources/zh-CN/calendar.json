@@ -1,0 +1,30 @@
+{
+  "editor": {
+    "editTitle": "编辑个人日程",
+    "addTitle": "添加个人日程",
+    "close": "关闭日程",
+    "loading": "正在加载最新日程…",
+    "title": "日程标题",
+    "starts": "开始时间",
+    "ends": "结束时间",
+    "timezone": "时区",
+    "reminder": "提前提醒（分钟）",
+    "invalidTime": "结束时间必须晚于开始时间。",
+    "missingDetails": "此日程缺少编辑所需的信息。",
+    "missingVersion": "请重新打开此日程，加载最新信息后再保存。",
+    "loadFailed": "暂时无法加载此日程。",
+    "saveFailed": "暂时无法保存此日程，已保留您填写的内容。",
+    "deleteFailed": "暂时无法删除此日程，请重试。",
+    "deleteConfirm": "要删除“{{title}}”吗？",
+    "delete": "删除日程",
+    "keep": "保留日程",
+    "create": "创建日程",
+    "requiredTitle": "请输入日程标题。",
+    "validDates": "请输入有效的开始和结束日期及时间。",
+    "requiredTimezone": "请输入日程的时区。",
+    "invalidReminder": "请输入大于或等于零的整数分钟数，或留空不设提醒。",
+    "versionConflict": "此事件已被其他请求修改。已重新请求最新详情，请核对后再操作。",
+    "requestVersionMissing": "请求缺少事件版本。请重新加载事件后再操作。",
+    "requestVersionInvalid": "请求中的事件版本不是合法整数。请重新加载事件后再操作。"
+  }
+}

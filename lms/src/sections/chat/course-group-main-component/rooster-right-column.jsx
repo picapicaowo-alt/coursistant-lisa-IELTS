@@ -25,7 +25,7 @@ export default function RoosterRightColumn ({users}) {
         <>
         {/* Roster List */}
         <div className="flex flex-col gap-4">
-          {["TEACHER", "TA", "STUDENT"].map(level => (
+          {["TEACHER", "STUDENT"].map(level => (
             <div key={level}>
               <h2 className="text-xs font-semibold text-gray-500 uppercase mb-2">{level}</h2>
               {users

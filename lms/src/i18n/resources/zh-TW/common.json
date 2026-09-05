@@ -466,7 +466,7 @@
     "coursesFailed": "暫時無法載入進行中的課程。",
     "noCourses": "暫無進行中的課程可供管理。",
     "courseAccess": "課程存取權限",
-    "courseAccessHelp": "先選擇教師的課程，再新增學生或設定助教。",
+    "courseAccessHelp": "先選擇教師的課程，再新增學生。",
     "teacherCourse": "教師的課程",
     "teacherLabel": "教師：{{name}}",
     "courseContext": "課程 #{{courseId}} · 機構 #{{tenantId}}",
@@ -480,7 +480,7 @@
     "enrollTa": "加入課程並設為助教",
     "enrollStudent": "新增學生",
     "taHelp": "助教權限僅適用於所選課程，帳戶的平台身分仍為學生。",
-    "memberHelp": "助教是課程內角色，不會變更帳戶的平台身分。",
+    "memberHelp": "查看所選課程的成員。",
     "searchCourse": "搜尋課程成員",
     "memberSearchPlaceholder": "姓名、電子郵件或使用者 ID",
     "loadingMembers": "正在載入課程成員…",
@@ -581,14 +581,6 @@
     "unit": "單元 {{number}}",
     "week": "第 {{number}} 周"
   },
-  "refreshControls": {
-    "intakes": "重新整理入學登記",
-    "directory": "重新整理使用者目錄",
-    "audit": "重新整理稽核紀錄",
-    "ownerships": "重新整理課程歸屬",
-    "alertRules": "重新整理提醒規則",
-    "unsavedChanges": "請先儲存或取消變更，再重新整理"
-  },
   "navigationControls": {
     "backToStudents": "返回學生清單",
     "backToTemplates": "模擬考試範本",
@@ -649,5 +641,13 @@
       "week": "下一週",
       "month": "下個月"
     }
+  },
+  "refreshControls": {
+    "intakes": "重新整理入學登記",
+    "directory": "重新整理使用者目錄",
+    "audit": "重新整理稽核紀錄",
+    "ownerships": "重新整理課程歸屬",
+    "alertRules": "重新整理提醒規則",
+    "unsavedChanges": "請先儲存或取消變更，再重新整理"
   }
 }

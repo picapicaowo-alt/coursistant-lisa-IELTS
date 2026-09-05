@@ -71,7 +71,7 @@ const weeks: CourseWeek[] = [
   },
 ];
 
-const renderCard = (canEditStructure: boolean) => {
+const renderCard = (canManageExistingMaterials: boolean) => {
   const client = new QueryClient({defaultOptions: {mutations: {retry: false}}});
   return render(
     <QueryClientProvider client={client}>
@@ -80,7 +80,7 @@ const renderCard = (canEditStructure: boolean) => {
         week={weeks[0]}
         weeks={weeks}
         currentUserId={385}
-        canEditStructure={canEditStructure}
+        canManageExistingMaterials={canManageExistingMaterials}
         canUploadMaterials
         onChanged={vi.fn()}
       />
@@ -94,7 +94,7 @@ describe('WeekContentCard', () => {
     vi.mocked(courseApiService.reorderMaterials).mockResolvedValue({} as never);
   });
 
-  it('gives instructors working reorder, rename, move, upload, link, and delete controls', async () => {
+  it('gives course managers working reorder, rename, move, upload, link, and delete controls', async () => {
     renderCard(true);
 
     expect(screen.getByRole('button', {name: 'Upload files'})).toBeTruthy();
@@ -124,7 +124,7 @@ describe('WeekContentCard', () => {
     expect(screen.queryByLabelText('Unpublish Reading')).toBeNull();
   });
 
-  it('shows publish and unpublish controls for instructors', () => {
+  it('shows publish and unpublish controls for course managers', () => {
     renderCard(true);
 
     expect(screen.getByLabelText('Publish Reading')).toBeTruthy();

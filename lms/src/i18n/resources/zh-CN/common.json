@@ -466,7 +466,7 @@
     "coursesFailed": "暂时无法加载进行中的课程。",
     "noCourses": "暂无进行中的课程可供管理。",
     "courseAccess": "课程访问权限",
-    "courseAccessHelp": "先选择教师的课程，再添加学生或设置助教。",
+    "courseAccessHelp": "先选择教师的课程，再添加学生。",
     "teacherCourse": "教师的课程",
     "teacherLabel": "教师：{{name}}",
     "courseContext": "课程 #{{courseId}} · 机构 #{{tenantId}}",
@@ -480,7 +480,7 @@
     "enrollTa": "加入课程并设为助教",
     "enrollStudent": "添加学生",
     "taHelp": "助教权限仅适用于所选课程，账户的平台身份仍为学生。",
-    "memberHelp": "助教是课程内角色，不会更改账户的平台身份。",
+    "memberHelp": "查看所选课程的成员。",
     "searchCourse": "搜索课程成员",
     "memberSearchPlaceholder": "姓名、邮箱或用户 ID",
     "loadingMembers": "正在加载课程成员…",
@@ -581,14 +581,6 @@
     "unit": "单元 {{number}}",
     "week": "第 {{number}} 周"
   },
-  "refreshControls": {
-    "intakes": "刷新入学登记",
-    "directory": "刷新用户目录",
-    "audit": "刷新审计记录",
-    "ownerships": "刷新课程归属",
-    "alertRules": "刷新提醒规则",
-    "unsavedChanges": "请先保存或取消更改，再刷新"
-  },
   "navigationControls": {
     "backToStudents": "返回学生列表",
     "backToTemplates": "模拟考试模板",
@@ -649,5 +641,13 @@
       "week": "下一周",
       "month": "下个月"
     }
+  },
+  "refreshControls": {
+    "intakes": "刷新入学登记",
+    "directory": "刷新用户目录",
+    "audit": "刷新审计记录",
+    "ownerships": "刷新课程归属",
+    "alertRules": "刷新提醒规则",
+    "unsavedChanges": "请先保存或取消更改，再刷新"
   }
 }
