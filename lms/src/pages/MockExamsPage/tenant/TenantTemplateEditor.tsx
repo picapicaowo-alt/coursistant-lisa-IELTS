@@ -1,3 +1,4 @@
+import {SavedSectionEditor} from './SavedSectionEditor';
 import {LocalizedError} from '@/i18n/errors';
 import {formatNumber} from '@/i18n/formatting';
 import { useTranslation } from 'react-i18next';
@@ -287,7 +288,7 @@ function VersionWorkspace({
               onClick={() => setSection(item)}
             >
               {translate(SECTION_META[item].labelKey)}
-              {current[SECTION_META[item].flag] === true ? (
+              {current[SECTION_META[item].flag] === true && !isDraft ? (
                 <LockKeyhole size={14} />
               ) : null}
             </button>
@@ -303,6 +304,12 @@ function VersionWorkspace({
             >
               {translate("common:actions.tryAgain")}</button>
           </div>
+        ) : current[SECTION_META[section].flag] === true && isDraft ? (
+          <SavedSectionEditor key={section} templateId={templateId} versionId={versionId} section={section}
+            draft={drafts[section]}
+            onChange={next => setDrafts(all => ({...all, [section]: typeof next === 'function' ? next(all[section]) : next}))}
+            onMediaDeleted={id => setDrafts(all => ({listening: clearDraftMedia(all.listening, id), reading: clearDraftMedia(all.reading, id), writing: clearDraftMedia(all.writing, id)}))}
+            onBack={() => setSection(null)} onSaved={refresh}/>
         ) : current[SECTION_META[section].flag] === true ? (
           <SavedSection
             templateId={templateId}
@@ -369,7 +376,7 @@ function VersionWorkspace({
                     <h3>{translate(meta.labelKey)}</h3>
                     <p>
                       {saved
-                        ? translate("exams:templates.savedReadOnly")
+                        ? translate(isDraft ? "exams:editing.savedEditable" : "exams:templates.savedReadOnly")
                         : current[meta.flag] === false
                           ? translate("exams:templates.noSavedContent")
                           : translate("exams:templates.contentStatusUnavailable")}
@@ -400,7 +407,7 @@ function VersionWorkspace({
                   }
                   onClick={() => setSection(item)}
                 >
-                  {saved ? translate("common:navigationControls.viewSection") : translate('common:navigationControls.composeSection')}
+                  {saved ? translate(isDraft ? 'common:actions.edit' : 'common:navigationControls.viewSection') : translate('common:navigationControls.composeSection')}
 
                 </button>
               </article>
@@ -551,7 +558,7 @@ function SavedSection({
           {translate("courseTools:owner.readOnly")}</span>
       </div>
       <p className={ui.hint}>
-        {translate("exams:templates.savedSectionHelp")}</p>
+        {translate("exams:editing.publishedHelp")}</p>
       {content.isPending ? (
         <p className={ui.status}>{translate("exams:templates.loadingContent")}</p>
       ) : content.isError ? (

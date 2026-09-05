@@ -1,4 +1,5 @@
-import {useTranslation} from 'react-i18next';
+import {useCourseAccess} from '@/hooks/useCourseAccess';
+import { useTranslation } from 'react-i18next';
 import React, {useEffect, useState} from "react";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import styles from "../CourseDetailView/index.module.scss";
@@ -45,6 +46,7 @@ export const CourseEditView: React.FC<CourseEditViewProps> = ({
   const {courseId, course, weeks, sessions, isLoading, isError, sessionsFailed, refetch} =
     useCourseWorkspaceData();
   const queryClient = useQueryClient();
+  const materialAccess = useCourseAccess(courseId);
   const {user} = useRequiredAuth();
 
   const [activeWeekId, setActiveWeekId] = useState<number | null>(null);
@@ -152,6 +154,7 @@ export const CourseEditView: React.FC<CourseEditViewProps> = ({
           weeks={weeks}
           currentUserId={user.id}
           canManageExistingMaterials={false}
+          canDeleteOwnPublishedMaterials={materialAccess.isTa}
           canUploadMaterials={canUploadMaterials}
           onChanged={invalidate}
         />

@@ -1,7 +1,2 @@
-/** Section submissions require every question number, including unanswered questions. */
-export function buildQuestionSubmission(
-  questionNumbers: readonly number[],
-  answers: Readonly<Record<number, string>>,
-): Record<string, string> {
-  return Object.fromEntries(questionNumbers.map(number => [String(number), answers[number] ?? '']));
-}
+// Keep the runner's existing entry point backed by the shared contract validation.
+export {completeMockExamAnswers as buildQuestionSubmission} from '@/utils/mockExamAnswers';

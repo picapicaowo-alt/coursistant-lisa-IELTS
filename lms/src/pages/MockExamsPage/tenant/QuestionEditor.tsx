@@ -1,3 +1,4 @@
+import {MultiSelectAnswerFields} from './MultiSelectAnswerFields';
 import {useTranslation} from 'react-i18next';
 import {useId, useState} from 'react';
 import type {QuestionDraft} from './model';
@@ -132,6 +133,7 @@ export function QuestionEditor({
             onChange={updateContent}
             nextNumber={nextNumber}
           />
+          {question.kind === 'multiSelect' ? <MultiSelectAnswerFields value={content} onChange={updateContent}/> : null}
         </>
       ) : question.kind ? (
         <p className={styles.notice}>

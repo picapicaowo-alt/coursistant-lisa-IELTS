@@ -1,3 +1,4 @@
+import {isAdvisorSchedulePending} from '../advising/scheduleRequests';
 import {InstructorAvailabilityPanel} from './InstructorAvailabilityPanel';
 import {formatNumber} from '@/i18n/formatting';
 import {statusLabel} from '@/i18n/presentation';
@@ -143,7 +144,7 @@ export default function AdvisorSchedulePage() {
                 <button
                   type="button"
                   className={styles.primary}
-                  disabled={request.expectedVersion == null || (Boolean(request.status) && request.status !== 'PENDING')}
+                  disabled={request.expectedVersion == null || !isAdvisorSchedulePending(request.status)}
                   onClick={() => {
                     setScheduleReview(request);
                     setScheduleConflict(false);
@@ -168,7 +169,7 @@ export default function AdvisorSchedulePage() {
               onSubmit={event => {
                 event.preventDefault();
                 setInvalidDecision(false);
-                if (scheduleMutation.isPending || scheduleConflict || scheduleReview.expectedVersion == null || (Boolean(scheduleReview.status) && scheduleReview.status !== 'PENDING')) return;
+                if (scheduleMutation.isPending || scheduleConflict || scheduleReview.expectedVersion == null || !isAdvisorSchedulePending(scheduleReview.status)) return;
                 if (scheduleDecision === 'REJECT' && !rejectionReason.trim()) {setInvalidDecision(true); return;}
                 scheduleMutation.mutate(scheduleReview);
               }}
@@ -229,7 +230,7 @@ export default function AdvisorSchedulePage() {
                     scheduleMutation.isPending ||
                     scheduleConflict ||
                     scheduleReview.expectedVersion == null ||
-                    (Boolean(scheduleReview.status) && scheduleReview.status !== 'PENDING') ||
+                    !isAdvisorSchedulePending(scheduleReview.status) ||
                     (scheduleDecision === 'REJECT' && !rejectionReason.trim())
                   }
                 >

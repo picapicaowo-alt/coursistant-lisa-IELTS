@@ -1,7 +1,7 @@
 import {getApiErrorMessage} from '@/utils/apiError'
 import {formatDateTime} from '@/i18n/formatting';
 import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
-import {buildQuestionSubmission} from '../utils/questionSubmission'
+import {completeMockExamAnswers} from '@/utils/mockExamAnswers'
 import {useTranslation} from 'react-i18next';
 import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -189,7 +189,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
     setSubmissionOpen(true)
     setSubmissionError('')
     try {
-      const payload = buildQuestionSubmission(questionIds, answers)
+      const payload = completeMockExamAnswers(questionIds, answers)
       const attemptId = await ensureAttemptId(testId)
       const result = await submitListening(testId, {
         attemptId,

@@ -1,3 +1,4 @@
+import {useTaskSubmission} from './useTaskSubmission';
 import {LocalizedError} from '@/i18n/errors';
 import {useTranslation} from 'react-i18next';
 import {ADVISING_ERROR_CODES} from '@/apis';
@@ -12,7 +13,7 @@ const MyOperationsPage = lazy(() => import('../MyOperationsPage'));
 import {useSearchParams} from 'react-router-dom';
 import {CheckpointWorkspace} from './CheckpointWorkspace';
 import checkpointStyles from './CheckpointWorkspace.module.scss';
-import {STUDY_PLAN_PARAMS, studyPlanRecordKey, type TaskAction} from './studyPlanView';
+import {STUDY_PLAN_PARAMS, studyPlanRecordKey} from './studyPlanView';
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {sendStableMessage} from '@/utils/sendStableMessage';
@@ -59,13 +60,7 @@ const StudentAdvisingPage: React.FC = () => {
     getNextPageParam: (lastPage, _pages, lastCursor) => lastPage.hasMore && lastPage.nextBeforeId != null && (lastCursor == null || lastPage.nextBeforeId < lastCursor) ? lastPage.nextBeforeId : undefined,
     retry: false,
   });
-  const taskMutation = useMutation({
-    mutationFn: ({action, taskId, version}: TaskAction) =>
-      action === 'start'
-        ? idempotency.run('student-start-task', [taskId, {expectedVersion: version}] satisfies Parameters<typeof advisorApiService.startOwnAdvisorTask>, (key, args) => advisorApiService.startOwnAdvisorTask(...args, key))
-        : idempotency.run('student-complete-task', [taskId, {expectedVersion: version, submissionText: taskSubmissions[taskId] ?? plan.data?.plan?.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []).find(task => task.id === taskId)?.submissionText}] satisfies Parameters<typeof advisorApiService.completeOwnAdvisorTask>, (key, args) => advisorApiService.completeOwnAdvisorTask(...args, key)),
-    onSuccess: async () => queryClient.invalidateQueries({queryKey: advisingQueryKeys.studentStudyPlan}),
-  });
+  const taskMutation = useTaskSubmission(taskSubmissions);
   const messageMutation = useMutation({
     mutationFn: () => {
       if (messageFiles.some(file => file.type.startsWith('audio/'))) throw new LocalizedError("learning:plan.audioUnsupported");
@@ -132,6 +127,7 @@ const StudentAdvisingPage: React.FC = () => {
   if (checkpointKey) return <div className={checkpointStyles.page}>
     {checkpoint ? <CheckpointWorkspace key={checkpointKey} checkpoint={checkpoint} index={checkpointIndex} onBack={backToPlan}
       submissions={taskSubmissions} onSubmission={(taskId, value) => setTaskSubmissions(current => ({...current, [taskId]: value}))}
+      onUpload={(taskId, version, file) => taskMutation.mutate({action: 'upload', taskId, version, file})}
       onAction={action => taskMutation.mutate(action)} isPending={taskMutation.isPending} actionTaskId={taskMutation.variables?.taskId} onClearError={() => {if (!taskMutation.isPending) taskMutation.reset();}}
       error={taskMutation.isError ? advisingErrorMessage(taskMutation.error, translate('learning:plan.taskUpdateRetry')) : undefined}/>
       : <section className={styles.editorPage}><button type="button" className={styles.secondary} onClick={backToPlan}>{translate("common:navigationControls.backToStudyPlan")}</button>

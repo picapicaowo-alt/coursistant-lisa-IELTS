@@ -3,7 +3,7 @@ import type {V2ApiClient} from '@/apis';
 import {MockExamApiService} from './mock-exam-api';
 
 const rawClient = {get: vi.fn()};
-const client = {get: vi.fn(), post: vi.fn(), delete: vi.fn(), getClient: vi.fn(() => rawClient)};
+const client = {get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn(), getClient: vi.fn(() => rawClient)};
 const service = new MockExamApiService(client as unknown as typeof V2ApiClient);
 
 describe('MockExamApiService', () => {
@@ -27,6 +27,14 @@ describe('MockExamApiService', () => {
     expect(client.post).toHaveBeenNthCalledWith(1, '/v2/tenant/mock-exam-templates', {label: 'Academic A', title: 'IELTS Academic A'});
     expect(client.post).toHaveBeenNthCalledWith(2, '/v2/tenant/mock-exam-templates/3/versions/8/listening', expect.any(Object));
     expect(client.post).toHaveBeenNthCalledWith(3, '/v2/tenant/mock-exam-templates/3/versions/8/publish');
+  });
+
+  it('reads authoring and replaces full sections with a version revision and no idempotency header', async () => {
+    for (const section of ['reading', 'listening', 'writing'] as const) await service.getTenantAuthoring(3, 8, section);
+    expect(client.get.mock.calls.map(call => call[0])).toEqual(['reading', 'listening', 'writing'].map(section => `/v2/tenant/mock-exam-templates/3/versions/8/${section}/authoring`));
+    const request = {totalMinutes: 60, expectedContentRevision: 0, tasks: [{seq: 2, taskKey: 'essay-b', title: 'Essay', prompt: 'Discuss', minWords: 250}]};
+    await service.replaceTenantSection(3, 8, 'writing', request);
+    expect(client.put).toHaveBeenCalledWith('/v2/tenant/mock-exam-templates/3/versions/8/writing', request);
   });
 
   it('uploads, lists, previews, and deletes tenant version media without object paths', async () => {

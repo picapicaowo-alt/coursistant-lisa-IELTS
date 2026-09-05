@@ -1,3 +1,4 @@
+# Scoped additions from ../backend-fix-adaptation-source-2026-09-05.md; preserve the existing contract.
 openapi: 3.0.1
 info:
   description: Coursistant LMS REST API contract (OpenAPI 3).
@@ -3702,6 +3703,7 @@ paths:
       - Materials
   /v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}:
     delete:
+      description: "Owner handoff 2026-09-05 B2: Course Managers may delete any material; active TAs only their own; active primary Instructors only their own publicationState=DRAFT material. FORBIDDEN means no deletion permission."
       operationId: courseMaterialDelete
       parameters:
       - in: path

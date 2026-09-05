@@ -16,7 +16,6 @@ import {ParentOverview} from './ParentOverview';
 import {ParentSchedule, type ParentScheduleDraft} from './ParentSchedule';
 import {ParentReports} from './ParentReports';
 import {ParentMockExams} from './ParentMockExams';
-import {parentStudentName, asRecord, parentText} from './parentPresentation';
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLinkedStudents } from "./useLinkedStudents";
@@ -34,7 +33,7 @@ import {
   unwrapData,
   type ParentConversationMessageResponse,
   type ParentNotification,
-  type ParentStudentSummary,
+  type ParentLinkedStudent,
 } from "@/apis";
 import { parentApiService } from "@/apis/services/parent-api";
 import { advisingErrorMessage } from "../advising/advisingErrors";
@@ -83,22 +82,17 @@ const numberField = (
 const ParentStudentWorkspace: React.FC<{
   studentUserId: number;
   studentIds: number[];
-  students: ParentStudentSummary[];
+  students: ParentLinkedStudent[];
   onStudentChange: (id: number) => void;
 }> = ({ studentUserId, studentIds, students, onStudentChange }) => {
   const {t: translate} = useTranslation();
+  const selectedStudent = students.find(student => student.studentUserId === studentUserId);
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [notificationPage, setNotificationPage] = useState(0);
   const [params] = useSearchParams();
   const section = getParentSection(params);
   const learningTab = PARENT_LEARNING_TABS.find(tab => tab.id === params.get('tab'))?.id ?? PARENT_LEARNING_TABS[0].id;
-  const studentSummary = useQuery({
-    // Share the overview cache so persistent student context does not duplicate the dashboard request.
-    queryKey: ['parent', studentUserId, 'section', 'dashboard', 0],
-    queryFn: async () => unwrapData(await parentApiService.getStudentDashboard(studentUserId), 'parentDashboard'),
-    retry: false,
-  });
   const [reportPage, setReportPage] = useState(0);
   const [attachmentError, setAttachmentError] = useState<unknown>();
   const [attachmentBusy, setAttachmentBusy] = useState<number>();
@@ -372,13 +366,13 @@ const ParentStudentWorkspace: React.FC<{
             >
               {studentIds.map((id) => (
                 <option value={id} key={id}>
-                  {formatPersonName(students.find(student => student.studentUserId === id), parentStudentName(queryClient.getQueryData(['parent', id, 'section', 'dashboard', 0]), translate('common:people.studentFallback', {id: formatNumber(id)})))}
+                  {formatPersonName(students.find(student => student.studentUserId === id), students.find(student => student.studentUserId === id)?.email || translate('common:people.studentFallback', {id: formatNumber(id)}))}
                 </option>
               ))}
             </select>
             <ChevronDown size={17} aria-hidden="true"/>
-          </label> : <strong>{formatPersonName(students.find(student => student.studentUserId === studentUserId), parentStudentName(studentSummary.data, translate('common:people.studentFallback', {id: formatNumber(studentUserId)})))}</strong>}
-        {parentText(asRecord(asRecord(studentSummary.data)?.student), 'email') ? <><span className={parentStyles.studentDivider} aria-hidden="true">·</span><span>{parentText(asRecord(asRecord(studentSummary.data)?.student), 'email')}</span></> : null}
+          </label> : <strong>{formatPersonName(students.find(student => student.studentUserId === studentUserId), selectedStudent?.email || translate('common:people.studentFallback', {id: formatNumber(studentUserId)}))}</strong>}
+        {selectedStudent?.email ? <><span className={parentStyles.studentDivider} aria-hidden="true">·</span><span>{selectedStudent?.email}</span></> : null}
       </div>
 
       {studentIds.length > 0 ? (

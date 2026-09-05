@@ -1,3 +1,4 @@
+import {useCourseAccess} from '@/hooks/useCourseAccess';
 import {useTranslation} from 'react-i18next';
 import {LocalizedError} from '@/i18n/errors';
 import { useState } from "react";
@@ -132,6 +133,7 @@ function SelectedWeek({
 }) {
   const {t: translate} = useTranslation();
   const [manage, setManage] = useState(false);
+  const materialAccess = useCourseAccess(courseId);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const overview = useQuery({
     queryKey: ["course-week", courseId, week.id],
@@ -316,6 +318,7 @@ function SelectedWeek({
               weeks={weeks}
               currentUserId={currentUserId}
               canManageExistingMaterials={false}
+              canDeleteOwnPublishedMaterials={materialAccess.isTa}
               canUploadMaterials={canUpload}
               onChanged={onChanged}
               compactControls

@@ -55,7 +55,7 @@ async function weeksFixture(
         orderPosition: 0,
         uploadedBy: 301,
         previewAvailable: true,
-        publicationState: "PUBLISHED",
+        publicationState: i < 3 ? "PUBLISHED" : "DRAFT",
         downloadUrl: "",
       },
     ],
@@ -363,11 +363,13 @@ for (const width of [1600, 1280, 1024, 390])
     await page
       .getByRole("button", { name: "Manage materials", exact: true })
       .click();
-    await page.getByLabel(/Manage academic-writing-week/).click();
+    if (width === 390) await page.getByLabel(/Manage academic-writing-week/).click();
+    else await expect(page.getByLabel(/Manage academic-writing-week/)).toHaveCount(0);
     await expect(
       page.getByRole("button", { name: /Rename academic-writing|Publish academic-writing|Unpublish academic-writing/ }),
     ).toHaveCount(0);
-    await expect(page.getByRole("button", {name: /Delete academic-writing/})).toBeVisible();
+    if (width === 390) await expect(page.getByRole("button", {name: /Delete academic-writing/})).toBeVisible();
+    else await expect(page.getByRole("button", {name: /Delete academic-writing/})).toHaveCount(0);
     await expect(page.getByRole("button", {name: "Upload files", exact: true})).toBeVisible();
     expect(
       await page.evaluate(
@@ -403,7 +405,7 @@ test("Overview detail read fills a missing list projection without blocking mate
   ).toBeVisible();
 });
 
-test("Instructor material menu on a phone deletes only the fixture uploader's own material", async ({
+test("Instructor material menu on a phone deletes only the fixture uploader's own draft material", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 844 });

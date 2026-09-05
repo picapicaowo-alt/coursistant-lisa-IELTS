@@ -21,6 +21,7 @@ export interface TaskInteractionProps {
   submissions: Record<number, string>;
   onSubmission: (taskId: number, value: string) => void;
   onAction: (action: TaskAction) => void;
+  onUpload?: (taskId: number, version: number, file: File) => void;
   isPending: boolean;
   error?: string;
   actionTaskId?: number;

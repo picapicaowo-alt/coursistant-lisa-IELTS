@@ -1,3 +1,6 @@
+import {unwrapData} from '@/apis';
+import {getApiErrorCode} from '@/utils/apiError';
+import {AUTHORING_ERROR_KEYS} from './authoringContent';
 import {LocalizedError} from '@/i18n/errors';
 import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
 import i18n from '@/i18n';
@@ -47,6 +50,9 @@ export function TenantSectionComposer({
   onMediaDeleted,
   onBack,
   onSaved,
+  existing = false,
+  disabled = false,
+  onConflict,
 }: {
   templateId: number;
   versionId: number;
@@ -55,7 +61,10 @@ export function TenantSectionComposer({
   onChange: (draft: SetStateAction<SectionDraft>) => void;
   onMediaDeleted: (id: number) => void;
   onBack: () => void;
-  onSaved: () => Promise<void>;
+  onSaved: (contentRevision?: number) => Promise<void>;
+  existing?: boolean;
+  disabled?: boolean;
+  onConflict?: (error: unknown) => Promise<void>;
 }) {
   const { t: translate } = useTranslation();
   const [active, setActive] = useState(0);
@@ -69,7 +78,7 @@ export function TenantSectionComposer({
   const reviewPanel = useRef<HTMLElement>(null);
   const client = useQueryClient();
   const mutationKey = tenantContentWriteKey(templateId, versionId);
-  const contentBusy = useIsMutating({mutationKey}) > 0;
+  const contentBusy = useIsMutating({mutationKey}) > 0 || disabled;
   const meta = SECTION_META[section];
   const unit = draft.units[Math.min(active, draft.units.length - 1)];
   const issues = sectionIssues(section, draft);
@@ -131,12 +140,27 @@ export function TenantSectionComposer({
     }));
   const save = useMutation({
     mutationKey,
-    mutationFn: () => {
+    mutationFn: async () => {
+      if (disabled) throw new LocalizedError("exams:editing.reloadRequired");
       if (client.isMutating({mutationKey}) > 1)
         throw new LocalizedError("exams:templates.contentBusy");
       if (sectionIssues(section, draft).length)
         throw new LocalizedError("exams:authoring.needsAttention");
-      return section === 'listening'
+      if (existing) {
+        const expectedContentRevision = draft.contentRevision;
+        if (expectedContentRevision == null || !Number.isSafeInteger(expectedContentRevision) || expectedContentRevision < 0)
+          throw new LocalizedError('exams:editing.reloadRequired');
+        const response = section === 'listening'
+          ? await mockExamApiService.replaceTenantSection(templateId, versionId, section, {...listeningPayload(draft), expectedContentRevision})
+          : section === 'reading'
+            ? await mockExamApiService.replaceTenantSection(templateId, versionId, section, {...readingPayload(draft), expectedContentRevision})
+            : await mockExamApiService.replaceTenantSection(templateId, versionId, section, {...writingPayload(draft), expectedContentRevision});
+        const result = unwrapData(response, 'replaceTenantSection');
+        if (!Number.isSafeInteger(result.contentRevision) || result.contentRevision <= expectedContentRevision)
+          throw new LocalizedError('exams:editing.reloadRequired');
+        return result.contentRevision;
+      }
+      await (section === 'listening'
         ? mockExamApiService.createTenantListening(
             templateId,
             versionId,
@@ -152,9 +176,13 @@ export function TenantSectionComposer({
               templateId,
               versionId,
               writingPayload(draft),
-            );
+            ));
+      return undefined;
     },
     onSuccess: onSaved,
+    onError: async error => {
+      if (existing && (AUTHORING_ERROR_KEYS[getApiErrorCode(error) ?? ''] || error instanceof LocalizedError)) await onConflict?.(error);
+    },
   });
   const prepare = () => {
     if (contentBusy) return;
@@ -190,7 +218,7 @@ export function TenantSectionComposer({
           draft={draft}
           disabled={contentBusy}
           onApply={(imported) => {
-            update(imported);
+            update({...imported, contentRevision: draft.contentRevision});
             setActive(0);
             setShowIssues(false);
           }}
@@ -221,7 +249,6 @@ export function TenantSectionComposer({
           onClick={() => {
             const added = newUnit();
             if (
-              section === 'reading' &&
               draft.units.some((item) => item.seq !== undefined)
             )
               added.seq =
@@ -229,6 +256,12 @@ export function TenantSectionComposer({
                   (max, item, index) => Math.max(max, item.seq ?? index + 1),
                   0,
                 ) + 1;
+            if (section === 'writing') {
+              const usedKeys = new Set(draft.units.map((item, index) => item.taskKey ?? `task-${item.seq ?? index + 1}`));
+              let suffix = added.seq ?? draft.units.length + 1;
+              while (usedKeys.has(`task-${suffix}`)) suffix++;
+              added.taskKey = `task-${suffix}`;
+            }
             added.questions[0].start = String(nextQuestionNumber);
             added.questions[0].end = String(nextQuestionNumber);
             update((current) => ({
@@ -253,7 +286,7 @@ export function TenantSectionComposer({
         >
           <fieldset
             className={styles.composerFields}
-            disabled={save.isPending}
+            disabled={save.isPending || disabled}
             hidden={review}
           >
             <section className={`${ui.surface} ${authoring.surface}`}>
@@ -650,13 +683,13 @@ export function TenantSectionComposer({
                 {translate(section === "writing" ? "exams:authoring.writingReview" : "exams:authoring.scoringReview")}
               </p>
               <p>
-                {translate('exams:authoring.createHelp', {section: translate(meta.labelKey).toLowerCase()})}
+                {translate(existing ? 'exams:editing.replaceHelp' : 'exams:authoring.createHelp', {section: translate(meta.labelKey).toLowerCase()})}
               </p>
               {save.error ? (
                 <p className={ui.inlineError} role="alert">
                   {advisingErrorMessage(
                     save.error,
-                    translate('exams:authoring.createRetryFailed'),
+                    translate(AUTHORING_ERROR_KEYS[getApiErrorCode(save.error) ?? ''] ?? (existing ? 'exams:editing.saveFailed' : 'exams:authoring.createRetryFailed')),
                   )}
                 </p>
               ) : null}
@@ -668,8 +701,8 @@ export function TenantSectionComposer({
                   onClick={() => save.mutate()}
                 >
                   {save.isPending
-                    ? translate("exams:authoring.creatingSection")
-                    : translate("exams:authoring.confirmCreate")}
+                    ? translate(existing ? "common:actions.saving" : "exams:authoring.creatingSection")
+                    : translate(existing ? "exams:editing.confirmSave" : "exams:authoring.confirmCreate")}
                 </button>
                 <button
                   type="button"

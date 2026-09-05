@@ -1,3 +1,4 @@
+# Scoped additions from ../backend-fix-adaptation-source-2026-09-05.md; preserve the existing contract.
 openapi: 3.0.1
 info:
   description: Coursistant LMS REST API contract (OpenAPI 3).
@@ -9,6 +10,63 @@ servers:
 security:
 - bearerAuth: []
 paths:
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/writing/authoring:
+    get:
+      description: Authoring projection with answer keys, media IDs and version-wide contentRevision. Response-only IDs and preview URLs must not be copied into writes.
+      parameters:
+      - {in: path, name: templateId, required: true, schema: {type: integer, format: int64}}
+      - {in: path, name: versionId, required: true, schema: {type: integer, format: int64}}
+      responses:
+        "200":
+          description: Authoring content and contentRevision
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                    - {$ref: "#/components/schemas/CreateWritingRequest"}
+                    - {$ref: "#/components/schemas/MockExamContentRevision"}
+        "404": {description: MOCK_EXAM_SECTION_NOT_FOUND}
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/listening/authoring:
+    get:
+      description: Authoring projection with answer keys, media IDs and version-wide contentRevision. Response-only IDs and preview URLs must not be copied into writes.
+      parameters:
+      - {in: path, name: templateId, required: true, schema: {type: integer, format: int64}}
+      - {in: path, name: versionId, required: true, schema: {type: integer, format: int64}}
+      responses:
+        "200":
+          description: Authoring content and contentRevision
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                    - {$ref: "#/components/schemas/CreateListeningRequest"}
+                    - {$ref: "#/components/schemas/MockExamContentRevision"}
+        "404": {description: MOCK_EXAM_SECTION_NOT_FOUND}
+  /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/reading/authoring:
+    get:
+      description: Authoring projection with answer keys, media IDs and version-wide contentRevision. Response-only IDs and preview URLs must not be copied into writes.
+      parameters:
+      - {in: path, name: templateId, required: true, schema: {type: integer, format: int64}}
+      - {in: path, name: versionId, required: true, schema: {type: integer, format: int64}}
+      responses:
+        "200":
+          description: Authoring content and contentRevision
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                    - {$ref: "#/components/schemas/CreateReadingRequest"}
+                    - {$ref: "#/components/schemas/MockExamContentRevision"}
+        "404": {description: MOCK_EXAM_SECTION_NOT_FOUND}
   /v2/advisor/mock-exam-templates:
     get:
       operationId: listAdvisorMockExamTemplates
@@ -2011,6 +2069,33 @@ paths:
           description: Conflict
       tags:
       - TenantMockExamTemplates
+    put:
+      description: Complete replacement of an existing draft section. Requires expectedContentRevision shared across all sections; no Idempotency-Key. Does not create a missing section.
+      parameters:
+      - {in: path, name: templateId, required: true, schema: {type: integer, format: int64}}
+      - {in: path, name: versionId, required: true, schema: {type: integer, format: int64}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - {$ref: "#/components/schemas/CreateListeningRequest"}
+              - type: object
+                required: [expectedContentRevision]
+                properties:
+                  expectedContentRevision: {type: integer, format: int64, minimum: 0}
+      responses:
+        "200":
+          description: Updated contentRevision
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: {$ref: "#/components/schemas/MockExamContentRevision"}
+        "404": {description: MOCK_EXAM_SECTION_NOT_FOUND}
+        "409": {description: "MOCK_EXAM_CONTENT_VERSION_CONFLICT, MOCK_EXAM_CONTENT_LOCKED, MOCK_EXAM_MEDIA_STATE_CONFLICT"}
   /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/listening/parts/{partSeq}/audio:
     get:
       operationId: getTenantMockExamListeningPartAudio
@@ -2219,6 +2304,33 @@ paths:
           description: Conflict
       tags:
       - TenantMockExamTemplates
+    put:
+      description: Complete replacement of an existing draft section. Requires expectedContentRevision shared across all sections; no Idempotency-Key. Does not create a missing section.
+      parameters:
+      - {in: path, name: templateId, required: true, schema: {type: integer, format: int64}}
+      - {in: path, name: versionId, required: true, schema: {type: integer, format: int64}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - {$ref: "#/components/schemas/CreateReadingRequest"}
+              - type: object
+                required: [expectedContentRevision]
+                properties:
+                  expectedContentRevision: {type: integer, format: int64, minimum: 0}
+      responses:
+        "200":
+          description: Updated contentRevision
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: {$ref: "#/components/schemas/MockExamContentRevision"}
+        "404": {description: MOCK_EXAM_SECTION_NOT_FOUND}
+        "409": {description: "MOCK_EXAM_CONTENT_VERSION_CONFLICT, MOCK_EXAM_CONTENT_LOCKED, MOCK_EXAM_MEDIA_STATE_CONFLICT"}
   /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/reading/passages/{passageSeq}/questions/{sortOrder}/image:
     get:
       operationId: getTenantMockExamReadingQuestionImage
@@ -2384,6 +2496,33 @@ paths:
           description: Conflict
       tags:
       - TenantMockExamTemplates
+    put:
+      description: Complete replacement of an existing draft section. Requires expectedContentRevision shared across all sections; no Idempotency-Key. Does not create a missing section.
+      parameters:
+      - {in: path, name: templateId, required: true, schema: {type: integer, format: int64}}
+      - {in: path, name: versionId, required: true, schema: {type: integer, format: int64}}
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              allOf:
+              - {$ref: "#/components/schemas/CreateWritingRequest"}
+              - type: object
+                required: [expectedContentRevision]
+                properties:
+                  expectedContentRevision: {type: integer, format: int64, minimum: 0}
+      responses:
+        "200":
+          description: Updated contentRevision
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data: {$ref: "#/components/schemas/MockExamContentRevision"}
+        "404": {description: MOCK_EXAM_SECTION_NOT_FOUND}
+        "409": {description: "MOCK_EXAM_CONTENT_VERSION_CONFLICT, MOCK_EXAM_CONTENT_LOCKED, MOCK_EXAM_MEDIA_STATE_CONFLICT"}
   /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/writing/tasks/{taskSeq}/image:
     get:
       operationId: getTenantMockExamWritingTaskImage
@@ -2442,6 +2581,27 @@ paths:
       - TenantMockExamTemplates
 components:
   schemas:
+    MockExamObjectiveAnswer:
+      oneOf:
+      - type: object
+        required: [answer]
+        properties:
+          answer: {type: string}
+        not: {required: [answers]}
+      - type: object
+        required: [answers]
+        properties:
+          answers: {type: array, items: {type: string}}
+        not: {required: [answer]}
+    MockExamAnswerBearingQuestionPayload:
+      type: object
+      description: Renderer-specific question content. Each non-multiSelect numbered slot requires exactly one answer string or answers string array of equivalent answers. multiSelect uses questionIds, chooseCount, options and answersByQuestion (question ID to one option key) and is graded as an unordered set. Matching trims outer whitespace and ignores case; punctuation, internal whitespace and word order remain significant. Numbers are strings.
+      additionalProperties: true
+    MockExamContentRevision:
+      type: object
+      required: [contentRevision]
+      properties:
+        contentRevision: {type: integer, format: int64, minimum: 0}
     ApiErrorResponse:
       type: object
       description: Error envelope rendered by ApiExceptionHandler (data is explicitly
@@ -2560,7 +2720,7 @@ components:
         kind:
           type: string
         payload:
-          $ref: "#/components/schemas/JsonNode"
+          $ref: "#/components/schemas/MockExamAnswerBearingQuestionPayload"
         questionEnd:
           type: integer
           format: int32
@@ -2583,7 +2743,7 @@ components:
         kind:
           type: string
         payload:
-          $ref: "#/components/schemas/JsonNode"
+          $ref: "#/components/schemas/MockExamAnswerBearingQuestionPayload"
         questionEnd:
           type: integer
           format: int32
@@ -3113,18 +3273,20 @@ components:
           format: int32
     SubmitListeningRequest:
       type: object
+      required: [answers]
+      description: Exactly the configured section question numbers, including unanswered keys; null is an empty answer. Extra, missing or invalid IDs return MOCK_EXAM_ANSWER_INVALID. Multiple-choice answers are one option key per question ID.
       properties:
         answers:
           type: object
-          additionalProperties:
-            type: string
+          additionalProperties: {type: string, nullable: true, maxLength: 512}
     SubmitReadingRequest:
       type: object
+      required: [answers]
+      description: Exactly the configured section question numbers, including unanswered keys; null is an empty answer. Extra, missing or invalid IDs return MOCK_EXAM_ANSWER_INVALID. Multiple-choice answers are one option key per question ID.
       properties:
         answers:
           type: object
-          additionalProperties:
-            type: string
+          additionalProperties: {type: string, nullable: true, maxLength: 512}
     SubmitWritingRequest:
       type: object
       properties:

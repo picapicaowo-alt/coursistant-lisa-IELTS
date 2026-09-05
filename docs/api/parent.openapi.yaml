@@ -1,3 +1,4 @@
+# Scoped additions from ../backend-fix-adaptation-source-2026-09-05.md; preserve the existing contract.
 openapi: 3.0.1
 info:
   title: LMS Parent API
@@ -227,7 +228,17 @@ paths:
           description: "HTTP 200, ApiResponse.status=200, ApiResponse.code=SUCCESS"
           content:
             application/json:
-              schema: { $ref: "#/components/schemas/ParentStudentSummaryPageApiResponse" }
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    required: [items, page, size, total]
+                    properties:
+                      items: {type: array, items: {$ref: "#/components/schemas/ParentLinkedStudent"}}
+                      page: {type: integer}
+                      size: {type: integer}
+                      total: {type: integer}
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
   /v2/parent/students/{studentUserId}/dashboard:
@@ -680,6 +691,16 @@ components:
     Forbidden:
       description: FORBIDDEN
   schemas:
+    ParentLinkedStudent:
+      type: object
+      required: [studentUserId, firstName, middleName, lastName, email, avatarUrl]
+      properties:
+        studentUserId: {type: integer, format: int64}
+        firstName: {type: string, nullable: true}
+        middleName: {type: string, nullable: true}
+        lastName: {type: string, nullable: true}
+        email: {type: string, nullable: true}
+        avatarUrl: {type: string, nullable: true}
     CreateOrReuseParentLinkRequest:
       type: object
       required: [email]

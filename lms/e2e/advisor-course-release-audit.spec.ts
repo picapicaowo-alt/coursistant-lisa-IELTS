@@ -444,3 +444,19 @@ test('publish rejection exposes current readiness blockers across delivery views
   await expect(panel).toContainText('Course published');
   await expect(page.getByRole('list', {name: 'Readiness blockers'})).toHaveCount(0);
 });
+
+test('B1 course-not-found remains visible and only a successful empty response is an empty schedule', async ({page}) => {
+  await setupCourse(page);
+  let missing = true;
+  await page.route('**/v2/courses/71/session-occurrences?*', route => route.fulfill(missing
+    ? {status: 404, json: {code: 'COURSE_NOT_FOUND'}} : {json: reply([])}));
+  await page.goto('/advisor/courses/71/delivery?view=schedule');
+  await page.getByRole('button', {name: 'View class dates'}).click();
+  const section = page.getByRole('region', {name: 'Course occurrences'});
+  await expect(section.getByRole('alert')).toContainText('This course does not exist or is not accessible');
+  await expect(page.getByText('No occurrences were returned for this period.')).toHaveCount(0);
+  missing = false;
+  await section.getByRole('button', {name: 'Try again'}).click();
+  await expect(section.getByRole('alert')).toHaveCount(0);
+  await expect(page.getByText('No occurrences were returned for this period.')).toBeVisible();
+});

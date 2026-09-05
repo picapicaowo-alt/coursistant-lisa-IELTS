@@ -2,11 +2,10 @@ import {isRecord} from '@/utils/apiError';
 import i18n from '@/i18n';
 import {formatNumber} from '@/i18n/formatting';
 import type {Field} from './questionSchema';
+import type {MockExamObjectiveAnswer} from '@/apis/types/mockExam';
 
 /** Supplied Reading/Listening authoring rule; never used for student responses. */
-export type ObjectiveAnswerKey =
-  | {answer: string; answers?: never}
-  | {answer?: never; answers: string[]};
+export type ObjectiveAnswerKey = MockExamObjectiveAnswer;
 
 export function hasAnswerSlot(field: Field): boolean {
   return (
@@ -31,17 +30,27 @@ export function answerKeyErrors(value: Record<string, unknown>): string[] {
     value.answers.some((answer) => typeof answer !== 'string' || !answer.trim())
   )
     return [i18n.t('exams:validation.answersNonblank')];
-  // Only trim for duplicate detection. Do not invent grading normalization,
-  // reorder words, or change the official text sent to the API.
-  const answers = value.answers.map((answer: string) => answer.trim());
+  // Detect equivalent alternatives using the documented outer-space/case rules.
+  // Preserve punctuation, internal spaces, word order and the outgoing text.
+  const answers = value.answers.map((answer: string) => answer.trim().toLowerCase());
   return new Set(answers).size === answers.length
     ? []
     : [i18n.t('exams:validation.answersUnique')];
 }
 
 /** Walk active renderer slots, excluding metadata and dormant text-cell IDs.
- * multiSelect has primitive questionIds, so answersByQuestion is untouched. */
+ * multiSelect has primitive questionIds; validate its answer map without rewriting it. */
 export function objectiveAnswerErrors(field: Field, value: unknown): string[] {
+  if (field.type === 'object' && field.fields.questionIds && isRecord(value)) {
+    const ids = Array.isArray(value.questionIds) ? value.questionIds.map(String) : [];
+    const keys = value.answersByQuestion;
+    const options = Array.isArray(value.options) ? value.options.filter((option): option is string => typeof option === 'string').map(option => option.charAt(0)) : [];
+    if ('answer' in value || 'answers' in value || !ids.length || !isRecord(keys) || Object.keys(keys).length !== ids.length ||
+      ids.some(id => typeof keys[id] !== 'string' || !options.includes(keys[id])) ||
+      new Set(Object.values(keys)).size !== ids.length || value.chooseCount !== ids.length)
+      return [i18n.t('exams:validation.multiSelectAnswers')];
+    return [];
+  }
   if (field.type === 'object' && isRecord(value))
     return [
       ...(hasAnswerSlot(field)

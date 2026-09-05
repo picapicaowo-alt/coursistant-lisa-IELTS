@@ -89,7 +89,7 @@ export function OwnerCourseSchedule({courseId, course, readOnly, canGenerateDate
   // Occurrence reads can fail independently of a successfully loaded course and weekly schedule.
   const error = sessions.error || create.error || update.error || generate.error;
   const visibleOccurrences = showAllOccurrences ? occurrences.data : occurrences.data?.slice(0, 8);
-  const datesError = isHttpStatus(occurrences.error, 401) || isHttpStatus(occurrences.error, 403)
+  const datesError = isHttpStatus(occurrences.error, 404) ? translate('courseTools:owner.courseUnavailable') : isHttpStatus(occurrences.error, 401) || isHttpStatus(occurrences.error, 403)
     ? advisingErrorMessage(occurrences.error, translate('courseTools:owner.deniedDates'))
     : translate('courseTools:owner.datesFailed');
   const activeDraft = editing?.draft ?? draft;

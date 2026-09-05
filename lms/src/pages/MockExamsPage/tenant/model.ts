@@ -2,6 +2,7 @@ import i18n from '@/i18n';
 import {LocalizedError} from '@/i18n/errors';
 import {formatNumber} from '@/i18n/formatting';
 import {objectiveAnswerErrors} from './answerKeys';
+import {questionPayloadObject} from '@/utils/mockExamAnswers';
 import {BookOpenText, Headphones, PenLine} from 'lucide-react';
 import type {
   CreateMockExamListeningRequest,
@@ -73,6 +74,7 @@ export interface QuestionDraft {
 export interface UnitDraft {
   draftId: string;
   seq?: number;
+  taskKey?: string;
   label: string;
   title: string;
   intro: string;
@@ -83,6 +85,8 @@ export interface UnitDraft {
   questions: QuestionDraft[];
 }
 export interface SectionDraft {
+  /** Revision from the authoring GET, never silently replaced on background reads. */
+  contentRevision?: number;
   minutes: string;
   units: UnitDraft[];
 }
@@ -301,7 +305,7 @@ function questionPayload(
   index: number,
   section: 'reading' | 'listening',
 ) {
-  const payload = json(question.payload, 'exams:validation.questionJson');
+  const payload = questionPayloadObject(json(question.payload, 'exams:validation.questionJson'));
   const definition = questionDefinition(section, question.kind);
   const schema = definition?.answerSchema ?? definition?.schema;
   const errors = schema ? objectiveAnswerErrors(schema, payload) : [];
@@ -338,7 +342,7 @@ export function listeningPayload(
       if (!unit.mediaId)
         throw new LocalizedError('exams:validation.partAudioNumber', {number: formatNumber(index + 1)});
       return {
-        seq: index + 1,
+        seq: unit.seq ?? index + 1,
         label: unitName('listening', unit, index),
         audioMediaId: unit.mediaId,
         sections: unit.questions.map((question, i) =>
@@ -381,8 +385,8 @@ export function writingPayload(
       if (!unit.prompt.trim())
         throw new LocalizedError('exams:validation.taskPromptNumber', {number: formatNumber(index + 1)});
       return {
-        seq: index + 1,
-        taskKey: `task-${index + 1}`,
+        seq: unit.seq ?? index + 1,
+        taskKey: unit.taskKey ?? `task-${unit.seq ?? index + 1}`,
         title: unitName('writing', unit, index),
         prompt: unit.prompt.trim(),
         minWords: positiveInteger(unit.minWords, 'exams:validation.wordInteger'),

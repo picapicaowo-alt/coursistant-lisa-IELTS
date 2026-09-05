@@ -2,11 +2,26 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {V2ApiClient} from '@/apis';
 import {AdvisorApiService} from './advisor-api';
 
-const client = {get: vi.fn(), post: vi.fn(), put: vi.fn()};
+const rawClient = {get: vi.fn()};
+const client = {getClient: () => rawClient, get: vi.fn(), post: vi.fn(), put: vi.fn()};
 const service = new AdvisorApiService(client as unknown as typeof V2ApiClient);
 
 describe('AdvisorApiService', () => {
   beforeEach(() => vi.clearAllMocks());
+
+  it('uploads one multipart file with expectedVersion in the query and reads protected blobs', async () => {
+    const file = new File(['work'], 'work.pdf', {type: 'application/pdf'});
+    await service.uploadOwnTaskSubmission(24, 7, file);
+    const [url, form, config] = client.put.mock.calls[0];
+    expect(url).toBe('/v2/student/study-plan/tasks/24/submission-file');
+    expect([...form.keys()]).toEqual(['file']);
+    expect(form.get('file')).toBe(file);
+    expect(config).toEqual({params: {expectedVersion: 7}});
+    const blob = new Blob(['work']);
+    rawClient.get.mockResolvedValue({data: blob});
+    await expect(service.getTaskSubmissionFile(41, 24, 'download')).resolves.toBe(blob);
+    expect(rawClient.get).toHaveBeenCalledWith('/v2/advisor/students/41/study-plan/tasks/24/submission-file/download', {responseType: 'blob'});
+  });
 
   it('loads subsequent cohort pages for assignment pickers using the returned page size', async () => {
     client.get.mockResolvedValueOnce({code: 'SUCCESS', data: {items: [{studentUserId: 41}], page: 0, size: 1, total: 2}})
