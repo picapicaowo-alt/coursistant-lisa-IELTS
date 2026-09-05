@@ -1,5 +1,6 @@
+import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
-import {ArrowRight, UserRound} from 'lucide-react';
+import {UserRound} from 'lucide-react';
 import type {UseQueryResult} from '@tanstack/react-query';
 import type {ParentStudentLinkResponse, StudentIntakeResponse} from '@/apis';
 import {formatPersonName} from '@/utils/personName';
@@ -14,6 +15,7 @@ export function IntakePreview({query, parents, selectedId, unavailable}: {
   parents: UseQueryResult<ParentStudentLinkResponse[], Error>;
   selectedId: number | null; unavailable: boolean;
 }) {
+  const {t: translate} = useTranslation();
   const intake = query.data;
   return <section className={`${styles.panel} ${styles.previewPanel}`} id="intake-preview" aria-labelledby="intake-preview-title">
     <header className={styles.panelHeader}><h2 id="intake-preview-title" aria-label="Intake preview"><span className={styles.previewHeading}>Intake preview</span><span className={styles.compactStudentName}>{intake && !unavailable && !query.isError ? formatPersonName(intake, 'Intake preview') : 'Intake preview'}</span></h2><UserRound size={19} aria-hidden="true"/></header>
@@ -44,7 +46,7 @@ export function IntakePreview({query, parents, selectedId, unavailable}: {
               {parents.isError ? <p className={styles.compactParentError} role="alert" title={advisingErrorMessage(parents.error, 'Parent links could not be loaded.')}>Parent links unavailable</p> : null}
               <div className={styles.previewActions}>
                 <Link className={`${styles.secondary} ${styles.compactParents}`} to={intakePath(intake.intakeId)}>Parents{parents.isSuccess ? ` (${parents.data.length})` : ''}</Link>
-                <Link className={styles.primary} aria-label="Select advisor" to={assignmentPath(intake.intakeId)}><span className={styles.actionLabelFull}>Select advisor</span><span className={styles.actionLabelShort}>Advisor</span><ArrowRight size={16} aria-hidden="true"/></Link>
+                <Link className={styles.primary} aria-label={translate('common:navigationControls.selectAdvisor')} to={assignmentPath(intake.intakeId)}><span className={styles.actionLabelFull}>{translate('common:navigationControls.selectAdvisor')}</span><span className={styles.actionLabelShort}>{translate("common:roles.ADVISOR")}</span></Link>
                 <Link className={styles.secondary} aria-label="Edit intake" to={intakePath(intake.intakeId)}><span className={styles.actionLabelFull}>Edit intake</span><span className={styles.actionLabelShort}>Edit</span></Link>
               </div>
               <dl className={styles.timestamps}>

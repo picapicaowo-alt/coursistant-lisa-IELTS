@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {FormEvent, useEffect, useMemo, useRef, useState} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, CheckCircle2, Download, FileText, MessageSquare, RotateCcw, Search, Trash2, Upload} from 'lucide-react';
@@ -316,6 +317,7 @@ export const GradeDialog = ({
 };
 
 const AssignmentGradingPage = () => {
+  const {t: translate} = useTranslation();
   const {courseId: courseParam, assignmentId: assignmentParam} = useParams();
   const courseId = parseId(courseParam);
   const assignmentId = parseId(assignmentParam);
@@ -514,8 +516,13 @@ const AssignmentGradingPage = () => {
     <div className={styles.page}>
       <header className={styles.pageHeader}>
         <div className={styles.headingGroup}>
-          <Link to={`/course/${courseId}/assignments/${assignmentId}`} className={styles.backButton} aria-label="Back to assignment">
-            <ArrowLeft size={20}/>
+          <Link
+            to={`/course/${courseId}/assignments/${assignmentId}`}
+            className={styles.backButton}
+            aria-label={translate("common:navigationControls.backToAssignment")}
+            title={translate("common:navigationControls.backToAssignment")}
+          >
+            <ArrowLeft size={20} aria-hidden="true" />
           </Link>
           <div>
             <p className={styles.eyebrow}>Grading</p>

@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useQueries, useQuery} from '@tanstack/react-query';
 import {ArrowLeft, CheckCircle2, Clock3, FileCheck2} from 'lucide-react';
 import {Link, useParams} from 'react-router-dom';
@@ -14,6 +15,7 @@ import {formatGradePoints, quizGradeDisplay} from './gradeDisplay';
 import styles from './index.module.scss';
 
 const CourseGradesPage = () => {
+  const {t: translate} = useTranslation();
   const {courseId: courseIdParam} = useParams();
   const courseId = Number(courseIdParam);
   const valid = Number.isInteger(courseId) && courseId > 0;
@@ -69,7 +71,7 @@ const CourseGradesPage = () => {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <Link className={styles.backLink} to={`/course/${courseId}`} aria-label="Back to course">
+        <Link className={styles.backLink} to={`/course/${courseId}`} aria-label={translate("course:grades.back")} title={translate("course:grades.back")}>
           <ArrowLeft aria-hidden="true"/>
         </Link>
         <div>

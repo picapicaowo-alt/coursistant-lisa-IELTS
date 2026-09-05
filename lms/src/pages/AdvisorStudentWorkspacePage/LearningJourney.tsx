@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {useEffect, useId, useMemo, useRef, useState} from 'react';
 import {X, Plus, Calendar, Check} from 'lucide-react';
 import {useQuery} from '@tanstack/react-query';
@@ -23,6 +24,7 @@ export function LearningJourney({
   checkpointTarget: number;
   taskTarget: number;
 }) {
+  const {t: translate} = useTranslation();
   const checkpoints = useMemo(() => plan.checkpoints ?? [], [plan.checkpoints]);
   const [selected, setSelected] = useState<number | null>(null);
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED'>('ALL');
@@ -160,9 +162,9 @@ interface PendingRequestItem {
                   className={styles.phaseActionBtn}
                   data-variant={isCurrent ? 'primary' : isCompleted ? 'secondary' : 'outline'}
                   onClick={() => {setSelectedTask(null); setTaskFilter('ALL'); setSelected(index);}}
-                  aria-label={`View phase ${index + 1}`}
+                  aria-label={translate("common:navigationControls.viewPhase", {number: index + 1})}
                 >
-                  View details →
+                  {translate("common:actions.viewDetails")}
                 </button>
               </article>
             );

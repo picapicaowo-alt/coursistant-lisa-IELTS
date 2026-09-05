@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useRef, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -204,6 +205,7 @@ export const StudentGradeSummary = ({
 };
 
 const AssignmentDetailPage = () => {
+  const {t: translate} = useTranslation();
   const {courseId: courseIdParam, assignmentId: assignmentIdParam} = useParams();
   const {user} = useAuth();
   const navigate = useNavigate();
@@ -388,8 +390,13 @@ const AssignmentDetailPage = () => {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <Link to={`/course/${courseId}`} className={styles.backLink} aria-label="Back to course">
-          <ArrowLeft size={20}/>
+        <Link
+          to={`/course/${courseId}`}
+          className={styles.backLink}
+          aria-label={translate("course:grades.back")}
+          title={translate("course:grades.back")}
+        >
+          <ArrowLeft size={20} aria-hidden="true" />
         </Link>
         <div className={styles.headerText}>
           <div className={styles.eyebrow}>

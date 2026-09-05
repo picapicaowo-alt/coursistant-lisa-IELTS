@@ -1,6 +1,7 @@
+import {useTranslation} from 'react-i18next';
 import {useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {ArrowLeft, ArrowRight, BookOpenCheck, Check, Clock3, Layers3, RefreshCcw, Shuffle, Square, X} from 'lucide-react';
+import {BookOpenCheck, Check, Clock3, Layers3, RefreshCcw, Shuffle, Square, X} from 'lucide-react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import type {StudyMode, VocabularyUnitSummary} from '@/apis/types/vocabulary';
 import {vocabularyApi} from '@/apis/services/vocabulary-api';
@@ -13,6 +14,7 @@ import {getApiErrorMessage} from '@/utils/apiError';
 import styles from './index.module.scss';
 
 const VocabularyListPage = () => {
+  const {t: translate} = useTranslation();
   const {listId = ''} = useParams();
   const {user} = useRequiredAuth();
   const studentId = String(user.userId);
@@ -55,7 +57,7 @@ const VocabularyListPage = () => {
   const list = query.data;
   return (
     <main className={styles.page}>
-      <Link className={styles.backLink} to={VOCABULARY_PATHS.root}><ArrowLeft size={17}/> Vocabulary library</Link>
+      <Link className={styles.backLink} to={VOCABULARY_PATHS.root}> {translate('common:navigationControls.vocabularyLibrary')}</Link>
       <section className={styles.overview}>
         <div className={styles.overviewCopy}>
           <div className={styles.tags}><span>{list.theme}</span><span>{list.skillFocus}</span><span>{list.difficulty}</span></div>
@@ -139,6 +141,7 @@ interface UnitCardProps {
 const modeLabel = (mode: StudyMode): string => mode === 'TEST' ? 'Test' : 'Remember';
 
 const UnitCard = ({unit, mode, pending, ending, onStart, onEnd}: UnitCardProps) => {
+  const {t: translate} = useTranslation();
   const [confirmingEnd, setConfirmingEnd] = useState(false);
   const percent = Math.round((unit.progress.clearedWords / unit.progress.totalWords) * 100);
   const activeSession = unit.activeSession;
@@ -190,7 +193,7 @@ const UnitCard = ({unit, mode, pending, ending, onStart, onEnd}: UnitCardProps) 
             ) : (
               <div className={styles.activeSessionButtons}>
                 <button type="button" className={styles.resumeButton} onClick={() => onStart(activeSession.mode)} disabled={pending || ending}>
-                  {pending ? <Clock3 size={17}/> : null}{pending ? 'Resuming…' : `Resume ${activeModeLabel}`}<ArrowRight size={18}/>
+                  {pending ? <Clock3 size={17}/> : null}{pending ? translate('common:navigationControls.resuming') : translate(activeSession.mode === 'TEST' ? 'common:navigationControls.resumeTest' : 'common:navigationControls.resumeRemember')}
                 </button>
                 <button type="button" className={styles.endButton} onClick={() => setConfirmingEnd(true)} disabled={pending || ending}>
                   <X size={16}/> End session
@@ -200,7 +203,7 @@ const UnitCard = ({unit, mode, pending, ending, onStart, onEnd}: UnitCardProps) 
           </div>
         ) : (
           <button type="button" className={styles.startButton} onClick={() => onStart(mode)} disabled={pending}>
-            {pending ? <Clock3 size={17}/> : null}{pending ? 'Starting…' : `Start ${selectedModeLabel}`}<ArrowRight size={18}/>
+            {pending ? <Clock3 size={17}/> : null}{pending ? translate('common:navigationControls.starting') : translate(mode === 'TEST' ? 'common:navigationControls.startTest' : 'common:navigationControls.startRemember')}
           </button>
         )}
       </div>

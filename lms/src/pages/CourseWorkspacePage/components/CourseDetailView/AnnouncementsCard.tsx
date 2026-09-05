@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React from 'react';
 import {Link} from 'react-router-dom';
 import type {CourseAnnouncementSummary} from '@/apis';
@@ -25,6 +26,7 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({
   failed,
   canManage = false,
 }) => {
+  const {t: translate} = useTranslation();
   const ordered = [...announcements].sort(
     (a, b) => parseUtcTimestamp(b.postedAt).getTime() - parseUtcTimestamp(a.postedAt).getTime(),
   );
@@ -71,7 +73,7 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({
                 to={`/course/${courseId}/announcements`}
                 className={styles.viewAllLink}
               >
-                View all announcements ({ordered.length}) →
+                {translate("common:navigationControls.allAnnouncements", {count: ordered.length})}
               </Link>
             </div>
           )}

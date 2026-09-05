@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {lazy, Suspense, useEffect, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {MessageSquare} from 'lucide-react';
@@ -128,6 +129,7 @@ export function MaterialReader({
   onClose: () => void;
   onDiscussion: () => void;
 }) {
+  const {t: translate} = useTranslation();
 
   const materials = weeks.flatMap((week) => week.materials);
   const index = materials.findIndex((item) => item.id === materialId);
@@ -147,7 +149,7 @@ export function MaterialReader({
     <section className={styles.reader} aria-label="Course learning viewer">
       <header>
         <button type="button" onClick={onClose}>
-          ‹ Back to course
+          {translate("common:navigationControls.backToCourse")}
         </button>
         {next ? (
           <button
@@ -155,7 +157,7 @@ export function MaterialReader({
             className={styles.primary}
             onClick={() => onSelect(next.id)}
           >
-            Go to next item ›
+            {translate("common:navigationControls.nextMaterial")}
           </button>
         ) : null}
       </header>

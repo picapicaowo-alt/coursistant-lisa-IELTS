@@ -59,7 +59,7 @@ const PanelHeader: React.FC<{title: string; to?: string}> = ({title, to}) => (
     <h2>{title}</h2>
     {to ? (
       <Link to={to} className={styles.viewAll}>
-        View all <img src="/icons/figma-dashboard/arrow-right.svg" alt=""/>
+        View all
       </Link>
     ) : null}
   </header>
@@ -109,7 +109,7 @@ const CourseWorkPanel: React.FC = () => {
           </select>
         </label>
         <Link to="/course" className={styles.viewAll}>
-          View all <img src="/icons/figma-dashboard/arrow-right.svg" alt=""/>
+          View all
         </Link>
       </header>
 
@@ -204,7 +204,7 @@ const AlertsPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
     <section className={`${styles.panel} ${styles.alertsPanel}`}>
       <header className={styles.alertHeader}>
         <h2>Alerts</h2>
-        <Link to={audience === 'student' ? STUDENT_LEARNING_PATH : APP_ROUTE_PATHS.myOperations}>{alerts.length} alert{alerts.length === 1 ? '' : 's'} <img src="/icons/figma-dashboard/arrow-right.svg" alt=""/></Link>
+        <Link to={audience === 'student' ? STUDENT_LEARNING_PATH : APP_ROUTE_PATHS.myOperations}>{alerts.length} alert{alerts.length === 1 ? '' : 's'} </Link>
       </header>
       {query.isPending ? <RegionStatus state="loading"/> : null}
       {query.isError ? <RegionStatus state="error" onRetry={() => void query.refetch()}/> : null}

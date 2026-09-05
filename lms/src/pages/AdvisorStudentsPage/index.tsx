@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {useDeferredValue, useEffect, useState} from 'react';
 import {Link, generatePath} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
@@ -28,6 +29,7 @@ import listStyles from './index.module.scss';
 import {advisorPaginationItems} from './pagination';
 
 const AdvisorStudentsPage: React.FC = () => {
+  const {t} = useTranslation();
   const [page, setPage] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [filters, setFilters] = useState<AdvisorStudentFilters>({});
@@ -277,7 +279,7 @@ const AdvisorStudentsPage: React.FC = () => {
               type="button"
               disabled={page === 0}
               onClick={() => setPage(page - 1)}
-              aria-label="Previous page"
+              aria-label={t('common:navigationControls.previousPage')} title={t('common:navigationControls.previousPage')}
             >
               <ChevronLeft size={14} aria-hidden="true" />
             </button>
@@ -301,7 +303,7 @@ const AdvisorStudentsPage: React.FC = () => {
               type="button"
               disabled={page + 1 >= pageCount}
               onClick={() => setPage(page + 1)}
-              aria-label="Next page"
+              aria-label={t('common:navigationControls.nextPage')} title={t('common:navigationControls.nextPage')}
             >
               <ChevronRight size={14} aria-hidden="true" />
             </button>

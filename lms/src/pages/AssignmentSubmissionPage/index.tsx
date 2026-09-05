@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {ArrowLeft, Clock3, Download, Eye, FileText, ShieldCheck} from 'lucide-react';
@@ -17,6 +18,7 @@ const formatSize = (bytes: number) => {
 };
 
 const AssignmentSubmissionPage = () => {
+  const {t: translate} = useTranslation();
   const params = useParams();
   const courseId = Number(params.courseId);
   const assignmentId = Number(params.assignmentId);
@@ -80,7 +82,7 @@ const AssignmentSubmissionPage = () => {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link to={valid ? `/course/${courseId}/assignments/${assignmentId}` : '/'} className={styles.backLink} aria-label="Back to assignment"><ArrowLeft size={22}/></Link>
+        <Link to={valid ? `/course/${courseId}/assignments/${assignmentId}` : '/'} className={styles.backLink} aria-label={translate('common:navigationControls.backToAssignment')} title={translate('common:navigationControls.backToAssignment')}><ArrowLeft size={22} aria-hidden="true"/></Link>
         <div className={styles.headerText}><p className={styles.eyebrow}>Assignment submission</p><h1>{assignmentQuery.data?.title || (failed ? 'Submission unavailable' : 'Loading submission…')}</h1><p>Submission {submissionId}</p></div>
         {access.canGrade ? <Link className={styles.primaryButton} to={`/course/${courseId}/assignments/${assignmentId}/grading`}><ShieldCheck size={17}/> Open grading roster</Link> : null}
       </div>

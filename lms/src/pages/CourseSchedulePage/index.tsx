@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {COURSE_SESSION_DAYS as DAYS, COURSE_SESSION_TYPES as TYPES} from '@/configs/courseSessions';
 import {FormEvent, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -23,6 +24,7 @@ const emptyDraft = (): CourseSessionPayload => ({type: 'Lecture', dayOfWeek: 'MO
 const toDraft = (session: CourseSession): CourseSessionPayload => ({type: session.type, dayOfWeek: session.dayOfWeek, startTime: session.startTime.slice(0, 5), endTime: session.endTime.slice(0, 5), location: session.location ?? ''});
 
 const CourseSchedulePage = () => {
+  const {t: translate} = useTranslation();
   const courseId = Number(useParams().courseId);
   const validCourse = Number.isInteger(courseId) && courseId > 0;
   const access = useCourseAccess(validCourse ? courseId : null);
@@ -68,7 +70,7 @@ const CourseSchedulePage = () => {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}><Link to={`/course/${courseId}`} className={styles.backLink} aria-label="Back to course"><ArrowLeft size={22}/></Link><div className={styles.headerText}><p className={styles.eyebrow}>Recurring weekly schedule</p><h1>Course schedule</h1></div>{canEditSchedule && !editorOpen ? <button type="button" className={styles.primaryButton} onClick={() => { setDraft(emptyDraft()); setEditingId(null); setEditorOpen(true); }}><Plus size={17}/> Add class time</button> : null}</header>
+      <header className={styles.header}><Link to={`/course/${courseId}`} className={styles.backLink} aria-label={translate("course:grades.back")} title={translate("course:grades.back")}><ArrowLeft size={22} aria-hidden="true"/></Link><div className={styles.headerText}><p className={styles.eyebrow}>Recurring weekly schedule</p><h1>Course schedule</h1></div>{canEditSchedule && !editorOpen ? <button type="button" className={styles.primaryButton} onClick={() => { setDraft(emptyDraft()); setEditingId(null); setEditorOpen(true); }}><Plus size={17}/> Add class time</button> : null}</header>
       {message ? <p className={message.includes('could not') ? styles.error : styles.success} role="status">{message}</p> : null}
 
       {editorOpen ? <form className={styles.card} onSubmit={submit}>

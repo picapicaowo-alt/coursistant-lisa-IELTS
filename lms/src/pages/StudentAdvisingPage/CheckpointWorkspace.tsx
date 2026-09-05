@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useEffect, useId, useRef, useState} from 'react';
 import {ArrowDown, ChevronLeft, ChevronRight, X} from 'lucide-react';
 import {useSearchParams} from 'react-router-dom';
@@ -13,6 +14,7 @@ type Sort = {field: 'deadline' | 'status'; direction: 1 | -1};
 export function CheckpointWorkspace({checkpoint, index, onBack, ...interaction}: {
   checkpoint: CheckpointResponse; index: number; onBack: () => void;
 } & TaskInteractionProps) {
+  const {t: translate} = useTranslation();
   const [params, setParams] = useSearchParams();
   const [filter, setFilter] = useState('');
   const [sort, setSort] = useState<Sort | null>(null);
@@ -74,7 +76,7 @@ export function CheckpointWorkspace({checkpoint, index, onBack, ...interaction}:
     if (event.key === 'Escape' && taskKey) { event.stopPropagation(); closeDetail(); }
   }}>
     <header className={styles.topbar}>
-      <button type="button" className={styles.back} onClick={onBack}><img src="/icons/figma-study-plan/back.svg" alt=""/>Back to study plan</button>
+      <button type="button" className={styles.back} onClick={onBack}>{translate("common:navigationControls.backToStudyPlan")}</button>
     </header>
     <div className={`${styles.columns} ${taskKey ? styles.withDetail : ''}`}>
       <div className={styles.main}>
@@ -112,9 +114,9 @@ export function CheckpointWorkspace({checkpoint, index, onBack, ...interaction}:
         </div>
         {rows.length > 0 ? <nav className={styles.pagination} aria-label="Task pages">
           <div className={styles.pageControls}>
-            <button type="button" aria-label="Previous task page" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}><ChevronLeft size={18}/></button>
+            <button type="button" aria-label={translate('common:navigationControls.previousTaskPage')} title={translate('common:navigationControls.previousTaskPage')} disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}><ChevronLeft size={18} aria-hidden="true"/></button>
             <span aria-live="polite">Page <strong>{currentPage + 1}</strong> of {pageCount}</span>
-            <button type="button" aria-label="Next task page" disabled={currentPage + 1 >= pageCount} onClick={() => setPage(currentPage + 1)}><ChevronRight size={18}/></button>
+            <button type="button" aria-label={translate('common:navigationControls.nextTaskPage')} title={translate('common:navigationControls.nextTaskPage')} disabled={currentPage + 1 >= pageCount} onClick={() => setPage(currentPage + 1)}><ChevronRight size={18} aria-hidden="true"/></button>
           </div>
           <label>Rows per page<select value={pageSize} onChange={event => {setPageSize(Number(event.target.value)); setPage(0);}}>{TASK_PAGE_SIZES.map(size => <option value={size} key={size}>{size}</option>)}</select></label>
         </nav> : null}

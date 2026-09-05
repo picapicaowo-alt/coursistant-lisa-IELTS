@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import styles from "./styles.module.scss";
 import { useNavigate, useParams } from "react-router-dom";
 import { useState } from "react";
@@ -5,6 +6,7 @@ import FileUploadBox from "./file-upload_ver2";
 import RichTextEditor from "./rich-textarea";
 import ChatComponent from "./chatbot";
 const CreateContent = () => {
+  const {t: translate} = useTranslation();
     const navigate = useNavigate();
     const { contentType } = useParams();
     const [isSubmitted, setIsSubmitted] = useState(true)
@@ -21,13 +23,13 @@ const CreateContent = () => {
       "[CS01]Computer Science"
     ];
     return (
-        
+
         <div className="w-full">
             {/* Header */}
             <div className="w-full flex items-center justify-between px-6 py-3 mb-2">
                 {/* Back Button */}
-                <button className="cursor-pointer hover:opacity-70 transition-opacity duration-300" onClick={() => navigate(-1)}>
-                    <img src="/icons/course/arrow-left-v2.png" alt="arrow-left" />
+                <button className="cursor-pointer hover:opacity-70 transition-opacity duration-300" type="button" aria-label={translate("common:actions.back")} title={translate("common:actions.back")} onClick={() => navigate(-1)}>
+                    <img src="/icons/course/arrow-left-v2.png" alt="" />
                 </button>
                 {/* Title */}
                 <div className="flex items-center ml-5 text-lg font-semibold">
@@ -45,7 +47,7 @@ const CreateContent = () => {
                 </button>
 
                 {/* Enabled "Create" button */}
-                <button 
+                <button
                   className={`px-4 py-2 text-sm font-medium text-white rounded-lg transition ${
                     !isHavingContent
                       ? "bg-gray-400 cursor-not-allowed"
@@ -134,7 +136,7 @@ const CreateContent = () => {
                 {/* Chatbot */}
                 {!isChatbotOpen && (
                     <div className="fixed bottom-6 right-6 z-50">
-                        <img src="/icons/add-content/chatbot.png" alt="Floating Icon" 
+                        <img src="/icons/add-content/chatbot.png" alt="Floating Icon"
                             className="rounded-full cursor-pointer hover:scale-110 transition-all duration-300"
                          onClick={() => {
                             setIsChatbotOpen(true);
@@ -147,4 +149,4 @@ const CreateContent = () => {
 }
 export default CreateContent;
 
-    
+

@@ -116,7 +116,7 @@ describe('AnnouncementsCard', () => {
     expect(screen.queryByText(/View all announcements/)).not.toBeInTheDocument();
   });
 
-  it('renders top 3 items and footer "View all announcements (5) →" when more than 3 items exist', () => {
+  it('renders top 3 items and footer "View all announcements (5)" when more than 3 items exist', () => {
     const list = [
       mockAnnouncement(1, 'Ann 1', '2026-08-01T10:00:00Z'),
       mockAnnouncement(2, 'Ann 2', '2026-08-02T10:00:00Z'),
@@ -143,7 +143,7 @@ describe('AnnouncementsCard', () => {
     expect(screen.queryByText('Ann 2')).not.toBeInTheDocument();
     expect(screen.queryByText('Ann 1')).not.toBeInTheDocument();
 
-    const footerLink = screen.getByRole('link', {name: 'View all announcements (5) →'});
+    const footerLink = screen.getByRole('link', {name: 'View all announcements (5)'});
     expect(footerLink).toBeInTheDocument();
     expect(footerLink).toHaveAttribute('href', '/course/33/announcements');
   });

@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import { useState, type FormEvent } from "react";
 import {
   Activity,
@@ -105,6 +106,7 @@ function RuleEditor({
 }
 
 export function AlertRulesPanel() {
+  const {t: translate} = useTranslation();
   const {
     rules,
     form,
@@ -122,16 +124,16 @@ export function AlertRulesPanel() {
     <button
       type="button"
       className={styles.iconButton}
-      aria-label="Refresh alert rules"
+      aria-label={translate("common:refreshControls.alertRules")}
       disabled={dirty || Boolean(editing) || rules.isFetching || save.isPending}
       title={
         dirty
-          ? "Save or cancel your changes before refreshing"
-          : "Refresh alert rules"
+          ? translate("common:refreshControls.unsavedChanges")
+          : translate("common:refreshControls.alertRules")
       }
       onClick={reload}
     >
-      <RefreshCw size={18} />
+      <RefreshCw size={18} aria-hidden="true" />
     </button>
   );
 

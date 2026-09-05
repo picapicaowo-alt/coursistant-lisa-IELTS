@@ -40,3 +40,6 @@ if (typeof window !== 'undefined') {
   Object.defineProperty(window, 'localStorage', {value: localStorage, configurable: true});
   Object.defineProperty(window, 'sessionStorage', {value: sessionStorage, configurable: true});
 }
+
+// Components exercise the same translations as the application after storage is installed.
+await import('./i18n');

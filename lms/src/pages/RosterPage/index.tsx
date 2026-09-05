@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {useState} from 'react';
 import {generatePath, Link, Navigate, useLocation, useParams} from 'react-router-dom';
 import {CourseRole} from '@/apis';
@@ -13,6 +14,7 @@ import styles from './index.module.scss';
 const ROLE_FILTERS: Array<CourseRole | 'All'> = ['All', 'Instructor', 'TA', 'Student'];
 
 const RosterPage: React.FC = () => {
+  const {t: translate} = useTranslation();
   const {courseId: courseIdParam} = useParams();
   const {state: navigationState} = useLocation();
   const parsedCourseId = Number(courseIdParam);
@@ -44,7 +46,7 @@ const RosterPage: React.FC = () => {
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <Link className={styles.backLink} to={backPath}>← {fromOverview ? 'Back to course' : 'Back to course operations'}</Link>
+          <Link className={styles.backLink} to={backPath}>{fromOverview ? 'Back to course' : translate('common:navigationControls.backToCourseOperations')}</Link>
           <h1 className={styles.title}>Roster</h1>
         </div>
         <span className={styles.count}>{total} {total === 1 ? 'member' : 'members'}</span>

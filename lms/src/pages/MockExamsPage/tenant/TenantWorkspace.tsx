@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
-import {ArrowRight, Copy, Plus} from 'lucide-react';
+import {Copy, Plus} from 'lucide-react';
 import {unwrapData, type MockExamTemplateSummary} from '@/apis';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {TenantDrawer} from '@/components/TenantWorkspace/TenantDrawer';
@@ -177,7 +177,7 @@ export function TenantWorkspace({value}: {value: unknown}) {
                       }
                     >
                       Open template
-                      <ArrowRight size={16} />
+
                     </button>
                     <button
                       className={ui.textButton}

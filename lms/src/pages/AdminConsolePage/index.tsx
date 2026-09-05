@@ -2,13 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useQuery } from "@tanstack/react-query";
 import { Navigate } from "react-router-dom";
-import {
-  Users,
-  GraduationCap,
-  Building2,
-  Settings2,
-  ArrowRight,
-} from "lucide-react";
+import {Users, GraduationCap, Building2, Settings2} from "lucide-react";
 import { unwrapData } from "@/apis";
 import { adminApiService } from "@/apis/services/admin-api";
 import { useRequiredAuth } from "@/contexts/RequiredAuthContext";
@@ -119,7 +113,7 @@ export default function AdminConsolePage() {
                       }}
                     >
                       {t("common:admin.viewUsers")}
-                      <ArrowRight size={18} />
+
                     </button>
                   </article>
                 ))}

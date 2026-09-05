@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {
@@ -6,7 +7,7 @@ import {
   useQuery,
   useQueryClient,
 } from '@tanstack/react-query';
-import {ArrowLeft, ArrowRight, Copy, LockKeyhole} from 'lucide-react';
+import {Copy, LockKeyhole} from 'lucide-react';
 import {unwrapData, type MockExamTemplateVersionSummary} from '@/apis';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {getApiErrorMessage, isRecord} from '@/utils/apiError';
@@ -33,6 +34,7 @@ import ui from '@/components/TenantWorkspace/workspace.module.scss';
 import styles from './tenant.module.scss';
 
 export function TenantTemplateEditor({templateId}: {templateId: number}) {
+  const {t: translate} = useTranslation();
   const [params, setParams] = useSearchParams();
   const requestedSection = params.get('section');
   const activeSection = isSection(requestedSection) ? requestedSection : null;
@@ -64,8 +66,8 @@ export function TenantTemplateEditor({templateId}: {templateId: number}) {
           disabled={contentBusy}
           onClick={() => setParams({})}
         >
-          <ArrowLeft size={17} />
-          Mock exam templates
+
+          {translate('common:navigationControls.backToTemplates')}
         </button>
       ) : null}
       <header
@@ -172,6 +174,7 @@ function VersionWorkspace({
   label?: string;
   title?: string;
 }) {
+  const {t: translate} = useTranslation();
   const versionId = version.id!;
   const [params, setParams] = useSearchParams();
   const client = useQueryClient();
@@ -407,8 +410,8 @@ function VersionWorkspace({
                   }
                   onClick={() => setSection(item)}
                 >
-                  {saved ? 'View section' : 'Compose section'}
-                  <ArrowRight size={16} />
+                  {saved ? translate('common:navigationControls.viewSection') : translate('common:navigationControls.composeSection')}
+
                 </button>
               </article>
             );
@@ -543,6 +546,7 @@ function SavedSection({
   section: Section;
   onBack: () => void;
 }) {
+  const {t: translate} = useTranslation();
   const content = useQuery({
     queryKey: ['mock-exams', 'tenant', templateId, versionId, section],
     queryFn: async () =>
@@ -593,8 +597,8 @@ function SavedSection({
         </>
       )}
       <button className={ui.textButton} onClick={onBack}>
-        <ArrowLeft size={17} />
-        Back to version
+
+        {translate('common:navigationControls.backToVersion')}
       </button>
     </div>
   );

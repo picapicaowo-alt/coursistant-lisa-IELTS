@@ -1,7 +1,8 @@
+import {useTranslation} from 'react-i18next';
 import {lazy, Suspense, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {Link, useSearchParams} from 'react-router-dom';
-import {ArrowLeft, ArrowRight, Bell, CalendarCheck2, CheckCircle2, ClipboardList, Clock3} from 'lucide-react';
+import {ArrowRight, Bell, CalendarCheck2, CheckCircle2, ClipboardList, Clock3} from 'lucide-react';
 import {unwrapData} from '@/apis';
 import {courseOperationsApiService as api} from '@/apis/services/course-operations-api';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
@@ -23,6 +24,7 @@ const DETAIL_PARAM = 'learningDetail';
 const COURSE_PARAM = 'learningCourse';
 
 export default function StudentLearningPage() {
+  const {t: translate} = useTranslation();
   const [params, setParams] = useSearchParams();
   const [tab, setTab] = useState<'overview' | 'calendar'>('overview');
   const [page, setPage] = useState(0);
@@ -54,14 +56,14 @@ export default function StudentLearningPage() {
     setParams(current => {const next = new URLSearchParams(current); if (value) next.set(COURSE_PARAM, value); else next.delete(COURSE_PARAM); return next;});
   };
   const coursePicker = (label: string) => <label className={s.coursePicker}><span className={s.srOnly}>{label}</span><select aria-label={label} value={courseId ?? ''} onChange={event => selectCourse(event.target.value)}><option value="">All courses</option>{courses.data?.map(item => <option key={item.id ?? item.courseId} value={item.id ?? item.courseId}>{item.title || item.name || item.courseCode}</option>)}</select></label>;
-  const detailButton = (value: LearningDetail) => <button className={s.textButton} type="button" onClick={() => openDetail(value)}>View all <ArrowRight size={15}/></button>;
+  const detailButton = (value: LearningDetail) => <button className={s.textButton} type="button" onClick={() => openDetail(value)}>{translate("common:actions.viewAll")}</button>;
 
   return <section className={s.page} aria-label="Learning overview workspace">
     <header className={s.header}><div><h2>Learning overview</h2><p>Attendance, reports, and schedule requests.</p></div>{coursePicker('Learning course')}</header>
     <LearningQueryState query={courses}/>
     <nav className={s.tabs} aria-label="Learning views">{(['overview', 'calendar'] as const).map(value => <button key={value} type="button" aria-pressed={tab === value} onClick={() => {setTab(value); openDetail();}}>{value === 'overview' ? 'Overview' : 'Calendar'}</button>)}</nav>
     {tab === 'calendar' ? <Suspense fallback={<p role="status">Loading calendar…</p>}><CalendarPage embedded courseId={courseId}/></Suspense> : detail ? <>
-      <header className={s.detailHeader}><button type="button" className={s.textButton} onClick={() => openDetail()}><ArrowLeft size={17}/> Back to overview</button><h3>{DETAIL_LABELS[detail]}</h3>{visibleCourse ? <p>{visibleCourse.title || visibleCourse.courseCode}</p> : null}</header>
+      <header className={s.detailHeader}><button type="button" className={s.textButton} onClick={() => openDetail()}> {translate('common:navigationControls.backToOverview')}</button><h3>{DETAIL_LABELS[detail]}</h3>{visibleCourse ? <p>{visibleCourse.title || visibleCourse.courseCode}</p> : null}</header>
       {detail === 'reports' ? <PublishedReports key={courseId ?? 'all'} courseId={courseId}/> : detail === 'course' ? courseId ? <CourseLearningDetails key={courseId} courseId={courseId}/> : <LearningEmpty title="Choose a course" description="Select a course above to see hours, reports, and schedule options."/> : <WorkspaceSection title={DETAIL_LABELS[detail]} headingLevel={4} appearance="record">
         <LearningQueryState query={detailQuery} errorMessage={`${DETAIL_LABELS[detail]} could not be loaded.`}/>
         {detailQuery.isSuccess ? <><OperationRows kind={detail} items={detailPage}/><TeachingPagination label={DETAIL_LABELS[detail]} page={page} size={LEARNING_PAGE_SIZE} total={detailItems.length} count={detailPage.length} onChange={setPage}/></> : null}
@@ -73,7 +75,7 @@ export default function StudentLearningPage() {
           <div className={s.overall}><ProgressRing value={summary.percent} label="Assignment completion" compact/><div><h3>{courseId ? 'Course progress' : 'Overall progress'}</h3><p>{summary.total === 0 ? 'No assignments published yet.' : summary.percent == null ? 'No overall progress record available.' : `${summary.completed} of ${summary.total} assignments completed`}</p><span className={s.scope}>Assignment completion{courseId ? ' for this course' : ' across your courses'}</span></div></div>
           <div className={s.courseProgress}>{courseProgress.slice(progressPage * LEARNING_PREVIEW_SIZE, (progressPage + 1) * LEARNING_PREVIEW_SIZE).map((item, index) => <article key={item.courseId ?? index}><h3>{item.courseTitle || courses.data?.find(course => (course.id ?? course.courseId) === item.courseId)?.title || 'Course progress'}</h3><AssignmentProgress progress={item}/></article>)}</div>
           {courseProgress.length > LEARNING_PREVIEW_SIZE ? <TeachingPagination label="Course progress" page={progressPage} size={LEARNING_PREVIEW_SIZE} total={courseProgress.length} count={Math.min(LEARNING_PREVIEW_SIZE, courseProgress.length - progressPage * LEARNING_PREVIEW_SIZE)} onChange={setProgressPage}/> : null}
-          {!!progress.data?.checkpoints?.length ? <div className={s.checkpoints}><h3>Study plan milestones</h3>{progress.data.checkpoints.slice(0, LEARNING_PREVIEW_SIZE).map((item, index) => <article className={s.checkpoint} key={item.checkpointId ?? index}><header><span><CheckCircle2 size={19}/>Milestone checkpoint</span><LearningBadge value={item.status}/></header><p>{item.title || 'Learning checkpoint'}</p><footer><span>Due {learningDate(item.dueDate)}</span>{item.checkpointId ? <Link className={s.textButton} to={`${APP_ROUTE_PATHS.myPlan}?${new URLSearchParams({[STUDY_PLAN_QUERY_PARAMS.checkpoint]: String(item.checkpointId)})}`}>View milestone <ArrowRight size={15}/></Link> : null}</footer></article>)}<Link className={s.textButton} to={APP_ROUTE_PATHS.myPlan}>View study plan <ArrowRight size={15}/></Link></div> : null}
+          {!!progress.data?.checkpoints?.length ? <div className={s.checkpoints}><h3>Study plan milestones</h3>{progress.data.checkpoints.slice(0, LEARNING_PREVIEW_SIZE).map((item, index) => <article className={s.checkpoint} key={item.checkpointId ?? index}><header><span><CheckCircle2 size={19}/>Milestone checkpoint</span><LearningBadge value={item.status}/></header><p>{item.title || 'Learning checkpoint'}</p><footer><span>Due {learningDate(item.dueDate)}</span>{item.checkpointId ? <Link className={s.textButton} to={`${APP_ROUTE_PATHS.myPlan}?${new URLSearchParams({[STUDY_PLAN_QUERY_PARAMS.checkpoint]: String(item.checkpointId)})}`}>{translate('common:navigationControls.viewMilestone')} </Link> : null}</footer></article>)}<Link className={s.textButton} to={APP_ROUTE_PATHS.myPlan}>{translate('common:navigationControls.viewStudyPlan')} </Link></div> : null}
         </> : null}
       </WorkspaceSection>
       <WorkspaceSection title="Alerts" summary="Your learning reminders" appearance="record" className={s.alertsPanel} meta={alerts.isSuccess ? <LearningBadge label={`${alerts.data.length} active`}/> : undefined}>
@@ -82,7 +84,7 @@ export default function StudentLearningPage() {
         {alerts.isSuccess ? <div className={s.alerts}>{alerts.data.slice(0, LEARNING_PREVIEW_SIZE).map((item, index) => <article key={optionalNumber(item, 'id') ?? index}><Bell size={18}/><div><strong>{textValue(item, 'title', 'message', 'type') || 'Learning update'}</strong>{textValue(item, 'createdAt') ? <small>{learningDate(textValue(item, 'createdAt'))}</small> : null}</div></article>)}</div> : null}
         {alerts.isSuccess && alerts.data.length > LEARNING_PREVIEW_SIZE ? detailButton('alerts') : null}
       </WorkspaceSection>
-      <section className={s.courseEntry} aria-label="Course reports and schedule changes"><div><h3>Need reports or schedule changes?</h3><p>Read published reports across your courses, or choose a course for hours and schedule changes.</p></div><div className={s.entryActions}><button className={s.textButton} type="button" onClick={() => openDetail('reports')}>View published reports <ArrowRight size={17}/></button>{coursePicker('Course details selection')}<button className={s.primary} type="button" disabled={!courseId} onClick={() => openDetail('course')}>View details <ArrowRight size={17}/></button></div></section>
+      <section className={s.courseEntry} aria-label="Course reports and schedule changes"><div><h3>Need reports or schedule changes?</h3><p>Read published reports across your courses, or choose a course for hours and schedule changes.</p></div><div className={s.entryActions}><button className={s.textButton} type="button" onClick={() => openDetail('reports')}>View published reports <ArrowRight size={17}/></button>{coursePicker('Course details selection')}<button className={s.primary} type="button" disabled={!courseId} onClick={() => openDetail('course')}>{translate("common:actions.viewDetails")}</button></div></section>
       <div className={s.supportGrid}>
         <WorkspaceSection title="Attendance" appearance="record" meta={detailButton('attendance')}>
           <LearningQueryState query={attendance}/>

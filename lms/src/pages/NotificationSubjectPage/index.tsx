@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useEffect} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, CalendarDays, Clock3, MapPin, Users} from 'lucide-react';
@@ -107,6 +108,7 @@ const loadSubject = async (
 };
 
 const NotificationSubjectPage = ({kind}: Props) => {
+  const {t: translate} = useTranslation();
   const {courseId: courseIdParam, subjectId: subjectIdParam} = useParams();
   const courseId = Number(courseIdParam);
   const subjectId = Number(subjectIdParam);
@@ -133,8 +135,8 @@ const NotificationSubjectPage = ({kind}: Props) => {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link to={validParams ? `/course/${courseId}` : '/'} className={styles.backLink} aria-label="Back to course">
-          <ArrowLeft size={22}/>
+        <Link to={validParams ? `/course/${courseId}` : '/'} className={styles.backLink} aria-label={translate("course:grades.back")} title={translate("course:grades.back")}>
+          <ArrowLeft size={22} aria-hidden="true"/>
         </Link>
         <div>
           <p className={styles.eyebrow}>{query.data?.label || 'Notification'}</p>

@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {FormEvent, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, Megaphone, Pencil, Plus, Trash2, X} from 'lucide-react';
@@ -13,6 +14,7 @@ import styles from '../CourseEventsPage/index.module.scss';
 const emptyDraft = (): CourseAnnouncementPayload => ({title: '', body: ''});
 
 const CourseAnnouncementsPage = () => {
+  const {t: translate} = useTranslation();
   const courseId = Number(useParams().courseId);
   const validCourse = Number.isInteger(courseId) && courseId > 0;
   const access = useCourseAccess(validCourse ? courseId : null);
@@ -71,7 +73,7 @@ const CourseAnnouncementsPage = () => {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <Link to={`/course/${courseId}`} className={styles.backLink} aria-label="Back to course"><ArrowLeft size={22}/></Link>
+        <Link to={`/course/${courseId}`} className={styles.backLink} aria-label={translate("course:grades.back")} title={translate("course:grades.back")}><ArrowLeft size={22} aria-hidden="true"/></Link>
         <div className={styles.headerText}><p className={styles.eyebrow}>Course communications</p><h1>Announcements</h1></div>
         {access.canPostAnnouncements && !editorOpen ? <button type="button" className={styles.primaryButton} onClick={() => { setEditingId(null); setDraft(emptyDraft()); setEditorOpen(true); setMessage(null); }}><Plus size={17}/> Add announcement</button> : null}
       </header>

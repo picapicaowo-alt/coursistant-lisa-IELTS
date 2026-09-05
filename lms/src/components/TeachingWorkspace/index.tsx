@@ -1,14 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import {statusLabel} from '@/i18n/presentation';
 import { useEffect, useId, useRef, type ReactNode } from "react";
-import {
-  AlertCircle,
-  ChevronLeft,
-  ChevronRight,
-  Inbox,
-  LoaderCircle,
-  X,
-} from "lucide-react";
+import {AlertCircle, Inbox, LoaderCircle, X} from "lucide-react";
 import { getApiErrorMessage, isHttpStatus } from "@/utils/apiError";
 import { formatNumber } from '@/i18n/formatting';
 import styles from "./index.module.scss";
@@ -210,7 +203,7 @@ export function TeachingPagination({
           disabled={loading || !page}
           onClick={() => onChange(page - 1)}
         >
-          <ChevronLeft size={16} />
+
           {translate("common:actions.previous")}</button>
         <button
           type="button"
@@ -218,7 +211,7 @@ export function TeachingPagination({
           disabled={loading || !hasNext}
           onClick={() => onChange(page + 1)}
         >
-          {translate("common:actions.next")}<ChevronRight size={16} />
+          {translate("common:actions.next")}
         </button>
       </div>
     </nav>

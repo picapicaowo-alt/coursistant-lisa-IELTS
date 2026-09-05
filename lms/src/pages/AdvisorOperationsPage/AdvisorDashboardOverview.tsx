@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useRef, useEffect, useState} from 'react';
 import {generatePath, Link} from 'react-router-dom';
 import {ChevronRight, ChevronDown} from 'lucide-react';
@@ -27,7 +28,8 @@ function formatTaskTime(task: AdvisorActionTaskResponse): string {
 }
 
 function ViewAll({to}: {to: string}) {
-  return <Link className={styles.viewAll} to={to}>View all <ChevronRight size={16} aria-hidden="true"/></Link>;
+  const {t: translate} = useTranslation();
+  return <Link className={styles.viewAll} to={to}>{translate("common:actions.viewAll")}</Link>;
 }
 
 export function AdvisorDashboardOverview({name, dashboard, students, tasks, conversations, schedule, loading, error, onRetry}: {

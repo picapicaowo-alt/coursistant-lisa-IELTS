@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {FormEvent, useEffect, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -22,6 +23,7 @@ interface StatusMessage {
 }
 
 const SettingsPage = () => {
+  const {t} = useTranslation();
   const navigate = useNavigate();
   const {user, updateProfile} = useAuth();
   const tenantAdmin = user?.role === 'TENANT_ADMIN';
@@ -134,9 +136,9 @@ const SettingsPage = () => {
           type="button"
           className={styles.backButton}
           onClick={handleBack}
-          aria-label="Back"
+          aria-label={t('common:actions.back')} title={t('common:actions.back')}
         >
-          <ArrowLeft size={20}/>
+          <ArrowLeft size={20} aria-hidden="true"/>
         </button>
         <div className={styles.settingsHeaderText}>
           <h2 className={styles.settingsTitle}>Settings</h2>

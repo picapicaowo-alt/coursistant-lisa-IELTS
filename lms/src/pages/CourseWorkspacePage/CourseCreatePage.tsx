@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {useState} from 'react';
 import {useMutation} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
@@ -27,6 +28,7 @@ const EMPTY_FORM: FormState = {
 };
 
 const CourseCreatePage: React.FC = () => {
+  const {t: translate} = useTranslation();
   const navigate = useNavigate();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
@@ -74,7 +76,7 @@ const CourseCreatePage: React.FC = () => {
           type="button"
           className={styles.back}
           onClick={() => navigate('/course')}
-          aria-label="Back to courses"
+          aria-label={translate('course:detail.backToCourses')} title={translate('course:detail.backToCourses')}
         >
           <span aria-hidden="true">←</span>
         </button>

@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useMemo, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {addDays, addMonths, addWeeks, eachDayOfInterval, endOfMonth, endOfWeek, format, isSameMonth, max, min, parseISO, startOfDay, endOfDay, startOfMonth, startOfWeek} from 'date-fns';
@@ -16,6 +17,7 @@ const CATEGORIES = [{id: 'all', label: 'All Events'}, {id: 'courses', label: 'Co
 const color = (item: CalendarItem) => item.kind === 'Personal' ? 'neutral' : item.kind === 'Assignment' || item.kind === 'Quiz' ? 'cyan' : item.kind === 'Event' ? 'pink' : 'brand';
 
 const CalendarPage = ({embedded = false, courseId}: {embedded?: boolean; courseId?: number}) => {
+  const {t: translate} = useTranslation();
   const eventAnchor = useRef<HTMLElement>();
   const [view, setView] = useState<CalendarView>('week');
   const [category, setCategory] = useState<Category>('all');
@@ -56,7 +58,7 @@ const CalendarPage = ({embedded = false, courseId}: {embedded?: boolean; courseI
     <h1 className={styles.visuallyHidden}>Calendar</h1>
     <nav className={styles.categoryTabs} aria-label="Calendar categories">{CATEGORIES.map(item => <button type="button" key={item.id} aria-pressed={category === item.id} onClick={() => setCategory(item.id)}>{item.label}</button>)}</nav>
     <div className={styles.calendarShell}><div className={styles.calendarMain}>
-      <header className={styles.toolbar}><div className={styles.navigation}><button type="button" onClick={() => move(-1)} aria-label={`Previous ${view}`}><ChevronLeft size={18}/></button><h2>{view === 'month' ? format(cursor, 'MMMM yyyy') : view === 'day' ? format(cursor, 'MMMM d, yyyy') : `${format(range.start, 'MMM d')} – ${format(range.end, 'MMM d, yyyy')}`}</h2><button type="button" onClick={() => move(1)} aria-label={`Next ${view}`}><ChevronRight size={18}/></button></div><div className={styles.viewSwitch}><button type="button" onClick={() => setCursor(new Date())}>Today</button><label><span className={styles.visuallyHidden}>Calendar view</span><select value={view} onChange={event => setView(event.target.value as CalendarView)}><option value="day">Day</option><option value="week">Week</option><option value="month">Month</option></select></label><button type="button" className={styles.primary} disabled={!personal.isSuccess} onClick={event => {eventAnchor.current = event.currentTarget; setEditor({event: null});}}>+ Add event</button></div></header>
+      <header className={styles.toolbar}><div className={styles.navigation}><button type="button" onClick={() => move(-1)} aria-label={translate(`common:navigationControls.previousPeriod.${view}`)} title={translate(`common:navigationControls.previousPeriod.${view}`)}><ChevronLeft size={18} aria-hidden="true"/></button><h2>{view === 'month' ? format(cursor, 'MMMM yyyy') : view === 'day' ? format(cursor, 'MMMM d, yyyy') : `${format(range.start, 'MMM d')} – ${format(range.end, 'MMM d, yyyy')}`}</h2><button type="button" onClick={() => move(1)} aria-label={translate(`common:navigationControls.nextPeriod.${view}`)} title={translate(`common:navigationControls.nextPeriod.${view}`)}><ChevronRight size={18} aria-hidden="true"/></button></div><div className={styles.viewSwitch}><button type="button" onClick={() => setCursor(new Date())}>Today</button><label><span className={styles.visuallyHidden}>Calendar view</span><select value={view} onChange={event => setView(event.target.value as CalendarView)}><option value="day">Day</option><option value="week">Week</option><option value="month">Month</option></select></label><button type="button" className={styles.primary} disabled={!personal.isSuccess} onClick={event => {eventAnchor.current = event.currentTarget; setEditor({event: null});}}>+ Add event</button></div></header>
       {calendar.isPending || personal.isPending ? <p className={styles.status} role="status">Loading calendar…</p> : null}
       {calendar.isError ? <p className={styles.warning} role="alert">Course calendar could not be loaded. <button type="button" onClick={() => void calendar.refetch()}>Retry courses</button></p> : null}
       {personal.isError ? <p className={styles.warning} role="alert">Personal events could not be loaded. <button type="button" onClick={() => void personal.refetch()}>Retry personal events</button></p> : null}

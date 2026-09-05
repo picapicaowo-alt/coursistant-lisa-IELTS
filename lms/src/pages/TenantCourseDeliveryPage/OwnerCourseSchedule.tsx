@@ -1,5 +1,6 @@
+import {useTranslation} from 'react-i18next';
 import {useState} from 'react';
-import {ArrowRight, CalendarDays, Globe2, MapPin, Plus} from 'lucide-react';
+import {CalendarDays, Globe2, MapPin, Plus} from 'lucide-react';
 import {useIsMutating, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {unwrapData, type CourseResponse, type CourseSession, type CourseSessionPayload} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
@@ -31,6 +32,7 @@ function SessionFields({draft, onChange}: {draft: CourseSessionPayload; onChange
 }
 
 export function OwnerCourseSchedule({courseId, course, readOnly, canGenerateDates}: {courseId: number; course: CourseResponse; readOnly: boolean; canGenerateDates: boolean}) {
+  const {t: translate} = useTranslation();
   const client = useQueryClient();
   // Schedule writes survive tab changes; block new actions after this view remounts.
   const schedulePending = useIsMutating({mutationKey: keys.scheduleWrites(courseId)}) > 0;
@@ -129,7 +131,7 @@ export function OwnerCourseSchedule({courseId, course, readOnly, canGenerateDate
       {visibleOccurrences?.length ? <table className={styles.occurrenceTable}><thead><tr><th>Date</th><th>Time</th><th>Location</th><th>Status</th></tr></thead><tbody>{visibleOccurrences.map(item => {
         return <tr key={item.id}><td data-label="Date">{shortDate(item.date)}</td><td data-label="Time">{formatCourseTime(item.startTime)}{item.endTime ? `–${formatCourseTime(item.endTime)}` : ''}</td><td data-label="Location">{item.location || 'Not provided'}</td><td data-label="Status"><span className={styles.statusPill} data-state={item.status}>{item.status?.replace(/_/g, ' ') || 'Not provided'}</span></td></tr>;
       })}</tbody></table> : !occurrences.isPending && !occurrences.isError ? <p className={styles.helper}>No occurrences were returned for this period.</p> : null}
-      {occurrences.data && occurrences.data.length > 8 ? <button type="button" className={styles.textAction} onClick={() => setShowAllOccurrences(current => !current)}>{showAllOccurrences ? 'Show fewer occurrences' : `View all ${occurrences.data.length} occurrences`}<ArrowRight size={15} aria-hidden="true" /></button> : null}
+      {occurrences.data && occurrences.data.length > 8 ? <button type="button" className={styles.textAction} onClick={() => setShowAllOccurrences(current => !current)}>{showAllOccurrences ? translate('common:navigationControls.fewerOccurrences') : translate('common:navigationControls.allOccurrences', {count: occurrences.data.length})}</button> : null}
     </section> : null}
     {error ? <p role="alert" className={styles.error}>{advisingErrorMessage(error, 'The course schedule could not be loaded or updated.')} {sessions.isError ? <button type="button" className={styles.ghostButton} onClick={() => void sessions.refetch()}>Retry</button> : 'Your input is preserved. Review the form and submit again to retry.'}</p> : null}
   </div>;

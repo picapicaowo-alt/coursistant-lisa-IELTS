@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {Dispatch, FormEvent, SetStateAction, useEffect, useMemo, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowDown, ArrowLeft, ArrowUp, KeyRound, Pencil, Plus, Trash2, X} from 'lucide-react';
@@ -143,6 +144,7 @@ const QuestionFields = ({draft, setDraft, canChangeType}: QuestionFieldsProps) =
 };
 
 const QuizEditorPage = () => {
+  const {t: translate} = useTranslation();
   const {courseId: courseIdParam, quizId: quizIdParam} = useParams();
   const courseId = Number(courseIdParam);
   const quizId = quizIdParam ? Number(quizIdParam) : null;
@@ -414,7 +416,18 @@ const QuizEditorPage = () => {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link to={isNew ? `/course/${courseId}` : `/course/${courseId}/quizzes/${quizId}`} className={styles.backLink} aria-label="Back"><ArrowLeft size={22}/></Link>
+        <Link
+          to={
+            isNew
+              ? `/course/${courseId}`
+              : `/course/${courseId}/quizzes/${quizId}`
+          }
+          className={styles.backLink}
+          aria-label={translate("common:actions.back")}
+          title={translate("common:actions.back")}
+        >
+          <ArrowLeft size={22} aria-hidden="true" />
+        </Link>
         <div><p className={styles.eyebrow}>{isNew ? 'New quiz' : quizQuery.data?.state || 'Quiz editor'}</p><h1>{isNew ? 'Create a quiz' : `Edit ${quizQuery.data?.title || 'quiz'}`}</h1></div>
       </div>
 

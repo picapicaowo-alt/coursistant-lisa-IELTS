@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import { useState } from "react";
 import {
   BookOpen,
@@ -24,6 +25,7 @@ export function WeekDirectory({
   onSelect: (id: number) => void;
   onCreate?: () => void;
 }) {
+  const {t: translate} = useTranslation();
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [state, setState] = useState<WeekFilter>("All");
@@ -221,22 +223,22 @@ export function WeekDirectory({
           <nav aria-label="Week pages">
             <button
               type="button"
-              aria-label="Previous weeks"
+              aria-label={translate('common:navigationControls.previousWeeks')} title={translate('common:navigationControls.previousWeeks')}
               disabled={currentPage === 0}
               onClick={() => setPage(currentPage - 1)}
             >
-              <ChevronLeft size={17} />
+              <ChevronLeft size={17}  aria-hidden="true"/>
             </button>
             <span>
               {currentPage + 1} / {pageCount}
             </span>
             <button
               type="button"
-              aria-label="Next weeks"
+              aria-label={translate('common:navigationControls.nextWeeks')} title={translate('common:navigationControls.nextWeeks')}
               disabled={currentPage === pageCount - 1}
               onClick={() => setPage(currentPage + 1)}
             >
-              <ChevronRight size={17} />
+              <ChevronRight size={17}  aria-hidden="true"/>
             </button>
           </nav>
         ) : null}
