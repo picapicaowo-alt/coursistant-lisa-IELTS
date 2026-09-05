@@ -1,6 +1,6 @@
 # Production 功能问题记录
 
-> 历史快照：以下为前一轮执行时的故障。当前状态已重新核验，见 [最新后端清单](client-readiness-backend-handoff-2026-09-05.md)；不继续以本文件作为现有阻塞列表。
+> 历史快照：以下为前一轮执行时的故障。当前状态已重新核验，见 [继续排查报告](client-readiness-audit-2026-09-05.md)；不继续以本文件作为现有阻塞列表。
 
 前端：`https://app.xlearnedu.com`。API：`https://api-cn.xlearnedu.com/api`。租户：启澜雅思学院（测试用），`tenantId=1`。以下为 2026-09-05 UTC 的实际观察，仅描述当前未解决的问题。availability 按用户要求跳过。
 

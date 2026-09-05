@@ -64,7 +64,7 @@ F1–F14 的历史发现过程见 [先前审查快照](production-function-audit
 | 计划、课时与报告 | 真实计划显示 1/1 任务完成；课程已购／剩余 120 分钟及发布报告 1 读取 200。没有把旧测试评分解释为真实学习能力 |
 | 词汇 | 实际配置基址返回 JSON；列表、词库、单元、既有会话读取 200；同一 TEST 会话 PAUSED→ACTIVE→揭示答案 200→PAUSED，位置仍为 4，未评分、未跳到下一词 |
 
-旧的 Instructor 材料上传拒绝、成员读取拒绝、日程删除故障及词库 HTML 入口问题已被本轮新响应取代。当前后端清单见 [后端 Markdown](client-readiness-backend-handoff-2026-09-05.md)。
+旧的 Instructor 材料上传拒绝、成员读取拒绝、日程删除故障及词库 HTML 入口问题已被本轮新响应取代。已提及的问题不在新增清单中重复收录；本轮新增项见 [后端 Markdown](client-readiness-backend-handoff-2026-09-05.md)。
 
 ## 浏览器与测试数据边界
 
