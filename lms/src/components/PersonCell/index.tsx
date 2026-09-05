@@ -5,6 +5,7 @@ import styles from './index.module.scss';
 
 interface PersonIdentity {
   id?: number;
+  name?: string | null;
   firstName?: string | null;
   middleName?: string | null;
   lastName?: string | null;
@@ -23,7 +24,7 @@ export function PersonCell({person, secondary, roleLabel, compact = false}: {
   return <span className={styles.person} data-compact={compact || undefined}>
     <UserAvatar src={person.avatar} className={styles.avatar}/>
     <span className={styles.copy}>
-      <strong>{formatPersonName(person, person.id ? t('people.userFallback', {id: person.id}) : t('people.nameUnavailable'))}</strong>
+      <strong>{formatPersonName(person, person.name || (person.id ? t('people.userFallback', {id: person.id}) : t('people.nameUnavailable')))}</strong>
       {secondary || person.email ? <small>{secondary ?? person.email}</small> : null}
       {roleLabel ? <small>{roleLabel}</small> : null}
     </span>

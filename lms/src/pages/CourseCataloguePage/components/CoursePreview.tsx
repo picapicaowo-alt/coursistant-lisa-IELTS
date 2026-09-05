@@ -1,10 +1,11 @@
+import {formatWeekday, formatClockTime} from '@/i18n/formatting';
 import React, {useEffect, useRef, useState} from 'react';
 import styles from './CoursePreview.module.scss';
 import {Link, generatePath} from "react-router-dom";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {useTranslation} from "react-i18next";
 import {courseApiService} from "@/apis/services/course-api";
-import {CourseSession, CourseState, unwrapData, type CourseProgressResponse} from "@/apis";
+import {CourseState, unwrapData, type CourseProgressResponse} from "@/apis";
 import {AssignmentProgress} from '@/components/AssignmentProgress';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {CalendarDays, Ellipsis, MapPin} from 'lucide-react';
@@ -29,13 +30,6 @@ interface CoursePreviewProps {
   progressFailed?: boolean;
   showProgress?: boolean;
 }
-
-const DAY_LABEL: Record<CourseSession['dayOfWeek'], string> = {
-  MON: 'Mon', TUE: 'Tue', WED: 'Wed', THU: 'Thu', FRI: 'Fri', SAT: 'Sat', SUN: 'Sun',
-};
-
-/** `09:00:00` reads as `09:00`; the seconds are always zero in practice. */
-const toClockTime = (time: string) => time.slice(0, 5);
 
 /**
  * A course card in the course list.
@@ -131,25 +125,25 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
       title={title || courseCode}
       headingLevel={2}
       code={courseCode}
-      status={<TeachingBadge value={state}>{state}</TeachingBadge>}
-      instructor={instructorName || 'Instructor not assigned'}
+      status={<TeachingBadge value={state}/>}
+      instructor={instructorName || t('catalogue.unassignedInstructor')}
       instructorAvatar={avatarUrl}
       footer={<div className={styles.schedule}>
         <div><CalendarDays size={18} aria-hidden="true"/><span>
-          {scheduleError ? <button type="button" onClick={() => void retrySchedule()}>Retry schedule</button>
-            : firstSession ? `Weekly class, ${DAY_LABEL[firstSession.dayOfWeek]} ${toClockTime(firstSession.startTime)}`
-            : state === 'Archived' ? 'Archived course'
-            : schedulePending ? 'Loading schedule…' : 'No schedule published'}
+          {scheduleError ? <button type="button" onClick={() => void retrySchedule()}>{t('dashboard:retrySchedule')}</button>
+            : firstSession ? t('catalogue.weeklyClass', {day: formatWeekday(firstSession.dayOfWeek), time: formatClockTime(firstSession.startTime)})
+            : state === 'Archived' ? t('catalogue.archived')
+            : schedulePending ? t('dashboard:loadingSchedule') : t('dashboard:noSchedule')}
         </span></div>
-        <div><MapPin size={18} aria-hidden="true"/><span>{firstSession?.location || 'Location not provided'}</span></div>
+        <div><MapPin size={18} aria-hidden="true"/><span>{firstSession?.location || t('catalogue.noLocation')}</span></div>
       </div>}
       actions={<>
         <Link data-variant={showOperations || showDelivery ? 'secondary' : undefined}
           to={generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(id)})}>
           {t("card.viewDetails")}
         </Link>
-        {showOperations ? <Link to={generatePath(APP_ROUTE_PATHS.courseCourseIdOperations, {courseId: String(id)})}>Course operations</Link> : null}
-        {showDelivery ? <Link to={generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(id)})}>Delivery setup</Link> : null}
+        {showOperations ? <Link to={generatePath(APP_ROUTE_PATHS.courseCourseIdOperations, {courseId: String(id)})}>{t('catalogue.operations')}</Link> : null}
+        {showDelivery ? <Link to={generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(id)})}>{t('catalogue.deliverySetup')}</Link> : null}
       </>}
         menu={canManage ? (
           <div className={styles.menuAnchor} ref={menuRef} onKeyDown={event => {
@@ -186,15 +180,15 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
                 ) : (
                   <>
                     <button type="button" role="menuitem" className={styles.menuItem} disabled={unarchive.isPending} onClick={() => { setMenuOpen(false); unarchive.mutate(); }}>
-                      {unarchive.isPending ? 'Restoring…' : 'Restore course'}
+                      {unarchive.isPending ? t('catalogue.restoring') : t('catalogue.restore')}
                     </button>
                     {confirmDelete ? (
                       <div className={styles.confirmDelete}>
-                        <p>Delete permanently?</p>
-                        <button type="button" role="menuitem" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? 'Deleting…' : 'Confirm'}</button>
-                        <button type="button" role="menuitem" onClick={() => setConfirmDelete(false)}>Cancel</button>
+                        <p>{t('catalogue.confirmDelete')}</p>
+                        <button type="button" role="menuitem" disabled={remove.isPending} onClick={() => remove.mutate()}>{remove.isPending ? t('common:actions.deleting') : t('common:actions.confirm')}</button>
+                        <button type="button" role="menuitem" onClick={() => setConfirmDelete(false)}>{t('common:actions.cancel')}</button>
                       </div>
-                    ) : <button type="button" role="menuitem" className={`${styles.menuItem} ${styles.dangerItem}`} onClick={() => setConfirmDelete(true)}>Delete permanently</button>}
+                    ) : <button type="button" role="menuitem" className={`${styles.menuItem} ${styles.dangerItem}`} onClick={() => setConfirmDelete(true)}>{t('catalogue.deletePermanently')}</button>}
                   </>
                 )}
               </div>

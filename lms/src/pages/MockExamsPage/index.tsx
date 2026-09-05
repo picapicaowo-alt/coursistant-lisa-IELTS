@@ -1,17 +1,22 @@
 import React from 'react';
+import {useTranslation} from 'react-i18next';
+import {SystemWorkspace} from './SystemWorkspace';
+import {TeachingState} from '@/components/TeachingWorkspace';
+import systemStyles from './system.module.scss';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {StudentMockExamLibrary} from './StudentMockExamLibrary';
-import {AdvisorWorkspace, InstructorWorkspace, SystemWorkspace} from './StaffMockExamWorkspaces';
+import {AdvisorWorkspace, InstructorWorkspace} from './StaffMockExamWorkspaces';
 import {TenantWorkspace} from './tenant/TenantWorkspace';
 import studentStyles from './index.module.scss';
 import styles from '../advising/advising.module.scss';
 
 const MockExamsPage: React.FC = () => {
   const {user} = useRequiredAuth();
+  const {t} = useTranslation();
 
   const mode = user.role === 'SYSTEM_ADMIN'
     ? 'system'
@@ -38,6 +43,8 @@ const MockExamsPage: React.FC = () => {
     },
   });
 
+  if (mode === 'system') return data.data !== undefined ? <SystemWorkspace value={data.data}/> : <main className={systemStyles.page}><header className={systemStyles.header}><h1>{t('common:admin.examTitle')}</h1></header><TeachingState loading={data.isPending} error={data.error} onRetry={() => void data.refetch()}/></main>;
+
   if (mode === 'student') {
     return (
       <main className={studentStyles.studentPage}>
@@ -59,7 +66,7 @@ const MockExamsPage: React.FC = () => {
     if (mode === 'tenant') return <TenantWorkspace value={data.data}/>;
     if (mode === 'advisor') return <AdvisorWorkspace value={data.data}/>;
     if (mode === 'instructor') return <InstructorWorkspace value={data.data}/>;
-    if (mode === 'system') return <SystemWorkspace value={data.data}/>;
+
   }
 
   return (

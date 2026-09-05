@@ -139,12 +139,12 @@ const Sidebar: React.FC = () => {
     }));
   }
   if (!student && canAccessStandaloneMockExams(user)) {
-    addItem({to: APP_ROUTE_PATHS.mockExams, label: 'Mock exams', icon: GraduationCap, active: pathname.startsWith('/mock-exams')});
+    addItem({to: APP_ROUTE_PATHS.mockExams, label: t('navigation:mockExams'), icon: GraduationCap, active: pathname.startsWith('/mock-exams')});
   }
   if (!student) standardItems.forEach(({item, originalIndex}) => {
     addItem({
       to: item.path,
-      label: !isUserAccount && item.path === '/course' ? 'Courses' : t(item.sidebarItem.translationLabel),
+      label: !isUserAccount && item.path === '/course' ? t('navigation:courses') : t(item.sidebarItem.translationLabel),
       icon: STANDARD_ICONS[item.path] ?? BookOpen,
       active: selectedSidebarIndex === originalIndex,
     });
@@ -161,7 +161,7 @@ const Sidebar: React.FC = () => {
   if (canUseAdminConsole) {
     addItem({
       to: APP_ROUTE_PATHS.admin,
-      label: isTenantAdminAccount(user) ? 'Governance' : 'Admin Console',
+      label: isTenantAdminAccount(user) ? t('navigation:governance') : t('navigation:adminConsole'),
       icon: Settings,
       active: pathname === APP_ROUTE_PATHS.admin,
     });
@@ -186,20 +186,20 @@ const Sidebar: React.FC = () => {
   }, [pathname, hash, search]);
 
   return (
-    <aside className={styles.sidebar} data-collapsed={collapsed || undefined} data-workspace={isTenantAdminAccount(user) ? 'tenant' : user.role === 'USER' && user.level === 'INSTRUCTOR' ? 'instructor' : undefined} aria-label="Primary navigation">
+    <aside className={styles.sidebar} data-collapsed={collapsed || undefined} data-workspace={isTenantAdminAccount(user) ? 'tenant' : user.role === 'USER' && user.level === 'INSTRUCTOR' ? 'instructor' : undefined} aria-label={t('navigation:primary')}>
       <Link to={homePath} className={styles.logo} aria-label={t('sidebar.dashboard')}>
         <img src="/icons/figma-dashboard/logo-mark.svg" alt=""/>
         <img className={styles.wordmark} src="/icons/figma-dashboard/logo-wordmark.svg" alt="X—LEARN"/>
       </Link>
 
-      <button type="button" className={styles.collapseToggle} aria-label={collapsed ? "Expand navigation" : "Collapse navigation"} aria-expanded={!collapsed} onClick={() => setCollapsed(current => !current)}>{collapsed ? <PanelLeftOpen size={19}/> : <PanelLeftClose size={19}/>}</button>
+      <button type="button" className={styles.collapseToggle} aria-label={collapsed ? t('navigation:expand') : t('navigation:collapse')} aria-expanded={!collapsed} onClick={() => setCollapsed(current => !current)}>{collapsed ? <PanelLeftOpen size={19}/> : <PanelLeftClose size={19}/>}</button>
       <nav className={styles.desktopNavigation}>
         <ul>
           {navigationItems.map(item => <NavigationItem key={item.to} {...item}/>)}
         </ul>
       </nav>
 
-      <nav className={styles.mobileNavigation} aria-label="Mobile primary navigation">
+      <nav className={styles.mobileNavigation} aria-label={t('navigation:mobilePrimary')}>
         <ul>
           {mobilePrimaryItems.slice(0, 3).map(item => <NavigationItem key={item.to} {...item}/>)}
           {mobileMoreItems.length > 0 ? (

@@ -2,9 +2,6 @@
     "list": {
         "title": "My Courses",
         "noCourses": "No courses match this view.",
-        "noCurrentCourses": "You have no current courses.",
-        "noCompletedCourses": "You have no completed courses yet.",
-        "noCourseUnits": "No course units have been added yet.",
         "createCourse": "Create course",
         "joinCourse": "Join course",
         "tabs": {
@@ -12,7 +9,10 @@
             "myCollection": "My Collection"
         },
         "newContent": "New Content",
-        "linesPerPage": "Lines per page"
+        "linesPerPage": "Lines per page",
+        "noCurrentCourses": "You have no current courses.",
+        "noCompletedCourses": "You have no completed courses yet.",
+        "noCourseUnits": "No course units have been added yet."
     },
     "card": {
         "instructor": "Instructor",
@@ -312,5 +312,48 @@
         "allowLateSubmission": "Allow Late Submission",
         "allowedResubmissionCount": "Allowed Resubmissions",
         "remainingResubmissions": "Remaining Resubmissions"
+    },
+    "catalogue": {
+        "operations": "Course operations",
+        "allStatuses": "All Status",
+        "display": "Course display",
+        "grid": "Grid view",
+        "list": "List view",
+        "previousPage": "Previous course page",
+        "nextPage": "Next course page",
+        "unassignedInstructor": "Instructor not assigned",
+        "archived": "Archived course",
+        "noLocation": "Location not provided",
+        "deliverySetup": "Delivery setup",
+        "restoring": "Restoring…",
+        "restore": "Restore course",
+        "confirmDelete": "Delete permanently?",
+        "deletePermanently": "Delete permanently",
+        "deleteFailure": "This course could not be deleted. Courses with enrolments or coursework must be retained.",
+        "restoreFailure": "The course could not be restored.",
+        "weeklyClass": "Weekly class, {{day}} {{time}}"
+    },
+    "grades": {
+        "invalid": "Invalid course.",
+        "loading": "Loading grades…",
+        "ownOnly": "This page shows a student's own grades only.",
+        "back": "Back to course",
+        "title": "Course grades",
+        "label": "Grades",
+        "visibility": "Grade visibility information",
+        "visibilityHelp": "Released scores and enabled instant quiz auto-scores appear here. This page does not calculate a course total.",
+        "partialFailure": "Some grades could not be loaded. Refresh to try again.",
+        "noAssignments": "No published assignments.",
+        "notGraded": "Not graded yet",
+        "noQuizzes": "No published quizzes.",
+        "instant": "Instant auto-score",
+        "afterRelease": "After instructor release",
+        "autoScore": "Auto-score",
+        "autoScoreSoFar": "Auto-score so far",
+        "itemCount": "{{count}} items",
+        "itemCount_one": "{{count}} item",
+        "itemCount_other": "{{count}} items",
+        "assignmentFallback": "Assignment {{id}}",
+        "due": "Due {{date}}"
     }
 }

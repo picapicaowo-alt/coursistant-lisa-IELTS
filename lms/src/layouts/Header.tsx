@@ -1,3 +1,4 @@
+import type {TFunction} from 'i18next';
 import {UserAvatar} from '@/components/UserAvatar';
 import {useEffect, useRef, useState} from 'react';
 import {Bell, ChevronDown, LogOut, Settings, ShieldCheck, UserRound, type LucideIcon} from 'lucide-react';
@@ -19,24 +20,24 @@ interface MenuItem {
   path?: string;
 }
 
-const getWorkspaceLabel = (pathname: string, instructor: boolean): string => {
-  if (pathname === '/') return 'Dashboard';
-  if (pathname.startsWith('/course')) return 'Courses';
-  if (pathname.startsWith('/calendar')) return 'Calendar';
-  if (pathname.startsWith('/aibot')) return 'AI Workplace';
-  if (pathname.startsWith('/mock-exams')) return 'Mock exams';
-  if (pathname === APP_ROUTE_PATHS.advisorMessages) return 'Messages';
-  if (pathname === APP_ROUTE_PATHS.advisorOperations) return 'Dashboard';
-  if (pathname.startsWith('/advisor/students')) return 'Students';
-  if (pathname.startsWith('/advisor')) return 'Advisor operations';
-  if (pathname.startsWith('/counsellor')) return 'Counsellor operations';
-  if (pathname.startsWith('/my-plan')) return 'My plan';
-  if (pathname.startsWith('/my-operations')) return instructor ? 'Teaching operations' : 'Learning operations';
-  if (pathname.startsWith('/profile')) return 'Profile';
-  if (pathname.startsWith('/settings')) return 'Settings';
-  if (pathname.startsWith('/admin')) return 'Administration';
-  if (pathname.startsWith('/parent')) return 'Student progress';
-  if (pathname.startsWith('/vocabulary')) return 'Vocabulary';
+const getWorkspaceLabel = (pathname: string, instructor: boolean, t: TFunction): string => {
+  if (pathname === '/') return t('navigation:dashboard');
+  if (pathname.startsWith('/course')) return t('navigation:courses');
+  if (pathname.startsWith('/calendar')) return t('common:sidebar.calendar');
+  if (pathname.startsWith('/aibot')) return t('common:sidebar.aiWorkplace');
+  if (pathname.startsWith('/mock-exams')) return t('navigation:mockExams');
+  if (pathname === APP_ROUTE_PATHS.advisorMessages) return t('navigation:messages');
+  if (pathname === APP_ROUTE_PATHS.advisorOperations) return t('navigation:dashboard');
+  if (pathname.startsWith('/advisor/students')) return t('navigation:students');
+  if (pathname.startsWith('/advisor')) return t('navigation:advisorOperations');
+  if (pathname.startsWith('/counsellor')) return t('navigation:counsellorOperations');
+  if (pathname.startsWith('/my-plan')) return t('navigation:myPlan');
+  if (pathname.startsWith('/my-operations')) return instructor ? t('navigation:teachingOperations') : t('navigation:learningOperations');
+  if (pathname.startsWith('/profile')) return t('common:menu.profile');
+  if (pathname.startsWith('/settings')) return t('common:menu.settings');
+  if (pathname.startsWith('/admin')) return t('navigation:administration');
+  if (pathname.startsWith('/parent')) return t('navigation:studentProgress');
+  if (pathname.startsWith('/vocabulary')) return t('common:sidebar.vocabulary');
   return 'X-Learn';
 };
 
@@ -50,7 +51,7 @@ const Header = () => {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const name = identity.name || 'Your profile';
+  const name = identity.name || t('navigation:profileFallback');
   const email = user?.email;
   const profileImage = identity.avatar;
   const canUseAdminConsole = user ? canAccessAdminConsole(user) : false;
@@ -80,9 +81,9 @@ const Header = () => {
 
   const profileMenuItems: MenuItem[] = [
     ...(!isTenantAdmin ? [{id: 'profile', icon: UserRound, label: t('menu.profile'), path: '/profile'}] : []),
-    {id: 'settings', icon: Settings, label: isTenantAdmin ? 'Password & security' : t('menu.settings'), path: '/settings'},
+    {id: 'settings', icon: Settings, label: isTenantAdmin ? t('navigation:passwordSecurity') : t('menu.settings'), path: '/settings'},
     ...(canUseAdminConsole
-      ? [{id: 'admin', icon: ShieldCheck, label: isTenantAdmin ? 'Tenant governance' : 'Admin Console', path: '/admin'}]
+      ? [{id: 'admin', icon: ShieldCheck, label: isTenantAdmin ? t('navigation:tenantGovernance') : t('navigation:adminConsole'), path: '/admin'}]
       : []),
     {id: 'logout', icon: LogOut, label: t('menu.signOut')},
   ];
@@ -117,8 +118,8 @@ const Header = () => {
         </form>
       ) : (
         <div className={styles.workspaceContext}>
-          <span>Workspace{isTenantAdmin ? ':' : ''}</span>
-          <strong>{isTenantAdmin ? 'Administration' : pathname === APP_ROUTE_PATHS.parent ? PARENT_SECTIONS[getParentSection(new URLSearchParams(search))].label : getWorkspaceLabel(pathname, instructor)}</strong>
+          <span>{t('navigation:workspace')}{isTenantAdmin ? ':' : ''}</span>
+          <strong>{isTenantAdmin ? t('navigation:administration') : pathname === APP_ROUTE_PATHS.parent ? PARENT_SECTIONS[getParentSection(new URLSearchParams(search))].label : getWorkspaceLabel(pathname, instructor, t)}</strong>
         </div>
       )}
 

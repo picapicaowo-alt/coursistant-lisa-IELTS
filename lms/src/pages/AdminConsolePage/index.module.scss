@@ -1,84 +1,603 @@
-.page { min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-16; overflow-y: auto; background: t.$page-bg; color: t.$text; }
-.pageHeader { max-width: t.$workspace-max-width; margin: 0 auto 1.25rem; }
-.pageHeader h1 { margin: .2rem 0; font-size: t.$workspace-title-size; line-height: t.$line-height-title-1; font-weight: t.$fw-extrabold; }
-.pageHeader > div > p:last-child { color: t.$text-muted; }
-.eyebrow { color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; letter-spacing: .08em; text-transform: uppercase; }
-.tabs { display: flex; max-width: t.$workspace-max-width; margin: 0 auto 1rem; gap: .35rem; padding: .35rem; border: 1px solid t.$border; border-radius: t.$radius-control; background: t.$card-bg; }
-.tabs button { min-height: 2.5rem; padding: 0 1rem; border-radius: t.$radius-control-sm; color: t.$text-muted; font-weight: t.$fw-semibold; cursor: pointer; }
-.tabs .activeTab { background: t.$brand; color: t.$content-on-color; }
-.contentGrid { display: grid; max-width: t.$workspace-max-width; margin: 0 auto; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); gap: 1.25rem; align-items: start; }
-.card { padding: 1.35rem; border: 1px solid t.$border; border-radius: t.$radius-card-lg; background: t.$card-bg; box-shadow: t.$shadow-card; }
-.card h2 { font-size: t.$fs-card-title; font-weight: t.$fw-bold; }
-.cardHeader { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
-.cardHeader p { margin-top: .2rem; color: t.$text-muted; font-size: t.$fs-caption; }
-.cardHeader > span { min-width: 2rem; padding: .2rem .45rem; border-radius: t.$radius-pill; background: t.$brand-subtle; color: t.$brand; text-align: center; font-weight: t.$fw-bold; }
-.form { display: grid; gap: t.$space-5; margin-top: t.$space-4; }
-.form label, .inlineForm label, .search { display: grid; gap: t.$space-2; color: t.$text; font-size: t.$font-size-body; font-weight: t.$fw-semibold; }
-.form input, .form select, .form textarea, .inlineForm input, .inlineForm select, .search input, .search select { width: 100%; height: t.$control-height-lg; padding: 0 t.$space-4; border: 1px solid t.$border; border-radius: t.$radius-control-sm; background: t.$card-bg; color: t.$text; font: inherit; line-height: t.$line-height-body; }
-.form textarea { height: auto; min-height: 7rem; padding-block: t.$space-3; resize: vertical; line-height: 1.55; }
-.form input:focus-visible, .form select:focus-visible, .form textarea:focus-visible, .inlineForm input:focus-visible, .inlineForm select:focus-visible, .search input:focus-visible, .search select:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid t.$brand-subtle; outline-offset: 2px; }
-.primaryButton, .secondaryButton, .dangerButton { min-height: 2.5rem; padding: 0 .9rem; border-radius: t.$radius-control-sm; font-weight: t.$fw-semibold; cursor: pointer; }
-.primaryButton { border: 1px solid t.$brand; background: t.$brand; color: t.$content-on-color; }
-.secondaryButton { border: 1px solid t.$border; background: t.$card-bg; color: t.$text; }
-.dangerButton { border: 1px solid t.$danger; background: t.$danger; color: t.$content-on-color; }
-.primaryButton:disabled, .secondaryButton:disabled, .dangerButton:disabled, .dangerLink:disabled { cursor: not-allowed; opacity: .5; }
-.dangerLink { justify-self: start; color: t.$danger; font-size: t.$fs-caption; cursor: pointer; }
-.hint { margin-top: .85rem; color: t.$text-muted; font-size: t.$fs-caption; line-height: 1.5; }
-.listCard { min-height: 18rem; }
-.search { margin: 1rem 0; }
-.list { display: grid; gap: .65rem; margin-top: 1rem; }
-.listRow { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: .85rem; border: 1px solid t.$border; border-radius: t.$radius-control; }
-.rowIdentity { display: grid; min-width: 0; gap: .15rem; }
-.rowIdentity strong, .rowIdentity span, .rowIdentity small { overflow-wrap: anywhere; }
-.rowIdentity span, .rowIdentity small { color: t.$text-muted; font-size: t.$fs-caption; }
-.details { flex: 0 0 auto; }
-.details summary { color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; cursor: pointer; }
-.details[open] { flex: 1 1 18rem; }
-.details[open] + * { display: none; }
-.inlineForm { display: grid; gap: .55rem; margin-top: .65rem; }
-.status { padding: 2rem 1rem; color: t.$text-muted; text-align: center; }
-.message, .errorMessage { max-width: t.$workspace-max-width; margin: 0 auto 1rem; padding: .75rem 1rem; border-radius: t.$radius-control; background: t.$feedback-success-surface; color: t.$success; }
-.errorMessage { background: rgba(t.$danger, .1); color: t.$danger; }
-.confirmRow { display: flex; gap: .6rem; }
-.confirmStack { display: grid; gap: .65rem; padding: .75rem; border-radius: t.$radius-control-sm; background: rgba(t.$danger, .08); }
-.confirmStack p { margin: 0; color: t.$danger; font-size: t.$fs-caption; line-height: 1.45; }
-.operationDivider { border-top: 1px solid t.$border; margin: .25rem 0; }
-.operationsGrid { display: grid; max-width: t.$workspace-max-width; margin: 0 auto; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; align-items: start; }
-.courseContext { display: grid; gap: .2rem; margin-top: 1rem; padding: .85rem; border: 1px solid rgba(t.$brand, .18); border-radius: t.$radius-control; background: t.$brand-subtle; }
-.courseContext > span { justify-self: start; padding: .15rem .5rem; border-radius: t.$radius-pill; background: t.$brand; color: t.$card-bg; font-size: t.$fs-logo; font-weight: t.$fw-bold; letter-spacing: .04em; }
-.courseContext strong { margin-top: .25rem; font-size: t.$fs-item-sub; }
-.courseContext p, .courseContext small { margin: 0; color: t.$text-muted; font-size: t.$fs-caption; line-height: 1.45; }
-.inlineSuccess, .inlineError { margin-top: .85rem; padding: .7rem .8rem; border-radius: t.$radius-control-sm; background: t.$success-subtle; color: t.$success; font-size: t.$fs-caption; line-height: 1.45; }
-.inlineError { background: rgba(t.$danger, .1); color: t.$danger; }
-.memberSearch { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: .6rem; margin: 1rem 0; }
-.courseMemberList { display: grid; gap: .65rem; }
-.courseMemberRow { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: .85rem; border: 1px solid t.$border; border-radius: t.$radius-control; }
-.memberIdentity { display: grid; min-width: 0; gap: .18rem; }
-.memberNameLine { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
-.memberIdentity > span, .memberIdentity small { overflow-wrap: anywhere; color: t.$text-muted; font-size: t.$fs-caption; }
-.roleBadge { display: inline-block; padding: .14rem .55rem; border-radius: t.$radius-pill; color: t.$card-bg; font-size: t.$fs-logo; font-weight: t.$fw-bold; }
-.roleInstructor { background: t.$brand; }
-.roleTa { background: t.$success; }
-.roleStudent { background: t.$text-placeholder; }
-.memberActions { flex: 0 0 auto; }
-.memberActions button { min-height: 2.25rem; padding: 0 .75rem; border: 1px solid t.$border; border-radius: t.$radius-control-sm; color: t.$brand; font-size: t.$fs-caption; font-weight: t.$fw-semibold; cursor: pointer; }
-.memberActions button:disabled { cursor: not-allowed; opacity: .5; }
-.roleChangeReview { display: grid; max-width: 27rem; gap: .55rem; padding: .7rem; border-radius: t.$radius-control-sm; background: t.$brand-subtle; }
-.roleChangeReview p { margin: 0; color: t.$text; font-size: t.$fs-caption; line-height: 1.45; }
-.pagination { display: flex; align-items: center; justify-content: center; gap: .75rem; margin-top: 1rem; color: t.$text-muted; font-size: t.$fs-caption; }
-
-@media (max-width: 900px) { .contentGrid, .operationsGrid { grid-template-columns: 1fr; } }
-@media (max-width: 600px) { .page { padding-top: 1rem; } .listRow, .courseMemberRow { flex-direction: column; } .details, .details[open], .roleChangeReview { width: 100%; max-width: none; } .tabs { flex-wrap: wrap; } .tabs button { flex: 1 1 8.5rem; } .memberSearch { grid-template-columns: 1fr; } .memberActions { width: 100%; } .memberActions button { width: 100%; } }
-.identityDetails { grid-column: 1 / -1; order: 2; width: 100%; color: t.$content-secondary; font-size: t.$font-size-caption; }
-.identityDetails summary { width: fit-content; color: t.$action-primary; cursor: pointer; }
-.identityDetails dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-3; margin: t.$space-3 0 0; }
-.identityDetails dl > div { display: grid; gap: t.$space-1; }
-.identityDetails dd { margin: 0; color: t.$content-primary; overflow-wrap: anywhere; }
-@media (max-width: 700px) { .identityDetails dl { grid-template-columns: minmax(0, 1fr); } }
-
-.adminDirectoryWorkspace {display:grid; grid-template-columns:minmax(0,5fr) minmax(0,7fr); gap:t.$space-5; margin-top:t.$space-4;}
-.adminDirectoryWorkspace > * {min-width:0;}
-.adminDirectoryList {display:flex; flex-direction:column; gap:t.$space-2;}
-.adminDirectoryList button {min-height:t.$touch-target; padding:t.$space-3; border:1px solid t.$border-default; border-radius:t.$radius-control; background:t.$surface-raised; text-align:left; overflow-wrap:anywhere; cursor:pointer;}
-.adminDirectoryList button[aria-pressed='true'] {background:t.$surface-brand-subtle; border-color:t.$action-primary; color:t.$action-primary;}
-@media(max-width:t.$breakpoint-shell-mobile) {.adminDirectoryWorkspace {grid-template-columns:1fr;}}
+.page {
+  min-height: 100%;
+  padding: t.$workspace-gutter-block t.$workspace-gutter-inline t.$space-12;
+  overflow-y: auto;
+  background: t.$page-bg;
+  color: t.$text;
+}
+.pageHeader,
+.tabs,
+.workspace,
+.workspaceFooter {
+  max-width: t.$workspace-max-width;
+  margin-inline: auto;
+}
+.pageHeader {
+  margin-bottom: t.$space-8;
+}
+.pageHeader h1 {
+  margin: 0;
+  font-size: t.$workspace-title-size;
+  line-height: 1.2;
+  font-weight: t.$fw-bold;
+}
+.pageHeader p {
+  margin-top: t.$space-3;
+  color: t.$text-muted;
+  max-width: 65ch;
+  line-height: 1.6;
+}
+.tabs {
+  display: flex;
+  gap: t.$space-6;
+  border-bottom: 1px solid t.$border;
+  margin-bottom: t.$space-8;
+}
+.tabs button {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  min-height: 3.5rem;
+  padding: t.$space-3 t.$space-1;
+  border-bottom: 2px solid transparent;
+  color: t.$text-muted;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+.tabs .activeTab {
+  border-color: t.$brand;
+  color: t.$brand;
+}
+.card {
+  min-width: 0;
+  padding: t.$space-8;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-card;
+  background: t.$card-bg;
+}
+.card h2 {
+  margin: 0;
+  font-size: t.$fs-card-title;
+  font-weight: t.$fw-bold;
+  line-height: 1.4;
+}
+.cardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-5;
+  margin-bottom: t.$space-6;
+}
+.cardHeader p {
+  margin-top: t.$space-2;
+  color: t.$text-muted;
+  line-height: 1.6;
+  max-width: 65ch;
+}
+.cardHeader > span {
+  color: t.$text-muted;
+  font-variant-numeric: tabular-nums;
+}
+.form {
+  display: grid;
+  gap: t.$space-5;
+  margin-top: t.$space-5;
+}
+.form label,
+.search {
+  display: grid;
+  gap: t.$space-2;
+  min-width: 0;
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-medium;
+}
+.form input,
+.form select,
+.form textarea,
+.search input,
+.search select {
+  width: 100%;
+  min-width: 0;
+  height: t.$control-height-lg;
+  padding: 0 t.$space-3;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  background: t.$card-bg;
+  color: t.$text;
+  font: inherit;
+  caret-color: t.$brand;
+}
+.form textarea {
+  height: auto;
+  min-height: 7rem;
+  padding-block: t.$space-3;
+  resize: vertical;
+  line-height: 1.6;
+}
+.form small {
+  color: t.$text-muted;
+  font-weight: t.$fw-regular;
+  line-height: 1.5;
+}
+.page :is(button, input, select, textarea):focus-visible,
+.form :is(button, input, select, textarea):focus-visible {
+  outline: 2px solid t.$brand;
+  outline-offset: 3px;
+}
+.primaryButton,
+.secondaryButton,
+.dangerButton,
+.textButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: t.$space-2;
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-4;
+  border-radius: t.$radius-control-sm;
+  font-weight: t.$fw-semibold;
+  cursor: pointer;
+}
+.primaryButton {
+  border: 1px solid t.$brand;
+  background: t.$brand;
+  color: t.$content-on-color;
+}
+.secondaryButton {
+  border: 1px solid t.$border;
+  background: t.$card-bg;
+  color: t.$text;
+}
+.dangerButton {
+  border: 1px solid t.$danger;
+  background: t.$danger;
+  color: t.$content-on-color;
+}
+.textButton {
+  color: t.$brand;
+  padding-inline: t.$space-2;
+}
+.primaryButton:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+.secondaryButton:hover:not(:disabled),
+.textButton:hover,
+.memberActions button:hover:not(:disabled) {
+  background: t.$brand-subtle;
+}
+.primaryButton:disabled,
+.secondaryButton:disabled,
+.dangerButton:disabled,
+.memberActions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.hint {
+  margin-top: t.$space-3;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.65;
+  max-width: 68ch;
+}
+.directoryFilters {
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 3fr) minmax(0, 3fr);
+  gap: t.$space-5;
+  padding-block: t.$space-2 t.$space-6;
+}
+.resultCount {
+  font-size: t.$fs-caption;
+  color: t.$text-muted;
+  margin-bottom: t.$space-4;
+}
+.directoryHead,
+.directoryRow {
+  display: grid;
+  grid-template-columns: minmax(0, 4.2fr) minmax(0, 2.3fr) minmax(
+      0,
+      1.5fr
+    ) minmax(0, 1.5fr) minmax(5rem, 1fr);
+  gap: t.$space-5;
+  align-items: center;
+}
+.directoryHead {
+  padding: t.$space-3 t.$space-2;
+  background: t.$page-bg;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+.directoryRow {
+  padding: t.$space-5 t.$space-2;
+  min-height: 6rem;
+  border-bottom: 1px solid t.$border;
+}
+.directoryRow > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.directoryRow:hover {
+  background: t.$page-bg;
+}
+.directoryRow > :last-child,
+.directoryHead > :last-child {
+  justify-self: end;
+}
+.identityCell {
+  line-height: 1.5;
+}
+.statusBadge {
+  display: inline-flex;
+  border-radius: t.$radius-pill;
+  padding: t.$space-1 t.$space-3;
+  color: t.$text-muted;
+  background: t.$page-bg;
+  font-size: t.$fs-caption;
+}
+.statusBadge[data-active="true"] {
+  background: t.$success-subtle;
+  color: t.$success;
+}
+.pagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: t.$space-3;
+  margin-top: t.$space-6;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  font-variant-numeric: tabular-nums;
+}
+.accountFacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: t.$space-5;
+  padding-block: t.$space-6;
+}
+.accountFacts dt {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+.accountFacts dd {
+  margin: t.$space-1 0 0;
+  overflow-wrap: anywhere;
+}
+.taskTabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+  border-bottom: 1px solid t.$border;
+}
+.taskTabs button {
+  padding: t.$space-3;
+  min-height: t.$touch-target;
+  color: t.$text-muted;
+  cursor: pointer;
+}
+.taskTabs button[aria-pressed="true"] {
+  color: t.$brand;
+  border-bottom: 2px solid t.$brand;
+}
+.message,
+.errorMessage,
+.inlineSuccess,
+.inlineError {
+  padding: t.$space-4;
+  margin-block: t.$space-4;
+  border-radius: t.$radius-control;
+  background: t.$success-subtle;
+  color: t.$success;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.errorMessage,
+.inlineError {
+  background: rgba(t.$danger, 0.08);
+  color: t.$danger;
+}
+.confirmRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+}
+.confirmStack {
+  display: grid;
+  gap: t.$space-4;
+  padding: t.$space-5;
+  border-radius: t.$radius-control;
+  background: rgba(t.$danger, 0.06);
+  line-height: 1.6;
+}
+.confirmStack p {
+  margin: 0;
+}
+.operationsLayout {
+  display: grid;
+  grid-template-columns: minmax(14rem, 3fr) minmax(0, 9fr);
+  gap: t.$space-8;
+  align-items: start;
+}
+.operationNav {
+  display: grid;
+  gap: t.$space-2;
+}
+.operationNav button {
+  display: grid;
+  gap: t.$space-2;
+  text-align: left;
+  padding: t.$space-5;
+  border-radius: t.$radius-control;
+  cursor: pointer;
+}
+.operationNav button strong {
+  font-weight: t.$fw-semibold;
+}
+.operationNav button span {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.5;
+}
+.operationNav button[aria-pressed="true"] {
+  background: t.$brand-subtle;
+  color: t.$brand;
+}
+.operationNav button:not([aria-pressed="true"]):hover {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px t.$border-strong, t.$shadow-sm;
+}
+.operationNav button:focus-visible {
+  outline: 2px solid t.$brand;
+  outline-offset: 2px;
+}
+.operationBody {
+  min-width: 0;
+}
+.operationBody .form {
+  max-width: 40rem;
+}
+.adminDirectoryWorkspace {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  gap: t.$space-6;
+  margin-top: t.$space-6;
+}
+.adminDirectoryWorkspace > * {
+  min-width: 0;
+}
+.adminDirectoryList {
+  display: grid;
+  align-content: start;
+}
+.adminDirectoryList button {
+  padding: t.$space-5 t.$space-3;
+  border-bottom: 1px solid t.$border;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+.adminDirectoryList button[aria-pressed="true"] {
+  background: t.$brand-subtle;
+  color: t.$brand;
+}
+.tenantList {
+  margin-top: t.$space-6;
+}
+.tenantRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-4;
+  padding: t.$space-6 t.$space-2;
+  border-bottom: 1px solid t.$border;
+}
+.tenantRow h3 {
+  font-size: t.$font-size-body;
+  font-weight: t.$fw-semibold;
+}
+.tenantRow p {
+  margin-top: t.$space-2;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+}
+.sectionNote {
+  margin-top: t.$space-6;
+  color: t.$text-muted;
+  line-height: 1.6;
+  max-width: 70ch;
+}
+.workspaceFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: t.$space-4;
+  margin-top: t.$space-6;
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  line-height: 1.6;
+}
+.membersLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  gap: t.$space-6;
+  align-items: start;
+}
+.membersLayout > .card:first-child > .primaryButton {
+  width: 100%;
+  margin-top: t.$space-6;
+}
+.courseContext {
+  display: grid;
+  gap: t.$space-3;
+  margin-top: t.$space-6;
+  padding-block: t.$space-6;
+  border-block: 1px solid t.$border;
+}
+.courseContext > span {
+  color: t.$brand;
+  font-size: t.$fs-caption;
+}
+.courseContext strong {
+  font-size: t.$fs-card-title;
+  line-height: 1.5;
+}
+.courseContext p,
+.courseContext small {
+  color: t.$text-muted;
+  font-size: t.$fs-caption;
+  overflow-wrap: anywhere;
+}
+.memberSearch {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: t.$space-3;
+  margin-block: t.$space-6;
+}
+.courseMemberRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-4;
+  padding-block: t.$space-5;
+  border-bottom: 1px solid t.$border;
+}
+.memberIdentity {
+  display: grid;
+  gap: t.$space-2;
+  min-width: 0;
+}
+.roleBadge {
+  justify-self: start;
+  padding: t.$space-1 t.$space-3;
+  border-radius: t.$radius-pill;
+  font-size: t.$fs-caption;
+}
+.roleInstructor {
+  background: t.$brand-subtle;
+  color: t.$brand;
+}
+.roleTa {
+  background: t.$success-subtle;
+  color: t.$success;
+}
+.roleStudent {
+  background: t.$page-bg;
+  color: t.$text-muted;
+}
+.memberActions {
+  flex: 0 0 auto;
+}
+.memberActions button {
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-3;
+  border: 1px solid t.$border;
+  border-radius: t.$radius-control-sm;
+  color: t.$brand;
+  cursor: pointer;
+}
+.roleChangeReview {
+  display: grid;
+  max-width: 26rem;
+  gap: t.$space-4;
+  padding: t.$space-4;
+  background: t.$brand-subtle;
+  border-radius: t.$radius-control;
+  font-size: t.$fs-caption;
+  line-height: 1.6;
+}
+.status {
+  padding: t.$space-8;
+  color: t.$text-muted;
+  text-align: center;
+}
+@media (max-width: 1100px) {
+  .membersLayout {
+    grid-template-columns: minmax(0, 4.5fr) minmax(0, 7.5fr);
+  }
+  .card {
+    padding: t.$space-6;
+  }
+  .directoryHead {
+    display: none;
+  }
+  .directoryRow {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr) auto;
+    gap: t.$space-3;
+  }
+  .directoryRow > :first-child {
+    grid-column: 1 / -1;
+  }
+  .directoryRow > :last-child {
+    grid-column: 3;
+    grid-row: 2 / 4;
+  }
+  .operationsLayout {
+    grid-template-columns: minmax(12rem, 3fr) minmax(0, 9fr);
+    gap: t.$space-5;
+  }
+}
+@media (max-width: 760px) {
+  .card {
+    padding: t.$space-5;
+  }
+  .cardHeader {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .tabs {
+    gap: t.$space-2;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .tabs button {
+    justify-content: center;
+  }
+  .directoryFilters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: t.$space-3;
+  }
+  .directoryFilters > :first-child {
+    grid-column: 1 / -1;
+  }
+  .operationsLayout,
+  .membersLayout,
+  .adminDirectoryWorkspace {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .operationNav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .operationNav button {
+    padding: t.$space-3;
+  }
+  .operationNav button span {
+    display: none;
+  }
+  .courseMemberRow {
+    flex-wrap: wrap;
+  }
+  .workspaceFooter {
+    flex-direction: column;
+  }
+  .tenantRow {
+    flex-wrap: wrap;
+  }
+}
+@media (max-width: 420px) {
+  .directoryRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .directoryRow > :last-child {
+    grid-column: 2;
+    grid-row: 3 / 5;
+  }
+  .directoryRow > :nth-child(2) {
+    grid-column: 1 / -1;
+  }
+  .memberSearch {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .primaryButton,
+  .secondaryButton,
+  .dangerButton {
+    padding-inline: t.$space-3;
+  }
+}

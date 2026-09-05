@@ -1,4 +1,6 @@
 import {formatInstructorName} from '@/utils/personName';
+import {SystemCourseFilters, type SystemCourseScope} from '@/components/SystemCourseFilters';
+import {TeachingState} from '@/components/TeachingWorkspace';
 import React, {Suspense, useState} from "react";
 import {Navigate, useNavigate} from "react-router-dom";
 import styles from "./index.module.scss";
@@ -27,6 +29,7 @@ const CourseCataloguePage: React.FC = () => {
   const navigate = useNavigate();
   const {user} = useRequiredAuth();
   const isUserAccount = user.role === 'USER';
+  const [scope, setScope] = useState<SystemCourseScope>({});
   const canCreateCourse = canCreateCourses(user);
   const [courseState, setCourseState] = useState<CourseState | undefined>(undefined);
 
@@ -43,9 +46,9 @@ const CourseCataloguePage: React.FC = () => {
     <div className={styles.pageContainer}>
       <div className={styles.contentContainer}>
         {user.level === 'INSTRUCTOR' ? <p className={styles.eyebrow}>Course operations <span>/</span> My courses</p> : null}
-        <h1 className={styles.pageTitle}>{isUserAccount ? t("list.tabs.myCourses") : 'Courses'}</h1>
+        <h1 className={styles.pageTitle}>{isUserAccount ? t("list.tabs.myCourses") : t('common:fields.courses')}</h1>
         <div className={styles.tabsContainer}>
-          {student ? (['CURRENT', 'COMPLETED'] as const).map(value => <button key={value} type="button" className={`${styles.tab} ${courseView === value ? styles.active : ''}`} aria-pressed={courseView === value} onClick={() => setCourseView(value)}>{value === 'CURRENT' ? 'Current' : 'Completed'}</button>) : ([{value: undefined, label: 'All Status'}, {value: 'Active', label: 'Active'}, {value: 'Archived', label: 'Archived'}] as const).map(tab => <button key={tab.label} type="button" className={`${styles.tab} ${courseState === tab.value ? styles.active : ''}`} aria-pressed={courseState === tab.value} onClick={() => setCourseState(tab.value)}>{tab.label}</button>)}
+          {student ? (['CURRENT', 'COMPLETED'] as const).map(value => <button key={value} type="button" className={`${styles.tab} ${courseView === value ? styles.active : ''}`} aria-pressed={courseView === value} onClick={() => setCourseView(value)}>{value === 'CURRENT' ? 'Current' : 'Completed'}</button>) : ([{value: undefined, label: t('course:catalogue.allStatuses')}, {value: 'Active', label: t('common:status.ACTIVE')}, {value: 'Archived', label: t('common:status.ARCHIVED')}] as const).map(tab => <button key={tab.label} type="button" className={`${styles.tab} ${courseState === tab.value ? styles.active : ''}`} aria-pressed={courseState === tab.value} onClick={() => setCourseState(tab.value)}>{tab.label}</button>)}
           <div className={styles.tabSpacer}/>
           
           {canCreateCourse ? (
@@ -59,10 +62,11 @@ const CourseCataloguePage: React.FC = () => {
               </span>
             </button>
           ) : null}
-          <div className={styles.viewToggle} aria-label="Course display"><button type="button" aria-label="Grid view" aria-pressed={view === 'grid'} onClick={() => setView('grid')}><img src="/icons/figma-courses/grid.svg" alt=""/></button><button type="button" aria-label="List view" aria-pressed={view === 'list'} onClick={() => setView('list')}><img src="/icons/figma-courses/list.svg" alt=""/></button></div>
+          <div className={styles.viewToggle} aria-label={t('catalogue.display')}><button type="button" aria-label={t('catalogue.grid')} aria-pressed={view === 'grid'} onClick={() => setView('grid')}><img src="/icons/figma-courses/grid.svg" alt=""/></button><button type="button" aria-label={t('catalogue.list')} aria-pressed={view === 'list'} onClick={() => setView('list')}><img src="/icons/figma-courses/list.svg" alt=""/></button></div>
         </div>
+        {!isUserAccount ? <><p className={styles.scopeDescription}>{t('common:admin.courseBrowseHelp')}</p><SystemCourseFilters onApply={setScope}/></> : null}
         <Suspense fallback={<LoadingOverlay/>}>
-          <CoursesList key={student ? courseView : courseState} state={student ? undefined : courseState} courseView={student ? courseView : undefined} view={view}/>
+          <CoursesList key={`${student ? courseView : courseState}-${scope.q}-${scope.tenantId}`} scope={scope} state={student ? undefined : courseState} courseView={student ? courseView : undefined} view={view}/>
         </Suspense>
       </div>
     </div>
@@ -71,7 +75,7 @@ const CourseCataloguePage: React.FC = () => {
 
 const PAGE_SIZE = 20;
 
-const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMPLETED'; view: 'grid' | 'list'}> = ({state, courseView, view}) => {
+const CoursesList: React.FC<{scope: SystemCourseScope; state?: CourseState; courseView?: 'CURRENT' | 'COMPLETED'; view: 'grid' | 'list'}> = ({scope, state, courseView, view}) => {
   const {t} = useTranslation("course");
   const {user} = useRequiredAuth();
   const isUserAccount = user.role === 'USER';
@@ -87,7 +91,7 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
    * is the endpoint every USER account can call for their own enrolments.
    */
   const {data} = useSuspenseQuery({
-    queryKey: [isUserAccount ? 'my-courses' : 'admin-courses', user.id, state, courseView, currentPage],
+    queryKey: [isUserAccount ? 'my-courses' : 'admin-courses', user.id, state, courseView, currentPage, scope],
     queryFn: async () => {
       const params = {
         state,
@@ -99,7 +103,7 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
         const response = await dashboardApiService.getMyCourses(params);
         return unwrapData(response, 'getMyCourses');
       }
-      const response = await courseApiService.browseCourses(params);
+      const response = await courseApiService.browseCourses({...params, ...scope});
       return unwrapData(response, 'browseCourses');
     },
     staleTime: 5 * 60 * 1000,
@@ -108,13 +112,14 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
   });
 
-  const courses = data.items ?? [];
+  const courses = data.items;
+  if (!Array.isArray(courses)) throw new Error(t('common:admin.courseResponseInvalid'));
   const totalPages = Math.max(1, Math.ceil((data.total ?? 0) / (data.size || PAGE_SIZE)));
 
   if (courses.length === 0) {
     return (
       <div className={styles.emptyState}>
-        <p>{t(courseView === 'COMPLETED' ? 'list.noCompletedCourses' : courseView === 'CURRENT' ? 'list.noCurrentCourses' : 'list.noCourses')}</p>
+        {isUserAccount ? <p>{t(courseView === 'COMPLETED' ? 'list.noCompletedCourses' : courseView === 'CURRENT' ? 'list.noCurrentCourses' : 'list.noCourses')}</p> : <TeachingState empty={t('common:admin.noScopedCourses')}/>}
       </div>
     );
   }
@@ -148,7 +153,7 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
         <div className={styles.paginationContainer}>
           <button
             className={styles.paginationButton}
-            aria-label="Previous course page"
+            aria-label={t('catalogue.previousPage')}
             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
             disabled={currentPage === 1}
           >
@@ -161,7 +166,7 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
             {Array.from({length: Math.min(totalPages, 5)}, (_, offset) => Math.min(Math.max(currentPage - 2, 1), Math.max(totalPages - 4, 1)) + offset).map(page => (
               <button
                 key={page}
-                aria-label={`Course page ${page}`}
+                aria-label={t('common:admin.coursePage', {page})}
                 aria-current={currentPage === page ? 'page' : undefined}
                 className={`${styles.pageButton} ${currentPage === page ? styles.active : ""}`}
                 onClick={() => setCurrentPage(page)}
@@ -173,7 +178,7 @@ const CoursesList: React.FC<{state?: CourseState; courseView?: 'CURRENT' | 'COMP
           
           <button
             className={styles.paginationButton}
-            aria-label="Next course page"
+            aria-label={t('catalogue.nextPage')}
             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
             disabled={currentPage === totalPages}
           >

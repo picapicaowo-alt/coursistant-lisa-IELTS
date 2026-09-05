@@ -1,13 +1,16 @@
 import {useState} from 'react';
-import {fireEvent, render, screen, within} from '@testing-library/react';
-import {beforeEach, describe, expect, it, vi} from 'vitest';
+import {act, cleanup, fireEvent, render, screen, within} from '@testing-library/react';
+import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
+import i18n from '@/i18n';
 import {EnglishDateInput, EnglishDateTimeInput, EnglishTimeInput} from './EnglishDateInput';
 
-describe('English date inputs', () => {
-  beforeEach(() => {
+describe('locale-aware date inputs with legacy export compatibility', () => {
+  beforeEach(async () => {
+    await i18n.changeLanguage('en');
     vi.spyOn(HTMLInputElement.prototype, 'getBoundingClientRect').mockReturnValue(new DOMRect(20, 40, 400, 44));
   });
-  it('shows and emits datetime values in a fixed English format', () => {
+  afterEach(async () => {cleanup(); await i18n.changeLanguage('en');});
+  it('preserves the established English display and canonical API value', () => {
     const Harness = () => {
       const [value, setValue] = useState('2026-08-03T22:19');
       return <><label>Due time<EnglishDateTimeInput value={value} onChangeValue={setValue}/></label><output>{value}</output></>;
@@ -19,7 +22,7 @@ describe('English date inputs', () => {
     fireEvent.change(input, {target: {value: '09/15/2026, 11:45 PM'}});
 
     expect(screen.getByText('2026-09-15T23:45').textContent).toBe('2026-09-15T23:45');
-    expect(input.lang).toBe('en-US');
+    expect(input.lang).toBe('en');
     expect(input.type).toBe('text');
   });
 
@@ -82,5 +85,20 @@ describe('English date inputs', () => {
 
     expect(screen.getByText('2026-08-17T23:45').textContent).toBe('2026-08-17T23:45');
     expect((screen.getByLabelText('Quiz closes') as HTMLInputElement).value).toBe('08/17/2026, 11:45 PM');
+  });
+
+  it('reformats a valid value after switching and preserves an incomplete draft', async () => {
+    function Harness() {
+      const [value, setValue] = useState('2026-08-03T22:19');
+      return <label>Due time<EnglishDateTimeInput value={value} onChangeValue={setValue}/></label>;
+    }
+    render(<Harness/>);
+    await act(async () => {await i18n.changeLanguage('zh-TW');});
+    const input = screen.getByLabelText('Due time');
+    expect(input).toHaveValue('2026/08/03 22:19');
+    expect(input).toHaveAttribute('lang', 'zh-TW');
+    fireEvent.change(input, {target: {value: '2026/'}});
+    await act(async () => {await i18n.changeLanguage('zh-CN');});
+    expect(input).toHaveValue('2026/');
   });
 });
