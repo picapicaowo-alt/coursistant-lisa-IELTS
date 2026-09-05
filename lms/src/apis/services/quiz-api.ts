@@ -8,6 +8,7 @@ import {
   PatchQuizRequest,
   QuizAttempt,
   QuizAttemptSummary,
+  QuizAttemptResultSummary,
   QuizAutosaveResponse,
   QuizGradingSummary,
   QuizQuestion,
@@ -171,7 +172,7 @@ export class QuizApiService {
     );
   }
 
-  listMyAttempts(courseId: number, quizId: number): Promise<ApiResponse<QuizAttemptSummary[]>> {
+  listMyAttempts(courseId: number, quizId: number): Promise<ApiResponse<QuizAttemptResultSummary[]>> {
     return this.apiClient.get(`/v2/courses/${courseId}/quizzes/${quizId}/my-attempts`);
   }
 

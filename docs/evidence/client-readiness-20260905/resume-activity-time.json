@@ -1,0 +1,104 @@
+{
+  "at": "2026-09-05T08:28:07.269Z",
+  "path": "/v2/me/teaching/activity/recent?limit=10",
+  "httpStatus": 200,
+  "elapsedMs": 142,
+  "data": {
+    "status": 200,
+    "code": "SUCCESS",
+    "data": [
+      {
+        "kind": "GroupMembershipChange",
+        "courseId": 1,
+        "courseCode": "QA-0905-ONE",
+        "summary": "LEAVE_SELF user=26",
+        "occurredAt": "2026-09-05T15:36:24",
+        "timezone": "Asia/Shanghai",
+        "assignmentId": null,
+        "groupSetId": 1,
+        "groupId": 1,
+        "targetUserId": 26
+      },
+      {
+        "kind": "GroupMembershipChange",
+        "courseId": 1,
+        "courseCode": "QA-0905-ONE",
+        "summary": "MOVE_STAFF user=26",
+        "occurredAt": "2026-09-05T15:16:54",
+        "timezone": "Asia/Shanghai",
+        "assignmentId": null,
+        "groupSetId": 1,
+        "groupId": 1,
+        "targetUserId": 26
+      },
+      {
+        "kind": "GroupMembershipChange",
+        "courseId": 1,
+        "courseCode": "QA-0905-ONE",
+        "summary": "MOVE_STAFF user=26",
+        "occurredAt": "2026-09-05T15:15:04",
+        "timezone": "Asia/Shanghai",
+        "assignmentId": null,
+        "groupSetId": 1,
+        "groupId": 2,
+        "targetUserId": 26
+      },
+      {
+        "kind": "GroupMembershipChange",
+        "courseId": 1,
+        "courseCode": "QA-0905-ONE",
+        "summary": "ASSIGN_STAFF user=26",
+        "occurredAt": "2026-09-05T15:15:03",
+        "timezone": "Asia/Shanghai",
+        "assignmentId": null,
+        "groupSetId": 1,
+        "groupId": 1,
+        "targetUserId": 26
+      },
+      {
+        "kind": "GroupMembershipChange",
+        "courseId": 1,
+        "courseCode": "QA-0905-ONE",
+        "summary": "LEAVE_SELF user=26",
+        "occurredAt": "2026-09-05T15:14:23",
+        "timezone": "Asia/Shanghai",
+        "assignmentId": null,
+        "groupSetId": 1,
+        "groupId": 2,
+        "targetUserId": 26
+      },
+      {
+        "kind": "GroupMembershipChange",
+        "courseId": 1,
+        "courseCode": "QA-0905-ONE",
+        "summary": "SWITCH_SELF user=26",
+        "occurredAt": "2026-09-05T15:13:06",
+        "timezone": "Asia/Shanghai",
+        "assignmentId": null,
+        "groupSetId": 1,
+        "groupId": 2,
+        "targetUserId": 26
+      },
+      {
+        "kind": "GroupMembershipChange",
+        "courseId": 1,
+        "courseCode": "QA-0905-ONE",
+        "summary": "JOIN_SELF user=26",
+        "occurredAt": "2026-09-05T15:13:05",
+        "timezone": "Asia/Shanghai",
+        "assignmentId": null,
+        "groupSetId": 1,
+        "groupId": 1,
+        "targetUserId": 26
+      }
+    ],
+    "message": "Success",
+    "timestamp": "2026-09-05T08:28:07.258099223Z"
+  },
+  "actor": {
+    "role": "USER",
+    "level": "INSTRUCTOR",
+    "userId": 15,
+    "tenantId": 1
+  }
+}

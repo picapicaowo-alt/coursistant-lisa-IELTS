@@ -1,0 +1,111 @@
+[
+  {
+    "at": "2026-09-05T07:22:46.018Z",
+    "account": "a",
+    "path": "/v2/advisor/courses/1/delivery-config",
+    "httpStatus": 200,
+    "elapsedMs": 477,
+    "data": {
+      "status": 200,
+      "code": "SUCCESS",
+      "data": {
+        "courseId": 1,
+        "deliveryMode": "ONE_ON_ONE",
+        "capacity": 1,
+        "catalogCode": null,
+        "launchState": "PUBLISHED",
+        "courseLaunchVersion": 2,
+        "blockers": []
+      },
+      "message": "Success",
+      "timestamp": "2026-09-05T07:22:46.023171913Z"
+    }
+  },
+  {
+    "at": "2026-09-05T07:22:46.163Z",
+    "account": "a",
+    "path": "/v2/courses/1/session-occurrences?from=2026-09-05&to=2026-10-01&includeHistory=false",
+    "httpStatus": 404,
+    "elapsedMs": 144,
+    "data": {
+      "status": 404,
+      "code": "COURSE_NOT_FOUND",
+      "data": null,
+      "message": "Course does not exist",
+      "timestamp": "2026-09-05T07:22:46.168360922Z"
+    }
+  },
+  {
+    "at": "2026-09-05T07:40:07.342Z",
+    "account": "i",
+    "method": "POST",
+    "path": "/v2/courses/1/weeks/1/materials",
+    "form": {
+      "linkUrl": "https://example.com/qa-readiness-20260905",
+      "linkDisplayName": "QA0905 Readiness delete verification"
+    },
+    "httpStatus": 200,
+    "elapsedMs": 455,
+    "data": {
+      "status": 200,
+      "code": "SUCCESS",
+      "data": [
+        {
+          "id": 4,
+          "weekId": 1,
+          "courseId": 1,
+          "materialType": "LINK",
+          "teachingType": "LINK",
+          "displayName": "QA0905 Readiness delete verification",
+          "orderPosition": 1,
+          "originalFilename": null,
+          "contentType": null,
+          "extension": null,
+          "sizeBytes": null,
+          "checksumSha256": null,
+          "linkUrl": "https://example.com/qa-readiness-20260905",
+          "uploadedBy": 15,
+          "previewAvailable": false,
+          "downloadUrl": "https://api-cn.xlearnedu.com/api/v2/courses/1/weeks/1/materials/4/download",
+          "previewUrl": null,
+          "publicationState": "DRAFT",
+          "effectiveStudentVisible": false,
+          "createdAt": "2026-09-05T07:40:07",
+          "updatedAt": "2026-09-05T07:40:07"
+        }
+      ],
+      "message": "Success",
+      "timestamp": "2026-09-05T07:40:07.356537291Z"
+    }
+  },
+  {
+    "at": "2026-09-05T07:40:20.628Z",
+    "account": "i",
+    "method": "DELETE",
+    "path": "/v2/courses/1/weeks/1/materials/4",
+    "httpStatus": 403,
+    "elapsedMs": 411,
+    "data": {
+      "status": 403,
+      "code": "FORBIDDEN",
+      "data": null,
+      "message": "Access denied",
+      "timestamp": "2026-09-05T07:40:20.645449894Z"
+    }
+  },
+  {
+    "at": "2026-09-05T07:40:20.772Z",
+    "account": "a",
+    "method": "DELETE",
+    "path": "/v2/courses/1/weeks/1/materials/4",
+    "httpStatus": 200,
+    "elapsedMs": 143,
+    "data": {
+      "status": 200,
+      "code": "SUCCESS",
+      "data": null,
+      "message": "Success",
+      "timestamp": "2026-09-05T07:40:20.789031192Z"
+    }
+  }
+]

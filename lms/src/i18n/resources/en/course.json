@@ -419,7 +419,7 @@
         "clearFilters": "Clear filters"
     },
     "roster": {
-    "withdrawAction": "Withdraw",
+        "withdrawAction": "Withdraw",
         "accessDenied": "You do not have permission to view this course roster.",
         "notFound": "This course does not exist or is not visible to you.",
         "chooseHint": "Open a course to see its roster.",
@@ -446,5 +446,30 @@
         "unnamedMember": "Unnamed member",
         "view": "View roster",
         "readSummary": "View course members and their roles."
+    },
+    "mockResults": {
+        "submitted": "Section submitted",
+        "title": "Mock exam results",
+        "back": "Back to exams",
+        "sections": {
+            "reading": "Reading",
+            "listening": "Listening",
+            "writing": "Writing"
+        },
+        "saved": "Your submission is saved. This section is closed for further answers.",
+        "feedback": "Instructor feedback",
+        "feedbackPending": "Instructor feedback will appear here when available.",
+        "task": "Task {{number}}",
+        "words": "{{number}} words",
+        "responseUnavailable": "The submitted response is not available in this record.",
+        "result": "Result",
+        "correct": "{{score}} / {{total}} correct",
+        "pending": "Awaiting result"
+    },
+    "groupReadiness": {
+        "moveMember": "Move {{name}}",
+        "ungroupedCount_one": "{{count}} student currently ungrouped.",
+        "ungroupedCount_other": "{{count}} students currently ungrouped.",
+        "ungroupedError": "Ungrouped students could not be loaded."
     }
 }

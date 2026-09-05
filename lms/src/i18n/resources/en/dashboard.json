@@ -73,5 +73,12 @@
     "needsGrading": "Needs grading",
     "manualGrading": "Manual grading",
     "readyRelease": "Ready to release"
+  },
+  "teachingAlerts": {
+    "pendingGrading_one": "{{displayCount}} submission awaiting grading",
+    "pendingGrading_other": "{{displayCount}} submissions awaiting grading",
+    "grading": "Submissions awaiting grading",
+    "upcomingClass": "Upcoming class",
+    "scheduleConflict": "Schedule conflict"
   }
 }

@@ -213,7 +213,9 @@
     "WRITING": "Writing",
     "SPEAKING": "Speaking",
     "NOT_APPLICABLE": "Not applicable",
-    "UNKNOWN": "Unknown"
+    "UNKNOWN": "Unknown",
+    "READY": "Ready",
+    "PENDING_WRITING_GRADING": "Awaiting writing grade"
   },
   "pagination": {
     "summary": "Page {{page}} · {{total}} results",

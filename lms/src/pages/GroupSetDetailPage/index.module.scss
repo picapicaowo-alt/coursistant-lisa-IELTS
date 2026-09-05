@@ -1,5 +1,6 @@
 .page { min-height: 100%; padding: t.$workspace-gutter-block t.$workspace-gutter-inline 5rem; background: t.$page-bg; color: t.$text; }
-.header, .card, .dangerCard, .confirmBar, .page > .error, .page > .success { max-width: t.$workspace-readable-max-inline-size; margin-inline: auto; }
+.workspace { min-inline-size: 0; margin: 0; padding: 0; border: 0; }
+.header, .card, .dangerCard, .confirmBar, .workspace > .error, .workspace > .success { max-width: t.$workspace-readable-max-inline-size; margin-inline: auto; }
 .header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.25rem; }
 .headerText { min-width: 0; flex: 1; }
 .header h1 { margin: .25rem 0 0; font-size: t.$workspace-title-size; line-height: t.$line-height-title-1; }

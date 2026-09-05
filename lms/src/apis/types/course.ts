@@ -174,7 +174,10 @@ export interface CourseEventPayload {
 export interface CourseGroupMembership {
   groupId: number;
   userId: number;
-  displayName: string | null;
+  userFirstName?: string | null;
+  userMiddleName?: string | null;
+  userLastName?: string | null;
+  displayName?: string | null;
   joinedAt: string;
   addedByType: string;
   addedByUserId: number | null;
@@ -296,7 +299,10 @@ export type SyllabusState =
 
 export interface UngroupedStudent {
   userId: number;
-  displayName: string | null;
+  studentFirstName?: string | null;
+  studentMiddleName?: string | null;
+  studentLastName?: string | null;
+  displayName?: string | null;
 }
 
 /** Day codes used by sessions. */

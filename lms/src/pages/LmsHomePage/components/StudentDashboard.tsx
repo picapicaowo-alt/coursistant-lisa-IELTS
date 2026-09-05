@@ -1,4 +1,5 @@
 import {useTranslation} from 'react-i18next';
+import {ADVISING_ERROR_CODES} from '@/apis';
 import {useEffect, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {generatePath, Link} from 'react-router-dom';
@@ -18,7 +19,7 @@ import {APP_ROUTE_PATHS, STUDENT_LEARNING_PATH, STUDY_PLAN_QUERY_PARAMS} from '@
 import {advisingQueryKeys} from '@/pages/advising/queryKeys';
 import {studyPlanRecordKey} from '@/pages/StudentAdvisingPage/studyPlanView';
 import {formatPlanDate, TASK_STATUS, taskStatusLabel} from '@/utils/studyPlan';
-import {isNotFound} from '@/utils/apiError';
+import {isMissingResource} from '@/utils/apiError';
 import LearningScheduleComponent from '@/sections/learning_schedule/LearningScheduleComponent';
 import {useCourseList} from '../hooks/useCourseList';
 import type {DashboardCourse} from '../types';
@@ -82,7 +83,7 @@ function DashboardTasks() {
   })).sort((a, b) => Number(a.task.status === TASK_STATUS.completed) - Number(b.task.status === TASK_STATUS.completed) || (a.task.dueDate ?? '9999').localeCompare(b.task.dueDate ?? '9999'));
   const today = new Date();
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-  const missingPlan = query.isError && isNotFound(query.error);
+  const missingPlan = query.isError && isMissingResource(query.error, ADVISING_ERROR_CODES.studyPlanNotFound);
   return <WorkspaceSection title="Advisor Tasks" appearance="record" meta={<ViewAll to={`${APP_ROUTE_PATHS.myPlan}?view=tasks`}/>}>
     {!missingPlan ? <LearningQueryState query={query}/> : null}
     {(!query.isPending && !query.isError || missingPlan) && !tasks.length ? <LearningEmpty icon={ClipboardList} title="No advisor tasks right now" description="Your next steps will appear when your advisor updates your plan."/> : null}

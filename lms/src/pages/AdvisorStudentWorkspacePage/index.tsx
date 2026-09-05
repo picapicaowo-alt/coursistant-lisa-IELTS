@@ -1,4 +1,5 @@
 import {useTranslation} from 'react-i18next';
+import {ADVISING_ERROR_CODES} from '@/apis';
 import React, {useId, useState} from 'react';
 import {generatePath, Link, NavLink, Outlet, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
@@ -9,7 +10,7 @@ import {ProgressRing} from '@/components/ProgressRing';
 import {TASK_STATUS, formatPlanDate} from '@/utils/studyPlan';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {isNotFound} from '@/utils/apiError';
+import {isNotFound, isMissingResource} from '@/utils/apiError';
 import {formatPersonName} from '@/utils/personName';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import {useAssignmentBoundary} from '../advising/useAssignmentBoundary';
@@ -114,7 +115,7 @@ const AdvisorStudentLayout: React.FC = () => {
           {!skills.length ? <p className={layout.skillEmpty}>{profile.isPending ? 'Loading assessments…' : 'No skill assessments yet.'}</p> : null}
         </div>
         </div>
-        {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">Profile summary could not be loaded. <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
+        {profile.isError && !isMissingResource(profile.error, ADVISING_ERROR_CODES.profileNotFound) ? <p className={styles.error} role="alert">Profile summary could not be loaded. <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
       </header>
 
       {intake.isError ? (

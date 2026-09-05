@@ -112,6 +112,8 @@ describe('QuizPage Question Attempt Gate', () => {
     expect(screen.queryByText(/no instructions (?:were )?provided/i)).not.toBeInTheDocument();
     // Verify listQuestions was NEVER called because no attempt is in progress
     expect(quizApi.listQuestions).not.toHaveBeenCalled();
+    expect(quizApi.listAttempts).toHaveBeenCalledWith(5, 10);
+    expect(quizApi.listMyAttempts).not.toHaveBeenCalled();
   });
 
   it('fetches questions only after student starts an attempt', async () => {

@@ -99,6 +99,11 @@ export interface TeachingAvailabilityResponse {
   windows?: AvailabilityWindowRequest[];
 }
 
+/** Advisor read model from InstructorAvailabilityResponse in course.openapi.yaml. */
+export interface InstructorAvailabilityResponse extends TeachingAvailabilityResponse {
+  instructorUserId?: number;
+}
+
 export interface TeachingGradingItemResponse {
   assignmentId: number;
   courseCode?: string;

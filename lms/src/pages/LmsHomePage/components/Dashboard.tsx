@@ -1,5 +1,6 @@
 import {useTranslation} from 'react-i18next';
 import React, {useMemo, useState} from 'react';
+import {teachingAlertTitle} from '@/utils/teachingAlert';
 import {useQuery} from '@tanstack/react-query';
 import {generatePath, Link} from 'react-router-dom';
 import {APP_ROUTE_PATHS, STUDENT_LEARNING_PATH} from '@/configs/routePaths';
@@ -193,6 +194,7 @@ const ExamsPanel: React.FC = () => {
 };
 
 const AlertsPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
+  const {t} = useTranslation('dashboard');
   const query = useQuery({
     queryKey: ['dashboard', audience, 'alerts'],
     queryFn: async () => (await (audience === 'instructor'
@@ -214,7 +216,7 @@ const AlertsPanel: React.FC<{audience: DashboardAudience}> = ({audience}) => {
       <div className={styles.alertList}>
         {alerts.map((alert, index) => (
           <Link to={audience === 'student' ? STUDENT_LEARNING_PATH : APP_ROUTE_PATHS.myOperations} key={textFrom(alert, 'id', 'alertId') ?? index}>
-            <span>{textFrom(alert, 'title', 'message', 'type') ?? (audience === 'instructor' ? 'Teaching update' : 'Learning update')}</span>
+            <span>{audience === 'instructor' ? teachingAlertTitle(alert) : textFrom(alert, 'title', 'message', 'type') ?? t('learningUpdate')}</span>
             <small>{textFrom(alert, 'relativeTime', 'createdAt', 'severity') ?? 'New'}</small>
             <i/>
           </Link>

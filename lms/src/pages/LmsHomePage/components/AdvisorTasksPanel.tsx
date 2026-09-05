@@ -1,3 +1,4 @@
+import {ADVISING_ERROR_CODES} from '@/apis';
 import {useQuery} from '@tanstack/react-query';
 import {Link} from 'react-router-dom';
 import {unwrapData} from '@/apis';
@@ -6,7 +7,7 @@ import {APP_ROUTE_PATHS, STUDY_PLAN_QUERY_PARAMS} from '@/configs/routePaths';
 import {advisingQueryKeys} from '@/pages/advising/queryKeys';
 import {studyPlanRecordKey} from '@/pages/StudentAdvisingPage/studyPlanView';
 import {formatPlanDate, taskStatusLabel} from '@/utils/studyPlan';
-import {isNotFound} from '@/utils/apiError';
+import {isMissingResource} from '@/utils/apiError';
 import styles from './Dashboard.module.scss';
 
 /** The work queue contains activity notifications. Advisor tasks belong to the study plan. */
@@ -17,7 +18,7 @@ export function AdvisorTasksPanel() {
     if (task.id != null) params.set(STUDY_PLAN_QUERY_PARAMS.task, String(task.id));
     return {task, key: `${studyPlanRecordKey(checkpoint, index)}-${task.id ?? taskIndex}`, to: `${APP_ROUTE_PATHS.myPlan}?${params}`};
   })).slice(0, 3);
-  const error = query.isError && !isNotFound(query.error);
+  const error = query.isError && !isMissingResource(query.error, ADVISING_ERROR_CODES.studyPlanNotFound);
   return <section className={`${styles.panel} ${styles.advisorPanel}`} aria-labelledby="advisor-tasks-title">
     <header className={styles.panelHeader}><h2 id="advisor-tasks-title">Advisor Tasks</h2><Link to={`${APP_ROUTE_PATHS.myPlan}?view=tasks`} className={styles.viewAll}>View all </Link></header>
     {query.isPending ? <p className={styles.regionStatus} role="status">Loading tasks…</p> : error ? <div className={styles.regionStatus} role="alert">This section could not be loaded. <button type="button" onClick={() => void query.refetch()}>Retry</button></div> : tasks.length === 0 ? <p className={styles.regionStatus}>No advisor tasks right now.</p> : <div className={styles.taskList}>

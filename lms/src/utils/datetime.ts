@@ -9,6 +9,15 @@ dayjs.extend(advancedFormat);
 
 const HAS_TIMEZONE = /(Z|[+-]\d{2}:?\d{2})$/i;
 
+/** Course activity DTOs pair a local timestamp with its IANA zone. Explicit offsets remain authoritative. */
+export const parseZonedTimestamp = (value: string, zone: string): Date => {
+  try {
+    return HAS_TIMEZONE.test(value) ? new Date(value) : dayjs.tz(value, zone).toDate();
+  } catch {
+    return new Date(NaN);
+  }
+};
+
 /** Calendar feeds carry instants; convert them once into the displayed IANA zone. */
 export function calendarLocalFields(startsAtUtc: string, endsAtUtc: string | undefined, zone: string) {
   try {

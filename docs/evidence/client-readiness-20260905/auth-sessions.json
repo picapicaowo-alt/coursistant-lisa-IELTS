@@ -1,0 +1,202 @@
+[
+  {
+    "at": "2026-09-05T07:26:15.070Z",
+    "account": "Counsellor",
+    "path": "/v1/auth/login",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:15.231Z",
+    "account": "Counsellor",
+    "path": "/v1/auth/refresh-token",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:15.379Z",
+    "account": "Counsellor",
+    "path": "/v2/me/profile",
+    "method": "GET",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:15.530Z",
+    "account": "Counsellor",
+    "path": "/v1/auth/logout",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:15.672Z",
+    "account": "Counsellor",
+    "path": "/v1/auth/refresh-token",
+    "method": "POST",
+    "status": 401,
+    "code": "REFRESH_TOKEN_INVALID",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:15.889Z",
+    "account": "Advisor",
+    "path": "/v1/auth/login",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:16.046Z",
+    "account": "Advisor",
+    "path": "/v1/auth/refresh-token",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:16.193Z",
+    "account": "Advisor",
+    "path": "/v2/me/profile",
+    "method": "GET",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:16.331Z",
+    "account": "Advisor",
+    "path": "/v1/auth/logout",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:16.465Z",
+    "account": "Advisor",
+    "path": "/v1/auth/refresh-token",
+    "method": "POST",
+    "status": 401,
+    "code": "REFRESH_TOKEN_INVALID",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:16.675Z",
+    "account": "Instructor",
+    "path": "/v1/auth/login",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:16.822Z",
+    "account": "Instructor",
+    "path": "/v1/auth/refresh-token",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:16.958Z",
+    "account": "Instructor",
+    "path": "/v2/me/profile",
+    "method": "GET",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:17.098Z",
+    "account": "Instructor",
+    "path": "/v1/auth/logout",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:17.231Z",
+    "account": "Instructor",
+    "path": "/v1/auth/refresh-token",
+    "method": "POST",
+    "status": 401,
+    "code": "REFRESH_TOKEN_INVALID",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:17.444Z",
+    "account": "Student",
+    "path": "/v1/auth/login",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:17.589Z",
+    "account": "Student",
+    "path": "/v1/auth/refresh-token",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:17.724Z",
+    "account": "Student",
+    "path": "/v2/me/profile",
+    "method": "GET",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:17.865Z",
+    "account": "Student",
+    "path": "/v1/auth/logout",
+    "method": "POST",
+    "status": 200,
+    "code": "SUCCESS",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  },
+  {
+    "at": "2026-09-05T07:26:17.999Z",
+    "account": "Student",
+    "path": "/v1/auth/refresh-token",
+    "method": "POST",
+    "status": 401,
+    "code": "REFRESH_TOKEN_INVALID",
+    "allowOrigin": "https://app.xlearnedu.com",
+    "allowCredentials": "true"
+  }
+]

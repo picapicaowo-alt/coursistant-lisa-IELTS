@@ -213,7 +213,9 @@
     "WRITING": "寫作",
     "SPEAKING": "口語",
     "NOT_APPLICABLE": "不適用",
-    "UNKNOWN": "未知"
+    "UNKNOWN": "未知",
+    "READY": "就緒",
+    "PENDING_WRITING_GRADING": "等待寫作評分"
   },
   "pagination": {
     "summary": "第 {{page}} 頁 · 共 {{total}} 條結果",
