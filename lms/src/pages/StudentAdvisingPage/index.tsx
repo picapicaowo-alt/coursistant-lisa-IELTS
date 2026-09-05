@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {WorkspaceSection as CollapsibleSection} from '@/components/WorkspaceSection';
 import {PlanOverview} from './PlanOverview';
 import React, {lazy, Suspense, useState} from 'react';
@@ -21,6 +22,7 @@ import {advisorConversationPage} from '../AdvisorOperationsPage/advisorViewModel
 import styles from '../advising/advising.module.scss';
 
 const StudentAdvisingPage: React.FC = () => {
+  const {t: translate} = useTranslation();
   const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const view = searchParams.get('view');
@@ -114,15 +116,15 @@ const StudentAdvisingPage: React.FC = () => {
 
 
   return (
-    <div className={styles.page}>
+    <div className={`${styles.page} ${view === STUDENT_PLAN_VIEWS.tasks ? pageStyles.tasksPage : ''}`}>
       <header className={styles.header}>
         <div>
-          <h1>Study plan</h1>
-          <p className={styles.lede}>Your goals, checkpoints, and next steps.</p>
+          <h1>{translate("navigation:parent.studyPlan")}</h1>
+          {view !== STUDENT_PLAN_VIEWS.tasks ? <p className={styles.lede}>{translate('advising:studentPlan.description')}</p> : null}
         </div>
       </header>
-      <nav className={pageStyles.tabs} aria-label="Study plan views">
-        {[[STUDENT_PLAN_VIEWS.overview, 'Overview'], ['tasks', 'Advisor Tasks'], [STUDENT_PLAN_VIEWS.learning, 'Learning overview'], [STUDENT_PLAN_VIEWS.messages, 'Advisor messages']].map(([key, label]) => <button type="button" key={key} aria-pressed={key === (view || STUDENT_PLAN_VIEWS.overview)} onClick={() => { const next = new URLSearchParams(searchParams); next.set('view', key); setSearchParams(next); }}>{label}</button>)}
+      <nav className={pageStyles.tabs} aria-label={translate('advising:studentPlan.views')}>
+        {[[STUDENT_PLAN_VIEWS.overview, translate('advising:studentPlan.overview')], [STUDENT_PLAN_VIEWS.tasks, translate('dashboard:advisorTasks')], [STUDENT_PLAN_VIEWS.learning, translate('advising:studentPlan.learning')], [STUDENT_PLAN_VIEWS.messages, translate('advising:studentPlan.messages')]].map(([key, label]) => <button type="button" key={key} aria-pressed={key === (view || STUDENT_PLAN_VIEWS.overview)} onClick={() => { const next = new URLSearchParams(searchParams); next.set('view', key); setSearchParams(next); }}>{label}</button>)}
       </nav>
       {showLearning ? <Suspense fallback={<p role="status">Loading learning overview…</p>}><MyOperationsPage embedded/></Suspense> : null}
       {!showLearning && !showMessages ? <>

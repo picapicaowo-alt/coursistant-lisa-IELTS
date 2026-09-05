@@ -4,18 +4,33 @@
   flex-wrap: wrap;
   gap: t.$space-2;
   margin-bottom: t.$space-6;
-  border-bottom: 1px solid t.$border-default;
 }
 .tabs button {
   min-height: t.$touch-target;
   padding: t.$space-3 t.$space-4;
   border: 0;
-  border-bottom: 2px solid transparent;
+  border-radius: t.$radius-control;
   background: transparent;
   color: t.$content-secondary;
   font: inherit;
   font-weight: t.$fw-semibold;
   cursor: pointer;
 }
-.tabs button[aria-pressed='true'] { border-bottom-color: t.$action-primary; color: t.$action-primary; }
+.tabs button[aria-pressed='true'] { background: t.$surface-brand-subtle; color: t.$action-primary; }
 .tabs button:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+
+.tasksPage {
+  padding: t.$space-8 clamp(t.$space-6, 2.5vw, t.$space-10) t.$space-16;
+  background: t.$surface-dashboard-card;
+  > header { margin-bottom: t.$space-5; }
+  > header h1 { font-size: calc(t.$font-size-title-1 + t.$space-1); font-weight: t.$fw-bold; }
+  .tabs { gap: t.$space-3; margin-bottom: t.$space-8; }
+  .tabs button { padding: t.$space-2 t.$space-6; font-size: clamp(t.$font-size-body-lg, 1.15vw, t.$font-size-title-compact); font-weight: t.$fw-medium; border-radius: t.$radius-md; }
+  .tabs button[aria-pressed='true'] { font-weight: t.$fw-semibold; }
+  @media (max-width: 700px) {
+    padding: t.$space-5 t.$space-4 t.$space-12;
+    > header h1 { font-size: t.$font-size-title-2; }
+    .tabs { gap: t.$space-2; margin-bottom: t.$space-5; }
+    .tabs button { padding-inline: t.$space-3; font-size: t.$font-size-body; }
+  }
+}

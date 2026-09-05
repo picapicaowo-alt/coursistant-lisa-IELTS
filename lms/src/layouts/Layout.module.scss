@@ -52,3 +52,23 @@
   transform: translateY(-200%);
   &:focus { transform: translateY(0); }
 }
+
+.studyPlanCanvas {
+  --shell-header-height: 6.25rem;
+  --shell-search-width: 24rem;
+  --shell-search-height: 3.125rem;
+  --shell-search-icon: 1.5rem;
+  --shell-search-font: #{t.$font-size-subhead};
+  --shell-canvas: #{t.$surface-dashboard-card};
+  --shell-inline-space: clamp(1.5rem, 2.5vw, 2.5rem);
+  background: t.$surface-dashboard-card;
+}
+
+@media (max-width: 700px) {
+  .studyPlanCanvas {
+    --shell-header-height: #{t.$shell-header-height};
+    --shell-search-height: 2rem;
+    --shell-search-icon: 1rem;
+    --shell-search-font: #{t.$font-size-caption};
+  }
+}
