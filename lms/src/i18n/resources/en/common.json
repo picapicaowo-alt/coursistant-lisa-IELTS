@@ -730,6 +730,15 @@
     "deleteFailed": "Could not delete this file. Please try again."
   },
   "validation": {
-    "checkFields": "Check the required fields and enter valid values before continuing."
+    "checkFields": "Check the required fields and enter valid values before continuing.",
+    "requiredField": "Complete this field.",
+    "url": "Enter a valid web address.",
+    "number": "Enter a valid number.",
+    "minimum": "Enter a value of at least {{value}}.",
+    "maximum": "Enter a value no greater than {{value}}.",
+    "minimumLength": "Enter at least {{value}} characters.",
+    "maximumLength": "Enter no more than {{value}} characters.",
+    "step": "Choose a value using the allowed increment.",
+    "format": "Check this value and use the requested format."
   }
 }

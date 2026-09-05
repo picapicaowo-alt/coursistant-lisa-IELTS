@@ -4,8 +4,9 @@ import {afterEach, beforeEach, expect, it, vi} from 'vitest';
 import i18n, {SUPPORTED_LOCALES} from './index';
 import usePasswordReset from '@/pages/ForgotPasswordPage/usePasswordReset';
 import SignUpView from '@/pages/signup/SignUpView';
+import LoginPage from '@/pages/LoginPage';
 
-const api = vi.hoisted(() => ({sendPasswordResetVerification: vi.fn(), resetPassword: vi.fn(), sendRegistrationVerification: vi.fn(), register: vi.fn()}));
+const api = vi.hoisted(() => ({login: vi.fn(), sendPasswordResetVerification: vi.fn(), resetPassword: vi.fn(), sendRegistrationVerification: vi.fn(), register: vi.fn()}));
 vi.mock('@/apis/services/auth-api', () => ({authApiService: api}));
 vi.mock('@/contexts/AuthContext', () => ({useAuth: () => ({login: vi.fn()})}));
 
@@ -15,6 +16,23 @@ beforeEach(async () => {
 });
 afterEach(async () => {
   await act(() => i18n.changeLanguage('en'));
+});
+
+it('updates an existing sign-in error without losing credentials or repeating login', async () => {
+  api.login.mockRejectedValue({code: 401, details: {code: 'INVALID_CREDENTIALS'}});
+  render(<MemoryRouter><LoginPage/></MemoryRouter>);
+  fireEvent.change(screen.getByLabelText(i18n.t('auth:login.emailLabel')), {target: {value: 'learner@example.test'}});
+  fireEvent.change(screen.getByLabelText(i18n.t('auth:login.passwordLabel')), {target: {value: 'UnsubmittedDraft1'}});
+  await act(async () => fireEvent.click(screen.getByRole('button', {name: i18n.t('auth:login.logIn')})));
+  const calls = api.login.mock.calls.length;
+  expect(calls).toBe(2);
+  for (const locale of SUPPORTED_LOCALES) {
+    await act(() => i18n.changeLanguage(locale));
+    expect(screen.getByRole('alert')).toHaveTextContent(i18n.t('auth:errors.invalidCredentials'));
+    expect(screen.getByLabelText(i18n.t('auth:login.emailLabel'))).toHaveValue('learner@example.test');
+    expect(screen.getByLabelText(i18n.t('auth:login.passwordLabel'))).toHaveValue('UnsubmittedDraft1');
+  }
+  expect(api.login).toHaveBeenCalledTimes(calls);
 });
 
 it('updates password-reset validation and request errors while preserving drafts and retry identity', async () => {

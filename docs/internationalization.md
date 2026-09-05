@@ -31,6 +31,9 @@ locale-specific artwork. This must never replace or modify original exam media.
   wall-clock/timezone semantics; keep API serialization unchanged.
 - Language switches must preserve filters, drafts, open dialogs, media URLs,
   student answers, pending request guards, retry IDs and permissions.
+- Native form validation uses the shared locale bridge in `nativeValidation.ts`.
+  It changes feedback only, never field values or HTML constraints. Custom date
+  and people controls retain their own semantic validation messages.
 - Do not translate machine conditions, select values or React component keys.
 - English is an emergency missing-key fallback. Development warnings and
   translation-key checks do not excuse missing supported resources.
@@ -72,10 +75,10 @@ Validated on the integrated branch:
 
 - Lint, normal/production/i18n-tool type checks, resource/key/interpolation checks
   and all six audit-tool tests pass. There are zero unreviewed direct UI copy
-  candidates across the 464-file active dependency graph.
-- 169 unit-test files / 844 tests pass, including open-dialog locale changes,
+  candidates across the 465-file active dependency graph.
+- 171 unit-test files / 849 tests pass, including open-dialog locale changes,
   nested translated labels, auth validation/feedback, draft and retry identity.
-- The production build succeeds. All 363 Chromium browser tests pass. The role
+- The production build succeeds. All 364 Chromium browser tests pass. The role
   layout matrix covers nine role/page configurations in all three locales at
   widths 320, 390, 768, 1024, 1440, 1920 and 2560; it checks locale persistence,
   overflow, unresolved interpolation and untranslated platform controls.

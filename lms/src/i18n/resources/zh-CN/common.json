@@ -730,6 +730,15 @@
     "deleteFailed": "无法删除此文件，请重试。"
   },
   "validation": {
-    "checkFields": "请检查必填项并输入有效内容，再继续操作。"
+    "checkFields": "请检查必填项并输入有效内容，再继续操作。",
+    "requiredField": "请填写此字段。",
+    "url": "请输入有效的网址。",
+    "number": "请输入有效的数字。",
+    "minimum": "请输入不小于 {{value}} 的值。",
+    "maximum": "请输入不大于 {{value}} 的值。",
+    "minimumLength": "请至少输入 {{value}} 个字符。",
+    "maximumLength": "请输入不超过 {{value}} 个字符。",
+    "step": "请按允许的增量输入数值。",
+    "format": "请检查此值并使用要求的格式。"
   }
 }
