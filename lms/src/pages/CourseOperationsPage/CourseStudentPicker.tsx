@@ -4,7 +4,7 @@ import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
 import {formatPersonName} from '@/utils/personName';
-import {getApiErrorMessage} from '@/utils/apiError';
+import {isHttpStatus, getApiErrorMessage} from '@/utils/apiError';
 import {TeachingPagination} from '@/components/TeachingWorkspace';
 import {PersonSearchSelect} from '@/components/PersonSearchSelect';
 import {PAGE_SIZE} from './records';
@@ -39,6 +39,8 @@ export function CourseStudentPicker({courseId, selected, onSelect}: {
     label: formatPersonName({firstName: item.userFirstName, middleName: item.userMiddleName, lastName: item.userLastName}, item.userName || t('people.studentFallback', {id: item.userId})),
     person: {id: item.userId, firstName: item.userFirstName, middleName: item.userMiddleName, lastName: item.userLastName, email: item.userEmail},
   }));
+  if (isHttpStatus(query.error, 403)) return <p role="alert">{t('course:roster.accessDenied')}</p>;
+  if (isHttpStatus(query.error, 404)) return <p role="alert">{t('course:roster.notFound')}</p>;
   return <PersonSearchSelect label={t('people.courseStudents')} search={search} onSearch={setSearch}
     onOpenChange={setOpen} options={options}
     selected={selected ? {value: String(selected.id), label: selected.name, person: {id: selected.id, firstName: selected.name}} : undefined}

@@ -25,7 +25,7 @@ interface WeekContentCardProps {
   week: CourseWeek | null;
   weeks: CourseWeek[];
   currentUserId: number;
-  canEditStructure: boolean;
+  canManageExistingMaterials: boolean;
   canUploadMaterials: boolean;
   onChanged: () => void;
   compactControls?: boolean;
@@ -42,17 +42,13 @@ interface LinkAttempt {
   idempotencyKey: string;
 }
 
-/**
- * Live material management for one week. Instructors can rename, reorder,
- * move and delete every item. A TA with the course content flag can upload and
- * delete only items they uploaded; week structure remains Instructor-only.
- */
+/** Upload does not imply Course Manager permissions; own uploads remain deletable. */
 export const WeekContentCard: React.FC<WeekContentCardProps> = ({
   courseId,
   week,
   weeks,
   currentUserId,
-  canEditStructure,
+  canManageExistingMaterials,
   canUploadMaterials,
   onChanged,
   compactControls = false,
@@ -279,7 +275,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
           ) : (
             <ul className={styles.materialList}>
               {week.materials.map((material, index) => {
-                const canDelete = canEditStructure
+                const canDelete = canManageExistingMaterials
                   || (canUploadMaterials && material.uploadedBy === currentUserId);
 
                 return (
@@ -319,7 +315,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                     )}
 
                     <MaterialActionDisclosure compact={compactControls} name={material.displayName}><span className={editStyles.materialControls}>
-                      {canEditStructure ? (
+                      {canManageExistingMaterials ? (
                         <>
                           {material.publicationState === 'PUBLISHED' ? (
                             <button

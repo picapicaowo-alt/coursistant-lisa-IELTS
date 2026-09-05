@@ -7,6 +7,7 @@ import {
   canAccessAiWorkspace,
   canAccessCalendar,
   canAccessCourseCatalogue,
+  canAccessCourseRoster,
   canAccessCourseAuthoringTools,
   canAccessDashboard,
   canAccessMyOperations,
@@ -19,6 +20,7 @@ import {
 type Capability =
   | 'dashboard'
   | 'courses'
+  | 'courseRoster'
   | 'courseCreation'
   | 'courseAuthoring'
   | 'calendar'
@@ -32,6 +34,7 @@ type Capability =
 const allowed: Record<Capability, (identity: ReturnType<typeof useRequiredAuth>['user']) => boolean> = {
   dashboard: canAccessDashboard,
   courses: canAccessCourseCatalogue,
+  courseRoster: canAccessCourseRoster,
   courseCreation: canCreateCourses,
   courseAuthoring: canAccessCourseAuthoringTools,
   calendar: canAccessCalendar,

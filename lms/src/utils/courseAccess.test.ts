@@ -45,6 +45,10 @@ describe('deriveCourseAccess', () => {
     });
   });
 
+  it.each(['Instructor', 'TA', 'Student'] as const)('denies inactive %s enrollments', courseRole => {
+    expect(deriveCourseAccess(membership({courseRole, active: false}))).toBe(NO_COURSE_ACCESS);
+  });
+
   it('limits a TA to explicitly granted course permissions', () => {
     const access = deriveCourseAccess(membership({
       courseRole: 'TA',

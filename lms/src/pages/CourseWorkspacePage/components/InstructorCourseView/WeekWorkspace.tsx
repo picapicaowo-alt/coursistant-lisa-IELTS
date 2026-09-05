@@ -318,7 +318,7 @@ function SelectedWeek({
               week={week}
               weeks={weeks}
               currentUserId={currentUserId}
-              canEditStructure={canEdit}
+              canManageExistingMaterials={false}
               canUploadMaterials={canUpload}
               onChanged={onChanged}
               compactControls

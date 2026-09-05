@@ -466,7 +466,7 @@
     "coursesFailed": "Active courses could not be loaded.",
     "noCourses": "There are no active courses to manage.",
     "courseAccess": "Course access",
-    "courseAccessHelp": "Choose the teacher's course before adding a student or assigning a TA.",
+    "courseAccessHelp": "Choose the teacher’s course before adding a student.",
     "teacherCourse": "Teacher's course",
     "teacherLabel": "Teacher: {{name}}",
     "courseContext": "Course #{{courseId}} · Tenant #{{tenantId}}",
@@ -480,7 +480,7 @@
     "enrollTa": "Enroll and assign TA",
     "enrollStudent": "Enroll student",
     "taHelp": "TA access applies only to the selected course; the user's platform level remains Student.",
-    "memberHelp": "TA is a course role and does not change the user's account level.",
+    "memberHelp": "View the members enrolled in the selected course.",
     "searchCourse": "Search this course",
     "memberSearchPlaceholder": "Name, email, or user ID",
     "loadingMembers": "Loading course members…",
@@ -580,5 +580,8 @@
     "user": "User {{id}}",
     "unit": "Unit {{number}}",
     "week": "Week {{number}}"
+  },
+  "navigationControls": {
+    "backToCourseOperations": "Back to course operations"
   }
 }

@@ -1,0 +1,30 @@
+{
+  "editor": {
+    "editTitle": "Edit personal event",
+    "addTitle": "Add personal event",
+    "close": "Close event",
+    "loading": "Loading latest event…",
+    "title": "Event title",
+    "starts": "Starts",
+    "ends": "Ends",
+    "timezone": "Timezone",
+    "reminder": "Reminder (minutes before)",
+    "invalidTime": "End time must be after start time.",
+    "missingDetails": "This event does not contain the fields needed for editing.",
+    "missingVersion": "Reopen this event to load the latest details before saving changes.",
+    "loadFailed": "The event could not be loaded.",
+    "saveFailed": "The event could not be saved. Your entries are preserved.",
+    "deleteFailed": "The event could not be deleted. You can try again.",
+    "deleteConfirm": "Delete “{{title}}”?",
+    "delete": "Delete event",
+    "keep": "Keep event",
+    "create": "Create event",
+    "requiredTitle": "Enter an event title.",
+    "validDates": "Enter a valid start and end date and time.",
+    "requiredTimezone": "Enter the event’s timezone.",
+    "invalidReminder": "Enter a whole number of minutes greater than or equal to zero, or leave the reminder blank.",
+    "versionConflict": "This event changed elsewhere. Its latest details have been requested. Review them before trying again.",
+    "requestVersionMissing": "The request is missing the event version. Reload the event before trying again.",
+    "requestVersionInvalid": "The request contains an invalid event version. Reload the event before trying again."
+  }
+}

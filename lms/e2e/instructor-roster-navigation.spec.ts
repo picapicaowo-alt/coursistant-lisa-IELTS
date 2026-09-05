@@ -35,6 +35,7 @@ test('instructor opens the learner roster, reads names, filters and returns to t
   await expect(page.getByRole('cell', {name: '王小明', exact: true})).toBeVisible();
   await expect(page.getByText('Outdated name', {exact: true})).toHaveCount(0);
   await expect(page.getByText('21 members', {exact: true})).toBeVisible();
+  await expect(page.getByRole('button', {name: /Make TA|Withdraw|Permissions|Enrol/})).toHaveCount(0);
 
   const pagination = page.getByRole('navigation', {name: 'Roster pages'});
   await pagination.getByRole('button', {name: 'Next'}).click();
@@ -61,7 +62,7 @@ test('a roster opened from course overview returns there, then back to the catal
   await page.goto('/course/71');
   await page.getByRole('button', {name: 'Schedule & Groups', exact: true}).click();
   await page.getByRole('button', {name: 'Members', exact: true}).click();
-  await page.getByRole('link', {name: 'Manage roster', exact: true}).click();
+  await page.getByRole('link', {name: 'View roster', exact: true}).click();
   await expect(page.getByRole('cell', {name: 'Alex Mei Chen', exact: true})).toBeVisible();
   await page.getByRole('link', {name: 'Back to course', exact: false}).click();
   await expect(page).toHaveURL(/\/course\/71$/);

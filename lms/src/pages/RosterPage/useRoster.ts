@@ -1,4 +1,6 @@
 import {useState} from 'react';
+import {LocalizedError} from '@/i18n/errors';
+import {isHttpStatus} from '@/utils/apiError';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {useParams} from 'react-router-dom';
 import {CourseMember, CourseRole, CourseMemberPage, TaPermissions, unwrapData} from '@/apis';
@@ -26,7 +28,7 @@ const getRolePriority = (role?: string) => (role && ROLE_PRIORITY[role]) || 4;
  * Filters are part of the Query key; successful writes invalidate every page
  * for this course so counts and role groupings cannot drift apart.
  */
-export const useRoster = ({enabled = true}: {enabled?: boolean} = {}) => {
+export const useRoster = ({enabled = true, canManageMembers = false}: {enabled?: boolean; canManageMembers?: boolean} = {}) => {
   const {courseId} = useParams();
   const queryClient = useQueryClient();
   const parsedCourseId = Number(courseId);
@@ -51,13 +53,16 @@ export const useRoster = ({enabled = true}: {enabled?: boolean} = {}) => {
     retry: (failureCount, error) => (
       // A permission denial is stable for the current session and retrying it
       // only delays the page's explicit forbidden state.
-      (error as {code?: number})?.code === 403 ? false : failureCount < 1
+      isHttpStatus(error, 403) || isHttpStatus(error, 404) ? false : failureCount < 1
     ),
   });
 
   const refresh = () => queryClient.invalidateQueries({queryKey: ['course-members', id]});
-  const mutationOptions = <T,>(mutationFn: (value: T) => Promise<unknown>) => ({
-    mutationFn,
+  const mutationOptions = <T, R = unknown>(mutationFn: (value: T) => Promise<R>) => ({
+    mutationFn: (value: T) => {
+      if (!enabled || !canManageMembers) throw new LocalizedError('course:roster.accessDenied');
+      return mutationFn(value);
+    },
     onSuccess: () => void refresh(),
   });
 
@@ -73,10 +78,7 @@ export const useRoster = ({enabled = true}: {enabled?: boolean} = {}) => {
   const updatePermissions = useMutation(mutationOptions<{member: CourseMember; permissions: TaPermissions}>(
     ({member, permissions}) => courseApiService.updateTaPermissions(id!, member.userId, permissions),
   ));
-  const enrol = useMutation({
-    mutationFn: (emails: string[]) => courseApiService.enrolStudents(id!, {emails}),
-    onSuccess: () => void refresh(),
-  });
+  const enrol = useMutation(mutationOptions<string[], Awaited<ReturnType<typeof courseApiService.enrolStudents>>>(emails => courseApiService.enrolStudents(id!, {emails})));
   const total = query.data?.total ?? 0;
   const rawMembers = query.data?.items ?? [];
   // The API owns filtering and pagination; this local sort only gives each
@@ -102,7 +104,8 @@ export const useRoster = ({enabled = true}: {enabled?: boolean} = {}) => {
     },
     isLoading: id !== null && enabled && query.isPending,
     isError: query.isError,
-    isForbidden: (query.error as {code?: number} | null)?.code === 403,
+    isForbidden: isHttpStatus(query.error, 403),
+    isNotFound: isHttpStatus(query.error, 404),
     refetch: () => void query.refetch(),
     withdraw,
     promote,

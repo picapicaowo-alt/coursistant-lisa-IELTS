@@ -6,6 +6,21 @@ const client = {get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delet
 const service = new CourseOperationsApiService(client as unknown as typeof V2ApiClient);
 
 describe('CourseOperationsApiService', () => {
+  it('sends the current personal-event version in the delete query and blocks a missing version', async () => {
+    client.delete.mockResolvedValue({status: 200, data: null});
+    await service.deleteMyPersonalEvent(71, 'delete-retry-key', 4);
+    expect(client.delete).toHaveBeenCalledWith('/v2/me/personal-events/71', {
+      headers: {'Idempotency-Key': 'delete-retry-key'}, params: {expectedVersion: 4},
+    });
+    expect(() => service.deleteMyPersonalEvent(71, 'missing-version')).toThrow();
+    expect(() => service.deleteMyPersonalEvent(71, 'negative-version', -1)).toThrow();
+    for (const invalid of [NaN, Infinity, 1.5]) {
+      expect(() => service.deleteMyPersonalEvent(71, 'invalid-version', invalid)).toThrow();
+    }
+    expect(client.delete).toHaveBeenCalledTimes(1);
+  });
+
+
   beforeEach(() => vi.clearAllMocks());
 
   it('covers occurrence attendance and schedule-request routes', async () => {

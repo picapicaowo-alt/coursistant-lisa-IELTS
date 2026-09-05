@@ -1,10 +1,12 @@
+import { useTranslation } from 'react-i18next';
 import {useEffect, useState} from 'react';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
 import {unwrapData, type PersonalEventRequest} from '@/apis';
 import {courseOperationsApiService as api} from '@/apis/services/course-operations-api';
 import {EnglishDateTimeInput} from '@/components/EnglishDateInput';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
-import {getApiErrorMessage} from '@/utils/apiError';
+import {isPersonalEventVersionConflict, personalEventErrorKey} from '@/utils/personalEventError';
+import {LocalizedError} from '@/i18n/errors';
 import {personalEventView, type PersonalEventView} from './personalEvents';
 import {useAnchoredEventDialog} from './useAnchoredEventDialog';
 import styles from './index.module.scss';
@@ -20,11 +22,14 @@ export function PersonalEventEditor({
   selected: PersonalEventView | null;
   onClose: () => void;
 }) {
+  const { t: translate } = useTranslation();
   const dialog = useAnchoredEventDialog(anchor);
   const [current, setCurrent] = useState(selected);
   const [loading, setLoading] = useState(Boolean(selected));
   const [readError, setReadError] = useState<unknown>();
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [showValidation, setShowValidation] = useState(false);
+  const [invalidReminderInput, setInvalidReminderInput] = useState(false);
   const [event, setEvent] = useState<PersonalEventRequest>(
     () =>
       selected ?? {
@@ -45,9 +50,7 @@ export function PersonalEventEditor({
       .then((response) => {
         const latest = personalEventView(unwrapData(response, 'personalEvent'));
         if (!latest)
-          throw new Error(
-            'This event does not contain the fields needed for editing.',
-          );
+          throw new LocalizedError('calendar:editor.missingDetails');
         if (!cancelled) {
           setCurrent(latest);
           setEvent(latest);
@@ -65,9 +68,11 @@ export function PersonalEventEditor({
   }, [selected]);
   const save = useMutation({
     mutationFn: (action: 'save' | 'delete') => {
+      if (current && current.version == null)
+        throw new LocalizedError('calendar:editor.missingVersion');
       if (action === 'delete' && current)
-        return checkpoint.run(`delete-event-${current.id}`, current.id, (key) =>
-          api.deleteMyPersonalEvent(current.id, key),
+        return checkpoint.run(`delete-event-${current.id}`, {id: current.id, expectedVersion: current.version}, (key, request) =>
+          api.deleteMyPersonalEvent(request.id, key, request.expectedVersion),
         );
       // Construct only contract request fields. Do not submit read-only identity/version aliases.
       const payload: PersonalEventRequest = {
@@ -78,10 +83,6 @@ export function PersonalEventEditor({
         reminderMinutesBefore: event.reminderMinutesBefore,
       };
       if (current) {
-        if (current.version == null)
-          throw new Error(
-            'Reload an event with a current version before saving changes.',
-          );
         return checkpoint.run(
           `update-event-${current.id}`,
           {...payload, expectedVersion: current.version},
@@ -91,6 +92,22 @@ export function PersonalEventEditor({
       return checkpoint.run('create-personal-event', payload, (key, request) =>
         api.createMyPersonalEvent(request, key),
       );
+    },
+    onError: async (error) => {
+      if (!isPersonalEventVersionConflict(error) || !current) return;
+      setConfirmDelete(false);
+      setLoading(true);
+      try {
+        const latest = personalEventView(unwrapData(await api.getMyPersonalEvent(current.id), 'personalEvent'));
+        if (!latest) throw new LocalizedError('calendar:editor.missingDetails');
+        setCurrent(latest);
+        setEvent(latest);
+        await client.invalidateQueries({queryKey: ['me', 'personal-events']});
+      } catch (readFailure) {
+        setReadError(readFailure);
+      } finally {
+        setLoading(false);
+      }
     },
     onSuccess: async () => {
       await Promise.all([
@@ -105,6 +122,11 @@ export function PersonalEventEditor({
       event.endsAtLocal &&
       event.endsAtLocal <= event.startsAtLocal,
   );
+  const validationKey = !event.title?.trim() ? 'calendar:editor.requiredTitle'
+    : !event.startsAtLocal || !event.endsAtLocal ? 'calendar:editor.validDates'
+    : !event.timezone?.trim() ? 'calendar:editor.requiredTimezone'
+    : invalidReminderInput || event.reminderMinutesBefore != null && (!Number.isSafeInteger(event.reminderMinutesBefore) || event.reminderMinutesBefore < 0) ? 'calendar:editor.invalidReminder'
+    : undefined;
   return (
     <dialog
       ref={dialog}
@@ -116,44 +138,48 @@ export function PersonalEventEditor({
       onClose={onClose}
     >
       <form
+        noValidate
         onSubmit={(e) => {
           e.preventDefault();
-          if (!invalidTime) save.mutate('save');
+          setShowValidation(true);
+          if (!invalidTime && !validationKey && !loading && !readError && !save.isPending) save.mutate('save');
         }}
       >
         <header>
           <h2 id="personal-event-title">
-            {selected ? 'Edit personal event' : 'Add personal event'}
+            {translate(selected ? 'calendar:editor.editTitle' : 'calendar:editor.addTitle')}
           </h2>
           <button
             type="button"
-            aria-label="Close event"
+            aria-label={translate('calendar:editor.close')}
             disabled={save.isPending}
             onClick={onClose}
           >
             ×
           </button>
         </header>
-        {loading ? <p role="status">Loading latest event…</p> : null}
+        {loading ? <p role="status">{translate('calendar:editor.loading')}</p> : null}
         {readError ? (
           <p role="alert">
-            {getApiErrorMessage(readError, 'The event could not be loaded.')}
+            {readError instanceof LocalizedError ? readError.localizedMessage() : translate('calendar:editor.loadFailed')}
           </p>
         ) : null}
         <fieldset disabled={loading || Boolean(readError) || save.isPending}>
           <label>
-            Event title
+            {translate('calendar:editor.title')}
             <input
               required
+              aria-invalid={showValidation && !event.title?.trim() || undefined}
               value={event.title ?? ''}
               onChange={(e) => setEvent({...event, title: e.target.value})}
             />
           </label>
           <div className={styles.dateFields}>
             <label>
-              Starts
+              {translate('calendar:editor.starts')}
               <EnglishDateTimeInput
                 required
+                aria-label={translate('calendar:editor.starts')}
                 value={event.startsAtLocal ?? ''}
                 onChangeValue={(startsAtLocal) =>
                   setEvent({...event, startsAtLocal})
@@ -161,9 +187,10 @@ export function PersonalEventEditor({
               />
             </label>
             <label>
-              Ends
+              {translate('calendar:editor.ends')}
               <EnglishDateTimeInput
                 required
+                aria-label={translate('calendar:editor.ends')}
                 value={event.endsAtLocal ?? ''}
                 onChangeValue={(endsAtLocal) =>
                   setEvent({...event, endsAtLocal})
@@ -172,7 +199,7 @@ export function PersonalEventEditor({
             </label>
           </div>
           <label>
-            Timezone
+            {translate('calendar:editor.timezone')}
             <input
               required
               value={event.timezone ?? ''}
@@ -180,50 +207,50 @@ export function PersonalEventEditor({
             />
           </label>
           <label>
-            Reminder (minutes before)
+            {translate('calendar:editor.reminder')}
             <input
               type="number"
               min="0"
               step="1"
               value={event.reminderMinutesBefore ?? ''}
-              onChange={(e) =>
+              aria-invalid={showValidation && validationKey === 'calendar:editor.invalidReminder' || undefined}
+              onChange={(e) => {
+                setInvalidReminderInput(!e.currentTarget.validity.valid);
                 setEvent({
                   ...event,
                   reminderMinutesBefore:
                     e.target.value === '' ? undefined : Number(e.target.value),
-                })
-              }
+                });
+              }}
             />
           </label>
           {invalidTime ? (
-            <p role="alert">End time must be after start time.</p>
+            <p role="alert">{translate('calendar:editor.invalidTime')}</p>
           ) : null}
           {current && current.version == null ? (
             <p role="alert">
-              Reopen this event to load the latest details before saving changes.
+              {translate('calendar:editor.missingVersion')}
             </p>
           ) : null}
         </fieldset>
+        {showValidation && validationKey ? <p role="alert">{translate(validationKey)}</p> : null}
         {save.isError ? (
           <p role="alert">
-            {getApiErrorMessage(
-              save.error,
-              'The event could not be saved. Your entries are preserved.',
-            )}
+            {save.error instanceof LocalizedError ? save.error.localizedMessage() : translate(personalEventErrorKey(save.error, save.variables === 'delete'))}
           </p>
         ) : null}
         {confirmDelete ? (
           <div className={styles.deleteConfirm}>
-            <p>Delete “{current?.title}”?</p>
+            <p>{translate('calendar:editor.deleteConfirm', {title: current?.title})}</p>
             <button
               type="button"
-              disabled={save.isPending}
+              disabled={save.isPending || loading || Boolean(readError)}
               onClick={() => save.mutate('delete')}
             >
-              Delete event
+              {translate('calendar:editor.delete')}
             </button>
-            <button type="button" onClick={() => setConfirmDelete(false)}>
-              Keep event
+            <button type="button" disabled={save.isPending} onClick={() => setConfirmDelete(false)}>
+              {translate('calendar:editor.keep')}
             </button>
           </div>
         ) : null}
@@ -231,15 +258,13 @@ export function PersonalEventEditor({
           {selected ? (
             <button
               type="button"
-              disabled={save.isPending || loading || Boolean(readError)}
+              disabled={save.isPending || loading || Boolean(readError) || current?.version == null}
               onClick={() => setConfirmDelete(true)}
             >
-              Delete
-            </button>
+              {translate("common:actions.delete")}</button>
           ) : null}
           <button type="button" disabled={save.isPending} onClick={onClose}>
-            Cancel
-          </button>
+            {translate("common:actions.cancel")}</button>
           <button
             className={styles.primary}
             disabled={
@@ -251,10 +276,10 @@ export function PersonalEventEditor({
             }
           >
             {save.isPending
-              ? 'Saving…'
+              ? translate(save.variables === 'delete' ? 'common:actions.deleting' : 'common:actions.saving')
               : selected
-                ? 'Save changes'
-                : 'Create event'}
+                ? translate('common:actions.saveChanges')
+                : translate('calendar:editor.create')}
           </button>
         </footer>
       </form>

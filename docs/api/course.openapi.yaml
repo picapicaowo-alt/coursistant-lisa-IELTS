@@ -2018,8 +2018,11 @@ paths:
       - Material links
   /v2/courses/{courseId}/members:
     get:
-      description: "Zero-based page of course members. page defaults to 0, size defaults\
-        \ to 20, size max 100."
+      description: >-
+        Zero-based page of course members. page defaults to 0, size defaults to 20,
+        size max 100. Read-only access for Course Owner Advisor and Active Primary Instructor.
+        TA, Student, unrelated Instructor and inactive enrollments are denied.
+        Reading members does not grant membership or TA permission management.
       operationId: courseMemberList
       parameters:
       - in: path
@@ -2056,6 +2059,8 @@ paths:
           type: integer
           format: int32
       responses:
+        "404":
+          description: COURSE_NOT_FOUND - course does not exist or is invisible.
         "200":
           content:
             application/json:
@@ -3601,6 +3606,8 @@ paths:
         \ teachingType; LINK and legacy FILE rows return null checksum. Storage materialType\
         \ remains FILE/LINK. Materials are general course resources, not the authoritative\
         \ location for graded-work files."
+      # Production handoff: upload permits Course Owner Advisor, Active Primary
+      # Instructor and Active TA; this does not grant other material management.
       operationId: courseMaterialCreate
       parameters:
       - description: Required idempotency key for safe retries of this mutating request
@@ -4494,6 +4501,9 @@ paths:
       - MePersonalEvents
   /v2/me/personal-events/{eventId}:
     delete:
+      description: >-
+        Delete using the current response version as expectedVersion.
+        On conflict reread the event and ask the user to review before retrying.
       operationId: deleteMyPersonalEvent
       parameters:
       - in: path
@@ -4509,6 +4519,10 @@ paths:
           type: integer
           format: int32
       responses:
+        "400":
+          description: PARAM_MISSING for absent expectedVersion; BAD_REQUEST for a non-integer version.
+        "409":
+          description: PERSONAL_EVENT_VERSION_CONFLICT - reread the event before retrying.
         "200":
           content:
             '*/*':

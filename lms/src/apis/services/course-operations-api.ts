@@ -1,3 +1,4 @@
+import {LocalizedError} from '@/i18n/errors';
 import {readCollection, type CollectionPage} from './readCollection';
 import type {
   ApiResponse,
@@ -281,8 +282,12 @@ export class CourseOperationsApiService {
     return this.apiClient.patch(`/v2/me/personal-events/${eventId}`, request, idempotent(key));
   }
 
-  deleteMyPersonalEvent(eventId: number, key: string = crypto.randomUUID()): Promise<ApiResponse<void>> {
-    return this.apiClient.delete(`/v2/me/personal-events/${eventId}`, idempotent(key));
+  deleteMyPersonalEvent(eventId: number, key: string = crypto.randomUUID(), expectedVersion?: number): Promise<ApiResponse<void>> {
+    // The consumed DELETE contract requires a version query parameter, not a body.
+    if (expectedVersion == null || !Number.isSafeInteger(expectedVersion) || expectedVersion < 0) {
+      throw new LocalizedError('calendar:editor.missingVersion');
+    }
+    return this.apiClient.delete(`/v2/me/personal-events/${eventId}`, {...idempotent(key), params: {expectedVersion}});
   }
 
   getMyTeachingAvailability(): Promise<ApiResponse<TeachingAvailabilityResponse>> {
