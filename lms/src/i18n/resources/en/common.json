@@ -640,6 +640,16 @@
       "day": "Next day",
       "week": "Next week",
       "month": "Next month"
+    },
+    "previousExamUnit": {
+      "listening": "Previous part",
+      "reading": "Previous passage",
+      "writing": "Previous task"
+    },
+    "nextExamUnit": {
+      "listening": "Next part",
+      "reading": "Next passage",
+      "writing": "Next task"
     }
   },
   "refreshControls": {

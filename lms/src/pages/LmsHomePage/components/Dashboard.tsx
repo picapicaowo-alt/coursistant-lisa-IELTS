@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {useMemo, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {generatePath, Link} from 'react-router-dom';
@@ -152,6 +153,7 @@ const CourseWorkPanel: React.FC = () => {
 };
 
 const ExamsPanel: React.FC = () => {
+  useTranslation();
   const query = useQuery({
     queryKey: ['dashboard', 'mock-exams'],
     queryFn: async () => (await mockExamApiService.listStudentExams()).data,

@@ -640,6 +640,16 @@
       "day": "后一天",
       "week": "下一周",
       "month": "下个月"
+    },
+    "previousExamUnit": {
+      "listening": "上一部分",
+      "reading": "上一篇文章",
+      "writing": "上一项任务"
+    },
+    "nextExamUnit": {
+      "listening": "下一部分",
+      "reading": "下一篇文章",
+      "writing": "下一项任务"
     }
   },
   "refreshControls": {

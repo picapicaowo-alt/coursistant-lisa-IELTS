@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+
 type ExamRecord = Record<string, unknown>;
 
 const isRecord = (value: unknown): value is ExamRecord =>
@@ -28,7 +30,7 @@ export const dashboardExamActionLabel = (
   score: number | undefined,
   direct: boolean,
 ): string => {
-  if (!direct) return 'Open exams';
-  if (status.toLowerCase().includes('progress')) return 'Continue the exam';
-  return score === undefined ? 'Open exam' : 'View feedback';
+  if (!direct) return i18n.t('dashboard:openExams');
+  if (status.toLowerCase().includes('progress')) return i18n.t('dashboard:continueExam');
+  return i18n.t(score === undefined ? 'dashboard:openExam' : 'dashboard:viewFeedback');
 };

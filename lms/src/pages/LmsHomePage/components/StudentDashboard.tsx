@@ -71,6 +71,7 @@ function DashboardCourses() {
 }
 
 function DashboardTasks() {
+  const {t: translate} = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const query = useQuery({queryKey: advisingQueryKeys.studentStudyPlan, queryFn: async () => unwrapData(await advisorApiService.getOwnStudyPlan(), 'student study plan'), retry: false});
   const tasks = (query.data?.plan?.checkpoints ?? []).flatMap((checkpoint, index) => (checkpoint.tasks ?? []).map((task, taskIndex) => {
@@ -92,7 +93,7 @@ function DashboardTasks() {
         <span className={s.taskIcon} data-complete={completed || undefined}>{completed ? <CheckCircle2 size={21}/> : <Circle size={21}/>}</span>
         <span className={s.taskCopy}><strong>{task.title || 'Learning task'}</strong>{checkpoint ? <small>{checkpoint}</small> : null}</span>
         <span className={s.taskMeta}><LearningBadge value={overdue ? 'OVERDUE' : task.status} label={overdue ? 'Overdue' : taskStatusLabel(task.status)}/><small>{formatPlanDate(task.dueDate)}</small></span>
-        <span className={s.taskAction}>{task.advisorFeedback ? 'View feedback' : completed ? 'View detail' : 'Open'}</span>
+        <span className={s.taskAction}>{translate(task.advisorFeedback ? 'dashboard:viewFeedback' : completed ? 'common:actions.viewDetail' : 'common:actions.open')}</span>
       </Link>;
     })}</div>
     {tasks.length > TASK_PREVIEW_LIMIT ? <button className={s.showMore} type="button" onClick={() => setExpanded(value => !value)}>{expanded ? 'Show fewer tasks' : 'Show more tasks'}</button> : null}
@@ -100,6 +101,7 @@ function DashboardTasks() {
 }
 
 function DashboardExams() {
+  useTranslation();
   const query = useQuery({queryKey: ['dashboard', 'mock-exams'], queryFn: async () => unwrapData(await mockExamApiService.listStudentExams(), 'student exams'), retry: false});
   const exams = (collection(query.data) ?? []).flatMap(value => {const item = asRecord(value); return item ? [item] : [];});
   return <WorkspaceSection title="Exams" appearance="record" meta={<ViewAll to={APP_ROUTE_PATHS.mockExams}/>}>

@@ -88,7 +88,7 @@ describe('Counsellor dashboard interactions', () => {
     mocks.listStudentIntakes.mockImplementation((page: number, size: number) => Promise.resolve(response({page, size, total: 6, items: page === 0 ? [student] : [secondStudent]})));
     renderPage();
     await screen.findByText('IELTS Academic preparation');
-    fireEvent.click(screen.getByRole('button', {name: 'Next intake pages'}));
+    fireEvent.click(within(screen.getByRole('navigation', {name: 'intake pages'})).getByRole('button', {name: 'Next page'}));
     expect(await screen.findByText('GRE preparation')).toBeVisible();
     expect(mocks.listStudentIntakes).toHaveBeenLastCalledWith(1, 5);
     expect(screen.getByRole('link', {name: 'Select advisor'})).toHaveAttribute('href', '/counsellor/intakes/8/assign');

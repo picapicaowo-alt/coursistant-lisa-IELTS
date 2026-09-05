@@ -745,7 +745,7 @@ export function TenantSectionComposer({
                 }}
               >
 
-          {translate('common:actions.previousItem', {item: meta.unit.toLowerCase()})}
+          {translate(`common:navigationControls.previousExamUnit.${section}`)}
               </button>
               <button
                 type="button"
@@ -756,7 +756,7 @@ export function TenantSectionComposer({
                   setReview(false);
                 }}
               >
-          {translate('common:actions.nextItem', {item: meta.unit.toLowerCase()})}
+          {translate(`common:navigationControls.nextExamUnit.${section}`)}
 
               </button>
             </div>
