@@ -417,5 +417,33 @@
         "results_other": "{{total}} materials found",
         "noMatches": "No materials match these filters. Try another name or learning unit.",
         "clearFilters": "Clear filters"
+    },
+    "roster": {
+        "accessDenied": "You do not have permission to view this course roster.",
+        "notFound": "This course does not exist or is not visible to you.",
+        "chooseHint": "Open a course to see its roster.",
+        "choose": "Choose a course",
+        "checking": "Checking course access…",
+        "title": "Roster",
+        "search": "Search roster",
+        "filterRole": "Filter by role",
+        "withdrawn": "Show withdrawn",
+        "loading": "Loading roster…",
+        "loadFailed": "Couldn't load the roster.",
+        "empty": "No members match these filters.",
+        "role": "Course role",
+        "pages": "Roster pages",
+        "count_one": "{{count}} member",
+        "count_other": "{{count}} members",
+        "roles": {
+            "All": "All",
+            "Instructor": "Instructor",
+            "TA": "TA",
+            "Student": "Student"
+        },
+        "submissionsFrozen": "Submissions frozen",
+        "unnamedMember": "Unnamed member",
+        "view": "View roster",
+        "readSummary": "View course members and their roles."
     }
 }

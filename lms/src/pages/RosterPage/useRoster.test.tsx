@@ -35,6 +35,11 @@ const createWrapper = () => {
 };
 
 describe('useRoster sorting', () => {
+  it('rejects membership mutations for a read-only roster before calling the API', async () => {
+    const {result} = renderHook(() => useRoster({enabled: false}), {wrapper: createWrapper()});
+    await expect(result.current.enrol.mutateAsync(['student@example.test'])).rejects.toThrow();
+  });
+
   it('sorts members client-side by role priority (Instructor -> TA -> Student)', async () => {
     const mockMembers: ApiResponse<CourseMemberPage> = {
       status: 200,

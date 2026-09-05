@@ -580,5 +580,8 @@
     "user": "User {{id}}",
     "unit": "Unit {{number}}",
     "week": "Week {{number}}"
+  },
+  "navigationControls": {
+    "backToCourseOperations": "Back to course operations"
   }
 }

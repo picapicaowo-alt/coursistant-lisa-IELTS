@@ -1,0 +1,30 @@
+{
+  "editor": {
+    "editTitle": "編輯個人日程",
+    "addTitle": "新增個人日程",
+    "close": "關閉日程",
+    "loading": "正在載入最新日程…",
+    "title": "日程標題",
+    "starts": "開始時間",
+    "ends": "結束時間",
+    "timezone": "時區",
+    "reminder": "提前提醒（分鐘）",
+    "invalidTime": "結束時間必須晚於開始時間。",
+    "missingDetails": "此日程缺少編輯所需的資訊。",
+    "missingVersion": "請重新開啟此日程，載入最新資訊後再儲存。",
+    "loadFailed": "暫時無法載入此日程。",
+    "saveFailed": "暫時無法儲存此日程，已保留您填寫的內容。",
+    "deleteFailed": "暫時無法刪除此日程，請重試。",
+    "deleteConfirm": "要刪除「{{title}}」嗎？",
+    "delete": "刪除日程",
+    "keep": "保留日程",
+    "create": "建立日程",
+    "requiredTitle": "請輸入日程標題。",
+    "validDates": "請輸入有效的開始和結束日期及時間。",
+    "requiredTimezone": "請輸入日程的時區。",
+    "invalidReminder": "請輸入大於或等於零的整數分鐘數，或留空不設提醒。",
+    "versionConflict": "此事件已被其他請求修改。已重新請求最新詳情，請核對後再操作。",
+    "requestVersionMissing": "請求缺少事件版本。請重新載入事件後再操作。",
+    "requestVersionInvalid": "請求中的事件版本不是合法整數。請重新載入事件後再操作。"
+  }
+}

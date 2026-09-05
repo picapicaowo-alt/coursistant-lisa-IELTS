@@ -42,7 +42,7 @@ export const NO_COURSE_ACCESS: CourseAccess = {
 };
 
 export const deriveCourseAccess = (membership?: MyCourse): CourseAccess => {
-  if (!membership) return NO_COURSE_ACCESS;
+  if (!membership || membership.active === false) return NO_COURSE_ACCESS;
 
   const courseRole = membership.courseRole ?? membership.role;
   const isInstructor = courseRole === 'Instructor';

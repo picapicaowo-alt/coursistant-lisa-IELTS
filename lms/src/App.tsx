@@ -143,8 +143,8 @@ const App = () => {
               <Route path={APP_ROUTE_PATHS.myOperations} element={<RequireRoleAccess capability="myOperations"><MyOperationsPage/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.post} element={<RequireRoleAccess capability="courses"><Navigate to={APP_ROUTE_PATHS.course} replace/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.postPostId} element={<RequireRoleAccess capability="courses"><Navigate to={APP_ROUTE_PATHS.course} replace/></RequireRoleAccess>}/>
-              <Route path={APP_ROUTE_PATHS.roster} element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
-              <Route path={APP_ROUTE_PATHS.rosterCourseId} element={<RequireRoleAccess capability="courseAuthoring"><Roster/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.roster} element={<RequireRoleAccess capability="courseRoster"><Roster/></RequireRoleAccess>}/>
+              <Route path={APP_ROUTE_PATHS.rosterCourseId} element={<RequireRoleAccess capability="courseRoster"><Roster/></RequireRoleAccess>}/>
               <Route path={APP_ROUTE_PATHS.profile} element={<RequireRoleAccess capability="selfProfile"><Profile/></RequireRoleAccess>}/>
               {/* Legacy creation links have no course identity; select a course to use its real editors. */}
               <Route path={APP_ROUTE_PATHS.createContentType} element={<RequireRoleAccess capability="courseAuthoring"><Navigate to={APP_ROUTE_PATHS.course} replace/></RequireRoleAccess>}/>

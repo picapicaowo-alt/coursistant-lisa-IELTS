@@ -19,6 +19,14 @@ const ta: CourseMember = {
 };
 
 describe('MemberRow TA permissions', () => {
+  it('renders a read-only TA without membership or permission actions', () => {
+    render(<table><tbody><MemberRow member={ta} canManageMembers={false}
+      onWithdraw={vi.fn()} onPromote={vi.fn()} onDemote={vi.fn()}
+      onUpdatePermissions={vi.fn()} isBusy={false}/></tbody></table>);
+    expect(screen.getByText('Taylor Assistant')).toBeVisible();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
   it('edits and submits individual permission flags', async () => {
     const onUpdatePermissions = vi.fn();
     const user = userEvent.setup();
@@ -31,6 +39,7 @@ describe('MemberRow TA permissions', () => {
         onDemote={vi.fn()}
         onUpdatePermissions={onUpdatePermissions}
         isBusy={false}
+        canManageMembers
       /></tbody></table>,
     );
 

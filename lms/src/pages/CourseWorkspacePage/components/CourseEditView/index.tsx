@@ -149,7 +149,7 @@ export const CourseEditView: React.FC<CourseEditViewProps> = ({
           week={activeWeek}
           weeks={weeks}
           currentUserId={user.id}
-          canEditStructure={canEditStructure}
+          canManageExistingMaterials={false}
           canUploadMaterials={canUploadMaterials}
           onChanged={invalidate}
         />

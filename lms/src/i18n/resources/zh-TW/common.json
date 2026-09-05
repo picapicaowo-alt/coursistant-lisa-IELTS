@@ -580,5 +580,8 @@
     "user": "使用者 {{id}}",
     "unit": "單元 {{number}}",
     "week": "第 {{number}} 周"
+  },
+  "navigationControls": {
+    "backToCourseOperations": "返回課程管理"
   }
 }

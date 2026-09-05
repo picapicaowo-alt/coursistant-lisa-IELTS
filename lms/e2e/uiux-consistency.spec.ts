@@ -149,8 +149,8 @@ test('instructor results preserve pagination, errors and the selected identity a
   await expect(dialog.getByRole('button', {name: 'Create group course', exact: true})).toBeDisabled();
 });
 
-test('TA permissions reuse the modal focus and small-screen behavior', async ({page}) => {
-  await fixture(page, 'INSTRUCTOR', 'Instructor');
+test('System Admin TA permissions reuse the modal focus and small-screen behavior', async ({page}) => {
+  await fixture(page, 'NOT_APPLICABLE', 'Instructor', 'SYSTEM_ADMIN');
   await page.route('**/v2/courses/71/members?*', route => route.fulfill({json: reply({items: [{id: 1, courseId: 71, userId: 51, userName: 'Taylor Assistant', userEmail: 'taylor@example.test', courseRole: 'TA', active: true, canGrade: true}], total: 1, page: 0, size: 20})}));
   await page.goto('/roster/71');
   const trigger = page.getByRole('button', {name: 'Permissions', exact: true});

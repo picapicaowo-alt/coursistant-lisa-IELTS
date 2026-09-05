@@ -36,7 +36,7 @@ export function personalEventView(
     !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(endsAtLocal)
   )
     return;
-  const version = row.version ?? row.eventVersion;
+  const version = row.version;
   return {
     id,
     title,

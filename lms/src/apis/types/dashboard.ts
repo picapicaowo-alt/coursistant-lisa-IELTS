@@ -77,6 +77,8 @@ export interface MyCourse {
   tenantId: number;
   state: CourseState;
   status: CourseState;
+  /** Explicit inactive enrollment denies course access; legacy omissions defer to the API. */
+  active?: boolean;
   courseRole: CourseRole;
   role: CourseRole;
   /** Set only when `courseRole=TA`; `null` for Student and Instructor. */

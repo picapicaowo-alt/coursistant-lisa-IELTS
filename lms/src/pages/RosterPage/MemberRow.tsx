@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, {useEffect, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {CourseMember, TaPermissions} from '@/apis';
@@ -12,6 +13,7 @@ interface MemberRowProps {
   onDemote: () => void;
   onUpdatePermissions: (permissions: TaPermissions) => void;
   isBusy: boolean;
+  canManageMembers: boolean;
 }
 
 const permissionsFromMember = (member: CourseMember): Required<TaPermissions> => ({
@@ -28,12 +30,13 @@ const PERMISSION_OPTIONS: Array<{key: keyof Required<TaPermissions>; label: stri
   {key: 'canManageCourseEvents', label: 'Manage schedule and events', description: 'Create, edit, and delete sessions and course events.'},
 ];
 
-export const MemberRow: React.FC<MemberRowProps> = ({member, onWithdraw, onPromote, onDemote, onUpdatePermissions, isBusy}) => {
+export const MemberRow: React.FC<MemberRowProps> = ({member, onWithdraw, onPromote, onDemote, onUpdatePermissions, isBusy, canManageMembers}) => {
+  const { t: translate } = useTranslation();
   const displayName = formatPersonName({
     firstName: member.userFirstName,
     middleName: member.userMiddleName,
     lastName: member.userLastName,
-  }, member.userName || member.userEmail || 'Unnamed member');
+  }, member.userName || member.userEmail || translate("course:roster.unnamedMember"));
   const isStudent = member.courseRole === 'Student';
   const isTa = member.courseRole === 'TA';
   const canPromote = isStudent && member.active && member.level === 'STUDENT';
@@ -49,21 +52,21 @@ export const MemberRow: React.FC<MemberRowProps> = ({member, onWithdraw, onPromo
 
   return <>
     <tr className={member.active ? undefined : styles.withdrawnRow}>
-      <td data-label="Name">{displayName}</td>
-      <td data-label="Email" className={styles.email}>{member.userEmail || '—'}</td>
-      <td data-label="Role"><span className={`${styles.roleBadge} ${styles[`role${member.courseRole}`]}`}>{member.courseRole}</span></td>
-      <td data-label="Status">
-        <span className={member.active ? styles.active : styles.withdrawn}>{member.active ? 'Active' : 'Withdrawn'}</span>
-        {member.assignmentSubmitFrozen ? <span className={styles.frozen}>Submissions frozen</span> : null}
+      <td data-label={translate("common:fields.name")}>{displayName}</td>
+      <td data-label={translate("common:fields.email")} className={styles.email}>{member.userEmail || '—'}</td>
+      <td data-label={translate("course:roster.role")}><span className={`${styles.roleBadge} ${styles[`role${member.courseRole}`]}`}>{translate(`course:roster.roles.${member.courseRole}`)}</span></td>
+      <td data-label={translate("common:fields.status")}>
+        <span className={member.active ? styles.active : styles.withdrawn}>{member.active ? translate("common:status.ACTIVE") : translate("common:status.WITHDRAWN")}</span>
+        {member.assignmentSubmitFrozen ? <span className={styles.frozen}>{translate("course:roster.submissionsFrozen")}</span> : null}
       </td>
-      <td data-label="Actions" className={styles.actions}>
+      {canManageMembers ? <td data-label={translate("common:fields.actions")} className={styles.actions}>
         {canPromote ? <button type="button" disabled={isBusy} onClick={onPromote}>Make TA</button> : null}
         {isTa ? <button type="button" disabled={isBusy} onClick={() => setPermissionOpen(true)}>Permissions</button> : null}
         {isTa ? <button type="button" disabled={isBusy} onClick={onDemote}>Remove TA</button> : null}
         {isStudent && member.active ? <button type="button" className={styles.danger} disabled={isBusy} onClick={onWithdraw}>Withdraw</button> : null}
-      </td>
+      </td> : null}
     </tr>
-    {permissionOpen ? createPortal(
+    {permissionOpen && canManageMembers ? createPortal(
           <TeachingDialog title="TA permissions" description={displayName} busy={isBusy} onClose={() => setPermissionOpen(false)}>
               <div className={styles.permissionList}>
                 {PERMISSION_OPTIONS.map(option => (
@@ -74,7 +77,7 @@ export const MemberRow: React.FC<MemberRowProps> = ({member, onWithdraw, onPromo
                 ))}
               </div>
               <div className={styles.dialogActions}>
-                <button type="button" onClick={() => setPermissionOpen(false)}>Cancel</button>
+                <button type="button" onClick={() => setPermissionOpen(false)}>{translate("common:actions.cancel")}</button>
                 <button type="button" className={styles.primary} disabled={isBusy} onClick={savePermissions}>Save permissions</button>
               </div>
           </TeachingDialog>,
