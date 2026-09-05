@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {LocalizedError} from '@/i18n/errors';
 import React, {useRef, useState} from 'react';
 import {useMutation} from '@tanstack/react-query';
 import {
@@ -53,6 +55,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
   onChanged,
   compactControls = false,
 }) => {
+  const {t: translate} = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const idempotency = useIdempotencyCheckpoint();
   const [linkUrl, setLinkUrl] = useState('');
@@ -69,7 +72,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
 
   const uploadMaterials = useMutation({
     mutationFn: ({files, idempotencyKey}: UploadAttempt) => {
-      if (!week) throw new Error('Select a week first');
+      if (!week) throw new LocalizedError("course:materialEditor.noWeek");
       return courseApiService.createMaterials(courseId, week.id, {files}, idempotencyKey);
     },
     retry: 1,
@@ -77,12 +80,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       idempotency.complete(`material-upload-${courseId}-${week?.id}`, attempt.idempotencyKey);
       finishChange();
     },
-    onError: () => setFailure("Couldn't upload the selected file(s)."),
+    onError: () => setFailure("course:materialEditor.uploadFailed"),
   });
 
   const addLink = useMutation({
     mutationFn: ({linkUrl: url, linkDisplayName, idempotencyKey}: LinkAttempt) => {
-      if (!week) throw new Error('Select a week first');
+      if (!week) throw new LocalizedError("course:materialEditor.noWeek");
       return courseApiService.createMaterials(
         courseId,
         week.id,
@@ -97,12 +100,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       setLinkName('');
       finishChange();
     },
-    onError: () => setFailure("Couldn't add the link."),
+    onError: () => setFailure("course:materialEditor.linkFailed"),
   });
 
   const renameMaterial = useMutation({
     mutationFn: ({materialId, displayName}: {materialId: number; displayName: string}) => {
-      if (!week) throw new Error('Select a week first');
+      if (!week) throw new LocalizedError("course:materialEditor.noWeek");
       const operation = `material-rename-${courseId}-${week.id}-${materialId}`;
       return courseApiService.renameMaterial(
         courseId,
@@ -118,12 +121,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       setEditingId(null);
       finishChange();
     },
-    onError: () => setFailure("Couldn't rename the material."),
+    onError: () => setFailure("course:materialEditor.renameFailed"),
   });
 
   const deleteMaterial = useMutation({
     mutationFn: (materialId: number) => {
-      if (!week) throw new Error('Select a week first');
+      if (!week) throw new LocalizedError("course:materialEditor.noWeek");
       const operation = `material-delete-${courseId}-${week.id}-${materialId}`;
       return courseApiService.deleteMaterial(courseId, week.id, materialId, idempotency.keyFor(operation, operation));
     },
@@ -133,12 +136,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       setConfirmDeleteId(null);
       finishChange();
     },
-    onError: () => setFailure("Couldn't delete the material."),
+    onError: () => setFailure("course:materialEditor.deleteFailed"),
   });
 
   const moveMaterial = useMutation({
     mutationFn: ({materialId, targetWeekId}: {materialId: number; targetWeekId: number}) => {
-      if (!week) throw new Error('Select a week first');
+      if (!week) throw new LocalizedError("course:materialEditor.noWeek");
       const operation = `material-move-${courseId}-${week.id}-${materialId}`;
       const fingerprint = idempotencyFingerprint({materialId, targetWeekId});
       return courseApiService.moveMaterial(
@@ -155,12 +158,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       idempotency.completeFingerprint(operation, fingerprint);
       finishChange();
     },
-    onError: () => setFailure("Couldn't move the material."),
+    onError: () => setFailure("course:materialEditor.moveFailed"),
   });
 
   const reorderMaterials = useMutation({
     mutationFn: (materialIds: number[]) => {
-      if (!week) throw new Error('Select a week first');
+      if (!week) throw new LocalizedError("course:materialEditor.noWeek");
       const operation = `materials-reorder-${courseId}-${week.id}`;
       return courseApiService.reorderMaterials(
         courseId,
@@ -174,12 +177,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       idempotency.completeFingerprint(operation, idempotencyFingerprint(materialIds));
       finishChange();
     },
-    onError: () => setFailure("Couldn't reorder the materials."),
+    onError: () => setFailure("course:materialEditor.reorderFailed"),
   });
 
   const publishMaterial = useMutation({
     mutationFn: (materialId: number) => {
-      if (!week) throw new Error('Select a week first');
+      if (!week) throw new LocalizedError("course:materialEditor.noWeek");
       const operation = `material-publish-${courseId}-${week.id}-${materialId}`;
       return courseApiService.publishMaterial(courseId, week.id, materialId, idempotency.keyFor(operation, operation));
     },
@@ -188,12 +191,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       idempotency.completeFingerprint(operation, operation);
       finishChange();
     },
-    onError: () => setFailure("Couldn't publish the material."),
+    onError: () => setFailure("course:materialEditor.publishFailed"),
   });
 
   const unpublishMaterial = useMutation({
     mutationFn: (materialId: number) => {
-      if (!week) throw new Error('Select a week first');
+      if (!week) throw new LocalizedError("course:materialEditor.noWeek");
       const operation = `material-unpublish-${courseId}-${week.id}-${materialId}`;
       return courseApiService.unpublishMaterial(courseId, week.id, materialId, idempotency.keyFor(operation, operation));
     },
@@ -202,7 +205,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       idempotency.completeFingerprint(operation, operation);
       finishChange();
     },
-    onError: () => setFailure("Couldn't unpublish the material."),
+    onError: () => setFailure("course:materialEditor.unpublishFailed"),
   });
 
   const commitRename = (material: CourseMaterial) => {
@@ -228,7 +231,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
     <section className={styles.card} data-material-editor={compactControls || undefined}>
       <div className={styles.cardHeader}>
         <div>
-          <p className={styles.cardLabel}>Course Content</p>
+          <p className={styles.cardLabel}>{translate('course:learning.content')}</p>
           {week ? <h2 className={styles.cardTitle}>{week.title}</h2> : null}
         </div>
         {week && canUploadMaterials ? (
@@ -257,20 +260,20 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload size={16}/>
-              {uploadMaterials.isPending ? 'Uploading…' : 'Upload files'}
+              {uploadMaterials.isPending ? translate("assessment:submission.uploading") : translate("course:materialEditor.upload")}
             </button>
           </>
         ) : null}
       </div>
 
       {!week ? (
-        <p className={styles.cardEmpty}>Add or select a week to manage its content.</p>
+        <p className={styles.cardEmpty}>{translate("course:materialEditor.selectWeek")}</p>
       ) : (
         <>
           {week.materials.length === 0 ? (
             <div className={editStyles.emptyMaterials}>
               <FileText size={22}/>
-              <p>No materials in this week yet.</p>
+              <p>{translate("course:materials.empty")}</p>
             </div>
           ) : (
             <ul className={styles.materialList}>
@@ -289,7 +292,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                     {editingId === material.id ? (
                       <input
                         className={`${editStyles.weekInput} ${editStyles.materialNameInput}`}
-                        aria-label={`Material name for ${material.displayName}`}
+                        aria-label={translate('course:materialEditor.nameFor', {name: material.displayName})}
                         value={editingName}
                         autoFocus
                         onChange={event => setEditingName(event.target.value)}
@@ -303,12 +306,12 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                       <span className={styles.materialName}>
                         {material.displayName}
                         {material.publicationState === 'DRAFT' ? (
-                          <span className={editStyles.draftBadge}>Draft</span>
+                          <span className={editStyles.draftBadge}>{translate("common:status.DRAFT")}</span>
                         ) : material.publicationState === 'PUBLISHED' ? (
-                          week.state === 'Draft' || week.publicationState === 'DRAFT' || material.effectiveStudentVisible === false ? (
-                            <span className={editStyles.hiddenBadge} title="Week is in draft; material is not visible to students">Draft Week</span>
+                          week.state === "Draft" || week.publicationState === 'DRAFT' || material.effectiveStudentVisible === false ? (
+                            <span className={editStyles.hiddenBadge} title={translate("course:materialEditor.draftWeekHelp")}>{translate("course:materialEditor.draftWeek")}</span>
                           ) : (
-                            <span className={editStyles.publishedBadge}>Published</span>
+                            <span className={editStyles.publishedBadge}>{translate("common:status.PUBLISHED")}</span>
                           )
                         ) : null}
                       </span>
@@ -322,39 +325,39 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                               type="button"
                               disabled={unpublishMaterial.isPending}
                               onClick={() => unpublishMaterial.mutate(material.id)}
-                              aria-label={`Unpublish ${material.displayName}`}
-                              title="Unpublish material"
+                              aria-label={translate('common:actions.unpublishNamed', {name: material.displayName})}
+                              title={translate("course:materialEditor.unpublish")}
                             >
-                              <EyeOff size={15}/>{compactControls ? 'Unpublish' : null}
+                              <EyeOff size={15}/>{compactControls ? translate("assessment:quiz.unpublish") : null}
                             </button>
                           ) : (
                             <button
                               type="button"
                               disabled={publishMaterial.isPending}
                               onClick={() => publishMaterial.mutate(material.id)}
-                              aria-label={`Publish ${material.displayName}`}
-                              title="Publish material"
+                              aria-label={translate('common:actions.publishNamed', {name: material.displayName})}
+                              title={translate("course:materialEditor.publish")}
                             >
-                              <Eye size={15}/>{compactControls ? 'Publish' : null}
+                              <Eye size={15}/>{compactControls ? translate("course:addContent.publishButton") : null}
                             </button>
                           )}
                           <button
                             type="button"
                             disabled={index === 0 || reorderMaterials.isPending}
                             onClick={() => moveWithinWeek(index, -1)}
-                            aria-label={`Move ${material.displayName} up`}
-                            title="Move up"
+                            aria-label={translate('assessment:quiz.moveUp', {title: material.displayName})}
+                            title={translate("course:workspace.moveUp")}
                           >
-                            <ArrowUp size={15}/>{compactControls ? 'Move up' : null}
+                            <ArrowUp size={15}/>{compactControls ? translate("course:workspace.moveUp") : null}
                           </button>
                           <button
                             type="button"
                             disabled={index === week.materials.length - 1 || reorderMaterials.isPending}
                             onClick={() => moveWithinWeek(index, 1)}
-                            aria-label={`Move ${material.displayName} down`}
-                            title="Move down"
+                            aria-label={translate('assessment:quiz.moveDown', {title: material.displayName})}
+                            title={translate("course:workspace.moveDown")}
                           >
-                            <ArrowDown size={15}/>{compactControls ? 'Move down' : null}
+                            <ArrowDown size={15}/>{compactControls ? translate("course:workspace.moveDown") : null}
                           </button>
                           <button
                             type="button"
@@ -362,15 +365,15 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                               setEditingId(material.id);
                               setEditingName(material.displayName);
                             }}
-                            aria-label={`Rename ${material.displayName}`}
-                            title="Rename"
+                            aria-label={translate('common:actions.renameNamed', {name: material.displayName})}
+                            title={translate("course:workspace.renameAction")}
                           >
-                            <Pencil size={15}/>{compactControls ? 'Rename' : null}
+                            <Pencil size={15}/>{compactControls ? translate("course:workspace.renameAction") : null}
                           </button>
                           {weeks.length > 1 ? (
-                            <label className={editStyles.moveControl} title="Move to another week">
+                            <label className={editStyles.moveControl} title={translate("course:materialEditor.moveWeek")}>
                               <FolderInput size={15}/>
-                              <span className={editStyles.visuallyHidden}>Move {material.displayName}</span>
+                              <span className={editStyles.visuallyHidden}>{translate('courseTools:groups.moveNamed', {name: material.displayName})}</span>
                               <select
                                 value=""
                                 disabled={moveMaterial.isPending}
@@ -378,9 +381,9 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                                   const targetWeekId = Number(event.target.value);
                                   if (targetWeekId) moveMaterial.mutate({materialId: material.id, targetWeekId});
                                 }}
-                                aria-label={`Move ${material.displayName} to another week`}
+                                aria-label={translate('course:materialEditor.moveNamedWeek', {name: material.displayName})}
                               >
-                                <option value="">Move…</option>
+                                <option value="">{translate("course:workspace.move")}</option>
                                 {weeks.filter(item => item.id !== week.id).map(item => (
                                   <option key={item.id} value={item.id}>{item.title}</option>
                                 ))}
@@ -399,19 +402,18 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                               disabled={deleteMaterial.isPending}
                               onClick={() => deleteMaterial.mutate(material.id)}
                             >
-                              Confirm
-                            </button>
-                            <button type="button" onClick={() => setConfirmDeleteId(null)}>Cancel</button>
+                              {translate("common:actions.confirm")}</button>
+                            <button type="button" onClick={() => setConfirmDeleteId(null)}>{translate("common:actions.cancel")}</button>
                           </span>
                         ) : (
                           <button
                             type="button"
                             className={editStyles.deleteIcon}
                             onClick={() => setConfirmDeleteId(material.id)}
-                            aria-label={`Delete ${material.displayName}`}
-                            title="Delete"
+                            aria-label={translate('common:actions.deleteNamed', {name: material.displayName})}
+                            title={translate("common:actions.delete")}
                           >
-                            <Trash2 size={15}/>{compactControls ? 'Delete' : null}
+                            <Trash2 size={15}/>{compactControls ? translate("common:actions.delete") : null}
                           </button>
                         )
                       ) : null}
@@ -441,42 +443,43 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
               }}
             >
               <div className={editStyles.linkFormTitle}>
-                <Plus size={16}/> Add external link
-              </div>
+                <Plus size={16}/> {' '}{translate("course:materialEditor.externalLink")}</div>
               <input
                 type="url"
                 required
-                placeholder="https://example.com/reading"
+                placeholder={translate("course:materialEditor.linkPlaceholder")}
                 value={linkUrl}
                 onChange={event => setLinkUrl(event.target.value)}
-                aria-label="Link URL"
+                aria-label={translate("editor:linkUrl")}
               />
               <input
                 type="text"
-                placeholder="Display name (optional)"
+                placeholder={translate("course:materialEditor.namePlaceholder")}
                 value={linkName}
                 onChange={event => setLinkName(event.target.value)}
-                aria-label="Link display name"
+                aria-label={translate("course:materialEditor.linkName")}
               />
               <button type="submit" disabled={!linkUrl.trim() || addLink.isPending}>
                 <LinkIcon size={15}/>
-                {addLink.isPending ? 'Adding…' : 'Add link'}
+                {addLink.isPending ? translate("assessment:quiz.adding") : translate("course:materialEditor.addLink")}
               </button>
             </form></LinkDisclosure>
           ) : null}
         </>
       )}
 
-      {failure ? <p className={editStyles.error} role="alert">{failure}</p> : null}
+      {failure ? <p className={editStyles.error} role="alert">{translate(failure)}</p> : null}
     </section>
   );
 };
 
 function MaterialActionDisclosure({compact, name, children}: {compact: boolean; name: string; children: React.ReactNode}) {
+  const {t: translate} = useTranslation();
   if (!compact) return children;
-  return <details className={editStyles.actionDisclosure} onKeyDown={event => {if (event.key === 'Escape') {event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus();}}} onBlur={event => {if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false;}}><summary aria-label={`Manage ${name}`}><MoreHorizontal size={20}/></summary>{children}</details>;
+  return <details className={editStyles.actionDisclosure} onKeyDown={event => {if (event.key === 'Escape') {event.currentTarget.open = false; event.currentTarget.querySelector('summary')?.focus();}}} onBlur={event => {if (!event.currentTarget.contains(event.relatedTarget)) event.currentTarget.open = false;}}><summary aria-label={translate('course:materialEditor.manageNamed', {name})}><MoreHorizontal size={20}/></summary>{children}</details>;
 }
 
 function LinkDisclosure({compact, children}: {compact: boolean; children: React.ReactNode}) {
-  return compact ? <details className={editStyles.linkDisclosure}><summary>Add external link</summary>{children}</details> : children;
+  const {t: translate} = useTranslation();
+  return compact ? <details className={editStyles.linkDisclosure}><summary>{translate("course:materialEditor.externalLink")}</summary>{children}</details> : children;
 }

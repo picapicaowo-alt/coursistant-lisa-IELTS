@@ -1,19 +1,19 @@
 import type {StudySupportProgress} from './studySupportStream';
 import type {ThinkingStep} from '@/components/DynamicThinking/DynamicThinking';
 
-const SAFE_PHASE_COPY: Readonly<Record<string, string>> = {
-  understand: 'Understanding your question.',
-  thinking: 'Understanding your question.',
-  route: 'Choosing the right support workflow.',
-  routing: 'Choosing the right support workflow.',
-  search: 'Searching your course materials.',
-  retrieval: 'Searching your course materials.',
-  context: 'Reviewing the relevant course context.',
-  tool: 'Checking the relevant LMS context.',
-  tools: 'Checking the relevant LMS context.',
-  writing: 'Preparing a clear response.',
-  answer: 'Preparing a clear response.',
-  response: 'Preparing a clear response.',
+const SAFE_PHASE_KEYS: Readonly<Record<string, string>> = {
+  understand: 'assistant:thinking.question',
+  thinking: 'assistant:thinking.question',
+  route: 'assistant:thinking.route',
+  routing: 'assistant:thinking.route',
+  search: 'assistant:thinking.search',
+  retrieval: 'assistant:thinking.search',
+  context: 'assistant:thinking.courseContext',
+  tool: 'assistant:thinking.tools',
+  tools: 'assistant:thinking.tools',
+  writing: 'assistant:thinking.response',
+  answer: 'assistant:thinking.response',
+  response: 'assistant:thinking.response',
 };
 
 export const safeStudySupportProgress = (
@@ -21,5 +21,6 @@ export const safeStudySupportProgress = (
   id: string,
 ): ThinkingStep => ({
   id,
-  text: SAFE_PHASE_COPY[progress.phase.trim().toLowerCase()] ?? 'Working on your request.',
+  text: '',
+  translationKey: SAFE_PHASE_KEYS[progress.phase.trim().toLowerCase()] ?? 'assistant:thinking.working',
 });

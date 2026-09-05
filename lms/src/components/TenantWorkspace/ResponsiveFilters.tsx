@@ -1,9 +1,11 @@
+import { useTranslation } from 'react-i18next';
 import { type ReactNode, useId, useState } from "react";
 import { SlidersHorizontal } from "lucide-react";
 import styles from "./workspace.module.scss";
 
 /** Secondary filters stay inline on desktop and explicitly expandable on mobile. */
 export const ResponsiveFilters = ({ children }: { children: ReactNode }) => {
+  const { t: translate } = useTranslation();
   const [open, setOpen] = useState(false);
   const id = useId();
   return (
@@ -16,7 +18,7 @@ export const ResponsiveFilters = ({ children }: { children: ReactNode }) => {
         onClick={() => setOpen((value) => !value)}
       >
         <SlidersHorizontal size={16} />
-        {open ? "Hide filters" : "More filters"}
+        {open ? translate("common:filters.hide") : translate("common:filters.more")}
       </button>
       <div id={id} className={styles.secondaryFilters} data-open={open}>
         {children}

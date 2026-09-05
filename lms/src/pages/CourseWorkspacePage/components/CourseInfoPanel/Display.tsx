@@ -33,20 +33,20 @@ export const Display: React.FC = () => {
       </div>
       
       <div className={styles.infoSection}>
-        <h3 className={styles.sectionTitle}>{t('display.teacherInfo')}</h3>
+        <h3 className={styles.sectionTitle}>{t('course:info.instructor')}</h3>
         <div className={styles.infoGrid}>
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>{t('display.teacherName')}:</span>
+            <span className={styles.infoLabel}>{t('common:fields.name')}:</span>
             <span className={styles.infoValue}>{course.teacherName}</span>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>{t('display.teacherEmail')}:</span>
+            <span className={styles.infoLabel}>{t('common:fields.email')}:</span>
             <a href={`mailto:${course.teacherEmail}`} className={styles.infoLink}>
               {course.teacherEmail}
             </a>
           </div>
           <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>{t('display.teacherPhone')}:</span>
+            <span className={styles.infoLabel}>{t('advising:intake.phone')}:</span>
             <a href={`tel:${course.teacherPhone}`} className={styles.infoLink}>
               {course.teacherPhone}
             </a>
@@ -55,14 +55,14 @@ export const Display: React.FC = () => {
       </div>
       
       <div className={styles.infoSection}>
-        <h3 className={styles.sectionTitle}>{t('display.courseDescription')}</h3>
+        <h3 className={styles.sectionTitle}>{t('common:fields.description')}</h3>
         <div className={styles.markdownContent}>
           <RichTextEditor
             content={course.description}
             disabled
             displayOnly
             showToolbar={false}
-            ariaLabel="Course description"
+            ariaLabel={t('common:fields.description')}
           />
         </div>
       </div>

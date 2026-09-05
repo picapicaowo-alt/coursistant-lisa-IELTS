@@ -7,7 +7,7 @@ import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {AdvisingPagination} from '../advising/AdvisingPagination';
 import {useActionTaskTransition} from './useActionTaskTransition';
 import {AdvisingBadge} from '@/components/AdvisingBadge';
-import {ACTION_CATEGORY_KEYS, ACTION_STATUS_KEYS, PRIORITY_KEYS} from '@/components/AdvisingBadge/labels';
+import {ACTION_CATEGORY_LABELS, ACTION_STATUS_LABELS, PRIORITY_LABELS} from '@/components/AdvisingBadge/labels';
 import {useTranslation} from 'react-i18next';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import styles from '../advising/advising.module.scss';
@@ -84,7 +84,7 @@ export default function AdvisorTasksPage() {
                 }}
               >
                 <option value="">{t("advising:actionTasks.allStatuses")}</option>
-                {Object.entries(ACTION_STATUS_KEYS).map(([value, key]) => <option key={value} value={value}>{t(key)}</option>)}
+                {Object.entries(ACTION_STATUS_LABELS).map(([value, key]) => <option key={value} value={value}>{t(key)}</option>)}
               </select>
             </label>
             <label>
@@ -97,7 +97,7 @@ export default function AdvisorTasksPage() {
                 }}
               >
                 <option value="">{t("advising:actionTasks.allPriorities")}</option>
-                {Object.entries(PRIORITY_KEYS).map(([value, key]) => <option key={value} value={value}>{t(key)}</option>)}
+                {Object.entries(PRIORITY_LABELS).map(([value, key]) => <option key={value} value={value}>{t(key)}</option>)}
               </select>
             </label>
             <label>
@@ -151,7 +151,7 @@ export default function AdvisorTasksPage() {
                   <div className={taskStyles.taskMain}>
                     <h3>{task.description || t("advising:actionTasks.fallbackTitle", {id: task.taskId})}</h3>
                     <p>
-                      {task.category ? (ACTION_CATEGORY_KEYS[task.category] ? t(ACTION_CATEGORY_KEYS[task.category]) : task.category) : task.taskType && ACTION_TASK_TYPES.some(type => type === task.taskType) ? t(`advising:actionTasks.types.${task.taskType}`) : t('common:tasks.advisingTask')}
+                      {task.category ? (ACTION_CATEGORY_LABELS[task.category] ? t(ACTION_CATEGORY_LABELS[task.category]) : task.category) : task.taskType && ACTION_TASK_TYPES.some(type => type === task.taskType) ? t(`advising:actionTasks.types.${task.taskType}`) : t('common:tasks.advisingTask')}
                       {task.createdAt ? ` · ${formatTaskDateTime(task.createdAt)}` : ''}
                     </p>
                   </div>

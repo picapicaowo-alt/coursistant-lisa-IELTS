@@ -1,4 +1,6 @@
 import type {MockExamMediaRead} from '@/apis';
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
 import {isRecord} from '@/utils/apiError';
 import {newQuestion, newUnit, sectionIssues, type SectionDraft} from './model';
 
@@ -18,7 +20,7 @@ export function parseReadingImport(raw: string): ReadingImportResult {
   if (new TextEncoder().encode(raw).byteLength > READING_IMPORT_MAX_BYTES)
     return {
       errors: [
-        'This browser importer accepts JSON up to 2 MB. Split oversized content with your content team.',
+        i18n.t('exams:import.sizeLimit'),
       ],
     };
   let value: unknown;
@@ -26,18 +28,18 @@ export function parseReadingImport(raw: string): ReadingImportResult {
     value = JSON.parse(raw.replace(/^\uFEFF/, ''));
   } catch {
     return {
-      errors: ['The JSON cannot be read. Check quotes, commas and brackets.'],
+      errors: [i18n.t('exams:import.invalidJson')],
     };
   }
   const record = (input: unknown, path: string, keys: string[]) => {
     if (!isRecord(input)) {
-      errors.push(`${path}: expected an object.`);
+      errors.push(i18n.t('exams:import.objectRequired', {path}));
       return {};
     }
     const extra = Object.keys(input).filter((key) => !keys.includes(key));
     if (extra.length)
       errors.push(
-        `${path}: unsupported fields (${extra.join(', ')}). Use the Reading request body, not a response envelope. Nothing will be discarded.`,
+        i18n.t('exams:import.unsupportedFields', {path, fields: extra.join(', ')}),
       );
     return input;
   };
@@ -49,7 +51,7 @@ export function parseReadingImport(raw: string): ReadingImportResult {
       input > max
     ) {
       errors.push(
-        `${path}: enter a positive whole number within the API integer range.`,
+        i18n.t('exams:import.integerRequired', {path}),
       );
       return 0;
     }
@@ -58,23 +60,23 @@ export function parseReadingImport(raw: string): ReadingImportResult {
   const text = (input: unknown, path: string) => {
     if (input === undefined) return '';
     if (typeof input !== 'string') {
-      errors.push(`${path}: expected text.`);
+      errors.push(i18n.t('exams:import.textRequired', {path}));
       return '';
     }
     return input;
   };
   const items = (input: unknown, path: string): unknown[] => {
     if (!Array.isArray(input) || !input.length) {
-      errors.push(`${path}: include at least one item.`);
+      errors.push(i18n.t('exams:import.itemRequired', {path}));
       return [];
     }
     return input;
   };
   const unique = (values: number[], path: string) => {
     if (new Set(values).size !== values.length)
-      errors.push(`${path}: ordering values must be unique.`);
+      errors.push(i18n.t('exams:import.uniqueOrder', {path}));
   };
-  const root = record(value, 'Reading', ['totalMinutes', 'passages']);
+  const root = record(value, i18n.t('common:admin.examSections.reading'), ['totalMinutes', 'passages']);
   const draft: SectionDraft = {
     minutes: String(integer(root.totalMinutes, 'totalMinutes')),
     units: items(root.passages, 'passages').map((input, index) => {
@@ -88,7 +90,7 @@ export function parseReadingImport(raw: string): ReadingImportResult {
         'questions',
       ]);
       if (!('paragraphs' in passage))
-        errors.push(`${path}.paragraphs: content is required.`);
+        errors.push(i18n.t('exams:import.contentRequired', {path: `${path}.paragraphs`}));
       const questions = items(passage.questions, `${path}.questions`).map(
         (input, position) => {
           const groupPath = `${path}.questions[${position}]`;
@@ -103,7 +105,7 @@ export function parseReadingImport(raw: string): ReadingImportResult {
             'imageMediaId',
           ]);
           if (!('payload' in group))
-            errors.push(`${groupPath}.payload: content is required.`);
+            errors.push(i18n.t('exams:import.contentRequired', {path: `${groupPath}.payload`}));
           return {
             ...newQuestion(),
             sortOrder: integer(group.sortOrder, `${groupPath}.sortOrder`),
@@ -150,7 +152,7 @@ export function parseReadingImport(raw: string): ReadingImportResult {
     errors.push(
       ...sectionIssues('reading', draft).map(
         (issue) =>
-          `${issue.unitIndex === null ? 'Reading' : `Passage ${issue.unitIndex + 1}`}${issue.groupIndex === undefined ? '' : ` / Group ${issue.groupIndex + 1}`}: ${issue.message}`,
+          `${issue.unitIndex === null ? i18n.t('common:admin.examSections.reading') : i18n.t('exams:authoring.passageNumber', {number: formatNumber(issue.unitIndex + 1)})}${issue.groupIndex === undefined ? '' : ` / ${i18n.t('exams:authoring.groupShort', {number: formatNumber(issue.groupIndex + 1)})}`}: ${issue.message}`,
       ),
     );
   return errors.length ? {errors} : {draft, errors};
@@ -178,10 +180,12 @@ export function readingImportMediaErrors(
     .filter((id) => !available.has(id))
     .map(
       (id) =>
-        `Image ${id} is not an available Reading image in this version. Upload it here first and use its returned media ID, or remove imageMediaId and select an image after importing.`,
+        i18n.t('exams:import.imageUnavailable', {id: formatNumber(id)}),
     );
 }
 
+// Illustrative IELTS content, not interface copy. Keep prompts/options/answers
+// in English and preserve request field names in every UI locale.
 export const READING_IMPORT_EXAMPLE = {
   totalMinutes: 60,
   passages: [

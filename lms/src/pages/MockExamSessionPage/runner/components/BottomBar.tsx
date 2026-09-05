@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import { countAnswered } from '../data/reading'
 import type { PassageData } from '../data/types'
 import {AnswerSummary} from './AnswerSummary'
@@ -61,12 +63,13 @@ export function BottomBar({
   onPause,
   onExit,
 }: BottomBarProps) {
+  const { t: translate } = useTranslation();
   const submitted = Boolean(scoreSummary)
 
   return (
     <footer className="bottom-bar">
       <div className="bottom-bar__left">
-        <h2 className="exam-navigation-title">Reading</h2>
+        <h2 className="exam-navigation-title">{translate("common:status.READING")}</h2>
         <AnswerSummary questionNumbers={passage.questionNumbers} answers={answers} reviewByQuestion={reviewByQuestion} />
         <div className="question-nav">
           <span className="question-nav__label">{passage.shortLabel}</span>
@@ -76,7 +79,7 @@ export function BottomBar({
               type="button"
               className={chipClass(n, currentQuestion, answers, reviewByQuestion)}
               onClick={() => onJump(n)}
-              aria-label={`Go to question ${n}`}
+              aria-label={translate('exams:runner.goToQuestion', {number: formatNumber(n)})}
               aria-current={currentQuestion === n ? 'step' : undefined}
             >
               {n}
@@ -89,11 +92,11 @@ export function BottomBar({
             <>
               <span className="bottom-bar__score">
                 {scoreSummary.correctCount !== undefined && scoreSummary.totalQuestions !== undefined
-                  ? `Score: ${scoreSummary.correctCount}/${scoreSummary.totalQuestions}`
-                  : 'Answers submitted'}
+                  ? translate('exams:runner.scoreSummary', {correct: formatNumber(scoreSummary.correctCount), total: formatNumber(scoreSummary.totalQuestions)})
+                  : translate('exams:runner.answersSubmitted')}
               </span>
               {reviewByQuestion && Object.keys(reviewByQuestion).length > 0 ? (
-                <span className="bottom-bar__score-hint">Red = incorrect · Green = correct</span>
+                <span className="bottom-bar__score-hint">{translate('exams:runner.reviewLegend')}</span>
               ) : null}
             </>
           ) : null}
@@ -109,8 +112,8 @@ export function BottomBar({
                 onClick={() => onSelectPassage(p.id)}
               >
                 {submitted
-                  ? `Passage ${index + 1}`
-                  : `Passage ${index + 1} (${answered} of ${total})`}
+                  ? translate('exams:runner.passage', {number: formatNumber(index + 1)})
+                  : translate('exams:runner.passageProgress', {number: formatNumber(index + 1), answered: formatNumber(answered), total: formatNumber(total)})}
               </button>
             )
           })}
@@ -125,14 +128,12 @@ export function BottomBar({
           onClick={onFinish}
           disabled={submitting || submitted}
         >
-          {submitting ? 'Submitting…' : submitted ? 'Submitted' : 'Finish section'}
+          {submitting ? translate("common:actions.submitting") : submitted ? translate('common:status.SUBMITTED') : translate('exams:runner.finishSection')}
         </button>
         <button type="button" className="bar-btn" onClick={onPause}>
-          {paused ? 'Resume' : 'Pause'}
+          {paused ? translate('exams:runner.resume') : translate('exams:runner.pause')}
         </button>
-        <button type="button" className="bar-btn bar-btn--danger" onClick={onExit}>
-          Exit
-        </button>
+        <button type="button" className="bar-btn bar-btn--danger" onClick={onExit}>{translate('exams:runner.exit')}</button>
       </div>
     </footer>
   )

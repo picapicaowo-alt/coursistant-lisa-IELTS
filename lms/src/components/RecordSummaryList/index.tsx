@@ -4,7 +4,7 @@ import {
   asRecord,
   collection,
   displayScalar,
-  humanize,
+  recordFieldLabel,
   isDisplayField,
   recordHeading,
 } from "./recordPresentation";
@@ -12,7 +12,7 @@ import styles from "./RecordSummaryList.module.scss";
 
 type RecordPresentation = {
   fieldLabel?: (key: string) => string;
-  scalar?: (value: unknown) => string | null;
+  scalar?: (value: unknown, key?: string) => string | null;
 };
 
 const PAGE_SIZE = 20;
@@ -53,7 +53,7 @@ function RecordContent({
   value,
   depth,
   emptyMessage,
-  fieldLabel = humanize,
+  fieldLabel = recordFieldLabel,
   scalar = displayScalar,
 }: {
   value: unknown;
@@ -81,7 +81,7 @@ function RecordContent({
     ([key]) => isDisplayField(key) && !consumed.has(key),
   );
   const fields = entries.flatMap(([key, value]) => {
-    const display = scalar(value);
+    const display = scalar(value, key);
     return display == null ? [] : [{ key, display }];
   });
   const groups =

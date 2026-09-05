@@ -386,8 +386,8 @@ test('new group courses prepare recurring sessions before delivery locks their t
   await expect(page.getByRole('button', {name: 'Configure delivery', exact: true})).toBeDisabled();
   await page.getByRole('button', {name: 'Set up schedule', exact: true}).click();
   await page.getByRole('button', {name: 'Add session', exact: true}).click();
-  await page.getByRole('textbox', {name: 'Start time Open time picker', exact: true}).fill('11:00 AM');
-  await page.getByRole('textbox', {name: 'End time Open time picker', exact: true}).fill('11:30 AM');
+  await page.getByRole('textbox', {name: 'Start time', exact: true}).fill('11:00 AM');
+  await page.getByRole('textbox', {name: 'End time', exact: true}).fill('11:30 AM');
   await page.getByRole('region', {name: 'Add recurring session'}).getByRole('button', {name: 'Add session', exact: true}).click();
   await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
   await page.getByRole('button', {name: 'Configure delivery', exact: true}).click();
@@ -412,7 +412,7 @@ test('ready courses can publish without repeating the draft readiness transition
     return route.fulfill({json: reply(config())});
   });
   await page.goto('/advisor/courses/71/delivery?view=delivery');
-  await page.getByRole('button', {name: 'Validate readiness', exact: true}).click();
+  await page.getByRole('complementary', {name: 'Course readiness'}).getByRole('button', {name: 'Validate readiness', exact: true}).click();
   await expect(page.getByRole('button', {name: /Validate readiness|Validate again|Check readiness/})).toHaveCount(0);
   await page.reload();
   await expect(page.getByRole('button', {name: /Validate readiness|Validate again|Check readiness/})).toHaveCount(0);
@@ -433,10 +433,10 @@ test('publish rejection exposes current readiness blockers across delivery views
     : {json: reply({courseId: 71, deliveryMode: 'GROUP', catalogCode: 'IELTS', capacity: 16, launchState: 'PUBLISHED', courseLaunchVersion: 4, blockers: []})}));
   await page.goto('/advisor/courses/71/delivery?view=schedule');
   await page.getByRole('button', {name: 'Publish course', exact: true}).click();
-  await expect(page.getByRole('list', {name: 'Readiness blockers'})).toContainText('Current Syllabus is required');
+  await expect(page.getByRole('list', {name: 'Readiness blockers'})).toContainText('A current course syllabus is required before publication.');
   await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
   const panel = page.getByRole('complementary', {name: 'Course readiness'});
-  await expect(panel.getByRole('list', {name: 'Readiness blockers'})).toContainText('Current Syllabus is required');
+  await expect(panel.getByRole('list', {name: 'Readiness blockers'})).toContainText('A current course syllabus is required before publication.');
   await expect(panel).not.toContainText('No outstanding requirements.');
   await expect(panel).not.toContainText('Ready for publication');
   missingSyllabus = false;

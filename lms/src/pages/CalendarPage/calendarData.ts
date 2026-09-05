@@ -26,10 +26,17 @@ export interface CalendarItem {
   path?: string;
 }
 
+// Cache semantic failure identities, not display copy: changing locale must not refetch data.
+export interface CalendarFailure {
+  translationKey: 'calendar:errors.assignments' | 'calendar:errors.quizzes' | 'calendar:errors.events' | 'calendar:errors.classes' | 'calendar:errors.classesIncomplete';
+  courseCode?: string;
+  count?: number;
+}
+
 export interface CalendarWindowData {
   courses: Array<Pick<MyCourse, 'id' | 'courseCode' | 'title'>>;
   items: CalendarItem[];
-  failures: string[];
+  failures: CalendarFailure[];
 }
 
 const localDate = (value: string) => value.slice(0, 10);
@@ -54,14 +61,14 @@ export const loadCalendarWindow = async (windowStart: string, windowEnd: string)
   const [courses, dated] = await Promise.all([loadAllActiveCourses(), courseOperationsApiService.getMyCalendar({from: windowStart, to: format(addDays(parseISO(windowEnd), 1), 'yyyy-MM-dd'), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone}).then(response => ({value: unwrapData(response, 'myCalendar'), failed: false})).catch(() => ({value: null, failed: true}))]);
   const occurrences = calendarOccurrences(dated.value, courses, windowStart, windowEnd);
   const courseResults = await Promise.all(courses.map(async course => {
-    const sourceNames = ['assignments', 'quizzes', 'events'] as const;
+    const sourceKeys = ['calendar:errors.assignments', 'calendar:errors.quizzes', 'calendar:errors.events'] as const;
     const results = await Promise.allSettled([
       assignmentApiService.getCourseAssignmentSummaries(course.id),
       quizApiService.listQuizzes(course.id),
       courseApiService.listCourseEvents(course.id),
     ]);
-    const failures = results.flatMap((result, index) => result.status === 'rejected'
-      ? [`${course.courseCode}: ${sourceNames[index]} could not be loaded`]
+    const failures: CalendarFailure[] = results.flatMap((result, index) => result.status === 'rejected'
+      ? [{translationKey: sourceKeys[index], courseCode: course.courseCode}]
       : []);
     const items: CalendarItem[] = [];
 
@@ -140,6 +147,6 @@ export const loadCalendarWindow = async (windowStart: string, windowEnd: string)
     items: [...occurrences.items, ...courseResults.flatMap(result => result.items)].sort((a, b) => (
       `${a.date}T${a.startTime ?? '23:59'}`.localeCompare(`${b.date}T${b.startTime ?? '23:59'}`)
     )),
-    failures: [...courseResults.flatMap(result => result.failures), ...(dated.failed ? ['Scheduled classes could not be loaded'] : []), ...(occurrences.unavailableCount ? [`${occurrences.unavailableCount} scheduled class records lack required calendar details`] : [])],
+    failures: [...courseResults.flatMap(result => result.failures), ...(dated.failed ? [{translationKey: 'calendar:errors.classes' as const}] : []), ...(occurrences.unavailableCount ? [{translationKey: 'calendar:errors.classesIncomplete' as const, count: occurrences.unavailableCount}] : [])],
   };
 };

@@ -26,9 +26,9 @@ describe('apiError helpers', () => {
     expect(isApiError({code: 'SUCCESS'})).toBe(false);
   });
 
-  it('prefers a safe details message and otherwise keeps the caller fallback', () => {
+  it('keeps contextual localized copy instead of unlocalized server messages', () => {
     expect(getApiErrorMessage({code: 400, message: 'Bad request', details: {message: 'Code expired'}}, 'Fallback'))
-      .toBe('Code expired');
+      .toBe('Fallback');
     expect(getApiErrorMessage({code: 0, message: 'Network Error'}, 'Could not save.')).toBe('Could not save.');
     expect(getApiErrorMessage('not-an-error', 'Could not save.')).toBe('Could not save.');
   });
@@ -57,8 +57,8 @@ describe('apiError helpers', () => {
     {code: 400, message: 'Select a course before saving.'},
     {code: 403, message: 'You do not have permission to edit this course.'},
     {code: 409, message: 'Reload the latest plan before saving.'},
-  ])('preserves actionable validation, permission, and conflict messages', error => {
-    expect(getApiErrorMessage(error, 'Could not save.')).toBe(error.message);
+  ])('uses contextual copy for unknown validation, permission, and conflict codes', error => {
+    expect(getApiErrorMessage(error, 'Could not save.')).toBe('Could not save.');
   });
 
   it('provides sensible human descriptions for HTTP status codes', () => {

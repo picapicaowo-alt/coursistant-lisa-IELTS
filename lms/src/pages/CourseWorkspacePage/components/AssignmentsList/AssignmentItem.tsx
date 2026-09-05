@@ -85,7 +85,7 @@ export const AssignmentItem: React.FC<AssignmentItemProps> = ({
                 })
               }
             }}
-            title={t('assignment.viewDetails')}
+            title={t('common:actions.viewDetails')}
           />
         </React.Fragment>
       );
@@ -104,7 +104,7 @@ export const AssignmentItem: React.FC<AssignmentItemProps> = ({
               }
             });
           }}
-          title={t('assignment.editDetails')}
+          title={t('common:actions.edit')}
         />
         <IconButton
           type={"delete"}
@@ -112,7 +112,7 @@ export const AssignmentItem: React.FC<AssignmentItemProps> = ({
             e.stopPropagation();
             if (activeUnitId === null) return;
           }}
-          title={t('assignment.delete')}
+          title={t('common:actions.delete')}
         />
       </React.Fragment>
     );

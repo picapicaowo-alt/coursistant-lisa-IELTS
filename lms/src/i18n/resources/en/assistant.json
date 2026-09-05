@@ -1,0 +1,145 @@
+{
+  "newChat": "New Chat",
+  "greeting": "Hi there!",
+  "help": {
+    "student": "How can I help you with your learning today?",
+    "instructor": "How can I help you with your teaching today?",
+    "advisor": "How can I help you with your advising today?"
+  },
+  "input": {
+    "student": "Ask the learning assistant",
+    "instructor": "Ask the teaching assistant",
+    "advisor": "Ask the advising assistant"
+  },
+  "startNew": "Start a new chat",
+  "attachmentOpen": "Open chat to add an attachment",
+  "ask": "Ask me anything…",
+  "send": "Send message",
+  "prompts": {
+    "explain": "Explain a concept",
+    "reviewWriting": "Review my writing",
+    "speaking": "Practice speaking",
+    "advice": "Study advice",
+    "lesson": "Plan a lesson",
+    "questions": "Create practice questions",
+    "materials": "Review course materials",
+    "feedback": "Draft student feedback",
+    "progress": "Review student progress",
+    "plan": "Prepare a study plan",
+    "goals": "Review learning goals",
+    "followUp": "Plan a follow-up"
+  },
+  "copy": {
+    "label": "Copy response",
+    "copied": "Copied",
+    "copy": "Copy",
+    "failed": "Copy failed. Select the response text to copy it.",
+    "success": "Response copied."
+  },
+  "thinking": {
+    "understand": "Understanding your request.",
+    "context": "Reviewing the relevant context.",
+    "response": "Preparing a clear response.",
+    "label": "AI is thinking",
+    "progress": "AI response progress",
+    "elapsed": "{{seconds}}s",
+    "status": "{{label}}: {{step}}",
+    "question": "Understanding your question.",
+    "courseContext": "Reviewing the relevant course context.",
+    "route": "Choosing the right support workflow.",
+    "search": "Searching your course materials.",
+    "tools": "Checking the relevant LMS context.",
+    "working": "Working on your request."
+  },
+  "courseFallback": "Course {{id}}",
+  "courseListError": "Study Support is temporarily unavailable because your course list could not be verified.",
+  "checkingAttempts": "Checking quiz attempt status before enabling Study Support…",
+  "attemptCheckError": "Study Support is temporarily unavailable because quiz attempt status could not be verified. Try again shortly.",
+  "lockedCourses": "Study Support is locked because an active quiz attempt is open in {{courses}}. Select a course without an active attempt to continue.",
+  "oneOfCourses": "one of your courses",
+  "lockedCourse": "Study Support is unavailable for {{course}} while you have an active quiz attempt. Submit or finalize the attempt before using course assistance.",
+  "reviewFile": "Review the attached file.",
+  "selectCourseFirst": "Select a course before asking Study Support.",
+  "responseError": "Study Support could not respond. Please try again.",
+  "new": "New",
+  "closeCourse": "Close course assistant",
+  "createChat": "+ New chat",
+  "lockdownActive": "Exam lockdown active",
+  "supportUnavailable": "Study Support unavailable",
+  "summarize": "Summarize it for me",
+  "summarizeHelp": "Ripan will summarize this material as clearly as possible.",
+  "welcomeBack": "Welcome back, {{name}}! 👋",
+  "encouragement": "Every small step forward brings you closer to your big dream.",
+  "latestResponse": "Latest response",
+  "chooseFile": "Choose a file for Study Support",
+  "attachFile": "Attach a file",
+  "askSupport": "Ask Study Support",
+  "askMaterials": "Ask a question about your course materials…",
+  "attachedFile": "Attached file: {{name}}",
+  "keyboardHelp": "Enter to send · Shift+Enter for a new line",
+  "personalHeading": "Your personal <0>learning assistant</0>",
+  "errors": {
+    "invalidResponse": "The AI Agent returned an invalid response.",
+    "emptyResponse": "The AI Agent returned an empty response.",
+    "approvalDetails": "The AI Agent returned an approval request without details.",
+    "workflowUnavailable": "Workflow is temporarily unavailable. Please try again."
+  },
+  "workspace": {
+    "title": "AI ChatBot",
+    "tools": "AI tools",
+    "study": "Study Support",
+    "workflow": "Workflow",
+    "loading": "Loading Study Support…"
+  },
+  "workflow": {
+    "badge": "Actions · Planning · Organization",
+    "description": "Ask the AI Agent to inspect LMS data and complete supported tasks. Consequential changes always require approval.",
+    "suggestions": "Suggested workflow prompts",
+    "tryAsking": "Try asking",
+    "thinking": "AI Agent is thinking",
+    "input": "Tell Workflow what to do",
+    "run": "Run",
+    "detailsTitle": "Confirm assignment details",
+    "reviewDetails": "Review details",
+    "detailsWarning": "Confirming continues to the deadline approval step. The due date has not changed yet.",
+    "approvalTitle": "Deadline change approval",
+    "actionRequired": "Action required",
+    "approvalWarning": "The deadline has not changed yet.",
+    "allow": "Allow",
+    "expand": "Expand {{panel}}",
+    "exitExpanded": "Exit {{panel}} full view",
+    "prompts": {
+      "due": "What assignments are due in the next 14 days?",
+      "courses": "List my courses.",
+      "deadline": "Help me change an assignment deadline."
+    },
+    "steps": {
+      "understand": "Interpreting your request.",
+      "response": "Preparing the next step."
+    },
+    "greeting": {
+      "instructor": "I can check your courses and teaching deadlines, or prepare an assignment deadline change for your approval.",
+      "student": "I can check your courses and upcoming assignment deadlines."
+    },
+    "role": {
+      "instructor": "Instructor workflow",
+      "student": "Student workflow"
+    },
+    "errors": {
+      "lockdown": "AI assistance is not available while you have an active quiz attempt in progress.",
+      "empty": "The AI Agent returned an empty response. Please try again.",
+      "studentChange": "Students can view assignment deadlines, but only instructors can change them.",
+      "incompleteApproval": "The AI Agent returned an incomplete approval request. No changes were made. Please try again.",
+      "incompleteConfirmation": "The AI Agent returned an incomplete confirmation request. No changes were made. Please try again.",
+      "reset": "Those details were confirmed. The next step is the deadline approval dialog, but the agent reset instead of continuing. Please send the full deadline change again."
+    },
+    "cancelled": "The deadline change was cancelled. Send a new request when you are ready.",
+    "approved": "The deadline change was approved.",
+    "rejected": "The deadline change was rejected.",
+    "placeholder": {
+      "approval": "Approve or reject the pending change above.",
+      "confirmation": "Confirm or cancel the details above.",
+      "request": "Tell Workflow what to do…"
+    }
+  }
+}

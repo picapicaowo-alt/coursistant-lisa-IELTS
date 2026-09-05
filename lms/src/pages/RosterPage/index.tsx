@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import React, {useState} from 'react';
 import {generatePath, Link, Navigate, useLocation, useParams} from 'react-router-dom';
 import {CourseRole} from '@/apis';
@@ -54,7 +55,7 @@ const RosterPage: React.FC = () => {
           <Link className={styles.backLink} to={backPath}>{fromOverview ? translate("course:grades.back") : translate('common:navigationControls.backToCourseOperations')}</Link>
           <h1 className={styles.title}>{translate("course:roster.title")}</h1>
         </div>
-        <span className={styles.count}>{translate("course:roster.count", {count: total})}</span>
+        <span className={styles.count}>{translate("course:roster.count", {count: total, number: formatNumber(total)})}</span>
       </header>
 
       {canManageMembers ? <EnrolStudentsPanel onEnrol={emails => enrol.mutate(emails)} isPending={enrol.isPending} result={enrol.data?.data ?? null} failed={enrol.isError}/> : null}

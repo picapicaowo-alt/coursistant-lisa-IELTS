@@ -1,10 +1,10 @@
+import {LocalizedError} from '@/i18n/errors';
+
 export type OperationRecord = Record<string, unknown>;
 
 export function record(value: unknown): OperationRecord {
   if (typeof value !== "object" || value === null || Array.isArray(value))
-    throw new Error(
-      "The server returned an unsupported record. Please refresh or contact support.",
-    );
+    throw new LocalizedError('common:records.unsupportedRecord');
   return value as OperationRecord;
 }
 export function optionalNumber(
@@ -31,9 +31,7 @@ export function textValue(
 export function recordId(item: OperationRecord, ...keys: string[]): number {
   const id = optionalNumber(item, ...keys);
   if (!id)
-    throw new Error(
-      "A record is missing its identity. Actions are unavailable until the server returns a valid record.",
-    );
+    throw new LocalizedError('common:records.missingIdentity');
   return id;
 }
 /** Generic OpenAPI envelopes are read defensively. Malformed data is never an empty success. */
@@ -50,5 +48,5 @@ export function recordPage(
         total: optionalNumber(result, "total", "totalElements"),
       };
   }
-  throw new Error("The server did not return a supported list. Please retry.");
+  throw new LocalizedError('common:records.unsupportedList');
 }

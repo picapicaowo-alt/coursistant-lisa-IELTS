@@ -1,3 +1,7 @@
+import {formatUtcTimestamp} from '@/utils/datetime';
+import {LocalizedError} from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import {formatNumber, formatNumericText} from '@/i18n/formatting';
 import React, {useEffect, useId, useRef, useState} from 'react';
 import {generatePath, Link, useParams, useSearchParams} from 'react-router-dom';
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -36,13 +40,8 @@ import s from './SupportPage.module.scss';
 
 const positiveId = (value: string): boolean => Number.isInteger(Number(value)) && Number(value) > 0;
 
-const formatDateTime = (value?: string): string => {
-  if (!value) return '';
-  const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
-};
-
 const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = ({studentId, conversationOnly = false}) => {
+  const { t: translate } = useTranslation();
   const {studentUserId} = useParams();
   const {user} = useAuth();
   const fileInputId = useId();
@@ -62,6 +61,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
   const [openedReport, setOpenedReport] = useState<{courseId: number; reportId: number}>();
   const hoursInitializedFor = useRef<number | null>(null);
   const [hoursReloadRequired, setHoursReloadRequired] = useState(false);
+  const [hoursValidationKey, setHoursValidationKey] = useState<string>();
   const [hoursForm, setHoursForm] = useState({purchasedMinutes: '', expectedVersion: '', reason: ''});
   const [advanced, setAdvanced] = useState({
     taskId: '',
@@ -146,6 +146,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
     hoursInitializedFor.current = null;
     setHoursForm({purchasedMinutes: '', expectedVersion: '', reason: ''});
     setHoursReloadRequired(false);
+    setHoursValidationKey(undefined);
     setCourseReportPage(0);
     setAdvanced(current => ({...current, occurrenceId: '', reportId: ''}));
   }, [selectedCourseId]);
@@ -165,7 +166,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
   const sendMessage = useMutation({
     meta: {advisingStudentId: id},
     mutationFn: async () => {
-      if (messageFiles.some(file => file.type.startsWith('audio/'))) throw new Error('Audio attachments are not supported.');
+      if (messageFiles.some(file => file.type.startsWith('audio/'))) throw new LocalizedError("learning:plan.audioUnsupported");
       const draft = {body: messageBody.trim(), files: messageFiles};
       const fingerprint = idempotencyFingerprint(draft);
       const clientMessageId = idempotency.keyFor(`message-client-${id}`, fingerprint);
@@ -275,7 +276,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
     meta: {advisingStudentId: id},
     queryKey: ['advisor', 'published-course-report', id, openedReport?.courseId, openedReport?.reportId],
     queryFn: async () => {
-      if (!openedReport) throw new Error('Select a report to view.');
+      if (!openedReport) throw new LocalizedError("advising:support.selectReport");
       return unwrapData(await courseOperationsApiService.getAdvisorPublishedCourseReport(id, openedReport.courseId, openedReport.reportId), 'advisorPublishedCourseReport');
     },
     enabled: Boolean(openedReport),
@@ -292,7 +293,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
   const previewAttachment = async (attachmentId: number): Promise<void> => {
     const popup = openPreviewWindow();
     setFileError(undefined);
-    if (!popup) {setFileError(new Error('Allow pop-ups to preview this attachment.')); return;}
+    if (!popup) {setFileError(new LocalizedError("operations:errors.attachmentPopups")); return;}
     try {
       const blob = await advisorApiService.previewConversationAttachment(id, attachmentId);
       showBlobInPreviewWindow(popup, blob);
@@ -304,8 +305,8 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
 
   const conversationContent = (
         <div className={`${s.conversationCard} ${conversationOnly ? s.standalone : ''}`}>
-          <div className={s.messageStream} aria-label="Message history">
-            {messages.isPending ? <p className={styles.status}>Loading conversation…</p> : null}
+          <div className={s.messageStream} aria-label={translate("advising:support.history")}>
+            {messages.isPending ? <p className={styles.status}>{translate("advising:support.loadingConversation")}</p> : null}
 
             {messages.hasNextPage ? (
               <button
@@ -315,14 +316,14 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                 onClick={() => void messages.fetchNextPage()}
               >
                 <Clock size={13} aria-hidden="true" />
-                <span>{messages.isFetchingNextPage ? 'Loading…' : 'Load older messages'}</span>
+                <span>{messages.isFetchingNextPage ? translate("common:feedback.loading") : translate("learning:messages.older")}</span>
               </button>
             ) : null}
 
             {!messages.isPending && !messages.isError && conversationRows.length === 0 ? (
               <div className={s.emptyBlock}>
-                <strong>No messages yet</strong>
-                <span>Start the conversation below. File actions appear on messages that have attachments.</span>
+                <strong>{translate("learning:messages.none")}</strong>
+                <span>{translate("advising:support.startConversation")}</span>
               </div>
             ) : null}
 
@@ -337,14 +338,14 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                 >
                   <div className={s.messageMeta}>
                     <span className={s.messageSender}>
-                      {isAdvisor ? 'You' : isStudent ? (hub.data?.firstName ? [hub.data.firstName, hub.data.middleName, hub.data.lastName].filter(Boolean).join(' ') : `Student #${id}`) : 'Advisor'}
+                      {isAdvisor ? translate("learning:messages.you") : isStudent ? (hub.data?.firstName ? [hub.data.firstName, hub.data.middleName, hub.data.lastName].filter(Boolean).join(' ') : translate('common:people.studentFallback', {id: formatNumber(id)})) : translate("common:roles.ADVISOR")}
                     </span>
                     {message.createdAt ? (
-                      <span className={s.messageTime}>{formatDateTime(message.createdAt)}</span>
+                      <span className={s.messageTime}>{formatUtcTimestamp(message.createdAt)}</span>
                     ) : null}
                   </div>
 
-                  <p>{message.body || 'Message has no text content.'}</p>
+                  <p>{message.body || translate("learning:messages.noText")}</p>
 
                   {(message.attachments?.length ?? 0) > 0 ? (
                     <div className={s.attachmentList}>
@@ -353,7 +354,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                           <div className={s.attachmentRow} key={attachment.attachmentId}>
                             <span>
                               <FileText size={14} aria-hidden="true" />
-                              {attachment.originalName || `Attachment #${attachment.attachmentId}`}
+                              {attachment.originalName || translate('learning:plan.attachmentNumber', {id: formatNumber(attachment.attachmentId)})}
                             </span>
                             <div className={s.attachmentActions}>
                               {attachment.previewAvailable ? (
@@ -362,8 +363,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                                   onClick={() => void previewAttachment(attachment.attachmentId!)}
                                 >
                                   <Eye size={12} aria-hidden="true" />
-                                  Preview
-                                </button>
+                                  {translate("course:materials.preview")}</button>
                               ) : null}
                               <button
                                 type="button"
@@ -371,13 +371,12 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                                   void advisorApiService
                                     .downloadConversationAttachment(id, attachment.attachmentId!)
                                     .then(blob =>
-                                      saveBlob(blob, attachment.originalName || `conversation-attachment-${attachment.attachmentId}`)
+                                      saveBlob(blob, attachment.originalName || translate('learning:plan.attachmentDownload', {id: attachment.attachmentId}))
                                     ).catch(setFileError)
                                 }
                               >
                                 <Download size={12} aria-hidden="true" />
-                                Download
-                              </button>
+                                {translate("common:actions.download")}</button>
                             </div>
                           </div>
                         )
@@ -392,8 +391,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                       disabled={markRead.isPending}
                       onClick={() => markRead.mutate(message.messageId!)}
                     >
-                      Mark read through this message
-                    </button>
+                      {translate("learning:plan.markRead")}</button>
                   ) : null}
                 </article>
               );
@@ -404,18 +402,17 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
             className={s.composer}
             onSubmit={event => {
               event.preventDefault();
-              sendMessage.mutate();
+              if ((messageBody.trim() || messageFiles.length) && !sendMessage.isPending && hub.isSuccess) sendMessage.mutate();
             }}
           >
             <label htmlFor="advisor-message" className={styles.srOnly}>
-              Reply to student
-            </label>
+              {translate("advising:support.reply")}</label>
             <textarea
               id="advisor-message"
               className={s.composerTextarea}
               value={messageBody}
               onChange={event => setMessageBody(event.target.value)}
-              placeholder="Write a support message to this student…"
+              placeholder={translate("advising:support.placeholder")}
             />
 
             {messageFiles.length > 0 ? (
@@ -426,7 +423,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                     {file.name}
                     <button
                       type="button"
-                      aria-label={`Remove ${file.name}`}
+                      aria-label={translate('common:actions.removeItem', {item: file.name})}
                       onClick={() => setMessageFiles(current => current.filter((_, fileIndex) => fileIndex !== index))}
                     >
                       ×
@@ -440,11 +437,10 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
               <div className={s.fileInputWrapper}>
                 <button type="button" className={s.attachButton} onClick={() => fileInput.current?.click()}>
                   <Paperclip size={14} aria-hidden="true" />
-                  Attach files
-                </button>
+                  {translate("advising:support.attach")}</button>
                   <input
                     ref={fileInput}
-                    aria-label="Attach message files"
+                    aria-label={translate("advising:support.attachLabel")}
                     key={fileInputKey}
                     id={fileInputId}
                     type="file"
@@ -459,41 +455,41 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                 disabled={(!messageBody.trim() && messageFiles.length === 0) || sendMessage.isPending || hub.isError || hub.isPending}
               >
                 <Send size={14} aria-hidden="true" />
-                {sendMessage.isPending ? 'Sending…' : 'Send message'}
+                {sendMessage.isPending ? translate("operations:sending") : translate("assistant:send")}
               </button>
             </div>
           </form>
         </div>
       );
-  if (conversationOnly) return <>{primaryError || fileError ? <p className={styles.error} role="alert">{advisingErrorMessage(primaryError || fileError, 'The conversation could not be loaded or updated.')} <button type="button" onClick={() => void messages.refetch()}>Retry conversation</button></p> : null}{conversationContent}</>;
+  if (conversationOnly) return <>{primaryError || fileError ? <p className={styles.error} role="alert">{advisingErrorMessage(primaryError || fileError, translate("advising:support.conversationFailed"))} <button type="button" onClick={() => void messages.refetch()}>{translate("advising:support.retryConversation")}</button></p> : null}{conversationContent}</>;
 
   return (
     <div className={layout.support}>
       {primaryError || fileError ? (
         <p className={styles.error} role="alert">
-          {advisingErrorMessage(primaryError || fileError, 'Student support information could not be loaded.')}
+          {advisingErrorMessage(primaryError || fileError, translate("advising:support.loadFailed"))}
         </p>
       ) : null}
 
-      <WorkspaceSection appearance="record" title="Conversation" id="conversation" meta={<span className={s.countBadge}>{conversationRows.length}</span>}>{conversationContent}</WorkspaceSection>
+      <WorkspaceSection appearance="record" title={translate("navigation:parent.conversation")} id="conversation" meta={<span className={s.countBadge}>{messages.isSuccess ? formatNumber(conversationRows.length) : '—'}</span>}>{conversationContent}</WorkspaceSection>
 
 
       {/* Reports and attendance remain visible beside one another on desktop. */}
       <div className={s.mainGrid}>
         <WorkspaceSection appearance="record"
-          title="Reports"
+          title={translate("navigation:parent.reports")}
           meta={
             <span className={s.countBadge}>
-              {contractRecordNumber(studentReports.data, 'total') ?? contractItems(studentReports.data).length}
+              {studentReports.isSuccess ? formatNumber(contractRecordNumber(studentReports.data, 'total') ?? contractItems(studentReports.data).length) : '—'}
             </span>
           }
         >
-          {studentReports.isPending ? <p className={styles.status}>Loading reports…</p> : null}
+          {studentReports.isPending ? <p className={styles.status}>{translate("learning:reports.loadingList")}</p> : null}
           {!studentReports.isPending && !studentReports.isError && contractItems(studentReports.data).length === 0 ? (
             <div className={s.emptyBlock}>
               <FileText size={32} aria-hidden="true"/>
-              <strong>No published reports</strong>
-              <span>Reports become visible here after publication.</span>
+              <strong>{translate("learning:reports.parentNone")}</strong>
+              <span>{translate("advising:support.reportsHelp")}</span>
             </div>
           ) : null}
           {contractItems(studentReports.data).length > 0 ? (
@@ -502,7 +498,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
             </div>
           ) : null}
           <AdvisingPagination
-            label="Student report pages"
+            label={translate("advising:support.reportPages")}
             page={reportPage}
             total={contractRecordNumber(studentReports.data, 'total') ?? 0}
             onPage={setReportPage}
@@ -510,15 +506,15 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
         </WorkspaceSection>
 
         <WorkspaceSection appearance="record"
-          title="Learning history"
-          meta={<span className={s.countBadge}>{contractItems(attendance.data).length}</span>}
+          title={translate("advising:support.learningHistory")}
+          meta={<span className={s.countBadge}>{attendance.isSuccess ? formatNumber(contractItems(attendance.data).length) : '—'}</span>}
         >
-          {attendance.isPending ? <p className={styles.status}>Loading attendance…</p> : null}
+          {attendance.isPending ? <p className={styles.status}>{translate("operations:legacy.loadingAttendance")}</p> : null}
           {!attendance.isPending && !attendance.isError && contractItems(attendance.data).length === 0 ? (
             <div className={s.emptyBlock}>
               <Clock size={32} aria-hidden="true"/>
-              <strong>No attendance records</strong>
-              <span>Recorded course attendance will appear here.</span>
+              <strong>{translate("advising:support.noAttendance")}</strong>
+              <span>{translate("advising:support.attendanceHelp")}</span>
             </div>
           ) : null}
           {contractItems(attendance.data).length > 0 ? (
@@ -530,23 +526,21 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
       </div>
 
       {/* Course Hours & Reports */}
-      <WorkspaceSection appearance="record" title="Course hours &amp; reports" id="course-support">
-        {(courses.data?.length ?? 0) === 0 ? (
+      <WorkspaceSection appearance="record" title={translate('advising:support.hoursReports')} id="course-support">
+        {courses.isSuccess && courses.data.length === 0 ? (
           <div className={s.emptyBlock}>
-            <strong>No linked courses</strong>
-            <span>Link or create a course before managing hours and course reports.</span>
+            <strong>{translate("advising:support.noCourses")}</strong>
+            <span>{translate("advising:support.linkCourseHelp")}</span>
             <Link className={styles.secondaryLink} to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdCourses, {studentUserId: String(id)})}>
-              Open courses
-            </Link>
+              {translate("advising:support.openCourses")}</Link>
           </div>
         ) : (
           <label className={s.coursePickerLabel}>
-            Course
-            <select value={selectedCourseId} disabled={saveHours.isPending} onChange={event => {setSelectedCourseId(event.target.value); saveHours.reset();}}>
-              <option value="">Select a course</option>
+            {translate("common:fields.course")}<select value={selectedCourseId} disabled={saveHours.isPending} onChange={event => {setSelectedCourseId(event.target.value); saveHours.reset();}}>
+              <option value="">{translate("advising:support.selectCourse")}</option>
               {(courses.data ?? []).map((item, index) => (
                 <option key={item.courseId ?? index} value={item.courseId}>
-                  {item.title || item.courseCode || `Course #${item.courseId}`}
+                  {item.title || item.courseCode || translate('assistant:courseFallback', {id: item.courseId == null ? '—' : formatNumber(item.courseId)})}
                 </option>
               ))}
             </select>
@@ -557,18 +551,18 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
           <div className={s.courseSupport}>
             <div className={s.hoursWidget}>
               <div className={s.hourStat}>
-                <strong>{hours.isPending ? '…' : hours.isError || !hoursForm.purchasedMinutes ? '—' : `${hoursForm.purchasedMinutes}m`}</strong>
-                <span>Purchased minutes</span>
+                <strong>{hours.isPending ? '…' : hours.isError || !hoursForm.purchasedMinutes ? '—' : formatNumericText(hoursForm.purchasedMinutes)}</strong>
+                <span>{translate("advising:support.purchasedMinutes")}</span>
               </div>
               <div className={s.hourStat}>
-                <strong>{hours.isSuccess ? contractRecordNumber(hours.data, 'remainingMinutes') ?? '—' : '—'}</strong>
-                <span>Remaining minutes</span>
+                <strong>{hours.isSuccess ? formatNumericText(contractRecordNumber(hours.data, 'remainingMinutes')) ?? '—' : '—'}</strong>
+                <span>{translate("advising:support.remainingMinutes")}</span>
               </div>
             </div>
 
             {hoursReloadRequired ? (
               <div className={styles.conflictNotice} role="alert">
-                <p>Your entered hours are preserved. Reload the latest version before confirming.</p>
+                <p>{translate("advising:support.hoursConflict")}</p>
                 <button
                   type="button"
                   className={styles.secondary}
@@ -579,29 +573,32 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                       if (!result.isError && version != null) {
                         setHoursForm(current => ({...current, expectedVersion: String(version)}));
                         setHoursReloadRequired(false);
+                        saveHours.reset();
                       }
                     })
                   }
                 >
-                  Load latest hours
-                </button>
+                  {translate("advising:support.reloadHours")}</button>
               </div>
             ) : null}
 
             {hours.isError ? (
-              <p className={styles.error}>{advisingErrorMessage(hours.error, 'Course hours could not be loaded.')}</p>
+              <p className={styles.error}>{advisingErrorMessage(hours.error, translate("advising:support.hoursFailed"))}</p>
             ) : null}
 
             <form
+              noValidate
               className={s.formGrid}
               onSubmit={event => {
                 event.preventDefault();
-                saveHours.mutate();
+                const minutes = Number(hoursForm.purchasedMinutes);
+                const valid = hoursForm.purchasedMinutes.trim() && Number.isSafeInteger(minutes) && minutes >= 0 && hoursForm.reason.trim();
+                setHoursValidationKey(valid ? undefined : 'advising:support.invalidHours');
+                if (valid && hoursForm.expectedVersion && !hoursReloadRequired && hours.isSuccess && !saveHours.isPending) saveHours.mutate();
               }}
             >
               <label>
-                Purchased minutes
-                <input
+                {translate("advising:support.purchasedMinutes")}<input
                   required
                   type="number"
                   min="0"
@@ -610,12 +607,11 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                 />
               </label>
               <label>
-                Reason for adjustment
-                <textarea
+                {translate("advising:support.adjustmentReason")}<textarea
                   required
                   value={hoursForm.reason}
                   onChange={event => setHoursForm(current => ({...current, reason: event.target.value}))}
-                  placeholder="Specify the reason for this allocation change…"
+                  placeholder={translate("advising:support.adjustmentPlaceholder")}
                 />
               </label>
               <button
@@ -628,25 +624,26 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                   saveHours.isPending
                 }
               >
-                {saveHours.isPending ? 'Saving…' : 'Save purchased hours'}
+                {saveHours.isPending ? translate("common:actions.saving") : translate("advising:support.saveHours")}
               </button>
             </form>
 
+            {hoursValidationKey ? <p className={styles.error} role="alert">{translate(hoursValidationKey)}</p> : null}
             <div className={s.publishedReports}>
-              <h4 className={s.reportsTitle}>Published course reports</h4>
+              <h4 className={s.reportsTitle}>{translate("advising:support.publishedCourseReports")}</h4>
               <AdvisingPagination
-                label="Course report pages"
+                label={translate("advising:support.courseReportPages")}
                 page={courseReportPage}
                 total={contractRecordNumber(courseReports.data, 'total') ?? 0}
                 onPage={setCourseReportPage}
               />
               {courseReports.isError ? (
-                <p className={styles.error}>{advisingErrorMessage(courseReports.error, 'Course reports could not be loaded.')}</p>
+                <p className={styles.error}>{advisingErrorMessage(courseReports.error, translate("advising:support.courseReportsFailed"))}</p>
               ) : null}
               {!courseReports.isPending && !courseReports.isError && contractItems(courseReports.data).length === 0 ? (
                 <div className={s.emptyBlock}>
-                  <strong>No published course reports</strong>
-                  <span>Reports for this course will appear here.</span>
+                  <strong>{translate("advising:support.noCourseReports")}</strong>
+                  <span>{translate("advising:support.courseReportsHelp")}</span>
                 </div>
               ) : null}
               {contractItems(courseReports.data).length > 0 ? (
@@ -659,38 +656,37 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
         ) : null}
       </WorkspaceSection>
 
-      {saveHours.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(saveHours.error, 'Purchased hours could not be saved.')}</p> : null}
-      {saveHours.isSuccess ? <p className={styles.success} role="status">Purchased hours saved.</p> : null}
+      {saveHours.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(saveHours.error, translate("advising:support.saveHoursFailed"))}</p> : null}
+      {saveHours.isSuccess ? <p className={styles.success} role="status">{translate("advising:support.hoursSaved")}</p> : null}
 
       {/* Optional reference lookups remain available without crowding the daily workflow. */}
-      <CollapsibleSection title="Advanced record lookup">
-        <p className={styles.muted}>Look up a specific task, class, or report by its reference number.</p>
+      <CollapsibleSection title={translate("advising:support.advanced")}>
+        <p className={styles.muted}>{translate("advising:support.advancedHelp")}</p>
         <div className={s.advancedGrid}>
           <form
             className={styles.form}
             onSubmit={event => {
               event.preventDefault();
-              taskFeedback.mutate();
+              if (positiveId(advanced.taskId) && advanced.taskVersion && advanced.feedback.trim() && !taskFeedback.isPending) taskFeedback.mutate();
             }}
           >
-            <h4>Task feedback</h4>
+            <h4>{translate("advising:support.taskFeedback")}</h4>
             <label>
-              Learning plan task
-              <select
+              {translate("advising:support.planTask")}<select
                 value={advanced.taskId}
                 onChange={event => {const task = planTasks.find(task => String(task.id) === event.target.value); setAdvanced(current => ({...current, taskId: event.target.value, taskVersion: task?.version == null ? '' : String(task.version), feedback: task?.advisorFeedback ?? ''})); taskFeedback.reset();}}
-              ><option value="">Choose a task</option>{planTasks.filter(task => task.id != null).map(task => <option key={task.id} value={task.id}>{task.title || `Task #${task.id}`}</option>)}</select>
+              ><option value="">{translate("advising:support.chooseTask")}</option>{planTasks.filter(task => task.id != null).map(task => <option key={task.id} value={task.id}>{task.title || translate('advising:actionTasks.fallbackTitle', {id: formatNumber(task.id!)})}</option>)}</select>
             </label>
-            {plan.isError ? <p className={styles.error} role="alert">Tasks could not be loaded. <button type="button" onClick={() => void plan.refetch()}>Retry tasks</button></p> : null}
-            {taskFeedback.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskFeedback.error, 'Feedback could not be saved.')} <button type="button" onClick={() => void plan.refetch().then(result => {
+
+            {plan.isError ? <p className={styles.error} role="alert">{translate("advising:support.tasksFailed")}{' '}<button type="button" onClick={() => void plan.refetch()}>{translate("advising:support.retryTasks")}</button></p> : null}
+            {taskFeedback.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskFeedback.error, translate("advising:support.feedbackFailed"))} <button type="button" onClick={() => void plan.refetch().then(result => {
               if (result.isError) return;
               const reviewedTask = result.data?.plan?.checkpoints?.flatMap(checkpoint => checkpoint.tasks ?? []).find(task => String(task.id) === advanced.taskId);
               if (reviewedTask?.version != null) {setAdvanced(current => current.taskId === String(reviewedTask.id) ? {...current, taskVersion: String(reviewedTask.version)} : current); taskFeedback.reset();}
-            })}>Load latest task version</button></p> : null}
-            {taskFeedback.isSuccess ? <p className={styles.success} role="status">Feedback saved.</p> : null}
+            })}>{translate("advising:support.reloadTask")}</button></p> : null}
+            {taskFeedback.isSuccess ? <p className={styles.success} role="status">{translate("course:assignmentTeacher.alertFeedbackSaved")}</p> : null}
             <label>
-              Feedback
-              <textarea
+              {translate("course:assignmentSubmissionDetail.feedback")}<textarea
                 value={advanced.feedback}
                 onChange={event => setAdvanced(current => ({...current, feedback: event.target.value}))}
               />
@@ -704,15 +700,13 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
                 taskFeedback.isPending
               }
             >
-              Save feedback
-            </button>
+              {translate("advising:support.saveFeedback")}</button>
           </form>
 
           <div className={styles.form}>
-            <h4>Course occurrence records</h4>
+            <h4>{translate("advising:support.occurrenceRecords")}</h4>
             <label>
-              Occurrence ID
-              <input
+              {translate("operations:occurrenceId")}<input
                 inputMode="numeric"
                 disabled={!positiveId(selectedCourseId)}
                 value={advanced.occurrenceId}
@@ -726,8 +720,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
             ) : null}
 
             <label>
-              Published report ID
-              <input
+              {translate("advising:support.reportId")}<input
                 inputMode="numeric"
                 disabled={!positiveId(selectedCourseId)}
                 value={advanced.reportId}
@@ -744,14 +737,14 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
       </CollapsibleSection>
 
       {hub.data !== undefined ? (
-        <CollapsibleSection title="Student support summary">
+        <CollapsibleSection title={translate("advising:support.summary")}>
           <div className={styles.compactResult}>
             <RecordSummaryList value={hub.data} />
           </div>
         </CollapsibleSection>
       ) : null}
-      {openedReport ? <TenantDrawer title="Published report" onClose={() => setOpenedReport(undefined)}>
-        {selectedReport.isPending ? <p role="status">Loading report…</p> : selectedReport.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(selectedReport.error, 'Report could not be loaded.')} <button type="button" onClick={() => void selectedReport.refetch()}>Retry report</button></p> : <RecordSummaryList value={selectedReport.data}/>}
+      {openedReport ? <TenantDrawer title={translate("learning:reports.publishedReport")} onClose={() => setOpenedReport(undefined)}>
+        {selectedReport.isPending ? <p role="status">{translate("learning:reports.loading")}</p> : selectedReport.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(selectedReport.error, translate("advising:support.reportFailed"))} <button type="button" onClick={() => void selectedReport.refetch()}>{translate("advising:support.retryReport")}</button></p> : <RecordSummaryList value={selectedReport.data}/>}
       </TenantDrawer> : null}
     </div>
   );

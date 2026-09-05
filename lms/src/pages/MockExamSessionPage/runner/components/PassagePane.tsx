@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import { useCallback } from 'react'
 import type { PassageData } from '../data/types'
 import type { TextSpan } from '../types/annotation'
@@ -21,6 +22,7 @@ export function PassagePane({
   onAddHighlight,
   onRemoveHighlight,
 }: PassagePaneProps) {
+  const {t: translate} = useTranslation();
   const handleMouseUp = useCallback(() => {
     if (!highlightMode) return
     const selection = window.getSelection()
@@ -56,11 +58,11 @@ export function PassagePane({
   return (
     <section
       className={`passage-pane ${highlightMode ? 'is-highlight-mode' : ''}`}
-      aria-label="Reading passage"
+      aria-label={translate('exams:runner.readingPassage')}
       onMouseUp={handleMouseUp}
     >
       {highlightMode ? (
-        <div className="highlight-hint">Highlight mode on — select text to highlight. Click a highlight to remove.</div>
+        <div className="highlight-hint">{translate('exams:runner.highlightHelp')}</div>
       ) : null}
       <article className="passage">
         <h1 className="passage__title">{passage.title}</h1>

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React, {useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {type ManagedUser, unwrapData} from '@/apis';
@@ -13,12 +14,17 @@ import {UsersRound} from 'lucide-react';
 import panel from './index.module.scss';
 import {getApiErrorCode, isNotFound} from '@/utils/apiError';
 import {parentLinkQueryKeys} from './queryKeys';
+import {formatUtcTimestamp} from '@/utils/datetime';
+import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
 
 type Scope = 'counsellor' | 'advisor' | 'tenant';
 
 export const ParentLinksPanel = ({scope, subjectId, onUnavailable, presentation = 'disclosure'}: {scope: Scope; subjectId: number; onUnavailable?: () => void; presentation?: 'disclosure' | 'panel'}) => {
+  const { t: translate } = useTranslation();
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
+  const confirmation = useConfirmationDialog(`${scope}/${subjectId}`);
+  const [validationKey, setValidationKey] = useState<string | null>(null);
   const [tenantMode, setTenantMode] = useState<'create' | 'existing'>('create');
   const [selectedParent, setSelectedParent] = useState<ManagedUser | null>(null);
   const [parent, setParent] = useState({
@@ -115,63 +121,75 @@ export const ParentLinksPanel = ({scope, subjectId, onUnavailable, presentation 
     && relationshipReadErrorCode !== 'ACCESS_DENIED';
   const mutationError = save.error || unlink.error;
   const description = scope === 'advisor'
-    ? 'Parent links connect this student to a parent or guardian account. Advisors can view the relationship, but cannot change it.'
+    ? translate("advising:parents.description.advisor")
     : scope === 'counsellor'
-      ? 'Connect a parent or guardian before the intake is handed to an Advisor. You can create, reuse, or unlink a relationship while you still own the intake.'
-      : 'Review and manage the parent or guardian accounts connected to this student.';
+      ? translate("advising:parents.description.counsellor")
+      : translate("advising:parents.description.tenant");
   const content = (
     <div className={presentation === 'panel' ? panel.content : undefined}>
+      {confirmation.dialog}
       {presentation === 'panel' ? <p className={panel.description}>{description}</p> : null}
       {links.isError ? (
         <div className={styles.error} role="alert">
-          <strong>{advisingErrorMessage(links.error, 'Parent links could not be loaded.')}</strong>
-          {canRetryRelationshipRead ? <button type="button" className={styles.secondary} onClick={() => void links.refetch()}>Try again</button> : null}
+          <strong>{advisingErrorMessage(links.error, translate("advising:parents.loadFailed"))}</strong>
+          {canRetryRelationshipRead ? <button type="button" className={styles.secondary} onClick={() => void links.refetch()}>{translate("common:actions.tryAgain")}</button> : null}
         </div>
       ) : null}
-      {mutationError ? <p className={styles.error} role="alert">{advisingErrorMessage(mutationError, 'Parent links could not be updated.')}</p> : null}
-      {save.isSuccess ? <p className={styles.success} role="status">Parent relationship saved.</p> : null}
-      {unlink.isSuccess ? <p className={styles.success} role="status">Parent relationship removed.</p> : null}
-      {links.isPending ? <p className={styles.status}>Loading parent links…</p> : null}
+      {mutationError ? <p className={styles.error} role="alert">{advisingErrorMessage(mutationError, translate("advising:parents.updateFailed"))}</p> : null}
+      {save.isSuccess ? <p className={styles.success} role="status">{translate("advising:parents.saved")}</p> : null}
+      {unlink.isSuccess ? <p className={styles.success} role="status">{translate("advising:parents.removed")}</p> : null}
+      {links.isPending ? <p className={styles.status}>{translate("advising:parents.loading")}</p> : null}
       {!links.isError ? <div className={styles.list}>
         {(links.data ?? []).map((link, index) => (
           <article className={styles.row} key={link.linkId ?? index}>
             <div className={styles.identity}>
-              <strong>{formatPersonName({firstName: link.parentFirstName, middleName: link.parentMiddleName, lastName: link.parentLastName}, `Parent #${link.parentUserId ?? '—'}`)}</strong>
-              <span>{link.parentEmail || 'No email in response'} · linked {link.linkedAt || '—'}</span>
+              <strong>{formatPersonName({firstName: link.parentFirstName, middleName: link.parentMiddleName, lastName: link.parentLastName}, translate('advising:parents.fallback', {id: link.parentUserId ?? '—'}))}</strong>
+              <span>{translate('advising:parents.linkedAt', {email: link.parentEmail || translate('advising:parents.noEmail'), date: link.linkedAt ? formatUtcTimestamp(link.linkedAt) : '—'})}</span>
             </div>
-            {scope !== 'advisor' && link.parentUserId != null ? <button type="button" className={styles.danger} disabled={unlink.isPending || save.isPending} onClick={() => {if (window.confirm('Remove this parent’s access to the student? The parent account will not be deleted.')) unlink.mutate(link.parentUserId!);}}>{unlink.isPending ? 'Unlinking…' : 'Unlink'}</button> : null}
+            {scope !== 'advisor' && link.parentUserId != null ? <button type="button" className={styles.danger} disabled={unlink.isPending || save.isPending} onClick={async () => {if (await confirmation.confirm({titleKey: 'advising:parents.unlink', messageKey: 'advising:parents.confirmUnlink'})) unlink.mutate(link.parentUserId!);}}>{unlink.isPending ? translate("advising:parents.unlinking") : translate("advising:parents.unlink")}</button> : null}
           </article>
         ))}
       </div> : null}
       {!links.isPending && !links.isError && (links.data ?? []).length === 0 ? (
         <div className={presentation === 'panel' ? `${panel.empty} ${scope === 'tenant' ? panel.emptyCompact : ''}` : styles.emptyState}>
           {presentation === 'panel' ? <span className={panel.emptyIcon} aria-hidden="true"><UsersRound size={scope === 'tenant' ? 24 : 32}/></span> : null}
-          <strong>No parent or guardian linked</strong>
-          <span>{scope === 'advisor' ? 'No relationship was included in the handover record.' : 'Add a relationship below if the student needs parent or guardian access.'}</span>
+          <strong>{translate("advising:parents.empty")}</strong>
+          <span>{scope === 'advisor' ? translate("advising:parents.handoverEmpty") : translate("advising:parents.emptyHelp")}</span>
         </div>
       ) : null}
       {scope !== 'advisor' && links.isSuccess ? (
-        <form className={styles.form} onSubmit={event => { event.preventDefault(); save.mutate(); }}>
-          {scope === 'tenant' ? <div className={styles.actions}><button type="button" className={tenantMode === 'create' ? styles.selectedOption : styles.secondary} onClick={() => { setTenantMode('create'); setSelectedParent(null); setParent(current => ({...current, parentUserId: ''})); }}>Create or reuse by email</button><button type="button" className={tenantMode === 'existing' ? styles.selectedOption : styles.secondary} onClick={() => setTenantMode('existing')}>Link existing Parent</button></div> : null}
-          {scope === 'tenant' && tenantMode === 'existing' ? <div className={styles.pickerField}><span>Existing Parent</span><TenantUserPicker title="Choose an existing Parent" description="Searches active Parent identities in this tenant by name or email." triggerLabel="Choose Parent" levels={['PARENT']} selectedUser={selectedParent} onSelect={user => { setSelectedParent(user); setParent(current => ({...current, parentUserId: String(user.id)})); }}/></div> : null}
-          {scope === 'counsellor' ? <label><span>Existing parent user ID (optional)</span><input inputMode="numeric" value={parent.parentUserId} onChange={event => setParent(current => ({...current, parentUserId: event.target.value}))}/><small className={styles.fieldHelp}>Use this only when you already know the parent account ID. Otherwise, create or reuse the account by email.</small></label> : null}
+        <form noValidate className={styles.form} onSubmit={event => {
+          event.preventDefault();
+          const emailField = event.currentTarget.querySelector<HTMLInputElement>('input[type="email"]');
+          const invalid = parent.parentUserId
+            ? (!/^[1-9]\d*$/.test(parent.parentUserId) || !Number.isSafeInteger(Number(parent.parentUserId)) ? 'advising:parents.invalidId' : null)
+            : !parent.email.trim() || emailField?.validity.typeMismatch ? 'auth:signupErrors.emailInvalid'
+              : !parent.firstName.trim() ? 'operations:directory.validation.firstName'
+                : !parent.lastName.trim() ? 'operations:directory.validation.lastName' : null;
+          setValidationKey(invalid);
+          if (!invalid && !save.isPending && !unlink.isPending) save.mutate();
+        }}>
+          {validationKey ? <p className={styles.error} role="alert">{translate(validationKey)}</p> : null}
+          {scope === 'tenant' ? <div className={styles.actions}><button type="button" className={tenantMode === 'create' ? styles.selectedOption : styles.secondary} onClick={() => { setTenantMode('create'); setSelectedParent(null); setParent(current => ({...current, parentUserId: ''})); }}>{translate("advising:parents.createByEmail")}</button><button type="button" className={tenantMode === 'existing' ? styles.selectedOption : styles.secondary} onClick={() => setTenantMode('existing')}>{translate("advising:parents.linkExisting")}</button></div> : null}
+          {scope === 'tenant' && tenantMode === 'existing' ? <div className={styles.pickerField}><span>{translate("advising:parents.existing")}</span><TenantUserPicker title={translate("advising:parents.chooseExisting")} description={translate("advising:parents.searchHelp")} triggerLabel={translate("advising:parents.choose")} levels={['PARENT']} selectedUser={selectedParent} onSelect={user => { setSelectedParent(user); setParent(current => ({...current, parentUserId: String(user.id)})); }}/></div> : null}
+          {scope === 'counsellor' ? <label><span>{translate("advising:parents.existingId")}</span><input inputMode="numeric" value={parent.parentUserId} onChange={event => setParent(current => ({...current, parentUserId: event.target.value}))}/><small className={styles.fieldHelp}>{translate("advising:parents.idHelp")}</small></label> : null}
           <div className={presentation === 'panel' && scope === 'tenant' && tenantMode === 'create' ? panel.formFields : panel.stackedFields}>
           {(scope === 'tenant' ? tenantMode === 'create' : !parent.parentUserId) ? (
             <>
-              <label><span>Parent email</span><input required type="email" value={parent.email} onChange={event => setParent(current => ({...current, email: event.target.value}))}/></label>
-              <label><span>First name</span><input required maxLength={100} value={parent.firstName} onChange={event => setParent(current => ({...current, firstName: event.target.value}))}/></label>
-              <label><span>Middle name</span><input maxLength={100} value={parent.middleName} onChange={event => setParent(current => ({...current, middleName: event.target.value}))}/></label>
-              <label><span>Last name</span><input required maxLength={100} value={parent.lastName} onChange={event => setParent(current => ({...current, lastName: event.target.value}))}/></label>
+              <label><span>{translate("advising:parents.email")}</span><input required type="email" value={parent.email} onChange={event => setParent(current => ({...current, email: event.target.value}))}/></label>
+              <label><span>{translate("common:fields.firstName")}</span><input required maxLength={100} value={parent.firstName} onChange={event => setParent(current => ({...current, firstName: event.target.value}))}/></label>
+              <label><span>{translate("auth:signup.middleNameLabel")}</span><input maxLength={100} value={parent.middleName} onChange={event => setParent(current => ({...current, middleName: event.target.value}))}/></label>
+              <label><span>{translate("common:fields.lastName")}</span><input required maxLength={100} value={parent.lastName} onChange={event => setParent(current => ({...current, lastName: event.target.value}))}/></label>
             </>
           ) : null}
-          <label className={panel.relationshipNote}><span>Relationship note</span><input value={parent.reason} onChange={event => setParent(current => ({...current, reason: event.target.value}))}/><small className={styles.fieldHelp}>Optional context for staff, such as “guardian” or “primary contact”.</small></label>
+          <label className={panel.relationshipNote}><span>{translate("advising:parents.note")}</span><input value={parent.reason} onChange={event => setParent(current => ({...current, reason: event.target.value}))}/><small className={styles.fieldHelp}>{translate("advising:parents.noteHelp")}</small></label>
           </div>
-          <button className={styles.primary} disabled={save.isPending || unlink.isPending || (tenantMode === 'existing' && !selectedParent)}>{save.isPending ? 'Saving…' : !parent.parentUserId ? 'Create or reuse Parent' : 'Link Parent'}</button>
+          <button className={styles.primary} disabled={save.isPending || unlink.isPending || (tenantMode === 'existing' && !selectedParent)}>{save.isPending ? translate("common:actions.saving") : !parent.parentUserId ? translate("advising:parents.create") : translate("advising:parents.link")}</button>
         </form>
       ) : null}
     </div>
   );
   return presentation === 'panel'
-    ? <WorkspaceSection appearance="record" title="Parent or guardian access" icon={scope === 'tenant' ? <UsersRound size={22}/> : undefined} count={links.isSuccess ? links.data?.length : undefined}>{content}</WorkspaceSection>
-    : <CollapsibleSection title="Parent or guardian access" summary={description} count={links.data?.length} className={styles.disclosureLayout} revealKey={links.isError || mutationError ? 'error' : undefined}>{content}</CollapsibleSection>;
+    ? <WorkspaceSection appearance="record" title={translate("advising:parents.title")} icon={scope === 'tenant' ? <UsersRound size={22}/> : undefined} count={links.isSuccess ? links.data?.length : undefined}>{content}</WorkspaceSection>
+    : <CollapsibleSection title={translate("advising:parents.title")} summary={description} count={links.data?.length} className={styles.disclosureLayout} revealKey={links.isError || mutationError ? 'error' : undefined}>{content}</CollapsibleSection>;
 };

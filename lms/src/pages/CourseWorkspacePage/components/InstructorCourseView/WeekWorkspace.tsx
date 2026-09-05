@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {LocalizedError} from '@/i18n/errors';
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { generatePath, Link } from "react-router-dom";
@@ -46,6 +48,7 @@ export function WeekWorkspace({
   canUpload: boolean;
   currentUserId: number;
 }) {
+  const {t: translate} = useTranslation();
   const [editor, setEditor] = useState<CourseWeek | "new" | null>(null);
   const client = useQueryClient();
   const ordered = [...weeks].sort(
@@ -78,14 +81,14 @@ export function WeekWorkspace({
           currentUserId={currentUserId}
         />
       ) : (
-        <section className={styles.detail} aria-label="Selected week">
+        <section className={styles.detail} aria-label={translate("course:weeks.selected")}>
           <div className={styles.empty}>
             <BookOpen size={28} />
-            <h2>Your course content starts here</h2>
+            <h2>{translate("course:weeks.start")}</h2>
             <p>
               {canEdit
-                ? "Add a week, then upload its learning materials."
-                : "Course weeks will appear here when available."}
+                ? translate("course:weeks.startHelp")
+                : translate("course:weeks.awaitContent")}
             </p>
           </div>
         </section>
@@ -127,6 +130,7 @@ function SelectedWeek({
   canUpload: boolean;
   currentUserId: number;
 }) {
+  const {t: translate} = useTranslation();
   const [manage, setManage] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const overview = useQuery({
@@ -138,7 +142,7 @@ function SelectedWeek({
         "get week",
       );
       if (result?.id !== week.id)
-        throw new Error("The week overview could not be loaded.");
+        throw new LocalizedError("course:weeks.overviewFailed");
       return result;
     },
     staleTime: 60_000,
@@ -161,7 +165,7 @@ function SelectedWeek({
       const ids = weeks.map((item) => item.id);
       const target = index + (value === "up" ? -1 : 1);
       if (target < 0 || target >= ids.length)
-        throw new Error("This week is already at the end of the list.");
+        throw new LocalizedError("course:weeks.listEnd");
       [ids[index], ids[target]] = [ids[target], ids[index]];
       return api.reorderWeeks(courseId, ids).then(() => undefined);
     },
@@ -173,7 +177,7 @@ function SelectedWeek({
   return (
     <section
       className={styles.detail}
-      aria-label="Selected week"
+      aria-label={translate("course:weeks.selected")}
       aria-busy={action.isPending}
     >
       <header className={styles.detailHeader}>
@@ -181,7 +185,7 @@ function SelectedWeek({
           <h2>{week.title}</h2>
           <div className={styles.weekMeta}>
             <TeachingBadge value={week.state}>{week.state}</TeachingBadge>
-            <span>Week {index + 1}</span>
+            <span>{translate("calendar:views.week")}{' '}{index + 1}</span>
           </div>
         </div>
         {canEdit ? (
@@ -198,7 +202,7 @@ function SelectedWeek({
                 event.currentTarget.open = false;
             }}
           >
-            <summary aria-label="Week actions">
+            <summary aria-label={translate("course:weeks.actions")}>
               <MoreHorizontal size={21} />
             </summary>
             <div
@@ -216,8 +220,7 @@ function SelectedWeek({
                 onClick={editWeek}
               >
                 <Pencil size={16} />
-                Edit week
-              </button>
+                {translate("course:weeks.edit")}</button>
               <button
                 type="button"
                 disabled={action.isPending}
@@ -232,7 +235,7 @@ function SelectedWeek({
                 ) : (
                   <Eye size={16} />
                 )}
-                {week.state === "Published" ? "Unpublish week" : "Publish week"}
+                {week.state === "Published" ? translate("course:weeks.unpublish") : translate("course:weeks.publish")}
               </button>
               <button
                 type="button"
@@ -240,16 +243,14 @@ function SelectedWeek({
                 onClick={() => action.mutate("up")}
               >
                 <ArrowUp size={16} />
-                Move week up
-              </button>
+                {translate("course:weeks.moveUp")}</button>
               <button
                 type="button"
                 disabled={index === weeks.length - 1 || action.isPending}
                 onClick={() => action.mutate("down")}
               >
                 <ArrowDown size={16} />
-                Move week down
-              </button>
+                {translate("course:weeks.moveDown")}</button>
               <button
                 type="button"
                 disabled={action.isPending}
@@ -257,32 +258,30 @@ function SelectedWeek({
                 className={styles.danger}
               >
                 <Trash2 size={16} />
-                Delete week
-              </button>
+                {translate("course:weeks.delete")}</button>
             </div>
           </details>
         ) : null}
       </header>
       {!confirmDelete ? <TeachingError error={action.error} /> : null}
       <div className={styles.overview}>
-        <h3>Overview</h3>
+        <h3>{translate("advising:studentPlan.overview")}</h3>
         {summary ? (
           <p>{summary}</p>
         ) : (
           <p className={styles.muted}>
             {week.summary === undefined && overview.isPending
-              ? "Loading overview…"
+              ? translate("course:weeks.loadingOverview")
               : summary === undefined
-                ? "Overview unavailable."
-                : "No overview added."}
+                ? translate("course:weeks.overviewUnavailable")
+                : translate("course:weeks.noOverview")}
             {overview.isError ? (
               <button
                 type="button"
                 className={styles.textButton}
                 onClick={() => void overview.refetch()}
               >
-                Retry overview
-              </button>
+                {translate("course:weeks.retryOverview")}</button>
             ) : null}
             {canEdit ? (
               <>
@@ -292,8 +291,7 @@ function SelectedWeek({
                   className={styles.textButton}
                   onClick={editWeek}
                 >
-                  Add an overview
-                </button>
+                  {translate("course:weeks.addOverview")}</button>
               </>
             ) : null}
           </p>
@@ -303,14 +301,13 @@ function SelectedWeek({
         {manage ? (
           <>
             <div className={styles.materialToolbar}>
-              <h3>Manage learning materials</h3>
+              <h3>{translate("course:materialEditor.manage")}</h3>
               <button
                 type="button"
                 className={styles.textButton}
                 onClick={() => setManage(false)}
               >
-                Done
-              </button>
+                {translate("common:admin.done")}</button>
             </div>
             <WeekContentCard
               key={week.id}
@@ -331,7 +328,7 @@ function SelectedWeek({
               week={week}
               onOpenMaterial={onOpenMaterial}
               compact
-              label="Learning materials"
+              label={translate("course:materials.title")}
             />
             {canUpload || canEdit ? (
               <div className={styles.manageRow}>
@@ -341,15 +338,14 @@ function SelectedWeek({
                   onClick={() => setManage(true)}
                 >
                   <Settings2 size={16} />
-                  {week.materials.length ? "Manage materials" : "Add materials"}
+                  {week.materials.length ? translate("course:materialEditor.manageAction") : translate("course:materialEditor.add")}
                 </button>
                 {canEdit && week.materials.length ? (
                   <Link
                     className={styles.textButton}
                     to={`${generatePath(routes.courseCourseIdOperations, { courseId: String(courseId) })}?section=content`}
                   >
-                    Material links
-                  </Link>
+                    {translate("operations:materialLinks")}</Link>
                 ) : null}
               </div>
             ) : null}
@@ -358,13 +354,13 @@ function SelectedWeek({
       </div>
       {confirmDelete ? (
         <TeachingDialog
-          title="Delete this week?"
+          title={translate("course:weeks.deleteTitle")}
           busy={action.isPending}
           onClose={() => setConfirmDelete(false)}
           description={
             week.materials.length
-              ? "Move or delete the materials in this week before deleting it."
-              : `This removes “${week.title}” from the course.`
+              ? translate("course:weeks.deleteBlocked")
+              : translate('course:weeks.deleteDescription', {title: week.title})
           }
         >
           <TeachingError error={action.error} />
@@ -375,16 +371,14 @@ function SelectedWeek({
               disabled={action.isPending}
               onClick={() => setConfirmDelete(false)}
             >
-              Keep week
-            </button>
+              {translate("course:weeks.keep")}</button>
             <button
               type="button"
               className={styles.secondary}
               disabled={week.materials.length > 0 || action.isPending}
               onClick={() => action.mutate("delete")}
             >
-              Delete week
-            </button>
+              {translate("course:weeks.delete")}</button>
           </div>
         </TeachingDialog>
       ) : null}

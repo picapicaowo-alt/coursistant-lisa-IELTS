@@ -1,3 +1,6 @@
+import {LocalizedError} from '@/i18n/errors';
+import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import {
@@ -27,7 +30,9 @@ export function IntakeAssignmentEditor({
   onUpdated: () => Promise<void>;
   onPendingChange?: (pending: boolean) => void;
 }) {
+  const { t: translate } = useTranslation();
   const [reviewed, setReviewed] = useState(intake);
+  const confirmation = useConfirmationDialog(`${intake.intakeId}/${intake.intakeVersion}`);
   const [advisor, setAdvisor] = useState<ManagedUser | null>(null);
   const [reason, setReason] = useState("");
   const [reloadRequired, setReloadRequired] = useState(false);
@@ -36,12 +41,10 @@ export function IntakeAssignmentEditor({
   const save = useMutation({
     mutationFn: async (action: "assign" | "cancel") => {
       if (reviewed.lifecycleStatus !== "OPEN" || reloadRequired)
-        throw new Error("Reload and review the intake before continuing.");
+        throw new LocalizedError("advising:intake.reviewRequired");
       if (action === "cancel") {
         if (assigned || !reason.trim())
-          throw new Error(
-            "Only unassigned intakes can be cancelled. Enter a reason.",
-          );
+          throw new LocalizedError("advising:intake.cancelValidation");
         const request = {
           expectedIntakeVersion: reviewed.intakeVersion,
           reason: reason.trim(),
@@ -59,10 +62,10 @@ export function IntakeAssignmentEditor({
           "tenantCancel",
         );
       }
-      if (!advisor) throw new Error("Select an eligible advisor.");
+      if (!advisor) throw new LocalizedError("advising:intake.selectEligible");
       if (assigned) {
         if (reviewed.assignmentVersion == null)
-          throw new Error("Refresh the intake before reassigning the advisor.");
+          throw new LocalizedError("advising:intake.refreshRequired");
         const request = {
           advisorUserId: advisor.id,
           expectedAssignmentVersion: reviewed.assignmentVersion,
@@ -129,47 +132,45 @@ export function IntakeAssignmentEditor({
 
   return (
     <div className={styles.form}>
+      {confirmation.dialog}
       {save.isError && !reloadRequired ? (
         <p className={feedback.error} role="alert">
           {advisingErrorMessage(
             save.error,
-            "The assignment could not be updated.",
+            translate("advising:intake.assignmentFailed"),
           )}
         </p>
       ) : null}
       {save.isSuccess ? (
         <p className={feedback.success} role="status">
           {save.variables === "cancel"
-            ? "Intake cancelled."
-            : "Advisor assignment saved."}
+            ? translate("advising:intake.cancelled")
+            : translate("advising:intake.assignmentSaved")}
         </p>
       ) : null}
       {reloadRequired || (assigned && reviewed.assignmentVersion == null) ? (
         <div className={feedback.conflictNotice} role="alert">
           <p>
-            Load the latest intake and review its assignment before confirming.
-            Your selection and reason are preserved.
-          </p>
+            {translate("advising:intake.reloadHelp")}</p>
           <button
             type="button"
             className={styles.secondaryButton}
             disabled={busy}
             onClick={() => reload.mutate()}
           >
-            Load latest intake
-          </button>
+            {translate("advising:intake.loadLatest")}</button>
         </div>
       ) : null}
       {reload.isError ? (
         <p className={feedback.error} role="alert">
           {advisingErrorMessage(
             reload.error,
-            "The latest intake could not be loaded.",
+            translate("advising:intake.loadFailed"),
           )}
         </p>
       ) : null}
       {reviewed.lifecycleStatus === "CANCELLED" ? (
-        <p>Cancelled intakes cannot be assigned or edited.</p>
+        <p>{translate("advising:intake.cancelledReadonly")}</p>
       ) : (
         <form
           className={styles.form}
@@ -179,15 +180,15 @@ export function IntakeAssignmentEditor({
           }}
         >
           <div>
-            <span>Eligible advisor</span>
+            <span>{translate("advising:intake.eligibleAdvisor")}</span>
             <TenantUserPicker
               title={
                 assigned
-                  ? "Choose the replacement advisor"
-                  : "Choose an advisor"
+                  ? translate("advising:intake.chooseReplacement")
+                  : translate("common:intake.chooseAdvisor")
               }
-              description="Searches active Advisor and Instructor Advisor identities in this tenant."
-              triggerLabel="Choose advisor"
+              description={translate("advising:intake.advisorSearchHelp")}
+              triggerLabel={translate("advising:intake.chooseAdvisor")}
               levels={[...TENANT_ADVISOR_LEVELS]}
               selectedUser={advisor}
               onSelect={setAdvisor}
@@ -196,8 +197,8 @@ export function IntakeAssignmentEditor({
           <label>
             <span>
               {assigned
-                ? "Reason (recommended for reassignment)"
-                : "Reason (required only when cancelling)"}
+                ? translate("advising:intake.reassignReason")
+                : translate("advising:intake.cancelReason")}
             </span>
             <textarea
               maxLength={1000}
@@ -216,27 +217,24 @@ export function IntakeAssignmentEditor({
               }
             >
               {save.isPending
-                ? "Saving…"
+                ? translate("common:actions.saving")
                 : assigned
-                  ? "Reassign advisor"
-                  : "Assign advisor"}
+                  ? translate("advising:intake.reassign")
+                  : translate("advising:intake.assign")}
             </button>
             {!assigned ? (
               <button
                 type="button"
                 className={styles.dangerButton}
                 disabled={busy || !reason.trim() || reloadRequired}
-                onClick={() => {
+                onClick={async () => {
                   if (
-                    window.confirm(
-                      "Cancel this intake? It will no longer be available for assignment.",
-                    )
+                    !busy && !reloadRequired && reason.trim() && await confirmation.confirm({titleKey: 'advising:intake.cancel', messageKey: 'advising:intake.confirmCancel'})
                   )
                     save.mutate("cancel");
                 }}
               >
-                Cancel intake
-              </button>
+                {translate("advising:intake.cancel")}</button>
             ) : null}
           </div>
         </form>

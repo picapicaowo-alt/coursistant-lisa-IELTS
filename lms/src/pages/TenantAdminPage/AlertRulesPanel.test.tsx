@@ -50,7 +50,7 @@ const renderPanel = () => {
 };
 const editInactivity = async (value: string) => {
   fireEvent.click(
-    await screen.findByRole("button", { name: "Edit learning inactivity" }),
+    await screen.findByRole("button", { name: "Edit Learning inactivity" }),
   );
   const dialog = await screen.findByRole("dialog", {
     name: "Learning inactivity",

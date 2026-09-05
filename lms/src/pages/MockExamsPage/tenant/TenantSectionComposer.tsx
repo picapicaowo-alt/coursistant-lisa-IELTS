@@ -1,5 +1,8 @@
-import {useTranslation} from 'react-i18next';
-import {advisingErrorMessage} from '@/pages/advising/advisingErrors';
+import {LocalizedError} from '@/i18n/errors';
+import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
+import { useTranslation } from 'react-i18next';
 import {useEffect, useRef, useState, type SetStateAction} from 'react';
 import {
   useIsMutating,
@@ -8,6 +11,7 @@ import {
 } from '@tanstack/react-query';
 import {Plus} from 'lucide-react';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
+import {advisingErrorMessage} from '@/pages/advising/advisingErrors';
 import {
   SECTION_META,
   listeningPayload,
@@ -53,10 +57,13 @@ export function TenantSectionComposer({
   onBack: () => void;
   onSaved: () => Promise<void>;
 }) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const [active, setActive] = useState(0);
+  const confirmation = useConfirmationDialog(`${templateId}/${versionId}/${section}/${active}`);
+  const latestDraft = useRef(draft);
+  latestDraft.current = draft;
   const [review, setReview] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState<unknown>(null);
   const [showIssues, setShowIssues] = useState(false);
   const feedback = useRef<HTMLDivElement>(null);
   const reviewPanel = useRef<HTMLElement>(null);
@@ -84,7 +91,7 @@ export function TenantSectionComposer({
   }, [review, showIssues]);
   const update = (next: SetStateAction<SectionDraft>) => {
     setReview(false);
-    setError('');
+    setError(null);
     onChange(next);
   };
   const changeUnit = (change: (current: typeof unit) => typeof unit) =>
@@ -126,11 +133,9 @@ export function TenantSectionComposer({
     mutationKey,
     mutationFn: () => {
       if (client.isMutating({mutationKey}) > 1)
-        throw new Error('Wait for the current content operation to finish.');
+        throw new LocalizedError("exams:templates.contentBusy");
       if (sectionIssues(section, draft).length)
-        throw new Error(
-          'Some content needs attention. Keep editing and review the section again.',
-        );
+        throw new LocalizedError("exams:authoring.needsAttention");
       return section === 'listening'
         ? mockExamApiService.createTenantListening(
             templateId,
@@ -164,22 +169,19 @@ export function TenantSectionComposer({
       if (section === 'listening') listeningPayload(draft);
       else if (section === 'reading') readingPayload(draft);
       else writingPayload(draft);
-      setError('');
+      setError(null);
       setShowIssues(false);
       setReview(true);
     } catch (problem) {
-      setError(
-        problem instanceof Error
-          ? problem.message
-          : 'Review all fields before submitting.',
-      );
+      setError(problem);
     }
   };
   return (
     <div className={authoring.composer}>
-      {section !== 'writing' ? <div className={authoring.notice} role="note">
-        <strong>Correct answers are required before saving.</strong>
-        <p>Enter official accepted answers in the question form, or include verified answer keys in imported or advanced question data. A preview alone does not mean the paper is ready to save or assign.</p>
+      {confirmation.dialog}
+      {section !== "writing" ? <div className={authoring.notice} role="note">
+        <strong>{translate("exams:authoring.answersRequired")}</strong>
+        <p>{translate("exams:authoring.answersRequiredHelp")}</p>
       </div> : null}
       {section === 'reading' && !review ? (
         <ReadingImport
@@ -196,7 +198,7 @@ export function TenantSectionComposer({
       ) : null}
       <div
         className={styles.partNav}
-        aria-label={`${meta.label} ${meta.unit.toLowerCase()} navigation`}
+        aria-label={translate('exams:authoring.unitNavigation', {section: translate(meta.labelKey), unit: translate(meta.unitKey).toLowerCase()})}
       >
         {draft.units.map((item, index) => (
           <button
@@ -210,7 +212,7 @@ export function TenantSectionComposer({
               setReview(false);
             }}
           >
-            {meta.unit} {index + 1}
+            {translate(meta.numberKey, {number: formatNumber(index + 1)})}
           </button>
         ))}
         <button
@@ -237,7 +239,7 @@ export function TenantSectionComposer({
           }}
         >
           <Plus size={15} />
-          Add {meta.unit.toLowerCase()}
+          {translate('common:actions.addItem', {item: translate(meta.unitKey).toLowerCase()})}
         </button>
       </div>
       <div className={authoring.layout}>
@@ -256,16 +258,14 @@ export function TenantSectionComposer({
           >
             <section className={`${ui.surface} ${authoring.surface}`}>
               <div className={ui.sectionHeading}>
-                <h2>{meta.unit} Settings</h2>
+                <h2>{translate('exams:authoring.unitSettings', {unit: translate(meta.unitKey)})}</h2>
                 {draft.units.length > 1 ? (
                   <button
                     type="button"
                     className={ui.dangerLink}
-                    onClick={() => {
+                    onClick={async () => {
                       if (
-                        window.confirm(
-                          `Remove ${meta.unit.toLowerCase()} ${active + 1} from this unsaved draft?`,
-                        )
+                        await confirmation.confirm({titleKey: 'common:actions.remove', messageKey: 'exams:authoring.removeUnitConfirm', valueKeys: {unit: meta.unitKey}}) && latestDraft.current === draft
                       ) {
                         update((current) => ({
                           ...current,
@@ -277,13 +277,13 @@ export function TenantSectionComposer({
                       }
                     }}
                   >
-                    Remove {meta.unit.toLowerCase()}
+                    {translate('common:actions.removeItem', {item: translate(meta.unitKey).toLowerCase()})}
                   </button>
                 ) : null}
               </div>
               <div className={`${ui.fieldGrid} ${authoring.settingsGrid}`}>
                 <label>
-                  <span>{meta.label} duration (minutes)</span>
+                  <span>{translate('exams:authoring.duration', {section: translate(meta.labelKey)})}</span>
                   <input
                     required
                     type="number"
@@ -296,18 +296,18 @@ export function TenantSectionComposer({
                     }}
                   />
                   <small className={ui.hint}>
-                    Applies to the complete {meta.label.toLowerCase()} section.
+                    {translate('exams:authoring.durationHelp', {section: translate(meta.labelKey).toLowerCase()})}
                   </small>
                 </label>
                 <label>
                   <span>
-                    {meta.unit} {section === 'writing' ? 'title' : 'name'}
+                    {translate(section === 'writing' ? 'exams:authoring.unitTitle' : 'exams:authoring.unitName', {unit: translate(meta.unitKey)})}
                   </span>
                   <input
                     value={section === 'writing' ? unit.title : unit.label}
-                    placeholder={`${meta.unit} ${active + 1}`}
+                    placeholder={i18n.getFixedT('en')(meta.numberKey, {number: active + 1})}
                     aria-describedby="unit-name-help"
-                    aria-label={`${meta.unit} ${section === 'writing' ? 'title' : 'name'}`}
+                    aria-label={translate(section === 'writing' ? 'exams:authoring.unitTitle' : 'exams:authoring.unitName', {unit: translate(meta.unitKey)})}
                     onChange={(event) =>
                       patchUnit(
                         section === 'writing'
@@ -317,8 +317,7 @@ export function TenantSectionComposer({
                     }
                   />
                   <small id="unit-name-help" className={ui.hint}>
-                    Shown to students. Leave blank to use “{meta.unit}{' '}
-                    {active + 1}”.
+                    {translate('exams:authoring.unitNameHelp', {name: i18n.getFixedT('en')(meta.numberKey, {number: active + 1})})}
                   </small>
                 </label>
                 {section !== 'writing' && unit.questions.length === 1 ? (
@@ -332,11 +331,11 @@ export function TenantSectionComposer({
             {section === 'reading' ? (
               <section className={`${ui.surface} ${authoring.surface}`}>
                 <div className={ui.sectionHeading}>
-                  <h2>Passage content</h2>
+                  <h2>{translate("exams:authoring.passageContent")}</h2>
                 </div>
                 <div className={ui.form}>
                   <label>
-                    <span>Passage title</span>
+                    <span>{translate("exams:authoring.passageTitle")}</span>
                     <input
                       value={unit.title}
                       onChange={(event) =>
@@ -345,7 +344,7 @@ export function TenantSectionComposer({
                     />
                   </label>
                   <label>
-                    <span>Introduction</span>
+                    <span>{translate("exams:authoring.introduction")}</span>
                     <textarea
                       value={unit.intro}
                       onChange={(event) =>
@@ -364,11 +363,11 @@ export function TenantSectionComposer({
             {section === 'writing' ? (
               <section className={`${ui.surface} ${authoring.surface}`}>
                 <div className={ui.sectionHeading}>
-                  <h2>Task content</h2>
+                  <h2>{translate("exams:authoring.taskContent")}</h2>
                 </div>
                 <div className={ui.form}>
                   <label>
-                    <span>Writing prompt</span>
+                    <span>{translate("exams:authoring.writingPrompt")}</span>
                     <textarea
                       required
                       value={unit.prompt}
@@ -378,7 +377,7 @@ export function TenantSectionComposer({
                     />
                   </label>
                   <label>
-                    <span>Minimum words</span>
+                    <span>{translate("exams:authoring.minimumWordsLabel")}</span>
                     <input
                       required
                       type="number"
@@ -397,23 +396,21 @@ export function TenantSectionComposer({
                   <section
                     className={`${ui.surface} ${authoring.surface}`}
                     key={question.draftId}
-                    aria-label={`Content for question group ${index + 1}`}
+                    aria-label={translate('exams:authoring.groupContentLabel', {number: formatNumber(index + 1)})}
                   >
                     <div className={ui.sectionHeading}>
                       <h2>
                         {unit.questions.length === 1
-                          ? 'Content'
-                          : `Content · Group ${index + 1}`}
+                          ? translate("common:admin.examFields.content")
+                          : translate('exams:authoring.groupContent', {number: formatNumber(index + 1)})}
                       </h2>
                       {unit.questions.length > 1 ? (
                         <button
                           type="button"
                           className={ui.dangerLink}
-                          onClick={() => {
+                          onClick={async () => {
                             if (
-                              window.confirm(
-                                'Remove this unsaved question group?',
-                              )
+                              await confirmation.confirm({titleKey: 'exams:authoring.removeGroup', messageKey: 'exams:authoring.removeGroupConfirm'}) && latestDraft.current === draft
                             )
                               changeUnit((current) => ({
                                 ...current,
@@ -423,8 +420,7 @@ export function TenantSectionComposer({
                               }));
                           }}
                         >
-                          Remove group
-                        </button>
+                          {translate("exams:authoring.removeGroup")}</button>
                       ) : null}
                     </div>
                     <div className={`${ui.form} ${authoring.fields}`}>
@@ -439,7 +435,7 @@ export function TenantSectionComposer({
                         </div>
                       ) : null}
                       <label>
-                        <span>Question group title (optional)</span>
+                        <span>{translate("exams:authoring.groupTitleOptional")}</span>
                         <input
                           value={question.title}
                           placeholder={questionTitle(question)}
@@ -449,10 +445,10 @@ export function TenantSectionComposer({
                         />
                       </label>
                       <label>
-                        <span>Instructions for students</span>
+                        <span>{translate("exams:authoring.instructions")}</span>
                         <textarea
                           value={question.instruction}
-                          placeholder="For example: Choose the correct letter, A, B or C."
+                          placeholder={translate("exams:authoring.instructionsPlaceholder")}
                           onChange={(event) =>
                             patchQuestion(index, {
                               instruction: event.target.value,
@@ -467,11 +463,11 @@ export function TenantSectionComposer({
             {section !== 'reading' ? (
               <section className={`${ui.surface} ${authoring.surface}`}>
                 <div className={ui.sectionHeading}>
-                  <h2>Media</h2>
+                  <h2>{translate("exams:authoring.media")}</h2>
                   <span className={ui.hint}>
                     {section === 'listening'
-                      ? 'Audio required for this part'
-                      : 'Optional task image'}
+                      ? translate("exams:authoring.audioRequired")
+                      : translate("exams:authoring.optionalTaskImage")}
                   </span>
                 </div>
                 <TenantMediaManager
@@ -487,15 +483,15 @@ export function TenantSectionComposer({
             ) : (
               <section className={`${ui.surface} ${authoring.surface}`}>
                 <div className={ui.sectionHeading}>
-                  <h2>Media</h2>
+                  <h2>{translate("exams:authoring.media")}</h2>
                 </div>
                 <div className={authoring.fields}>
                   {unit.questions.map((question, index) => (
                     <div key={question.draftId}>
                       <p className={authoring.mediaLabel}>
                         {unit.questions.length === 1
-                          ? 'Question image (optional)'
-                          : `Group ${index + 1} image (optional)`}
+                          ? translate("exams:authoring.optionalQuestionImage")
+                          : translate('exams:authoring.groupImageOptional', {number: formatNumber(index + 1)})}
                       </p>
                       <TenantMediaManager
                         templateId={templateId}
@@ -513,21 +509,22 @@ export function TenantSectionComposer({
             {section !== 'writing' ? (
               <section
                 className={`${ui.surface} ${authoring.surface}`}
-                aria-label="Question configuration"
+                aria-label={translate("exams:authoring.questionConfiguration")}
               >
                 <div className={ui.sectionHeading}>
-                  <h2>Question Configuration</h2>
+                  <h2>{translate("exams:authoring.questionConfigurationTitle")}</h2>
                 </div>
                 <div className={authoring.fields}>
                   {unit.questions.map((question, index) => (
                     <div
                       key={question.draftId}
                       role="group"
-                      aria-label={`Question group ${index + 1}`}
+                      aria-label={translate('exams:authoring.groupNumber', {number: formatNumber(index + 1)})}
+                      data-question-group-index={index}
                     >
                       {unit.questions.length > 1 ? (
                         <h3 className={authoring.groupTitle}>
-                          Question group {index + 1}
+                          {translate('exams:authoring.groupNumber', {number: formatNumber(index + 1)})}
                         </h3>
                       ) : null}
                       <QuestionEditor
@@ -537,7 +534,7 @@ export function TenantSectionComposer({
                         suggestedNumber={nextQuestionNumber}
                       />
                       <details className={authoring.advanced}>
-                        <summary>Preview this question group</summary>
+                        <summary>{translate("exams:authoring.previewGroup")}</summary>
                         <QuestionPreview
                           key={question.payload + question.kind}
                           subject={section}
@@ -570,8 +567,7 @@ export function TenantSectionComposer({
                       }));
                     }}
                   >
-                    <Plus size={16} /> Add question group
-                  </button>
+                    <Plus size={16} /> {' '}{translate("exams:authoring.addGroup")}</button>
                 </div>
               </section>
             ) : null}
@@ -584,8 +580,7 @@ export function TenantSectionComposer({
               role="alert"
             >
               <strong>
-                {issues.length} item{issues.length === 1 ? '' : 's'} to check
-                before review
+                {translate('exams:authoring.reviewIssues', {count: issues.length, number: formatNumber(issues.length)})}
               </strong>
               <ul>
                 {issues.map((issue, index) => (
@@ -602,7 +597,7 @@ export function TenantSectionComposer({
                             ?.closest('form')
                             ?.querySelector<HTMLElement>(
                               issue.groupIndex !== undefined
-                                ? `[aria-label="Question group ${issue.groupIndex + 1}"]`
+                                ? `[data-question-group-index="${issue.groupIndex}"]`
                                 : 'fieldset',
                             );
                           element?.scrollIntoView({block: 'start'});
@@ -615,8 +610,8 @@ export function TenantSectionComposer({
                       }}
                     >
                       {issue.unitIndex === null
-                        ? meta.label
-                        : `${meta.unit} ${issue.unitIndex + 1}${issue.groupIndex === undefined ? '' : ` · Group ${issue.groupIndex + 1}`}`}
+                        ? translate(meta.labelKey)
+                        : <>{translate(meta.numberKey, {number: formatNumber(issue.unitIndex + 1)})}{issue.groupIndex === undefined ? null : <> · {translate('exams:authoring.groupShort', {number: formatNumber(issue.groupIndex + 1)})}</>}</>}
                       : {issue.message}
                     </button>
                   </li>
@@ -624,13 +619,9 @@ export function TenantSectionComposer({
               </ul>
             </div>
           ) : null}
-          {!review && (error || save.error) ? (
+          {!review && Boolean(error || save.error) ? (
             <p className={ui.inlineError} role="alert">
-              {error ||
-                advisingErrorMessage(
-                  save.error,
-                  'The section could not be created. Your draft is preserved.',
-                )}
+              {advisingErrorMessage(error || save.error, translate(error ? 'exams:authoring.reviewFields' : 'exams:authoring.createFailed'))}
             </p>
           ) : null}
           {review ? (
@@ -638,17 +629,13 @@ export function TenantSectionComposer({
               ref={reviewPanel}
               tabIndex={-1}
               className={`${ui.surface} ${authoring.surface} ${authoring.review}`}
-              aria-label="Review section submission"
+              aria-label={translate("exams:authoring.reviewSubmission")}
             >
               <h2>
-                {draft.units.length === 1
-                  ? `Submit this ${meta.unit.toLowerCase()}?`
-                  : `Submit all ${draft.units.length} ${meta.unit.toLowerCase()}s?`}
+                {translate('exams:authoring.submitUnits', {count: draft.units.length, number: formatNumber(draft.units.length), unit: translate(meta.unitKey).toLowerCase()})}
               </h2>
               <p>
-                {meta.label} · {draft.minutes} minutes · {draft.units.length}{' '}
-                {meta.unit.toLowerCase()}
-                {draft.units.length === 1 ? '' : 's'}
+                {translate(meta.labelKey)} · {translate('assessment:attempt.duration', {count: Number(draft.minutes), number: formatNumber(Number(draft.minutes))})} · {translate('exams:authoring.unitCount', {count: draft.units.length, number: formatNumber(draft.units.length)})}
               </p>
               <SectionReview
                 section={section}
@@ -659,21 +646,17 @@ export function TenantSectionComposer({
                   setActive(index);
                 }}
               />
-              {section !== 'writing' ? <p className={authoring.notice}>
-                Answer-key format checks do not verify which answers are correct or
-                how the backend scores them. Confirm the official answers with
-                your content team before publishing.
-              </p> : <p className={authoring.notice}>Writing responses are reviewed by the instructor selected when the exam is assigned.</p>}
+              <p className={authoring.notice}>
+                {translate(section === "writing" ? "exams:authoring.writingReview" : "exams:authoring.scoringReview")}
+              </p>
               <p>
-                This creates the complete {meta.label.toLowerCase()} section.
-                Once saved, its content is read only. Make any final edits
-                before confirming.
+                {translate('exams:authoring.createHelp', {section: translate(meta.labelKey).toLowerCase()})}
               </p>
               {save.error ? (
                 <p className={ui.inlineError} role="alert">
                   {advisingErrorMessage(
                     save.error,
-                    'The section could not be created. Your draft is preserved. Try again when ready.',
+                    translate('exams:authoring.createRetryFailed'),
                   )}
                 </p>
               ) : null}
@@ -685,8 +668,8 @@ export function TenantSectionComposer({
                   onClick={() => save.mutate()}
                 >
                   {save.isPending
-                    ? 'Creating section…'
-                    : 'Confirm and create section'}
+                    ? translate("exams:authoring.creatingSection")
+                    : translate("exams:authoring.confirmCreate")}
                 </button>
                 <button
                   type="button"
@@ -694,16 +677,13 @@ export function TenantSectionComposer({
                   disabled={save.isPending}
                   onClick={() => setReview(false)}
                 >
-                  Keep editing
-                </button>
+                  {translate("operations:keepEditing")}</button>
               </div>
             </section>
           ) : null}
           {!review ? (
             <p className={authoring.saveHint}>
-              Draft content stays in this browser tab. Review every{' '}
-              {meta.unit.toLowerCase()} before saving; saved sections are read
-              only.
+              {translate('exams:authoring.draftHelp', {unit: translate(meta.unitKey).toLowerCase()})}
             </p>
           ) : null}
           <footer className={styles.composerFooter} hidden={review}>
@@ -712,17 +692,14 @@ export function TenantSectionComposer({
                 className={ui.primaryButton}
                 disabled={contentBusy || review}
               >
-                Review &amp; save
-              </button>
+                {translate("exams:authoring.reviewSave")}</button>
               <button
                 type="button"
                 className={ui.secondaryButton}
                 disabled={contentBusy}
-                onClick={() => {
+                onClick={async () => {
                   if (
-                    window.confirm(
-                      `Discard the unsaved ${meta.label.toLowerCase()} section, including all ${meta.unit.toLowerCase()}s? Uploaded files will not be deleted.`,
-                    )
+                    await confirmation.confirm({titleKey: 'exams:authoring.discardDraft', messageKey: 'exams:authoring.discardConfirm', valueKeys: {section: meta.labelKey}}) && latestDraft.current === draft && !client.isMutating({mutationKey})
                   ) {
                     update(newDraft());
                     setActive(0);
@@ -731,8 +708,7 @@ export function TenantSectionComposer({
                   }
                 }}
               >
-                Discard draft
-              </button>
+                {translate("exams:authoring.discardDraft")}</button>
             </div>
             <div className={ui.actions}>
               <button
@@ -745,7 +721,7 @@ export function TenantSectionComposer({
                 }}
               >
 
-          {translate(`common:navigationControls.previousExamUnit.${section}`)}
+          {translate('common:actions.previousItem', {item: translate(meta.unitKey).toLowerCase()})}
               </button>
               <button
                 type="button"
@@ -756,7 +732,7 @@ export function TenantSectionComposer({
                   setReview(false);
                 }}
               >
-          {translate(`common:navigationControls.nextExamUnit.${section}`)}
+          {translate('common:actions.nextItem', {item: translate(meta.unitKey).toLowerCase()})}
 
               </button>
             </div>

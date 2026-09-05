@@ -70,7 +70,7 @@ test('tenant reference layouts render across desktop and mobile without page ove
   const errors: string[] = []; page.on('pageerror', error => errors.push(error.message));
   const directory = '.impeccable/review/tenant-admin'; await mkdir(directory, {recursive: true});
   const screens = [
-    ['dashboard', '/admin/dashboard', 'Welcome back, Grace'], ['people', '/admin', 'Tenant governance'],
+    ['dashboard', '/admin/dashboard', 'Welcome back, Grace!'], ['people', '/admin', 'Tenant governance'],
     ['ownership', '/admin?section=ownership', 'Tenant governance'], ['alerts', '/admin?section=alerts', 'Tenant governance'],
     ['audit', '/admin?section=audit', 'Tenant governance'], ['intakes', '/admin/intakes', 'Student intakes'],
     ['templates', '/mock-exams', 'Mock exam templates'], ['version', '/mock-exams?template=48&version=480', titles[0]],
@@ -191,7 +191,7 @@ test('composer keeps tab drafts and submits every part once then becomes read on
   await page.getByRole('button', {name: 'Part 2', exact: true}).click();
   await expect(page.getByLabel('Part name', {exact: true})).toHaveValue('Part 2');
   await page.getByRole('button', {name: 'Review & save', exact: true}).click();
-  await expect(page.getByText('Submit all 2 parts?')).toBeVisible();
+  await expect(page.getByText('Submit all 2 units?')).toBeVisible();
   expect(requests.filter(request => request.method === 'POST')).toHaveLength(0);
   await page.getByRole('button', {name: 'Confirm and create section'}).click();
   await expect(page.getByRole('heading', {name: 'Listening content', exact: true})).toBeVisible();
@@ -299,8 +299,8 @@ test('an in-flight reading upload keeps its question identity when another group
   await page.getByLabel('Choose media file').nth(1).setInputFiles({name: 'question.png', mimeType: 'image/png', buffer: Buffer.from('isolated upload fixture')});
   await page.getByRole('button', {name: 'Upload and use', exact: true}).click();
   await expect.poll(() => Boolean(finishUpload)).toBe(true);
-  page.once('dialog', dialog => dialog.accept());
   await page.getByRole('button', {name: 'Remove group', exact: true}).first().click();
+  await page.getByRole('dialog').getByRole('button', {name: 'Confirm', exact: true}).click();
   finishUpload!();
   await expect(page.getByRole('radio')).toBeChecked();
   await expect(page.getByLabel('Question group title (optional)', {exact: true})).toHaveValue('Keep this group');

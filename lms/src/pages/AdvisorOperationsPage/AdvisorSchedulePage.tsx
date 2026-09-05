@@ -1,3 +1,7 @@
+import {InstructorAvailabilityPanel} from './InstructorAvailabilityPanel';
+import {formatNumber} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
+import { useTranslation } from 'react-i18next';
 import {useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -14,10 +18,10 @@ import {courseOperationsApiService} from '@/apis/services/course-operations-api'
 import {ADVISOR_PAGE_SIZE} from '@/apis/types/advisorWorkspace';
 import {idempotencyFingerprint} from '@/hooks/useIdempotencyCheckpoint';
 import {isConflict} from '@/utils/apiError';
-import {InstructorAvailabilityPanel} from './InstructorAvailabilityPanel';
 import {advisorScheduleRequestViews, type AdvisorScheduleRequestView} from './advisorViewModels';
 
 export default function AdvisorSchedulePage() {
+  const { t: translate } = useTranslation();
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [searchParams] = useSearchParams();
@@ -29,6 +33,7 @@ export default function AdvisorSchedulePage() {
   const [scheduleConflict, setScheduleConflict] = useState(false);
   const [scheduleDecision, setScheduleDecision] = useState('APPROVE');
   const [rejectionReason, setRejectionReason] = useState('');
+  const [invalidDecision, setInvalidDecision] = useState(false);
 
   const scheduleRequests = useQuery({
     queryKey: ['advisor', 'schedule-requests', schedulePage, requestType, studentFilter],
@@ -77,49 +82,46 @@ export default function AdvisorSchedulePage() {
   });
 
   const scheduleRows = advisorScheduleRequestViews(scheduleRequests.data);
-  const scheduleError = scheduleRequests.error || scheduleMutation.error;
   return <div className={styles.page}>
-    <header className={styles.header}><div><h1>Scheduling</h1><p className={styles.lede}>Review schedule requests and check instructor availability.</p></div><Link className={styles.secondaryLink} to={APP_ROUTE_PATHS.advisorOperations}>Back to dashboard</Link></header>
+    <header className={styles.header}><div><h1>{translate("navigation:scheduling")}</h1><p className={styles.lede}>{translate("advising:scheduling.description")}</p></div><Link className={styles.secondaryLink} to={APP_ROUTE_PATHS.advisorOperations}>{translate("course:detail.backToDashboard")}</Link></header>
         <div className={layout.grid}><WorkspaceSection
-          title="Schedule requests"
+          title={translate("operations:scheduleRequests")}
           id="schedule-requests"
           className={layout.primary}
-          meta={<span className={styles.countBadge}>{scheduleRequests.data?.total ?? 0}</span>}
+          meta={<span className={styles.countBadge}>{scheduleRequests.isError || scheduleRequests.isPending ? '—' : formatNumber(scheduleRequests.data?.total ?? 0)}</span>}
         >
           <div className={styles.form}>
             <label>
-              Request type
-              <select
+              {translate("operations:requestType")}<select
                 value={requestType}
                 onChange={event => {
                   setRequestType(event.target.value);
                   setSchedulePage(0);
                 }}
               >
-                <option value="">All requests</option>
-                <option>ABSENCE</option>
-                <option>SCHEDULE_CHANGE</option>
+                <option value="">{translate("advising:scheduling.allRequests")}</option>
+                <option value="ABSENCE">{statusLabel('ABSENCE')}</option>
+                <option value="SCHEDULE_CHANGE">{statusLabel('SCHEDULE_CHANGE')}</option>
               </select>
             </label>
           </div>
           {studentFilter ? (
             <p>
-              Requests for student #{studentFilter} ·{' '}
-              <Link to={APP_ROUTE_PATHS.advisorSchedule}>Show all students</Link>
+              {translate("advising:scheduling.studentFilter", {id: formatNumber(studentFilter)})} ·{' '}
+              <Link to={APP_ROUTE_PATHS.advisorSchedule}>{translate("advising:scheduling.allStudents")}</Link>
             </p>
           ) : null}
-          {scheduleError ? (
+          {scheduleRequests.isError ? (
             <p className={styles.error} role="alert">
-              {advisingErrorMessage(scheduleError, 'Schedule requests could not be loaded.')}
+              {advisingErrorMessage(scheduleRequests.error, translate("advising:scheduling.failed"))}
             </p>
           ) : null}
-          {scheduleRequests.isPending ? <p className={styles.status}>Loading schedule requests…</p> : null}
+          {scheduleRequests.isPending ? <p className={styles.status}>{translate("learning:schedule.loadingRequests")}</p> : null}
           {!scheduleRequests.isPending && !scheduleRequests.isError && scheduleRows.length === 0 ? (
             <div className={styles.emptyState}>
-              <strong>No schedule requests are waiting</strong>
+              <strong>{translate("advising:scheduling.empty")}</strong>
               <span>
-                Student and parent requests will appear here for your review.
-              </span>
+                {translate("advising:scheduling.emptyHelp")}</span>
             </div>
           ) : null}
 
@@ -129,7 +131,7 @@ export default function AdvisorSchedulePage() {
                 <div className={styles.inboxMain}>
                   <div className={styles.rowTitle}>
                     <strong>{request.studentName}</strong>
-                    <span className={styles.statusPill}>{request.status || request.requestType || 'Pending'}</span>
+                    <span className={styles.statusPill}>{statusLabel(request.status || request.requestType || 'PENDING')}</span>
                   </div>
                   <span>
                     {request.courseLabel}
@@ -147,14 +149,13 @@ export default function AdvisorSchedulePage() {
                     setScheduleConflict(false);
                   }}
                 >
-                  Review request
-                </button>
+                  {translate("operations:reviewRequest")}</button>
               </article>
             ))}
           </div>
 
           <AdvisingPagination
-            label="Schedule request pages"
+            label={translate("advising:scheduling.pages")}
             page={schedulePage}
             total={scheduleRequests.data?.total ?? 0}
             onPage={setSchedulePage}
@@ -163,20 +164,26 @@ export default function AdvisorSchedulePage() {
           {scheduleReview ? (
             <form
               className={styles.reviewPanel}
+              noValidate
               onSubmit={event => {
                 event.preventDefault();
+                setInvalidDecision(false);
+                if (scheduleMutation.isPending || scheduleConflict || scheduleReview.expectedVersion == null || (Boolean(scheduleReview.status) && scheduleReview.status !== 'PENDING')) return;
+                if (scheduleDecision === 'REJECT' && !rejectionReason.trim()) {setInvalidDecision(true); return;}
                 scheduleMutation.mutate(scheduleReview);
               }}
             >
               <div>
-                <strong>Review request #{scheduleReview.requestId}</strong>
+                <strong>{translate("advising:scheduling.reviewNumber", {id: formatNumber(scheduleReview.requestId)})}</strong>
                 <span>
-                  {scheduleReview.studentName} · version {scheduleReview.expectedVersion}
+                  {translate("advising:scheduling.studentVersion", {name: scheduleReview.studentName, version: scheduleReview.expectedVersion == null ? '—' : formatNumber(scheduleReview.expectedVersion)})}
                 </span>
               </div>
+              {invalidDecision ? <p className={styles.error} role="alert">{translate("advising:scheduling.requiredReason")}</p> : null}
+              {scheduleMutation.isError && !scheduleConflict ? <p className={styles.error} role="alert">{advisingErrorMessage(scheduleMutation.error, translate("advising:scheduling.decisionFailed"))}</p> : null}
               {scheduleConflict ? (
                 <div role="alert">
-                  <p>The request changed. Your decision and reason are preserved.</p>
+                  <p>{translate("advising:scheduling.conflict")}</p>
                   <button
                     type="button"
                     onClick={() =>
@@ -192,25 +199,22 @@ export default function AdvisorSchedulePage() {
                       })
                     }
                   >
-                    Load latest request
-                  </button>
+                    {translate("advising:scheduling.loadLatest")}</button>
                 </div>
               ) : null}
               <label>
-                Decision
-                <select
+                {translate("operations:decision")}<select
                   value={scheduleDecision}
                   onChange={event => setScheduleDecision(event.target.value)}
                 >
                   {SCHEDULE_DECISIONS.map(decision => (
-                    <option key={decision}>{decision}</option>
+                    <option key={decision} value={decision}>{statusLabel(decision)}</option>
                   ))}
                 </select>
               </label>
               {scheduleDecision === 'REJECT' ? (
                 <label>
-                  Reason
-                  <textarea
+                  {translate("common:fields.reason")}<textarea
                     required
                     value={rejectionReason}
                     onChange={event => setRejectionReason(event.target.value)}
@@ -229,7 +233,7 @@ export default function AdvisorSchedulePage() {
                     (scheduleDecision === 'REJECT' && !rejectionReason.trim())
                   }
                 >
-                  {scheduleMutation.isPending ? 'Saving…' : 'Save decision'}
+                  {scheduleMutation.isPending ? translate("common:actions.saving") : translate("advising:scheduling.saveDecision")}
                 </button>
                 <button
                   type="button"
@@ -237,14 +241,13 @@ export default function AdvisorSchedulePage() {
                   disabled={scheduleMutation.isPending}
                   onClick={() => setScheduleReview(null)}
                 >
-                  Cancel
-                </button>
+                  {translate("common:actions.cancel")}</button>
               </div>
             </form>
           ) : null}
         </WorkspaceSection>
 
-        <InstructorAvailabilityPanel/>
+        <InstructorAvailabilityPanel />
         </div>
   </div>;
 }

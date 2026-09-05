@@ -66,7 +66,7 @@ export function ManagedUserDialog({
     },
     onSuccess: async (_data, action) => {
       setReview(null);
-      setMessage(t(`common:admin.${action.type}Success`));
+      setMessage(`common:admin.${action.type}Success`);
       await Promise.all([
         client.invalidateQueries({ queryKey: ["admin", "users"] }),
         client.invalidateQueries({
@@ -256,7 +256,7 @@ export function ManagedUserDialog({
         ) : null}
         {message ? (
           <p role="status" className={styles.message}>
-            {message}
+            {t(message)}
           </p>
         ) : null}
       </div>

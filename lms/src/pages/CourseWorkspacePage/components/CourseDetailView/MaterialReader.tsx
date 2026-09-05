@@ -25,6 +25,7 @@ function FilePreview({
   material: CourseMaterial;
   courseId: number;
 }) {
+  const {t: translate} = useTranslation();
   const [url, setUrl] = useState<string>();
   const [downloadError, setDownloadError] = useState<unknown>();
   const preview = useQuery({
@@ -66,20 +67,17 @@ function FilePreview({
     <div className={styles.preview}>
       {!material.previewAvailable ? (
         <p>
-          A browser preview is not available for this file. Download it to
-          continue reading.
-        </p>
+          {translate("course:reader.noPreview")}</p>
       ) : preview.isPending ? (
-        <p role="status">Loading material…</p>
+        <p role="status">{translate("course:reader.loading")}</p>
       ) : preview.isError ? (
         <p role="alert">
           {getApiErrorMessage(
             preview.error,
-            'This material could not be loaded.',
+            translate('course:reader.loadFailed'),
           )}{' '}
           <button type="button" onClick={() => void preview.refetch()}>
-            Retry
-          </button>
+            {translate("common:actions.retry")}</button>
         </p>
       ) : url ? (
         type.startsWith('video/') ? (
@@ -89,9 +87,9 @@ function FilePreview({
         ) : type.startsWith('image/') ? (
           <img src={url} alt={material.displayName} />
         ) : type === 'application/pdf' ? (
-          <Suspense fallback={<p role="status">Loading PDF viewer…</p>}><PdfMaterialPreview blob={preview.data!} title={material.displayName} onRetry={() => preview.refetch()}/></Suspense>
+          <Suspense fallback={<p role="status">{translate("course:reader.loadingPdf")}</p>}><PdfMaterialPreview blob={preview.data!} title={material.displayName} onRetry={() => preview.refetch()}/></Suspense>
         ) : (
-          <p>Download this file to view it in a compatible application.</p>
+          <p>{translate("course:reader.downloadHelp")}</p>
         )
       ) : null}
       <button
@@ -99,13 +97,12 @@ function FilePreview({
         className={styles.download}
         onClick={() => void download()}
       >
-        Download material
-      </button>
+        {translate("course:reader.download")}</button>
       {downloadError ? (
         <p role="alert">
           {getApiErrorMessage(
             downloadError,
-            'The file could not be downloaded.',
+            translate('course:reader.downloadFailed'),
           )}
         </p>
       ) : null}
@@ -138,15 +135,14 @@ export function MaterialReader({
   if (!material)
     return (
       <section className={styles.reader}>
-        <p role="alert">This learning material is unavailable.</p>
+        <p role="alert">{translate("course:reader.unavailable")}</p>
         <button type="button" onClick={onClose}>
-          Back to course
-        </button>
+          {translate("common:navigationControls.backToCourse")}</button>
       </section>
     );
   const embed = embeddedVideoUrl(material.linkUrl);
   return (
-    <section className={styles.reader} aria-label="Course learning viewer">
+    <section className={styles.reader} aria-label={translate("course:reader.title")}>
       <header>
         <button type="button" onClick={onClose}>
           {translate("common:navigationControls.backToCourse")}
@@ -178,8 +174,8 @@ export function MaterialReader({
                       <span>{item.displayName}</span>
                       <small>
                         {item.materialType === 'LINK'
-                          ? 'Link'
-                          : item.extension || 'File'}
+                          ? translate("common:status.LINK")
+                          : item.extension || translate("common:status.FILE")}
                       </small>
                     </button>
                   </li>
@@ -206,7 +202,7 @@ export function MaterialReader({
             />
           ) : (
             <div className={styles.linkResource}>
-              <p>Open this learning resource to read the published material.</p>
+              <p>{translate("course:reader.linkHelp")}</p>
               {safeLink(material.linkUrl) ? (
                 <a
                   className={styles.primary}
@@ -214,19 +210,16 @@ export function MaterialReader({
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Open learning resource ↗
-                </a>
+                  {translate("course:reader.openLink")}</a>
               ) : (
                 <p role="alert">
-                  This resource does not contain a supported link.
-                </p>
+                  {translate("course:reader.invalidLink")}</p>
               )}
             </div>
           )}
-          <footer role="toolbar" aria-label="Learning tools">
+          <footer role="toolbar" aria-label={translate("course:reader.tools")}>
             <button type="button" onClick={onDiscussion}>
-              <MessageSquare size={16} aria-hidden="true"/>Discussion
-            </button>
+              <MessageSquare size={16} aria-hidden="true"/>{translate("course:learning.tabs.discussion")}</button>
           </footer>
         </div>
 

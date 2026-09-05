@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useId} from 'react';
 import {answerKeyErrors, withOfficialAnswers} from './answerKeys';
 import ui from '@/components/TenantWorkspace/workspace.module.scss';
@@ -11,6 +12,7 @@ export function AnswerKeyFields({
   onChange: (value: unknown) => void;
   path: string;
 }) {
+  const {t: translate} = useTranslation();
   const hintId = useId();
   const present =
     Object.prototype.hasOwnProperty.call(value, 'answer') ||
@@ -29,9 +31,7 @@ export function AnswerKeyFields({
   if (!editable)
     return (
       <p className={ui.inlineError} role="alert">
-        {errors.join(' ')} Correct the answer key in Advanced data; the original
-        is preserved.
-      </p>
+        {errors.join(' ')} {' '}{translate("exams:authoring.answerAdvanced")}</p>
     );
   const answers =
     typeof value.answer === 'string'
@@ -41,9 +41,9 @@ export function AnswerKeyFields({
         : [];
   return (
     <label>
-      <span>Official accepted answers</span>
+      <span>{translate("exams:authoring.officialAnswers")}</span>
       <textarea
-        aria-label={`${path} / Official accepted answers`}
+        aria-label={`${path} / ${translate('exams:authoring.officialAnswers')}`}
         aria-describedby={hintId}
         rows={2}
         value={answers.join('\n')}
@@ -52,11 +52,7 @@ export function AnswerKeyFields({
         }
       />
       <small id={hintId}>
-        Enter one official answer per line. One line saves a single answer;
-        additional lines are equivalent alternatives. Do not leave blank or
-        duplicate lines. Word order matters: cow dung and dung cow are different
-        answers.
-      </small>
+        {translate("exams:authoring.answerHelp")}</small>
       {present && errors.length ? (
         <small className={ui.inlineError} role="alert">
           {errors.join(' ')}

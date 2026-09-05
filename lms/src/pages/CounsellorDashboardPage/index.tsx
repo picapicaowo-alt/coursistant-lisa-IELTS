@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {Link} from 'react-router-dom';
 import {Plus} from 'lucide-react';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
@@ -10,6 +11,7 @@ import {useDashboardSizing} from './useDashboardSizing';
 import styles from './index.module.scss';
 
 const CounsellorDashboardPage = () => {
+  const { t: translate } = useTranslation();
   const sizing = useDashboardSizing();
   const workspace = useCounsellorDashboard(sizing.intakePageSize, sizing.advisorPageSize);
 
@@ -17,9 +19,9 @@ const CounsellorDashboardPage = () => {
     <div className={styles.page}>
       <div ref={sizing.canvasRef} className={styles.canvas}>
       <header className={styles.header}>
-        <h1>Intake dashboard</h1>
-        <Link className={styles.primary} aria-label="Create student" to={APP_ROUTE_PATHS.counsellorIntakesNew}>
-          <Plus size={18} aria-hidden="true"/><span className={styles.createLabel}>Create student</span><span className={styles.compactCreateLabel}>Create</span>
+        <h1>{translate("advising:counsellor.dashboard")}</h1>
+        <Link className={styles.primary} aria-label={translate("advising:counsellor.createStudent")} to={APP_ROUTE_PATHS.counsellorIntakesNew}>
+          <Plus size={18} aria-hidden="true"/><span className={styles.createLabel}>{translate("advising:counsellor.createStudent")}</span><span className={styles.compactCreateLabel}>{translate("course:scheduleModal.createButton")}</span>
         </Link>
       </header>
       <DashboardMetrics query={workspace.metrics}/>

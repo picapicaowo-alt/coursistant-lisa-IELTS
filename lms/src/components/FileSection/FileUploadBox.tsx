@@ -1,4 +1,5 @@
 import React from 'react';
+import {LocalizedError} from '@/i18n/errors';
 import {useTranslation} from "react-i18next";
 import styles from './FileUploadBox.module.scss';
 import {v4} from "uuid";
@@ -94,7 +95,7 @@ const FileUploadBox: React.FC<FileUploadBoxProps> = ({
         if (onUploadSucceed) onUploadSucceed(id, uploadedFileId);
       })
       .catch((reason: unknown) => {
-        const error = reason instanceof Error ? reason : new Error('Upload failed');
+        const error = reason instanceof Error ? reason : new LocalizedError('common:files.uploadFailed');
         if (onUploadError) onUploadError(id, error);
       });
   };

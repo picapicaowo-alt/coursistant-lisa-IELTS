@@ -1,28 +1,108 @@
 export interface FileTypeOption {
   extension: string;
-  label: string;
-  group: string;
+  labelKey: string;
+  groupKey: string;
 }
 
 export const ASSIGNMENT_FILE_TYPE_OPTIONS: FileTypeOption[] = [
-  {extension: 'pdf', label: 'PDF document', group: 'Documents'},
-  {extension: 'doc', label: 'Word document', group: 'Documents'},
-  {extension: 'docx', label: 'Word document', group: 'Documents'},
-  {extension: 'odt', label: 'OpenDocument text', group: 'Documents'},
-  {extension: 'rtf', label: 'Rich Text Format', group: 'Documents'},
-  {extension: 'txt', label: 'Plain text', group: 'Documents'},
-  {extension: 'md', label: 'Markdown', group: 'Documents'},
-  {extension: 'xls', label: 'Excel workbook', group: 'Spreadsheets'},
-  {extension: 'xlsx', label: 'Excel workbook', group: 'Spreadsheets'},
-  {extension: 'csv', label: 'Comma-separated values', group: 'Spreadsheets'},
-  {extension: 'ppt', label: 'PowerPoint presentation', group: 'Presentations'},
-  {extension: 'pptx', label: 'PowerPoint presentation', group: 'Presentations'},
-  {extension: 'png', label: 'PNG image', group: 'Images'},
-  {extension: 'jpg', label: 'JPEG image', group: 'Images'},
-  {extension: 'jpeg', label: 'JPEG image', group: 'Images'},
-  {extension: 'gif', label: 'GIF image', group: 'Images'},
-  {extension: 'webp', label: 'WebP image', group: 'Images'},
-  {extension: 'zip', label: 'ZIP archive', group: 'Archives'},
-  {extension: 'json', label: 'JSON data', group: 'Data and code'},
-  {extension: 'xml', label: 'XML data', group: 'Data and code'},
+  {
+    extension: "pdf",
+    labelKey: "assessment:files.pdf",
+    groupKey: "assessment:files.groups.documents",
+  },
+  {
+    extension: "doc",
+    labelKey: "assessment:files.word",
+    groupKey: "assessment:files.groups.documents",
+  },
+  {
+    extension: "docx",
+    labelKey: "assessment:files.word",
+    groupKey: "assessment:files.groups.documents",
+  },
+  {
+    extension: "odt",
+    labelKey: "assessment:files.odt",
+    groupKey: "assessment:files.groups.documents",
+  },
+  {
+    extension: "rtf",
+    labelKey: "assessment:files.rtf",
+    groupKey: "assessment:files.groups.documents",
+  },
+  {
+    extension: "txt",
+    labelKey: "assessment:files.text",
+    groupKey: "assessment:files.groups.documents",
+  },
+  {
+    extension: "md",
+    labelKey: "assessment:files.markdown",
+    groupKey: "assessment:files.groups.documents",
+  },
+  {
+    extension: "xls",
+    labelKey: "assessment:files.excel",
+    groupKey: "assessment:files.groups.spreadsheets",
+  },
+  {
+    extension: "xlsx",
+    labelKey: "assessment:files.excel",
+    groupKey: "assessment:files.groups.spreadsheets",
+  },
+  {
+    extension: "csv",
+    labelKey: "assessment:files.csv",
+    groupKey: "assessment:files.groups.spreadsheets",
+  },
+  {
+    extension: "ppt",
+    labelKey: "assessment:files.powerpoint",
+    groupKey: "assessment:files.groups.presentations",
+  },
+  {
+    extension: "pptx",
+    labelKey: "assessment:files.powerpoint",
+    groupKey: "assessment:files.groups.presentations",
+  },
+  {
+    extension: "png",
+    labelKey: "assessment:files.png",
+    groupKey: "assessment:files.groups.images",
+  },
+  {
+    extension: "jpg",
+    labelKey: "assessment:files.jpeg",
+    groupKey: "assessment:files.groups.images",
+  },
+  {
+    extension: "jpeg",
+    labelKey: "assessment:files.jpeg",
+    groupKey: "assessment:files.groups.images",
+  },
+  {
+    extension: "gif",
+    labelKey: "assessment:files.gif",
+    groupKey: "assessment:files.groups.images",
+  },
+  {
+    extension: "webp",
+    labelKey: "assessment:files.webp",
+    groupKey: "assessment:files.groups.images",
+  },
+  {
+    extension: "zip",
+    labelKey: "assessment:files.zip",
+    groupKey: "assessment:files.groups.archives",
+  },
+  {
+    extension: "json",
+    labelKey: "assessment:files.json",
+    groupKey: "assessment:files.groups.data",
+  },
+  {
+    extension: "xml",
+    labelKey: "assessment:files.xml",
+    groupKey: "assessment:files.groups.data",
+  },
 ];

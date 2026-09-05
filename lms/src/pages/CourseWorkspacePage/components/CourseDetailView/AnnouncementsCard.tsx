@@ -1,4 +1,4 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import {Link} from 'react-router-dom';
 import type {CourseAnnouncementSummary} from '@/apis';
@@ -26,7 +26,7 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({
   failed,
   canManage = false,
 }) => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const ordered = [...announcements].sort(
     (a, b) => parseUtcTimestamp(b.postedAt).getTime() - parseUtcTimestamp(a.postedAt).getTime(),
   );
@@ -35,21 +35,20 @@ export const AnnouncementsCard: React.FC<AnnouncementsCardProps> = ({
   return (
     <section className={styles.card}>
       <div className={styles.cardHeader}>
-        <h2 className={styles.cardTitle}>Announcements</h2>
+        <h2 className={styles.cardTitle}>{translate("course:detail.announcements")}</h2>
         <Link
           to={`/course/${courseId}/announcements`}
           className={styles.addButton}
         >
-          {canManage ? 'Manage announcements' : 'View all'}
+          {canManage ? translate("course:workspace.manageAnnouncements") : translate("common:actions.viewAll")}
         </Link>
       </div>
 
       {failed ? (
         <p className={styles.cardEmpty} role="alert">
-          Couldn&apos;t load announcements.
-        </p>
+          {translate("course:workspace.announcementsFailed")}</p>
       ) : ordered.length === 0 ? (
-        <p className={styles.cardEmpty}>No announcements in this course yet.</p>
+        <p className={styles.cardEmpty}>{translate("course:workspace.announcementsEmpty")}</p>
       ) : (
         <>
           <ul className={styles.rowList}>

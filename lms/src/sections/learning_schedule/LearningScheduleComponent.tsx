@@ -1,4 +1,4 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import React, {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {
@@ -15,11 +15,12 @@ import {
 } from 'date-fns';
 import {useDashboardActivities, ACTIVITY_WINDOW_DAYS} from '@/pages/LmsHomePage/hooks/useDashboardActivities';
 import './LearningScheduleComponent.scss';
+import {formatDateTime, formatNumber, formatClockTime} from '@/i18n/formatting';
 
 const DATE_KEY = 'yyyy-MM-dd';
 
 const LearningScheduleComponent: React.FC<{spacious?: boolean}> = ({spacious = false}) => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const {activities, isLoading, isError, refetch} = useDashboardActivities();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -40,25 +41,25 @@ const LearningScheduleComponent: React.FC<{spacious?: boolean}> = ({spacious = f
   return (
     <div className={`learning-schedule${spacious ? ' learning-schedule--spacious' : ''}`}>
       <header className="learning-schedule__header">
-        <h2>Learning Schedule</h2>
-        <Link to="/calendar" aria-label="Open full calendar">
+        <h2>{translate('dashboard:schedule.title')}</h2>
+        <Link to="/calendar" aria-label={translate('dashboard:schedule.open')}>
           <img src="/icons/figma-dashboard/maximize.svg" alt=""/>
         </Link>
       </header>
 
       <div className="learning-schedule__calendar">
         <div className="learning-schedule__month">
-          <button type="button" aria-label={translate('common:dateTime.previousMonth')} title={translate('common:dateTime.previousMonth')} onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+          <button type="button" aria-label={translate("common:dateTime.previousMonth")} title={translate("common:dateTime.previousMonth")} onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
             <img src="/icons/figma-dashboard/arrow-left.svg" alt=""/>
           </button>
-          <strong>{format(currentMonth, 'MMMM yyyy')}</strong>
-          <button type="button" aria-label={translate('common:dateTime.nextMonth')} title={translate('common:dateTime.nextMonth')} onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+          <strong>{formatDateTime(currentMonth, {month: 'long', year: 'numeric'})}</strong>
+          <button type="button" aria-label={translate("common:dateTime.nextMonth")} title={translate("common:dateTime.nextMonth")} onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
             <img src="/icons/figma-dashboard/arrow-right.svg" alt=""/>
           </button>
         </div>
 
         <div className="learning-schedule__weekdays" aria-hidden="true">
-          {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((label, index) => <span key={`${label}-${index}`}>{label}</span>)}
+          {calendarDays.slice(0, 7).map(day => <span key={day.getDay()}>{formatDateTime(day, {weekday: 'narrow'})}</span>)}
         </div>
 
         <div className="learning-schedule__days">
@@ -74,10 +75,10 @@ const LearningScheduleComponent: React.FC<{spacious?: boolean}> = ({spacious = f
                 data-outside={outside || undefined}
                 data-has-activity={activityDates.has(dateKey) || undefined}
                 onClick={() => {setSelectedDate(day); setDateSelected(true);}}
-                aria-label={format(day, 'EEEE, MMMM d, yyyy')}
+                aria-label={formatDateTime(day, {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'})}
                 aria-pressed={selected}
               >
-                {format(day, 'd')}
+                {formatNumber(day.getDate())}
               </button>
             );
           })}
@@ -85,28 +86,28 @@ const LearningScheduleComponent: React.FC<{spacious?: boolean}> = ({spacious = f
       </div>
 
       <div className="learning-schedule__timeline">
-        {dateSelected ? <button className="learning-schedule__reset" type="button" onClick={() => setDateSelected(false)}>Show upcoming classes</button> : null}
-        {isLoading ? <p className="learning-schedule__status">Loading schedule…</p> : null}
+        {dateSelected ? <button className="learning-schedule__reset" type="button" onClick={() => setDateSelected(false)}>{translate('dashboard:schedule.upcoming')}</button> : null}
+        {isLoading ? <p className="learning-schedule__status">{translate("dashboard:loadingSchedule")}</p> : null}
         {isError ? (
           <p className="learning-schedule__status" role="alert">
-            Couldn&apos;t load your schedule. <button type="button" onClick={refetch}>Retry</button>
+            {translate('dashboard:schedule.failed')} <button type="button" onClick={refetch}>{translate("common:actions.retry")}</button>
           </p>
         ) : null}
         {!isLoading && !isError && upcoming.length === 0 ? (
-          <p className="learning-schedule__status">{dateSelected ? `No loaded sessions for ${format(selectedDate, 'MMM d')}. Open the full calendar to see other dates.` : `No sessions in the next ${ACTIVITY_WINDOW_DAYS} days.`}</p>
+          <p className="learning-schedule__status">{dateSelected ? translate('dashboard:schedule.noLoaded', {date: formatDateTime(selectedDate, {month: 'short', day: 'numeric'})}) : translate('dashboard:schedule.noUpcoming', {count: ACTIVITY_WINDOW_DAYS})}</p>
         ) : null}
         {!isLoading && !isError ? upcoming.map((activity, index) => (
           <Link
             to={`/course/${activity.courseId}`}
             className="learning-schedule__event"
             key={`${activity.source}-${activity.sourceId}-${activity.startTime}`}
-            aria-label={`Open ${activity.courseCode}: ${activity.title}`}
+            aria-label={translate('dashboard:schedule.openActivity', {code: activity.courseCode, title: activity.title})}
           >
             <i data-muted={index === 2 || undefined}/>
             <span>
-              <small>{isSameDay(new Date(`${activity.date}T00:00:00`), new Date()) ? 'Today' : format(new Date(`${activity.date}T00:00:00`), 'MMM d, EEE')}</small>
+              <small>{isSameDay(new Date(`${activity.date}T00:00:00`), new Date()) ? translate("common:dateTime.today") : formatDateTime(new Date(`${activity.date}T00:00:00`), {month: 'short', day: 'numeric', weekday: 'short'})}</small>
               <strong>{activity.title}</strong>
-              <em>{activity.startTime.slice(0, 5)} - {activity.endTime.slice(0, 5)}</em>
+              <em>{formatClockTime(activity.startTime)} – {formatClockTime(activity.endTime)}</em>
             </span>
           </Link>
         )) : null}

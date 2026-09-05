@@ -7,7 +7,7 @@ import {calendarLocalFields} from '@/utils/datetime';
 export const LEARNING_PREVIEW_SIZE = 3;
 export const LEARNING_PAGE_SIZE = 10;
 export type LearningDetail = 'attendance' | 'work' | 'requests' | 'alerts' | 'course' | 'reports';
-export const DETAIL_LABELS: Record<LearningDetail, string> = {alerts: 'Alerts', attendance: 'Attendance', work: 'Work queue', requests: 'Schedule requests', course: 'Course details', reports: 'Published reports'};
+export const DETAIL_LABEL_KEYS: Record<LearningDetail, string> = {alerts: 'dashboard:alerts', attendance: 'operations:tabs.attendance', work: 'learning:overview.work', requests: 'operations:scheduleRequests', course: 'learning:parent.courseDetails', reports: 'learning:reports.title'};
 
 /** Schedule proposals use the course timezone, even when the feed uses UTC instants. */
 export function scheduleOccurrence(item: OperationRecord): OperationRecord {
@@ -37,9 +37,7 @@ export function attendanceData(value: unknown) {
 
 /** Date-only deadlines retain the student's calendar date. */
 export function learningDate(value?: string) {
-  if (!value) return 'No date provided';
-  const date = new Date(/^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00` : value);
-  return Number.isNaN(date.valueOf()) ? value : new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric'}).format(date);
+  return value ? formatDateValue(value, {hour: undefined, minute: undefined}) : i18n.t('learning:overview.noDate');
 }
 
 export function courseRecords(items: OperationRecord[] | undefined, courseId?: number) {
@@ -62,3 +60,5 @@ export function learningWorkDestination(item: OperationRecord) {
   if (deepLink && /^\/(?:course\/\d+(?:\/[^\s\\]*)?|my-plan(?:\?[^\s\\]*)?|calendar(?:\?[^\s\\]*)?|mock-exams(?:\/[^\s\\]*)?)$/.test(deepLink)) return deepLink;
   return courseId ? generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(courseId)}) : undefined;
 }
+import i18n from '@/i18n';
+import {formatDateValue} from '@/i18n/formatting';

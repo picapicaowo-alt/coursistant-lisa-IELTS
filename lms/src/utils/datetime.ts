@@ -2,6 +2,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import advancedFormat from 'dayjs/plugin/advancedFormat';
+import {formatDateTime} from '@/i18n/formatting';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -53,7 +54,7 @@ export const formatUtcTimestamp = (
 ): string => {
   const date = parseUtcTimestamp(value);
   if (Number.isNaN(date.getTime())) return value;
-  return new Intl.DateTimeFormat('en-US', options).format(date);
+  return formatDateTime(date, options);
 };
 
 /**
@@ -81,18 +82,7 @@ export const formatDeadline = (atLocal: string, tenantZone: string): string => {
     return atLocal;
   }
 
-  return instant.local().format('MMM D, HH:mm ') + localZoneLabel();
-};
-
-/**
- * Short label for the viewer's zone, e.g. "PDT". Falls back to the IANA name
- * when the runtime cannot produce an abbreviation.
- */
-const localZoneLabel = (): string => {
-  const parts = new Intl.DateTimeFormat('en-US', {timeZoneName: 'short'})
-    .formatToParts(new Date());
-  return parts.find((part) => part.type === 'timeZoneName')?.value
-    ?? dayjs.tz.guess();
+  return formatDateTime(instant.toDate(), {month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false, timeZoneName: 'short'});
 };
 
 /**

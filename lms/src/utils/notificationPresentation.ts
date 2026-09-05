@@ -1,42 +1,43 @@
+import i18n from '@/i18n';
 import type {NotificationType} from '@/apis';
 import {formatUtcTimestamp} from '@/utils/datetime';
 
 const NOTIFICATION_TITLES = new Map<string, string>(Object.entries({
-  ANNOUNCEMENT_POSTED: 'New announcement',
-  ASSIGNMENT_PUBLISHED: 'Assignment published',
-  ASSIGNMENT_SUBMISSION_RECEIVED: 'Submission received',
-  ASSIGNMENT_GRADE_RELEASED: 'Grade released',
-  QUIZ_GRADE_RELEASED: 'Quiz grade released',
-  ASSIGNMENT_GRADE_CORRECTED: 'Assignment grade updated',
-  QUIZ_GRADE_CORRECTED: 'Quiz grade updated',
-  WEEK_PUBLISHED: 'Course week published',
-  ASSIGNMENT_SCHEDULE_CHANGED: 'Assignment schedule changed',
-  QUIZ_PUBLISHED: 'Quiz published',
-  QUIZ_SCHEDULE_CHANGED: 'Quiz schedule changed',
-  QUIZ_TIME_LIMIT_CHANGED: 'Quiz time limit changed',
-  COURSE_EVENT_CREATED: 'New course event',
-  COURSE_EVENT_UPDATED: 'Course event updated',
-  COURSE_EVENT_CANCELLED: 'Course event cancelled',
-  GROUP_MEMBER_ADDED: 'Group member added',
-  GROUP_MEMBER_REMOVED: 'Group member removed',
-  GROUP_MEMBER_MOVED: 'Group membership updated',
-  REPORT_PUBLISHED: 'Student report published',
-  ABSENCE_REQUEST_DECIDED: 'Absence request decided',
-  CHECKPOINT_REACHED_INCOMPLETE: 'Checkpoint needs attention',
-  SCHEDULE_REQUEST_CREATED: 'Schedule request created',
-  SCHEDULE_REQUEST_DECIDED: 'Schedule request decided',
-  SESSION_SCHEDULE_CHANGED: 'Session schedule changed',
-  SESSION_CANCELLED: 'Session cancelled',
-  ATTENDANCE_STATUS_CHANGED: 'Attendance updated',
-  COURSE_HOURS_CHANGED: 'Course hours updated',
-  ADVISOR_TASK_CREATED: 'Advisor task created',
-  ADVISOR_TASK_STATUS_CHANGED: 'Advisor task status changed',
-  ADVISOR_TASK_FEEDBACK_CHANGED: 'Advisor task feedback updated',
+  ANNOUNCEMENT_POSTED: 'notification:types.ANNOUNCEMENT_POSTED',
+  ASSIGNMENT_PUBLISHED: 'notification:types.ASSIGNMENT_PUBLISHED',
+  ASSIGNMENT_SUBMISSION_RECEIVED: 'notification:types.ASSIGNMENT_SUBMISSION_RECEIVED',
+  ASSIGNMENT_GRADE_RELEASED: 'notification:types.ASSIGNMENT_GRADE_RELEASED',
+  QUIZ_GRADE_RELEASED: 'notification:types.QUIZ_GRADE_RELEASED',
+  ASSIGNMENT_GRADE_CORRECTED: 'notification:types.ASSIGNMENT_GRADE_CORRECTED',
+  QUIZ_GRADE_CORRECTED: 'notification:types.QUIZ_GRADE_CORRECTED',
+  WEEK_PUBLISHED: 'notification:types.WEEK_PUBLISHED',
+  ASSIGNMENT_SCHEDULE_CHANGED: 'notification:types.ASSIGNMENT_SCHEDULE_CHANGED',
+  QUIZ_PUBLISHED: 'notification:types.QUIZ_PUBLISHED',
+  QUIZ_SCHEDULE_CHANGED: 'notification:types.QUIZ_SCHEDULE_CHANGED',
+  QUIZ_TIME_LIMIT_CHANGED: 'notification:types.QUIZ_TIME_LIMIT_CHANGED',
+  COURSE_EVENT_CREATED: 'notification:types.COURSE_EVENT_CREATED',
+  COURSE_EVENT_UPDATED: 'notification:types.COURSE_EVENT_UPDATED',
+  COURSE_EVENT_CANCELLED: 'notification:types.COURSE_EVENT_CANCELLED',
+  GROUP_MEMBER_ADDED: 'notification:types.GROUP_MEMBER_ADDED',
+  GROUP_MEMBER_REMOVED: 'notification:types.GROUP_MEMBER_REMOVED',
+  GROUP_MEMBER_MOVED: 'notification:types.GROUP_MEMBER_MOVED',
+  REPORT_PUBLISHED: 'notification:types.REPORT_PUBLISHED',
+  ABSENCE_REQUEST_DECIDED: 'notification:types.ABSENCE_REQUEST_DECIDED',
+  CHECKPOINT_REACHED_INCOMPLETE: 'notification:types.CHECKPOINT_REACHED_INCOMPLETE',
+  SCHEDULE_REQUEST_CREATED: 'notification:types.SCHEDULE_REQUEST_CREATED',
+  SCHEDULE_REQUEST_DECIDED: 'notification:types.SCHEDULE_REQUEST_DECIDED',
+  SESSION_SCHEDULE_CHANGED: 'notification:types.SESSION_SCHEDULE_CHANGED',
+  SESSION_CANCELLED: 'notification:types.SESSION_CANCELLED',
+  ATTENDANCE_STATUS_CHANGED: 'notification:types.ATTENDANCE_STATUS_CHANGED',
+  COURSE_HOURS_CHANGED: 'notification:types.COURSE_HOURS_CHANGED',
+  ADVISOR_TASK_CREATED: 'notification:types.ADVISOR_TASK_CREATED',
+  ADVISOR_TASK_STATUS_CHANGED: 'notification:types.ADVISOR_TASK_STATUS_CHANGED',
+  ADVISOR_TASK_FEEDBACK_CHANGED: 'notification:types.ADVISOR_TASK_FEEDBACK_CHANGED',
 } satisfies Record<NotificationType, string>));
 
 // Parent read responses allow new notification types; keep unknown types readable.
 export const getNotificationTitle = (type?: string): string =>
-  NOTIFICATION_TITLES.get(type ?? '') ?? 'Academic update';
+  i18n.t(NOTIFICATION_TITLES.get(type ?? '') ?? 'notification:academicUpdate');
 
 export const formatNotificationTime = (value: string): string => {
   return formatUtcTimestamp(value, {

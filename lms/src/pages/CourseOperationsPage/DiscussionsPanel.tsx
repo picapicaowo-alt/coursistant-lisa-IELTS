@@ -1,4 +1,7 @@
+import { LocalizedError } from "@/i18n/errors";
+import { useTranslation } from "react-i18next";
 import { useRef, useState } from "react";
+import { formatNumber } from "@/i18n/formatting";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Download, MessageSquare, Paperclip, Plus, Search } from "lucide-react";
 import { unwrapData } from "@/apis";
@@ -28,6 +31,7 @@ import {
 import s from "@/components/TeachingWorkspace/index.module.scss";
 
 export function DiscussionsPanel({ courseId }: { courseId: number }) {
+  const { t: translate } = useTranslation();
   const [page, setPage] = useState(0);
   const [filter, setFilter] = useState("");
   const [create, setCreate] = useState(false);
@@ -47,16 +51,21 @@ export function DiscussionsPanel({ courseId }: { courseId: number }) {
   });
   const visible =
     query.data?.items.filter((item) =>
-      `${item.name} ${item.body}`.toLowerCase().includes(filter.toLowerCase()),
+      `${item.name || translate("operations:courseMember")} ${item.body}`
+        .toLowerCase()
+        .includes(filter.toLowerCase()),
     ) ?? [];
   return (
-    <section className={s.panel} aria-label="Course discussions">
+    <section
+      className={s.panel}
+      aria-label={translate("operations:courseDiscussions")}
+    >
       <div className={s.toolbar}>
         <label className={s.search}>
           <Search size={18} aria-hidden="true" />
           <input
-            aria-label="Filter discussions on this page"
-            placeholder="Filter this page…"
+            aria-label={translate("operations:filterDiscussions")}
+            placeholder={translate("operations:filterPage")}
             value={filter}
             onChange={(event) => setFilter(event.target.value)}
           />
@@ -67,7 +76,7 @@ export function DiscussionsPanel({ courseId }: { courseId: number }) {
           onClick={() => setCreate(true)}
         >
           <Plus size={18} />
-          New post
+          {translate("operations:newPost")}
         </button>
       </div>
       {query.isPending || query.isError || !visible.length ? (
@@ -76,8 +85,8 @@ export function DiscussionsPanel({ courseId }: { courseId: number }) {
           error={query.error}
           empty={
             filter
-              ? "No discussions on this page match your filter."
-              : "No discussion posts yet. Start a conversation with your course."
+              ? translate("operations:noMatchingDiscussions")
+              : translate("operations:noDiscussions")
           }
           onRetry={() => void query.refetch()}
         />
@@ -90,10 +99,11 @@ export function DiscussionsPanel({ courseId }: { courseId: number }) {
                 <div className={s.recordHeader}>
                   <div>
                     <h3 className={s.preview}>
-                      {lines[0] || "Course discussion"}
+                      {lines[0] || translate("operations:courseDiscussion")}
                     </h3>
                     <small className={s.subline}>
-                      {item.name} · {dateLabel(item.createdAt)}
+                      {item.name || translate("operations:courseMember")} ·{" "}
+                      {dateLabel(item.createdAt)}
                     </small>
                   </div>
                   <button
@@ -102,7 +112,7 @@ export function DiscussionsPanel({ courseId }: { courseId: number }) {
                     onClick={() => setSelected(item)}
                   >
                     <MessageSquare size={17} />
-                    View replies
+                    {translate("operations:viewReplies")}
                   </button>
                 </div>
                 {lines.slice(1).join("\n").trim() ? (
@@ -123,7 +133,7 @@ export function DiscussionsPanel({ courseId }: { courseId: number }) {
           setPage(value);
           setFilter("");
         }}
-        label="Discussions"
+        label={translate("operations:discussions")}
       />
       {create ? (
         <NewPost
@@ -156,6 +166,7 @@ function NewPost({
   onClose: () => void;
   onCreated: () => void;
 }) {
+  const { t: translate } = useTranslation();
   const [body, setBody] = useState("");
   const [files, setFiles] = useState<File[]>([]);
   const input = useRef<HTMLInputElement>(null);
@@ -186,39 +197,49 @@ function NewPost({
   });
   return (
     <TeachingDialog
-      title="New discussion"
-      description="Share a question, update, or resource with your course."
+      title={translate("operations:newDiscussion")}
+      description={translate("operations:discussionHelp")}
       onClose={onClose}
       busy={mutation.isPending}
     >
       <form
+        noValidate
         className={s.form}
         onSubmit={(event) => {
           event.preventDefault();
-          mutation.mutate();
+          if (body.trim()) mutation.mutate();
         }}
       >
         <label className={`${s.field} ${s.full}`}>
-          Message
+          {translate("operations:message")}
           <textarea
             required
             rows={7}
-            placeholder="Start with your question or topic, then add the details…"
+            placeholder={translate("operations:discussionPlaceholder")}
             value={body}
             onChange={(event) => setBody(event.target.value)}
           />
         </label>
-        <label className={`${s.field} ${s.full}`}>
+        <div className={`${s.field} ${s.full}`}>
           <span>
-            <Paperclip size={16} /> Attach files (optional)
+            <Paperclip size={16} />{" "}
+            {translate("operations:optionalAttachments")}
           </span>
+          <button
+            type="button"
+            className={s.secondary}
+            onClick={() => input.current?.click()}
+          >
+            {translate("common:actions.chooseFiles")}
+          </button>
           <input
             ref={input}
             type="file"
+            hidden
             multiple
             onChange={(event) => setFiles(Array.from(event.target.files ?? []))}
           />
-        </label>
+        </div>
         {files.length ? (
           <p className={`${s.muted} ${s.full}`}>
             {files.map((file) => file.name).join(", ")}
@@ -234,13 +255,15 @@ function NewPost({
             disabled={mutation.isPending}
             onClick={onClose}
           >
-            Cancel
+            {translate("common:actions.cancel")}
           </button>
           <button
             className={s.primary}
             disabled={mutation.isPending || !body.trim()}
           >
-            {mutation.isPending ? "Posting…" : "Post discussion"}
+            {mutation.isPending
+              ? translate("operations:posting")
+              : translate("operations:postDiscussion")}
           </button>
         </div>
       </form>
@@ -257,6 +280,7 @@ function DiscussionThread({
   post: DiscussionPost;
   onClose: () => void;
 }) {
+  const { t: translate } = useTranslation();
   const [page, setPage] = useState(0);
   const [body, setBody] = useState("");
   const client = useQueryClient();
@@ -305,8 +329,8 @@ function DiscussionThread({
   });
   return (
     <TeachingDialog
-      title="Course discussion"
-      description={`${post.name} · ${dateLabel(post.createdAt)}`}
+      title={translate("operations:courseDiscussion")}
+      description={`${post.name || translate("operations:courseMember")} · ${dateLabel(post.createdAt)}`}
       onClose={onClose}
       busy={mutation.isPending}
     >
@@ -323,20 +347,25 @@ function DiscussionThread({
       )}
       <PostAttachments courseId={courseId} postId={post.id} />
       <h3>
-        Replies{replies.data?.total != null ? ` (${replies.data.total})` : ""}
+        {translate("operations:replies")}
+        {replies.data?.total != null
+          ? ` (${formatNumber(replies.data.total)})`
+          : ""}
       </h3>
       {replies.isPending || replies.isError || !replies.data?.items.length ? (
         <TeachingState
           loading={replies.isPending}
           error={replies.error}
-          empty="No replies yet. Add the first reply below."
+          empty={translate("operations:noReplies")}
           onRetry={() => void replies.refetch()}
         />
       ) : (
         <div className={s.recordList}>
           {replies.data.items.map((item) => (
             <article className={s.record} key={item.id}>
-              <strong>{item.name}</strong>
+              <strong>
+                {item.name || translate("operations:courseMember")}
+              </strong>
               <small className={s.subline}>{dateLabel(item.createdAt)}</small>
               <p style={{ whiteSpace: "pre-wrap" }}>{item.body}</p>
             </article>
@@ -350,22 +379,23 @@ function DiscussionThread({
         count={replies.data?.items.length ?? 0}
         loading={replies.isFetching}
         onChange={setPage}
-        label="Replies"
+        label={translate("operations:replies")}
       />
       <form
+        noValidate
         className={s.form}
         onSubmit={(event) => {
           event.preventDefault();
-          mutation.mutate();
+          if (body.trim()) mutation.mutate();
         }}
       >
         <label className={`${s.field} ${s.full}`}>
-          Your reply
+          {translate("operations:yourReply")}
           <textarea
             required
             value={body}
             onChange={(event) => setBody(event.target.value)}
-            placeholder="Write a thoughtful reply…"
+            placeholder={translate("operations:replyPlaceholder")}
           />
         </label>
         <div className={s.full}>
@@ -376,7 +406,9 @@ function DiscussionThread({
             className={s.primary}
             disabled={mutation.isPending || !body.trim()}
           >
-            {mutation.isPending ? "Sending…" : "Send reply"}
+            {mutation.isPending
+              ? translate("operations:sending")
+              : translate("operations:sendReply")}
           </button>
         </div>
       </form>
@@ -391,6 +423,7 @@ function PostAttachments({
   courseId: number;
   postId: number;
 }) {
+  const { t: translate } = useTranslation();
   const query = useQuery({
     queryKey: ["discussion", courseId, postId, "attachments"],
     queryFn: async () =>
@@ -412,7 +445,7 @@ function PostAttachments({
       const id = recordId(item, "attachmentId", "id");
       if (preview) {
         if (!window)
-          throw new Error("Allow pop-ups to preview this attachment.");
+          throw new LocalizedError("operations:errors.attachmentPopups");
         showBlobInPreviewWindow(
           window,
           await api.previewDiscussionAttachment(courseId, postId, id),
@@ -441,7 +474,8 @@ function PostAttachments({
           <div key={recordId(item, "attachmentId", "id")} className={s.toolbar}>
             <span>
               <Paperclip size={15} />{" "}
-              {textValue(item, "originalFilename") ?? "Attachment"}
+              {textValue(item, "originalFilename") ??
+                translate("operations:attachment")}
             </span>
             <div className={s.recordActions}>
               {item.previewAvailable === true ? (
@@ -451,7 +485,7 @@ function PostAttachments({
                   disabled={busy}
                   onClick={() => void open(item, true)}
                 >
-                  Preview
+                  {translate("course:materials.preview")}
                 </button>
               ) : null}
               <button
@@ -461,7 +495,7 @@ function PostAttachments({
                 onClick={() => void open(item, false)}
               >
                 <Download size={15} />
-                Download
+                {translate("common:actions.download")}
               </button>
             </div>
           </div>

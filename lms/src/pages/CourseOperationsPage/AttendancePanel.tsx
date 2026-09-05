@@ -1,3 +1,5 @@
+import { LocalizedError } from "@/i18n/errors";
+import { useTranslation } from "react-i18next";
 import { teachingLabel } from "@/components/TeachingWorkspace/presentation";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -26,6 +28,8 @@ import {
   parseAttendance,
   type AttendanceRoster,
 } from "./records";
+import { formatNumber } from "@/i18n/formatting";
+import { studentRecordLabel } from "./records";
 import { occurrenceTitle } from "./records";
 import s from "@/components/TeachingWorkspace/index.module.scss";
 import local from "./attendance.module.scss";
@@ -42,6 +46,7 @@ export function AttendancePanel({
   onSelect: (id: number) => void;
   onEditing: (state: EditingState) => void;
 }) {
+  const { t: translate } = useTranslation();
   const occurrences = useCourseOccurrences(courseId);
   const weeks = useCourseWeeks(courseId);
   const [epoch, setEpoch] = useState(0);
@@ -67,17 +72,17 @@ export function AttendancePanel({
   return (
     <section
       className={`${s.panel} ${local.attendancePanel}`}
-      aria-label="Class attendance"
+      aria-label={translate("operations:classAttendance")}
     >
       <label className={`${s.field} ${local.sessionPicker}`}>
-        SELECT SESSION
+        {translate("operations:selectSession")}
         <select
           value={id ?? ""}
           onChange={(event) => onSelect(Number(event.target.value))}
           disabled={occurrences.isPending}
         >
           {!occurrences.data?.length ? (
-            <option value="">No sessions available</option>
+            <option value="">{translate("operations:noSessions")}</option>
           ) : null}
           {occurrences.data?.map((item) => (
             <option value={item.id} key={item.id}>
@@ -89,7 +94,7 @@ export function AttendancePanel({
       </label>
       {message ? (
         <p className={s.success} role="status">
-          {message}
+          {translate(message)}
         </p>
       ) : null}
       {occurrences.isPending || occurrences.isError ? (
@@ -99,7 +104,7 @@ export function AttendancePanel({
           onRetry={() => void occurrences.refetch()}
         />
       ) : id == null ? (
-        <TeachingState empty="Create a class occurrence before taking attendance." />
+        <TeachingState empty={translate("operations:noAttendanceClass")} />
       ) : roster.isPending || roster.isError ? (
         <TeachingState
           loading={roster.isPending}
@@ -114,7 +119,7 @@ export function AttendancePanel({
           initial={roster.data}
           onReload={reload}
           onEditing={onEditing}
-          onSaved={() => setMessage("Attendance saved.")}
+          onSaved={() => setMessage("operations:attendanceSaved")}
         />
       ) : null}
     </section>
@@ -136,6 +141,7 @@ function AttendanceEditor({
   onEditing: (state: EditingState) => void;
   onSaved: () => void;
 }) {
+  const { t: translate } = useTranslation();
   // Keep the editing snapshot/version together. A background refetch cannot overwrite unsaved choices.
   const [snapshot] = useState(initial);
   const [changes, setChanges] = useState<Record<number, string>>({});
@@ -151,9 +157,7 @@ function AttendanceEditor({
   const save = useMutation({
     mutationFn: () => {
       if (snapshot.version == null)
-        throw new Error(
-          "Reload the attendance roster before saving.",
-        );
+        throw new LocalizedError("operations:errors.reloadAttendance");
       return checkpoint.run(
         "save-attendance",
         { entries, expectedAttendanceVersion: snapshot.version },
@@ -198,8 +202,11 @@ function AttendanceEditor({
       <div className={local.actionBar}>
         <span className={s.muted}>
           {entries.length
-            ? `${entries.length} unsaved change${entries.length === 1 ? "" : "s"}`
-            : "Attendance for the selected session"}
+            ? translate("operations:unsavedChanges", {
+                count: entries.length,
+                number: formatNumber(entries.length),
+              })
+            : translate("operations:selectedAttendance")}
         </span>
         <div className={s.toolbarGroup}>
           <button
@@ -211,7 +218,7 @@ function AttendanceEditor({
             }
           >
             <RefreshCw size={18} />
-            Sync roster
+            {translate("operations:syncRoster")}
           </button>
           <button
             type="button"
@@ -222,55 +229,76 @@ function AttendanceEditor({
             onClick={() => save.mutate()}
           >
             <Check size={18} />
-            {save.isPending ? "Saving…" : "Save attendance"}
+            {save.isPending
+              ? translate("common:actions.saving")
+              : translate("operations:saveAttendance")}
           </button>
         </div>
       </div>
       <div className={local.metrics}>
         {[
-          { label: "Total roster", value: snapshot.items.length, status: "" },
-          { label: "Present", value: counts.PRESENT ?? 0, status: "PRESENT" },
-          { label: "Late arrivals", value: counts.LATE ?? 0, status: "LATE" },
-          { label: "Absent", value: counts.ABSENT ?? 0, status: "ABSENT" },
+          {
+            labelKey: "operations:totalRoster",
+            value: snapshot.items.length,
+            status: "",
+          },
+          {
+            labelKey: "common:status.PRESENT",
+            value: counts.PRESENT ?? 0,
+            status: "PRESENT",
+          },
+          {
+            labelKey: "operations:lateArrivals",
+            value: counts.LATE ?? 0,
+            status: "LATE",
+          },
+          {
+            labelKey: "common:status.ABSENT",
+            value: counts.ABSENT ?? 0,
+            status: "ABSENT",
+          },
         ].map((item) => (
-          <div key={item.label} data-status={item.status}>
-            <span>{item.label}</span>
+          <div key={item.labelKey} data-status={item.status}>
+            <span>{translate(item.labelKey)}</span>
             <strong>
-              {item.value}
-              {!item.status ? <small> Students</small> : null}
+              {formatNumber(item.value)}
+              {!item.status ? (
+                <small> {translate("common:people.students")}</small>
+              ) : null}
             </strong>
           </div>
         ))}
       </div>
       {(counts.UNRECORDED ?? 0) > 0 || (counts.EXCUSED ?? 0) > 0 ? (
         <p className={s.muted}>
-          {counts.UNRECORDED ?? 0} unrecorded · {counts.EXCUSED ?? 0} excused.
-          Unrecorded students are not counted as present.
+          {translate("operations:attendanceCounts", {
+            unrecorded: formatNumber(counts.UNRECORDED ?? 0),
+            excused: formatNumber(counts.EXCUSED ?? 0),
+          })}
         </p>
       ) : null}
       <TeachingError error={save.error || sync.error} />
       {needsReload || snapshot.version == null ? (
         <div className={s.notice}>
-          Reload the latest attendance before saving again. Your choices remain
-          visible until you reload.
+          {translate("operations:reloadAttendanceHelp")}
           <button
             type="button"
             className={s.textButton}
             onClick={() => setConfirmReload(true)}
           >
-            Reload roster
+            {translate("operations:reloadRoster")}
           </button>
         </div>
       ) : null}
       {!snapshot.items.length ? (
-        <TeachingState empty="No students are on this attendance roster. Sync the roster to load current enrolments." />
+        <TeachingState empty={translate("operations:noAttendanceStudents")} />
       ) : (
         <div className={s.tableWrap}>
           <table className={`${s.table} ${local.roster}`}>
             <thead>
               <tr>
-                <th>Student information</th>
-                <th>Attendance status</th>
+                <th>{translate("operations:studentInformation")}</th>
+                <th>{translate("operations:attendanceStatus")}</th>
               </tr>
             </thead>
             <tbody>
@@ -280,7 +308,7 @@ function AttendanceEditor({
                   <tr key={item.studentUserId}>
                     <td>
                       <div className={s.person}>
-                        <TeachingAvatar name={item.name} />
+                        <TeachingAvatar name={studentRecordLabel(item)} />
                         <div>
                           <button
                             type="button"
@@ -292,10 +320,12 @@ function AttendanceEditor({
                               })
                             }
                           >
-                            {item.name}
+                            {studentRecordLabel(item)}
                           </button>
                           <small className={s.subline}>
-                            {status ? teachingLabel(status) : "Not recorded"}
+                            {status
+                              ? teachingLabel(status)
+                              : translate("operations:notRecorded")}
                           </small>
                         </div>
                       </div>
@@ -304,7 +334,9 @@ function AttendanceEditor({
                       <div
                         className={local.statusToggle}
                         role="group"
-                        aria-label={`Attendance for ${item.name}`}
+                        aria-label={translate("operations:attendanceFor", {
+                          name: studentRecordLabel(item),
+                        })}
                       >
                         {ATTENDANCE_STATUSES.map((value) => (
                           <button
@@ -337,8 +369,8 @@ function AttendanceEditor({
       )}
       {confirmReload ? (
         <TeachingDialog
-          title="Reload attendance?"
-          description="Unsaved choices will be discarded. The latest roster and attendance will be loaded."
+          title={translate("operations:reloadAttendance")}
+          description={translate("operations:discardAttendanceHelp")}
           onClose={() => setConfirmReload(false)}
           busy={busy}
         >
@@ -348,7 +380,7 @@ function AttendanceEditor({
               className={s.secondary}
               onClick={() => setConfirmReload(false)}
             >
-              Keep editing
+              {translate("operations:keepEditing")}
             </button>
             <button
               type="button"
@@ -358,7 +390,7 @@ function AttendanceEditor({
                 sync.mutate();
               }}
             >
-              Reload and sync
+              {translate("operations:reloadSync")}
             </button>
           </div>
         </TeachingDialog>
@@ -383,6 +415,7 @@ function StudentContext({
   student: { id: number; name: string };
   onClose: () => void;
 }) {
+  const { t: translate } = useTranslation();
   const query = useQuery({
     queryKey: ["instructor-student-context", courseId, student.id],
     queryFn: async () =>
@@ -397,8 +430,11 @@ function StudentContext({
   });
   return (
     <TeachingDialog
-      title={student.name}
-      description="Teaching context shared for this course"
+      title={studentRecordLabel({
+        studentUserId: student.id,
+        name: student.name,
+      })}
+      description={translate("operations:sharedTeachingContext")}
       onClose={onClose}
     >
       {query.isPending || query.isError ? (
@@ -410,7 +446,7 @@ function StudentContext({
       ) : (
         <RecordSummaryList
           value={query.data}
-          emptyMessage="No teaching context has been shared yet."
+          emptyMessage={translate("operations:noTeachingContext")}
         />
       )}
     </TeachingDialog>

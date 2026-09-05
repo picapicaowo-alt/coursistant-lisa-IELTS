@@ -1,4 +1,4 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from "react-i18next";
 
 import { useEffect, useState } from "react";
 import {
@@ -17,11 +17,11 @@ import { ContentPanel } from "./ContentPanel";
 import styles from "@/components/TeachingWorkspace/index.module.scss";
 
 const SECTIONS = [
-  { id: "occurrences", label: "Occurrences" },
-  { id: "attendance", label: "Attendance" },
-  { id: "reports", label: "Reports" },
-  { id: "discussion", label: "Discussion" },
-  { id: "content", label: "Content" },
+  { id: "occurrences", labelKey: "operations:tabs.occurrences" },
+  { id: "attendance", labelKey: "operations:tabs.attendance" },
+  { id: "reports", labelKey: "operations:tabs.reports" },
+  { id: "discussion", labelKey: "course:learning.tabs.discussion" },
+  { id: "content", labelKey: "operations:tabs.content" },
 ] as const;
 export function InstructorCourseOperations({
   courseId,
@@ -30,7 +30,7 @@ export function InstructorCourseOperations({
   courseId: number;
   title: string;
 }) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const [editing, setEditing] = useState({ dirty: false, busy: false });
@@ -84,10 +84,15 @@ export function InstructorCourseOperations({
     >
       <div className={styles.heading}>
         <div>
-          <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-            <Link to={routes.course}>Course operations</Link>
+          <nav
+            className={styles.breadcrumb}
+            aria-label={translate("operations:breadcrumb")}
+          >
+            <Link to={routes.course}>
+              {translate("course:catalogue.operations")}
+            </Link>
             <span aria-hidden="true">/</span>
-            <span>Teaching schedule</span>
+            <span>{translate("operations:teachingSchedule")}</span>
           </nav>
           <h1>{title}</h1>
         </div>
@@ -97,21 +102,34 @@ export function InstructorCourseOperations({
       </div>
       <nav
         className={styles.primaryNav}
-        aria-label="Course workspace shortcuts"
+        aria-label={translate("operations:shortcuts")}
       >
-        <Link to={path(routes.courseCourseId)}>Course overview</Link>
-        <Link to={path(routes.courseCourseIdOperations)} aria-current="page">
-          Teaching schedule
+        <Link to={path(routes.courseCourseId)}>
+          {translate("course:learning.overview")}
         </Link>
-        <Link to={path(routes.courseCourseIdEvents)}>Course events</Link>
-        <Link to={path(routes.rosterCourseId)}>Learner roster</Link>
-        <Link to={path(routes.courseCourseIdGroups)}>Learning groups</Link>
-        <Link to={path(routes.courseCourseIdGrades)}>Grades</Link>
+        <Link to={path(routes.courseCourseIdOperations)} aria-current="page">
+          {translate("operations:teachingSchedule")}
+        </Link>
+        <Link to={path(routes.courseCourseIdEvents)}>
+          {translate("operations:courseEvents")}
+        </Link>
+        <Link to={path(routes.rosterCourseId)}>
+          {translate("operations:learnerRoster")}
+        </Link>
+        <Link to={path(routes.courseCourseIdGroups)}>
+          {translate("operations:learningGroups")}
+        </Link>
+        <Link to={path(routes.courseCourseIdGrades)}>
+          {translate("course:grades.label")}
+        </Link>
         <Link to={path(routes.courseCourseIdAssignmentsNew)}>
-          Create assignment
+          {translate("operations:createAssignment")}
         </Link>
       </nav>
-      <nav className={styles.tabs} aria-label="Course operation sections">
+      <nav
+        className={styles.tabs}
+        aria-label={translate("operations:sections")}
+      >
         {SECTIONS.map((item) => (
           <button
             type="button"
@@ -119,7 +137,7 @@ export function InstructorCourseOperations({
             aria-pressed={section === item.id}
             onClick={() => select(item.id)}
           >
-            {item.label}
+            {translate(item.labelKey)}
           </button>
         ))}
       </nav>
@@ -144,8 +162,8 @@ export function InstructorCourseOperations({
       {section === "content" ? <ContentPanel courseId={courseId} /> : null}
       {leave ? (
         <TeachingDialog
-          title="Leave unsaved attendance?"
-          description="Your attendance changes have not been saved. Stay here to save them, or discard them and continue."
+          title={translate("operations:leaveAttendance")}
+          description={translate("operations:leaveAttendanceHelp")}
           onClose={() => setLeave(undefined)}
         >
           <div className={styles.actions}>
@@ -154,7 +172,7 @@ export function InstructorCourseOperations({
               type="button"
               onClick={() => setLeave(undefined)}
             >
-              Keep editing
+              {translate("operations:keepEditing")}
             </button>
             <button
               className={styles.danger}
@@ -165,7 +183,7 @@ export function InstructorCourseOperations({
                 leave();
               }}
             >
-              Discard and continue
+              {translate("operations:discardContinue")}
             </button>
           </div>
         </TeachingDialog>

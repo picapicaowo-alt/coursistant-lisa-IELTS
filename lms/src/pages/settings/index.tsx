@@ -1,4 +1,7 @@
 import {useTranslation} from 'react-i18next';
+import {roleLabel} from '@/i18n/presentation';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import {LANGUAGE_SWITCHER_ENABLED} from '@/i18n/configuration';
 import {FormEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -19,7 +22,8 @@ type SettingsTab = (typeof tabList)[number];
 
 interface StatusMessage {
   kind: 'success' | 'error';
-  text: string;
+  key: string;
+  error?: unknown;
 }
 
 const SettingsPage = () => {
@@ -80,9 +84,9 @@ const SettingsPage = () => {
       });
       queryClient.setQueryData(['my-profile'], data);
       updateProfile({name: formatPersonName(data), avatar: data.avatarUrl});
-      setStatus({kind: 'success', text: 'Settings saved.'});
+      setStatus({kind: 'success', key: 'settings:saved'});
     },
-    onError: error => setStatus({kind: 'error', text: getApiErrorMessage(error, 'Could not save settings.')}),
+    onError: error => setStatus({kind: 'error', key: 'settings:saveFailed', error}),
   });
 
   const changePassword = useMutation({
@@ -101,39 +105,41 @@ const SettingsPage = () => {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
-      setStatus({kind: 'success', text: 'Password updated.'});
+      setStatus({kind: 'success', key: 'settings:passwordUpdated'});
     },
-    onError: error => setStatus({kind: 'error', text: getApiErrorMessage(error, 'Could not update password.')}),
+    onError: error => setStatus({kind: 'error', key: 'settings:passwordUpdateFailed', error}),
   });
 
   const submitPassword = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus(null);
+    if (!currentPassword) {
+      setStatus({kind: 'error', key: 'settings:currentPasswordRequired'});
+      return;
+    }
     if (!isValidPassword(newPassword)) {
-      setStatus({kind: 'error', text: 'Use at least 8 characters with both letters and numbers.'});
+      setStatus({kind: 'error', key: 'auth:signupErrors.passwordFormat'});
       return;
     }
     if (newPassword !== confirmPassword) {
-      setStatus({kind: 'error', text: 'New passwords do not match.'});
+      setStatus({kind: 'error', key: 'settings:passwordMismatch'});
       return;
     }
     changePassword.mutate();
   };
 
-  if (!tenantAdmin && profileQuery.isLoading) return <div className={styles.settingsPageWrapper}>Loading settings…</div>;
+  if (!tenantAdmin && profileQuery.isLoading) return <div className={styles.settingsPageWrapper}>{t('settings:loading')}</div>;
   if (!tenantAdmin && profileQuery.isError) {
     return (
       <div className={styles.settingsPageWrapper} role="alert">
-        Could not load settings.
-        <button type="button" className={styles.primaryButton} onClick={() => void profileQuery.refetch()}>
-          Try again
-        </button>
+        {t('settings:loadFailed')}<button type="button" className={styles.primaryButton} onClick={() => void profileQuery.refetch()}>
+          {t('common:actions.tryAgain')}</button>
       </div>
     );
   }
 
   const profile = profileQuery.data;
-  if (!tenantAdmin && !profile) return <div className={styles.settingsPageWrapper}>Could not load settings.</div>;
+  if (!tenantAdmin && !profile) return <div className={styles.settingsPageWrapper}>{t('settings:loadFailed')}</div>;
 
   return (
     <div className={styles.settingsPageWrapper}>
@@ -147,11 +153,11 @@ const SettingsPage = () => {
           <ArrowLeft size={20} aria-hidden="true"/>
         </button>
         <div className={styles.settingsHeaderText}>
-          <h2 className={styles.settingsTitle}>Settings</h2>
-          <p className={styles.settingsSubtitle}>Manage your Coursistant account and security.</p>
+          <h2 className={styles.settingsTitle}>{t('common:menu.settings')}</h2>
+          <p className={styles.settingsSubtitle}>{t('settings:subtitle')}</p>
         </div>
       </div>
-      <div className={styles.tabsContainer} role="tablist" aria-label="Settings sections">
+      <div className={styles.tabsContainer} role="tablist" aria-label={t('settings:sections')}>
         {(tenantAdmin ? ['Password'] as const : tabList).map(tab => (
           <button
             key={tab}
@@ -164,54 +170,60 @@ const SettingsPage = () => {
               setStatus(null);
             }}
           >
-            {tab}
+            {t(tab === 'Account' ? 'auth:signup.steps.account' : tab === 'Password' ? 'auth:login.passwordLabel' : 'navigation:parent.notifications')}
           </button>
         ))}
       </div>
       <div className={styles.tabDivider}/>
+      {LANGUAGE_SWITCHER_ENABLED ? <LanguageSwitcher/> : null}
       {status ? (
         <p className={status.kind === 'success' ? styles.successMessage : styles.errorMessage} role="status">
-          {status.text}
+          {status.error ? getApiErrorMessage(status.error, t(status.key)) : t(status.key)}
         </p>
       ) : null}
 
       {activeTab === 'Account' && profile && (
         <section className={styles.generalSection}>
-          <h3 className={styles.generalTitle}>Account</h3>
-          <p className={styles.generalSubtitle}>Your email, role, and level are managed by your organization.</p>
+          <h3 className={styles.generalTitle}>{t('auth:signup.steps.account')}</h3>
+          <p className={styles.generalSubtitle}>{t('settings:accountHelp')}</p>
           <form
+            noValidate
             className={styles.generalForm}
             onSubmit={event => {
               event.preventDefault();
               setStatus(null);
+              if (!firstName.trim() || !lastName.trim()) {
+                setStatus({kind: 'error', key: !firstName.trim() ? 'operations:directory.validation.firstName' : 'operations:directory.validation.lastName'});
+                return;
+              }
               saveProfile.mutate({firstName: firstName.trim(), middleName: middleName.trim(), lastName: lastName.trim(), phone: phone.trim()});
             }}
           >
             <div className={styles.inputGroup}>
-              <label htmlFor="firstName">First name</label>
+              <label htmlFor="firstName">{t('auth:signup.firstNameLabel')}</label>
               <input id="firstName" value={firstName} onChange={event => editProfileField('firstName', event.target.value)} required maxLength={100}/>
             </div>
             <div className={styles.inputGroup}>
-              <label htmlFor="middleName">Middle name</label>
+              <label htmlFor="middleName">{t('auth:signup.middleNameLabel')}</label>
               <input id="middleName" value={middleName} onChange={event => editProfileField('middleName', event.target.value)} maxLength={100}/>
             </div>
             <div className={styles.inputGroup}>
-              <label htmlFor="lastName">Last name</label>
+              <label htmlFor="lastName">{t('auth:signup.lastNameLabel')}</label>
               <input id="lastName" value={lastName} onChange={event => editProfileField('lastName', event.target.value)} required maxLength={100}/>
             </div>
             <div className={styles.inputGroup}>
-              <label htmlFor="phone">Phone</label>
+              <label htmlFor="phone">{t('settings:phone')}</label>
               <input id="phone" value={phone} onChange={event => editProfileField('phone', event.target.value)} maxLength={64} autoComplete="tel"/>
             </div>
             <div className={styles.inputGroup}>
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">{t('auth:login.emailLabel')}</label>
               <input id="email" type="email" value={profile.email} readOnly aria-readonly="true"/>
             </div>
             <div className={styles.inputGroup}>
-              <label htmlFor="role">Account role</label>
+              <label htmlFor="role">{t('settings:accountRole')}</label>
               <input
                 id="role"
-                value={[profile.role, profile.level].filter(Boolean).join(' · ')}
+                value={[profile.role, profile.level].filter(Boolean).map(value => roleLabel(value)).join(' · ')}
                 readOnly
                 aria-readonly="true"
               />
@@ -221,7 +233,7 @@ const SettingsPage = () => {
               className={styles.primaryButton}
               disabled={saveProfile.isPending || !firstName.trim() || !lastName.trim()}
             >
-              {saveProfile.isPending ? 'Saving…' : 'Save account'}
+              {saveProfile.isPending ? t('settings:saving') : t('settings:saveAccount')}
             </button>
           </form>
         </section>
@@ -229,11 +241,11 @@ const SettingsPage = () => {
 
       {activeTab === 'Password' && (
         <section className={styles.generalSection}>
-          <h3 className={styles.generalTitle}>Password</h3>
-          <p className={styles.generalSubtitle}>Use at least 8 characters with both a letter and a number.</p>
-          <form className={styles.generalForm} onSubmit={submitPassword}>
+          <h3 className={styles.generalTitle}>{t('auth:login.passwordLabel')}</h3>
+          <p className={styles.generalSubtitle}>{t('auth:forgotPassword.newPasswordSubtitle')}</p>
+          <form noValidate className={styles.generalForm} onSubmit={submitPassword}>
               <div className={styles.inputGroup}>
-                <label htmlFor="currentPassword">Current password</label>
+                <label htmlFor="currentPassword">{t('settings:currentPassword')}</label>
                 <div className={styles.passwordInputWrapper}>
                   <input
                     id="currentPassword"
@@ -242,12 +254,12 @@ const SettingsPage = () => {
                     onChange={event => setCurrentPassword(event.target.value)}
                     required
                     autoComplete="current-password"
-                    placeholder="Enter current password"
+                    placeholder={t('settings:enterCurrentPassword')}
                   />
                   <button
                     type="button"
                     className={styles.passwordToggle}
-                    aria-label={showOldPassword ? 'Hide current password' : 'Show current password'}
+                    aria-label={showOldPassword ? t('settings:hideCurrentPassword') : t('settings:showCurrentPassword')}
                     onClick={() => setShowOldPassword(value => !value)}
                   >
                     {showOldPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
@@ -255,7 +267,7 @@ const SettingsPage = () => {
                 </div>
               </div>
               <div className={styles.inputGroup}>
-                <label htmlFor="newPassword">New password</label>
+                <label htmlFor="newPassword">{t('settings:newPassword')}</label>
                 <div className={styles.passwordInputWrapper}>
                   <input
                     id="newPassword"
@@ -265,12 +277,12 @@ const SettingsPage = () => {
                     required
                     minLength={8}
                     autoComplete="new-password"
-                    placeholder="Enter new password"
+                    placeholder={t('auth:forgotPassword.newPasswordPlaceholder')}
                   />
                   <button
                     type="button"
                     className={styles.passwordToggle}
-                    aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                    aria-label={showNewPassword ? t('settings:hideNewPassword') : t('settings:showNewPassword')}
                     onClick={() => setShowNewPassword(value => !value)}
                   >
                     {showNewPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
@@ -278,7 +290,7 @@ const SettingsPage = () => {
                 </div>
               </div>
               <div className={styles.inputGroup}>
-                <label htmlFor="confirmPassword">Confirm new password</label>
+                <label htmlFor="confirmPassword">{t('settings:confirmNewPassword')}</label>
                 <div className={styles.passwordInputWrapper}>
                   <input
                     id="confirmPassword"
@@ -288,12 +300,12 @@ const SettingsPage = () => {
                     required
                     minLength={8}
                     autoComplete="new-password"
-                    placeholder="Confirm new password"
+                    placeholder={t('settings:confirmNewPassword')}
                   />
                   <button
                     type="button"
                     className={styles.passwordToggle}
-                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                    aria-label={showConfirmPassword ? t('settings:hideConfirmPassword') : t('settings:showConfirmPassword')}
                     onClick={() => setShowConfirmPassword(value => !value)}
                   >
                     {showConfirmPassword ? <EyeOff size={18}/> : <Eye size={18}/>}
@@ -301,7 +313,7 @@ const SettingsPage = () => {
                 </div>
               </div>
             <button type="submit" className={styles.primaryButton} disabled={changePassword.isPending}>
-              {changePassword.isPending ? 'Updating…' : 'Update password'}
+              {changePassword.isPending ? t('settings:updating') : t('settings:updatePassword')}
             </button>
           </form>
         </section>
@@ -309,8 +321,8 @@ const SettingsPage = () => {
 
       {activeTab === 'Notifications' && (
         <section className={styles.generalSection}>
-          <h3 className={styles.generalTitle}>Email notifications</h3>
-          <p className={styles.generalSubtitle}>Choose whether Coursistant may send course notification emails.</p>
+          <h3 className={styles.generalTitle}>{t('settings:emailNotifications')}</h3>
+          <p className={styles.generalSubtitle}>{t('settings:notificationHelp')}</p>
           <form
             className={styles.generalForm}
             onSubmit={event => {
@@ -325,10 +337,10 @@ const SettingsPage = () => {
                 checked={emailNotifications}
                 onChange={event => editProfileField('emailNotifications', event.target.checked)}
               />
-              <span>Receive course and account notification emails</span>
+              <span>{t('settings:receiveNotifications')}</span>
             </label>
             <button type="submit" className={styles.primaryButton} disabled={saveProfile.isPending}>
-              {saveProfile.isPending ? 'Saving…' : 'Save notifications'}
+              {saveProfile.isPending ? t('settings:saving') : t('settings:saveNotifications')}
             </button>
           </form>
         </section>

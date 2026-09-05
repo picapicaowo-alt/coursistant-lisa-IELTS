@@ -132,7 +132,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
         <div><CalendarDays size={18} aria-hidden="true"/><span>
           {scheduleError ? <button type="button" onClick={() => void retrySchedule()}>{t('dashboard:retrySchedule')}</button>
             : firstSession ? t('catalogue.weeklyClass', {day: formatWeekday(firstSession.dayOfWeek), time: formatClockTime(firstSession.startTime)})
-            : state === 'Archived' ? t('catalogue.archived')
+            : state === "Archived" ? t('catalogue.archived')
             : schedulePending ? t('dashboard:loadingSchedule') : t('dashboard:noSchedule')}
         </span></div>
         <div><MapPin size={18} aria-hidden="true"/><span>{firstSession?.location || t('catalogue.noLocation')}</span></div>
@@ -173,7 +173,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
 
             {menuOpen && (
               <div className={styles.menu} role="menu">
-                {state === 'Active' ? (
+                {state === "Active" ? (
                   <button type="button" role="menuitem" className={styles.menuItem} disabled={archive.isPending} onClick={() => { setMenuOpen(false); archive.mutate(); }}>
                     {archive.isPending ? t("card.archiving") : t("card.archive")}
                   </button>
@@ -198,7 +198,7 @@ export const CoursePreview: React.FC<CoursePreviewProps> = ({
     >
       {showProgress ? <AssignmentProgress progress={progress} loading={progressLoading} failed={progressFailed}/> : null}
       {(archive.isError || unarchive.isError || remove.isError) && (
-        <p className={styles.error} role="alert">{remove.isError ? 'This course could not be deleted. Courses with enrolments or coursework must be retained.' : archive.isError ? t("card.archiveFailed") : 'The course could not be restored.'}</p>
+        <p className={styles.error} role="alert">{remove.isError ? t("course:catalogue.deleteFailure") : archive.isError ? t("card.archiveFailed") : t("course:catalogue.restoreFailure")}</p>
       )}
     </CourseIdentityCard>
   );

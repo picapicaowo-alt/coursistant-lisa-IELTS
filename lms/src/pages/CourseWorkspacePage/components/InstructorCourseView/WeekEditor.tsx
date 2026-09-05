@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CourseWeek, CourseWeekPayload, unwrapData } from "@/apis";
@@ -20,6 +21,7 @@ export function WeekEditor({
   onClose: () => void;
   onSaved: (id: number) => void;
 }) {
+  const {t: translate} = useTranslation();
   const [title, setTitle] = useState(week?.title ?? "");
   const [summary, setSummary] = useState(week?.summary ?? "");
   const [notice, setNotice] = useState("");
@@ -44,7 +46,7 @@ export function WeekEditor({
       const id = week?.id ?? saved?.id;
       if (!Number.isInteger(id) || id <= 0) {
         setNotice(
-          "The server accepted the week but did not return its identity. Close this editor and refresh the course before making another change.",
+          "course:weeks.missingIdentity",
         );
         return;
       }
@@ -62,7 +64,7 @@ export function WeekEditor({
         }
         if (!confirmed) {
           setNotice(
-            "The week was saved, but its overview could not be confirmed. Your text is kept here so you can copy it before closing.",
+            "course:weeks.unconfirmedOverview",
           );
           return;
         }
@@ -74,11 +76,12 @@ export function WeekEditor({
     !week || title.trim() !== week.title || summary !== (week.summary ?? "");
   return (
     <TeachingDialog
-      title={week ? "Edit week" : "Add week"}
+      title={week ? translate("course:weeks.edit") : translate("course:weeks.add")}
       onClose={onClose}
       busy={save.isPending}
     >
       <form
+        noValidate
         className={styles.form}
         onSubmit={(event) => {
           event.preventDefault();
@@ -87,8 +90,7 @@ export function WeekEditor({
         }}
       >
         <label>
-          Week title
-          <input
+          {translate("course:weeks.title")}<input
             autoFocus
             required
             value={title}
@@ -97,19 +99,19 @@ export function WeekEditor({
           />
         </label>
         <label>
-          Overview <span className={styles.optional}>(optional)</span>
+          {translate("advising:studentPlan.overview")}{' '}<span className={styles.optional}>{translate("course:workspace.optionalParentheses")}</span>
           <textarea
             rows={5}
             value={summary}
             onChange={(event) => setSummary(event.target.value)}
             disabled={save.isPending}
-            placeholder="Describe the focus of this week"
+            placeholder={translate("course:weeks.overviewPlaceholder")}
           />
         </label>
         <TeachingError error={save.error} />
         {notice ? (
           <p role="status" className={styles.notice}>
-            {notice}
+            {translate(notice)}
           </p>
         ) : null}
         <footer className={styles.formActions}>
@@ -119,15 +121,14 @@ export function WeekEditor({
             disabled={save.isPending}
             onClick={onClose}
           >
-            Close
-          </button>
+            {translate("common:actions.close")}</button>
           <button
             className={styles.primary}
             disabled={
               !title.trim() || !changed || save.isPending || Boolean(notice)
             }
           >
-            {save.isPending ? "Saving…" : week ? "Save week" : "Create week"}
+            {save.isPending ? translate("common:actions.saving") : week ? translate("course:weeks.save") : translate("course:weeks.create")}
           </button>
         </footer>
       </form>

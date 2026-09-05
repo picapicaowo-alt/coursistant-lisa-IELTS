@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import {useLayoutEffect, useEffect, useState, useRef, type CSSProperties, type ReactNode} from 'react';
+import {formatClockTime, formatDateTime, formatNumber} from '@/i18n/formatting';
 import {format} from 'date-fns';
 import type {CalendarItem} from './calendarData';
 import styles from './index.module.scss';
@@ -12,6 +14,7 @@ export function WeekCalendar({
   byDate: Map<string, CalendarItem[]>;
   renderItem: (item: CalendarItem) => ReactNode;
 }) {
+  const { t: translate } = useTranslation();
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {const timer = window.setInterval(() => setNow(new Date()), 60_000); return () => window.clearInterval(timer);}, []);
   const today = format(now, 'yyyy-MM-dd');
@@ -35,26 +38,26 @@ export function WeekCalendar({
   return (
     <section
       className={styles.weekTimeGrid}
-      aria-label={days.length === 1 ? 'Daily timetable' : 'Weekly timetable'}
+      aria-label={translate(days.length === 1 ? 'calendar:timetable.day' : 'calendar:timetable.week')}
       style={{'--day-count': days.length} as CSSProperties}
     >
-      <div className={styles.timeHeading}>Time</div>
+      <div className={styles.timeHeading}>{translate("common:dateTime.time")}</div>
       {days.map((day) => (
         <header key={format(day, 'yyyy-MM-dd')} className={styles.timeDay} aria-current={format(day, 'yyyy-MM-dd') === today ? 'date' : undefined}>
-          <span>{format(day, 'EEE')}</span>
-          <strong>{format(day, 'd')}</strong>
+          <span>{formatDateTime(day, {weekday: 'short'})}</span>
+          <strong>{formatNumber(day.getDate())}</strong>
         </header>
       ))}
       {hasUntimed ? <>
-        <span className={styles.untimedLabel}>All day</span>
+        <span className={styles.untimedLabel}>{translate('calendar:allDay')}</span>
         {days.map((day, index) => <div key={format(day, 'yyyy-MM-dd')} className={styles.untimed}>
           {entriesByDay[index].filter(item => !item.startTime).map(item => <div key={item.id}>{renderItem(item)}</div>)}
         </div>)}
       </> : null}
-      <div ref={viewport} className={styles.timetableViewport} tabIndex={0} aria-label="Scrollable 24-hour timetable">
+      <div ref={viewport} className={styles.timetableViewport} tabIndex={0} aria-label={translate('calendar:timetable.scrollLabel')}>
       <div className={styles.hourRail} ref={hourRail}>
         {Array.from({length: 24}, (_, hour) => (
-          <span key={hour}>{String(hour).padStart(2, '0')}:00</span>
+          <span key={hour}>{formatClockTime(`${String(hour).padStart(2, '0')}:00`, {hour: '2-digit', hourCycle: 'h23'})}</span>
         ))}
       </div>
       {days.map((day) => {
@@ -64,9 +67,9 @@ export function WeekCalendar({
           <div
             className={styles.timeColumn}
             key={date}
-            aria-label={format(day, 'EEEE MMMM d')}
+            aria-label={formatDateTime(day, {weekday: 'long', month: 'long', day: 'numeric'})}
           >
-            {date === today ? <div className={styles.currentTime} style={{top: `${minutesNow / MINUTES_IN_DAY * 100}%`}} aria-label={`Current time ${format(now, 'HH:mm')}`}/> : null}
+            {date === today ? <div className={styles.currentTime} style={{top: `${minutesNow / MINUTES_IN_DAY * 100}%`}} aria-label={translate('calendar:timetable.currentTime', {time: formatDateTime(now, {hour: 'numeric', minute: '2-digit'})})}/> : null}
             {layoutDay(entries).map(({item, start, end, lane, lanes}) => (
               <div
                 className={styles.timedEvent}

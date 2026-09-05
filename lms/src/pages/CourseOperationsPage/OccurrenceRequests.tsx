@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {LocalizedError} from '@/i18n/errors';
 import { teachingLabel } from "@/components/TeachingWorkspace/presentation";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -31,6 +33,7 @@ export function ScheduleReview({
   request: OperationRecord;
   onSaved: () => Promise<void>;
 }) {
+  const {t: translate} = useTranslation();
   const [decision, setDecision] = useState("APPROVE");
   const [reason, setReason] = useState("");
   const [saved, setSaved] = useState(false);
@@ -39,9 +42,7 @@ export function ScheduleReview({
   const mutation = useMutation({
     mutationFn: () => {
       if (version == null || !isInstructorScheduleRequestReviewable(request))
-        throw new Error(
-          "Reopen this request before reviewing it.",
-        );
+        throw new LocalizedError("operations:errors.reloadRequest");
       const payload = {
         decision,
         expectedVersion: version,
@@ -66,30 +67,28 @@ export function ScheduleReview({
   });
   if (!isInstructorScheduleRequestReviewable(request)) return <TeachingBadge value={textValue(request, 'status')}/>;
   return (
-    <form
+    <form noValidate
       className={s.form}
       onSubmit={(event) => {
         event.preventDefault();
-        mutation.mutate();
+        if (!mutation.isPending && (decision !== 'REJECT' || reason.trim())) mutation.mutate();
       }}
     >
       <label className={s.field}>
-        Your decision
-        <select
+        {translate("operations:yourDecision")}<select
           value={decision}
           onChange={(event) => {
             setDecision(event.target.value);
             setSaved(false);
           }}
         >
-          <option value="APPROVE">Approve</option>
-          <option value="REJECT">Reject</option>
+          <option value="APPROVE">{translate("operations:approve")}</option>
+          <option value="REJECT">{translate("operations:reject")}</option>
         </select>
       </label>
       {decision === "REJECT" ? (
         <label className={`${s.field} ${s.full}`}>
-          Reason for rejection
-          <textarea
+          {translate("operations:rejectionReason")}<textarea
             required
             value={reason}
             onChange={(event) => setReason(event.target.value)}
@@ -98,15 +97,13 @@ export function ScheduleReview({
       ) : null}
       {version == null ? (
         <p className={`${s.notice} ${s.full}`}>
-          Reopen this request to load the latest details before reviewing it.
-        </p>
+          {translate("operations:reloadRequest")}</p>
       ) : null}
       <div className={s.full}>
         <TeachingError error={mutation.error} />
         {saved ? (
           <p className={s.success} role="status">
-            Review saved.
-          </p>
+            {translate("operations:reviewSaved")}</p>
         ) : null}
       </div>
       <div className={s.actions}>
@@ -119,7 +116,7 @@ export function ScheduleReview({
             (decision === "REJECT" && !reason.trim())
           }
         >
-          {mutation.isPending ? "Saving…" : "Submit review"}
+          {mutation.isPending ? translate("common:actions.saving") : translate("operations:submitReview")}
         </button>
       </div>
     </form>
@@ -133,6 +130,7 @@ export function OccurrenceRequests({
   courseId: number;
   occurrenceId: number;
 }) {
+  const {t: translate} = useTranslation();
   const [selected, setSelected] = useState<OperationRecord>();
   const query = useQuery({
     queryKey: [...operationKeys.requests(courseId), occurrenceId],
@@ -152,7 +150,7 @@ export function OccurrenceRequests({
         <TeachingState
           loading={query.isPending}
           error={query.error}
-          empty="No schedule requests for this class."
+          empty={translate("operations:noClassRequests")}
           onRetry={() => void query.refetch()}
         />
       ) : (
@@ -181,15 +179,14 @@ export function OccurrenceRequests({
                 className={s.textButton}
                 onClick={() => setSelected(item)}
               >
-                Review request
-              </button> : null}
+                {translate("operations:reviewRequest")}</button> : null}
             </article>
           ))}
         </div>
       )}
       {selected ? (
         <section className={s.notice}>
-          <h3>Instructor review</h3>
+          <h3>{translate("operations:instructorReview")}</h3>
           <ScheduleReview
             key={`${recordId(selected, "requestId", "id")}-${optionalNumber(selected, "version")}`}
             courseId={courseId}

@@ -1,4 +1,6 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import {formatClockTime, formatDateValue, formatNumber, formatPercent} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
 import React, {useEffect, useId, useMemo, useRef, useState} from 'react';
 import {X, Plus, Calendar, Check} from 'lucide-react';
 import {useQuery} from '@tanstack/react-query';
@@ -24,7 +26,7 @@ export function LearningJourney({
   checkpointTarget: number;
   taskTarget: number;
 }) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const checkpoints = useMemo(() => plan.checkpoints ?? [], [plan.checkpoints]);
   const [selected, setSelected] = useState<number | null>(null);
   const [taskFilter, setTaskFilter] = useState<'ALL' | 'IN_PROGRESS' | 'COMPLETED' | 'NOT_STARTED'>('ALL');
@@ -85,13 +87,12 @@ interface PendingRequestItem {
   version?: number;
 }
 
-  // Unknown states must not expose approval actions.
   const rawPendingRequests = (scheduleRequests.data?.items ?? []).filter(r => r.status === 'PENDING');
   const pendingRequests: PendingRequestItem[] = rawPendingRequests.filter(r => r.id != null).map(r => ({
-    id: r.id!, courseTitle: r.courseId ? `Course #${r.courseId}` : 'Schedule request',
-    requestedDate: r.proposedOccurrenceDate || 'Not supplied',
-    requestedTime: [r.proposedStartTime, r.proposedEndTime].filter(Boolean).join(' – '),
-    reason: r.reason || 'No reason supplied', version: r.version,
+    id: r.id!, courseTitle: r.courseId ? translate('assistant:courseFallback', {id: formatNumber(r.courseId)}) : translate('operations:teacher.request'),
+    requestedDate: r.proposedOccurrenceDate ? formatDateValue(r.proposedOccurrenceDate) : translate('advising:studentWorkspace.notSupplied'),
+    requestedTime: [r.proposedStartTime, r.proposedEndTime].filter((time): time is string => Boolean(time)).map(time => formatClockTime(time)).join(' – '),
+    reason: r.reason || translate('advising:journey.noReason'), version: r.version,
   }));
 
   return (
@@ -100,12 +101,11 @@ interface PendingRequestItem {
       <section className={styles.journey} aria-labelledby="learning-journey-title">
         <header className={styles.header}>
           <div>
-            <h2 id="learning-journey-title">Learning Journey</h2>
-            <p>{plan.strategySummary || 'Target-driven milestone progression'}</p>
+            <h2 id="learning-journey-title">{translate("learning:plan.journey")}</h2>
+            <p>{plan.strategySummary || translate("advising:journey.strategyFallback")}</p>
           </div>
           <button type="button" className={styles.editBtn} onClick={() => onEdit()}>
-            Edit study plan
-          </button>
+            {translate("advising:journey.edit")}</button>
         </header>
 
         <div className={styles.phases}>
@@ -125,28 +125,28 @@ interface PendingRequestItem {
               >
                 <span className={styles.phaseMarker} data-state={isCompleted ? 'completed' : isCurrent ? 'current' : 'planned'} aria-hidden="true">{isCompleted ? <Check size={18}/> : null}</span>
                 <div className={styles.phaseBadgeRow}>
-                  <span className={styles.phaseNumber}>Phase {String(index + 1).padStart(2, '0')}</span>
+                  <span className={styles.phaseNumber}>{translate('advising:journey.phase', {number: formatNumber(index + 1, {minimumIntegerDigits: 2})})}</span>
                   <span
                     className={styles.statusPill}
                     data-status={isCompleted ? 'completed' : isCurrent ? 'current' : 'locked'}
                   >
-                    {isCompleted ? 'Completed' : isCurrent ? 'Current Phase' : 'Planned'}
+                    {isCompleted ? translate("common:status.COMPLETED") : isCurrent ? translate("advising:journey.currentPhase") : translate("advising:journey.planned")}
                   </span>
                 </div>
 
-                <h3>{item.goal || item.description || `Checkpoint ${index + 1}`}</h3>
+                <h3>{item.goal || item.description || translate('advising:planEditor.checkpointNumber', {number: formatNumber(index + 1)})}</h3>
                 <p className={styles.phaseDesc}>
-                  {item.description || 'No description provided.'}
+                  {item.description || translate("advising:journey.noDescription")}
                 </p>
 
                 <div className={styles.phaseMetrics}>
                   <div className={styles.metricLine}>
-                    <span>Advisor Tasks</span>
-                    <strong>{completed}/{tasks.length}</strong>
+                    <span>{translate("dashboard:advisorTasks")}</span>
+                    <strong>{formatNumber(completed)}/{formatNumber(tasks.length)}</strong>
                   </div>
                   <div className={styles.metricLine}>
-                    <span>Progress</span>
-                    <strong>{progressPercent}%</strong>
+                    <span>{translate("records:fields.progress")}</span>
+                    <strong>{formatPercent(progressPercent / 100)}</strong>
                   </div>
                   <div className={styles.progressBar}>
                     <div
@@ -162,7 +162,7 @@ interface PendingRequestItem {
                   className={styles.phaseActionBtn}
                   data-variant={isCurrent ? 'primary' : isCompleted ? 'secondary' : 'outline'}
                   onClick={() => {setSelectedTask(null); setTaskFilter('ALL'); setSelected(index);}}
-                  aria-label={translate("common:navigationControls.viewPhase", {number: index + 1})}
+                  aria-label={translate("common:navigationControls.viewPhase", {number: formatNumber(index + 1)})}
                 >
                   {translate("common:actions.viewDetails")}
                 </button>
@@ -173,48 +173,47 @@ interface PendingRequestItem {
           {!checkpoints.length ? (
             <article className={styles.phaseCard}>
               <div className={styles.phaseBadgeRow}>
-                <span className={styles.phaseNumber}>Phase 01</span>
-                <span className={styles.statusPill} data-status="current">Setup</span>
+                <span className={styles.phaseNumber}>{translate('advising:journey.phase', {number: formatNumber(1, {minimumIntegerDigits: 2})})}</span>
+                <span className={styles.statusPill} data-status="current">{translate("advising:journey.setup")}</span>
               </div>
-              <h3>No checkpoints yet</h3>
-              <p className={styles.phaseDesc}>Add a checkpoint to begin this student’s learning journey.</p>
+              <h3>{translate("advising:journey.noCheckpoints")}</h3>
+              <p className={styles.phaseDesc}>{translate("advising:journey.firstCheckpoint")}</p>
               <button
                 type="button"
                 className={styles.phaseActionBtn}
                 data-variant="primary"
                 onClick={() => onEdit()}
               >
-                + Create Checkpoint
-              </button>
+                {translate("advising:journey.createCheckpoint")}</button>
             </article>
           ) : null}
         </div>
       </section>
 
       {/* Right Column: Pending Requests */}
-      <section className={styles.requestsCard} aria-label="Student pending requests">
+      <section className={styles.requestsCard} aria-label={translate("advising:journey.pendingRequests")}>
         <header className={styles.requestsHeader}>
           <div className={styles.headerGroup}>
-            <h3>Requests</h3>
-            <span className={styles.pendingBadge}>{pendingRequests.length} Pending{(scheduleRequests.data?.total ?? 0) > (scheduleRequests.data?.items?.length ?? 0) ? ' on this page' : ''}</span>
+            <h3>{translate("records:fields.requests")}</h3>
+            <span className={styles.pendingBadge}>{scheduleRequests.isSuccess ? translate((scheduleRequests.data?.total ?? 0) > (scheduleRequests.data?.items?.length ?? 0) ? 'advising:journey.pendingPage' : 'operations:teacher.pending', {count: pendingRequests.length, number: formatNumber(pendingRequests.length)}) : '—'}</span>
           </div>
         </header>
 
         <div className={styles.requestsList}>
-          {scheduleRequests.isPending ? <p>Loading requests…</p> : scheduleRequests.isError ? <p role="alert">Schedule requests could not be loaded.</p> : pendingRequests.length === 0 ? <p>No pending requests.</p> : null}
+          {scheduleRequests.isPending ? <p>{translate("advising:journey.loadingRequests")}</p> : scheduleRequests.isError ? <p role="alert">{translate("advising:scheduling.failed")}</p> : pendingRequests.length === 0 ? <p>{translate("advising:journey.noRequests")}</p> : null}
           {pendingRequests.map(req => (
             <div className={styles.requestItem} key={req.id}>
               <div className={styles.reqTopLine}>
                 <strong>{req.courseTitle}</strong>
-                <span className={styles.reqTag}>Schedule change</span>
+                <span className={styles.reqTag}>{translate("common:status.SCHEDULE_CHANGE")}</span>
               </div>
 
               <div className={styles.reqDetails}>
                 <div>
-                  Requested: <strong>{req.requestedDate} · {req.requestedTime}</strong>
+                  {translate("advising:journey.requested")}{' '}<strong>{req.requestedDate} · {req.requestedTime}</strong>
                 </div>
                 <div>
-                  Reason: <span>{req.reason}</span>
+                  {translate("advising:journey.reasonLabel")}{' '}<span>{req.reason}</span>
                 </div>
               </div>
 
@@ -222,7 +221,7 @@ interface PendingRequestItem {
             </div>
           ))}
         </div>
-        <Link to={`${APP_ROUTE_PATHS.advisorSchedule}?studentUserId=${studentUserId}`}>View all schedule requests</Link>
+        <Link to={`${APP_ROUTE_PATHS.advisorSchedule}?studentUserId=${studentUserId}`}>{translate("advising:journey.allRequests")}</Link>
       </section>
 
       {/* Checkpoint Tasks Modal Dialog (Figma Top-Right Frame) */}
@@ -233,11 +232,11 @@ interface PendingRequestItem {
         onClose={() => setSelected(null)}
       >
         <div className={styles.dialogHeader}>
-          <h2 id={titleId}>{checkpoint?.goal || checkpoint?.description || 'Checkpoint tasks'}</h2>
+          <h2 id={titleId}>{checkpoint?.goal || checkpoint?.description || translate("learning:checkpoint.workspace")}</h2>
           <button
             type="button"
             className={styles.closeBtn}
-            aria-label="Close dialog"
+            aria-label={translate("common:actions.closeDialog")}
             onClick={() => dialog.current?.close()}
           >
             <X size={18} />
@@ -251,28 +250,28 @@ interface PendingRequestItem {
               data-active={taskFilter === 'ALL' ? 'true' : undefined}
               onClick={() => setTaskFilter('ALL')}
             >
-              All Tasks: {allTasks.length}
+              {translate('advising:journey.allTasks', {number: formatNumber(allTasks.length)})}
             </button>
             <button
               type="button"
               data-active={taskFilter === 'IN_PROGRESS' ? 'true' : undefined}
               onClick={() => setTaskFilter('IN_PROGRESS')}
             >
-              In Progress: {inProgressCount}
+              {translate('advising:journey.inProgress', {number: formatNumber(inProgressCount)})}
             </button>
             <button
               type="button"
               data-active={taskFilter === 'COMPLETED' ? 'true' : undefined}
               onClick={() => setTaskFilter('COMPLETED')}
             >
-              Completed: {completedCount}
+              {translate('advising:journey.completed', {number: formatNumber(completedCount)})}
             </button>
             <button
               type="button"
               data-active={taskFilter === 'NOT_STARTED' ? 'true' : undefined}
               onClick={() => setTaskFilter('NOT_STARTED')}
             >
-              Not Started: {notStartedCount}
+              {translate('advising:journey.notStarted', {number: formatNumber(notStartedCount)})}
             </button>
           </div>
 
@@ -285,25 +284,25 @@ interface PendingRequestItem {
             }}
           >
             <Plus size={14} />
-            <span>Edit checkpoint &amp; tasks</span>
+            <span>{translate("advising:journey.editTasks")}</span>
           </button>
         </div>
 
-        {selectedTask != null ? <section className={styles.taskDetail} aria-label="Task details">
-          <button type="button" onClick={() => setSelectedTask(null)}>Back to all tasks</button>
-          <h3>{selectedTask.title || 'Advisor task'}</h3>
-          <p>{selectedTask.description || 'No description supplied.'}</p>
-          <dl><dt>Deadline</dt><dd>{formatPlanDate(selectedTask.dueDate)}</dd><dt>Submission requirement</dt><dd>{selectedTask.submissionRequirement || 'No additional requirement.'}</dd></dl>
-          <button type="button" onClick={() => {dialog.current?.close(); onEdit(checkpoint?.id, selectedTask.id);}}>Edit task</button>
+        {selectedTask != null ? <section className={styles.taskDetail} aria-label={translate("advising:actionTasks.details")}>
+          <button type="button" onClick={() => setSelectedTask(null)}>{translate("advising:journey.backToTasks")}</button>
+          <h3>{selectedTask.title || translate("advising:studentTasks.task")}</h3>
+          <p>{selectedTask.description || translate("advising:journey.noTaskDescription")}</p>
+          <dl><dt>{translate("learning:checkpoint.deadline")}</dt><dd>{formatPlanDate(selectedTask.dueDate)}</dd><dt>{translate("advising:journey.submissionRequirement")}</dt><dd>{selectedTask.submissionRequirement || translate("advising:journey.noRequirement")}</dd></dl>
+          <button type="button" onClick={() => {dialog.current?.close(); onEdit(checkpoint?.id, selectedTask.id);}}>{translate("advising:journey.editTask")}</button>
         </section> :
         <div className={styles.tableWrap}>
           <table>
             <thead>
               <tr>
-                <th scope="col">Task Name</th>
-                <th scope="col">Deadline</th>
-                <th scope="col">Status</th>
-                <th scope="col">Actions</th>
+                <th scope="col">{translate("advising:journey.taskName")}</th>
+                <th scope="col">{translate("learning:checkpoint.deadline")}</th>
+                <th scope="col">{translate("common:fields.status")}</th>
+                <th scope="col">{translate("common:fields.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -311,13 +310,13 @@ interface PendingRequestItem {
                 const isDone = task.status === TASK_STATUS.completed;
                 const isInProg = task.status === TASK_STATUS.inProgress;
                 const statusKey = isDone ? 'COMPLETED' : isInProg ? 'IN_PROGRESS' : 'NOT_STARTED';
-                const statusText = isDone ? 'Completed' : isInProg ? 'In Progress' : 'Not Started';
+                const statusText = statusLabel(task.status ?? statusKey);
 
                 return (
                   <tr key={task.id ?? index}>
                     <td>
                       <strong className={styles.taskTitle}>
-                        {task.title || `Task ${index + 1}`}
+                        {task.title || translate('advising:planEditor.taskNumber', {number: formatNumber(index + 1)})}
                       </strong>
                       <small className={styles.taskDescription}>
                         {task.description || ''}
@@ -326,7 +325,7 @@ interface PendingRequestItem {
                     <td>
                       <span className={styles.deadlineCell}>
                         <Calendar size={13} />
-                        {task.dueDate ? formatPlanDate(task.dueDate) : 'No deadline'}
+                        {task.dueDate ? formatPlanDate(task.dueDate) : translate("common:dateTime.noDeadline")}
                       </span>
                     </td>
                     <td>
@@ -340,8 +339,7 @@ interface PendingRequestItem {
                           type="button"
                           onClick={() => setSelectedTask(task)}
                         >
-                          View
-                        </button>
+                          {translate("common:actions.view")}</button>
                       </div>
                     </td>
                   </tr>
@@ -351,8 +349,7 @@ interface PendingRequestItem {
               {!filteredTasks.length ? (
                 <tr>
                   <td colSpan={4} className={styles.tableEmpty}>
-                    No tasks match this filter.
-                  </td>
+                    {translate("advising:journey.noMatchingTasks")}</td>
                 </tr>
               ) : null}
             </tbody>

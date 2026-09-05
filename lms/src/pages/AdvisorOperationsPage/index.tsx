@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {Navigate, useLocation} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -11,6 +12,7 @@ import {advisorConversationViews, advisorDashboardView, advisorScheduleRequestVi
 import styles from './AdvisorOperationsPage.module.scss';
 
 export default function AdvisorOperationsPage() {
+  const {t: translate} = useTranslation();
   const {user} = useRequiredAuth();
   const {hash, search} = useLocation();
   const dashboard = useQuery({queryKey: ['advisor', 'dashboard'], queryFn: async () => unwrapData(await advisorApiService.getDashboard(), 'advisorDashboard'), retry: false});
@@ -23,7 +25,7 @@ export default function AdvisorOperationsPage() {
   if (legacyDestination) return <Navigate to={`${legacyDestination}${search}`} replace/>;
   const queries = [dashboard, students, tasks, conversations, schedule];
   return <div className={styles.page}>
-    <AdvisorDashboardOverview name={user.name || 'Advisor'} dashboard={advisorDashboardView(dashboard.data)} students={students.data?.items ?? []}
+    <AdvisorDashboardOverview name={user.name || translate('common:roles.ADVISOR')} dashboard={advisorDashboardView(dashboard.data)} students={students.data?.items ?? []}
       tasks={tasks.data?.items ?? []} conversations={advisorConversationViews(conversations.data)} schedule={advisorScheduleRequestViews(schedule.data)}
       loading={queries.some(query => query.isPending)} error={queries.some(query => query.isError)}
       onRetry={() => void Promise.all(queries.filter(query => query.isError).map(query => query.refetch()))}/>

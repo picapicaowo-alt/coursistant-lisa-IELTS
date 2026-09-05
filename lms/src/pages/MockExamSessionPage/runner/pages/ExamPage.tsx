@@ -1,4 +1,8 @@
-import {getApiErrorMessage} from '@/utils/apiError';
+import {useTranslation} from 'react-i18next'
+import {formatDateTime} from '@/i18n/formatting';
+import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
+import {getApiErrorMessage} from '@/utils/apiError'
+import {buildQuestionSubmission} from '../utils/questionSubmission'
 import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { submitReading } from '../api/readings'
@@ -14,7 +18,6 @@ import {
   type ReadingTest,
 } from '../data/reading'
 import type { NoteItem, TextSpan, ToolMode } from '../types/annotation'
-import { buildQuestionSubmission } from '../utils/questionSubmission'
 
 type ExamPageProps = {
   reading: ReadingTest
@@ -25,7 +28,7 @@ type ExamPageProps = {
 }
 
 function formatClock(date: Date): string {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+  return formatDateTime(date, { hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
 function createId() {
@@ -33,6 +36,8 @@ function createId() {
 }
 
 export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }: ExamPageProps) {
+  const {t: translate} = useTranslation()
+  const {confirm, dialog: exitDialog} = useConfirmationDialog();
   const passages = reading.passages
   const questionIds = useMemo(() => allQuestionNumbers(passages), [passages])
   const firstPassageId = passages[0]?.id ?? 1
@@ -43,13 +48,13 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
   const [paused, setPaused] = useState(false)
   const [currentPassageId, setCurrentPassageId] = useState(firstPassageId)
   const [currentQuestion, setCurrentQuestion] = useState(firstQuestion)
-  const [clockLabel, setClockLabel] = useState(() => formatClock(new Date()))
+  const [clock, setClock] = useState(() => new Date())
   const [activeTool, setActiveTool] = useState<ToolMode>(null)
   const [highlightsByPassage, setHighlightsByPassage] = useState<Record<number, TextSpan[]>>({})
   const [notesByPassage, setNotesByPassage] = useState<Record<number, NoteItem[]>>({})
   const [submitting, setSubmitting] = useState(false)
   const [submissionOpen, setSubmissionOpen] = useState(false)
-  const [submissionError, setSubmissionError] = useState('')
+  const [submissionError, setSubmissionError] = useState<unknown>()
   const [reviewByQuestion, setReviewByQuestion] = useState<Record<
     number,
     { submitted: string; correct: boolean; blank: boolean }
@@ -70,7 +75,7 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setClockLabel(formatClock(new Date()))
+      setClock(new Date())
     }, 1000)
     return () => window.clearInterval(id)
   }, [])
@@ -136,12 +141,11 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
   const submitSection = useCallback(async () => {
     if (submitting || scoreSummary) return
 
-    const payload = buildQuestionSubmission(questionIds, answers)
-
     setSubmitting(true)
     setSubmissionOpen(true)
     setSubmissionError('')
     try {
+      const payload = buildQuestionSubmission(questionIds, answers)
       const attemptId = await ensureAttemptId(testId)
       const result = await submitReading(testId, {
         attemptId,
@@ -164,7 +168,7 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
         totalQuestions: result.totalQuestions,
       })
     } catch (err) {
-      setSubmissionError(getApiErrorMessage(err, 'Your exam could not be submitted. Please try again.'))
+      setSubmissionError(err)
     } finally {
       setSubmitting(false)
     }
@@ -197,14 +201,14 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
     setSubmissionOpen(true)
   }, [scoreSummary, submitting])
 
-  const handleExit = useCallback(() => {
+  const handleExit = useCallback(async () => {
     if (scoreSummary) {
       onExit()
       return
     }
-    const ok = window.confirm('Exit this section? Your current answers will not be saved.')
+    const ok = await confirm({titleKey: 'exams:runner.exit', messageKey: 'exams:runner.exitConfirm'})
     if (ok) onExit()
-  }, [onExit, scoreSummary])
+  }, [confirm, onExit, scoreSummary])
 
   const handleToggleHighlight = useCallback(() => {
     setActiveTool((prev) => (prev === 'highlight' ? null : 'highlight'))
@@ -269,7 +273,8 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
 
   return (
     <div className="exam-shell">
-      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(scoreSummary)} error={submissionError} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
+      {exitDialog}
+      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(scoreSummary)} error={submissionError ? getApiErrorMessage(submissionError, translate('exams:submission.failed')) : ''} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
       <TopBar
         testTitle={testTitle}
         candidateId={candidateLabel}
@@ -308,7 +313,7 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
         answers={answers}
         currentQuestion={currentQuestion}
         paused={paused}
-        clockLabel={clockLabel}
+        clockLabel={formatClock(clock)}
         onJump={goToQuestion}
         onSelectPassage={handleSelectPassage}
         submitting={submitting}

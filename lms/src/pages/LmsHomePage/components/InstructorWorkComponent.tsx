@@ -26,6 +26,7 @@ const queueLabel = (kind: GradingQueueItem['kind']) => ({
 }[kind]);
 
 const InstructorWorkComponent: React.FC = () => {
+  const {t: translate} = useTranslation();
   useTranslation();
   const [queueQuery, activityQuery] = useQueries({
     queries: [
@@ -51,17 +52,17 @@ const InstructorWorkComponent: React.FC = () => {
   return (
     <section className={styles.widget} aria-labelledby="instructor-work-title">
       <header className={styles.header}>
-        <div><h2 id="instructor-work-title">Teaching activity</h2><p>Grade current work and review recent course changes.</p></div>
-        {failed ? <button type="button" onClick={() => { void queueQuery.refetch(); void activityQuery.refetch(); }}>Retry</button> : null}
+        <div><h2 id="instructor-work-title">{translate("dashboard:teachingActivity")}</h2><p>{translate("dashboard:teachingActivityHelp")}</p></div>
+        {failed ? <button type="button" onClick={() => { void queueQuery.refetch(); void activityQuery.refetch(); }}>{translate("common:actions.retry")}</button> : null}
       </header>
 
-      {loading ? <p className={styles.status}>Loading teaching activity…</p> : null}
+      {loading ? <p className={styles.status}>{translate("dashboard:loadingActivity")}</p> : null}
       {!loading ? (
         <div className={styles.columns}>
           <section aria-labelledby="grading-queue-title">
-            <div className={styles.sectionTitle}><h3 id="grading-queue-title">Grading queue</h3><span>{queue.length}</span></div>
-            {queueQuery.isError ? <p className={styles.inlineError}>Couldn&apos;t load the grading queue.</p> : null}
-            {!queueQuery.isError && queue.length === 0 ? <p className={styles.empty}>No grading work is waiting.</p> : null}
+            <div className={styles.sectionTitle}><h3 id="grading-queue-title">{translate("dashboard:gradingQueue")}</h3><span>{queue.length}</span></div>
+            {queueQuery.isError ? <p className={styles.inlineError}>{translate("dashboard:gradingFailed")}</p> : null}
+            {!queueQuery.isError && queue.length === 0 ? <p className={styles.empty}>{translate("dashboard:noGrading")}</p> : null}
             <div className={styles.list}>
               {queue.map(item => (
                 <Link key={`${item.kind}-${item.courseId}-${item.assignmentId ?? item.quizId}`} to={queueLink(item)} className={styles.item}>
@@ -73,9 +74,9 @@ const InstructorWorkComponent: React.FC = () => {
           </section>
 
           <section aria-labelledby="recent-activity-title">
-            <div className={styles.sectionTitle}><h3 id="recent-activity-title">Recent activity</h3><span>{activity.length}</span></div>
-            {activityQuery.isError ? <p className={styles.inlineError}>Couldn&apos;t load recent activity.</p> : null}
-            {!activityQuery.isError && activity.length === 0 ? <p className={styles.empty}>No recent teaching activity.</p> : null}
+            <div className={styles.sectionTitle}><h3 id="recent-activity-title">{translate("dashboard:recentActivity")}</h3><span>{activity.length}</span></div>
+            {activityQuery.isError ? <p className={styles.inlineError}>{translate("dashboard:recentFailed")}</p> : null}
+            {!activityQuery.isError && activity.length === 0 ? <p className={styles.empty}>{translate("dashboard:noRecentActivity")}</p> : null}
             <div className={styles.list}>
               {activity.map((item, index) => {
                 const occurredAt = parseZonedTimestamp(item.occurredAt, item.timezone);

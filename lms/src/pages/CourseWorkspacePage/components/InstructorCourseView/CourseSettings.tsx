@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { CourseResponse, UpdateCourseRequest } from "@/apis";
@@ -14,6 +15,7 @@ export function CourseSettings({
   writable: boolean;
   onClose: () => void;
 }) {
+  const {t: translate} = useTranslation();
   const [title, setTitle] = useState(course.title || course.name);
   const [description, setDescription] = useState(course.description ?? "");
   const client = useQueryClient();
@@ -33,7 +35,7 @@ export function CourseSettings({
   });
   return (
     <TeachingDialog
-      title="Edit course details"
+      title={translate("course:workspace.editDetails")}
       onClose={onClose}
       busy={save.isPending}
     >
@@ -52,8 +54,7 @@ export function CourseSettings({
         }}
       >
         <label>
-          Course title
-          <input
+          {translate("course:form.titleLabel")}<input
             autoFocus
             required
             value={title}
@@ -62,8 +63,7 @@ export function CourseSettings({
           />
         </label>
         <label>
-          Description
-          <textarea
+          {translate("common:fields.description")}<textarea
             rows={4}
             value={description}
             disabled={!writable || save.isPending}
@@ -72,8 +72,7 @@ export function CourseSettings({
         </label>
         {!writable ? (
           <p className={styles.notice}>
-            This course is archived. Its content is read-only.
-          </p>
+            {translate("course:workspace.archived")}</p>
         ) : null}
         <TeachingError error={save.error} />
         <div className={styles.formActions}>
@@ -83,8 +82,7 @@ export function CourseSettings({
             disabled={save.isPending}
             onClick={onClose}
           >
-            Cancel
-          </button>
+            {translate("common:actions.cancel")}</button>
           <button
             className={styles.primary}
             disabled={
@@ -94,7 +92,7 @@ export function CourseSettings({
               save.isPending
             }
           >
-            {save.isPending ? "Saving…" : "Save changes"}
+            {save.isPending ? translate("common:actions.saving") : translate("common:actions.saveChanges")}
           </button>
         </div>
       </form>

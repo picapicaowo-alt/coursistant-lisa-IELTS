@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
 import {fixture, reply} from './workspace-fixtures';
+import {tx} from './i18n-fixture';
 
 const member = {groupId: 81, userId: 401, userFirstName: 'Mei', userMiddleName: 'An', userLastName: 'Lin', joinedAt: '2026-09-05T07:13:00', addedByType: 'Self', addedByUserId: 401};
 const groups = [
@@ -10,8 +11,8 @@ const groupSet = {id: 91, courseId: 71, name: 'Writing groups', defaultCapacity:
 
 for (const [locale, move, retry, error] of [
   ['en', 'Move Mei An Lin', 'Retry', 'Ungrouped students could not be loaded.'],
-  ['zh-CN', '移动 Mei An Lin', '重试', '暂时无法加载未分组学生。'],
-  ['zh-TW', '移動 Mei An Lin', '重試', '暫時無法載入未分組學生。'],
+  ['zh-CN', '移动Mei An Lin', '重试', '暂时无法加载未分组学生。'],
+  ['zh-TW', '移動Mei An Lin', '重試', '暫時無法載入未分組學生。'],
 ] as const) {
   test(`group names and failed roster recovery preserve identities in ${locale}`, async ({page}) => {
     await fixture(page, 'INSTRUCTOR', 'Instructor');
@@ -33,13 +34,13 @@ for (const [locale, move, retry, error] of [
     const alert = page.getByRole('alert');
     await expect(alert).toContainText(error);
     await expect(page.getByText(/0 students currently ungrouped|有 0 名学生尚未分组|有 0 名學生尚未分組/)).toHaveCount(0);
-    await expect(page.getByRole('button', {name: 'Distribute randomly', exact: true})).toBeDisabled();
+    await expect(page.getByRole('button', {name: tx(locale, 'courseTools:groups.distribute'), exact: true})).toBeDisabled();
     failed = false;
     await alert.getByRole('button', {name: retry, exact: true}).click();
-    await expect(page.getByRole('combobox', {name: 'Student', exact: true}).getByRole('option', {name: 'Kai Zhou', exact: true})).toHaveAttribute('value', '402');
+    await expect(page.getByRole('combobox', {name: tx(locale, 'common:roles.STUDENT'), exact: true}).getByRole('option', {name: 'Kai Zhou', exact: true})).toHaveAttribute('value', '402');
     await page.getByRole('combobox', {name: move, exact: true}).selectOption('82');
     await expect(page.getByRole('alertdialog')).toContainText('Mei An Lin');
-    await page.getByRole('alertdialog').getByRole('button', {name: 'Confirm', exact: true}).click();
+    await page.getByRole('alertdialog').getByRole('button', {name: tx(locale, 'common:actions.confirm'), exact: true}).click();
     await expect.poll(() => writes).toEqual([{targetGroupId: 82, confirmCapacityOverfill: true, confirmAcademicImpact: true}]);
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('lang', locale);

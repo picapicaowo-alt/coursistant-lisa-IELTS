@@ -1,6 +1,10 @@
-import {teachingLabel} from '@/components/TeachingWorkspace/presentation';
-import {useTranslation} from 'react-i18next';
 import {teachingAlertTitle} from '@/utils/teachingAlert';
+import {isInstructorScheduleRequestReviewable} from '../CourseOperationsPage/records';
+import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
+import {MY_OPERATIONS_SECTION_KEYS} from './sections';
+import {teachingLabel} from '@/components/TeachingWorkspace/presentation';
 import { useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { generatePath, Link, useSearchParams } from "react-router-dom";
@@ -22,7 +26,6 @@ import CalendarPage from "@/pages/CalendarPage";
 import { TeacherOperationsSections } from "./TeacherOperationsSections";
 import { ScheduleReview } from "../CourseOperationsPage/OccurrenceRequests";
 import {
-  isInstructorScheduleRequestReviewable,
   dateLabel,
   timeRange,
   recordId,
@@ -36,6 +39,7 @@ import local from "./instructor.module.scss";
 
 const SECTIONS = ["teaching", "availability", "calendar"] as const;
 export function InstructorOperationsPage() {
+  const {t: translate} = useTranslation();
   const [params, setParams] = useSearchParams();
   const section =
     SECTIONS.find((item) => item === params.get("view")) ?? "teaching";
@@ -47,14 +51,12 @@ export function InstructorOperationsPage() {
     <main className={s.page}>
       <header className={s.heading}>
         <div>
-          <h1>Teaching Operations</h1>
+          <h1>{translate("operations:teacher.title")}</h1>
           <p>
-            Your live teaching queue, classes, personal calendar, and
-            availability.
-          </p>
+            {translate("operations:teacher.description")}</p>
         </div>
       </header>
-      <nav className={s.primaryNav} aria-label="Operations sections">
+      <nav className={s.primaryNav} aria-label={translate("operations:teacher.sections")}>
         {SECTIONS.map((item) => (
           <button
             type="button"
@@ -62,7 +64,7 @@ export function InstructorOperationsPage() {
             aria-pressed={section === item}
             onClick={() => setParams({ view: item })}
           >
-            {teachingLabel(item)}
+            {translate(MY_OPERATIONS_SECTION_KEYS[item])}
           </button>
         ))}
       </nav>
@@ -120,13 +122,13 @@ const personName = (item: {
       middleName: item.studentMiddleName,
       lastName: item.studentLastName,
     },
-    `Student #${item.studentUserId}`,
+    i18n.t('common:people.studentFallback', {id: formatNumber(item.studentUserId)}),
   );
 const coursePath = (id: number) =>
   generatePath(APP_ROUTE_PATHS.courseCourseId, { courseId: String(id) });
 
 function TeachingOverview() {
-  useTranslation('dashboard');
+  const { t: translate } = useTranslation();
   const today = useQuery({
     queryKey: ["me", "teaching-today"],
     queryFn: async () =>
@@ -213,12 +215,12 @@ function TeachingOverview() {
   return (
     <div className={local.grid}>
       <Card
-        title="Today's classes"
+        title={translate("operations:teacher.today")}
         meta={
           <Link
             to={`${APP_ROUTE_PATHS.myOperations}?view=calendar`}
             className={s.iconButton}
-            aria-label="Open teaching calendar"
+            aria-label={translate("operations:teacher.openCalendar")}
           >
             <CalendarDays size={19} />
           </Link>
@@ -227,9 +229,8 @@ function TeachingOverview() {
         {today.isPending || today.isError || !today.data?.length ? (
           <TeachingState compact
             loading={today.isPending}
-            error={today.error}
-            errorMessage="Today’s classes could not be loaded."
-            empty="No classes scheduled for today."
+            error={today.error} errorMessage={translate('operations:teacher.todayFailed')}
+            empty={translate("operations:teacher.noClasses")}
             onRetry={() => void today.refetch()}
           />
         ) : (
@@ -262,12 +263,12 @@ function TeachingOverview() {
         )}
       </Card>
       <Card
-        title="Grading queue"
+        title={translate("dashboard:gradingQueue")}
         meta={
           !queue.isPending &&
           !grading.isPending &&
           (groups.length > 0 || (!queue.isError && !grading.isError)) ? (
-            <TeachingBadge value="PENDING">{count} pending</TeachingBadge>
+            <TeachingBadge value="PENDING">{translate('operations:teacher.pending', {count, number: formatNumber(count)})}</TeachingBadge>
           ) : null
         }
       >
@@ -277,9 +278,7 @@ function TeachingOverview() {
           <div>
             {queue.isError ? (
               <p className={s.notice}>
-                Showing assignment submissions. The combined assignment/quiz
-                queue is unavailable.
-              </p>
+                {translate("operations:teacher.queueFallback")}</p>
             ) : null}
             {groups.map((item) => (
               <Link
@@ -300,37 +299,33 @@ function TeachingOverview() {
                 <span>
                   <strong>{item.title}</strong>
                   <small>
-                    {item.courseCode} · {item.pendingCount}{" "}
-                    {item.kind.includes("Release")
-                      ? "awaiting release"
-                      : "submissions"}
+                    {item.courseCode} · {translate(item.kind.includes('Release') ? 'operations:teacher.awaitingRelease' : 'operations:teacher.submissions', {count: item.pendingCount, number: formatNumber(item.pendingCount)})}
                   </small>
                 </span>
                 <span className={local.action}>
-                  {item.kind.includes("Release") ? "Review" : "Grade"}
+                  {item.kind.includes("Release") ? translate("common:actions.review") : translate("course:assignmentTeacher.grade")}
                 </span>
               </Link>
             ))}
           </div>
         ) : queue.isError || grading.isError ? (
           <TeachingState compact
-            error={queue.error || grading.error}
-            errorMessage="Grading queue could not be loaded."
+            error={queue.error || grading.error} errorMessage={translate('operations:teacher.queueFailed')}
             onRetry={() => {
               void queue.refetch();
               void grading.refetch();
             }}
           />
         ) : (
-          <TeachingState compact empty="All caught up. No submissions waiting for review." />
+          <TeachingState compact empty={translate("operations:teacher.queueClear")} />
         )}
       </Card>
       <Card
-        title="Students needing support"
+        title={translate("operations:teacher.support")}
         meta={
           support.isSuccess ? (
             <TeachingBadge value={support.data?.length ? "ABSENT" : undefined}>
-              {support.data?.length ?? 0} flagged
+              {translate('operations:teacher.flagged', {count: support.data?.length ?? 0, number: formatNumber(support.data?.length ?? 0)})}
             </TeachingBadge>
           ) : null
         }
@@ -338,9 +333,8 @@ function TeachingOverview() {
         {support.isPending || support.isError || !support.data?.length ? (
           <TeachingState compact
             loading={support.isPending}
-            error={support.error}
-            errorMessage="Student support details could not be loaded."
-            empty="No students currently flagged for support."
+            error={support.error} errorMessage={translate('operations:teacher.supportFailed')}
+            empty={translate("operations:teacher.noSupport")}
             onRetry={() => void support.refetch()}
           />
         ) : (
@@ -360,22 +354,21 @@ function TeachingOverview() {
                   <small>
                     {(item.reasons ?? []).map(teachingLabel).join(" · ") ||
                       item.courseTitle ||
-                      "Review course context"}
+                      translate("operations:teacher.courseContext")}
                   </small>
                 </span>
               </div>
-              <span className={local.action}>Review</span>
+              <span className={local.action}>{translate("common:actions.review")}</span>
             </Link>
           ))
         )}
       </Card>
-      <Card title="Teaching alerts">
+      <Card title={translate("operations:teacher.alerts")}>
         {alerts.isPending || alerts.isError || !alerts.data?.items.length ? (
           <TeachingState compact
             loading={alerts.isPending}
-            error={alerts.error}
-            errorMessage="Teaching alerts could not be loaded."
-            empty="No teaching alerts right now."
+            error={alerts.error} errorMessage={translate('operations:teacher.alertsFailed')}
+            empty={translate("operations:teacher.noAlerts")}
             onRetry={() => void alerts.refetch()}
           />
         ) : (
@@ -410,13 +403,12 @@ function TeachingOverview() {
           })
         )}
       </Card>
-      <Card title="My teaching courses" full>
+      <Card title={translate("operations:teacher.courses")} full>
         {courses.isPending || courses.isError || !courses.data?.length ? (
           <TeachingState compact
             loading={courses.isPending}
-            error={courses.error}
-            errorMessage="Your teaching courses could not be loaded."
-            empty="No teaching courses assigned yet."
+            error={courses.error} errorMessage={translate('operations:teacher.coursesFailed')}
+            empty={translate("operations:teacher.noCourses")}
             onRetry={() => void courses.refetch()}
           />
         ) : (
@@ -432,12 +424,12 @@ function TeachingOverview() {
         )}
       </Card>
       <Card
-        title="Schedule requests"
+        title={translate("operations:scheduleRequests")}
         full
         meta={
           requests.isSuccess ? (
             <span className={s.muted}>
-              {requests.data?.total ?? requests.data?.items.length} requests
+              {translate('operations:teacher.requestsCount', {count: requests.data?.total ?? requests.data?.items.length ?? 0, number: formatNumber(requests.data?.total ?? requests.data?.items.length ?? 0)})}
             </span>
           ) : null
         }
@@ -447,9 +439,8 @@ function TeachingOverview() {
         !requests.data?.items.length ? (
           <TeachingState compact
             loading={requests.isPending}
-            error={requests.error}
-            errorMessage="Schedule requests could not be loaded."
-            empty="No schedule requests to review."
+            error={requests.error} errorMessage={translate('operations:teacher.requestsFailed')}
+            empty={translate("operations:teacher.noRequests")}
             onRetry={() => void requests.refetch()}
           />
         ) : (
@@ -484,8 +475,7 @@ function TeachingOverview() {
                     className={s.textButton}
                     onClick={() => setSelected(item)}
                   >
-                    Review
-                  </button>
+                    {translate("common:actions.review")}</button>
                 ) : null}
               </div>
             </div>
@@ -494,10 +484,10 @@ function TeachingOverview() {
       </Card>
       {selected ? (
         <TeachingDialog
-          title="Schedule request review"
+          title={translate("operations:teacher.reviewTitle")}
           description={
             textValue(selected, "reason") ||
-            "Review the requested change for this course."
+            translate("operations:teacher.reviewHelp")
           }
           onClose={() => setSelected(undefined)}
         >

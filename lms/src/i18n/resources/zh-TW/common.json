@@ -65,7 +65,17 @@
     "viewTarget": "檢視{{target}}",
     "chooseTarget": "選擇{{target}}",
     "confirmTarget": "確認{{target}}",
-    "send": "傳送"
+    "send": "傳送",
+    "chooseFiles": "選擇檔案",
+    "editNamed": "編輯{{name}}",
+    "deleteNamed": "刪除{{name}}",
+    "review": "檢視",
+    "messagePerson": "傳送訊息給 {{name}}",
+    "deletingNamed": "正在刪除{{name}}…",
+    "renameNamed": "重新命名{{name}}",
+    "publishNamed": "發布{{name}}",
+    "unpublishNamed": "撤回{{name}}的發布",
+    "closeItem": "關閉{{item}}"
   },
   "common": {
     "yes": "是",
@@ -104,7 +114,7 @@
     "skipToContent": "跳轉到正文"
   },
   "intake": {
-    "reviewThenAssign": "核對學生資料和家長訪問許可權，然後繼續分配顧問。",
+    "reviewThenAssign": "核對學生資料和家長訪問權限，然後繼續分配顧問。",
     "saved": "更改已儲存。",
     "saving": "正在儲存…",
     "continueToAssignment": "繼續分配顧問",
@@ -124,7 +134,7 @@
     "loadingSession": "正在載入會話…",
     "somethingWentWrong": "發生錯誤",
     "pageFailed": "無法載入此頁面。請重試；如果問題持續存在，請重新整理頁面。",
-    "operationFailed": "無法完成操作。請檢查必填項、許可權和當前記錄版本。",
+    "operationFailed": "無法完成操作。請檢查必填項、權限和當前記錄版本。",
     "updatedAt": "更新於 {{time}}",
     "pageNotFound": "頁面不存在",
     "unknownUrl": "此地址不是 Coursistant 的頁面。",
@@ -149,7 +159,7 @@
     "approval": "審批",
     "risk": "風險",
     "followUp": "跟進",
-    "review": "稽覈",
+    "review": "審核",
     "planning": "規劃",
     "ongoing": "持續跟進"
   },
@@ -157,7 +167,7 @@
     "pending": "待處理",
     "inProgress": "進行中",
     "resolved": "已解決",
-    "PUBLISHED": "已釋出",
+    "PUBLISHED": "已發布",
     "COMPLETED": "已完成",
     "PRESENT": "已出勤",
     "ACTIVE": "有效",
@@ -215,14 +225,39 @@
     "NOT_APPLICABLE": "不適用",
     "UNKNOWN": "未知",
     "READY": "就緒",
-    "PENDING_WRITING_GRADING": "等待寫作評分"
+    "PENDING_WRITING_GRADING": "等待寫作評分",
+    "ABSENCE": "請假",
+    "SCHEDULE_CHANGE": "調課",
+    "APPROVE": "核准",
+    "REJECT": "拒絕",
+    "LECTURE": "課堂",
+    "ASSIGNMENT": "作業",
+    "FILE": "檔案",
+    "LINK": "連結",
+    "DOCUMENT": "文件",
+    "IMAGE": "圖片",
+    "AUDIO": "音訊",
+    "VIDEO": "影片",
+    "ARCHIVE": "壓縮檔",
+    "ENTERED": "已錄入",
+    "EXPIRED": "已過期",
+    "TIMED_OUT": "已超時",
+    "AUTO_SUBMITTED": "已自動提交",
+    "LAB": "實驗課",
+    "TUTORIAL": "輔導課",
+    "PENDING_GRADING": "待批改",
+    "UPCOMING_CLASS": "即將上課",
+    "SCHEDULE_CONFLICT": "排課衝突",
+    "PENDING_ADVISOR": "待學業顧問處理",
+    "PENDING_INSTRUCTOR": "待教師處理"
   },
   "pagination": {
     "summary": "第 {{page}} 頁 · 共 {{total}} 條結果",
     "records": "記錄",
     "pages": "{{label}}分頁",
     "page": "第 {{page}} 頁",
-    "total": "共 {{total}} 條{{label}} · 第 {{page}} 頁，共 {{pages}} 頁"
+    "total": "共 {{total}} 條{{label}} · 第 {{page}} 頁，共 {{pages}} 頁",
+    "pageOf": "第 {{page}} / {{total}} 頁"
   },
   "dateTime": {
     "selectDate": "選擇日期",
@@ -251,13 +286,21 @@
       "timeHint": "請使用24小時制，格式為 時:分",
       "dateTimeHint": "請使用 年/月/日 時:分 格式，時間採用24小時制"
     },
-    "noDeadline": "無截止日期"
+    "noDeadline": "無截止日期",
+    "durationWeek_one": "{{number}} 周",
+    "durationWeek_other": "{{number}} 周",
+    "durationDay_one": "{{number}} 天",
+    "durationDay_other": "{{number}} 天",
+    "durationHour_one": "{{number}} 小時",
+    "durationHour_other": "{{number}} 小時",
+    "setStartFirst": "請先設定開始時間",
+    "customDuration": "自定義"
   },
   "roles": {
     "USER": "使用者",
     "SYSTEM_ADMIN": "系統管理員",
     "TENANT_ADMIN": "機構管理員",
-    "COUNSELLOR": "諮詢師",
+    "COUNSELLOR": "招生顧問",
     "ADVISOR": "顧問",
     "INSTRUCTOR": "教師",
     "INSTRUCTOR_ADVISOR": "教師兼顧問",
@@ -306,9 +349,10 @@
     "assignment": "作業完成情況",
     "lecture": "課時進度",
     "courseLecture": "{{title}}：課時進度",
-    "noAssignments": "尚未釋出作業。",
+    "noAssignments": "尚未發布作業。",
     "courseAssignments": "本課程作業完成情況",
-    "allAssignments": "所有課程作業完成情況"
+    "allAssignments": "所有課程作業完成情況",
+    "unavailableLabel": "{{label}}：暫無進度"
   },
   "admin": {
     "pageDescription": "管理人員、課程存取權限與系統操作。",
@@ -338,8 +382,8 @@
     "manage": "管理",
     "managePerson": "管理 {{name}}",
     "noUsers": "沒有符合篩選條件的人員。",
-    "resultCount_one": "{{count}} 個帳戶",
-    "resultCount_other": "{{count}} 個帳戶",
+    "resultCount_one": "{{count, number}} 個帳戶",
+    "resultCount_other": "{{count, number}} 個帳戶",
     "directoryPages": "人員清單分頁",
     "accountDetails": "帳戶詳情",
     "accountActions": "帳戶操作",
@@ -372,8 +416,8 @@
     "passwordHelp": "新帳戶需先透過「忘記密碼」設定密碼，再登入。",
     "tenantAccounts": "依機構檢視帳戶",
     "tenantAccountsHelp": "顯示系統人員清單中出現的機構，不代表完整機構目錄。",
-    "linkedAccounts_one": "目前清單中有 {{count}} 個帳戶",
-    "linkedAccounts_other": "目前清單中有 {{count}} 個帳戶",
+    "linkedAccounts_one": "目前清單中有 {{count, number}} 個帳戶",
+    "linkedAccounts_other": "目前清單中有 {{count, number}} 個帳戶",
     "viewUsers": "檢視人員",
     "noTenants": "目前清單中沒有可顯示的機構帳戶。",
     "tenantUnavailable": "此版本暫不支援建立和維護機構。建立帳戶時請使用現有機構 ID。",
@@ -468,7 +512,7 @@
     "coursesFailed": "暫時無法載入進行中的課程。",
     "noCourses": "暫無進行中的課程可供管理。",
     "courseAccess": "課程存取權限",
-    "courseAccessHelp": "先選擇教師的課程，再新增學生。",
+    "courseAccessHelp": "先選擇教師的課程，再新增學生或設定助教。",
     "teacherCourse": "教師的課程",
     "teacherLabel": "教師：{{name}}",
     "courseContext": "課程 #{{courseId}} · 機構 #{{tenantId}}",
@@ -482,7 +526,7 @@
     "enrollTa": "加入課程並設為助教",
     "enrollStudent": "新增學生",
     "taHelp": "助教權限僅適用於所選課程，帳戶的平台身分仍為學生。",
-    "memberHelp": "查看所選課程的成員。",
+    "memberHelp": "助教是課程內角色，不會變更帳戶的平台身分。",
     "searchCourse": "搜尋課程成員",
     "memberSearchPlaceholder": "姓名、電子郵件或使用者 ID",
     "loadingMembers": "正在載入課程成員…",
@@ -495,7 +539,7 @@
       "TA": "助教"
     },
     "createRejected": "受管理帳戶未建立。{{detail}}{{guidance}}",
-    "createFallback": "伺服器拒絕了請求，但未提供原因。",
+    "createFallback": "暫時無法完成請求，請核對填寫內容後重試。",
     "createConflict": " 電子郵件或產生的使用者名稱可能已被其他帳戶使用。",
     "searchCourses": "搜尋課程",
     "courseSearchPlaceholder": "課程名稱或代碼",
@@ -525,8 +569,8 @@
       "email": "電子郵件",
       "username": "使用者名稱"
     },
-    "recordsMore_one": "顯示更多（剩餘 {{count}} 項）",
-    "recordsMore_other": "顯示更多（剩餘 {{count}} 項）",
+    "recordsMore_one": "顯示更多（剩餘 {{count, number}} 項）",
+    "recordsMore_other": "顯示更多（剩餘 {{count, number}} 項）",
     "recordsEmptyGroup": "暫無{{label}}可顯示。",
     "yes": "是",
     "no": "否",
@@ -569,11 +613,13 @@
       "totalQuestions": "題目總數",
       "correctAnswer": "正確答案"
     },
-    "usersFailed": "暫時無法載入使用者清單。"
+    "usersFailed": "暫時無法載入使用者清單。",
+    "partialTaRetry": "使用者已加入課程，但助教權限未分配成功。請在成員名單中使用「設為助教」重試。",
+    "invalidTenantId": "請輸入有效的機構編號（正整數）。"
   },
   "records": {
     "submittedAt": "提交時間：{{date}}",
-    "publishedAt": "釋出時間：{{date}}",
+    "publishedAt": "發布時間：{{date}}",
     "assignedAt": "分配時間：{{date}}",
     "resolvedAt": "解決時間：{{date}}",
     "attempt": "第 {{number}} 次作答",
@@ -581,7 +627,13 @@
     "student": "學生 {{id}}",
     "user": "使用者 {{id}}",
     "unit": "單元 {{number}}",
-    "week": "第 {{number}} 周"
+    "week": "第 {{number}} 周",
+    "unsupportedRecord": "收到的紀錄格式不受支援，請重新整理頁面或聯絡支援人員。",
+    "missingIdentity": "紀錄缺少有效識別碼，暫時無法操作，請重新整理後再試。",
+    "unsupportedList": "未能讀取有效的清單，請重試。",
+    "question": "第 {{number}} 題",
+    "id": "編號 {{id}}",
+    "advisor": "顧問 #{{id}}"
   },
   "navigationControls": {
     "backToStudents": "返回學生清單",
@@ -590,7 +642,7 @@
     "backToReports": "返回報告清單",
     "backToOverview": "返回概覽",
     "backToGovernance": "返回機構管理",
-    "backToIntakes": "返回入學登記",
+    "backToIntakes": "返回入學檔案",
     "vocabularyLibrary": "單字庫",
     "backToUnits": "返回單元清單",
     "previousWeek": "上一週行程",
@@ -623,7 +675,7 @@
     "viewSection": "檢視考試部分",
     "composeSection": "編寫考試部分",
     "fewerOccurrences": "收起課次",
-    "allOccurrences": "檢視全部 {{count}} 個課次",
+    "allOccurrences": "檢視全部 {{count, number}} 個課次",
     "resuming": "正在繼續…",
     "starting": "正在開始…",
     "resumeTest": "繼續測試",
@@ -631,7 +683,7 @@
     "startTest": "開始測試",
     "startRemember": "開始記憶",
     "resumeSession": "繼續本次學習",
-    "allAnnouncements": "檢視全部公告（{{count}}）",
+    "allAnnouncements": "檢視全部公告（{{count, number}}）",
     "viewPhase": "檢視第 {{number}} 階段",
     "previousPeriod": {
       "day": "前一天",
@@ -652,14 +704,32 @@
       "listening": "下一部分",
       "reading": "下一篇文章",
       "writing": "下一項任務"
-    }
+    },
+    "openNotifications": "開啟通知"
   },
   "refreshControls": {
-    "intakes": "重新整理入學登記",
+    "intakes": "重新整理入學檔案",
     "directory": "重新整理使用者目錄",
     "audit": "重新整理稽核紀錄",
     "ownerships": "重新整理課程歸屬",
     "alertRules": "重新整理提醒規則",
     "unsavedChanges": "請先儲存或取消變更，再重新整理"
+  },
+  "http": {
+    "notFound": "找不到所需內容，或該內容目前無法使用。",
+    "unsupported": "此內容不支援這項操作。",
+    "conflict": "內容發生衝突，可能已由其他使用者更新。",
+    "serverError": "服務暫時發生問題，請稍後再試。"
+  },
+  "files": {
+    "loadingPreview": "正在載入預覽…",
+    "unusableFile": "未收到可用的檔案內容，請重試。",
+    "uploadFailed": "檔案上傳失敗，請重試。",
+    "retryHelp": "請重新選擇檔案以重試。",
+    "deleting": "正在刪除檔案",
+    "deleteFailed": "無法刪除此檔案，請重試。"
+  },
+  "validation": {
+    "checkFields": "請檢查必填項並輸入有效內容，再繼續操作。"
   }
 }

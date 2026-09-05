@@ -65,7 +65,17 @@
     "viewTarget": "View {{target}}",
     "chooseTarget": "Choose {{target}}",
     "confirmTarget": "Confirm {{target}}",
-    "send": "Send"
+    "send": "Send",
+    "chooseFiles": "Choose files",
+    "editNamed": "Edit {{name}}",
+    "deleteNamed": "Delete {{name}}",
+    "review": "Review",
+    "messagePerson": "Message {{name}}",
+    "deletingNamed": "Deleting {{name}}…",
+    "renameNamed": "Rename {{name}}",
+    "publishNamed": "Publish {{name}}",
+    "unpublishNamed": "Unpublish {{name}}",
+    "closeItem": "Close {{item}}"
   },
   "common": {
     "yes": "Yes",
@@ -215,14 +225,39 @@
     "NOT_APPLICABLE": "Not applicable",
     "UNKNOWN": "Unknown",
     "READY": "Ready",
-    "PENDING_WRITING_GRADING": "Awaiting writing grade"
+    "PENDING_WRITING_GRADING": "Awaiting writing grade",
+    "ABSENCE": "Absence",
+    "SCHEDULE_CHANGE": "Schedule change",
+    "APPROVE": "Approve",
+    "REJECT": "Reject",
+    "LECTURE": "Lecture",
+    "ASSIGNMENT": "Assignment",
+    "FILE": "File",
+    "LINK": "Link",
+    "DOCUMENT": "Document",
+    "IMAGE": "Image",
+    "AUDIO": "Audio",
+    "VIDEO": "Video",
+    "ARCHIVE": "Archive",
+    "ENTERED": "Entered",
+    "EXPIRED": "Expired",
+    "TIMED_OUT": "Timed out",
+    "AUTO_SUBMITTED": "Auto-submitted",
+    "LAB": "Lab",
+    "TUTORIAL": "Tutorial",
+    "PENDING_GRADING": "Pending grading",
+    "UPCOMING_CLASS": "Upcoming class",
+    "SCHEDULE_CONFLICT": "Schedule conflict",
+    "PENDING_ADVISOR": "Awaiting advisor",
+    "PENDING_INSTRUCTOR": "Awaiting instructor"
   },
   "pagination": {
     "summary": "Page {{page}} · {{total}} results",
     "records": "Records",
     "pages": "{{label}} pages",
     "page": "Page {{page}}",
-    "total": "{{total}} {{label}} · Page {{page}} of {{pages}}"
+    "total": "{{total}} {{label}} · Page {{page}} of {{pages}}",
+    "pageOf": "Page {{page}} of {{total}}"
   },
   "dateTime": {
     "selectDate": "Select date",
@@ -251,7 +286,15 @@
       "timeHint": "Use hh:mm AM/PM",
       "dateTimeHint": "Use MM/DD/YYYY, hh:mm AM/PM"
     },
-    "noDeadline": "No deadline"
+    "noDeadline": "No deadline",
+    "durationWeek_one": "{{number}} week",
+    "durationWeek_other": "{{number}} weeks",
+    "durationDay_one": "{{number}} day",
+    "durationDay_other": "{{number}} days",
+    "durationHour_one": "{{number}} hour",
+    "durationHour_other": "{{number}} hours",
+    "setStartFirst": "Set start first",
+    "customDuration": "Custom"
   },
   "roles": {
     "USER": "User",
@@ -308,7 +351,8 @@
     "courseLecture": "{{title}}: lecture progress",
     "noAssignments": "No assignments published yet.",
     "courseAssignments": "Assignment completion for this course",
-    "allAssignments": "Assignment completion across your courses"
+    "allAssignments": "Assignment completion across your courses",
+    "unavailableLabel": "{{label}}: progress unavailable"
   },
   "admin": {
     "pageDescription": "Manage people, course access and system operations.",
@@ -338,8 +382,8 @@
     "manage": "Manage",
     "managePerson": "Manage {{name}}",
     "noUsers": "No users match these filters.",
-    "resultCount_one": "{{count}} account",
-    "resultCount_other": "{{count}} accounts",
+    "resultCount_one": "{{count, number}} account",
+    "resultCount_other": "{{count, number}} accounts",
     "directoryPages": "Directory pages",
     "accountDetails": "Account details",
     "accountActions": "Account actions",
@@ -372,8 +416,8 @@
     "passwordHelp": "New accounts must establish their password through Forgot Password before signing in.",
     "tenantAccounts": "Accounts by tenant",
     "tenantAccountsHelp": "Tenants represented in the system user directory. This is not a complete tenant registry.",
-    "linkedAccounts_one": "{{count}} account in this directory",
-    "linkedAccounts_other": "{{count}} accounts in this directory",
+    "linkedAccounts_one": "{{count, number}} account in this directory",
+    "linkedAccounts_other": "{{count, number}} accounts in this directory",
     "viewUsers": "View users",
     "noTenants": "No tenant accounts are available in the current directory.",
     "tenantUnavailable": "Tenant creation and maintenance are not available in this release. Use an existing tenant ID when creating an account.",
@@ -468,7 +512,7 @@
     "coursesFailed": "Active courses could not be loaded.",
     "noCourses": "There are no active courses to manage.",
     "courseAccess": "Course access",
-    "courseAccessHelp": "Choose the teacher’s course before adding a student.",
+    "courseAccessHelp": "Choose the teacher's course before adding a student or assigning a TA.",
     "teacherCourse": "Teacher's course",
     "teacherLabel": "Teacher: {{name}}",
     "courseContext": "Course #{{courseId}} · Tenant #{{tenantId}}",
@@ -482,7 +526,7 @@
     "enrollTa": "Enroll and assign TA",
     "enrollStudent": "Enroll student",
     "taHelp": "TA access applies only to the selected course; the user's platform level remains Student.",
-    "memberHelp": "View the members enrolled in the selected course.",
+    "memberHelp": "TA is a course role and does not change the user's account level.",
     "searchCourse": "Search this course",
     "memberSearchPlaceholder": "Name, email, or user ID",
     "loadingMembers": "Loading course members…",
@@ -495,7 +539,7 @@
       "TA": "Teaching assistant"
     },
     "createRejected": "Managed user was not created. {{detail}}{{guidance}}",
-    "createFallback": "The server rejected the request without an explanation.",
+    "createFallback": "The request could not be completed. Review the fields and try again.",
     "createConflict": " The email or generated username may already belong to an existing identity.",
     "searchCourses": "Search courses",
     "courseSearchPlaceholder": "Course name or code",
@@ -525,8 +569,8 @@
       "email": "Email",
       "username": "Username"
     },
-    "recordsMore_one": "Show more ({{count}} remaining)",
-    "recordsMore_other": "Show more ({{count}} remaining)",
+    "recordsMore_one": "Show more ({{count, number}} remaining)",
+    "recordsMore_other": "Show more ({{count, number}} remaining)",
     "recordsEmptyGroup": "No {{label}} to show.",
     "yes": "Yes",
     "no": "No",
@@ -569,7 +613,9 @@
       "totalQuestions": "Total questions",
       "correctAnswer": "Correct answer"
     },
-    "usersFailed": "Users could not be loaded."
+    "usersFailed": "Users could not be loaded.",
+    "partialTaRetry": "The user was enrolled, but TA access was not assigned. Use “Set as TA” in the roster to try again.",
+    "invalidTenantId": "Enter a valid positive whole-number institution ID."
   },
   "records": {
     "submittedAt": "Submitted {{date}}",
@@ -581,7 +627,13 @@
     "student": "Student {{id}}",
     "user": "User {{id}}",
     "unit": "Unit {{number}}",
-    "week": "Week {{number}}"
+    "week": "Week {{number}}",
+    "unsupportedRecord": "The server returned an unsupported record. Please refresh or contact support.",
+    "missingIdentity": "A record is missing its identity. Actions are unavailable until the server returns a valid record.",
+    "unsupportedList": "The server did not return a supported list. Please retry.",
+    "question": "Question {{number}}",
+    "id": "ID {{id}}",
+    "advisor": "Advisor #{{id}}"
   },
   "navigationControls": {
     "backToStudents": "Back to students",
@@ -623,7 +675,7 @@
     "viewSection": "View section",
     "composeSection": "Compose section",
     "fewerOccurrences": "Show fewer occurrences",
-    "allOccurrences": "View all {{count}} occurrences",
+    "allOccurrences": "View all {{count, number}} occurrences",
     "resuming": "Resuming…",
     "starting": "Starting…",
     "resumeTest": "Resume Test",
@@ -631,7 +683,7 @@
     "startTest": "Start Test",
     "startRemember": "Start Remember",
     "resumeSession": "Resume session",
-    "allAnnouncements": "View all announcements ({{count}})",
+    "allAnnouncements": "View all announcements ({{count, number}})",
     "viewPhase": "View phase {{number}}",
     "previousPeriod": {
       "day": "Previous day",
@@ -652,7 +704,8 @@
       "listening": "Next part",
       "reading": "Next passage",
       "writing": "Next task"
-    }
+    },
+    "openNotifications": "Open notifications"
   },
   "refreshControls": {
     "intakes": "Refresh intakes",
@@ -661,5 +714,22 @@
     "ownerships": "Refresh ownerships",
     "alertRules": "Refresh alert rules",
     "unsavedChanges": "Save or cancel your changes before refreshing"
+  },
+  "http": {
+    "notFound": "The requested resource was not found or is not available.",
+    "unsupported": "The requested action is not supported for this resource.",
+    "conflict": "A conflict occurred. The resource may have been updated by another user.",
+    "serverError": "An unexpected server error occurred. Please try again later."
+  },
+  "files": {
+    "loadingPreview": "Loading preview…",
+    "unusableFile": "The file endpoint did not return usable file bytes.",
+    "uploadFailed": "The file could not be uploaded. Please try again.",
+    "retryHelp": "Choose the file again to retry.",
+    "deleting": "Deleting file",
+    "deleteFailed": "Could not delete this file. Please try again."
+  },
+  "validation": {
+    "checkFields": "Check the required fields and enter valid values before continuing."
   }
 }

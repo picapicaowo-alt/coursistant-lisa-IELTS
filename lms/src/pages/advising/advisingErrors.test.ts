@@ -24,8 +24,8 @@ describe('advisingErrorMessage', () => {
       .toBe('Class dates could not be loaded.');
   });
 
-  it('keeps actionable field validation returned for a rejected write', () => {
+  it('uses contextual copy when an unknown rejected write has no localized error code', () => {
     expect(advisingErrorMessage({code: 400, details: {message: 'End date must follow start date.'}}, 'Could not save.'))
-      .toBe('End date must follow start date.');
+      .toBe('Could not save.');
   });
 });

@@ -13,9 +13,9 @@ for (const route of [{path: '/login', title: 'Welcome to X-Learn'}, {path: '/for
       await expect(email).toBeVisible();
       await email.fill('responsive@example.test');
       if (width >= 1024) {
-        const art = page.locator('img[src="/icons/figma-auth/dashboard.png"]');
+        const art = page.locator('[data-auth-preview="dashboard"]');
         await expect(art).toBeVisible();
-        expect(await art.evaluate((node: HTMLImageElement) => node.naturalWidth)).toBeGreaterThan(0);
+        await expect(art).toContainText('All courses');
         const fieldBox = await email.boundingBox();
         const artBox = await art.boundingBox();
         expect(artBox!.x).toBeGreaterThan(fieldBox!.x + fieldBox!.width);
@@ -25,7 +25,7 @@ for (const route of [{path: '/login', title: 'Welcome to X-Learn'}, {path: '/for
     if (route.path === '/login') {
       for (const viewport of [{width: 1280, height: 720}, {width: 1710, height: 805}, {width: 2560, height: 960}]) {
         await page.setViewportSize(viewport);
-        const art = await page.locator('img[src="/icons/figma-auth/goal.png"]').boundingBox();
+        const art = await page.locator('[data-auth-preview="goal"]').boundingBox();
         expect(art!.y + art!.height).toBeLessThanOrEqual(viewport.height);
       }
     }

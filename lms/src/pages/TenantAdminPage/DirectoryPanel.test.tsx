@@ -91,14 +91,11 @@ describe('Tenant Admin directory', () => {
     const select = await screen.findByLabelText('Convert identity');
     const options = within(select)
       .getAllByRole('option')
-      .map((option) => option.textContent);
-    expect(options).toEqual(['Choose allowed target', 'INSTRUCTOR_ADVISOR']);
-    expect(
-      screen.queryByRole('option', {name: 'STUDENT'}),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('option', {name: 'TENANT_ADMIN'}),
-    ).not.toBeInTheDocument();
+      .map((option) => ({label: option.textContent, value: (option as HTMLOptionElement).value}));
+    expect(options).toEqual([
+      {label: 'Choose allowed target', value: ''},
+      {label: 'Instructor + Advisor', value: 'INSTRUCTOR_ADVISOR'},
+    ]);
   });
   it('preserves a draft on account conflict and submits the refreshed version only after review', async () => {
     mocks.getTenantUser.mockResolvedValueOnce(

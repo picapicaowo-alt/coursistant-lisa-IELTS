@@ -164,8 +164,8 @@ test('instructor dashboard uses teaching data and availability edits preserve ev
   await page.getByRole('button', {name: 'availability'}).click();
   await expect(page.getByRole('heading', {name: 'Weekly availability'})).toBeVisible();
   await openSection(page, 'Weekly availability');
-  await expect(page.getByText('Monday', {exact: true})).toBeVisible();
-  await expect(page.getByText('Wednesday', {exact: true})).toBeVisible();
+  await expect(page.getByLabel('Weekly availability').getByText('Monday', {exact: true})).toBeVisible();
+  await expect(page.getByLabel('Weekly availability').getByText('Wednesday', {exact: true})).toBeVisible();
   await expect(page.getByText('1 date exception will be preserved')).toBeVisible();
   await expect(page.getByText('Record', {exact: true})).toHaveCount(0);
   await page.getByRole('button', {name: 'Save all availability'}).click();
@@ -207,7 +207,7 @@ test('advisor can assign a published mock exam and cannot enter Vocabulary', asy
   await page.goto('/mock-exams');
   await expect(page.getByRole('heading', {name: 'Match students to published papers'})).toBeVisible();
   await page.setViewportSize({width: 1600, height: 1000});
-  await expect(page.getByText('No Active Assignments', {exact: true})).toBeVisible();
+  await expect(page.getByRole('region', {name: 'Assigned papers', exact: true}).getByRole('heading', {name: 'Select student', exact: true})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('advisor-mock-exam-empty-desktop.png'), fullPage: true});
   await page.setViewportSize({width: 390, height: 844});
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -317,9 +317,9 @@ test('counsellor dashboard keeps count help contextual and the create form marks
   }));
 
   await page.goto('/counsellor');
-  await page.getByLabel('About assigned count').click();
+  await page.getByLabel('About the Assigned count').click();
   await expect(page.getByText(/Intake access transfers to the Advisor at handover/)).toBeVisible();
-  await page.getByLabel('About assigned count').press('Escape');
+  await page.getByLabel('About the Assigned count').press('Escape');
   await expect(page.getByRole('link', {name: /1 Unassigned/})).toHaveAttribute('href', '/counsellor/intakes');
   await page.screenshot({path: testInfo.outputPath('counsellor-dashboard.png'), fullPage: true});
 
@@ -455,7 +455,7 @@ test('counsellor completes intake, parent link, edit, and first advisor handover
   await page.getByRole('radio').check();
   await page.getByRole('button', {name: 'Assign advisor'}).click();
   await expect(page).toHaveURL(/\/counsellor\/intakes$/);
-  await expect(page.getByText('No unassigned intakes.')).toBeVisible();
+  await expect(page.getByText('No unassigned intakes')).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('counsellor-handover-complete.png'), fullPage: true});
 
   expect(createBody).toMatchObject({firstName: 'Alex', lastName: 'Chen', email: 'alex.chen@example.test', studentType: 'STANDARD'});

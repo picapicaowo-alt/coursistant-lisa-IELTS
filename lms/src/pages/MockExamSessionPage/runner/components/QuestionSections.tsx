@@ -1,4 +1,6 @@
 import type { QuestionSection } from '../data/types'
+import {useTranslation} from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import { TFNG_OPTIONS } from '../data/types'
 import { assignMultiSelectSlots } from '../utils/multiSelectSlots'
 import { QuestionReviewMark, type QuestionReview } from './QuestionReviewMark'
@@ -27,6 +29,7 @@ function GapInput({
   onSelectQuestion: (id: number) => void
   review?: QuestionReview | null
 }) {
+  const {t: translate} = useTranslation();
   return (
     <span className="gap-input-wrap">
       <input
@@ -34,7 +37,7 @@ function GapInput({
         type="text"
         value={value}
         placeholder={String(id)}
-        aria-label={`Question ${id}`}
+        aria-label={translate('common:records.question', {number: formatNumber(id)})}
         onFocus={() => onSelectQuestion(id)}
         onChange={(e) => onAnswerChange(id, e.target.value)}
       />
@@ -54,8 +57,9 @@ function LetterChoices({
   value: string
   onAnswerChange: (id: number, value: string) => void
 }) {
+  const {t: translate} = useTranslation();
   return (
-    <div className="match-item__choices" role="radiogroup" aria-label={`Question ${id}`}>
+    <div className="match-item__choices" role="radiogroup" aria-label={translate('common:records.question', {number: formatNumber(id)})}>
       {choices.map((choice) => (
         <label key={choice.key} className="tfng-option">
           <input
@@ -80,6 +84,9 @@ export function SectionView({
   onSelectQuestion,
   reviewByQuestion = null,
 }: SectionProps) {
+  const {t: translate} = useTranslation();
+  // Word banks, paragraph prompts and TFNG explanations below are IELTS paper
+  // content, not application copy. Keep their original English in every locale.
   if (section.kind === 'notes') {
     return (
       <div className="question-block">
@@ -232,7 +239,7 @@ export function SectionView({
               <p className="tfng-item__stem">
                 <span className="tfng-item__num">{q.id}</span> {q.statement}
               </p>
-              <div className="tfng-item__options" role="radiogroup" aria-label={`Question ${q.id}`}>
+              <div className="tfng-item__options" role="radiogroup" aria-label={translate('common:records.question', {number: formatNumber(q.id)})}>
                 {options.map((option) => (
                   <label key={option} className="tfng-option">
                     <input
@@ -271,7 +278,7 @@ export function SectionView({
               <p className="mcq-item__stem">
                 <span className="tfng-item__num">{q.id}</span> {q.prompt}
               </p>
-              <div className="mcq-item__options" role="radiogroup" aria-label={`Question ${q.id}`}>
+              <div className="mcq-item__options" role="radiogroup" aria-label={translate('common:records.question', {number: formatNumber(q.id)})}>
                 {q.options.map((option) => {
                   const value = option.charAt(0)
                   return (
@@ -589,7 +596,7 @@ export function SectionView({
             />
           </figure>
           <div className="diagram-split__answers">
-            <h4 className="diagram-split__answers-title">Answers</h4>
+            <h4 className="diagram-split__answers-title">{translate('exams:runner.answerArea')}</h4>
             {section.labels.map((label) => {
               const active = currentQuestion === label.id
               return (

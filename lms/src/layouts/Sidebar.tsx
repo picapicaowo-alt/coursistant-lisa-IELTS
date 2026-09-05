@@ -107,34 +107,34 @@ const Sidebar: React.FC = () => {
   const addItem = (item: NavigationItemProps) => navigationItems.push(item);
 
   if (student) {
-    addItem({to: APP_ROUTE_PATHS.home, label: 'Dashboard', asset: '/icons/figma-dashboard/home.svg', active: pathname === '/'});
-    addItem({to: APP_ROUTE_PATHS.course, label: 'My Courses', asset: '/icons/figma-dashboard/courses.svg', active: pathname.startsWith('/course')});
-    addItem({to: APP_ROUTE_PATHS.myPlan, label: 'Study Plan', asset: '/icons/figma-dashboard/study-plan.svg', active: pathname === '/my-plan'});
-    addItem({to: APP_ROUTE_PATHS.mockExams, label: 'Exams', asset: '/icons/figma-dashboard/exams.svg', active: pathname.startsWith('/mock-exams')});
-    if (canAccessAiWorkspace(user)) addItem({to: APP_ROUTE_PATHS.aibot, label: 'AI ChatBot', asset: '/icons/figma-dashboard/ai-chat.svg', active: pathname.startsWith('/aibot')});
-    addItem({to: APP_ROUTE_PATHS.calendar, label: 'Calendar', asset: '/icons/figma-dashboard/calendar.svg', active: pathname.startsWith('/calendar')});
-    addItem({to: VOCABULARY_PATHS.root, label: 'Vocabulary', icon: BookMarked, active: pathname.startsWith(VOCABULARY_PATHS.root)});
+    addItem({to: APP_ROUTE_PATHS.home, label: t('navigation:dashboard'), asset: '/icons/figma-dashboard/home.svg', active: pathname === '/'});
+    addItem({to: APP_ROUTE_PATHS.course, label: t('navigation:myCourses'), asset: '/icons/figma-dashboard/courses.svg', active: pathname.startsWith('/course')});
+    addItem({to: APP_ROUTE_PATHS.myPlan, label: t('navigation:studyPlan'), asset: '/icons/figma-dashboard/study-plan.svg', active: pathname === '/my-plan'});
+    addItem({to: APP_ROUTE_PATHS.mockExams, label: t('navigation:exams'), asset: '/icons/figma-dashboard/exams.svg', active: pathname.startsWith('/mock-exams')});
+    if (canAccessAiWorkspace(user)) addItem({to: APP_ROUTE_PATHS.aibot, label: t('common:sidebar.aiChatbot'), asset: '/icons/figma-dashboard/ai-chat.svg', active: pathname.startsWith('/aibot')});
+    addItem({to: APP_ROUTE_PATHS.calendar, label: t('common:sidebar.calendar'), asset: '/icons/figma-dashboard/calendar.svg', active: pathname.startsWith('/calendar')});
+    addItem({to: VOCABULARY_PATHS.root, label: t('common:sidebar.vocabulary'), icon: BookMarked, active: pathname.startsWith(VOCABULARY_PATHS.root)});
   }
   if (!student && counsellor) {
-    addItem({to: APP_ROUTE_PATHS.counsellor, label: 'Dashboard', icon: LayoutDashboard, active: pathname === '/counsellor'});
-    addItem({to: APP_ROUTE_PATHS.counsellorIntakes, label: 'Unassigned intakes', icon: ClipboardList, active: pathname.startsWith('/counsellor/intakes')});
+    addItem({to: APP_ROUTE_PATHS.counsellor, label: t('navigation:dashboard'), icon: LayoutDashboard, active: pathname === '/counsellor'});
+    addItem({to: APP_ROUTE_PATHS.counsellorIntakes, label: t('navigation:unassignedIntakes'), icon: ClipboardList, active: pathname.startsWith('/counsellor/intakes')});
   }
   if (!student && advisor) {
-    addItem({to: APP_ROUTE_PATHS.advisorOperations, label: advisorOnly ? 'Dashboard' : 'Advisor dashboard', icon: LayoutDashboard, active: pathname === APP_ROUTE_PATHS.advisorOperations});
-    addItem({to: APP_ROUTE_PATHS.advisorStudents, label: 'Students', icon: UsersRound, active: pathname.startsWith('/advisor/students')});
-    addItem({to: APP_ROUTE_PATHS.advisorMessages, label: 'Messages', icon: MessageSquare, active: pathname === APP_ROUTE_PATHS.advisorMessages});
-    addItem({to: APP_ROUTE_PATHS.advisorCourses, label: 'Course management', icon: BookOpen, active: pathname === APP_ROUTE_PATHS.advisorCourses || pathname.startsWith('/advisor/courses/')});
-    addItem({to: APP_ROUTE_PATHS.advisorTasks, label: 'Action tasks', icon: ClipboardList, active: pathname === APP_ROUTE_PATHS.advisorTasks});
-    addItem({to: APP_ROUTE_PATHS.advisorSchedule, label: 'Scheduling', icon: CalendarDays, active: pathname === APP_ROUTE_PATHS.advisorSchedule});
+    addItem({to: APP_ROUTE_PATHS.advisorOperations, label: advisorOnly ? t('navigation:dashboard') : t('navigation:advisorDashboard'), icon: LayoutDashboard, active: pathname === APP_ROUTE_PATHS.advisorOperations});
+    addItem({to: APP_ROUTE_PATHS.advisorStudents, label: t('navigation:students'), icon: UsersRound, active: pathname.startsWith('/advisor/students')});
+    addItem({to: APP_ROUTE_PATHS.advisorMessages, label: t('navigation:messages'), icon: MessageSquare, active: pathname === APP_ROUTE_PATHS.advisorMessages});
+    addItem({to: APP_ROUTE_PATHS.advisorCourses, label: t('navigation:courseManagement'), icon: BookOpen, active: pathname === APP_ROUTE_PATHS.advisorCourses || pathname.startsWith('/advisor/courses/')});
+    addItem({to: APP_ROUTE_PATHS.advisorTasks, label: t('navigation:actionTasks'), icon: ClipboardList, active: pathname === APP_ROUTE_PATHS.advisorTasks});
+    addItem({to: APP_ROUTE_PATHS.advisorSchedule, label: t('navigation:scheduling'), icon: CalendarDays, active: pathname === APP_ROUTE_PATHS.advisorSchedule});
   }
   if (!student && instructor) {
-    addItem({to: APP_ROUTE_PATHS.myOperations, label: 'Teaching operations', icon: ClipboardList, active: pathname === '/my-operations'});
+    addItem({to: APP_ROUTE_PATHS.myOperations, label: t('navigation:teachingOperations'), icon: ClipboardList, active: pathname === '/my-operations'});
   }
   if (!student && parent) {
     const params = new URLSearchParams(search);
     const area = getParentArea(getParentSection(params));
     PARENT_AREAS.forEach(id => addItem({
-      to: parentHref(id, params), label: PARENT_SECTIONS[id].label, icon: PARENT_ICONS[id],
+      to: parentHref(id, params), label: t(PARENT_SECTIONS[id].label), icon: PARENT_ICONS[id],
       active: pathname === APP_ROUTE_PATHS.parent && area === id,
     }));
   }
@@ -150,10 +150,10 @@ const Sidebar: React.FC = () => {
     });
   });
   if (isTenantAdminAccount(user)) {
-    addItem({to: APP_ROUTE_PATHS.adminDashboard, label: 'Dashboard', icon: LayoutDashboard, active: pathname === APP_ROUTE_PATHS.adminDashboard});
+    addItem({to: APP_ROUTE_PATHS.adminDashboard, label: t('navigation:dashboard'), icon: LayoutDashboard, active: pathname === APP_ROUTE_PATHS.adminDashboard});
     addItem({
       to: APP_ROUTE_PATHS.adminIntakes,
-      label: 'Intakes',
+      label: t('navigation:intakes'),
       icon: ClipboardList,
       active: pathname.startsWith('/admin/intakes') || pathname.startsWith('/admin/students'),
     });
@@ -212,7 +212,7 @@ const Sidebar: React.FC = () => {
                 onClick={() => setIsMoreOpen(open => !open)}
               >
                 <Menu className={styles.navigationIcon} size={21} strokeWidth={1.8} aria-hidden="true"/>
-                <span>More</span>
+                <span>{t('navigation:more')}</span>
               </button>
             </li>
           ) : null}
@@ -222,11 +222,11 @@ const Sidebar: React.FC = () => {
 
       {isMoreOpen && mobileMoreItems.length > 0 ? (
         <>
-          <button type="button" className={styles.moreBackdrop} aria-label="Close more navigation" onClick={() => setIsMoreOpen(false)}/>
-          <nav id="mobile-more-navigation" className={styles.morePanel} aria-label="More navigation">
+          <button type="button" className={styles.moreBackdrop} aria-label={t('navigation:closeMore')} onClick={() => setIsMoreOpen(false)}/>
+          <nav id="mobile-more-navigation" className={styles.morePanel} aria-label={t('navigation:moreNavigation')}>
             <div className={styles.morePanelHeader}>
-              <strong>More</strong>
-              <button type="button" aria-label="Close more navigation" onClick={() => setIsMoreOpen(false)}>
+              <strong>{t('navigation:more')}</strong>
+              <button type="button" aria-label={t('navigation:closeMore')} onClick={() => setIsMoreOpen(false)}>
                 <X size={20} aria-hidden="true"/>
               </button>
             </div>

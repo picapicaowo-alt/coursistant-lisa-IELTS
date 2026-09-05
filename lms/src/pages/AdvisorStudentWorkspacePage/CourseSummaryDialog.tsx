@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {statusLabel} from '@/i18n/presentation';
 import {useEffect, useRef, useState} from 'react';
 import {X} from 'lucide-react';
 import type {AdvisorStudentCourseResponse} from '@/apis';
@@ -14,6 +16,7 @@ export function CourseSummaryDialog({
   course: AdvisorStudentCourseResponse;
   onClose: () => void;
 }) {
+  const {t: translate} = useTranslation();
   const dialog = useRef<HTMLDialogElement>(null);
   const [view, setView] = useState<'overview' | 'schedule'>('overview');
   useEffect(() => {
@@ -37,77 +40,74 @@ export function CourseSummaryDialog({
     >
       <header>
         <h2 id="view-course-title">
-          {course.title || course.courseCode || 'Course details'}
+          {course.title || course.courseCode || translate("learning:parent.courseDetails")}
         </h2>
         <button
           type="button"
-          aria-label="Close course details"
+          aria-label={translate("advising:courseSummary.close")}
           onClick={onClose}
         >
           <X size={20} />
         </button>
       </header>
-      <nav aria-label="Course details views">
+      <nav aria-label={translate("advising:courseSummary.views")}>
         <button
           type="button"
           aria-pressed={view === 'overview'}
           onClick={() => setView('overview')}
         >
-          Course Information
-        </button>
+          {translate("advising:courseSummary.information")}</button>
         <button
           type="button"
           aria-pressed={view === 'schedule'}
           onClick={() => setView('schedule')}
         >
-          Class Schedule
-        </button>
+          {translate("advising:courseSummary.schedule")}</button>
       </nav>
       {view === 'overview' ? (
         <dl className={styles.courseFacts}>
           <div>
-            <dt>Course code</dt>
-            <dd>{course.courseCode || 'Not available'}</dd>
+            <dt>{translate("course:form.codeLabel")}</dt>
+            <dd>{course.courseCode || translate("common:feedback.notAvailable")}</dd>
           </div>
           <div>
-            <dt>Delivery mode</dt>
-            <dd>{course.deliveryMode?.replace(/_/g, ' ') || 'Not provided'}</dd>
+            <dt>{translate("advising:courseSummary.delivery")}</dt>
+            <dd>{course.deliveryMode === 'GROUP' ? translate('courseTools:delivery.group') : statusLabel(course.deliveryMode)}</dd>
           </div>
           <div>
-            <dt>Instructor</dt>
-            <dd>{instructors.join(', ') || primary || 'Not assigned'}</dd>
+            <dt>{translate("common:people.instructor")}</dt>
+            <dd>{instructors.join(', ') || primary || translate("course:learning.notAssigned")}</dd>
           </div>
           <div>
-            <dt>Status</dt>
+            <dt>{translate("common:fields.status")}</dt>
             <dd>
               {course.lifecycleStatus ||
                 course.launchState ||
                 course.status ||
-                'Not provided'}
+                translate("common:feedback.notProvided")}
             </dd>
           </div>
           <div>
-            <dt>Lectures completed</dt>
+            <dt>{translate("advising:courseSummary.completedLectures")}</dt>
             <dd>
-              {course.lectureCompleted ?? 'Not available'} /{' '}
-              {course.lectureTotal ?? 'Not available'}
+              {course.lectureCompleted ?? translate("common:feedback.notAvailable")} /{' '}
+              {course.lectureTotal ?? translate("common:feedback.notAvailable")}
             </dd>
           </div>
           <div>
-            <dt>Study plan alignment</dt>
-            <dd>{course.alignmentNotes || 'No alignment notes yet.'}</dd>
+            <dt>{translate("advising:courseSummary.alignment")}</dt>
+            <dd>{course.alignmentNotes || translate("advising:courseSummary.noAlignment")}</dd>
           </div>
         </dl>
       ) : (
         <RecordSummaryList
           value={course.schedule}
-          emptyMessage="No class schedule is available yet."
+          emptyMessage={translate("advising:courseSummary.noSchedule")}
         />
       )}
       <footer>
         <button type="button" onClick={onClose}>
-          Close
-        </button>
+          {translate("common:actions.close")}</button>
       </footer>
     </dialog>
   );

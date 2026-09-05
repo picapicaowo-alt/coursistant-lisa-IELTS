@@ -24,7 +24,7 @@
     "grade": "成績",
     "gradePlaceholder": "0-100",
     "comment": "評語",
-    "commentPlaceholder": "請輸入您的反饋...",
+    "commentPlaceholder": "請輸入您的回饋...",
     "saveGrade": "儲存成績",
     "saving": "儲存中...",
     "previousGrade": "歷史成績",

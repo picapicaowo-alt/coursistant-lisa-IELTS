@@ -25,18 +25,18 @@ describe('friendly question editor', () => {
   it('retains a cell value and blank number through display mode changes', () => {
     const field: Field = {
       type: 'variant',
-      label: 'Cell',
+      labelKey: 'exams:schema.cell',
       variants: {
         text: {
           type: 'object',
-          label: 'Text',
-          fields: {value: {type: 'text', label: 'Cell text'}},
+          labelKey: 'common:admin.examFields.text',
+          fields: {value: {type: 'text', labelKey: 'exams:schema.cellText'}},
         },
         gap: {
           type: 'object',
-          label: 'Blank',
+          labelKey: 'exams:schema.blank',
           fields: {
-            id: {type: 'number', label: 'Question number', questionId: true},
+            id: {type: 'number', labelKey: 'common:admin.examFields.questionNumber', questionId: true},
           },
         },
       },
@@ -75,7 +75,7 @@ describe('friendly question editor', () => {
       screen.getByLabelText('Form / Form fields 1 / Field label'),
       {target: {value: 'Name'}},
     );
-    fireEvent.click(screen.getByRole('button', {name: 'Add form field'}));
+    fireEvent.click(screen.getByRole('button', {name: /add form field/i}));
     const question = JSON.parse(
       screen.getByTestId('question').textContent ?? '{}',
     );
