@@ -1,13 +1,12 @@
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {useQueries} from '@tanstack/react-query';
 import {Link} from 'react-router-dom';
-import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import {GradingQueueItem, RecentActivityItem, unwrapData} from '@/apis';
 import {dashboardApiService} from '@/apis/services/dashboard-api';
+import {parseZonedTimestamp} from '@/utils/datetime';
+import {formatDateTime} from '@/i18n/formatting';
 import styles from './InstructorWorkComponent.module.scss';
-
-dayjs.extend(relativeTime);
 
 const queueLink = (item: GradingQueueItem) => item.assignmentId
   ? `/course/${item.courseId}/assignments/${item.assignmentId}/grading`
@@ -27,6 +26,7 @@ const queueLabel = (kind: GradingQueueItem['kind']) => ({
 }[kind]);
 
 const InstructorWorkComponent: React.FC = () => {
+  useTranslation();
   const [queueQuery, activityQuery] = useQueries({
     queries: [
       {
@@ -77,12 +77,16 @@ const InstructorWorkComponent: React.FC = () => {
             {activityQuery.isError ? <p className={styles.inlineError}>Couldn&apos;t load recent activity.</p> : null}
             {!activityQuery.isError && activity.length === 0 ? <p className={styles.empty}>No recent teaching activity.</p> : null}
             <div className={styles.list}>
-              {activity.map((item, index) => (
+              {activity.map((item, index) => {
+                const occurredAt = parseZonedTimestamp(item.occurredAt, item.timezone);
+                const hasTime = !Number.isNaN(occurredAt.getTime());
+                return (
                 <Link key={`${item.kind}-${item.occurredAt}-${index}`} to={activityLink(item)} className={styles.item}>
-                  <span className={styles.itemMain}><strong>{item.summary}</strong><small>{item.courseCode} · {dayjs(item.occurredAt).fromNow()}</small></span>
+                  <span className={styles.itemMain}><strong>{item.summary}</strong><small>{item.courseCode} · <time dateTime={hasTime ? occurredAt.toISOString() : undefined}>{hasTime ? formatDateTime(occurredAt, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'}) : item.occurredAt}</time></small></span>
                   <span aria-hidden="true">›</span>
                 </Link>
-              ))}
+                );
+              })}
             </div>
           </section>
         </div>

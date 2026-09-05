@@ -160,6 +160,10 @@ const GroupSetDetailPage = () => {
     onSuccess: async () => { setConfirmDeleteId(null); setMessage('Ungrouped students were distributed.'); await refresh(); },
     onError: () => setMessage('Students could not be distributed. Check that groups have enough capacity.'),
   });
+  // All writes affect the same membership workspace. Keep their controls stable
+  // until the mutation and its follow-up reads finish, including delete and leave.
+  const isWriting = [settingsMutation, createGroups, updateGroup, deleteItem, selfService, assignStudent, changeMembership, randomDistribution]
+    .some(mutation => mutation.isPending);
 
   const startGroupEdit = (group: CourseGroup) => {
     setEditingGroupId(group.id);
@@ -193,6 +197,7 @@ const GroupSetDetailPage = () => {
 
   return (
     <main className={styles.page}>
+      <fieldset className={styles.workspace} disabled={isWriting} aria-busy={isWriting} aria-label={groupSet?.name}>
       <div className={styles.header}>
         <Link to={`/course/${courseId}/groups`} className={styles.backLink} aria-label={translate('common:navigationControls.backToGroupSets')} title={translate('common:navigationControls.backToGroupSets')}><ArrowLeft size={22} aria-hidden="true"/></Link>
         <div className={styles.headerText}><p className={styles.eyebrow}>Course group set</p><h1>{groupSet?.name || 'Loading group set…'}</h1>{groupSet ? <p>{groupSet.locked ? 'Membership locked' : groupSet.openForSelfService ? 'Student choice open' : 'Instructor managed'} · {groupSet.timezone}</p> : null}</div>
@@ -253,6 +258,7 @@ const GroupSetDetailPage = () => {
       {membershipAction ? <section className={styles.confirmBar} role="alertdialog" aria-labelledby="membership-confirm-title"><div><strong id="membership-confirm-title">Confirm membership change</strong><p>{membershipAction.kind === 'move' ? `Move ${membershipAction.displayName} to ${groups.find(group => group.id === membershipAction.targetGroupId)?.name}?` : `Remove ${membershipAction.displayName} from this group?`} This may affect group assignment ownership.</p></div><button type="button" className={styles.dangerButton} onClick={() => changeMembership.mutate()} disabled={changeMembership.isPending}>Confirm</button><button type="button" className={styles.secondaryButton} onClick={() => setMembershipAction(null)}>Cancel</button></section> : null}
 
       {access.canManageGroups ? <section className={styles.dangerCard}><div><Lock size={20}/><div><strong>Delete group set</strong><p>Deletion is refused when assignments or other dependencies still use this group set.</p></div></div>{confirmDeleteId === 'set' ? <div className={styles.actionRow}><button type="button" className={styles.dangerButton} onClick={() => deleteItem.mutate({kind: 'set', id: groupSetId})}>Confirm delete</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmDeleteId(null)}>Cancel</button></div> : <button type="button" className={styles.dangerButton} onClick={() => setConfirmDeleteId('set')}><Trash2 size={16}/> Delete group set</button>}</section> : null}
+      </fieldset>
     </main>
   );
 };

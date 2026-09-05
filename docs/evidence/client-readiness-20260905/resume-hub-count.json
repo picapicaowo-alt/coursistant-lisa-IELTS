@@ -1,0 +1,171 @@
+{
+  "scope": "Four additional read-only requests; separate from the initial 428-response audit snapshot. Authentication values and personal identity fields omitted.",
+  "records": [
+    {
+      "at": "2026-09-05T08:24:37.941Z",
+      "path": "/v2/advisor/students/26/hub",
+      "httpStatus": 200,
+      "elapsedMs": 153,
+      "data": {
+        "status": 200,
+        "code": "SUCCESS",
+        "data": {
+          "studentUserId": 26,
+          "studentType": null,
+          "risk": {
+            "studentUserId": 26,
+            "status": "ON_TRACK",
+            "reasons": []
+          },
+          "activeTasks": [
+            {
+              "taskId": 1,
+              "studentUserId": 26,
+              "taskType": "REPORT_REVIEW",
+              "category": "REVIEW",
+              "description": "Published course report ready for review",
+              "priority": "LOW",
+              "status": "IN_PROGRESS",
+              "version": 1,
+              "sourceType": "COURSE_REPORT",
+              "sourceId": 1,
+              "sourceReference": "{\"resourceType\":\"COURSE_REPORT\",\"studentUserId\":26,\"courseId\":1,\"reportId\":1}",
+              "target": {
+                "resourceType": "COURSE_REPORT",
+                "studentUserId": 26,
+                "courseId": 1,
+                "requestId": null,
+                "reportId": 1,
+                "assignmentId": null,
+                "submissionId": null,
+                "checkpointId": null,
+                "advisorTaskId": null
+              },
+              "createdAt": "2026-09-05T01:12:58.322",
+              "startedAt": "2026-09-05T03:02:49.522",
+              "resolvedAt": null
+            }
+          ],
+          "activeCourseCount": null,
+          "publishedReportCount": 1,
+          "pendingRequestCount": 1
+        },
+        "message": "Success",
+        "timestamp": "2026-09-05T08:24:37.927099708Z"
+      },
+      "actor": {
+        "role": "USER",
+        "level": "ADVISOR",
+        "userId": 7,
+        "tenantId": 1
+      }
+    },
+    {
+      "at": "2026-09-05T08:24:38.091Z",
+      "path": "/v2/advisor/schedule-requests?page=0&size=20&studentUserId=26",
+      "httpStatus": 200,
+      "elapsedMs": 144,
+      "data": {
+        "status": 200,
+        "code": "SUCCESS",
+        "data": {
+          "page": 0,
+          "size": 20,
+          "total": 0,
+          "items": []
+        },
+        "message": "Success",
+        "timestamp": "2026-09-05T08:24:38.078240544Z"
+      },
+      "actor": {
+        "role": "USER",
+        "level": "ADVISOR",
+        "userId": 7,
+        "tenantId": 1
+      }
+    },
+    {
+      "at": "2026-09-05T08:24:38.234Z",
+      "path": "/v2/advisor/schedule-requests?page=0&size=20",
+      "httpStatus": 200,
+      "elapsedMs": 142,
+      "data": {
+        "status": 200,
+        "code": "SUCCESS",
+        "data": {
+          "page": 0,
+          "size": 20,
+          "total": 0,
+          "items": []
+        },
+        "message": "Success",
+        "timestamp": "2026-09-05T08:24:38.221738908Z"
+      },
+      "actor": {
+        "role": "USER",
+        "level": "ADVISOR",
+        "userId": 7,
+        "tenantId": 1
+      }
+    },
+    {
+      "at": "2026-09-05T08:24:38.380Z",
+      "path": "/v2/advisor/students/26/hub",
+      "httpStatus": 200,
+      "elapsedMs": 145,
+      "data": {
+        "status": 200,
+        "code": "SUCCESS",
+        "data": {
+          "studentUserId": 26,
+          "studentType": null,
+          "risk": {
+            "studentUserId": 26,
+            "status": "ON_TRACK",
+            "reasons": []
+          },
+          "activeTasks": [
+            {
+              "taskId": 1,
+              "studentUserId": 26,
+              "taskType": "REPORT_REVIEW",
+              "category": "REVIEW",
+              "description": "Published course report ready for review",
+              "priority": "LOW",
+              "status": "IN_PROGRESS",
+              "version": 1,
+              "sourceType": "COURSE_REPORT",
+              "sourceId": 1,
+              "sourceReference": "{\"resourceType\":\"COURSE_REPORT\",\"studentUserId\":26,\"courseId\":1,\"reportId\":1}",
+              "target": {
+                "resourceType": "COURSE_REPORT",
+                "studentUserId": 26,
+                "courseId": 1,
+                "requestId": null,
+                "reportId": 1,
+                "assignmentId": null,
+                "submissionId": null,
+                "checkpointId": null,
+                "advisorTaskId": null
+              },
+              "createdAt": "2026-09-05T01:12:58.322",
+              "startedAt": "2026-09-05T03:02:49.522",
+              "resolvedAt": null
+            }
+          ],
+          "activeCourseCount": null,
+          "publishedReportCount": 1,
+          "pendingRequestCount": 1
+        },
+        "message": "Success",
+        "timestamp": "2026-09-05T08:24:38.367786920Z"
+      },
+      "actor": {
+        "role": "USER",
+        "level": "ADVISOR",
+        "userId": 7,
+        "tenantId": 1
+      }
+    }
+  ]
+}

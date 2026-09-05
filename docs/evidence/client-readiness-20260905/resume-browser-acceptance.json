@@ -1,0 +1,57 @@
+{
+  "verifiedOn": "2026-09-05",
+  "environment": "https://app.xlearnedu.com",
+  "evidenceType": "Observed real browser interactions; not HTTP response capture and not candidate-code deployment acceptance.",
+  "roles": [
+    {
+      "role": "STUDENT",
+      "userId": 26,
+      "passed": [
+        "Open Profile and Settings",
+        "Sign out returns to Login"
+      ]
+    },
+    {
+      "role": "COUNSELLOR",
+      "userId": 3,
+      "passed": [
+        "Sign in with correct identity and role navigation",
+        "Advisor directory pagination",
+        "390px viewport: clientWidth=scrollWidth=390",
+        "Desktop viewport restored",
+        "Sign out returns to Login"
+      ]
+    },
+    {
+      "role": "ADVISOR",
+      "userId": 7,
+      "passed": [
+        "Sign in with correct identity and role navigation",
+        "Student search narrows to one matching student",
+        "Open saved study plan and checkpoint detail",
+        "Not-started task filter shows empty results for a completed task",
+        "Read published report from Support & reports",
+        "Sign out returns to Login"
+      ],
+      "issue": "Hub displays one pending request while student and global schedule queues show zero. See resume-hub-count.json."
+    },
+    {
+      "role": "INSTRUCTOR",
+      "userId": 15,
+      "passed": [
+        "Sign in and reopen application with correct identity",
+        "My Courses and course content navigation",
+        "Teaching schedule displays current occurrences",
+        "Published report opens read-only detail",
+        "Roster displays structured names and Student filter",
+        "Sign out returns to Login"
+      ],
+      "issue": "Recent activity ignored supplied course timezone. See resume-activity-time.json; candidate fix has separate fixture and unit validation."
+    }
+  ],
+  "limits": [
+    "Existing server records only; no business writes in this resumed browser pass.",
+    "Earlier CUA CDP failures and subsequently closed tabs are tool/session observations, not proof of application navigation defects.",
+    "Does not cover real Parent, Admin, combined Instructor Advisor, or TA sessions."
+  ]
+}

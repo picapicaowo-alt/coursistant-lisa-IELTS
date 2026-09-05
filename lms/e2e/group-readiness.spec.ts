@@ -70,3 +70,70 @@ test('group rename prevents another save while the original request is pending',
   await expect(card.getByRole('textbox', {name: 'Name', exact: true})).toHaveCount(0);
   expect(writes).toBe(1);
 });
+
+test('pending group deletion locks competing actions and recovers for retry', async ({page}) => {
+  await fixture(page, 'INSTRUCTOR', 'Instructor');
+  let currentGroups = groups;
+  let writes = 0;
+  let finish: (() => void) | undefined;
+  const pending = new Promise<void>(resolve => {finish = resolve;});
+  await page.route('**/v2/courses/71/group-sets/91', route => route.fulfill({json: reply({...groupSet, groups: currentGroups})}));
+  await page.route('**/v2/courses/71/group-sets/91/groups/81', async route => {
+    writes += 1;
+    if (writes === 1) {
+      await pending;
+      return route.fulfill({status: 503, json: {code: 'SERVICE_UNAVAILABLE'}});
+    }
+    currentGroups = groups.filter(group => group.id !== 81);
+    return route.fulfill({json: reply(null)});
+  });
+  await page.goto('/course/71/group-sets/91');
+  const card = page.getByRole('article').filter({has: page.getByRole('heading', {name: 'Writing A', exact: true})});
+  await card.getByRole('button', {name: 'Delete', exact: true}).click();
+  const confirm = card.getByRole('button', {name: 'Confirm delete', exact: true});
+  await confirm.click();
+  await expect.poll(() => writes).toBe(1);
+  await expect(confirm).toBeDisabled();
+  await expect(card.getByRole('button', {name: 'Cancel', exact: true})).toBeDisabled();
+  await expect(page.getByRole('button', {name: 'Add group', exact: true})).toBeDisabled();
+  await expect(page.getByRole('combobox', {name: 'Move Mei An Lin', exact: true})).toBeDisabled();
+  await page.setViewportSize({width: 390, height: 844});
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  finish?.();
+  await expect(confirm).toBeEnabled();
+  await expect(page.getByRole('status')).toContainText('could not be deleted');
+  await confirm.click();
+  await expect(card).toHaveCount(0);
+  expect(writes).toBe(2);
+});
+
+test('a pending student leave request cannot be repeated and failure retains the membership', async ({page}) => {
+  await fixture(page);
+  let isMember = true;
+  let writes = 0;
+  let finish: (() => void) | undefined;
+  const pending = new Promise<void>(resolve => {finish = resolve;});
+  await page.route('**/v2/courses/71/group-sets/91', route => route.fulfill({json: reply({...groupSet, myGroup: isMember ? member : null})}));
+  await page.route('**/v2/courses/71/group-sets/91/groups/81/leave', async route => {
+    writes += 1;
+    if (writes === 1) {
+      await pending;
+      return route.fulfill({status: 503, json: {code: 'SERVICE_UNAVAILABLE'}});
+    }
+    isMember = false;
+    return route.fulfill({json: reply({membership: null, group: null, groups})});
+  });
+  await page.goto('/course/71/group-sets/91');
+  const leave = page.getByRole('button', {name: 'Leave group', exact: true});
+  await leave.click();
+  await expect.poll(() => writes).toBe(1);
+  await expect(leave).toBeDisabled();
+  await expect(page.getByRole('button', {name: 'Switch to this group', exact: true})).toBeDisabled();
+  finish?.();
+  await expect(leave).toBeEnabled();
+  await expect(page.getByRole('status')).toContainText('could not be changed');
+  await leave.click();
+  await expect(leave).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Join group', exact: true})).toHaveCount(2);
+  expect(writes).toBe(2);
+});

@@ -1,5 +1,5 @@
 import {useTranslation} from 'react-i18next';
-import {FormEvent, useEffect, useState} from 'react';
+import {FormEvent, useState} from 'react';
 import {useNavigate} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, Eye, EyeOff} from 'lucide-react';
@@ -28,11 +28,7 @@ const SettingsPage = () => {
   const {user, updateProfile} = useAuth();
   const tenantAdmin = user?.role === 'TENANT_ADMIN';
   const [activeTab, setActiveTab] = useState<SettingsTab>(tenantAdmin ? 'Password' : 'Account');
-  const [firstName, setFirstName] = useState('');
-  const [middleName, setMiddleName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [emailNotifications, setEmailNotifications] = useState(false);
+  const [profileDraft, setProfileDraft] = useState<UpdateProfileRequest>({});
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -57,21 +53,31 @@ const SettingsPage = () => {
     enabled: !tenantAdmin,
   });
 
-  useEffect(() => {
-    if (!profileQuery.data) return;
-    setFirstName(profileQuery.data.firstName || '');
-    setMiddleName(profileQuery.data.middleName || '');
-    setLastName(profileQuery.data.lastName || '');
-    setPhone(profileQuery.data.phone || '');
-    setEmailNotifications(Boolean(profileQuery.data.emailNotifications));
-  }, [profileQuery.data]);
+  // Keep edits separate from server state: either tab can save without replacing
+  // the other tab's draft, and a late response cannot overwrite newer input.
+  const firstName = profileDraft.firstName ?? profileQuery.data?.firstName ?? '';
+  const middleName = profileDraft.middleName ?? profileQuery.data?.middleName ?? '';
+  const lastName = profileDraft.lastName ?? profileQuery.data?.lastName ?? '';
+  const phone = profileDraft.phone ?? profileQuery.data?.phone ?? '';
+  const emailNotifications = profileDraft.emailNotifications ?? profileQuery.data?.emailNotifications ?? false;
+  const editProfileField = <Key extends keyof UpdateProfileRequest,>(key: Key, value: UpdateProfileRequest[Key]) => {
+    setProfileDraft(current => ({...current, [key]: value}));
+  };
 
   const saveProfile = useMutation({
     mutationFn: async (changes: UpdateProfileRequest) => unwrapData(
       await profileApiService.updateMyProfile(changes),
       'Update profile',
     ),
-    onSuccess: data => {
+    onSuccess: (data, changes) => {
+      setProfileDraft(current => {
+        const remaining = {...current};
+        for (const key of Object.keys(changes) as (keyof UpdateProfileRequest)[]) {
+          const value = current[key];
+          if ((typeof value === 'string' ? value.trim() : value) === changes[key]) delete remaining[key];
+        }
+        return remaining;
+      });
       queryClient.setQueryData(['my-profile'], data);
       updateProfile({name: formatPersonName(data), avatar: data.avatarUrl});
       setStatus({kind: 'success', text: 'Settings saved.'});
@@ -183,19 +189,19 @@ const SettingsPage = () => {
           >
             <div className={styles.inputGroup}>
               <label htmlFor="firstName">First name</label>
-              <input id="firstName" value={firstName} onChange={event => setFirstName(event.target.value)} required maxLength={100}/>
+              <input id="firstName" value={firstName} onChange={event => editProfileField('firstName', event.target.value)} required maxLength={100}/>
             </div>
             <div className={styles.inputGroup}>
               <label htmlFor="middleName">Middle name</label>
-              <input id="middleName" value={middleName} onChange={event => setMiddleName(event.target.value)} maxLength={100}/>
+              <input id="middleName" value={middleName} onChange={event => editProfileField('middleName', event.target.value)} maxLength={100}/>
             </div>
             <div className={styles.inputGroup}>
               <label htmlFor="lastName">Last name</label>
-              <input id="lastName" value={lastName} onChange={event => setLastName(event.target.value)} required maxLength={100}/>
+              <input id="lastName" value={lastName} onChange={event => editProfileField('lastName', event.target.value)} required maxLength={100}/>
             </div>
             <div className={styles.inputGroup}>
               <label htmlFor="phone">Phone</label>
-              <input id="phone" value={phone} onChange={event => setPhone(event.target.value)} maxLength={64} autoComplete="tel"/>
+              <input id="phone" value={phone} onChange={event => editProfileField('phone', event.target.value)} maxLength={64} autoComplete="tel"/>
             </div>
             <div className={styles.inputGroup}>
               <label htmlFor="email">Email</label>
@@ -317,7 +323,7 @@ const SettingsPage = () => {
               <input
                 type="checkbox"
                 checked={emailNotifications}
-                onChange={event => setEmailNotifications(event.target.checked)}
+                onChange={event => editProfileField('emailNotifications', event.target.checked)}
               />
               <span>Receive course and account notification emails</span>
             </label>

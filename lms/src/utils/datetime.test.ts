@@ -1,5 +1,22 @@
 import {describe, expect, it, vi} from 'vitest';
-import {formatUtcTimestamp, parseUtcTimestamp} from './datetime';
+import {formatUtcTimestamp, parseUtcTimestamp, parseZonedTimestamp} from './datetime';
+
+describe('course activity timestamps', () => {
+  it('anchors a zone-less activity in its supplied course zone', () => {
+    expect(parseZonedTimestamp('2026-09-05T15:36:24', 'Asia/Shanghai').toISOString()).toBe('2026-09-05T07:36:24.000Z');
+    expect(parseZonedTimestamp('2026-09-05T00:36:24', 'America/Los_Angeles').toISOString()).toBe('2026-09-05T07:36:24.000Z');
+  });
+
+  it('preserves explicit offsets instead of applying the course zone again', () => {
+    expect(parseZonedTimestamp('2026-09-05T07:36:24Z', 'Asia/Shanghai').toISOString()).toBe('2026-09-05T07:36:24.000Z');
+    expect(parseZonedTimestamp('2026-09-05T00:36:24-07:00', 'Asia/Shanghai').toISOString()).toBe('2026-09-05T07:36:24.000Z');
+  });
+
+  it('does not crash the activity list or invent an instant for invalid input', () => {
+    expect(Number.isNaN(parseZonedTimestamp('invalid', 'Asia/Shanghai').getTime())).toBe(true);
+    expect(Number.isNaN(parseZonedTimestamp('2026-09-05T15:36:24', 'invalid').getTime())).toBe(true);
+  });
+});
 
 describe('UTC timestamp display', () => {
   it('treats a zone-less backend LocalDateTime as UTC', () => {
