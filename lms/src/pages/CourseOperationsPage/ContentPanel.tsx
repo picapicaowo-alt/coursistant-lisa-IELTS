@@ -1,3 +1,5 @@
+import { LocalizedError } from "@/i18n/errors";
+import { useTranslation } from "react-i18next";
 import { teachingLabel } from "@/components/TeachingWorkspace/presentation";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -34,6 +36,7 @@ import s from "@/components/TeachingWorkspace/index.module.scss";
 
 type MaterialRow = { material: CourseMaterial; week: CourseWeek };
 export function ContentPanel({ courseId }: { courseId: number }) {
+  const { t: translate } = useTranslation();
   const weeks = useCourseWeeks(courseId);
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(0);
@@ -69,7 +72,8 @@ export function ContentPanel({ courseId }: { courseId: number }) {
     setBusy(true);
     try {
       if (preview) {
-        if (!popup) throw new Error("Allow pop-ups to preview this material.");
+        if (!popup)
+          throw new LocalizedError("operations:errors.materialPopups");
         showBlobInPreviewWindow(
           popup,
           await courseApiService.previewMaterial(
@@ -95,13 +99,16 @@ export function ContentPanel({ courseId }: { courseId: number }) {
     }
   };
   return (
-    <section className={s.panel} aria-label="Course materials">
+    <section
+      className={s.panel}
+      aria-label={translate("operations:courseMaterials")}
+    >
       <div className={s.toolbar}>
         <label className={s.search}>
           <Search size={18} aria-hidden="true" />
           <input
-            aria-label="Search course materials"
-            placeholder="Search course materials…"
+            aria-label={translate("operations:searchMaterials")}
+            placeholder={translate("operations:searchMaterialsPlaceholder")}
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
@@ -115,7 +122,7 @@ export function ContentPanel({ courseId }: { courseId: number }) {
           onClick={() => setSelected("attach")}
         >
           <Plus size={18} />
-          Attach material
+          {translate("operations:attachMaterial")}
         </button>
       </div>
       <TeachingError error={error} />
@@ -125,8 +132,8 @@ export function ContentPanel({ courseId }: { courseId: number }) {
           error={weeks.error}
           empty={
             search
-              ? "No materials match this search."
-              : "No teaching materials yet. Add materials in the course overview, then link them to a lecture or assignment here."
+              ? translate("operations:noMatchingMaterials")
+              : translate("operations:noMaterials")
           }
           onRetry={() => void weeks.refetch()}
         />
@@ -135,25 +142,25 @@ export function ContentPanel({ courseId }: { courseId: number }) {
           <table className={`${s.table} ${s.responsive}`}>
             <thead>
               <tr>
-                <th>Date added</th>
-                <th>Material title</th>
-                <th>Type</th>
-                <th>Linked context</th>
-                <th>Actions</th>
+                <th>{translate("operations:dateAdded")}</th>
+                <th>{translate("operations:materialTitle")}</th>
+                <th>{translate("common:fields.type")}</th>
+                <th>{translate("operations:linkedContext")}</th>
+                <th>{translate("common:fields.actions")}</th>
               </tr>
             </thead>
             <tbody>
               {visible.map((item) => (
                 <tr key={item.material.id}>
-                  <td data-label="Date added">
+                  <td data-label={translate("operations:dateAdded")}>
                     <span className={s.muted}>
                       {dateLabel(item.material.createdAt)}
                     </span>
                   </td>
-                  <td data-label="Material">
+                  <td data-label={translate("operations:material")}>
                     <strong>{item.material.displayName}</strong>
                   </td>
-                  <td data-label="Type">
+                  <td data-label={translate("common:fields.type")}>
                     <TeachingBadge>
                       {teachingLabel(
                         item.material.teachingType ||
@@ -161,13 +168,15 @@ export function ContentPanel({ courseId }: { courseId: number }) {
                       )}
                     </TeachingBadge>
                   </td>
-                  <td data-label="Context">
+                  <td data-label={translate("operations:linkedContext")}>
                     <span className={s.muted}>
                       {item.week.title}
-                      <small className={s.subline}>Origin lecture</small>
+                      <small className={s.subline}>
+                        {translate("operations:originLecture")}
+                      </small>
                     </span>
                   </td>
-                  <td data-label="Actions">
+                  <td data-label={translate("common:fields.actions")}>
                     <div className={s.recordActions}>
                       {item.material.previewAvailable ? (
                         <button
@@ -176,7 +185,7 @@ export function ContentPanel({ courseId }: { courseId: number }) {
                           disabled={busy}
                           onClick={() => void open(item, true)}
                         >
-                          View
+                          {translate("common:actions.view")}
                         </button>
                       ) : null}
                       {item.material.materialType === "LINK" &&
@@ -188,13 +197,16 @@ export function ContentPanel({ courseId }: { courseId: number }) {
                           target="_blank"
                           rel="noopener noreferrer"
                         >
-                          Open link
+                          {translate("operations:openLink")}
                         </a>
                       ) : item.material.materialType !== "LINK" ? (
                         <button
                           type="button"
                           className={s.iconButton}
-                          aria-label={`Download ${item.material.displayName}`}
+                          aria-label={translate(
+                            "course:materials.downloadNamed",
+                            { name: item.material.displayName },
+                          )}
                           disabled={busy}
                           onClick={() => void open(item, false)}
                         >
@@ -206,7 +218,7 @@ export function ContentPanel({ courseId }: { courseId: number }) {
                         className={s.textButton}
                         onClick={() => setSelected(item)}
                       >
-                        Manage links
+                        {translate("operations:manageLinks")}
                       </button>
                     </div>
                   </td>
@@ -222,7 +234,7 @@ export function ContentPanel({ courseId }: { courseId: number }) {
         total={filtered.length}
         count={visible.length}
         onChange={setPage}
-        label="Materials"
+        label={translate("operations:materials")}
       />
       {selected ? (
         <MaterialLinks
@@ -250,6 +262,7 @@ function MaterialLinks({
   weeks: CourseWeek[];
   onClose: () => void;
 }) {
+  const { t: translate } = useTranslation();
   const [materialId, setMaterialId] = useState(initial?.material.id ?? 0);
   const [kind, setKind] = useState<"lecture" | "assignment">("lecture");
   const [targetId, setTargetId] = useState("");
@@ -272,7 +285,7 @@ function MaterialLinks({
         ),
       ).items.map((item) => ({
         id: recordId(item, "assignmentId", "id"),
-        title: textValue(item, "title") || "Assignment",
+        title: textValue(item, "title"),
       })),
     enabled: kind === "assignment",
     retry: false,
@@ -292,14 +305,12 @@ function MaterialLinks({
       const selection =
         action === "detach" ? detaching : { kind, id: Number(targetId) };
       if (!selection || !selected || !selection.id)
-        throw new Error("Select a material and a linked record.");
+        throw new LocalizedError("operations:errors.selectLink");
       if (
         selection.kind === "lecture" &&
         selection.id === (selected.week.lectureId ?? selected.week.id)
       )
-        throw new Error(
-          "The origin lecture is permanent and cannot be attached or detached here.",
-        );
+        throw new LocalizedError("operations:errors.permanentOrigin");
       return checkpoint.run(
         `${action}-material-link`,
         { courseId, materialId, kind: selection.kind, targetId: selection.id },
@@ -340,8 +351,8 @@ function MaterialLinks({
     onSuccess: async (_value, action) => {
       setSaved(
         action === "detach"
-          ? "Material link removed. The source material is kept."
-          : "Material linked.",
+          ? "operations:materialDetached"
+          : "operations:materialLinked",
       );
       setDetaching(undefined);
       setTargetId("");
@@ -394,8 +405,8 @@ function MaterialLinks({
   }
   return (
     <TeachingDialog
-      title="Material links"
-      description="Reuse an existing material in another lecture or assignment within this course."
+      title={translate("operations:materialLinks")}
+      description={translate("operations:materialLinksHelp")}
       onClose={onClose}
       busy={mutation.isPending}
     >
@@ -407,7 +418,7 @@ function MaterialLinks({
         }}
       >
         <label className={`${s.field} ${s.full}`}>
-          Material
+          {translate("operations:material")}
           <select
             value={materialId || ""}
             onChange={(event) => {
@@ -417,7 +428,7 @@ function MaterialLinks({
               setSaved("");
             }}
           >
-            <option value="">Choose a material</option>
+            <option value="">{translate("operations:chooseMaterial")}</option>
             {rows.map((item) => (
               <option key={item.material.id} value={item.material.id}>
                 {item.material.displayName}
@@ -426,7 +437,7 @@ function MaterialLinks({
           </select>
         </label>
         <label className={s.field}>
-          Link to
+          {translate("operations:linkTo")}
           <select
             value={kind}
             onChange={(event) => {
@@ -436,17 +447,25 @@ function MaterialLinks({
               setTargetId("");
             }}
           >
-            <option value="lecture">Lecture</option>
-            <option value="assignment">Assignment</option>
+            <option value="lecture">{translate("operations:lecture")}</option>
+            <option value="assignment">
+              {translate("course:assignmentList.badgeFallback")}
+            </option>
           </select>
         </label>
         <label className={s.field}>
-          Select {kind}
+          {translate("operations:selectTarget", {
+            target: teachingLabel(kind),
+          })}
           <select
             value={targetId}
             onChange={(event) => setTargetId(event.target.value)}
           >
-            <option value="">Choose {kind}</option>
+            <option value="">
+              {translate("common:actions.chooseTarget", {
+                target: teachingLabel(kind),
+              })}
+            </option>
             {kind === "lecture"
               ? weeks
                   .filter((item) => item.id !== selected?.week.id)
@@ -457,7 +476,8 @@ function MaterialLinks({
                   ))
               : assignments.data?.map((item) => (
                   <option key={item.id} value={item.id}>
-                    {item.title}
+                    {item.title ||
+                      translate("operations:assignmentNumber", { id: item.id })}
                   </option>
                 ))}
           </select>
@@ -466,7 +486,7 @@ function MaterialLinks({
           <TeachingError error={assignments.error || mutation.error} />
           {saved ? (
             <p className={s.success} role="status">
-              {saved}
+              {translate(saved)}
             </p>
           ) : null}
         </div>
@@ -475,15 +495,16 @@ function MaterialLinks({
             className={s.primary}
             disabled={!materialId || !targetId || mutation.isPending}
           >
-            Attach material
+            {translate("operations:attachMaterial")}
           </button>
         </div>
       </form>
       {selected ? (
         <>
           <p className={s.notice}>
-            Origin: {selected.week.title}. This original association is
-            retained.
+            {translate("operations:originRetained", {
+              title: selected.week.title,
+            })}
           </p>
           {links.isPending || links.isError ? (
             <TeachingState
@@ -507,7 +528,7 @@ function MaterialLinks({
                     disabled={mutation.isPending}
                     onClick={() => setDetaching(item)}
                   >
-                    Detach
+                    {translate("operations:detach")}
                   </button>
                 </div>
               ))}
@@ -515,7 +536,7 @@ function MaterialLinks({
           ) : (
             <RecordSummaryList
               value={links.data}
-              emptyMessage="No additional links were returned."
+              emptyMessage={translate("operations:noAdditionalLinks")}
             />
           )}
         </>
@@ -523,8 +544,9 @@ function MaterialLinks({
       {detaching ? (
         <section className={s.notice}>
           <p>
-            Detach from {detaching.title}? The original material will not be
-            deleted.
+            {translate("operations:detachConfirmation", {
+              title: detaching.title,
+            })}
           </p>
           <div className={s.actions}>
             <button
@@ -533,7 +555,7 @@ function MaterialLinks({
               disabled={mutation.isPending}
               onClick={() => setDetaching(undefined)}
             >
-              Keep link
+              {translate("operations:keepLink")}
             </button>
             <button
               type="button"
@@ -541,7 +563,7 @@ function MaterialLinks({
               disabled={mutation.isPending}
               onClick={() => mutation.mutate("detach")}
             >
-              Confirm detach
+              {translate("operations:confirmDetach")}
             </button>
           </div>
         </section>

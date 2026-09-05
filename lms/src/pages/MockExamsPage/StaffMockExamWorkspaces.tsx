@@ -1,4 +1,7 @@
-import {useTranslation} from 'react-i18next';
+import {formatNumber, formatDateValue} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
+import {formatPersonName} from '@/utils/personName';
+import { useTranslation } from 'react-i18next';
 import {WritingGradeReview} from "./WritingGradeReview";
 import { WorkspaceSection } from "@/components/WorkspaceSection";
 import { ObserverMockExams } from "@/components/ObserverMockExams";
@@ -6,12 +9,10 @@ import { AdvisorInstructorPicker } from "@/components/AdvisorInstructorPicker";
 import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  BookOpenText,
   CircleCheck,
   TextCursor,
   Headphones,
   Image as ImageIcon,
-  PenLine,
   Check,
   ChevronDown,
   FileText,
@@ -21,7 +22,6 @@ import {
 import { unwrapData } from "@/apis";
 import { advisorApiService } from "@/apis/services/advisor-api";
 import { mockExamApiService } from "@/apis/services/mock-exam-api";
-import { formatPersonName } from "@/utils/personName";
 import { RecordSummaryList } from "@/components/RecordSummaryList";
 import { advisingErrorMessage } from "../advising/advisingErrors";
 import {
@@ -40,11 +40,7 @@ import {
 
 type Section = "listening" | "reading" | "writing";
 
-const SECTION_META = {
-  listening: { label: "Listening", Icon: Headphones },
-  reading: { label: "Reading", Icon: BookOpenText },
-  writing: { label: "Writing", Icon: PenLine },
-} satisfies Record<Section, { label: string; Icon: typeof Headphones }>;
+const EXAM_SECTIONS: Section[] = ['listening', 'reading', 'writing'];
 
 function ErrorNotice({
   error,
@@ -75,7 +71,7 @@ function nestedRecords(value: unknown, key: string): RuntimeRecord[] {
     : [];
 }
 
-type MediaState = { loading?: boolean; url?: string; error?: string };
+type MediaState = { loading?: boolean; url?: string; error?: unknown };
 
 type SectionMediaProps = {section: Section; value: unknown} & (
   {scope?: 'tenant'; templateId: number; versionId: number} | {scope: 'system'; testId: number}
@@ -109,10 +105,7 @@ export function ExamSectionMedia(props: SectionMediaProps) {
       setMedia((current) => ({
         ...current,
         [key]: {
-          error: advisingErrorMessage(
-            error,
-            translate('common:admin.mediaFailed'),
-          ),
+          error,
         },
       }));
     }
@@ -122,7 +115,7 @@ export function ExamSectionMedia(props: SectionMediaProps) {
   const items = section === 'listening'
     ? nestedRecords(value, 'parts').flatMap(part => {
       const seq = runtimeNumber(part, 'seq');
-      return seq == null || part.hasAudio === false ? [] : [{key: `listening-${seq}`, label: runtimeString(part, 'label') || translate('common:admin.listeningPart', {seq}), type: 'audio' as const, load: () => audio(seq)}];
+      return seq == null || part.hasAudio === false ? [] : [{key: `listening-${seq}`, label: runtimeString(part, 'label') || translate('common:admin.listeningPart', {seq: formatNumber(seq)}), type: 'audio' as const, load: () => audio(seq)}];
     })
     : section === 'reading'
       ? nestedRecords(value, 'passages').flatMap(passage => {
@@ -130,12 +123,12 @@ export function ExamSectionMedia(props: SectionMediaProps) {
         if (passageSeq == null) return [];
         return nestedRecords(passage, 'questions').flatMap(question => {
           const sortOrder = runtimeNumber(question, 'sortOrder');
-          return sortOrder == null || !(question.hasImage === true || runtimeString(question, 'imageSrc')) ? [] : [{key: `reading-${passageSeq}-${sortOrder}`, label: runtimeString(question, 'title') || translate('common:admin.passageGroup', {passage: passageSeq, group: sortOrder}), type: 'image' as const, load: () => readingImage(passageSeq, sortOrder)}];
+          return sortOrder == null || !(question.hasImage === true || runtimeString(question, 'imageSrc')) ? [] : [{key: `reading-${passageSeq}-${sortOrder}`, label: runtimeString(question, 'title') || translate('common:admin.passageGroup', {passage: formatNumber(passageSeq), group: formatNumber(sortOrder)}), type: 'image' as const, load: () => readingImage(passageSeq, sortOrder)}];
         });
       })
       : nestedRecords(value, 'tasks').flatMap(task => {
         const seq = runtimeNumber(task, 'seq');
-        return seq == null || !(task.hasImage === true || runtimeString(task, 'imageSrc')) ? [] : [{key: `writing-${seq}`, label: runtimeString(task, 'title') || translate('common:admin.writingTask', {seq}), type: 'image' as const, load: () => writingImage(seq)}];
+        return seq == null || !(task.hasImage === true || runtimeString(task, 'imageSrc')) ? [] : [{key: `writing-${seq}`, label: runtimeString(task, 'title') || translate('common:admin.writingTask', {seq: formatNumber(seq)}), type: 'image' as const, load: () => writingImage(seq)}];
       });
 
   if (!items.length) return null;
@@ -184,7 +177,7 @@ export function ExamSectionMedia(props: SectionMediaProps) {
               {state?.url && item.type === "image" ? (
                 <img src={state.url} alt={translate('common:admin.mediaReference', {label: item.label})} />
               ) : null}
-              {state?.error ? <p role="alert">{state.error}</p> : null}
+              {state?.error ? <p role="alert">{advisingErrorMessage(state.error, translate('common:admin.mediaFailed'))}</p> : null}
             </article>
           );
         })}
@@ -194,6 +187,7 @@ export function ExamSectionMedia(props: SectionMediaProps) {
 }
 
 export function AdvisorWorkspace({ value }: { value: unknown }) {
+  const { t: translate } = useTranslation();
   const queryClient = useQueryClient();
   const templates = templateItems(value).filter(
     (item) => item.publishedVersionId || item.publishedVersionNo,
@@ -255,23 +249,24 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
     <div className={assignStyles.workspace}>
       <section className={assignStyles.hero}>
         <div>
-          <h1>Match students to published papers</h1>
+          <h1>{translate("exams:staff.assignTitle")}</h1>
           <p>
-            Assign mock exams to students, choose the exam sections, and review every prior assignment history.
-          </p>
+            {translate("exams:staff.assignHelp")}</p>
         </div>
       </section>
       <div className={assignStyles.columns}>
-        <WorkspaceSection title="Prepare a mock exam" className={assignStyles.panel} bodyClassName={assignStyles.panelBody}>
+        <WorkspaceSection title={translate("exams:staff.prepare")} className={assignStyles.panel} bodyClassName={assignStyles.panelBody}>
           <form
+            noValidate
             className={assignStyles.form}
             onSubmit={(event) => {
               event.preventDefault();
+              if (assign.isPending || !studentId || !templateId || (sections.writing && !instructorId) || !Object.values(sections).some(Boolean)) return;
               assign.mutate();
             }}
           >
             <label className={styles.full}>
-              <span>Select student</span>
+              <span>{translate("courseTools:groups.selectStudent")}</span>
               <span className={assignStyles.selectControl}>
               <UserRound size={20} aria-hidden="true"/>
               <select
@@ -279,13 +274,13 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
                 value={studentId}
                 onChange={(event) => {setStudentId(event.target.value); setAssignmentCount(undefined);}}
               >
-                <option value="">Choose a student from your cohort</option>
+                <option value="">{translate("exams:staff.studentPlaceholder")}</option>
                 {studentRows.map((student) => {
                   const id = student.studentUserId;
                   return id ? (
                     <option value={id} key={id}>
-                      {formatPersonName(student, `Student ${id}`)} ·{" "}
-                      {student.email || `ID ${id}`}
+                      {formatPersonName(student, translate('common:people.studentFallback', {id: formatNumber(id)}))} ·{" "}
+                      {student.email || translate('common:records.id', {id: formatNumber(id)})}
                     </option>
                   ) : null;
                 })}
@@ -293,11 +288,9 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               <ChevronDown size={18} aria-hidden="true"/>
               </span>
             </label>
-            {students.isSuccess && studentRows.length === 0 ? (
-              <p className={styles.full} role="status">No students are assigned to you yet. Ask a counsellor to complete the advisor handover.</p>
-            ) : null}
+            {students.isSuccess && studentRows.length === 0 ? <p className={styles.full} role="status">{translate("exams:staff.noAssignedStudents")}</p> : null}
             <label className={styles.full}>
-              <span>Published template</span>
+              <span>{translate("exams:staff.publishedTemplate")}</span>
               <span className={assignStyles.selectControl}>
               <FileText size={20} aria-hidden="true"/>
               <select
@@ -305,30 +298,28 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
                 value={templateId}
                 onChange={(event) => setTemplateId(event.target.value)}
               >
-                <option value="">Select exam template</option>
+                <option value="">{translate("exams:staff.templatePlaceholder")}</option>
                 {templates.map((template) => (
                   <option value={template.id} key={template.id}>
                     {template.title ||
                       template.label ||
-                      `Template ${template.id}`}{" "}
-                    · v{template.publishedVersionNo ?? "published"}
+                      translate('exams:staff.template', {id: template.id == null ? '—' : formatNumber(template.id)})}{" "}
+                    · {template.publishedVersionNo == null ? translate('common:status.PUBLISHED') : translate('courseTools:delivery.version', {number: formatNumber(template.publishedVersionNo)})}
                   </option>
                 ))}
               </select>
               <ChevronDown size={18} aria-hidden="true"/>
               </span>
             </label>
-            {templates.length === 0 ? (
-              <p className={styles.full} role="status">No published papers are available. A tenant administrator must publish a complete mock exam before you can assign it.</p>
-            ) : null}
+            {templates.length === 0 ? <p className={styles.full} role="status">{translate("exams:staff.noPublishedPapers")}</p> : null}
             {templateId ? (
-              <div className={styles.full} aria-label="Selected paper details">
+              <div className={styles.full} aria-label={translate("exams:staff.paperDetails")}>
                 {selectedTemplate.isPending ? (
-                  <p role="status">Loading paper details…</p>
+                  <p role="status">{translate("exams:staff.loadingPaper")}</p>
                 ) : selectedTemplate.isError ? (
                   <ErrorNotice
                     error={selectedTemplate.error}
-                    fallback="Paper details could not be loaded."
+                    fallback={translate('exams:staff.paperFailed')}
                   />
                 ) : (
                   <RecordSummaryList value={selectedTemplate.data} />
@@ -336,9 +327,9 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               </div>
             ) : null}
             <fieldset className={styles.full}>
-              <legend>Assigned sections</legend>
+              <legend>{translate("exams:staff.assignedSections")}</legend>
               <div className={assignStyles.sections}>
-                {(Object.keys(SECTION_META) as Section[]).map((section) => (
+                {EXAM_SECTIONS.map((section) => (
                   <label key={section}>
                     <input
                       type="checkbox"
@@ -351,7 +342,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
                       }
                     />
                     <Check size={18} aria-hidden="true"/>
-                    <span>{SECTION_META[section].label}</span>
+                    <span>{translate(`common:admin.examSections.${section}`)}</span>
                   </label>
                 ))}
               </div>
@@ -360,7 +351,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               {sections.writing ? (
                 <AdvisorInstructorPicker
                   required
-                  label="Writing instructor"
+                  label={translate("exams:assignment.instructor")}
                   value={instructorId}
                   onChange={setInstructorId}
                 />
@@ -375,22 +366,22 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
                   !Object.values(sections).some(Boolean)
                 }
               >
-                {assign.isPending ? "Assigning…" : "Assign Exam"}
+                {assign.isPending ? translate("exams:assignment.assigning") : translate("exams:assignment.assign")}
               </button>
             </div>
           </form>
           <ErrorNotice
             error={students.error || assign.error}
-            fallback="The assignment could not be completed."
+            fallback={translate('exams:staff.assignFailed')}
           />
         </WorkspaceSection>
-        <WorkspaceSection title="Assigned papers" className={assignStyles.panel} bodyClassName={assignStyles.panelBody}
-          meta={!studentId || assignmentCount != null ? <span className={assignStyles.count}>{studentId ? assignmentCount : 0} Assigned</span> : undefined}>
+        <WorkspaceSection title={translate("exams:staff.assignedPapers")} className={assignStyles.panel} bodyClassName={assignStyles.panelBody}
+          meta={studentId && assignmentCount != null ? <span className={assignStyles.count}>{translate('exams:staff.assignedCount', {count: assignmentCount, number: formatNumber(assignmentCount)})}</span> : undefined}>
           {!studentId ? (
             <div className={assignStyles.empty}>
               <span className={assignStyles.emptyIcon}><Inbox size={28} aria-hidden="true"/></span>
-              <h3>No Active Assignments</h3>
-              <p>Select a student from the form on the left to review their complete assignment history and assign new mock exams.</p>
+              <h3>{translate("courseTools:groups.selectStudent")}</h3>
+              <p>{translate("exams:staff.chooseStudentHelp")}</p>
             </div>
           ) : (
             <ObserverMockExams
@@ -398,8 +389,8 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
               onCountChange={setAssignmentCount}
               emptyState={<div className={assignStyles.empty}>
                 <span className={assignStyles.emptyIcon}><Inbox size={28} aria-hidden="true"/></span>
-                <h3>No assigned papers yet</h3>
-                <p>Choose a published template and exam sections to assign this student their first mock exam.</p>
+                <h3>{translate("exams:library.empty")}</h3>
+                <p>{translate("exams:staff.firstExamHelp")}</p>
               </div>}
               scope="advisor"
               studentUserId={Number(studentId)}
@@ -412,6 +403,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
 }
 
 export function InstructorWorkspace({ value }: { value: unknown }) {
+  const {t: translate} = useTranslation();
   const rows = runtimeItems(value);
   const [gradeId, setGradeId] = useState<number | null>(() =>
     rows[0] ? idFrom(rows[0], "id", "gradeId", "writingGradeId") : null,
@@ -421,16 +413,14 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
     <div className={`${styles.workspace} ${styles.instructorWorkspace}`}>
       <section className={styles.hero}>
         <div>
-          <div className={styles.queueEyebrow}><span>Assigned review queue</span><span>{rows.length} queue items</span></div>
-          <h1>Read the script. Return a clear result.</h1>
+          <div className={styles.queueEyebrow}><span>{translate("exams:staff.queue")}</span><span>{translate('exams:staff.queueCount', {count: rows.length, number: formatNumber(rows.length)})}</span></div>
+          <h1>{translate("exams:staff.reviewTitle")}</h1>
           <p>
-            Work from the assigned queue, inspect the complete submission, then
-            record a score and candidate-facing feedback.
-          </p>
+            {translate("exams:staff.reviewHelp")}</p>
         </div>
       </section>
       <div className={`${styles.queueLayout} ${rows.length ? styles.hasSubmissions : ''}`}>
-        <WorkspaceSection title="Writing submissions" className={styles.reviewPanel} bodyClassName={styles.reviewBody}>
+        <WorkspaceSection title={translate("exams:staff.submissions")} className={styles.reviewPanel} bodyClassName={styles.reviewBody}>
           {rows.length ? (
             <div className={styles.cardList}>
               {rows.map((row, index) => {
@@ -449,32 +439,32 @@ export function InstructorWorkspace({ value }: { value: unknown }) {
                     disabled={submitting}
                   >
                     <span className={styles.cardTopline}>
-                      {runtimeString(row, "status") || "Awaiting review"}
-                      <small>#{id}</small>
+                      {runtimeString(row, "status") ? statusLabel(runtimeString(row, "status")) : translate("exams:staff.awaitingReview")}
+                      <small>#{formatNumber(id)}</small>
                     </span>
                     <strong>
-                      {runtimeString(row, "templateTitle") || recordLabel(row, `Writing submission ${index + 1}`)}
+                      {runtimeString(row, 'templateTitle') || recordLabel(row, translate('exams:staff.writingSubmission', {number: formatNumber(index + 1)}))}
                     </strong>
                     <span>
-                      {runtimeString(row, "submittedAt", "createdAt") ||
-                        "Submission time unavailable"}
+                      {formatDateValue(runtimeString(row, "submittedAt", "createdAt") ?? "") ||
+                        translate("exams:staff.timeUnavailable")}
                     </span>
                   </button>
                 ) : null;
               })}
             </div>
           ) : (
-            <div className={styles.reviewEmpty}><span className={styles.caughtUpIcon}><CircleCheck size={27}/></span><h3>All caught up!</h3><p>No writing submissions are waiting for review in this pool.</p></div>
+            <div className={styles.reviewEmpty}><span className={styles.caughtUpIcon}><CircleCheck size={27}/></span><h3>{translate("exams:staff.caughtUp")}</h3><p>{translate("exams:staff.noReviews")}</p></div>
           )}
         </WorkspaceSection>
         <WorkspaceSection
-          title={gradeId ? `Submission #${gradeId}` : "Select a submission"}
+          title={gradeId ? translate('exams:staff.submissionId', {id: formatNumber(gradeId)}) : translate("exams:staff.selectSubmission")}
           className={styles.reviewPanel} bodyClassName={styles.reviewBody}
         >
           {gradeId ? (
             <WritingGradeReview key={gradeId} gradeId={gradeId} onBusy={setSubmitting}/>
           ) : (
-            <div className={styles.reviewEmpty}><span className={styles.readyIcon}><TextCursor size={27}/></span><h3>Ready to review</h3><p>Choose a queue item to begin grading.</p></div>
+            <div className={styles.reviewEmpty}><span className={styles.readyIcon}><TextCursor size={27}/></span><h3>{translate("exams:staff.ready")}</h3><p>{translate("exams:staff.selectReviewHelp")}</p></div>
           )}
         </WorkspaceSection>
       </div>

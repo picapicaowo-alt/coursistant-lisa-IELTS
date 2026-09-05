@@ -1,3 +1,4 @@
+import {LocalizedError} from '@/i18n/errors';
 import {useEffect, useState} from 'react';
 import {useIsMutating, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {unwrapData, type CourseDeliveryConfigResponse, type CourseReadinessBlocker} from '@/apis';
@@ -70,7 +71,7 @@ export function useCourseDelivery(id: number) {
   };
   const save = useMutation({
     mutationFn: async () => {
-      if (!canSaveDelivery || !validDeliveryDraft(draft)) throw new Error('Add a recurring session, then enter a valid catalog code and capacity.');
+      if (!canSaveDelivery || !validDeliveryDraft(draft)) throw new LocalizedError('courseTools:delivery.requiresSession');
       return unwrapData(await idempotency.run('putCourseDeliveryConfig', [id, {catalogCode: draft.catalogCode.trim(), capacity: Number(draft.capacity), expectedCourseLaunchVersion: reviewedVersion}] satisfies Parameters<typeof advisorApiService.putCourseDeliveryConfig>, (key, args) => advisorApiService.putCourseDeliveryConfig(...args, key)), 'advisorPutCourseDeliveryConfig');
     }, onError, onSuccess: acceptConfig,
   });
@@ -80,7 +81,7 @@ export function useCourseDelivery(id: number) {
   const canPublish = canTransition && config.data?.launchState === 'READY';
   const transition = useMutation({
     mutationFn: async (action: 'ready' | 'publish') => {
-      if (!(action === 'ready' ? canReady : canPublish)) throw new Error('Load and review the current group-course configuration first.');
+      if (!(action === 'ready' ? canReady : canPublish)) throw new LocalizedError("courseTools:delivery.loadGroup");
       return unwrapData(action === 'ready'
         ? await idempotency.run('readyCourseLaunch', [id, {expectedCourseLaunchVersion: reviewedVersion}] satisfies Parameters<typeof advisorApiService.readyCourseLaunch>, (key, args) => advisorApiService.readyCourseLaunch(...args, key))
         : await idempotency.run('publishCourseLaunch', [id, {expectedCourseLaunchVersion: reviewedVersion}] satisfies Parameters<typeof advisorApiService.publishCourseLaunch>, (key, args) => advisorApiService.publishCourseLaunch(...args, key)), `advisor${action}CourseLaunch`);

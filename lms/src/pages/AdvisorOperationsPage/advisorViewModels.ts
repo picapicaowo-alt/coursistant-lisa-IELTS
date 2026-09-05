@@ -1,3 +1,5 @@
+import i18n from '@/i18n';
+import {formatNumber, formatDateValue, formatClockTime} from '@/i18n/formatting';
 import {formatPersonName} from '@/utils/personName';
 import type {AdvisorConversationAttachmentResponse, AdvisorConversationMessageResponse} from '@/apis';
 
@@ -30,26 +32,28 @@ export const contractItems = (value: unknown): unknown[] => {
   return record && Array.isArray(record.items) ? record.items : [];
 };
 
+// Presentation getters read the shared locale at access time. Views may be retained
+// in an open review; language changes must not replace its captured id/version.
 export interface AdvisorDashboardView {
   stats: Array<{key: string; label: string; value: number}>;
   urgentTasks: unknown[];
 }
 
 const DASHBOARD_STATS = [
-  ['assignedStudentCount', 'Assigned students'],
-  ['onTrackCount', 'On track'],
-  ['atRiskCount', 'At risk'],
-  ['needsAttentionCount', 'Needs attention'],
-  ['pendingApprovalCount', 'Pending approval'],
-  ['overdueFollowUpCount', 'Overdue follow-up'],
+  ['assignedStudentCount', "advising:overview.stats.assigned"],
+  ['onTrackCount', "common:risk.onTrack"],
+  ['atRiskCount', "common:risk.atRisk"],
+  ['needsAttentionCount', "common:risk.needsAttention"],
+  ['pendingApprovalCount', "advising:overview.stats.approval"],
+  ['overdueFollowUpCount', "advising:overview.stats.overdue"],
 ] as const;
 
 export const advisorDashboardView = (value: unknown): AdvisorDashboardView => {
   const record = asRecord(value) ?? {};
   return {
-    stats: DASHBOARD_STATS.map(([key, label]) => ({
+    stats: DASHBOARD_STATS.map(([key, labelKey]) => ({
       key,
-      label,
+      get label() {return i18n.t(labelKey);},
       value: readNumber(record, key) ?? 0,
     })),
     urgentTasks: contractItems(record.urgentTasks),
@@ -73,7 +77,7 @@ export const advisorConversationViews = (value: unknown): AdvisorConversationSum
     if (studentUserId == null) return [];
     return [{
       studentUserId,
-      studentName: formatPersonName({firstName: readString(record, 'studentFirstName'), middleName: readString(record, 'studentMiddleName'), lastName: readString(record, 'studentLastName')}, `Student #${studentUserId}`),
+      get studentName() {return formatPersonName({firstName: readString(record, 'studentFirstName'), middleName: readString(record, 'studentMiddleName'), lastName: readString(record, 'studentLastName')}, i18n.t('common:people.studentFallback', {id: formatNumber(studentUserId)}));},
       latestPreview: readString(record, 'latestPreview'),
       latestAt: readString(record, 'latestAt'),
       unreadCount: readNumber(record, 'unreadCount') ?? 0,
@@ -106,11 +110,11 @@ export const advisorScheduleRequestViews = (value: unknown): AdvisorScheduleRequ
     return [{
       requestId,
       expectedVersion: readNumber(record, 'expectedVersion', 'version'),
-      studentName: readString(record, 'studentName') ?? (studentUserId == null ? 'Student' : `Student #${studentUserId}`),
-      courseLabel: readString(record, 'courseTitle', 'courseCode') ?? (courseId == null ? 'Course' : `Course #${courseId}`),
+      get studentName() {return readString(record, 'studentName') ?? (studentUserId == null ? i18n.t('common:roles.STUDENT') : i18n.t('common:people.studentFallback', {id: formatNumber(studentUserId)}));},
+      get courseLabel() {return readString(record, 'courseTitle', 'courseCode') ?? (courseId == null ? i18n.t('common:fields.course') : i18n.t('assistant:courseFallback', {id: formatNumber(courseId)}));},
       requestType: readString(record, 'requestType'),
-      requestedDate: readString(record, 'proposedOccurrenceDate', 'occurrenceDate'),
-      requestedTime: start ? `${start}${end ? `–${end}` : ''}` : undefined,
+      get requestedDate() {const value = readString(record, 'proposedOccurrenceDate', 'occurrenceDate'); return value ? formatDateValue(value) : undefined;},
+      get requestedTime() {return start ? `${formatClockTime(start)}${end ? `–${formatClockTime(end)}` : ''}` : undefined;},
       reason: readString(record, 'reason'),
       status: readString(record, 'status'),
     }];

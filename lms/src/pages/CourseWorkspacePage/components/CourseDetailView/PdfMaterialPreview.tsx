@@ -1,3 +1,4 @@
+import {formatNumber, formatPercent} from '@/i18n/formatting';
 import {useTranslation} from 'react-i18next';
 import {ChevronLeft, ChevronRight, RotateCcw} from 'lucide-react';
 import {usePdfMaterialPreview} from './usePdfMaterialPreview';
@@ -14,13 +15,14 @@ export default function PdfMaterialPreview({blob, title, onRetry}: PdfMaterialPr
   const {t: translate} = useTranslation();
   const {
     canvas, viewport, pageNumber, setPageNumber, pageCount,
-    zoom, setZoom, loading, error, pageText, retry,
+    zoom, setZoom, loading, errorKey, pageText, retry,
   } = usePdfMaterialPreview(blob, onRetry);
 
+  const error = errorKey ? translate(errorKey) : "";
   return (
-    <section className={styles.document} aria-label={`${title} PDF preview`}>
+    <section className={styles.document} aria-label={translate('course:pdf.previewTitle', {title})}>
       <div className={styles.toolbar}>
-        <nav aria-label="PDF pages">
+        <nav aria-label={translate("course:pdf.pages")}>
           <button
             type="button"
             aria-label={translate('common:navigationControls.previousPdfPage')} title={translate('common:navigationControls.previousPdfPage')}
@@ -29,7 +31,7 @@ export default function PdfMaterialPreview({blob, title, onRetry}: PdfMaterialPr
           >
             <ChevronLeft size={18} aria-hidden="true"/>
           </button>
-          <span aria-live="polite">Page {pageNumber} of {pageCount ?? '…'}</span>
+          <span aria-live="polite">{translate('common:pagination.pageOf', {page: formatNumber(pageNumber), total: pageCount == null ? '…' : formatNumber(pageCount)})}</span>
           <button
             type="button"
             aria-label={translate('common:navigationControls.nextPdfPage')} title={translate('common:navigationControls.nextPdfPage')}
@@ -40,23 +42,19 @@ export default function PdfMaterialPreview({blob, title, onRetry}: PdfMaterialPr
           </button>
         </nav>
         <label>
-          Zoom
-          <select value={zoom} onChange={event => setZoom(Number(event.target.value))}>
-            <option value={1}>Fit width</option>
-            <option value={1.25}>125%</option>
-            <option value={1.5}>150%</option>
-            <option value={2}>200%</option>
+          {translate("course:pdf.zoom")}<select value={zoom} onChange={event => setZoom(Number(event.target.value))}>
+            <option value={1}>{translate("course:pdf.fitWidth")}</option>
+            {[1.25, 1.5, 2].map(value => <option key={value} value={value}>{formatPercent(value)}</option>)}
           </select>
         </label>
       </div>
       <div ref={viewport} className={styles.viewport} aria-busy={loading}>
-        {loading ? <p role="status">Loading PDF page…</p> : null}
+        {loading ? <p role="status">{translate("course:pdf.loading")}</p> : null}
         {error ? (
           <p role="alert">
             {error}{' '}
             <button type="button" onClick={() => void retry()}>
-              <RotateCcw size={16}/>Retry PDF
-            </button>
+              <RotateCcw size={16}/>{translate("course:pdf.retry")}</button>
           </p>
         ) : null}
         <canvas
@@ -65,7 +63,7 @@ export default function PdfMaterialPreview({blob, title, onRetry}: PdfMaterialPr
           data-rendered={!loading && !error}
           aria-hidden={loading || Boolean(error)}
           role="img"
-          aria-label={`Page ${pageNumber} of ${title}`}
+          aria-label={translate('course:pdf.pageTitle', {title, number: formatNumber(pageNumber)})}
         />
         <p className={styles.pageText}>{pageText}</p>
       </div>

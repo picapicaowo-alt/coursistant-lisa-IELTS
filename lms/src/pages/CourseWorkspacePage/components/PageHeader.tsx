@@ -71,12 +71,12 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        {(instructorView || (studentView && workspaceMode === 'view')) ? <span>Back to courses</span> : null}
+        {(instructorView || (studentView && workspaceMode === 'view')) ? <span>{t("course:detail.backToCourses")}</span> : null}
       </button>
       
       <div className={styles.titleContainer} hidden={(instructorView || (studentView && workspaceMode === 'view'))}>
         <span className={`${styles.courseTitle} ${!course.name ? styles.placeholderTitle : ''}`}>
-          {course.name || t('addContent.untitledCourse')}
+          {course.name || t('advising:studentCourses.untitledCourse')}
         </span>
         <svg className={styles.titleArrow} width="16" height="16" viewBox="0 0 24 24" fill="none"
              stroke="currentColor">

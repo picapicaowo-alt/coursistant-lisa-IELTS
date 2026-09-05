@@ -212,7 +212,7 @@ for (const width of [1752, 1440, 1024, 390]) {
       .getByLabel('Form / Form fields 1 / Field label')
       .fill('Full name');
     await page
-      .getByRole('button', {name: 'Add form field', exact: true})
+      .getByRole('button', {name: 'Add Form field', exact: true})
       .click();
     await page
       .getByLabel('Form / Form fields 2 / Field label')
@@ -328,7 +328,7 @@ for (const width of [1752, 1440, 1024, 390]) {
     });
     await expect(review).toBeVisible();
     await expect(review).toContainText('Questions 1–2');
-    await expect(review).toContainText('Answer-key format checks');
+    await expect(review).toContainText('Content checks validate the supported answer format');
     await expect(page.getByLabel('Question type', {exact: true})).toBeHidden();
     await page.screenshot({path: `${directory}/review-${width}.png`});
     failSave();
@@ -608,10 +608,10 @@ test('Reading paste import protects existing work and rejects invalid media refe
     .getByLabel('Or paste complete Reading JSON')
     .fill(JSON.stringify(importedReading));
   await page.getByRole('button', {name: 'Validate JSON', exact: true}).click();
-  page.once('dialog', (dialog) => dialog.dismiss());
   await page
     .getByRole('button', {name: 'Load into editor', exact: true})
     .click();
+  await page.getByRole('dialog', {name: 'Import Reading JSON', exact: true}).getByRole('button', {name: 'Cancel', exact: true}).click();
   await expect(page.getByLabel('Passage title')).toHaveValue('Keep my draft');
   const withImage = {
     ...importedReading,
@@ -627,10 +627,10 @@ test('Reading paste import protects existing work and rejects invalid media refe
     .getByLabel('Or paste complete Reading JSON')
     .fill(JSON.stringify(withImage));
   await page.getByRole('button', {name: 'Validate JSON', exact: true}).click();
-  page.once('dialog', (dialog) => dialog.accept());
   await page
     .getByRole('button', {name: 'Load into editor', exact: true})
     .click();
+  await page.getByRole('dialog', {name: 'Import Reading JSON', exact: true}).getByRole('button', {name: 'Confirm', exact: true}).click();
   await expect(page.getByRole('alert')).toContainText(
     'not an available Reading image in this version',
   );
@@ -648,7 +648,7 @@ test('reading and writing use text fields and retain drafts across section navig
   await page
     .getByLabel('Reading duration (minutes)', {exact: false})
     .fill('60');
-  await page.getByRole('button', {name: 'Add paragraph', exact: true}).click();
+  await page.getByRole('button', {name: 'Add Paragraph', exact: true}).click();
   await page
     .getByLabel('Passage paragraphs 1', {exact: true})
     .fill('A library serves the whole community.');
@@ -707,16 +707,14 @@ test('discard confirms its scope, preserves another section and does not delete 
     .getByLabel('Part name', {exact: true})
     .fill('Unsaved listening part');
   await page.getByRole('radio').check();
-  page.once('dialog', (dialog) => dialog.dismiss());
   await page.getByRole('button', {name: 'Discard draft', exact: true}).click();
+  await page.getByRole('dialog').getByRole('button', {name: 'Cancel', exact: true}).click();
   await expect(page.getByLabel('Part name', {exact: true})).toHaveValue(
     'Unsaved listening part',
   );
-  page.once('dialog', async (dialog) => {
-    expect(dialog.message()).toContain('Uploaded files will not be deleted');
-    await dialog.accept();
-  });
   await page.getByRole('button', {name: 'Discard draft', exact: true}).click();
+  await expect(page.getByRole('dialog')).toContainText('Uploaded files will not be deleted');
+  await page.getByRole('dialog').getByRole('button', {name: 'Confirm', exact: true}).click();
   await expect(page).toHaveURL(/version=480$/);
   await page.goto(`${basePath}&section=listening`);
   await expect(page.getByLabel('Part name', {exact: true})).toHaveValue('');

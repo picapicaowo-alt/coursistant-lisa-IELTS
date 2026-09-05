@@ -1,8 +1,11 @@
+import {LocalizedError} from '@/i18n/errors';
 import {useTranslation} from 'react-i18next';
 import {ADVISING_ERROR_CODES} from '@/apis';
 import {WorkspaceSection as CollapsibleSection} from '@/components/WorkspaceSection';
 import {PlanOverview} from './PlanOverview';
-import React, {lazy, Suspense, useState} from 'react';
+import React, {lazy, Suspense, useState, useRef} from 'react';
+import {formatUtcTimestamp} from '@/utils/datetime';
+import {formatNumber} from '@/i18n/formatting';
 import {STUDENT_PLAN_VIEWS} from '@/configs/routePaths';
 import pageStyles from './index.module.scss';
 const MyOperationsPage = lazy(() => import('../MyOperationsPage'));
@@ -37,6 +40,7 @@ const StudentAdvisingPage: React.FC = () => {
   const [message, setMessage] = useState('');
   const [messageFiles, setMessageFiles] = useState<File[]>([]);
   const [fileInputKey, setFileInputKey] = useState(0);
+  const fileInput = useRef<HTMLInputElement>(null);
   const profile = useQuery({
     queryKey: advisingQueryKeys.studentProfile,
     queryFn: async () => unwrapData(await advisorApiService.getOwnProfile(), 'studentProfile'),
@@ -64,7 +68,7 @@ const StudentAdvisingPage: React.FC = () => {
   });
   const messageMutation = useMutation({
     mutationFn: () => {
-      if (messageFiles.some(file => file.type.startsWith('audio/'))) throw new Error('Audio attachments are not supported.');
+      if (messageFiles.some(file => file.type.startsWith('audio/'))) throw new LocalizedError("learning:plan.audioUnsupported");
       return sendStableMessage(idempotency, 'student-advisor', {body: message.trim(), files: messageFiles}, (draft, key) => draft.files.length
         ? advisorApiService.sendOwnConversationMessageMultipart(draft, key)
         : advisorApiService.sendOwnConversationMessage({clientMessageId: draft.clientMessageId, body: draft.body}, key));
@@ -99,7 +103,7 @@ const StudentAdvisingPage: React.FC = () => {
     setFileIssue(null);
     setFilePending(true);
     try {
-      saveBlob(await advisorApiService.downloadOwnConversationAttachment(attachmentId), name || `advisor-attachment-${attachmentId}`);
+      saveBlob(await advisorApiService.downloadOwnConversationAttachment(attachmentId), name || translate('learning:plan.attachmentDownload', {id: attachmentId}));
     } catch (error) {
       setFileIssue({kind: 'loadError', error});
     } finally {
@@ -129,10 +133,10 @@ const StudentAdvisingPage: React.FC = () => {
     {checkpoint ? <CheckpointWorkspace key={checkpointKey} checkpoint={checkpoint} index={checkpointIndex} onBack={backToPlan}
       submissions={taskSubmissions} onSubmission={(taskId, value) => setTaskSubmissions(current => ({...current, [taskId]: value}))}
       onAction={action => taskMutation.mutate(action)} isPending={taskMutation.isPending} actionTaskId={taskMutation.variables?.taskId} onClearError={() => {if (!taskMutation.isPending) taskMutation.reset();}}
-      error={taskMutation.isError ? advisingErrorMessage(taskMutation.error, 'The task could not be updated. Please try again.') : undefined}/>
-      : <section className={styles.editorPage}><button type="button" className={styles.secondary} onClick={backToPlan}>Back to study plan</button>
-        {plan.isPending ? <p className={styles.status}>Loading checkpoint…</p> : <p className={plan.isError ? styles.error : styles.status} role={plan.isError ? 'alert' : undefined}>{plan.isError ? advisingErrorMessage(plan.error, 'The study plan could not be loaded.') : 'This checkpoint is no longer in your current study plan.'}</p>}
-        {plan.isError ? <button type="button" className={styles.secondary} onClick={() => void plan.refetch()}>Try again</button> : null}
+      error={taskMutation.isError ? advisingErrorMessage(taskMutation.error, translate('learning:plan.taskUpdateRetry')) : undefined}/>
+      : <section className={styles.editorPage}><button type="button" className={styles.secondary} onClick={backToPlan}>{translate("common:navigationControls.backToStudyPlan")}</button>
+        {plan.isPending ? <p className={styles.status}>{translate("learning:plan.loadingCheckpoint")}</p> : <p className={plan.isError ? styles.error : styles.status} role={plan.isError ? 'alert' : undefined}>{plan.isError ? advisingErrorMessage(plan.error, translate('learning:plan.loadFailed')) : translate("learning:plan.checkpointGone")}</p>}
+        {plan.isError ? <button type="button" className={styles.secondary} onClick={() => void plan.refetch()}>{translate("common:actions.tryAgain")}</button> : null}
       </section>}
   </div>;
 
@@ -148,37 +152,37 @@ const StudentAdvisingPage: React.FC = () => {
       <nav className={pageStyles.tabs} aria-label={translate('advising:studentPlan.views')}>
         {[[STUDENT_PLAN_VIEWS.overview, translate('advising:studentPlan.overview')], [STUDENT_PLAN_VIEWS.tasks, translate('dashboard:advisorTasks')], [STUDENT_PLAN_VIEWS.learning, translate('advising:studentPlan.learning')], [STUDENT_PLAN_VIEWS.messages, translate('advising:studentPlan.messages')]].map(([key, label]) => <button type="button" key={key} aria-pressed={key === (view || STUDENT_PLAN_VIEWS.overview)} onClick={() => { const next = new URLSearchParams(searchParams); next.set('view', key); setSearchParams(next); }}>{label}</button>)}
       </nav>
-      {showLearning ? <Suspense fallback={<p role="status">Loading learning overview…</p>}><MyOperationsPage embedded/></Suspense> : null}
+      {showLearning ? <Suspense fallback={<p role="status">{translate('common:feedback.loading')}</p>}><MyOperationsPage embedded/></Suspense> : null}
       {!showLearning && !showMessages ? <>
-      {profile.isPending || plan.isPending ? <p role="status">Loading your learning plan…</p> : null}
-      {profile.isError && !isMissingResource(profile.error, ADVISING_ERROR_CODES.profileNotFound) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')} <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
-      {plan.isError && !isMissingResource(plan.error, ADVISING_ERROR_CODES.studyPlanNotFound) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, 'Study plan could not be loaded.')} <button type="button" onClick={() => void plan.refetch()}>Retry plan</button></p> : null}
+      {profile.isPending || plan.isPending ? <p role="status">{translate("learning:plan.loading")}</p> : null}
+      {profile.isError && !isMissingResource(profile.error, ADVISING_ERROR_CODES.profileNotFound) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, translate('learning:plan.profileFailed'))} <button type="button" onClick={() => void profile.refetch()}>{translate("learning:plan.retryProfile")}</button></p> : null}
+      {plan.isError && !isMissingResource(plan.error, ADVISING_ERROR_CODES.studyPlanNotFound) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, translate('learning:plan.loadFailed'))} <button type="button" onClick={() => void plan.refetch()}>{translate("learning:plan.retryPlan")}</button></p> : null}
       {!profile.isPending && !plan.isPending && (!profile.isError || isMissingResource(profile.error, ADVISING_ERROR_CODES.profileNotFound)) && (!plan.isError || isMissingResource(plan.error, ADVISING_ERROR_CODES.studyPlanNotFound)) ? <PlanOverview profile={profile.data} plan={plan.data?.plan} onCheckpoint={openCheckpoint}/> : null}
-      {taskMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskMutation.error, 'The task could not be updated.')}</p> : null}
+      {taskMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskMutation.error, translate('learning:plan.taskUpdateRetry'))}</p> : null}
       </> : null}
-      {showMessages ? <CollapsibleSection title="Advisor conversation" className={styles.disclosureLayout} summary="Ask questions, share context, or attach supporting files." meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
+      {showMessages ? <CollapsibleSection title={translate("learning:plan.conversation")} className={styles.disclosureLayout} summary={translate("learning:plan.conversationHelp")} meta={<span className={styles.countBadge}>{formatNumber(conversationRows.length)}</span>}>
 
         {fileIssue ? <p className={styles.error} role="alert">{fileIssue.kind === 'popupBlocked' ? t('attachments.popupBlocked') : getApiErrorMessage(fileIssue.error, t('attachments.loadError'))}</p> : null}
         {markReadMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(markReadMutation.error, t('conversation.markReadError'))}</p> : null}
-        {messageMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(messageMutation.error, 'Message could not be sent.')}</p> : null}
-        {conversation.isPending ? <p className={styles.status}>Loading messages…</p> : null}
+        {messageMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(messageMutation.error, translate('learning:messages.sendFailed'))}</p> : null}
+        {conversation.isPending ? <p className={styles.status}>{translate("learning:messages.loading")}</p> : null}
         {conversation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(conversation.error, t('conversation.loadError'))} <button type="button" onClick={() => void conversation.refetch()}>{t('conversation.retry')}</button></p> : null}
         {conversation.isSuccess && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>{t('conversation.empty')}</strong><span>{t('conversation.emptyHelp')}</span></div> : null}
         <div className={styles.messageList}>{conversationRows.map((item, index) => <article className={styles.messageRow} key={item.messageId ?? index}>
-          <div className={styles.rowTitle}><strong>{item.senderUserId == null ? 'Conversation message' : `User #${item.senderUserId}`}</strong><small>{item.createdAt || ''}</small></div>
-          <p>{item.body || 'Message has no text content.'}</p>
+          <div className={styles.rowTitle}><strong>{item.senderUserId == null ? translate("learning:plan.conversationMessage") : translate('common:people.userFallback', {id: formatNumber(item.senderUserId)})}</strong><small>{item.createdAt ? formatUtcTimestamp(item.createdAt) : ''}</small></div>
+          <p>{item.body || translate("learning:messages.noText")}</p>
           {(item.attachments?.length ?? 0) > 0 ? <div className={styles.attachmentList}>{item.attachments?.map(attachment => attachment.attachmentId == null ? null : <div className={styles.attachmentRow} key={attachment.attachmentId}>
-            <span>{attachment.originalName || `Attachment #${attachment.attachmentId}`}</span>
+            <span>{attachment.originalName || translate('learning:plan.attachmentNumber', {id: formatNumber(attachment.attachmentId)})}</span>
             <div className={styles.actions}>{attachment.previewAvailable ? <button type="button" className={styles.secondary} disabled={filePending} onClick={() => void previewAttachment(attachment.attachmentId!)}>{t('attachments.preview')}</button> : null}<button type="button" className={styles.secondary} disabled={filePending} onClick={() => void downloadAttachment(attachment.attachmentId!, attachment.originalName)}>{t('attachments.download')}</button></div>
           </div>)}</div> : null}
-          {item.messageId != null ? <button type="button" className={styles.textButton} disabled={markReadMutation.isPending} onClick={() => markReadMutation.mutate(item.messageId!)}>Mark read through this message</button> : null}
+          {item.messageId != null ? <button type="button" className={styles.textButton} disabled={markReadMutation.isPending} onClick={() => markReadMutation.mutate(item.messageId!)}>{translate("learning:plan.markRead")}</button> : null}
         </article>)}</div>
-        {conversation.hasNextPage ? <button type="button" className={styles.secondary} disabled={conversation.isFetchingNextPage} onClick={() => void conversation.fetchNextPage()}>Load older messages</button> : null}
-        <form className={styles.composeBox} onSubmit={event => { event.preventDefault(); messageMutation.mutate(); }}>
-          <label htmlFor="student-advisor-message">Message</label><textarea id="student-advisor-message" value={message} onChange={event => setMessage(event.target.value)} placeholder="Write to your advisor…"/>
-          <label htmlFor="student-advisor-files">Attachments</label><input key={fileInputKey} id="student-advisor-files" type="file" multiple onChange={event => setMessageFiles(Array.from(event.target.files ?? []))}/>
-          {messageFiles.length > 0 ? <div className={styles.selectedFiles}>{messageFiles.map((file, index) => <span key={`${file.name}-${file.lastModified}-${index}`}>{file.name}<button type="button" aria-label={`Remove ${file.name}`} onClick={() => setMessageFiles(current => current.filter((_, fileIndex) => fileIndex !== index))}>×</button></span>)}</div> : null}
-          <button className={styles.primary} disabled={(!message.trim() && messageFiles.length === 0) || messageMutation.isPending}>Send message</button>
+        {conversation.hasNextPage ? <button type="button" className={styles.secondary} disabled={conversation.isFetchingNextPage} onClick={() => void conversation.fetchNextPage()}>{translate("learning:messages.older")}</button> : null}
+        <form className={styles.composeBox} onSubmit={event => { event.preventDefault(); if (!messageMutation.isPending && (message.trim() || messageFiles.length)) messageMutation.mutate(); }}>
+          <label htmlFor="student-advisor-message">{translate("operations:message")}</label><textarea disabled={messageMutation.isPending} id="student-advisor-message" value={message} onChange={event => setMessage(event.target.value)} placeholder={translate("learning:plan.messagePlaceholder")}/>
+          <label htmlFor="student-advisor-files">{translate("course:assignment.attachments")}</label><button type="button" className={styles.secondary} disabled={messageMutation.isPending} onClick={() => fileInput.current?.click()}>{translate('learning:messages.addAttachments')}</button><input hidden ref={fileInput} disabled={messageMutation.isPending} key={fileInputKey} id="student-advisor-files" type="file" multiple onChange={event => setMessageFiles(Array.from(event.target.files ?? []))}/>
+          {messageFiles.length > 0 ? <div className={styles.selectedFiles}>{messageFiles.map((file, index) => <span key={`${file.name}-${file.lastModified}-${index}`}>{file.name}<button type="button" disabled={messageMutation.isPending} aria-label={translate('common:actions.removeItem', {item: file.name})} onClick={() => setMessageFiles(current => current.filter((_, fileIndex) => fileIndex !== index))}>×</button></span>)}</div> : null}
+          <button className={styles.primary} disabled={(!message.trim() && messageFiles.length === 0) || messageMutation.isPending}>{translate("assistant:send")}</button>
         </form>
       </CollapsibleSection> : null}
     </div>

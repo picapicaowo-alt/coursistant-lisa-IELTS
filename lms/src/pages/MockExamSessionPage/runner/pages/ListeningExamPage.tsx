@@ -1,5 +1,8 @@
+import {getApiErrorMessage} from '@/utils/apiError'
+import {formatDateTime} from '@/i18n/formatting';
+import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
+import {buildQuestionSubmission} from '../utils/questionSubmission'
 import {useTranslation} from 'react-i18next';
-import {getApiErrorMessage} from '@/utils/apiError';
 import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { submitListening } from '../api/listenings'
@@ -12,7 +15,6 @@ import {
   findPartForQuestion,
 } from '../data/listening/helpers'
 import type { ListeningPaper } from '../data/listening/types'
-import { buildQuestionSubmission } from '../utils/questionSubmission'
 
 type ListeningExamPageProps = {
   paper: ListeningPaper
@@ -23,11 +25,12 @@ type ListeningExamPageProps = {
 }
 
 function formatClock(date: Date): string {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+  return formatDateTime(date, { hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
 export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, onExit }: ListeningExamPageProps) {
   const {t: translate} = useTranslation();
+  const {confirm, dialog: exitDialog} = useConfirmationDialog();
   const questionIds = useMemo(() => allListeningQuestionNumbers(paper), [paper])
   const firstQuestion = questionIds[0] ?? 1
 
@@ -36,10 +39,10 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
   const [paused, setPaused] = useState(false)
   const [currentPartId, setCurrentPartId] = useState(paper.parts[0]?.id ?? 1)
   const [currentQuestion, setCurrentQuestion] = useState(firstQuestion)
-  const [clockLabel, setClockLabel] = useState(() => formatClock(new Date()))
+  const [clock, setClock] = useState(() => new Date())
   const [submitting, setSubmitting] = useState(false)
   const [submissionOpen, setSubmissionOpen] = useState(false)
-  const [submissionError, setSubmissionError] = useState('')
+  const [submissionError, setSubmissionError] = useState<unknown>()
   const [reviewByQuestion, setReviewByQuestion] = useState<Record<
     number,
     { submitted: string; correct: boolean; blank: boolean }
@@ -50,7 +53,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
   } | null>(null)
   /** partId -> ready to play (HTTP cache warmed); use API URL directly as src */
   const [audioReadyByPartId, setAudioReadyByPartId] = useState<Record<number, boolean>>({})
-  const [audioErrors, setAudioErrors] = useState<Record<number, string>>({})
+  const [audioErrors, setAudioErrors] = useState<Record<number, boolean>>({})
   const [audioStopSignal, setAudioStopSignal] = useState(0)
   const timeUpTriggered = useRef(false)
   const submitSectionRef = useRef<() => Promise<void>>(async () => {})
@@ -81,7 +84,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
           setAudioReadyByPartId((prev) => ({ ...prev, [part.id]: true }))
         } catch {
           if (!cancelled) {
-            setAudioErrors((prev) => ({ ...prev, [part.id]: 'Audio failed to load' }))
+            setAudioErrors((prev) => ({ ...prev, [part.id]: true }))
           }
         }
       })()
@@ -93,7 +96,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
   }, [paper])
 
   useEffect(() => {
-    const id = window.setInterval(() => setClockLabel(formatClock(new Date())), 1000)
+    const id = window.setInterval(() => setClock(new Date()), 1000)
     return () => window.clearInterval(id)
   }, [])
 
@@ -182,12 +185,11 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
 
     setAudioStopSignal((n) => n + 1)
 
-    const payload = buildQuestionSubmission(questionIds, answers)
-
     setSubmitting(true)
     setSubmissionOpen(true)
     setSubmissionError('')
     try {
+      const payload = buildQuestionSubmission(questionIds, answers)
       const attemptId = await ensureAttemptId(testId)
       const result = await submitListening(testId, {
         attemptId,
@@ -210,7 +212,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
         totalQuestions: result.totalQuestions,
       })
     } catch (err) {
-      setSubmissionError(getApiErrorMessage(err, 'Your exam could not be submitted. Please try again.'))
+      setSubmissionError(err)
     } finally {
       setSubmitting(false)
     }
@@ -243,14 +245,14 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
     setSubmissionOpen(true)
   }, [scoreSummary, submitting])
 
-  const handleExit = useCallback(() => {
+  const handleExit = useCallback(async () => {
     if (scoreSummary) {
       onExit()
       return
     }
-    const ok = window.confirm('Exit Listening? Your current answers will not be saved.')
+    const ok = await confirm({titleKey: 'exams:runner.exit', messageKey: 'exams:runner.exitConfirm'})
     if (ok) onExit()
-  }, [onExit, scoreSummary])
+  }, [confirm, onExit, scoreSummary])
 
   const rangeLabel = currentPart
     ? `${currentPart.questionNumbers[0]}-${currentPart.questionNumbers[currentPart.questionNumbers.length - 1]}`
@@ -264,7 +266,8 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
 
   return (
     <div className="exam-shell listening-shell">
-      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(scoreSummary)} error={submissionError} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
+      {exitDialog}
+      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(scoreSummary)} error={submissionError ? getApiErrorMessage(submissionError, translate('exams:submission.failed')) : ''} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
       <ListeningTopBar
         testTitle={testTitle}
         candidateId={candidateLabel}
@@ -272,7 +275,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
         paused={paused}
         audioSrc={currentAudioSrc}
         audioLoading={currentAudioLoading}
-        audioError={currentAudioError}
+        audioError={currentAudioError ? translate('exams:audio.loadError') : null}
         audioStopSignal={audioStopSignal}
       />
       <main className="listening-main">
@@ -281,6 +284,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
             <div className="listening-part-banner">
               <span className="listening-part-banner__label">{currentPart.label}</span>
               <span className="listening-part-banner__hint">
+                {/* This direction belongs to the IELTS paper, not the platform controls. */}
                 Listen and answer questions {rangeLabel}
               </span>
             </div>
@@ -318,7 +322,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
         answers={answers}
         currentQuestion={currentQuestion}
         testTitle={testTitle}
-        clockLabel={clockLabel}
+        clockLabel={formatClock(clock)}
         paused={paused}
         submitting={submitting}
         reviewByQuestion={

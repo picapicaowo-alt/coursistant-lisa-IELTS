@@ -1,9 +1,12 @@
 import {isRecord} from '@/utils/apiError';
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
 import type {Field} from './questionSchema';
 
 /** Supplied Reading/Listening authoring rule; never used for student responses. */
 export type ObjectiveAnswerKey =
-  {answer: string; answers?: never} | {answer?: never; answers: string[]};
+  | {answer: string; answers?: never}
+  | {answer?: never; answers: string[]};
 
 export function hasAnswerSlot(field: Field): boolean {
   return (
@@ -17,23 +20,23 @@ export function answerKeyErrors(value: Record<string, unknown>): string[] {
   const single = Object.prototype.hasOwnProperty.call(value, 'answer');
   const multiple = Object.prototype.hasOwnProperty.call(value, 'answers');
   if (single === multiple)
-    return ['Provide either answer or answers, never both.'];
+    return [i18n.t('exams:validation.answerExclusive')];
   if (single)
     return typeof value.answer === 'string' && value.answer.trim()
       ? []
-      : ['answer must be a nonblank string.'];
+      : [i18n.t('exams:validation.answerNonblank')];
   if (!Array.isArray(value.answers) || !value.answers.length)
-    return ['answers must be a nonempty array of strings.'];
+    return [i18n.t('exams:validation.answersArray')];
   if (
     value.answers.some((answer) => typeof answer !== 'string' || !answer.trim())
   )
-    return ['answers must contain only nonblank strings.'];
+    return [i18n.t('exams:validation.answersNonblank')];
   // Only trim for duplicate detection. Do not invent grading normalization,
   // reorder words, or change the official text sent to the API.
   const answers = value.answers.map((answer: string) => answer.trim());
   return new Set(answers).size === answers.length
     ? []
-    : ['answers must not contain duplicate answers.'];
+    : [i18n.t('exams:validation.answersUnique')];
 }
 
 /** Walk active renderer slots, excluding metadata and dormant text-cell IDs.
@@ -43,7 +46,7 @@ export function objectiveAnswerErrors(field: Field, value: unknown): string[] {
     return [
       ...(hasAnswerSlot(field)
         ? answerKeyErrors(value).map(
-            (error) => `Question ${String(value.id)}: ${error}`,
+            (error) => i18n.t('exams:validation.questionContext', {number: typeof value.id === 'number' ? formatNumber(value.id) : String(value.id), error}),
           )
         : []),
       ...Object.entries(field.fields).flatMap(([key, child]) =>

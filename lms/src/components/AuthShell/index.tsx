@@ -1,22 +1,23 @@
 import type {ReactNode} from 'react';
 import {useTranslation} from 'react-i18next';
 import styles from './index.module.scss';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import {LANGUAGE_SWITCHER_ENABLED} from '@/i18n/configuration';
+import {ProductPreview} from './ProductPreview';
 
 /** Shared Figma auth composition; field flows remain owned by each auth page. */
 export function AuthShell({children}: {children: ReactNode}) {
   const {t} = useTranslation('auth');
   return <main className={styles.page}>
     <section className={styles.formPanel}>
+      {LANGUAGE_SWITCHER_ENABLED ? <div className={styles.languageControl}><LanguageSwitcher/></div> : null}
       <div className={styles.formContent}>{children}</div>
       <p className={styles.help}>{t('shell.help')}</p>
     </section>
     <aside className={styles.visualPanel} aria-hidden="true">
       <div className={styles.artwork}>
         <p>{t('shell.promise')}</p>
-        <div className={styles.productPreview}>
-          <img className={styles.dashboard} src="/icons/figma-auth/dashboard.png" alt=""/>
-          <img className={styles.goal} src="/icons/figma-auth/goal.png" alt=""/>
-        </div>
+        <ProductPreview/>
       </div>
     </aside>
   </main>;

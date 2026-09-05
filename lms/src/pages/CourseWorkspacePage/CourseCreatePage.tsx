@@ -1,9 +1,9 @@
-import {useTranslation} from 'react-i18next';
+import {getApiErrorMessage} from '@/utils/apiError';
+import { useTranslation } from 'react-i18next';
 import React, {useState} from 'react';
 import {useMutation} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
 import {unwrapData} from '@/apis';
-import {getApiErrorMessage} from '@/utils/apiError';
 import {courseApiService} from '@/apis/services/course-api';
 import {EnglishDateInput} from '@/components/EnglishDateInput';
 import {RichTextEditor} from '@/components/RichTextEditor';
@@ -28,7 +28,7 @@ const EMPTY_FORM: FormState = {
 };
 
 const CourseCreatePage: React.FC = () => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const navigate = useNavigate();
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
 
@@ -65,9 +65,7 @@ const CourseCreatePage: React.FC = () => {
     && !datesOutOfOrder
     && !createCourse.isPending,
   );
-  const failure = createCourse.isError
-    ? getApiErrorMessage(createCourse.error, "Couldn't create the course.")
-    : null;
+  const failure = createCourse.isError ? getApiErrorMessage(createCourse.error, translate("course:workspace.createFailed")) : null;
 
   return (
     <main className={styles.page}>
@@ -76,17 +74,18 @@ const CourseCreatePage: React.FC = () => {
           type="button"
           className={styles.back}
           onClick={() => navigate('/course')}
-          aria-label={translate('course:detail.backToCourses')} title={translate('course:detail.backToCourses')}
+          aria-label={translate("course:detail.backToCourses")} title={translate("course:detail.backToCourses")}
         >
           <span aria-hidden="true">←</span>
         </button>
         <div>
-          <p className={styles.eyebrow}>Course setup</p>
-          <h1 className={styles.title}>New course</h1>
+          <p className={styles.eyebrow}>{translate("course:workspace.setup")}</p>
+          <h1 className={styles.title}>{translate("course:workspace.newCourse")}</h1>
         </div>
       </header>
 
       <form
+        noValidate
         className={styles.form}
         onSubmit={event => {
           event.preventDefault();
@@ -94,49 +93,49 @@ const CourseCreatePage: React.FC = () => {
         }}
       >
         <label className={styles.field}>
-          <span className={styles.label}>Course code</span>
-          <input className={styles.input} value={form.courseCode} onChange={updateField('courseCode')} maxLength={32} placeholder="CS01" required/>
+          <span className={styles.label}>{translate("course:form.codeLabel")}</span>
+          <input className={styles.input} value={form.courseCode} onChange={updateField('courseCode')} maxLength={32} placeholder={translate("course:workspace.codeExample")} required/>
         </label>
 
         <label className={styles.field}>
-          <span className={styles.label}>Course title</span>
-          <input className={styles.input} value={form.title} onChange={updateField('title')} placeholder="Computer Science" required/>
+          <span className={styles.label}>{translate("course:form.titleLabel")}</span>
+          <input className={styles.input} value={form.title} onChange={updateField('title')} placeholder={translate("course:workspace.titleExample")} required/>
         </label>
 
         <div className={styles.row}>
           <label className={styles.field}>
-            <span className={styles.label}>Term starts</span>
+            <span className={styles.label}>{translate("course:workspace.termStarts")}</span>
             <EnglishDateInput className={styles.input} value={form.termStartDate} onChangeValue={value => setForm(current => ({...current, termStartDate: value}))} required/>
           </label>
           <label className={styles.field}>
-            <span className={styles.label}>Term ends</span>
+            <span className={styles.label}>{translate("course:workspace.termEnds")}</span>
             <EnglishDateInput className={styles.input} value={form.termEndDate} onChangeValue={value => setForm(current => ({...current, termEndDate: value}))} required/>
           </label>
         </div>
 
-        {datesOutOfOrder ? <p className={styles.error}>The term must end on or after it starts.</p> : null}
+        {datesOutOfOrder ? <p className={styles.error}>{translate("course:workspace.invalidTerm")}</p> : null}
 
         <label className={styles.field}>
-          <span className={styles.label}>Location <span className={styles.optional}>optional</span></span>
-          <input className={styles.input} value={form.location} onChange={updateField('location')} placeholder="Engineering Building"/>
+          <span className={styles.label}>{translate("calendar:details.location")}{' '}<span className={styles.optional}>{translate("course:workspace.optional")}</span></span>
+          <input className={styles.input} value={form.location} onChange={updateField('location')} placeholder={translate("course:workspace.locationExample")}/>
         </label>
 
         <div className={styles.field}>
-          <span className={styles.label}>Description <span className={styles.optional}>optional</span></span>
+          <span className={styles.label}>{translate("common:fields.description")}<span className={styles.optional}>{translate("course:workspace.optional")}</span></span>
           <RichTextEditor
             content={form.description}
             onChange={description => setForm(current => ({...current, description}))}
-            placeholder="Describe the course…"
-            ariaLabel="Course description"
+            placeholder={translate("course:workspace.descriptionPlaceholder")}
+            ariaLabel={translate("course:workspace.descriptionLabel")}
           />
         </div>
 
         {failure ? <p className={styles.error} role="alert">{failure}</p> : null}
 
         <div className={styles.actions}>
-          <button type="button" className={styles.cancel} onClick={() => navigate('/course')}>Cancel</button>
+          <button type="button" className={styles.cancel} onClick={() => navigate('/course')}>{translate("common:actions.cancel")}</button>
           <button type="submit" className={styles.submit} disabled={!canSubmit}>
-            {createCourse.isPending ? 'Creating…' : 'Create course'}
+            {createCourse.isPending ? translate("common:actions.creating") : translate("course:list.createCourse")}
           </button>
         </div>
       </form>

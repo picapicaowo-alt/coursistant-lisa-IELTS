@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
 import {fixture, reply} from './workspace-fixtures';
+import {tx} from './i18n-fixture';
 import en from '../src/i18n/resources/en/course.json' with {type: 'json'};
 import cn from '../src/i18n/resources/zh-CN/course.json' with {type: 'json'};
 import tw from '../src/i18n/resources/zh-TW/course.json' with {type: 'json'};
@@ -15,8 +16,8 @@ for (const [locale, completed] of [['en', 'Completed'], ['zh-CN', '已完成'], 
     await page.goto('/mock-exams');
     await expect(page.getByRole('article').getByText(completed, {exact: true})).toBeVisible();
     await expect(page.getByRole('article').getByText('SUBMITTED', {exact: true})).toHaveCount(0);
-    await page.getByRole('combobox', {name: 'Exam status'}).selectOption({label: completed});
-    await expect(page.getByRole('combobox', {name: 'Exam status'})).toHaveValue('COMPLETED');
+    await page.getByRole('combobox', {name: tx(locale, 'exams:library.status')}).selectOption({label: completed});
+    await expect(page.getByRole('combobox', {name: tx(locale, 'exams:library.status')})).toHaveValue('COMPLETED');
     await expect(page.getByRole('heading', {name: 'Graded practice', exact: true})).toBeVisible();
   });
 }

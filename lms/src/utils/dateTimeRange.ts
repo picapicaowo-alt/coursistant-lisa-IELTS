@@ -1,3 +1,6 @@
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
+
 const pad = (value: number) => String(value).padStart(2, '0');
 
 export const DEFAULT_DURATION_MINUTES = 60;
@@ -6,11 +9,11 @@ export const SHORT_DURATION_OPTIONS = [30, 60, 90, 120, 180, 240] as const;
 export const LONG_DURATION_OPTIONS = [...SHORT_DURATION_OPTIONS, 24 * 60, 7 * 24 * 60] as const;
 
 export const durationLabel = (minutes: number): string => {
-  if (minutes === 7 * 24 * 60) return '1 week';
-  if (minutes === 24 * 60) return '1 day';
-  if (minutes < 60) return `${minutes} minutes`;
-  const hours = minutes / 60;
-  return `${hours} hour${hours === 1 ? '' : 's'}`;
+  const [key, count] = minutes === 7 * 24 * 60 ? ['common:dateTime.durationWeek', 1] as const
+    : minutes === 24 * 60 ? ['common:dateTime.durationDay', 1] as const
+    : minutes < 60 ? ['assessment:attempt.duration', minutes] as const
+    : ['common:dateTime.durationHour', minutes / 60] as const;
+  return i18n.t(key, {count, number: formatNumber(count, {maximumFractionDigits: 20})});
 };
 
 export const roundUpToMinutes = (date: Date, stepMinutes = 30): Date => {

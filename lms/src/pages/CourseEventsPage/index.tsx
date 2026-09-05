@@ -1,4 +1,4 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {FormEvent, useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, CalendarDays, Clock3, MapPin, Pencil, Plus, Trash2, X} from 'lucide-react';
@@ -21,6 +21,8 @@ import {
   SHORT_DURATION_OPTIONS,
   timeDurationMinutes,
 } from '@/utils/dateTimeRange';
+import {parseInputDate, parseInputTime} from '@/i18n/dateInput';
+import {formatClockTime, formatDateTime, formatDateValue, formatNumber} from '@/i18n/formatting';
 import styles from './index.module.scss';
 
 const emptyEvent = (): CourseEventPayload => {
@@ -67,7 +69,7 @@ interface DeleteEventAttempt {
 }
 
 const CourseEventsPage = () => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const params = useParams();
   const courseId = Number(params.courseId);
   const eventId = params.eventId ? Number(params.eventId) : null;
@@ -80,7 +82,7 @@ const CourseEventsPage = () => {
   const [draft, setDraft] = useState<CourseEventPayload>(emptyEvent);
   const [editorMode, setEditorMode] = useState<'create' | 'edit' | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{key: string; tone: 'success' | 'error'} | null>(null);
 
   const eventsQuery = useQuery({
     queryKey: ['course-events', courseId],
@@ -111,7 +113,7 @@ const CourseEventsPage = () => {
       const saved = unwrapData(response, 'saveCourseEvent');
       idempotency.complete(attempt.operation, attempt.idempotencyKey);
       setEditorMode(null);
-      setMessage(attempt.mode === 'edit' ? 'Event updated.' : 'Event created.');
+      setMessage({key: attempt.mode === 'edit' ? 'courseTools:events.updated' : 'courseTools:events.created', tone: 'success'});
       await Promise.all([
         queryClient.invalidateQueries({queryKey: ['course-events', courseId]}),
         queryClient.invalidateQueries({queryKey: ['course-event', courseId, saved.id]}),
@@ -123,9 +125,9 @@ const CourseEventsPage = () => {
         if (eventId !== null) {
           await selectedEventQuery.refetch();
         }
-        setMessage('This event was modified by another user. The latest version has been loaded. Please review your changes and try saving again.');
+        setMessage({key: 'courseTools:events.saveConflict', tone: 'error'});
       } else {
-        setMessage('The event could not be saved.');
+        setMessage({key: 'courseTools:events.saveFailed', tone: 'error'});
       }
     },
   });
@@ -141,17 +143,28 @@ const CourseEventsPage = () => {
     onError: async error => {
       if (isConflict(error) || getApiErrorCode(error) === 'COURSE_EVENT_VERSION_CONFLICT') {
         await selectedEventQuery.refetch();
-        setMessage('This event was modified by another user. Please review the updated event before deleting.');
+        setMessage({key: 'courseTools:events.deleteConflict', tone: 'error'});
       } else {
-        setMessage('The event could not be deleted.');
+        setMessage({key: 'courseTools:events.deleteFailed', tone: 'error'});
       }
     },
   });
 
-  const submit = (submitEvent: FormEvent) => {
+  const submit = (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
     setMessage(null);
-    if (!editorMode) return;
+    if (!editorMode || saveEvent.isPending) return;
+    if (!draft.name.trim() || !parseInputDate(draft.date)) {
+      setMessage({key: 'courseTools:events.invalidDate', tone: 'error'});
+      return;
+    }
+    // Optional times distinguish all-day events from invalid partially typed input.
+    const fields = new FormData(submitEvent.currentTarget);
+    if (['startTime', 'endTime'].some(name => {const raw = String(fields.get(name) ?? '').trim(); return raw !== '' && !parseInputTime(raw);})) {
+      setMessage({key: 'courseTools:events.invalidClock', tone: 'error'});
+      return;
+    }
+    if (invalidTime) {setMessage({key: 'operations:invalidTime', tone: 'error'}); return;}
     const request = buildCourseEventRequest(draft, editorMode, selectedEvent?.version);
     const operation = editorMode === 'edit' && eventId !== null
       ? `course-event-update-${courseId}-${eventId}`
@@ -200,52 +213,52 @@ const CourseEventsPage = () => {
     <main className={styles.page}>
       <div className={styles.header}>
         <Link to={eventId === null ? `/course/${courseId}` : `/course/${courseId}/events`} className={styles.backLink} aria-label={eventId === null ? translate("course:grades.back") : translate('common:navigationControls.backToEvents')} title={eventId === null ? translate("course:grades.back") : translate('common:navigationControls.backToEvents')}><ArrowLeft size={22} aria-hidden="true"/></Link>
-        <div className={styles.headerText}><p className={styles.eyebrow}>Course events</p><h1>{selectedEvent?.name || (eventId === null ? 'Events' : 'Loading event…')}</h1></div>
-        {access.canManageCourseEvents && editorMode === null ? <button type="button" className={styles.primaryButton} onClick={eventId === null ? openCreate : openEdit}>{eventId === null ? <><Plus size={17}/> Add event</> : <><Pencil size={17}/> Edit event</>}</button> : null}
+        <div className={styles.headerText}><p className={styles.eyebrow}>{translate("operations:courseEvents")}</p><h1>{selectedEvent?.name || (eventId === null ? translate("courseTools:events.title") : translate("courseTools:events.loading"))}</h1></div>
+        {access.canManageCourseEvents && editorMode === null ? <button type="button" className={styles.primaryButton} onClick={eventId === null ? openCreate : openEdit}>{eventId === null ? <><Plus size={17}/> {' '}{translate("courseTools:events.add")}</> : <><Pencil size={17}/> {' '}{translate("calendar:editEvent")}</>}</button> : null}
       </div>
 
-      {message ? <p className={message.includes('could not') ? styles.error : styles.success} role="status">{message}</p> : null}
-      {failed ? <section className={styles.card} role="alert"><h2>This event view could not be loaded</h2><button type="button" className={styles.primaryButton} onClick={() => { void eventsQuery.refetch(); void selectedEventQuery.refetch(); }}>Try again</button></section> : null}
+      {message ? <p className={message.tone === 'error' ? styles.error : styles.success} role={message.tone === 'error' ? 'alert' : 'status'}>{translate(message.key)}</p> : null}
+      {failed ? <section className={styles.card} role="alert"><h2>{translate("courseTools:events.loadFailed")}</h2><button type="button" className={styles.primaryButton} onClick={() => { void eventsQuery.refetch(); void selectedEventQuery.refetch(); }}>{translate("common:actions.tryAgain")}</button></section> : null}
 
       {editorMode ? (
-        <form className={styles.card} onSubmit={submit}>
-          <div className={styles.cardHeader}><div><h2>{editorMode === 'create' ? 'Create event' : 'Edit event'}</h2><p>Times use the course timezone. New events default to one hour.</p></div><button type="button" className={styles.iconButton} aria-label="Close event editor" onClick={() => setEditorMode(null)}><X size={18}/></button></div>
+        <form className={styles.card} noValidate onSubmit={submit}>
+          <div className={styles.cardHeader}><div><h2>{editorMode === 'create' ? translate("calendar:editor.create") : translate("calendar:editEvent")}</h2><p>{translate("courseTools:events.timezoneHelp")}</p></div><button type="button" className={styles.iconButton} aria-label={translate("courseTools:events.close")} onClick={() => setEditorMode(null)}><X size={18}/></button></div>
           <div className={styles.formGrid}>
-            <label className={styles.full}><span>Name</span><input required value={draft.name} onChange={e => setDraft(current => ({...current, name: e.target.value}))}/></label>
-            <label><span>Date</span><EnglishDateInput required value={draft.date} onChangeValue={value => setDraft(current => ({...current, date: value}))}/></label>
+            <label className={styles.full}><span>{translate("common:fields.name")}</span><input required value={draft.name} onChange={e => setDraft(current => ({...current, name: e.target.value}))}/></label>
+            <label><span>{translate("common:fields.date")}</span><EnglishDateInput required aria-label={translate("common:fields.date")} value={draft.date} onChangeValue={value => setDraft(current => ({...current, date: value}))}/></label>
             <span/>
-            <label><span>Starts</span><EnglishTimeInput value={draft.startTime ?? ''} onChangeValue={changeStartTime}/></label>
-            <label><span>Ends</span><EnglishTimeInput value={draft.endTime ?? ''} onChangeValue={value => setDraft(current => ({...current, endTime: value}))}/></label>
+            <label><span>{translate("calendar:editor.starts")}</span><EnglishTimeInput name="startTime" aria-label={translate("calendar:editor.starts")} value={draft.startTime ?? ''} onChangeValue={changeStartTime}/></label>
+            <label><span>{translate("calendar:editor.ends")}</span><EnglishTimeInput name="endTime" aria-label={translate("calendar:editor.ends")} value={draft.endTime ?? ''} onChangeValue={value => setDraft(current => ({...current, endTime: value}))}/></label>
             <DurationSelect minutes={selectedDuration} options={SHORT_DURATION_OPTIONS} onChange={changeDuration}/>
             <span/>
-            <label className={styles.full}><span>Location</span><input value={draft.location ?? ''} onChange={e => setDraft(current => ({...current, location: e.target.value}))}/></label>
+            <label className={styles.full}><span>{translate("calendar:details.location")}</span><input value={draft.location ?? ''} onChange={e => setDraft(current => ({...current, location: e.target.value}))}/></label>
             <div className={`${styles.full} ${styles.markdownField}`}>
-              <span>Description</span>
+              <span>{translate("common:fields.description")}</span>
               <RichTextEditor
                 content={draft.description ?? ''}
                 onChange={description => setDraft(current => ({...current, description}))}
-                placeholder="Add an event description…"
-                ariaLabel="Description"
+                placeholder={translate("courseTools:events.descriptionPlaceholder")}
+                ariaLabel={translate("common:fields.description")}
               />
             </div>
           </div>
-          {invalidTime ? <p className={styles.error} role="alert">End time must be later than start time.</p> : null}
-          <div className={styles.formFooter}><button type="submit" className={styles.primaryButton} disabled={saveEvent.isPending || !draft.name.trim() || !draft.date || invalidTime}>{saveEvent.isPending ? 'Saving…' : 'Save event'}</button></div>
+          {invalidTime ? <p className={styles.error} role="alert">{translate("operations:invalidTime")}</p> : null}
+          <div className={styles.formFooter}><button type="submit" className={styles.primaryButton} disabled={saveEvent.isPending || !draft.name.trim() || !draft.date || invalidTime}>{saveEvent.isPending ? translate("common:actions.saving") : translate("courseTools:events.save")}</button></div>
         </form>
       ) : eventId !== null && selectedEvent ? (
         <section className={styles.card}>
           {selectedEvent.description ? <MarkdownMessage className={styles.description} content={selectedEvent.description}/> : null}
           <dl className={styles.metadata}>
-            <div><dt><CalendarDays size={18}/><span className={styles.srOnly}>Date</span></dt><dd>{selectedEvent.date}</dd></div>
-            {selectedEvent.startTime ? <div><dt><Clock3 size={18}/><span className={styles.srOnly}>Time</span></dt><dd>{selectedEvent.startTime.slice(0, 5)}{selectedEvent.endTime ? ` – ${selectedEvent.endTime.slice(0, 5)}` : ''} {selectedEvent.timezone}</dd></div> : null}
-            {selectedEvent.location ? <div><dt><MapPin size={18}/><span className={styles.srOnly}>Location</span></dt><dd>{selectedEvent.location}</dd></div> : null}
+            <div><dt><CalendarDays size={18}/><span className={styles.srOnly}>{translate("common:fields.date")}</span></dt><dd>{formatDateValue(selectedEvent.date)}</dd></div>
+            {selectedEvent.startTime ? <div><dt><Clock3 size={18}/><span className={styles.srOnly}>{translate("common:dateTime.time")}</span></dt><dd>{formatClockTime(selectedEvent.startTime)}{selectedEvent.endTime ? ` – ${formatClockTime(selectedEvent.endTime)}` : ''} {selectedEvent.timezone}</dd></div> : null}
+            {selectedEvent.location ? <div><dt><MapPin size={18}/><span className={styles.srOnly}>{translate("calendar:details.location")}</span></dt><dd>{selectedEvent.location}</dd></div> : null}
           </dl>
-          {access.canManageCourseEvents ? <div className={styles.dangerZone}>{confirmDelete ? <><p>Delete this event for everyone in the course?</p><button type="button" className={styles.dangerButton} onClick={requestDelete} disabled={deleteEvent.isPending}>Confirm delete</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmDelete(false)}>Cancel</button></> : <button type="button" className={styles.dangerButton} onClick={() => setConfirmDelete(true)}><Trash2 size={16}/> Delete event</button>}</div> : null}
+          {access.canManageCourseEvents ? <div className={styles.dangerZone}>{confirmDelete ? <><p>{translate("courseTools:events.deleteConfirm")}</p><button type="button" className={styles.dangerButton} onClick={requestDelete} disabled={deleteEvent.isPending}>{translate("assessment:quiz.confirmDelete")}</button><button type="button" className={styles.secondaryButton} onClick={() => setConfirmDelete(false)}>{translate("common:actions.cancel")}</button></> : <button type="button" className={styles.dangerButton} onClick={() => setConfirmDelete(true)}><Trash2 size={16}/> {' '}{translate("calendar:editor.delete")}</button>}</div> : null}
         </section>
       ) : eventId === null && !failed ? (
         <section className={styles.card}>
-          <div className={styles.cardHeader}><div><h2>All events</h2><p>{sortedEvents.length} scheduled</p></div></div>
-          {eventsQuery.isPending ? <p className={styles.muted}>Loading events…</p> : sortedEvents.length === 0 ? <p className={styles.muted}>No course events have been scheduled.</p> : <ul className={styles.eventList}>{sortedEvents.map(item => <li key={item.id}><Link to={`/course/${courseId}/events/${item.id}`}><span className={styles.dateTile}><strong>{new Date(`${item.date}T12:00:00`).toLocaleDateString('en-US', {day: 'numeric'})}</strong><small>{new Date(`${item.date}T12:00:00`).toLocaleDateString('en-US', {month: 'short'})}</small></span><span className={styles.eventText}><strong>{item.name}</strong><small>{item.startTime ? item.startTime.slice(0, 5) : 'All day'}{item.location ? ` · ${item.location}` : ''}</small></span><span aria-hidden="true">→</span></Link></li>)}</ul>}
+          <div className={styles.cardHeader}><div><h2>{translate("courseTools:events.all")}</h2><p>{translate("courseTools:events.scheduled", {count: sortedEvents.length, number: formatNumber(sortedEvents.length)})}</p></div></div>
+          {eventsQuery.isPending ? <p className={styles.muted}>{translate("courseTools:events.loadingList")}</p> : sortedEvents.length === 0 ? <p className={styles.muted}>{translate("courseTools:events.none")}</p> : <ul className={styles.eventList}>{sortedEvents.map(item => <li key={item.id}><Link to={`/course/${courseId}/events/${item.id}`}><span className={styles.dateTile}><strong>{formatDateTime(new Date(`${item.date}T12:00:00Z`), {day: 'numeric', timeZone: 'UTC'})}</strong><small>{formatDateTime(new Date(`${item.date}T12:00:00Z`), {month: 'short', timeZone: 'UTC'})}</small></span><span className={styles.eventText}><strong>{item.name}</strong><small>{item.startTime ? formatClockTime(item.startTime) : translate("calendar:allDay")}{item.location ? ` · ${item.location}` : ''}</small></span><span aria-hidden="true">→</span></Link></li>)}</ul>}
         </section>
       ) : null}
     </main>

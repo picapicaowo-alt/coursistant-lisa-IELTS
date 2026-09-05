@@ -7,6 +7,8 @@ import {act} from 'react-dom/test-utils';
 import '@testing-library/jest-dom';
 import {FileSection} from './index';
 import {FileView} from '@/types';
+import i18n from '@/i18n';
+import type {TOptions} from 'i18next';
 import {
   createMockUploadFunction,
   createMockOnUploaded,
@@ -18,13 +20,13 @@ import {
 vi.mock('react-i18next', async (importOriginal) => ({
   ...await importOriginal<typeof import('react-i18next')>(),
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, options?: TOptions) => {
       const translations: Record<string, string> = {
         'fileUploadBox.prompt': 'Drag and drop files here or',
         'fileUploadBox.choose': 'choose',
         'fileUploadBox.toUpload': 'to upload'
       };
-      return translations[key] || key;
+      return translations[key] || i18n.t(key, {...options, ns: 'course'});
     }
   })
 }));
@@ -241,7 +243,7 @@ describe('FileSection', () => {
       });
       
       await waitFor(() => {
-        expect(screen.getByText(/Upload failed/)).toBeInTheDocument();
+        expect(screen.getByText(i18n.t('common:files.uploadFailed'))).toBeInTheDocument();
       });
     });
     
@@ -251,9 +253,9 @@ describe('FileSection', () => {
       const {container} = render(<FileSection files={[]} uploadFunction={mockUploadFunction} onUploaded={mockOnUploaded} onDelete={onDelete}/>);
       const input = await simulateFileInputChange(container, createTestFile());
       fireEvent.change(input);
-      await screen.findByText('Upload failed');
+      await screen.findByText(i18n.t('common:files.uploadFailed'));
       fireEvent.click(screen.getByRole('button', {name: 'Delete test.pdf'}));
-      await waitFor(() => expect(screen.queryByText('Upload failed')).not.toBeInTheDocument());
+      await waitFor(() => expect(screen.queryByText(i18n.t('common:files.uploadFailed'))).not.toBeInTheDocument());
       expect(onDelete).not.toHaveBeenCalled();
       expect(mockOnUploaded).not.toHaveBeenCalled();
     });

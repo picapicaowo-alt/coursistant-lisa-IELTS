@@ -1,3 +1,6 @@
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
+import {useTranslation} from 'react-i18next';
 import { useCallback, useEffect, useState } from 'react'
 import { AudioPlayer } from './AudioPlayer'
 
@@ -12,9 +15,9 @@ type ListeningTopBarProps = {
   audioStopSignal?: number
 }
 
-function formatMinutesLabel(seconds: number): string {
-  const minutes = Math.max(0, Math.ceil(seconds / 60))
-  return minutes === 1 ? '1 minute' : `${minutes} minutes`
+function formatMinutesLabel(seconds: number, paused: boolean): string {
+  const minutes = Math.max(0, Math.ceil(seconds / 60));
+  return i18n.t(paused ? 'exams:runner.pausedRemaining' : 'exams:runner.remaining', {count: minutes, minutes: formatNumber(minutes)});
 }
 
 function isFullscreenActive(): boolean {
@@ -28,8 +31,9 @@ async function toggleFullscreen() {
     } else {
       await document.documentElement.requestFullscreen()
     }
+    return true
   } catch {
-    window.alert('Unable to enter fullscreen. Please allow fullscreen for this page.')
+    return false
   }
 }
 
@@ -43,7 +47,9 @@ export function ListeningTopBar({
   audioError = null,
   audioStopSignal = 0,
 }: ListeningTopBarProps) {
+  const {t: translate} = useTranslation();
   const [fullscreen, setFullscreen] = useState(false)
+  const [fullscreenError, setFullscreenError] = useState(false)
 
   useEffect(() => {
     const sync = () => setFullscreen(isFullscreenActive())
@@ -53,17 +59,16 @@ export function ListeningTopBar({
   }, [])
 
   const handleFullscreen = useCallback(() => {
-    void toggleFullscreen()
+    void toggleFullscreen().then(success => setFullscreenError(!success))
   }, [])
 
   return (
     <header className="listening-top">
       <div className="listening-top__left">
         <strong className="top-bar__title">{testTitle}</strong>
-        <span className="listening-top__candidate">Candidate: {candidateId}</span>
+        <span className="listening-top__candidate">{translate('exams:runner.candidate', {id: candidateId})}</span>
         <span className={`listening-top__timer ${paused ? 'is-paused' : ''}`}>
-          {paused ? 'Paused · ' : ''}
-          {formatMinutesLabel(remainingSeconds)}
+                    {formatMinutesLabel(remainingSeconds, paused)}
         </span>
       </div>
       <div className="listening-top__center">
@@ -75,11 +80,12 @@ export function ListeningTopBar({
         />
       </div>
       <div className="listening-top__right">
+        {fullscreenError ? <span role="alert">{translate('exams:runner.fullscreenError')}</span> : null}
         <button
           type="button"
           className="icon-btn icon-btn--clickable"
-          title={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          title={fullscreen ? translate('exams:runner.exitFullscreen') : translate('exams:runner.enterFullscreen')}
+          aria-label={fullscreen ? translate('exams:runner.exitFullscreen') : translate('exams:runner.enterFullscreen')}
           aria-pressed={fullscreen}
           onClick={handleFullscreen}
         >

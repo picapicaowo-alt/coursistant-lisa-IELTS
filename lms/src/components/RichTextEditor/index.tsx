@@ -1,11 +1,12 @@
 import React, {useEffect, useRef} from 'react';
+import {useTranslation} from 'react-i18next';
 import type {Editor} from '@tiptap/core';
 import {useEditor, EditorContent} from '@tiptap/react';
 import MarkdownMessage from '../MarkdownMessage';
 import Toolbar from './Toolbar';
 import styles from './index.module.scss';
 import {createEditorExtensions} from './extensions';
-import {normalizeSafeUrl} from './url';
+import {editLink, useTextPromptDialog} from './useTextPromptDialog';
 import 'katex/dist/katex.min.css';
 
 interface TextBlockProps {
@@ -54,7 +55,7 @@ export const RichTextEditor: React.FC<TextBlockProps> = (props) => {
 const RichTextEditorClient: React.FC<TextBlockProps> = ({
                                                           content = '',
                                                           disabled = false,
-                                                          placeholder = 'Start writing your content here...',
+                                                          placeholder,
                                                           onChange,
                                                           onMouseUp,
                                                           registerRef,
@@ -63,13 +64,19 @@ const RichTextEditorClient: React.FC<TextBlockProps> = ({
                                                           showToolbar = true,
                                                           defaultToolbarVisible = true,
                                                           displayOnly = false,
-                                                          ariaLabel = 'Rich text editor',
+                                                          ariaLabel,
                                                           variant = 'default',
                                                           className,
                                                           onSubmit,
                                                           outputFormat = 'markdown',
                                                         }) => {
   
+  const {t} = useTranslation();
+  const {prompt, dialog} = useTextPromptDialog();
+  const displayPlaceholder = placeholder ?? t('editor:placeholder');
+  const displayLabel = ariaLabel ?? t('editor:label');
+  const placeholderRef = useRef(displayPlaceholder);
+  placeholderRef.current = displayPlaceholder;
   const [toolbarVisible, setToolbarVisible] = React.useState(defaultToolbarVisible);
   const [markdownContent, setMarkdownContent] = React.useState('');
   const onChangeRef = useRef(onChange);
@@ -87,7 +94,7 @@ const RichTextEditorClient: React.FC<TextBlockProps> = ({
   }, [onSubmit]);
   
   const editor = useEditor({
-    extensions: createEditorExtensions({placeholder, disabled}),
+    extensions: createEditorExtensions({placeholder: () => placeholderRef.current, disabled}),
     content,
     contentType: LEGACY_HTML_PATTERN.test(content) ? 'html' : 'markdown',
     editable: !disabled,
@@ -127,9 +134,9 @@ const RichTextEditorClient: React.FC<TextBlockProps> = ({
         'data-testid': 'text-block-editor',
         spellcheck: 'true',
         role: 'textbox',
-        'aria-label': ariaLabel,
+        'aria-label': displayLabel,
         'aria-multiline': 'true',
-        'data-placeholder': placeholder,
+        'data-placeholder': displayPlaceholder,
       },
       handleKeyDown: (_view, event) => {
         if (event.key === 'Enter' && !event.shiftKey && !event.isComposing && onSubmitRef.current) {
@@ -176,20 +183,7 @@ const RichTextEditorClient: React.FC<TextBlockProps> = ({
         const currentEditor = liveEditorRef.current;
         if (!currentEditor) return false;
         event.preventDefault();
-        const previousUrl = currentEditor.getAttributes('link').href as string | undefined;
-        const url = window.prompt('Link URL', previousUrl ?? '');
-
-        if (url === null) return true;
-        if (url.trim() === '') {
-          currentEditor.chain().focus().extendMarkRange('link').unsetLink().run();
-          return true;
-        }
-        const safeUrl = normalizeSafeUrl(url, {allowRelative: true});
-        if (!safeUrl) {
-          window.alert('Enter a valid HTTP, HTTPS, email, or relative link.');
-          return true;
-        }
-        currentEditor.chain().focus().extendMarkRange('link').setLink({href: safeUrl}).run();
+        void editLink(currentEditor, prompt);
         return true;
       },
       handlePaste: (_view, event) => {
@@ -210,17 +204,31 @@ const RichTextEditorClient: React.FC<TextBlockProps> = ({
       handleDoubleClickOn: (view, pos, node) => {
         if (disabled || !['inlineMath', 'blockMath'].includes(node.type.name)) return false;
 
-        const latex = window.prompt('Edit LaTeX', node.attrs.latex as string);
-        if (latex === null || latex.trim() === '') return true;
-        view.dispatch(view.state.tr.setNodeMarkup(pos, node.type, {
-          ...node.attrs,
-          latex: latex.trim(),
-        }));
+        const document = view.state.doc;
+        void prompt({titleKey: 'editor:editLatex', initialValue: String(node.attrs.latex ?? '')}).then(latex => {
+          const currentEditor = liveEditorRef.current;
+          if (latex === null || !latex.trim() || !currentEditor || currentEditor.isDestroyed
+            || !currentEditor.isEditable || !view.state.doc.eq(document)) return;
+          view.dispatch(view.state.tr.setNodeMarkup(pos, node.type, {...node.attrs, latex: latex.trim()}));
+        });
         return true;
       },
     },
   });
   
+  useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+    // Refresh presentation only. Never recreate the editor or replace its document
+    // on a locale change: that would discard selection and undo history.
+    const attributes = editor.options.editorProps.attributes;
+    editor.setOptions({editorProps: {...editor.options.editorProps, attributes: {
+      ...(typeof attributes === 'function' ? attributes(editor.state) : attributes),
+      'aria-label': displayLabel,
+      'data-placeholder': displayPlaceholder,
+    }}});
+    editor.view.dispatch(editor.state.tr.setMeta('addToHistory', false));
+  }, [editor, displayLabel, displayPlaceholder]);
+
   useEffect(() => {
     if (editor && registerRef) {
       const element = editor.view.dom;
@@ -263,7 +271,8 @@ const RichTextEditorClient: React.FC<TextBlockProps> = ({
   
   useEffect(() => {
     if (editor) {
-      editor.setEditable(!disabled);
+      // Editing permissions are presentation state, not an authored document update.
+      editor.setEditable(!disabled, false);
     }
   }, [disabled, editor]);
   
@@ -283,6 +292,7 @@ const RichTextEditorClient: React.FC<TextBlockProps> = ({
   
   return (
     <div className={rootClassName}>
+      {dialog}
       {showToolbar && editor && (
         <Toolbar 
           editor={editor} 

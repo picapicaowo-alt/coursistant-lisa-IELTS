@@ -1,5 +1,8 @@
-import {useTranslation} from 'react-i18next';
 import {ADVISING_ERROR_CODES} from '@/apis';
+import {isMissingResource} from '@/utils/apiError';
+import { useTranslation } from 'react-i18next';
+import {formatNumber, formatNumericText} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
 import React, {useId, useState} from 'react';
 import {generatePath, Link, NavLink, Outlet, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
@@ -10,7 +13,7 @@ import {ProgressRing} from '@/components/ProgressRing';
 import {TASK_STATUS, formatPlanDate} from '@/utils/studyPlan';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {isNotFound, isMissingResource} from '@/utils/apiError';
+import {isNotFound} from '@/utils/apiError';
 import {formatPersonName} from '@/utils/personName';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import {useAssignmentBoundary} from '../advising/useAssignmentBoundary';
@@ -19,7 +22,7 @@ import styles from '../advising/advising.module.scss';
 import layout from './index.module.scss';
 
 const AdvisorStudentLayout: React.FC = () => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
   const summaryId = useId();
@@ -53,13 +56,12 @@ const AdvisorStudentLayout: React.FC = () => {
   const completedTasks = tasks.filter(task => task.status === TASK_STATUS.completed).length;
   const completion = tasks.length ? completedTasks / tasks.length * 100 : null;
 
-  const name = formatPersonName(intake.data, `Student #${id}`);
-  const studentIdFormatted = `ID: ${id}`;
+  const name = formatPersonName(intake.data, translate('common:people.studentFallback', {id: formatNumber(id)}));
 
   if (intake.isError && isNotFound(intake.error)) {
     return (
       <div className={styles.page}>
-        <p className={styles.error} role="alert">This student is not in your current assignment.</p>
+        <p className={styles.error} role="alert">{translate("advising:studentWorkspace.notAssigned")}</p>
       </div>
     );
   }
@@ -73,99 +75,93 @@ const AdvisorStudentLayout: React.FC = () => {
         <span>{translate('common:navigationControls.backToStudents')}</span>
       </Link>
 
-      <header className={layout.studentSummary} aria-label="Student profile summary">
+      <header className={layout.studentSummary} aria-label={translate("advising:studentWorkspace.summary")}>
         <div className={layout.identityRow}>
         <UserAvatar userId={intake.data ? id : undefined} className={layout.avatarLarge}/>
         <div className={layout.nameBlock}>
           <h1>{name}</h1>
-          <span>Student {studentIdFormatted}</span>
+          <span>{translate('advising:studentWorkspace.studentId', {id: formatNumber(id)})}</span>
           <small>{intake.data?.email}</small>
         </div>
         <dl className={layout.metadata}>
-          <div><dt>Student type</dt><dd>{intake.data?.studentType || 'Not supplied'}</dd></div>
-          <div><dt>Active courses</dt><dd>{intake.data?.activeCourseCount ?? '—'}</dd></div>
-          <div><dt>Pending requests</dt><dd>{intake.data?.pendingRequestCount ?? '—'}</dd></div>
+          <div><dt>{translate("advising:actionTasks.studentType")}</dt><dd>{intake.data?.studentType ? statusLabel(intake.data.studentType) : translate("advising:studentWorkspace.notSupplied")}</dd></div>
+          <div><dt>{translate("dashboard:activeCourses")}</dt><dd>{intake.data?.activeCourseCount == null ? '—' : formatNumber(intake.data.activeCourseCount)}</dd></div>
+          <div><dt>{translate("advising:studentWorkspace.pendingRequests")}</dt><dd>{intake.data?.pendingRequestCount == null ? '—' : formatNumber(intake.data.pendingRequestCount)}</dd></div>
         </dl>
         <Link className={layout.messageBtn} to={`${APP_ROUTE_PATHS.advisorMessages}?studentUserId=${id}`}>
-          <MessageSquare size={20} aria-hidden="true" /><span>Message</span>
+          <MessageSquare size={20} aria-hidden="true" /><span>{translate("operations:message")}</span>
         </Link>
         </div>
-        <button type="button" className={layout.summaryToggle} aria-expanded={summaryExpanded} aria-controls={summaryId} onClick={() => setSummaryExpanded(current => !current)}>Learning overview<ChevronDown size={18} aria-hidden="true"/></button>
+        <button type="button" className={layout.summaryToggle} aria-expanded={summaryExpanded} aria-controls={summaryId} onClick={() => setSummaryExpanded(current => !current)}>{translate("advising:studentPlan.learning")}<ChevronDown size={18} aria-hidden="true"/></button>
         <div className={layout.learningSummary} id={summaryId} data-expanded={summaryExpanded}>
         <div className={layout.targetScoreCard}>
           <div className={layout.scoresLine}>
-            <div><span>Baseline assessment</span><strong className={layout.baselineValue}>{profile.data?.baselineAssessment || 'Not assessed'}</strong></div>
+            <div><span>{translate("learning:plan.baseline")}</span><strong className={layout.baselineValue}>{profile.data?.baselineAssessment || translate("common:risk.notAssessed")}</strong></div>
             <span aria-hidden="true">→</span>
-            <div><span>{profile.data?.targetMetric || 'Learning goal'}</span><strong className={layout.targetValue}>{profile.data?.targetValue || profile.data?.targetGoal || 'Not set'}</strong></div>
+            <div><span>{profile.data?.targetMetric || translate("learning:plan.goalLabel")}</span><strong className={layout.targetValue}>{formatNumericText(profile.data?.targetValue) || profile.data?.targetGoal || translate("assessment:submission.notSet")}</strong></div>
           </div>
-          <span className={layout.targetDate}><Calendar size={20} aria-hidden="true" />Target date · {profile.data?.targetDate ? formatPlanDate(profile.data.targetDate) : 'Not set'}</span>
+          <span className={layout.targetDate}><Calendar size={20} aria-hidden="true" />{translate('advising:studentWorkspace.targetDate')} · {profile.data?.targetDate ? formatPlanDate(profile.data.targetDate) : translate("assessment:submission.notSet")}</span>
         </div>
         <div className={layout.progress}>
-          <ProgressRing value={completion} label="Advisor task completion" compact />
-          <div><strong>Plan progress</strong><span>{plan.isPending ? 'Loading plan…' : plan.isError ? 'Plan unavailable' : tasks.length ? `${completedTasks} of ${tasks.length} tasks completed` : 'No tasks yet'}</span></div>
+          <ProgressRing value={completion} label={translate("learning:plan.completion")} compact />
+          <div><strong>{translate("advising:studentWorkspace.planProgress")}</strong><span>{plan.isPending ? translate("advising:studentWorkspace.loadingPlan") : plan.isError ? translate("advising:studentWorkspace.planUnavailable") : tasks.length ? translate('advising:studentWorkspace.completedTasks', {count: tasks.length, completed: formatNumber(completedTasks), number: formatNumber(tasks.length)}) : translate("advising:studentWorkspace.noTasks")}</span></div>
         </div>
         <div className={layout.skillCardsGrid}>
           {skills.map((skill, index) => (
             <div className={layout.skillCard} key={skill.skillCode ?? index}>
               <span>{skill.displayName || skill.skillCode}</span>
-              <strong>{skill.currentValue || '—'}</strong>
-              {skill.targetValue ? <small>Target {skill.targetValue}</small> : null}
+              <strong>{formatNumericText(skill.currentValue) || '—'}</strong>
+              {skill.targetValue ? <small>{translate('advising:studentWorkspace.targetValue', {value: formatNumericText(skill.targetValue)})}</small> : null}
             </div>
           ))}
-          {!skills.length ? <p className={layout.skillEmpty}>{profile.isPending ? 'Loading assessments…' : 'No skill assessments yet.'}</p> : null}
+          {!skills.length ? <p className={layout.skillEmpty}>{profile.isPending ? translate("advising:studentWorkspace.loadingAssessments") : translate("learning:plan.noSkills")}</p> : null}
         </div>
         </div>
-        {profile.isError && !isMissingResource(profile.error, ADVISING_ERROR_CODES.profileNotFound) ? <p className={styles.error} role="alert">Profile summary could not be loaded. <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
+        {profile.isError && !isMissingResource(profile.error, ADVISING_ERROR_CODES.profileNotFound) ? <p className={styles.error} role="alert">{translate("advising:studentWorkspace.profileFailed")}{' '}<button type="button" onClick={() => void profile.refetch()}>{translate("learning:plan.retryProfile")}</button></p> : null}
       </header>
 
       {intake.isError ? (
         <p className={styles.error} role="alert">
-          {advisingErrorMessage(intake.error, 'Intake could not be loaded.')}
+          {advisingErrorMessage(intake.error, translate('advising:studentWorkspace.intakeFailed'))}
         </p>
       ) : null}
 
       {/* Tabs */}
-      <nav className={layout.tabs} aria-label="Student advising sections">
+      <nav className={layout.tabs} aria-label={translate("advising:studentWorkspace.sections")}>
         <NavLink
           to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdStudyPlan, {studentUserId: String(id)})}
           className={({isActive}) => (isActive ? styles.tabActive : '')}
         >
-          Learning Plan
-        </NavLink>
+          {translate("advising:studentWorkspace.learningPlan")}</NavLink>
         <NavLink
           to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdCourses, {studentUserId: String(id)})}
           className={({isActive}) => (isActive ? styles.tabActive : '')}
         >
-          Courses
-        </NavLink>
+          {translate("common:fields.courses")}</NavLink>
         <NavLink
           to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdExams, {studentUserId: String(id)})}
           className={({isActive}) => (isActive ? styles.tabActive : '')}
         >
-          Exams
-        </NavLink>
+          {translate("navigation:exams")}</NavLink>
         <NavLink
           to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdSupport, {studentUserId: String(id)})}
           className={({isActive}) => (isActive ? styles.tabActive : '')}
         >
-          Support &amp; reports
-        </NavLink>
+          {translate("advising:studentWorkspace.supportReports")}</NavLink>
         <NavLink
           to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdProfile, {studentUserId: String(id)})}
           className={({isActive}) => (isActive ? styles.tabActive : '')}
         >
-          Profile
-        </NavLink>
+          {translate("common:menu.profile")}</NavLink>
         <NavLink
           to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdIntake, {studentUserId: String(id)})}
           className={({isActive}) => (isActive ? styles.tabActive : '')}
         >
-          Intake
-        </NavLink>
+          {translate("advising:actionTasks.intake")}</NavLink>
 
       </nav>
 
-      {intake.isPending ? <p role="status">Loading student workspace…</p> : intake.isError ? null : <Outlet key={id} />}
+      {intake.isPending ? <p role="status">{translate("advising:studentWorkspace.loading")}</p> : intake.isError ? null : <Outlet key={id} />}
     </div>
   );
 };

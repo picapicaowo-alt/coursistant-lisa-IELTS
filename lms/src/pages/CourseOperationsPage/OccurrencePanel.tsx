@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {LocalizedError} from '@/i18n/errors';
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import {
@@ -49,6 +51,7 @@ export function OccurrencePanel({
   courseId: number;
   onAttendance: (id: number) => void;
 }) {
+  const {t: translate} = useTranslation();
   const [range, setRange] = useState({ from: "", to: "", history: true });
   const [editor, setEditor] = useState<Editor>();
   const [saved, setSaved] = useState("");
@@ -67,7 +70,7 @@ export function OccurrencePanel({
     await refresh();
   };
   return (
-    <section className={s.panel} aria-label="Session occurrences">
+    <section className={s.panel} aria-label={translate("operations:sessionOccurrences")}>
       <div className={s.toolbar}>
         <div className={s.toolbarGroup}>
           <button
@@ -77,10 +80,10 @@ export function OccurrencePanel({
             onClick={() => setShowDates(!showDates)}
           >
             <CalendarDays size={18} />
-            {range.from || range.to ? "Custom dates" : "All dates"}
+            {range.from || range.to ? translate("operations:customDates") : translate("operations:allDates")}
           </button>
           <label className={s.field}>
-            <span className={s.subline}>Include history</span>
+            <span className={s.subline}>{translate("operations:includeHistory")}</span>
             <input
               type="checkbox"
               checked={range.history}
@@ -97,30 +100,26 @@ export function OccurrencePanel({
             onClick={() => setEditor({ kind: "generate" })}
           >
             <RefreshCw size={16} />
-            Generate from schedule
-          </button>
+            {translate("operations:generateFromSchedule")}</button>
           <button
             className={s.primary}
             type="button"
             onClick={() => setEditor({ kind: "create" })}
           >
             <Plus size={18} />
-            Create occurrence
-          </button>
+            {translate("operations:createOccurrence")}</button>
         </div> : null}
       </div>
       {showDates ? (
         <div className={s.toolbar}>
           <label className={s.field}>
-            From
-            <EnglishDateInput
+            {translate("operations:from")}<EnglishDateInput
               value={range.from}
               onChangeValue={(from) => setRange({ ...range, from })}
             />
           </label>
           <label className={s.field}>
-            To
-            <EnglishDateInput
+            {translate("operations:to")}<EnglishDateInput
               value={range.to}
               onChangeValue={(to) => setRange({ ...range, to })}
             />
@@ -130,20 +129,19 @@ export function OccurrencePanel({
             className={s.textButton}
             onClick={() => setRange({ ...range, from: "", to: "" })}
           >
-            Clear dates
-          </button>
+            {translate("operations:clearDates")}</button>
         </div>
       ) : null}
       {saved ? (
         <p role="status" className={s.success}>
-          {saved}
+          {translate(saved)}
         </p>
       ) : null}
       {query.isPending || query.isError || !query.data?.length ? (
         <TeachingState
           loading={query.isPending}
           error={query.error}
-          empty="No classes scheduled in this date range."
+          empty={translate('operations:noOccurrences')}
           onRetry={() => void query.refetch()}
         />
       ) : (
@@ -151,21 +149,21 @@ export function OccurrencePanel({
           <table className={`${s.table} ${s.responsive}`}>
             <thead>
               <tr>
-                <th>Date</th>
-                <th>Time</th>
-                <th>Session</th>
-                <th>Lecture</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{translate("common:fields.date")}</th>
+                <th>{translate("common:dateTime.time")}</th>
+                <th>{translate("operations:session")}</th>
+                <th>{translate("operations:lecture")}</th>
+                <th>{translate("common:fields.status")}</th>
+                <th>{translate("common:fields.actions")}</th>
               </tr>
             </thead>
             <tbody>
               {query.data.map((item) => (
                 <tr key={item.id}>
-                  <td data-label="Date">
+                  <td data-label={translate("common:fields.date")}>
                     <strong>{dateLabel(item.date)}</strong>
                   </td>
-                  <td data-label="Time">
+                  <td data-label={translate("common:dateTime.time")}>
                     <span className={s.muted}>
                       {timeRange(item.startTime, item.endTime)}
                       {item.timezone ? (
@@ -173,24 +171,24 @@ export function OccurrencePanel({
                       ) : null}
                     </span>
                   </td>
-                  <td data-label="Session">
+                  <td data-label={translate("operations:session")}>
                     <span>{occurrenceTitle(item, weeks.data)}</span>
                   </td>
-                  <td data-label="Lecture">
+                  <td data-label={translate("operations:lecture")}>
                     <span className={s.muted}>
                       {item.weekId
-                        ? `Lecture ${weeks.data?.find((week) => week.id === item.weekId)?.lectureNumber ?? item.weekId}`
-                        : "Not linked"}
+                        ? translate('operations:lectureNumber', {id: weeks.data?.find((week) => week.id === item.weekId)?.lectureNumber ?? item.weekId})
+                        : translate("operations:notLinked")}
                     </span>
                   </td>
-                  <td data-label="Status">
+                  <td data-label={translate("common:fields.status")}>
                     <TeachingBadge value={item.status} />
                   </td>
-                  <td data-label="Actions">
+                  <td data-label={translate("common:fields.actions")}>
                     <button
                       type="button"
                       className={s.iconButton}
-                      aria-label={`Manage ${dateLabel(item.date)} class`}
+                      aria-label={translate('operations:manageClass', {date: dateLabel(item.date)})}
                       onClick={() =>
                         setEditor({ kind: "detail", occurrence: item })
                       }
@@ -240,6 +238,7 @@ function OccurrenceDetails({
   onSaved: (message: string) => Promise<void>;
   onAttendance: (id: number) => void;
 }) {
+  const {t: translate} = useTranslation();
   const [mode, setMode] = useState<
     "detail" | "reschedule" | "cancel" | "requests"
   >("detail");
@@ -259,9 +258,7 @@ function OccurrenceDetails({
   const cancel = useMutation({
     mutationFn: () => {
       if (detail.data?.version == null)
-        throw new Error(
-          "Reopen this class before cancelling it.",
-        );
+        throw new LocalizedError("operations:errors.reloadBeforeCancel");
       return checkpoint.run(
         "cancel-occurrence",
         { id: occurrence.id, version: detail.data.version },
@@ -269,7 +266,7 @@ function OccurrenceDetails({
           api.cancelSessionOccurrence(courseId, value.id, value.version, key),
       );
     },
-    onSuccess: () => onSaved("Class occurrence cancelled."),
+    onSuccess: () => onSaved("operations:occurrenceCancelled"),
   });
   if (canManageSchedule && mode === "reschedule" && detail.data)
     return (
@@ -285,10 +282,10 @@ function OccurrenceDetails({
     <TeachingDialog
       title={
         mode === "requests"
-          ? "Schedule requests"
+          ? translate("operations:scheduleRequests")
           : mode === "cancel"
-            ? "Cancel this class?"
-            : "Class occurrence"
+            ? translate("operations:cancelClass")
+            : translate("operations:classOccurrence")
       }
       description={dateLabel(occurrence.date)}
       onClose={onClose}
@@ -316,14 +313,11 @@ function OccurrenceDetails({
               <TeachingBadge value={detail.data?.status} />
               {mode === "cancel" ? (
                 <p className={s.notice}>
-                  This cancels only this dated class. The recurring schedule and
-                  other classes are kept.
-                </p>
+                  {translate("operations:cancelClassHelp")}</p>
               ) : null}
               {canManageSchedule && detail.data?.version == null ? (
                 <p className={s.notice}>
-                  Reopen this class to load the latest details before changing its schedule.
-                </p>
+                  {translate("operations:reloadClass")}</p>
               ) : null}
               <TeachingError error={cancel.error} />
               <div className={s.actions}>
@@ -335,8 +329,7 @@ function OccurrenceDetails({
                       disabled={cancel.isPending}
                       onClick={() => setMode("detail")}
                     >
-                      Keep class
-                    </button>
+                      {translate("operations:keepClass")}</button>
                     <button
                       type="button"
                       className={s.danger}
@@ -346,8 +339,8 @@ function OccurrenceDetails({
                       onClick={() => cancel.mutate()}
                     >
                       {cancel.isPending
-                        ? "Cancelling…"
-                        : "Confirm cancellation"}
+                        ? translate("operations:cancelling")
+                        : translate("operations:confirmCancellation")}
                     </button>
                   </>
                 ) : (
@@ -357,16 +350,14 @@ function OccurrenceDetails({
                       className={s.textButton}
                       onClick={() => setMode("requests")}
                     >
-                      Schedule requests
-                    </button>
+                      {translate("operations:scheduleRequests")}</button>
                     {canManageSchedule ? <><button
                       type="button"
                       className={`${s.textButton} ${s.dangerText}`}
                       disabled={detail.data?.version == null}
                       onClick={() => setMode("cancel")}
                     >
-                      Cancel occurrence
-                    </button>
+                      {translate("operations:cancelOccurrence")}</button>
                     <button
                       type="button"
                       className={s.secondary}
@@ -376,16 +367,14 @@ function OccurrenceDetails({
                       }
                       onClick={() => setMode("reschedule")}
                     >
-                      Reschedule
-                    </button></> : null}
+                      {translate("operations:reschedule")}</button></> : null}
                     <button
                       type="button"
                       className={s.primary}
                       onClick={() => onAttendance(occurrence.id)}
                     >
                       <Check size={16} />
-                      Take attendance
-                    </button>
+                      {translate("operations:takeAttendance")}</button>
                   </>
                 )}
               </div>
@@ -410,6 +399,7 @@ function OccurrenceEditor({
   onClose: () => void;
   onSaved: (message: string) => Promise<void>;
 }) {
+  const {t: translate} = useTranslation();
   const [draft, setDraft] = useState({
     sessionId: occurrence?.sessionId ? String(occurrence.sessionId) : "",
     weekId: occurrence?.weekId ? String(occurrence.weekId) : "",
@@ -424,10 +414,10 @@ function OccurrenceEditor({
   const checkpoint = useIdempotencyCheckpoint();
   const title =
     mode === "generate"
-      ? "Generate class occurrences"
+      ? "operations:generateClassOccurrences"
       : mode === "reschedule"
-        ? "Reschedule class"
-        : "Create occurrence";
+        ? "operations:rescheduleClass"
+        : "operations:createOccurrence";
   const invalid =
     mode === "generate"
       ? !draft.from || !draft.to || draft.from > draft.to
@@ -455,7 +445,7 @@ function OccurrenceEditor({
           };
           if (mode === "reschedule") {
             if (!value.id || value.version == null)
-              throw new Error("Reload the latest class before rescheduling.");
+              throw new LocalizedError("operations:errors.reloadBeforeReschedule");
             return api.rescheduleSessionOccurrence(
               courseId,
               value.id,
@@ -476,20 +466,20 @@ function OccurrenceEditor({
     onSuccess: () =>
       onSaved(
         mode === "generate"
-          ? "Occurrences generated from the recurring schedule."
+          ? "operations:occurrencesGenerated"
           : mode === "reschedule"
-            ? "Class rescheduled."
-            : "Class occurrence created.",
+            ? "operations:classRescheduled"
+            : "operations:occurrenceCreated",
       ),
   });
   return (
     <TeachingDialog
-      title={title}
-      description="Times follow the course schedule. Instructor availability is checked before the change is saved."
+      title={translate(title)}
+      description={translate("operations:courseTimesHelp")}
       onClose={onClose}
       busy={mutation.isPending}
     >
-      <form
+      <form noValidate
         className={s.form}
         onSubmit={(event) => {
           event.preventDefault();
@@ -499,18 +489,16 @@ function OccurrenceEditor({
         {mode === "generate" ? (
           <>
             <label className={s.field}>
-              From
-              <EnglishDateInput
-                aria-label="From"
+              {translate("operations:from")}<EnglishDateInput
+                aria-label={translate("operations:from")}
                 required
                 value={draft.from}
                 onChangeValue={(from) => setDraft({ ...draft, from })}
               />
             </label>
             <label className={s.field}>
-              To
-              <EnglishDateInput
-                aria-label="To"
+              {translate("operations:to")}<EnglishDateInput
+                aria-label={translate("operations:to")}
                 required
                 value={draft.to}
                 onChangeValue={(to) => setDraft({ ...draft, to })}
@@ -522,15 +510,13 @@ function OccurrenceEditor({
                 courseId: String(courseId),
               })}
             >
-              Review recurring teaching schedule
-            </Link>
+              {translate("operations:reviewRecurringSchedule")}</Link>
           </>
         ) : (
           <>
             {mode === "create" ? (
               <label className={`${s.field} ${s.full}`}>
-                Recurring session (optional)
-                <select
+                {translate("operations:optionalSession")}<select
                   value={draft.sessionId}
                   onChange={(event) => {
                     const session = sessions.data?.find(
@@ -544,7 +530,7 @@ function OccurrenceEditor({
                     });
                   }}
                 >
-                  <option value="">Standalone class</option>
+                  <option value="">{translate("operations:standaloneClass")}</option>
                   {sessions.data?.map((item) => (
                     <option key={item.id} value={item.id}>
                       {item.type} · {item.dayOfWeek} ·{" "}
@@ -555,27 +541,24 @@ function OccurrenceEditor({
               </label>
             ) : null}
             <label className={`${s.field} ${s.full}`}>
-              Class date
-              <EnglishDateInput
-                aria-label="Class date"
+              {translate("operations:classDate")}<EnglishDateInput
+                aria-label={translate("operations:classDate")}
                 required
                 value={draft.date}
                 onChangeValue={(date) => setDraft({ ...draft, date })}
               />
             </label>
             <label className={s.field}>
-              Start time
-              <EnglishTimeInput
-                aria-label="Start time"
+              {translate("auth:preview.startTime")}<EnglishTimeInput
+                aria-label={translate("auth:preview.startTime")}
                 required
                 value={draft.start}
                 onChangeValue={(start) => setDraft({ ...draft, start })}
               />
             </label>
             <label className={s.field}>
-              End time
-              <EnglishTimeInput
-                aria-label="End time"
+              {translate("operations:endTime")}<EnglishTimeInput
+                aria-label={translate("operations:endTime")}
                 required
                 value={draft.end}
                 onChangeValue={(end) => setDraft({ ...draft, end })}
@@ -584,14 +567,13 @@ function OccurrenceEditor({
           </>
         )}
         <label className={`${s.field} ${s.full}`}>
-          Lecture (optional)
-          <select
+          {translate("operations:optionalLecture")}<select
             value={draft.weekId}
             onChange={(event) =>
               setDraft({ ...draft, weekId: event.target.value })
             }
           >
-            <option value="">No lecture linked</option>
+            <option value="">{translate("operations:noLecture")}</option>
             {weeks.data?.map((item) => (
               <option key={item.id} value={item.id}>
                 {item.title}
@@ -610,14 +592,13 @@ function OccurrenceEditor({
                 void weeks.refetch();
               }}
             >
-              Reload choices
-            </button>
+              {translate("operations:reloadChoices")}</button>
           </div>
         ) : null}
         <div className={s.full}>
           <TeachingError error={mutation.error} />
           {draft.start && draft.end && draft.end <= draft.start ? (
-            <p className={s.error}>End time must be later than start time.</p>
+            <p className={s.error}>{translate("operations:invalidTime")}</p>
           ) : null}
         </div>
         <div className={s.actions}>
@@ -627,19 +608,18 @@ function OccurrenceEditor({
             disabled={mutation.isPending}
             onClick={onClose}
           >
-            Cancel
-          </button>
+            {translate("common:actions.cancel")}</button>
           <button
             className={s.primary}
             disabled={invalid || mutation.isPending}
           >
             {mutation.isPending
-              ? "Saving…"
+              ? translate("common:actions.saving")
               : mode === "generate"
-                ? "Generate occurrences"
+                ? translate("operations:generateOccurrences")
                 : mode === "reschedule"
-                  ? "Save new schedule"
-                  : "Create occurrence"}
+                  ? translate("operations:saveNewSchedule")
+                  : translate("operations:createOccurrence")}
           </button>
         </div>
       </form>

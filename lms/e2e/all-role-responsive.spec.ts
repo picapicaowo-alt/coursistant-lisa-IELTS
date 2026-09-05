@@ -1,4 +1,5 @@
 import {expect, test, type Page} from '@playwright/test';
+import {productLocales, tx, untranslatedControlCopy} from './i18n-fixture';
 
 const students = [
   {studentUserId: 301, firstName: 'Alexandra', lastName: 'Chen', email: 'alexandra.chen@example.test', studentType: 'STANDARD', assignmentVersion: 2, targetGoal: 'Reach IELTS Writing 6.5 before university admission', riskStatus: 'ON_TRACK', lastActivityAt: '2026-09-01T10:00:00Z'},
@@ -42,25 +43,26 @@ async function fixture(page: Page, level: string, role = 'USER') {
 }
 
 const cases = [
-  {name: 'student', level: 'STUDENT', path: '/my-plan', title: 'Study plan'},
-  {name: 'advisor', level: 'ADVISOR', path: '/advisor/students', title: 'Students List'},
-  {name: 'instructor', level: 'INSTRUCTOR', path: '/my-operations', title: 'Teaching Operations'},
-  {name: 'combined-instructor-advisor', level: 'INSTRUCTOR_ADVISOR', path: '/my-operations', title: 'Teaching operations'},
-  {name: 'counsellor', level: 'COUNSELLOR', path: '/counsellor', title: 'Intake dashboard'},
-  {name: 'parent', level: 'PARENT', path: '/parent', title: 'Student progress'},
-  {name: 'tenant-admin', level: 'NOT_APPLICABLE', role: 'TENANT_ADMIN', path: '/admin', title: 'Tenant governance'},
-  {name: 'system-admin', level: 'NOT_APPLICABLE', role: 'SYSTEM_ADMIN', path: '/admin', title: 'Admin Console'},
-  {name: 'student-exams', level: 'STUDENT', path: '/mock-exams', title: 'Exams'},
+  {name: 'student', level: 'STUDENT', path: '/my-plan', title: 'navigation:parent.studyPlan'},
+  {name: 'advisor', level: 'ADVISOR', path: '/advisor/students', title: 'advising:students.title'},
+  {name: 'instructor', level: 'INSTRUCTOR', path: '/my-operations', title: 'operations:teacher.title'},
+  {name: 'combined-instructor-advisor', level: 'INSTRUCTOR_ADVISOR', path: '/my-operations', title: 'navigation:teachingOperations'},
+  {name: 'counsellor', level: 'COUNSELLOR', path: '/counsellor', title: 'advising:counsellor.dashboard'},
+  {name: 'parent', level: 'PARENT', path: '/parent', title: 'navigation:studentProgress'},
+  {name: 'tenant-admin', level: 'NOT_APPLICABLE', role: 'TENANT_ADMIN', path: '/admin', title: 'navigation:tenantGovernance'},
+  {name: 'system-admin', level: 'NOT_APPLICABLE', role: 'SYSTEM_ADMIN', path: '/admin', title: 'navigation:adminConsole'},
+  {name: 'student-exams', level: 'STUDENT', path: '/mock-exams', title: 'navigation:exams'},
 ];
-for (const subject of cases) {
-  test(`${subject.name} shares the design scale and fits responsive widths`, async ({page}, testInfo) => {
+for (const subject of cases) for (const locale of productLocales) {
+  test(`${subject.name} shares the design scale and fits responsive widths in ${locale}`, async ({page}, testInfo) => {
     const errors: string[] = [];
     page.on('pageerror', error => errors.push(error.message));
     const writes = await fixture(page, subject.level, subject.role);
+    await page.addInitScript(value => localStorage.setItem('coursistant.locale', value), locale);
     await page.goto(subject.path);
-    const title = page.getByRole('heading', {level: 1, name: subject.title, exact: true});
+    const title = page.getByRole('heading', {level: 1, name: tx(locale, subject.title), exact: true});
     await expect(title).toBeVisible();
-    if (subject.name === 'advisor') await expect(page.getByRole('link', {name: 'Open Alexandra Chen'})).toBeVisible();
+    if (subject.name === 'advisor') await expect(page.getByRole('link', {name: tx(locale, 'course:materials.openNamed', {name: 'Alexandra Chen'})})).toBeVisible();
     for (const width of [320, 390, 768, 1024, 1440, 1920, 2560]) {
       await page.setViewportSize({width, height: 960});
       await expect(title).toBeVisible();
@@ -77,7 +79,16 @@ for (const subject of cases) {
       expect(geometry.font).toBeLessThanOrEqual(maximumTitleSize);
       if (width === 390 || width === 1440) await page.screenshot({path: testInfo.outputPath(`${subject.name}-${width}.png`), fullPage: true});
     }
-    await expect(page.getByText(/NaN/)).toHaveCount(0);
+    await expect(page.getByText(/NaN|\{\{\w+\}\}/)).toHaveCount(0);
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    if (locale !== 'en') {
+      const untranslated = untranslatedControlCopy(locale);
+      const controls = await page.locator('button, summary, nav a, [role="tab"]').allTextContents();
+      expect(controls.map(copy => copy.trim()).filter(copy => untranslated.has(copy)), 'English platform controls').toEqual([]);
+    }
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    await expect(title).toBeVisible();
     expect(errors).toEqual([]);
     expect(writes).toEqual([]);
   });

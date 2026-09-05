@@ -1,3 +1,6 @@
+import i18n from '@/i18n';
+import {LocalizedError} from '@/i18n/errors';
+import {formatNumber} from '@/i18n/formatting';
 import {objectiveAnswerErrors} from './answerKeys';
 import {BookOpenText, Headphones, PenLine} from 'lucide-react';
 import type {
@@ -16,32 +19,36 @@ import {
 
 export const SECTION_META = {
   listening: {
-    label: 'Listening',
+    labelKey: 'common:admin.examSections.listening',
     Icon: Headphones,
-    unit: 'Part',
+    unitKey: 'exams:authoring.part',
+    numberKey: 'exams:authoring.partNumber',
     mediaKind: 'LISTENING_AUDIO',
     flag: 'hasListening',
   },
   reading: {
-    label: 'Reading',
+    labelKey: 'common:admin.examSections.reading',
     Icon: BookOpenText,
-    unit: 'Passage',
+    unitKey: 'exams:authoring.passage',
+    numberKey: 'exams:authoring.passageNumber',
     mediaKind: 'READING_IMAGE',
     flag: 'hasReading',
   },
   writing: {
-    label: 'Writing',
+    labelKey: 'common:admin.examSections.writing',
     Icon: PenLine,
-    unit: 'Task',
+    unitKey: 'exams:authoring.task',
+    numberKey: 'exams:authoring.taskNumber',
     mediaKind: 'WRITING_IMAGE',
     flag: 'hasWriting',
   },
 } satisfies Record<
   string,
   {
-    label: string;
+    labelKey: string;
     Icon: typeof Headphones;
-    unit: string;
+    unitKey: string;
+    numberKey: string;
     mediaKind: MockExamMediaKind;
     flag: keyof MockExamTemplateVersionSummary;
   }
@@ -147,20 +154,23 @@ export function clearDraftMedia(
 export const tenantContentWriteKey = (templateId: number, versionId: number) =>
   ['mock-exams', 'tenant', templateId, versionId, 'content-write'] as const;
 
-function positiveInteger(value: string, label: string): number {
+function positiveInteger(value: string, errorKey: string): number {
   const number = Number(value);
   // Create-section numeric fields are int32 in the consumed OpenAPI.
   if (!Number.isInteger(number) || number <= 0 || number > 2 ** 31 - 1)
-    throw new Error(`${label} must be a positive whole number.`);
+    throw new LocalizedError(errorKey);
   return number;
 }
-function json(value: string, label: string): unknown {
+function json(value: string, errorKey: string): unknown {
   try {
     return JSON.parse(value);
   } catch {
-    throw new Error(`${label} must be valid JSON.`);
+    throw new LocalizedError(errorKey);
   }
 }
+/** These fallbacks become IELTS learning content in the request, not interface
+ * labels. Keep their canonical English wording stable across UI locale changes.
+ * Author-provided names, instructions and answer data are never translated. */
 export function unitName(
   section: Section,
   unit: UnitDraft,
@@ -168,15 +178,15 @@ export function unitName(
 ): string {
   return (
     (section === 'writing' ? unit.title : unit.label).trim() ||
-    `${SECTION_META[section].unit} ${index + 1}`
+    i18n.getFixedT('en')(SECTION_META[section].numberKey, {number: index + 1})
   );
 }
 export function questionTitle(question: QuestionDraft): string {
   return (
     question.title.trim() ||
     (question.start && question.end
-      ? `Questions ${question.start}–${question.end}`
-      : 'Questions')
+      ? i18n.getFixedT('en')('exams:authoring.questionRange', {start: question.start, end: question.end})
+      : i18n.getFixedT('en')('common:admin.examFields.questions'))
   );
 }
 export interface DraftIssue {
@@ -194,28 +204,28 @@ export function sectionIssues(
   if (!Number.isSafeInteger(Number(draft.minutes)) || Number(draft.minutes) < 1)
     issues.push({
       unitIndex: null,
-      message: 'Enter the section duration in whole minutes.',
+      message: i18n.t('exams:validation.duration'),
     });
   const seen: {start: number; end: number}[] = [];
   draft.units.forEach((unit, unitIndex) => {
     const add = (message: string, groupIndex?: number) =>
       issues.push({unitIndex, groupIndex, message});
     if (section === 'listening' && !unit.mediaId)
-      add('Upload and select audio for this part.');
+      add(i18n.t('exams:validation.partAudio'));
     if (section === 'writing') {
-      if (!unit.prompt.trim()) add('Enter the writing prompt.');
+      if (!unit.prompt.trim()) add(i18n.t('exams:validation.writingPrompt'));
       if (
         !Number.isSafeInteger(Number(unit.minWords)) ||
         Number(unit.minWords) < 1
       )
-        add('Enter a minimum word count.');
+        add(i18n.t('exams:validation.wordCount'));
       return;
     }
     if (section === 'reading') {
       const paragraphs = parseContent(unit.paragraphs);
       if (paragraphs === undefined)
         add(
-          'Passage content is not valid JSON. Check Advanced paragraph data.',
+          i18n.t('exams:validation.paragraphJson'),
         );
       else if (
         paragraphs === null ||
@@ -226,23 +236,23 @@ export function sectionIssues(
               (paragraph) => typeof paragraph === 'string' && !paragraph.trim(),
             )))
       )
-        add('Add the passage text and complete each paragraph.');
+        add(i18n.t('exams:validation.paragraphText'));
     }
     unit.questions.forEach((question, groupIndex) => {
       const start = Number(question.start),
         end = Number(question.end);
-      if (!question.kind.trim()) add('Select a question type.', groupIndex);
+      if (!question.kind.trim()) add(i18n.t('exams:validation.selectType'), groupIndex);
       if (
         !Number.isSafeInteger(start) ||
         start < 1 ||
         !Number.isSafeInteger(end) ||
         end < start
       )
-        add('Check the first and last question numbers.', groupIndex);
+        add(i18n.t('exams:validation.questionRange'), groupIndex);
       const value = parseContent(question.payload);
       if (value === undefined)
         add(
-          'Question data is not valid JSON. Check Advanced data.',
+          i18n.t('exams:validation.questionJson'),
           groupIndex,
         );
       else {
@@ -263,7 +273,7 @@ export function sectionIssues(
             (Math.min(...numbers) !== start || Math.max(...numbers) !== end)
           )
             add(
-              'The group range must match the question numbers in its content.',
+              i18n.t('exams:validation.rangeContent'),
               groupIndex,
             );
         }
@@ -277,7 +287,7 @@ export function sectionIssues(
       ) {
         if (seen.some((prior) => start <= prior.end && end >= prior.start))
           add(
-            'This question range overlaps an earlier group. Use unique question numbers.',
+            i18n.t('exams:validation.rangeOverlap'),
             groupIndex,
           );
         seen.push({start, end});
@@ -291,23 +301,25 @@ function questionPayload(
   index: number,
   section: 'reading' | 'listening',
 ) {
-  const payload = json(question.payload, 'Question payload');
+  const payload = json(question.payload, 'exams:validation.questionJson');
   const definition = questionDefinition(section, question.kind);
   const schema = definition?.answerSchema ?? definition?.schema;
   const errors = schema ? objectiveAnswerErrors(schema, payload) : [];
+  // The review renders sectionIssues on every locale change; retain the same
+  // detailed validator output for direct payload callers as well.
   if (errors.length) throw new Error(errors.join(' '));
   const questionStart = positiveInteger(
     question.start,
-    'First question number',
+    'exams:validation.firstInteger',
   );
-  const questionEnd = positiveInteger(question.end, 'Last question number');
+  const questionEnd = positiveInteger(question.end, 'exams:validation.lastInteger');
   if (questionEnd < questionStart)
-    throw new Error('The last question number must not precede the first.');
-  if (!question.kind.trim()) throw new Error('Select a question type.');
+    throw new LocalizedError('exams:validation.lastBeforeFirst');
+  if (!question.kind.trim()) throw new LocalizedError('exams:validation.selectType');
   return {
     sortOrder: positiveInteger(
       String(question.sortOrder ?? index + 1),
-      'Question group order',
+      'exams:validation.orderInteger',
     ),
     title: questionTitle(question),
     instruction: question.instruction.trim(),
@@ -321,10 +333,10 @@ export function listeningPayload(
   draft: SectionDraft,
 ): CreateMockExamListeningRequest {
   return {
-    totalMinutes: positiveInteger(draft.minutes, 'Section duration'),
+    totalMinutes: positiveInteger(draft.minutes, 'exams:validation.durationInteger'),
     parts: draft.units.map((unit, index) => {
       if (!unit.mediaId)
-        throw new Error(`Upload and select audio for Part ${index + 1}.`);
+        throw new LocalizedError('exams:validation.partAudioNumber', {number: formatNumber(index + 1)});
       return {
         seq: index + 1,
         label: unitName('listening', unit, index),
@@ -340,14 +352,14 @@ export function readingPayload(
   draft: SectionDraft,
 ): CreateMockExamReadingRequest {
   return {
-    totalMinutes: positiveInteger(draft.minutes, 'Section duration'),
+    totalMinutes: positiveInteger(draft.minutes, 'exams:validation.durationInteger'),
     passages: draft.units.map((unit, index) => {
       const paragraphs = json(
         unit.paragraphs,
-        `Passage ${index + 1} paragraphs`,
+        'exams:validation.paragraphJson',
       );
       return {
-        seq: positiveInteger(String(unit.seq ?? index + 1), 'Passage sequence'),
+        seq: positiveInteger(String(unit.seq ?? index + 1), 'exams:validation.passageInteger'),
         shortLabel: unitName('reading', unit, index),
         title: unit.title.trim(),
         intro: unit.intro.trim(),
@@ -364,16 +376,16 @@ export function writingPayload(
   draft: SectionDraft,
 ): CreateMockExamWritingRequest {
   return {
-    totalMinutes: positiveInteger(draft.minutes, 'Section duration'),
+    totalMinutes: positiveInteger(draft.minutes, 'exams:validation.durationInteger'),
     tasks: draft.units.map((unit, index) => {
       if (!unit.prompt.trim())
-        throw new Error(`Enter a prompt for Task ${index + 1}.`);
+        throw new LocalizedError('exams:validation.taskPromptNumber', {number: formatNumber(index + 1)});
       return {
         seq: index + 1,
         taskKey: `task-${index + 1}`,
         title: unitName('writing', unit, index),
         prompt: unit.prompt.trim(),
-        minWords: positiveInteger(unit.minWords, 'Minimum words'),
+        minWords: positiveInteger(unit.minWords, 'exams:validation.wordInteger'),
         ...(unit.mediaId ? {imageMediaId: unit.mediaId} : {}),
       };
     }),
@@ -384,22 +396,22 @@ export const MEDIA_RULES = {
   LISTENING_AUDIO: {
     accept: '.mp3,.wav,audio/mpeg,audio/wav',
     extensions: ['mp3', 'wav'],
-    label: 'MP3 or WAV · up to 100 MB',
+    labelKey: 'exams:authoring.audioFormat',
     maxBytes: 100 * 1024 * 1024,
   },
   READING_IMAGE: {
     accept: '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp',
     extensions: ['png', 'jpg', 'jpeg', 'webp'],
-    label: 'PNG, JPG, JPEG, or WEBP · up to 10 MB',
+    labelKey: 'exams:authoring.imageFormat',
     maxBytes: 10 * 1024 * 1024,
   },
   WRITING_IMAGE: {
     accept: '.png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp',
     extensions: ['png', 'jpg', 'jpeg', 'webp'],
-    label: 'PNG, JPG, JPEG, or WEBP · up to 10 MB',
+    labelKey: 'exams:authoring.imageFormat',
     maxBytes: 10 * 1024 * 1024,
   },
 } satisfies Record<
   MockExamMediaKind,
-  {accept: string; extensions: string[]; label: string; maxBytes: number}
+  {accept: string; extensions: string[]; labelKey: string; maxBytes: number}
 >;

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {useEffect, useRef} from 'react';
 import {createPortal} from 'react-dom';
 import type {DeadlineDecision} from '@/apis/services/ai-agent-api';
@@ -17,16 +18,17 @@ interface DeadlineDecisionModalProps {
 }
 
 const DeadlineDecisionModal = ({
-  title = 'Deadline change approval',
-  eyebrow = 'Action required',
+  title,
+  eyebrow,
   confirmationText,
-  warningText = 'The deadline has not changed yet.',
-  confirmLabel = 'Allow',
-  cancelLabel = 'Reject',
+  warningText,
+  confirmLabel,
+  cancelLabel,
   errorMessage,
   isSubmitting,
   onDecision,
 }: DeadlineDecisionModalProps) => {
+  const { t: translate } = useTranslation();
   const rejectButtonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -71,8 +73,8 @@ const DeadlineDecisionModal = ({
         <div className={styles.modalHeader}>
           <span className={styles.modalIcon} aria-hidden="true">!</span>
           <div>
-            <span className={styles.modalEyebrow}>{eyebrow}</span>
-            <h3 id="deadline-decision-title">{title}</h3>
+            <span className={styles.modalEyebrow}>{eyebrow ?? translate('assistant:workflow.actionRequired')}</span>
+            <h3 id="deadline-decision-title">{title ?? translate('assistant:workflow.approvalTitle')}</h3>
           </div>
         </div>
 
@@ -80,7 +82,7 @@ const DeadlineDecisionModal = ({
           <MarkdownMessage content={confirmationText}/>
         </div>
         <p id="deadline-decision-warning" className={styles.modalWarning}>
-          {warningText}
+          {warningText ?? translate('assistant:workflow.approvalWarning')}
         </p>
 
         {errorMessage ? <p className={styles.modalError} role="alert">{errorMessage}</p> : null}
@@ -92,7 +94,7 @@ const DeadlineDecisionModal = ({
             onClick={() => onDecision('REJECT')}
             disabled={isSubmitting}
           >
-            {cancelLabel}
+            {cancelLabel ?? translate('common:status.REJECT')}
           </button>
           <button
             type="button"
@@ -100,7 +102,7 @@ const DeadlineDecisionModal = ({
             onClick={() => onDecision('ALLOW')}
             disabled={isSubmitting}
           >
-            {isSubmitting ? 'Working…' : confirmLabel}
+            {isSubmitting ? translate("common:actions.working") : confirmLabel ?? translate('assistant:workflow.allow')}
           </button>
         </div>
       </section>

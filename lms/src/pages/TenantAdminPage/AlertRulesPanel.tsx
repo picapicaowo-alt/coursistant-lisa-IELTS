@@ -1,4 +1,5 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import { useState, type FormEvent } from "react";
 import {
   Activity,
@@ -50,22 +51,27 @@ function RuleEditor({
   onApply: (next: AlertForm) => void;
   onClose: () => void;
 }) {
+  const { t: translate } = useTranslation();
   const [draft, setDraft] = useState(form);
-  const apply = (event: FormEvent) => {
+  const [invalid, setInvalid] = useState(false);
+  const apply = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const hasInvalidInput = !event.currentTarget.checkValidity();
+    setInvalid(hasInvalidInput);
+    if (hasInvalidInput) return;
     onApply(draft);
   };
   return (
     <TenantDrawer
-      title={group.title}
-      description={group.description}
+      title={translate(group.titleKey)}
+      description={translate(group.descriptionKey)}
       onClose={onClose}
     >
-      <form className={`${styles.form} ${rulesStyles.editor}`} onSubmit={apply}>
+      <form className={`${styles.form} ${rulesStyles.editor}`} noValidate onSubmit={apply}>
         <div className={rulesStyles.fields}>
           {group.numeric.map((key) => (
             <label key={key}>
-              <span>{NUMERIC_FIELDS[key].label}</span>
+              <span>{translate(NUMERIC_FIELDS[key].labelKey)}</span>
               <input
                 type="number"
                 min="0"
@@ -81,24 +87,22 @@ function RuleEditor({
             </label>
           ))}
         </div>
+        {invalid ? <p className={styles.inlineError} role="alert">{translate('operations:alertRules.invalidNumber')}</p> : null}
         <p className={rulesStyles.editorHint}>
-          Apply to your draft, then save changes on the rules page.
-        </p>
+          {translate("operations:alertRules.editorHint")}</p>
         <div className={rulesStyles.editorActions}>
           <button
             type="button"
             className={styles.secondaryButton}
             onClick={onClose}
           >
-            Cancel
-          </button>
+            {translate("common:actions.cancel")}</button>
           <button
             type="submit"
             className={styles.primaryButton}
             disabled={!groupIsDirty(group, draft, form)}
           >
-            Apply to draft
-          </button>
+            {translate("operations:alertRules.applyDraft")}</button>
         </div>
       </form>
     </TenantDrawer>
@@ -106,7 +110,7 @@ function RuleEditor({
 }
 
 export function AlertRulesPanel() {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const {
     rules,
     form,
@@ -138,18 +142,17 @@ export function AlertRulesPanel() {
   );
 
   return (
-    <section aria-label="Tenant alert rules" className={rulesStyles.panel}>
+    <section aria-label={translate("common:admin.alertRules")} className={rulesStyles.panel}>
       {rules.isPending ? (
         <p className={styles.status} role="status">
-          Loading alert rules…
-        </p>
+          {translate("common:admin.loadingAlerts")}</p>
       ) : null}
       {rules.isError ? (
         <div className={styles.errorNotice} role="alert">
           <p>
             {getApiErrorMessage(
               rules.error,
-              "Alert rules could not be loaded.",
+              translate("common:admin.alertsFailed"),
             )}
           </p>
           <button
@@ -157,8 +160,7 @@ export function AlertRulesPanel() {
             disabled={dirty || save.isPending}
             onClick={reload}
           >
-            Try again
-          </button>
+            {translate("common:actions.tryAgain")}</button>
         </div>
       ) : null}
       {form && baseline ? (
@@ -167,7 +169,7 @@ export function AlertRulesPanel() {
             className={rulesStyles.modePicker}
             disabled={save.isPending}
           >
-            <legend>Rule mode</legend>
+            <legend>{translate("operations:alertRules.mode")}</legend>
             {RULE_MODES.map((mode) => (
               <label key={mode.value}>
                 <input
@@ -179,8 +181,8 @@ export function AlertRulesPanel() {
                   }
                 />
                 <span>
-                  <strong>{mode.title}</strong>
-                  <small>{mode.description}</small>
+                  <strong>{translate(mode.titleKey)}</strong>
+                  <small>{translate(mode.descriptionKey)}</small>
                 </span>
               </label>
             ))}
@@ -188,10 +190,10 @@ export function AlertRulesPanel() {
 
           <div>
             <div className={rulesStyles.listHeading}>
-              <h2>Alert rules</h2>
+              <h2>{translate("operations:governance.alerts")}</h2>
               <div className={rulesStyles.headingTools}>
                 {editable ? (
-                  <span>Edit a rule to adjust its parameters</span>
+                  <span>{translate("operations:alertRules.editHelp")}</span>
                 ) : null}
                 {refresh}
               </div>
@@ -200,20 +202,20 @@ export function AlertRulesPanel() {
               <p className={rulesStyles.modeHint}>
                 {form.mode === "DISABLED"
                   ? dirty
-                    ? "Save changes to pause tenant alert evaluation."
-                    : "Tenant alert evaluation is paused. Choose a mode above to resume."
-                  : "Managed by the platform. Only returned values are shown; choose Tenant override to customize."}
+                    ? translate("operations:alertRules.pausePending")
+                    : translate("operations:alertRules.paused")
+                  : translate("operations:alertRules.defaultHelp")}
               </p>
             ) : null}
             <div className={rulesStyles.ruleList}>
               <div className={rulesStyles.columnHeadings} aria-hidden="true">
-                <span>Category</span>
-                <span>Parameters</span>
-                <span>{editable ? "Configure" : ""}</span>
+                <span>{translate("calendar:details.category")}</span>
+                <span>{translate("operations:alertRules.parameters")}</span>
+                <span>{editable ? translate("operations:alertRules.configure") : ""}</span>
               </div>
               <ul
                 className={rulesStyles.rows}
-                aria-label="Alert rule categories"
+                aria-label={translate("operations:alertRules.categories")}
               >
                 {RULE_GROUPS.map((group, index) => {
                   const Icon = RULE_ICONS[index];
@@ -225,12 +227,12 @@ export function AlertRulesPanel() {
                       <div className={rulesStyles.category}>
                         <Icon size={21} aria-hidden="true" />
                         <span>
-                          {group.title}
+                          {translate(group.titleKey)}
                           {changed ? (
                             <span
                               className={rulesStyles.changed}
-                              aria-label="Unsaved changes"
-                              title="Unsaved changes"
+                              aria-label={translate("operations:alertRules.unsaved")}
+                              title={translate("operations:alertRules.unsaved")}
                             />
                           ) : null}
                         </span>
@@ -244,7 +246,7 @@ export function AlertRulesPanel() {
                             <button
                               type="button"
                               role="switch"
-                              aria-label={group.title}
+                              aria-label={translate(group.titleKey)}
                               aria-checked={form[group.toggle] === 1}
                               disabled={save.isPending}
                               className={rulesStyles.switchControl}
@@ -265,23 +267,22 @@ export function AlertRulesPanel() {
                               </span>
                               <span>
                                 {form[group.toggle] === 1
-                                  ? "Enabled"
-                                  : "Disabled"}
+                                  ? translate("settings:profile.enabled")
+                                  : translate("common:admin.status.DISABLED")}
                               </span>
                             </button>
                           ) : (
                             <button
                               type="button"
                               className={rulesStyles.editButton}
-                              aria-label={`Edit ${group.title.toLowerCase()}`}
+                              aria-label={translate('operations:alertRules.editRule', {name: translate(group.titleKey)})}
                               disabled={save.isPending}
                               onClick={() => {
                                 update((current) => current);
                                 setEditing(group);
                               }}
                             >
-                              Edit
-                              <ChevronRight size={18} aria-hidden="true" />
+                              {translate("common:actions.edit")}<ChevronRight size={18} aria-hidden="true" />
                             </button>
                           )
                         ) : group.toggle &&
@@ -290,8 +291,8 @@ export function AlertRulesPanel() {
                           baseline[group.toggle] != null ? (
                           <span className={rulesStyles.readOnlyState}>
                             {baseline[group.toggle] === 1
-                              ? "Enabled"
-                              : "Disabled"}
+                              ? translate("settings:profile.enabled")
+                              : translate("common:admin.status.DISABLED")}
                           </span>
                         ) : null}
                       </div>
@@ -305,10 +306,10 @@ export function AlertRulesPanel() {
           <div className={rulesStyles.footer}>
             <span role="status">
               {save.isSuccess
-                ? "Changes saved"
+                ? translate("operations:alertRules.saved")
                 : dirty
-                  ? "You have unsaved changes"
-                  : `Policy version ${baseline.version}`}
+                  ? translate("operations:alertRules.unsavedHelp")
+                  : translate('operations:alertRules.policyVersion', {number: formatNumber(baseline.version)})}
             </span>
             <div className={rulesStyles.footerActions}>
               {dirty ? (
@@ -318,8 +319,7 @@ export function AlertRulesPanel() {
                   disabled={save.isPending}
                   onClick={discard}
                 >
-                  Cancel changes
-                </button>
+                  {translate("operations:alertRules.cancelChanges")}</button>
               ) : null}
               <button
                 type="button"
@@ -327,7 +327,7 @@ export function AlertRulesPanel() {
                 disabled={!dirty || save.isPending}
                 onClick={submit}
               >
-                {save.isPending ? "Saving…" : "Save changes"}
+                {save.isPending ? translate("common:actions.saving") : translate("common:actions.saveChanges")}
               </button>
             </div>
           </div>
@@ -336,13 +336,11 @@ export function AlertRulesPanel() {
               <p>
                 {getApiErrorMessage(
                   save.error,
-                  "Alert rules could not be saved.",
+                  translate("operations:alertRules.saveFailed"),
                 )}
               </p>
               <p>
-                Your draft is preserved. To load the latest policy, cancel
-                changes and refresh.
-              </p>
+                {translate("operations:alertRules.draftPreserved")}</p>
             </div>
           ) : null}
           {editing ? (

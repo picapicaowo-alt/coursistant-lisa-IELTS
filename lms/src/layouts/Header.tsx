@@ -1,4 +1,6 @@
 import type {TFunction} from 'i18next';
+import LanguageSwitcher from '@/components/LanguageSwitcher';
+import {LANGUAGE_SWITCHER_ENABLED} from '@/i18n/configuration';
 import {UserAvatar} from '@/components/UserAvatar';
 import {useEffect, useRef, useState} from 'react';
 import {Bell, ChevronDown, LogOut, Settings, ShieldCheck, UserRound, type LucideIcon} from 'lucide-react';
@@ -112,25 +114,26 @@ const Header = () => {
           <input
             value={searchQuery}
             onChange={event => setSearchQuery(event.target.value)}
-            placeholder="What do you want to learn?"
-            aria-label="Search courses"
+            placeholder={t("navigation:searchPrompt")}
+            aria-label={t("navigation:searchCourses")}
           />
         </form>
       ) : (
         <div className={styles.workspaceContext}>
           <span>{t('navigation:workspace')}{isTenantAdmin ? ':' : ''}</span>
-          <strong>{isTenantAdmin ? t('navigation:administration') : pathname === APP_ROUTE_PATHS.parent ? PARENT_SECTIONS[getParentSection(new URLSearchParams(search))].label : getWorkspaceLabel(pathname, instructor, t)}</strong>
+          <strong>{isTenantAdmin ? t('navigation:administration') : pathname === APP_ROUTE_PATHS.parent ? t(PARENT_SECTIONS[getParentSection(new URLSearchParams(search))].label) : getWorkspaceLabel(pathname, instructor, t)}</strong>
         </div>
       )}
 
       <div className={styles.accountActions}>
+        {LANGUAGE_SWITCHER_ENABLED ? <LanguageSwitcher/> : null}
         {/* Parents have a separate notification contract and inbox in their portal. */}
-        {user && isParentAccount(user) ? <Link className={notificationStyles.bellButton} to={parentHref('notifications', new URLSearchParams(search))} aria-label="Open notifications"><Bell size={20}/></Link> : user?.role === 'USER' ? <NotificationCenter identity={user ?? undefined}/> : null}
+        {user && isParentAccount(user) ? <Link className={notificationStyles.bellButton} to={parentHref('notifications', new URLSearchParams(search))} aria-label={t('common:navigationControls.openNotifications')}><Bell size={20}/></Link> : user?.role === 'USER' ? <NotificationCenter identity={user ?? undefined}/> : null}
         <div className={styles.profile} ref={menuRef}>
           <UserAvatar className={styles.avatar} src={profileImage}/>
           <div className={styles.profileCopy}>
             <strong>{name}</strong>
-            <span>{isTenantAdmin ? 'Tenant Administrator' : email}</span>
+            <span>{isTenantAdmin ? t("navigation:tenantAdministrator") : email}</span>
           </div>
           <button
             ref={menuButtonRef}

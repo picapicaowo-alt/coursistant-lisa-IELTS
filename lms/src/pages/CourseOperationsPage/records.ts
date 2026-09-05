@@ -1,16 +1,39 @@
+import { LocalizedError } from "@/i18n/errors";
 import { formatPersonName } from "@/utils/personName";
-import type {CourseWeek} from '@/apis';
+import i18n from "@/i18n";
+import { formatClockTime, formatDateTime } from "@/i18n/formatting";
+import type { CourseWeek } from "@/apis";
 
 export function occurrenceTitle(item: Occurrence, weeks?: CourseWeek[]) {
-  return weeks?.find(week => week.id === item.weekId)?.title || item.title || (item.sessionId ? `Session ${item.sessionId}` : 'Class session');
+  return (
+    weeks?.find((week) => week.id === item.weekId)?.title ||
+    item.title ||
+    (item.sessionId
+      ? i18n.t("operations:sessionNumber", { id: item.sessionId })
+      : i18n.t("calendar:kinds.Session"))
+  );
 }
 
-import {record, optionalNumber, textValue, recordId, recordPage, type OperationRecord} from '@/utils/operationRecords';
-export {record, optionalNumber, textValue, recordId, recordPage, type OperationRecord} from '@/utils/operationRecords';
+import {
+  record,
+  optionalNumber,
+  textValue,
+  recordId,
+  recordPage,
+  type OperationRecord,
+} from "@/utils/operationRecords";
+export {
+  record,
+  optionalNumber,
+  textValue,
+  recordId,
+  recordPage,
+  type OperationRecord,
+} from "@/utils/operationRecords";
 export const PAGE_SIZE = 20;
 export const REPORT_TYPES = [
-  { value: "MID_TERM", label: "Mid-term report" },
-  { value: "FINAL", label: "Final report" },
+  { value: "MID_TERM", labelKey: "operations:midTermReport" },
+  { value: "FINAL", labelKey: "operations:finalReport" },
 ] as const;
 export const REPORT_STATUSES = ["DRAFT", "PUBLISHED"] as const;
 export const operationKeys = {
@@ -31,29 +54,32 @@ export const studentName = (item: OperationRecord) =>
       middleName: textValue(item, "studentMiddleName", "userMiddleName"),
       lastName: textValue(item, "studentLastName", "userLastName"),
     },
-    textValue(item, "userName") ||
-      `Student #${optionalNumber(item, "studentUserId", "userId") ?? "—"}`,
+    textValue(item, "userName") || "",
   );
 
+/** Keep cached names as authored data; generate missing-name labels only at render time. */
+export const studentRecordLabel = (item: {
+  name: string;
+  studentUserId: number;
+}) =>
+  item.name ||
+  i18n.t("common:people.studentFallback", { id: item.studentUserId });
+
 export const dateLabel = (value?: string) => {
-  if (!value) return "Not provided";
+  if (!value) return i18n.t("common:feedback.notProvided");
   const date = /^\d{4}-\d{2}-\d{2}$/.test(value)
     ? new Date(`${value}T12:00:00`)
     : new Date(value);
   return Number.isNaN(date.valueOf())
     ? value
-    : new Intl.DateTimeFormat("en-US", {
+    : formatDateTime(date, {
         month: "short",
         day: "numeric",
         year: "numeric",
-      }).format(date);
+      });
 };
 export const timeLabel = (value?: string) => {
-  if (!value) return "Time not provided";
-  const match = /^(\d{2}):(\d{2})/.exec(value);
-  if (!match) return value;
-  const hour = Number(match[1]);
-  return `${hour % 12 || 12}:${match[2]} ${hour < 12 ? "AM" : "PM"}`;
+  return value ? formatClockTime(value) : i18n.t("operations:timeUnavailable");
 };
 export const timeRange = (start?: string, end?: string) =>
   `${timeLabel(start)}${end ? ` – ${timeLabel(end)}` : ""}`;
@@ -74,10 +100,7 @@ export interface Occurrence {
 export function parseOccurrence(value: unknown): Occurrence {
   const item = record(value);
   const date = textValue(item, "occurrenceDate", "date");
-  if (!date)
-    throw new Error(
-      "A class is missing its date. Please refresh the schedule.",
-    );
+  if (!date) throw new LocalizedError("operations:errors.missingDate");
   return {
     id: recordId(item, "occurrenceId", "id"),
     date,
@@ -123,9 +146,7 @@ export function parseAttendance(value: unknown): AttendanceRoster {
     }),
   );
   if (new Set(items.map((item) => item.studentUserId)).size !== items.length)
-    throw new Error(
-      "The attendance roster contains duplicate students. Please synchronize the roster.",
-    );
+    throw new LocalizedError("operations:errors.duplicateStudents");
   return {
     version: optionalNumber(root, "attendanceVersion", "version"),
     items,
@@ -181,7 +202,7 @@ export function parsePost(value: unknown): DiscussionPost {
         middleName: textValue(item, "authorMiddleName"),
         lastName: textValue(item, "authorLastName"),
       },
-      "Course member",
+      "",
     ),
     createdAt: textValue(item, "createdAt"),
   };

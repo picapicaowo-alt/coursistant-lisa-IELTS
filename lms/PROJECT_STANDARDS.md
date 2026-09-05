@@ -308,3 +308,37 @@ Historical normalized-store designs in `STATE_MANAGEMENT.md` / `ARCHITECTURE.md`
 - [ ] No new hardcoded deploy/domain/design value; comments explain only non-obvious constraints
 - [ ] Any lockfile change was reviewed and verified
 - [ ] Styles use modules/tokens (no new ad-hoc global CSS dumps)
+- [ ] UI copy is localized in `en`, `zh-CN`, and `zh-TW`; learning content and request values are unchanged
+
+---
+
+## 17. Internationalization
+
+Internationalization is a permanent, product-wide frontend requirement. Use the
+existing shared `i18next` / `react-i18next` setup in `src/i18n/`. Add, change and
+remove semantic keys in all supported locales in the same change. Reuse existing
+keys, retain plural/interpolation parity, and do not build page- or role-specific
+localization engines or component-level locale branches.
+
+Translate all platform-owned UI, including navigation, forms, status labels,
+errors, dialogs, toasts, accessibility text and product illustrations. A selected
+locale must render consistently; fallback English does not replace translation
+coverage. Store async feedback as semantic keys or `LocalizedError` identities,
+not translated snapshots that remain in the previous language.
+
+IELTS exam content is explicitly outside UI translation: preserve original
+passages, prompts, instructions, options, accepted answer codes, responses and
+question media. Vocabulary/learning content and names are also preserved.
+Language selection must not affect submission/authoring payloads, API enums,
+React keys, draft state, optimistic versions, idempotency keys or permissions.
+
+Use the shared locale-aware formatting utilities for display values. Do not
+change API date serialization or date-only/wall-clock/timezone interpretation.
+Review numeric IDs as identities rather than translating their underlying value.
+
+Validate locale resource parity, missing-key diagnostics, language persistence,
+responsive switching and original exam-content invariants. Run `i18n:keys`,
+`i18n:check` and `typecheck:i18n` alongside the standard baseline before merge.
+The static UI gate detects direct literals only: zero candidates is not proof
+that every route, state, runtime message or image is localized. See
+`../docs/internationalization.md` for the migration and acceptance ledger.

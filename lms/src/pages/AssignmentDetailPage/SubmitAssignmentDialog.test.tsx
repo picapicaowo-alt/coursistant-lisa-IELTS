@@ -3,10 +3,12 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 import type {AssignmentDetail, SubmissionState} from '@/apis';
 import {assignmentApiService} from '@/apis/services/assignment-api';
 import {SubmitAssignmentDialog} from './SubmitAssignmentDialog';
+import i18n from '@/i18n';
+import type {TOptions} from 'i18next';
 
 vi.mock('react-i18next', async (importOriginal) => ({
   ...await importOriginal<typeof import('react-i18next')>(),
-  useTranslation: () => ({t: (key: string) => key}),
+  useTranslation: () => ({t: (key: string, options?: TOptions) => key.startsWith('common:files.') || key.startsWith('common:actions.') ? i18n.t(key, options) : key}),
 }));
 
 vi.mock('@/apis/services/assignment-api', () => ({

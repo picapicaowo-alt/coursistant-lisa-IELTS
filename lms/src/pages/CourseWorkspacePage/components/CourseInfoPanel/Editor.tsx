@@ -13,8 +13,8 @@ export const Editor: React.FC = () => {
 
   return (
     <div className={styles.courseInfoEditor}>
-      <PropertyForm title={t('form.basicInfo')} columns={2}>
-        <PropertyRow title={t('form.courseCode')}>
+      <PropertyForm title={t('course:info.basic')} columns={2}>
+        <PropertyRow title={t('course:form.codeLabel')}>
           <input
             type="text"
             value={course.id}
@@ -24,49 +24,49 @@ export const Editor: React.FC = () => {
           />
         </PropertyRow>
 
-        <PropertyRow title={t('form.courseName')}>
+        <PropertyRow title={t('course:form.titleLabel')}>
           <input
             type="text"
             value={course.name}
             onChange={(e) => update("courses", course.id, {name: e.target.value})}
             className={styles.textInput}
-            placeholder={t('form.courseNamePlaceholder')}
+            placeholder={t('course:info.namePlaceholder')}
           />
         </PropertyRow>
 
-        <PropertyRow title={t('form.school')}>
+        <PropertyRow title={t('course:info.school')}>
           <input
             type="text"
             value={course.school}
             onChange={(e) => update("courses", course.id, {school: e.target.value})}
             className={styles.textInput}
-            placeholder={t('form.schoolPlaceholder')}
+            placeholder={t('course:info.schoolPlaceholder')}
           />
         </PropertyRow>
 
-        <PropertyRow title={t('form.semester')}>
+        <PropertyRow title={t('course:info.semester')}>
           <input
             type="text"
             value={course.semester}
             onChange={(e) => update("courses", course.id, {semester: e.target.value})}
             className={styles.textInput}
-            placeholder="2024 Spring"
+            placeholder={t('course:info.semesterPlaceholder')}
           />
         </PropertyRow>
       </PropertyForm>
 
-      <PropertyForm title={t('form.teacherInfo')}>
-        <PropertyRow title={t('form.teacherName')}>
+      <PropertyForm title={t('course:info.instructor')}>
+        <PropertyRow title={t('common:fields.name')}>
           <input
             type="text"
             value={course.teacherName}
             onChange={(e) => update("courses", course.id, {teacherName: e.target.value})}
             className={styles.textInput}
-            placeholder={t('form.teacherNamePlaceholder')}
+            placeholder={t('course:info.instructorPlaceholder')}
           />
         </PropertyRow>
 
-        <PropertyRow title={t('form.teacherEmail')}>
+        <PropertyRow title={t('common:fields.email')}>
           <input
             type="email"
             value={course.teacherEmail}
@@ -76,7 +76,7 @@ export const Editor: React.FC = () => {
           />
         </PropertyRow>
 
-        <PropertyRow title={t('form.teacherPhone')}>
+        <PropertyRow title={t('advising:intake.phone')}>
           <input
             type="tel"
             value={course.teacherPhone}
@@ -87,13 +87,13 @@ export const Editor: React.FC = () => {
         </PropertyRow>
       </PropertyForm>
 
-      <CollapsibleSection title={t('form.courseDescription')}>
+      <CollapsibleSection title={t('common:fields.description')}>
         <RichTextEditor
           content={course.description}
           onChange={(content) => {
             update("courses", course.id, {description: content});
           }}
-          placeholder={t('form.descriptionPlaceholder')}
+          placeholder={t('course:info.descriptionPlaceholder')}
         />
       </CollapsibleSection>
     </div>

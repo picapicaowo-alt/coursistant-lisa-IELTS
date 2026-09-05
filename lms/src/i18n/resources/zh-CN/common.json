@@ -65,7 +65,17 @@
     "viewTarget": "查看{{target}}",
     "chooseTarget": "选择{{target}}",
     "confirmTarget": "确认{{target}}",
-    "send": "发送"
+    "send": "发送",
+    "chooseFiles": "选择文件",
+    "editNamed": "编辑{{name}}",
+    "deleteNamed": "删除{{name}}",
+    "review": "审阅",
+    "messagePerson": "给 {{name}} 发消息",
+    "deletingNamed": "正在删除{{name}}…",
+    "renameNamed": "重命名{{name}}",
+    "publishNamed": "发布{{name}}",
+    "unpublishNamed": "撤回{{name}}的发布",
+    "closeItem": "关闭{{item}}"
   },
   "common": {
     "yes": "是",
@@ -215,14 +225,39 @@
     "NOT_APPLICABLE": "不适用",
     "UNKNOWN": "未知",
     "READY": "就绪",
-    "PENDING_WRITING_GRADING": "等待写作评分"
+    "PENDING_WRITING_GRADING": "等待写作评分",
+    "ABSENCE": "请假",
+    "SCHEDULE_CHANGE": "调课",
+    "APPROVE": "批准",
+    "REJECT": "拒绝",
+    "LECTURE": "课时",
+    "ASSIGNMENT": "作业",
+    "FILE": "文件",
+    "LINK": "链接",
+    "DOCUMENT": "文档",
+    "IMAGE": "图片",
+    "AUDIO": "音频",
+    "VIDEO": "视频",
+    "ARCHIVE": "压缩文件",
+    "ENTERED": "已录入",
+    "EXPIRED": "已过期",
+    "TIMED_OUT": "已超时",
+    "AUTO_SUBMITTED": "已自动提交",
+    "LAB": "实验课",
+    "TUTORIAL": "辅导课",
+    "PENDING_GRADING": "待批改",
+    "UPCOMING_CLASS": "即将上课",
+    "SCHEDULE_CONFLICT": "排课冲突",
+    "PENDING_ADVISOR": "待学业顾问处理",
+    "PENDING_INSTRUCTOR": "待教师处理"
   },
   "pagination": {
     "summary": "第 {{page}} 页 · 共 {{total}} 条结果",
     "records": "记录",
     "pages": "{{label}}分页",
     "page": "第 {{page}} 页",
-    "total": "共 {{total}} 条{{label}} · 第 {{page}} 页，共 {{pages}} 页"
+    "total": "共 {{total}} 条{{label}} · 第 {{page}} 页，共 {{pages}} 页",
+    "pageOf": "第 {{page}} / {{total}} 页"
   },
   "dateTime": {
     "selectDate": "选择日期",
@@ -251,13 +286,21 @@
       "timeHint": "请使用24小时制，格式为 时:分",
       "dateTimeHint": "请使用 年/月/日 时:分 格式，时间采用24小时制"
     },
-    "noDeadline": "无截止日期"
+    "noDeadline": "无截止日期",
+    "durationWeek_one": "{{number}} 周",
+    "durationWeek_other": "{{number}} 周",
+    "durationDay_one": "{{number}} 天",
+    "durationDay_other": "{{number}} 天",
+    "durationHour_one": "{{number}} 小时",
+    "durationHour_other": "{{number}} 小时",
+    "setStartFirst": "请先设置开始时间",
+    "customDuration": "自定义"
   },
   "roles": {
     "USER": "用户",
     "SYSTEM_ADMIN": "系统管理员",
     "TENANT_ADMIN": "机构管理员",
-    "COUNSELLOR": "咨询师",
+    "COUNSELLOR": "招生顾问",
     "ADVISOR": "顾问",
     "INSTRUCTOR": "教师",
     "INSTRUCTOR_ADVISOR": "教师兼顾问",
@@ -308,7 +351,8 @@
     "courseLecture": "{{title}}：课时进度",
     "noAssignments": "尚未发布作业。",
     "courseAssignments": "本课程作业完成情况",
-    "allAssignments": "所有课程作业完成情况"
+    "allAssignments": "所有课程作业完成情况",
+    "unavailableLabel": "{{label}}：暂无进度"
   },
   "admin": {
     "pageDescription": "管理人员、课程访问权限与系统操作。",
@@ -338,8 +382,8 @@
     "manage": "管理",
     "managePerson": "管理 {{name}}",
     "noUsers": "没有符合筛选条件的人员。",
-    "resultCount_one": "{{count}} 个账户",
-    "resultCount_other": "{{count}} 个账户",
+    "resultCount_one": "{{count, number}} 个账户",
+    "resultCount_other": "{{count, number}} 个账户",
     "directoryPages": "人员列表分页",
     "accountDetails": "账户详情",
     "accountActions": "账户操作",
@@ -372,8 +416,8 @@
     "passwordHelp": "新账户需先通过“忘记密码”设置密码，再登录。",
     "tenantAccounts": "按机构查看账户",
     "tenantAccountsHelp": "展示系统人员列表中出现的机构，不代表完整机构目录。",
-    "linkedAccounts_one": "当前列表中有 {{count}} 个账户",
-    "linkedAccounts_other": "当前列表中有 {{count}} 个账户",
+    "linkedAccounts_one": "当前列表中有 {{count, number}} 个账户",
+    "linkedAccounts_other": "当前列表中有 {{count, number}} 个账户",
     "viewUsers": "查看人员",
     "noTenants": "当前列表中没有可显示的机构账户。",
     "tenantUnavailable": "此版本暂不支持创建和维护机构。创建账户时请使用现有机构 ID。",
@@ -468,7 +512,7 @@
     "coursesFailed": "暂时无法加载进行中的课程。",
     "noCourses": "暂无进行中的课程可供管理。",
     "courseAccess": "课程访问权限",
-    "courseAccessHelp": "先选择教师的课程，再添加学生。",
+    "courseAccessHelp": "先选择教师的课程，再添加学生或设置助教。",
     "teacherCourse": "教师的课程",
     "teacherLabel": "教师：{{name}}",
     "courseContext": "课程 #{{courseId}} · 机构 #{{tenantId}}",
@@ -482,7 +526,7 @@
     "enrollTa": "加入课程并设为助教",
     "enrollStudent": "添加学生",
     "taHelp": "助教权限仅适用于所选课程，账户的平台身份仍为学生。",
-    "memberHelp": "查看所选课程的成员。",
+    "memberHelp": "助教是课程内角色，不会更改账户的平台身份。",
     "searchCourse": "搜索课程成员",
     "memberSearchPlaceholder": "姓名、邮箱或用户 ID",
     "loadingMembers": "正在加载课程成员…",
@@ -495,7 +539,7 @@
       "TA": "助教"
     },
     "createRejected": "受管理账户未创建。{{detail}}{{guidance}}",
-    "createFallback": "服务器拒绝了请求，但未提供原因。",
+    "createFallback": "暂时无法完成请求，请核对填写内容后重试。",
     "createConflict": " 邮箱或生成的用户名可能已被其他账户使用。",
     "searchCourses": "搜索课程",
     "courseSearchPlaceholder": "课程名称或代码",
@@ -525,8 +569,8 @@
       "email": "邮箱",
       "username": "用户名"
     },
-    "recordsMore_one": "显示更多（剩余 {{count}} 项）",
-    "recordsMore_other": "显示更多（剩余 {{count}} 项）",
+    "recordsMore_one": "显示更多（剩余 {{count, number}} 项）",
+    "recordsMore_other": "显示更多（剩余 {{count, number}} 项）",
     "recordsEmptyGroup": "暂无{{label}}可显示。",
     "yes": "是",
     "no": "否",
@@ -569,7 +613,9 @@
       "totalQuestions": "题目总数",
       "correctAnswer": "正确答案"
     },
-    "usersFailed": "暂时无法加载用户列表。"
+    "usersFailed": "暂时无法加载用户列表。",
+    "partialTaRetry": "用户已加入课程，但助教权限未分配成功。请在成员名单中使用“设为助教”重试。",
+    "invalidTenantId": "请输入有效的机构编号（正整数）。"
   },
   "records": {
     "submittedAt": "提交时间：{{date}}",
@@ -581,7 +627,13 @@
     "student": "学生 {{id}}",
     "user": "用户 {{id}}",
     "unit": "单元 {{number}}",
-    "week": "第 {{number}} 周"
+    "week": "第 {{number}} 周",
+    "unsupportedRecord": "收到的记录格式不受支持，请刷新页面或联系支持人员。",
+    "missingIdentity": "记录缺少有效标识，暂时无法操作，请刷新后重试。",
+    "unsupportedList": "未能读取有效的列表，请重试。",
+    "question": "第 {{number}} 题",
+    "id": "编号 {{id}}",
+    "advisor": "顾问 #{{id}}"
   },
   "navigationControls": {
     "backToStudents": "返回学生列表",
@@ -590,7 +642,7 @@
     "backToReports": "返回报告列表",
     "backToOverview": "返回概览",
     "backToGovernance": "返回机构管理",
-    "backToIntakes": "返回入学登记",
+    "backToIntakes": "返回入学档案",
     "vocabularyLibrary": "词汇库",
     "backToUnits": "返回单元列表",
     "previousWeek": "上一周日程",
@@ -623,7 +675,7 @@
     "viewSection": "查看考试部分",
     "composeSection": "编写考试部分",
     "fewerOccurrences": "收起课次",
-    "allOccurrences": "查看全部 {{count}} 个课次",
+    "allOccurrences": "查看全部 {{count, number}} 个课次",
     "resuming": "正在继续…",
     "starting": "正在开始…",
     "resumeTest": "继续测试",
@@ -631,7 +683,7 @@
     "startTest": "开始测试",
     "startRemember": "开始记忆",
     "resumeSession": "继续本次学习",
-    "allAnnouncements": "查看全部公告（{{count}}）",
+    "allAnnouncements": "查看全部公告（{{count, number}}）",
     "viewPhase": "查看第 {{number}} 阶段",
     "previousPeriod": {
       "day": "前一天",
@@ -652,14 +704,41 @@
       "listening": "下一部分",
       "reading": "下一篇文章",
       "writing": "下一项任务"
-    }
+    },
+    "openNotifications": "打开通知"
   },
   "refreshControls": {
-    "intakes": "刷新入学登记",
+    "intakes": "刷新入学档案",
     "directory": "刷新用户目录",
     "audit": "刷新审计记录",
     "ownerships": "刷新课程归属",
     "alertRules": "刷新提醒规则",
     "unsavedChanges": "请先保存或取消更改，再刷新"
+  },
+  "http": {
+    "notFound": "未找到所需内容，或该内容目前不可用。",
+    "unsupported": "此内容不支持该操作。",
+    "conflict": "内容发生冲突，可能已被其他用户更新。",
+    "serverError": "服务暂时出现问题，请稍后重试。"
+  },
+  "files": {
+    "loadingPreview": "正在加载预览…",
+    "unusableFile": "未收到可用的文件内容，请重试。",
+    "uploadFailed": "文件上传失败，请重试。",
+    "retryHelp": "请重新选择文件以重试。",
+    "deleting": "正在删除文件",
+    "deleteFailed": "无法删除此文件，请重试。"
+  },
+  "validation": {
+    "checkFields": "请检查必填项并输入有效内容，再继续操作。",
+    "requiredField": "请填写此字段。",
+    "url": "请输入有效的网址。",
+    "number": "请输入有效的数字。",
+    "minimum": "请输入不小于 {{value}} 的值。",
+    "maximum": "请输入不大于 {{value}} 的值。",
+    "minimumLength": "请至少输入 {{value}} 个字符。",
+    "maximumLength": "请输入不超过 {{value}} 个字符。",
+    "step": "请按允许的增量输入数值。",
+    "format": "请检查此值并使用要求的格式。"
   }
 }

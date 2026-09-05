@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {ASSIGNMENT_GRADING_ROUTE} from '@/configs/coursePaths';
 import {Suspense, lazy} from "react";
@@ -78,10 +79,11 @@ const SignedInHome = () => {
 };
 
 const App = () => {
+  const {t: translate} = useTranslation();
   return (
     <AuthProvider>
       <Router>
-        <Suspense fallback={<div role="status">Loading…</div>}>
+        <Suspense fallback={<div role="status">{translate("common:feedback.loading")}</div>}>
           <Routes>
             <Route path={APP_ROUTE_PATHS.login}
                    element={

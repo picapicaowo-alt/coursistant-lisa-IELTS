@@ -1,3 +1,6 @@
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
 import {isRecord} from '@/pages/MockExamSessionPage/runner/api/runtimeData';
 
 export type Section = 'listening' | 'reading' | 'writing'
@@ -50,16 +53,16 @@ export function normalizeStudentExams(value: unknown): StudentExamSummary[] {
       .filter((section) => includesSection(item, section))
     return [{
       id: idValue,
-      title: nestedString(item, 'title') ?? `Mock exam ${idValue}`,
-      label: nestedString(item, 'label') ?? 'Mock exam',
-      status: asString(item.status) ?? 'Status unavailable',
+      title: nestedString(item, 'title') ?? i18n.t('exams:untitled', {id: idValue}),
+      label: nestedString(item, 'label') ?? i18n.t('exams:label'),
+      status: asString(item.status) ?? 'UNKNOWN',
       assignedAt: asString(item.assignedAt) ?? asString(item.createdAt),
       sections,
       attemptStatus: asString(item.attemptStatus),
       results: {
-        reading: typeof item.readingCorrect === 'number' && typeof item.readingTotal === 'number' ? `${item.readingCorrect} / ${item.readingTotal} correct` : undefined,
-        listening: typeof item.listeningCorrect === 'number' && typeof item.listeningTotal === 'number' ? `${item.listeningCorrect} / ${item.listeningTotal} correct` : undefined,
-        writing: typeof item.writingScore === 'number' ? `Score ${item.writingScore}` : asString(item.writingGradeStatus)?.replace(/_/g, ' ').toLowerCase(),
+        reading: typeof item.readingCorrect === 'number' && typeof item.readingTotal === 'number' ? i18n.t('exams:correctCount', {correct: formatNumber(item.readingCorrect), total: formatNumber(item.readingTotal)}) : undefined,
+        listening: typeof item.listeningCorrect === 'number' && typeof item.listeningTotal === 'number' ? i18n.t('exams:correctCount', {correct: formatNumber(item.listeningCorrect), total: formatNumber(item.listeningTotal)}) : undefined,
+        writing: typeof item.writingScore === 'number' ? i18n.t('exams:score', {score: formatNumber(item.writingScore)}) : asString(item.writingGradeStatus) ? statusLabel(asString(item.writingGradeStatus)) : undefined,
       },
     }]
   })

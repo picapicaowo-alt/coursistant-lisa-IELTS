@@ -1,4 +1,6 @@
-import {useTranslation} from 'react-i18next';
+import {LocalizedError} from '@/i18n/errors';
+import {formatNumber} from '@/i18n/formatting';
+import { useTranslation } from 'react-i18next';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {
@@ -34,7 +36,7 @@ import ui from '@/components/TenantWorkspace/workspace.module.scss';
 import styles from './tenant.module.scss';
 
 export function TenantTemplateEditor({templateId}: {templateId: number}) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const [params, setParams] = useSearchParams();
   const requestedSection = params.get('section');
   const activeSection = isSection(requestedSection) ? requestedSection : null;
@@ -74,19 +76,18 @@ export function TenantTemplateEditor({templateId}: {templateId: number}) {
         className={`${ui.pageHeader} ${activeSection ? styles.composerHeading : styles.editorHeading}`}
       >
         <div>
-          <h1>{template.data?.title || 'Mock exam template'}</h1>
+          <h1>{template.data?.title || translate("exams:templates.templateTitle")}</h1>
           {activeSection ? (
             <nav
               className={styles.composerBreadcrumb}
-              aria-label="Exam breadcrumb"
+              aria-label={translate("exams:templates.breadcrumb")}
             >
               <button
                 type="button"
                 disabled={contentBusy}
                 onClick={() => setParams({})}
               >
-                Mock exam templates
-              </button>
+                {translate("common:navigationControls.backToTemplates")}</button>
               <span aria-hidden="true">›</span>
               <button
                 type="button"
@@ -98,26 +99,25 @@ export function TenantTemplateEditor({templateId}: {templateId: number}) {
                   })
                 }
               >
-                {template.data?.label || 'Version overview'}
+                {template.data?.label || translate("exams:templates.versionOverview")}
               </button>
               <span aria-hidden="true">›</span>
               <span aria-current="page">
-                {SECTION_META[activeSection].label}
+                {translate(SECTION_META[activeSection].labelKey)}
               </span>
             </nav>
           ) : (
             <p>
-              Template #{templateId}
+              {translate('exams:staff.template', {id: formatNumber(templateId)})}
               {version
-                ? ` · Version ${version.versionNo ?? '—'} · ${readableValue(version.status)}`
+                ? <> · {translate('courseTools:delivery.version', {number: version.versionNo == null ? '—' : formatNumber(version.versionNo)})} · {readableValue(version.status)}</>
                 : ''}
             </p>
           )}
         </div>
         {versions.length ? (
           <label className={styles.versionSelect}>
-            Working version
-            <select
+            {translate("exams:templates.workingVersion")}<select
               disabled={contentBusy}
               value={version?.id ?? ''}
               onChange={(event) =>
@@ -129,7 +129,7 @@ export function TenantTemplateEditor({templateId}: {templateId: number}) {
             >
               {versions.map((item) => (
                 <option key={item.id} value={item.id}>
-                  Version {item.versionNo ?? '—'} · {readableValue(item.status)}
+                  {translate('courseTools:delivery.version', {number: item.versionNo == null ? '—' : formatNumber(item.versionNo)})} · {readableValue(item.status)}
                 </option>
               ))}
             </select>
@@ -137,16 +137,15 @@ export function TenantTemplateEditor({templateId}: {templateId: number}) {
         ) : null}
       </header>
       {template.isPending ? (
-        <p className={ui.status}>Loading template…</p>
+        <p className={ui.status}>{translate("exams:templates.loading")}</p>
       ) : template.isError ? (
         <div className={ui.errorNotice}>
-          {getApiErrorMessage(template.error, 'Template unavailable.')}
+          {getApiErrorMessage(template.error, translate('exams:templates.unavailable'))}
           <button
             className={ui.textButton}
             onClick={() => void template.refetch()}
           >
-            Try again
-          </button>
+            {translate("common:actions.tryAgain")}</button>
         </div>
       ) : version?.id ? (
         <VersionWorkspace
@@ -157,7 +156,7 @@ export function TenantTemplateEditor({templateId}: {templateId: number}) {
           title={template.data?.title}
         />
       ) : (
-        <p className={ui.empty}>No version is available for this template.</p>
+        <p className={ui.empty}>{translate("exams:templates.noVersion")}</p>
       )}
     </div>
   );
@@ -174,7 +173,7 @@ function VersionWorkspace({
   label?: string;
   title?: string;
 }) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const versionId = version.id!;
   const [params, setParams] = useSearchParams();
   const client = useQueryClient();
@@ -215,7 +214,7 @@ function VersionWorkspace({
     mutationKey,
     mutationFn: async (kind: 'publish' | 'archive' | 'copy' | 'delete') => {
       if (client.isMutating({mutationKey}) > 1)
-        throw new Error('Wait for the current content operation to finish.');
+        throw new LocalizedError("exams:templates.contentBusy");
       if (kind === 'copy') {
         const data = unwrapData(
           await mockExamApiService.copyTenantVersion(
@@ -270,19 +269,15 @@ function VersionWorkspace({
       <>
         {contentBusy ? (
           <p className={ui.hint} role="status">
-            A content operation is in progress. Wait before submitting or
-            changing this version.
-          </p>
+            {translate("exams:templates.contentBusyHelp")}</p>
         ) : null}
         {!storageAvailable ? (
           <p className={ui.inlineError}>
-            Browser draft storage is unavailable. Keep this page open until your
-            section is submitted.
-          </p>
+            {translate("exams:templates.storageUnavailable")}</p>
         ) : null}
         <nav
           className={`${ui.tabs} ${styles.composerTabs}`}
-          aria-label="Exam sections"
+          aria-label={translate("exams:templates.sections")}
         >
           {SECTIONS.map((item) => (
             <button
@@ -291,7 +286,7 @@ function VersionWorkspace({
               aria-current={section === item ? 'page' : undefined}
               onClick={() => setSection(item)}
             >
-              {SECTION_META[item].label}
+              {translate(SECTION_META[item].labelKey)}
               {current[SECTION_META[item].flag] === true ? (
                 <LockKeyhole size={14} />
               ) : null}
@@ -299,16 +294,14 @@ function VersionWorkspace({
           ))}
         </nav>
         {detail.isPending ? (
-          <p className={ui.status}>Checking the current version…</p>
+          <p className={ui.status}>{translate("exams:templates.checkingVersion")}</p>
         ) : detail.isError ? (
           <div className={ui.errorNotice}>
-            The version could not be verified.
-            <button
+            {translate("exams:templates.versionUnverified")}<button
               className={ui.textButton}
               onClick={() => void detail.refetch()}
             >
-              Try again
-            </button>
+              {translate("common:actions.tryAgain")}</button>
           </div>
         ) : current[SECTION_META[section].flag] === true ? (
           <SavedSection
@@ -346,14 +339,11 @@ function VersionWorkspace({
           />
         ) : (
           <div className={ui.surface}>
-            <h2>Content unavailable</h2>
+            <h2>{translate("exams:templates.contentUnavailable")}</h2>
             <p className={ui.hint}>
-              Only an explicitly empty section in a draft version can accept new
-              content.
-            </p>
+              {translate("exams:templates.contentUnavailableHelp")}</p>
             <button className={ui.textButton} onClick={() => setSection(null)}>
-              Back to version
-            </button>
+              {translate("common:navigationControls.backToVersion")}</button>
           </div>
         )}
       </>
@@ -362,8 +352,8 @@ function VersionWorkspace({
     <div className={styles.editorGrid}>
       <section>
         <div className={ui.sectionHeading}>
-          <h2>Exam sections</h2>
-          <span className={ui.hint}>Listening · Reading · Writing</span>
+          <h2>{translate("exams:templates.sections")}</h2>
+          <span className={ui.hint}>{translate("exams:templates.sectionList")}</span>
         </div>
         <div className={styles.examSections}>
           {SECTIONS.map((item) => {
@@ -376,13 +366,13 @@ function VersionWorkspace({
                     <meta.Icon size={23} />
                   </span>
                   <div>
-                    <h3>{meta.label}</h3>
+                    <h3>{translate(meta.labelKey)}</h3>
                     <p>
                       {saved
-                        ? 'Content saved · Read only'
+                        ? translate("exams:templates.savedReadOnly")
                         : current[meta.flag] === false
-                          ? 'No content saved yet'
-                          : 'Content status unavailable'}
+                          ? translate("exams:templates.noSavedContent")
+                          : translate("exams:templates.contentStatusUnavailable")}
                     </p>
                   </div>
                   <span
@@ -390,16 +380,16 @@ function VersionWorkspace({
                     data-tone={saved ? 'SAVED' : 'DRAFT'}
                   >
                     {saved
-                      ? 'Saved'
+                      ? translate("assessment:attempt.saved")
                       : current[meta.flag] === false
-                        ? 'Not started'
-                        : 'Unavailable'}
+                        ? translate("common:status.NOT_STARTED")
+                        : translate('course:learning.dataUnavailable')}
                   </span>
                 </div>
                 <p className={ui.hint}>
                   {saved
-                    ? 'Review the saved content and preview its protected media.'
-                    : `Compose ${meta.label.toLowerCase()} content, then submit the complete section once.`}
+                    ? translate("exams:templates.reviewSavedHelp")
+                    : translate('exams:templates.composeHelp', {section: translate(meta.labelKey)})}
                 </p>
                 <button
                   className={saved ? ui.secondaryButton : ui.primaryButton}
@@ -410,7 +400,7 @@ function VersionWorkspace({
                   }
                   onClick={() => setSection(item)}
                 >
-                  {saved ? translate('common:navigationControls.viewSection') : translate('common:navigationControls.composeSection')}
+                  {saved ? translate("common:navigationControls.viewSection") : translate('common:navigationControls.composeSection')}
 
                 </button>
               </article>
@@ -419,23 +409,23 @@ function VersionWorkspace({
         </div>
       </section>
       <aside className={`${ui.surface} ${styles.versionDetails}`}>
-        <h2>Template details</h2>
+        <h2>{translate("exams:templates.details")}</h2>
         <dl className={ui.detailList}>
-          <dt>Status</dt>
+          <dt>{translate("common:fields.status")}</dt>
           <dd>
             <span className={ui.badge} data-tone={current.status}>
               {readableValue(current.status)}
             </span>
           </dd>
-          <dt>Internal label</dt>
+          <dt>{translate("exams:templates.internalLabel")}</dt>
           <dd>{label || '—'}</dd>
-          <dt>Candidate title</dt>
+          <dt>{translate("exams:templates.candidateTitle")}</dt>
           <dd>{title || '—'}</dd>
-          <dt>Version created</dt>
+          <dt>{translate("exams:templates.createdDate")}</dt>
           <dd>{tenantDate(version.createdAt)}</dd>
           {version.publishedAt ? (
             <>
-              <dt>Published</dt>
+              <dt>{translate("common:status.PUBLISHED")}</dt>
               <dd>{tenantDate(version.publishedAt)}</dd>
             </>
           ) : null}
@@ -448,7 +438,7 @@ function VersionWorkspace({
             }
             onClick={() => action.mutate('publish')}
           >
-            {action.isPending ? 'Working…' : 'Publish complete draft'}
+            {action.isPending ? translate("common:actions.working") : translate("exams:templates.publishComplete")}
           </button>
           <button
             className={ui.secondaryButton}
@@ -456,20 +446,16 @@ function VersionWorkspace({
             onClick={() => action.mutate('copy')}
           >
             <Copy size={16} />
-            Copy to new draft
-          </button>
+            {translate("exams:templates.copyToDraft")}</button>
           <p className={ui.hint}>
-            Copies retain saved, read-only content. All three sections are
-            required before publishing.
-          </p>
+            {translate("exams:templates.copyHelp")}</p>
           {current.status === 'PUBLISHED' ? (
             <button
               className={ui.textButton}
               disabled={contentBusy}
               onClick={() => setConfirmAction('archive')}
             >
-              Archive version
-            </button>
+              {translate("exams:templates.archive")}</button>
           ) : null}
           {isDraft ? (
             <button
@@ -477,16 +463,15 @@ function VersionWorkspace({
               disabled={contentBusy}
               onClick={() => setConfirmAction('delete')}
             >
-              Delete draft
-            </button>
+              {translate("exams:templates.deleteDraft")}</button>
           ) : null}
         </div>
         {confirmAction ? (
           <div className={ui.confirmBox}>
             <p>
               {confirmAction === 'delete'
-                ? 'Delete this draft version and its content? This cannot be undone.'
-                : 'Archive this published version? It will no longer be available for new assignments.'}
+                ? translate("exams:templates.confirmDelete")
+                : translate("exams:templates.confirmArchive")}
             </p>
             <div>
               <button
@@ -494,41 +479,38 @@ function VersionWorkspace({
                 disabled={contentBusy}
                 onClick={() => action.mutate(confirmAction)}
               >
-                Confirm {confirmAction}
+                {translate('common:actions.confirmTarget', {target: translate(confirmAction === 'delete' ? 'common:actions.delete' : 'common:status.ARCHIVE')})}
               </button>
               <button
                 className={ui.secondaryButton}
                 disabled={contentBusy}
                 onClick={() => setConfirmAction(null)}
               >
-                Keep version
-              </button>
+                {translate("exams:templates.keepVersion")}</button>
             </div>
           </div>
         ) : null}
         {detail.isError ? (
           <p className={ui.inlineError}>
-            The version could not be verified.{' '}
+            {translate("exams:templates.versionUnverified")}{' '}
             <button
               className={ui.textButton}
               onClick={() => void detail.refetch()}
             >
-              Retry
-            </button>
+              {translate("common:actions.retry")}</button>
           </p>
         ) : null}
         {action.error ? (
           <p className={ui.inlineError} role="alert">
             {getApiErrorMessage(
               action.error,
-              'The version operation failed. Your content has not been discarded.',
+              translate('exams:templates.operationFailed'),
             )}
           </p>
         ) : null}
         {action.isSuccess ? (
           <p className={ui.inlineSuccess} role="status">
-            Version operation completed.
-          </p>
+            {translate("exams:templates.operationComplete")}</p>
         ) : null}
       </aside>
     </div>
@@ -546,7 +528,7 @@ function SavedSection({
   section: Section;
   onBack: () => void;
 }) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const content = useQuery({
     queryKey: ['mock-exams', 'tenant', templateId, versionId, section],
     queryFn: async () =>
@@ -563,27 +545,22 @@ function SavedSection({
   return (
     <div className={ui.surface}>
       <div className={ui.sectionHeading}>
-        <h2>{SECTION_META[section].label} content</h2>
+        <h2>{translate('exams:templates.contentTitle', {section: translate(SECTION_META[section].labelKey)})}</h2>
         <span className={ui.badge}>
           <LockKeyhole size={14} />
-          Read only
-        </span>
+          {translate("courseTools:owner.readOnly")}</span>
       </div>
       <p className={ui.hint}>
-        This saved section is read only. The current API does not support
-        changing saved questions.
-      </p>
+        {translate("exams:templates.savedSectionHelp")}</p>
       {content.isPending ? (
-        <p className={ui.status}>Loading content…</p>
+        <p className={ui.status}>{translate("exams:templates.loadingContent")}</p>
       ) : content.isError ? (
         <p className={ui.inlineError}>
-          Content could not be loaded.
-          <button
+          {translate("exams:templates.contentFailed")}<button
             className={ui.textButton}
             onClick={() => void content.refetch()}
           >
-            Try again
-          </button>
+            {translate("common:actions.tryAgain")}</button>
         </p>
       ) : (
         <>

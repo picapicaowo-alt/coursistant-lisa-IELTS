@@ -180,7 +180,7 @@ describe('WorkflowPanel', () => {
     const dialog = await screen.findByRole('dialog', {name: 'Deadline change approval'});
     await user.click(within(dialog).getByRole('button', {name: 'Allow'}));
 
-    expect(await within(dialog).findByRole('alert')).toHaveTextContent('The LMS rejected this deadline change.');
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('Workflow is temporarily unavailable. Please try again.');
     expect(within(dialog).getByRole('button', {name: 'Reject'})).toBeEnabled();
     expect(screen.getByRole('dialog', {name: 'Deadline change approval'})).toBeInTheDocument();
   });

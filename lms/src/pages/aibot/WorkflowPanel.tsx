@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {FormEvent, useEffect, useRef, useState} from 'react';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
 import {
@@ -14,9 +15,10 @@ import {
   isGenericAssistantReset,
   lastOriginalUserRequest,
   toChatHistory,
+  workflowErrorMessage,
+  workflowMessageText,
   type WorkflowChatMessage,
 } from './workflowConversation';
-import {getApiErrorCode, getApiErrorMessage} from '@/utils/apiError';
 import DynamicThinking from '@/components/DynamicThinking/DynamicThinking';
 import MarkdownMessage from '@/components/MarkdownMessage';
 import {RichTextEditor} from '@/components/RichTextEditor';
@@ -25,32 +27,24 @@ import styles from './index.module.scss';
 import {isInstructorLevel} from '@/utils/roleCapabilities';
 
 const READ_ONLY_QUICK_PROMPTS = [
-  'What assignments are due in the next 14 days?',
-  'List my courses.',
+  'assistant:workflow.prompts.due',
+  'assistant:workflow.prompts.courses',
 ];
 
 const INSTRUCTOR_QUICK_PROMPTS = [
   ...READ_ONLY_QUICK_PROMPTS,
-  'Help me change an assignment deadline.',
+  'assistant:workflow.prompts.deadline',
 ];
 
 const WORKFLOW_THINKING_STEPS = [
-  {id: 'understand', text: 'Interpreting your request.'},
-  {id: 'context', text: 'Checking the relevant LMS context.'},
-  {id: 'response', text: 'Preparing the next step.'},
+  {id: 'understand', text: '', translationKey: 'assistant:workflow.steps.understand'},
+  {id: 'context', text: '', translationKey: 'assistant:thinking.tools'},
+  {id: 'response', text: '', translationKey: 'assistant:workflow.steps.response'},
 ];
 
 const getAgentRole = (user: ReturnType<typeof useRequiredAuth>['user']): AiAgentRole =>
   // UI-only. The agent backend must derive authorization from the Bearer token.
   isInstructorLevel(user) ? 'INSTRUCTOR' : 'STUDENT';
-
-const getErrorMessage = (error: unknown): string => {
-  const code = getApiErrorCode(error);
-  if (code === 'AI_EXAM_LOCKDOWN' || code === 'QUIZ_EXAM_LOCKDOWN') {
-    return 'AI assistance is not available while you have an active quiz attempt in progress.';
-  }
-  return getApiErrorMessage(error, 'Workflow is temporarily unavailable. Please try again.');
-};
 
 interface WorkflowPanelProps {
   isExpanded?: boolean;
@@ -63,6 +57,7 @@ const WorkflowPanel = ({
   isHidden = false,
   onToggleExpand,
 }: WorkflowPanelProps) => {
+  const { t: translate } = useTranslation();
   const {user} = useRequiredAuth();
   const role = getAgentRole(user);
   const canChangeDeadlines = role === 'INSTRUCTOR';
@@ -76,18 +71,19 @@ const WorkflowPanel = ({
   const [pendingConfirmation, setPendingConfirmation] = useState('');
   const [awaitingDetailsConfirmation, setAwaitingDetailsConfirmation] = useState(false);
   const [detailsConfirmation, setDetailsConfirmation] = useState('');
-  const [decisionError, setDecisionError] = useState<string | null>(null);
+  const [decisionError, setDecisionError] = useState<unknown>(null);
   const [messages, setMessages] = useState<WorkflowChatMessage[]>([
     {
       id: 0,
       sender: 'agent',
-      text: role === 'INSTRUCTOR'
-        ? 'I can check your courses and teaching deadlines, or prepare an assignment deadline change for your approval.'
-        : 'I can check your courses and upcoming assignment deadlines.',
+      text: '',
+      translationKey: role === 'INSTRUCTOR'
+        ? 'assistant:workflow.greeting.instructor'
+        : 'assistant:workflow.greeting.student',
     },
   ]);
 
-  const roleLabel = role === 'INSTRUCTOR' ? 'Instructor workflow' : 'Student workflow';
+  const roleLabel = translate(role === 'INSTRUCTOR' ? 'assistant:workflow.role.instructor' : 'assistant:workflow.role.student');
   const blockingDecision = Boolean(pendingAction) || awaitingDetailsConfirmation;
   const showQuickPrompts = messages.length === 1 && !isSending;
 
@@ -95,12 +91,14 @@ const WorkflowPanel = ({
     conversationEndRef.current?.scrollIntoView({behavior: 'smooth', block: 'nearest'});
   }, [isSending, messages, pendingAction, awaitingDetailsConfirmation]);
 
-  const addMessage = (sender: WorkflowChatMessage['sender'], text: string) => {
+  const addMessage = (sender: WorkflowChatMessage['sender'], text: string, metadata?: Pick<WorkflowChatMessage, 'translationKey' | 'error' | 'isControl'>) => {
     setMessages(current => [
       ...current,
-      {id: nextMessageId.current++, sender, text},
+      {id: nextMessageId.current++, sender, text, ...metadata},
     ]);
   };
+
+  const addReceipt = (translationKey: string) => addMessage('agent', '', {translationKey});
 
   const clearApprovalState = () => {
     setPendingAction(null);
@@ -117,20 +115,20 @@ const WorkflowPanel = ({
 
     if (!response.pendingAction && !response.reply.trim()) {
       clearApprovalState();
-      addMessage('agent', 'The AI Agent returned an empty response. Please try again.');
+      addReceipt('assistant:workflow.errors.empty');
       return;
     }
 
     if (response.pendingAction && !canChangeDeadlines) {
       clearApprovalState();
-      addMessage('agent', 'Students can view assignment deadlines, but only instructors can change them.');
+      addReceipt('assistant:workflow.errors.studentChange');
       return;
     }
 
     if (response.pendingAction) {
       if (!response.reply.trim()) {
         clearApprovalState();
-        addMessage('agent', 'The AI Agent returned an incomplete approval request. No changes were made. Please try again.');
+        addReceipt('assistant:workflow.errors.incompleteApproval');
         return;
       }
       setPendingAction(response.pendingAction);
@@ -148,7 +146,7 @@ const WorkflowPanel = ({
     if (needsDetailsConfirmation) {
       if (!response.reply.trim()) {
         clearApprovalState();
-        addMessage('agent', 'The AI Agent returned an incomplete confirmation request. No changes were made. Please try again.');
+        addReceipt('assistant:workflow.errors.incompleteConfirmation');
         return;
       }
       setPendingAction(null);
@@ -162,10 +160,7 @@ const WorkflowPanel = ({
 
     if (options?.afterDetailsConfirm && isGenericAssistantReset(response.reply)) {
       clearApprovalState();
-      addMessage(
-        'agent',
-        'Those details were confirmed. The next step is the deadline approval dialog, but the agent reset instead of continuing. Please send the full deadline change again.',
-      );
+      addReceipt('assistant:workflow.errors.reset');
       return;
     }
 
@@ -175,13 +170,14 @@ const WorkflowPanel = ({
 
   const sendMessage = async (
     message: string,
-    options?: {displayText?: string; afterDetailsConfirm?: boolean},
+    options?: {displayKey?: string; afterDetailsConfirm?: boolean},
   ) => {
     const trimmedMessage = message.trim();
     if (!trimmedMessage || isSending || pendingAction) return;
     if (awaitingDetailsConfirmation && !options?.afterDetailsConfirm) return;
 
-    addMessage('user', options?.displayText ?? trimmedMessage);
+    addMessage('user', options?.displayKey ? '' : trimmedMessage, options?.displayKey
+      ? {translationKey: options.displayKey, isControl: true} : undefined);
     setInput('');
     setDecisionError(null);
     if (!options?.afterDetailsConfirm) {
@@ -199,9 +195,9 @@ const WorkflowPanel = ({
       });
       applyAgentResponse(response, {afterDetailsConfirm: options?.afterDetailsConfirm});
     } catch (error) {
-      addMessage('agent', getErrorMessage(error));
+      addMessage('agent', '', {error, translationKey: 'assistant:errors.workflowUnavailable'});
       if (options?.afterDetailsConfirm) {
-        setDecisionError(getErrorMessage(error));
+        setDecisionError(error);
       }
     } finally {
       setIsSending(false);
@@ -217,15 +213,15 @@ const WorkflowPanel = ({
     if (!canChangeDeadlines || !awaitingDetailsConfirmation || isSending) return;
     void sendMessage(
       buildDetailsConfirmationMessage(lastOriginalUserRequest(messages)),
-      {displayText: 'Confirm', afterDetailsConfirm: true},
+      {displayKey: 'common:actions.confirm', afterDetailsConfirm: true},
     );
   };
 
   const handleCancelDetails = () => {
     if (isSending) return;
     clearApprovalState();
-    addMessage('user', 'Cancel');
-    addMessage('agent', 'The deadline change was cancelled. Send a new request when you are ready.');
+    addMessage('user', '', {translationKey: 'common:actions.cancel', isControl: true});
+    addReceipt('assistant:workflow.cancelled');
   };
 
   const handleDecision = async (decision: DeadlineDecision) => {
@@ -238,29 +234,25 @@ const WorkflowPanel = ({
         actionId: pendingAction.actionId,
         decision,
       });
-      addMessage(
-        'agent',
-        response.reply || (decision === 'ALLOW'
-          ? 'The deadline change was approved.'
-          : 'The deadline change was rejected.'),
-      );
+      if (response.reply) addMessage('agent', response.reply);
+      else addReceipt(decision === 'ALLOW' ? 'assistant:workflow.approved' : 'assistant:workflow.rejected');
       if (response.conversationId) {
         setConversationId(response.conversationId);
       }
       setPendingAction(response.pendingAction);
       setPendingConfirmation(response.pendingAction ? response.reply : '');
     } catch (error) {
-      setDecisionError(getErrorMessage(error));
+      setDecisionError(error);
     } finally {
       setIsSending(false);
     }
   };
 
   const inputPlaceholder = pendingAction
-    ? 'Approve or reject the pending change above.'
+    ? translate('assistant:workflow.placeholder.approval')
     : awaitingDetailsConfirmation
-      ? 'Confirm or cancel the details above.'
-      : 'Tell Workflow what to do…';
+      ? translate('assistant:workflow.placeholder.confirmation')
+      : translate('assistant:workflow.placeholder.request');
 
   return (
     <section
@@ -271,31 +263,30 @@ const WorkflowPanel = ({
       <div className={styles.toolHeader}>
         <div className={`${styles.toolIcon} ${styles.workflowIcon}`} aria-hidden="true">W</div>
         <div className={styles.toolHeading}>
-          <h2 id="workflow-title">Workflow</h2>
-          <span className={`${styles.badge} ${styles.workflowBadge}`}>Actions · Planning · Organization</span>
+          <h2 id="workflow-title">{translate("assistant:workspace.workflow")}</h2>
+          <span className={`${styles.badge} ${styles.workflowBadge}`}>{translate("assistant:workflow.badge")}</span>
         </div>
         {onToggleExpand ? <PanelExpandButton
-          panelName="Workflow"
+          panelName={translate('assistant:workspace.workflow')}
           isExpanded={isExpanded}
           onToggle={onToggleExpand}
         /> : null}
       </div>
       <p className={styles.toolDescription}>
-        Ask the AI Agent to inspect LMS data and complete supported tasks. Consequential changes always require approval.
-      </p>
+        {translate("assistant:workflow.description")}</p>
       <div className={styles.divider}/>
 
       {showQuickPrompts ? (
-        <div className={styles.quickPrompts} role="group" aria-label="Suggested workflow prompts">
-          <p>Try asking</p>
+        <div className={styles.quickPrompts} role="group" aria-label={translate("assistant:workflow.suggestions")}>
+          <p>{translate("assistant:workflow.tryAsking")}</p>
           {quickPrompts.map(prompt => (
             <button
               type="button"
               key={prompt}
-              onClick={() => void sendMessage(prompt)}
+              onClick={() => void sendMessage(translate(prompt))}
               disabled={isSending || blockingDecision}
             >
-              {prompt}
+              {translate(prompt)}
             </button>
           ))}
         </div>
@@ -308,13 +299,13 @@ const WorkflowPanel = ({
             key={message.id}
             className={`${styles.message} ${message.sender === 'user' ? styles.userMessage : styles.agentMessage} ${index === messages.length - 1 ? styles.lastMessage : ''}`}
           >
-            <MarkdownMessage content={message.text}/>
+            <MarkdownMessage content={workflowMessageText(message)}/>
           </div>
         ))}
 
         {isSending ? (
           <DynamicThinking
-            label="AI Agent is thinking"
+            label={translate("assistant:workflow.thinking")}
             fallbackSteps={WORKFLOW_THINKING_STEPS}
           />
         ) : null}
@@ -331,25 +322,24 @@ const WorkflowPanel = ({
           onSubmit={() => void sendMessage(input)}
           placeholder={inputPlaceholder}
           disabled={isSending || blockingDecision}
-          ariaLabel="Tell Workflow what to do"
+          ariaLabel={translate("assistant:workflow.input")}
         />
         <div className={styles.inputFooter}>
-          <span>Enter to send · Shift+Enter for a new line</span>
+          <span>{translate("assistant:keyboardHelp")}</span>
           <button type="submit" disabled={isSending || blockingDecision || !input.trim()}>
-            Run
-          </button>
+            {translate("assistant:workflow.run")}</button>
         </div>
       </form>
 
       {canChangeDeadlines && awaitingDetailsConfirmation && !pendingAction ? (
         <DeadlineDecisionModal
-          title="Confirm assignment details"
-          eyebrow="Review details"
+          title={translate("assistant:workflow.detailsTitle")}
+          eyebrow={translate('assistant:workflow.reviewDetails')}
           confirmationText={detailsConfirmation}
-          warningText="Confirming continues to the deadline approval step. The due date has not changed yet."
-          confirmLabel="Confirm"
-          cancelLabel="Cancel"
-          errorMessage={decisionError}
+          warningText={translate('assistant:workflow.detailsWarning')}
+          confirmLabel={translate("common:actions.confirm")}
+          cancelLabel={translate("common:actions.cancel")}
+          errorMessage={decisionError ? workflowErrorMessage(decisionError) : null}
           isSubmitting={isSending}
           onDecision={decision => {
             if (decision === 'ALLOW') handleConfirmDetails();
@@ -361,7 +351,7 @@ const WorkflowPanel = ({
       {canChangeDeadlines && pendingAction ? (
         <DeadlineDecisionModal
           confirmationText={pendingConfirmation}
-          errorMessage={decisionError}
+          errorMessage={decisionError ? workflowErrorMessage(decisionError) : null}
           isSubmitting={isSending}
           onDecision={decision => void handleDecision(decision)}
         />

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState } from 'react'
 import type { NoteItem } from '../types/annotation'
 
@@ -9,6 +10,7 @@ type NotesPanelProps = {
 }
 
 export function NotesPanel({ notes, onAdd, onDelete, onClose }: NotesPanelProps) {
+  const { t: translate } = useTranslation();
   const [draft, setDraft] = useState('')
 
   const handleAdd = () => {
@@ -19,26 +21,25 @@ export function NotesPanel({ notes, onAdd, onDelete, onClose }: NotesPanelProps)
   }
 
   return (
-    <div className="notes-panel" role="dialog" aria-label="Notes">
+    <div className="notes-panel" role="dialog" aria-label={translate("exams:schema.notes")}>
       <div className="notes-panel__header">
-        <h3>Notes</h3>
-        <button type="button" className="notes-panel__close" onClick={onClose} aria-label="Close notes">
+        <h3>{translate("exams:schema.notes")}</h3>
+        <button type="button" className="notes-panel__close" onClick={onClose} aria-label={translate('exams:runner.closeNotes')}>
           ×
         </button>
       </div>
       <textarea
         className="notes-panel__input"
         rows={4}
-        placeholder="Write a note for this passage…"
+        placeholder={translate('exams:runner.notePlaceholder')}
+        aria-label={translate('exams:schema.notes')}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
       />
-      <button type="button" className="notes-panel__add" onClick={handleAdd}>
-        Add note
-      </button>
+      <button type="button" className="notes-panel__add" onClick={handleAdd}>{translate('exams:runner.addNote')}</button>
       <ul className="notes-panel__list">
         {notes.length === 0 ? (
-          <li className="notes-panel__empty">No notes yet.</li>
+          <li className="notes-panel__empty">{translate('exams:runner.noNotes')}</li>
         ) : (
           notes.map((note) => (
             <li key={note.id} className="notes-panel__item">
@@ -47,10 +48,9 @@ export function NotesPanel({ notes, onAdd, onDelete, onClose }: NotesPanelProps)
                 type="button"
                 className="notes-panel__delete"
                 onClick={() => onDelete(note.id)}
-                aria-label="Delete note"
+                aria-label={translate('exams:runner.deleteNote')}
               >
-                Delete
-              </button>
+                {translate("common:actions.delete")}</button>
             </li>
           ))
         )}

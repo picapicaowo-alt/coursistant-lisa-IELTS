@@ -16,11 +16,11 @@ describe('editor media files', () => {
 
   it('rejects oversized files', () => {
     const huge = new File([new Uint8Array(8 * 1024 * 1024 + 1)], 'big.png', {type: 'image/png'});
-    expect(validateEditorFile(huge)).toMatch(/8 MB/i);
+    expect(validateEditorFile(huge)?.localizedMessage()).toMatch(/8 MB/i);
   });
 
   it('blocks HTML uploads', () => {
-    expect(validateEditorFile(html)).toMatch(/image, video, PDF, Office document, ZIP, or text file/i);
+    expect(validateEditorFile(html)?.localizedMessage()).toMatch(/image, video, PDF, Office document, ZIP, or text file/i);
   });
 
   it('reads a file into a typed data URL', async () => {

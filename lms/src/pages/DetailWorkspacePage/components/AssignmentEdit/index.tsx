@@ -40,14 +40,14 @@ export const AssignmentEdit: React.FC = () => {
               title: e.target.value,
             })
           }}
-          placeholder={t("assignmentModal.titlePlaceholder")}
+          placeholder={t("course:assignmentModal.titlePlaceholder")}
           className={styles.titleInput}
           maxLength={50}
         />
       </div>
       
-      <PropertyForm title={t("assignment.basics")}>
-        <PropertyRow title={t("assignmentModal.dueTimeLabel")}>
+      <PropertyForm title={t("course:info.basic")}>
+        <PropertyRow title={t("course:assignmentModal.dueTimeLabel")}>
           <EnglishDateTimeInput
             value={toLocalDateTimeValue(assignment.dueTime)}
             onChangeValue={(value) => {
@@ -58,7 +58,7 @@ export const AssignmentEdit: React.FC = () => {
           />
         </PropertyRow>
         
-        <PropertyRow title={t("assignmentModal.typeLabel")}>
+        <PropertyRow title={t("common:fields.type")}>
           <select
             value={assignment.type}
             onChange={(e) => {
@@ -68,7 +68,7 @@ export const AssignmentEdit: React.FC = () => {
           >
             {DOCUMENT_CATEGORIES.map((type) => (
               <option key={type} value={type}>
-                {t(`assignmentModal.categories.${type.toLowerCase()}`)}
+                {t(`course:assignmentModal.categories.${type.toLowerCase()}`)}
               </option>
             ))}
           </select>
@@ -111,7 +111,7 @@ export const AssignmentEdit: React.FC = () => {
       <PropertyForm title={t('assignmentEdit.description')} transparent={true}>
         <RichTextEditor
           content={assignment.description}
-          placeholder={t("blockEditor.placeholder")}
+          placeholder={t("course:blockEditor.placeholder")}
           onChange={(value) => {
             update("assignments", assignment.id, {
               description: value,

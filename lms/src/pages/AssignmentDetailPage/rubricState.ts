@@ -1,7 +1,7 @@
-import type {RubricState} from '@/apis';
-import {unwrapData} from '@/apis';
-import {assignmentApiService} from '@/apis/services/assignment-api';
-import {getApiErrorCode} from '@/utils/apiError';
+import type { RubricState } from "@/apis";
+import { unwrapData } from "@/apis";
+import { assignmentApiService } from "@/apis/services/assignment-api";
+import { getApiErrorCode } from "@/utils/apiError";
 
 export const loadRubricState = async (
   courseId: number,
@@ -10,10 +10,10 @@ export const loadRubricState = async (
   try {
     return unwrapData(
       await assignmentApiService.getRubric(courseId, assignmentId),
-      'getRubric',
+      "getRubric",
     );
   } catch (error) {
-    if (getApiErrorCode(error) === 'RUBRIC_NOT_FOUND') {
+    if (getApiErrorCode(error) === "RUBRIC_NOT_FOUND") {
       return {
         posted: false,
         assignmentId,

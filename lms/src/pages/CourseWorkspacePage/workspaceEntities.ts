@@ -33,8 +33,9 @@ export interface AssignmentEntity extends BaseEntity {
 
 export const assignmentEntityConfig: EntityConfig<AssignmentEntity> = {
   defaultValues: {
-    title: "New assignment",
-    description: "No description...",
+    // Authored fields start empty. UI placeholders must never become saved content.
+    title: "",
+    description: "",
     type: "homework",
     dueTime: new Date(),
     settings: {
@@ -44,7 +45,7 @@ export const assignmentEntityConfig: EntityConfig<AssignmentEntity> = {
   },
   validate: (data) => {
     const errors: Record<string, string> = {};
-    if (!data.title) errors.title = 'Title is required';
+    if (!data.title) errors.title = 'course:assignmentModal.titleRequired';
     return Object.keys(errors).length > 0 ? errors : null;
   },
 };
@@ -59,7 +60,7 @@ export interface FileEntity extends BaseEntity {
 export const fileEntityConfig: EntityConfig<FileEntity> = {
   validate: (data) => {
     const errors: Record<string, string> = {};
-    if (!data.filename) errors.name = 'Filename is required';
+    if (!data.filename) errors.name = 'course:courseContentModal.nameRequired';
     return Object.keys(errors).length > 0 ? errors : null;
   }
 };

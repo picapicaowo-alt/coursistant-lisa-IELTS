@@ -1,4 +1,14 @@
 import { formatPersonName } from "@/utils/personName";
+import i18n from "@/i18n";
+import {
+  formatClockTime,
+  formatDateValue,
+  formatNumber,
+  formatNumericText,
+  formatWeekday,
+} from "@/i18n/formatting";
+import { roleLabel, statusLabel } from "@/i18n/presentation";
+import { formatFileSize } from "@/utils/file-utils";
 
 export type RecordValue = Record<string, unknown>;
 export const asRecord = (value: unknown): RecordValue | null =>
@@ -21,6 +31,20 @@ export const humanize = (value: string): string =>
     .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
     .replace(/[_-]+/g, " ")
     .replace(/^./, (letter) => letter.toUpperCase());
+
+const sharedFieldKeys: Record<string, string> = {
+  submissionRequirement: 'advising:journey.submissionRequirement',
+  advisorPrivateNotes: 'advising:profile.privateNotes',
+};
+
+export function recordFieldLabel(key: string): string {
+  if (sharedFieldKeys[key]) return i18n.t(sharedFieldKeys[key]);
+  const shared = `common:fields.${key}`;
+  if (i18n.exists(shared)) return i18n.t(shared);
+  // Unexpected contract fields remain visible, and the shared missing-key
+  // warning identifies the field that needs a reviewed translation.
+  return i18n.t(`records:fields.${key}`, { defaultValue: humanize(key) });
+}
 
 // Generic reads are presentation boundaries, not permission boundaries. Keep
 // internal concurrency, storage and authentication metadata out of product UI.
@@ -69,16 +93,51 @@ export function recordHeading(record: RecordValue): {
     (key) => typeof record[key] === "string" && record[key].trim(),
   );
   return key
-    ? { title: String(record[key]), consumed: new Set([key]) }
+    ? {
+        title: displayScalar(record[key], key) ?? undefined,
+        consumed: new Set([key]),
+      }
     : { consumed: new Set() };
 }
 
-export function displayScalar(value: unknown): string | null {
-  if (typeof value === "boolean") return value ? "Yes" : "No";
+const ENUM_FIELDS = new Set([
+  "status",
+  "state",
+  "rawStatus",
+  "effectiveStatus",
+  "enrollmentStatus",
+  "requestType",
+  "reportType",
+  "taskType",
+  "notificationType",
+  "studentType",
+  "materialType",
+  "teachingType",
+  "decision",
+  "instructorDecision",
+  "skillCode",
+  "priority",
+  "severity",
+  "riskLevel",
+]);
+
+export function displayScalar(value: unknown, key?: string): string | null {
+  if (typeof value === "boolean")
+    return i18n.t(value ? "common:common.yes" : "common:common.no");
   if (typeof value === "number")
-    return Number.isFinite(value) ? String(value) : null;
+    return Number.isFinite(value)
+      ? key === "sizeBytes"
+        ? formatFileSize(value)
+        : formatNumber(value, { maximumFractionDigits: 20 })
+      : null;
   if (typeof value !== "string" || !value.trim()) return null;
-  return /^[A-Z]+(?:_[A-Z]+)+$/.test(value)
-    ? humanize(value.toLowerCase())
-    : value;
+  if (key === 'currentValue' || key === 'targetValue') return formatNumericText(value) ?? null;
+  if (key === "role" || key === "courseRole") return roleLabel(value);
+  if (key && ENUM_FIELDS.has(key)) return statusLabel(value);
+  if (key === "dayOfWeek") return formatWeekday(value, "long");
+  if (key && /(?:^date$|Date$|At(?:Local|Utc)?$)/.test(key))
+    return formatDateValue(value);
+  if (key && /Time$/.test(key)) return formatClockTime(value);
+  // Uppercase or underscored authored content is not an enum.
+  return value;
 }

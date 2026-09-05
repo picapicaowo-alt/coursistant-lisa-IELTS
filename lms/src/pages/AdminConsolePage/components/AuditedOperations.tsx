@@ -9,7 +9,7 @@ export function AuditedOperations({ view }: { view: "reassign" | "grade" }) {
   const { t: translate } = useTranslation();
   const [message, setMessage] = useState<{
     tone: "success" | "error";
-    text: string;
+    key: string;
   } | null>(null);
   const [courseId, setCourseId] = useState("");
   const [primaryInstructorUserId, setPrimaryInstructorUserId] = useState("");
@@ -31,13 +31,13 @@ export function AuditedOperations({ view }: { view: "reassign" | "grade" }) {
       setConfirmReassignment(false);
       setMessage({
         tone: "success",
-        text: translate("common:admin.reassignSuccess"),
+        key: "common:admin.reassignSuccess",
       });
     },
     onError: () =>
       setMessage({
         tone: "error",
-        text: translate("common:admin.reassignFailed"),
+        key: "common:admin.reassignFailed",
       }),
   });
   const correctGrade = useMutation({
@@ -50,13 +50,13 @@ export function AuditedOperations({ view }: { view: "reassign" | "grade" }) {
       setConfirmCorrection(false);
       setMessage({
         tone: "success",
-        text: translate("common:admin.gradeSuccess"),
+        key: "common:admin.gradeSuccess",
       });
     },
     onError: () =>
       setMessage({
         tone: "error",
-        text: translate("common:admin.gradeFailed"),
+        key: "common:admin.gradeFailed",
       }),
   });
 
@@ -69,7 +69,7 @@ export function AuditedOperations({ view }: { view: "reassign" | "grade" }) {
           }
           role={message.tone === "error" ? "alert" : "status"}
         >
-          {message.text}
+          {translate(message.key)}
         </p>
       ) : null}
       {view === "reassign" ? (

@@ -11,6 +11,9 @@ import {advisorApiService} from '@/apis/services/advisor-api';
 import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
 import {OneOnOneCourseDialog} from './OneOnOneCourseDialog';
 import {LocalizedError} from '@/i18n/errors';
+import {formatWeekday, formatNumber} from '@/i18n/formatting';
+import i18n from '@/i18n';
+import {statusLabel} from '@/i18n/presentation';
 import {CourseIdentityCard} from '@/components/CourseIdentityCard';
 import {CourseCardGrid} from '@/components/CourseIdentityCard/CourseCardGrid';
 import {AdvisingBadge} from '@/components/AdvisingBadge';
@@ -30,11 +33,11 @@ import {loadPlanningCourse} from './planningCourse';
 const scheduleLabel = (dayOfWeek?: string, startTime?: string, endTime?: string) => {
   if (!dayOfWeek && !startTime) return null;
   const day = dayOfWeek
-    ? dayOfWeek.charAt(0) + dayOfWeek.slice(1).toLowerCase()
-    : 'Weekly';
+    ? formatWeekday(dayOfWeek, 'long')
+    : i18n.t('advising:studentCourses.weekly');
   const time = startTime
     ? `${formatCourseTime(startTime)}${endTime ? ` – ${formatCourseTime(endTime)}` : ''}`
-    : 'Time not provided';
+    : i18n.t('common:feedback.notProvided');
   return `${day} · ${time}`;
 };
 
@@ -110,7 +113,7 @@ const CoursesPage: React.FC = () => {
         'advisorGroupCourseOptions',
       );
       // A malformed page is a load failure, not an empty catalogue.
-      if (!Array.isArray(result?.items)) throw new Error('Available courses returned an invalid page. Please retry.');
+      if (!Array.isArray(result?.items)) throw new LocalizedError("advising:studentCourses.invalidPage");
       return result;
     },
     enabled: Number.isInteger(id) && isAddDialogOpen && addMode === 'GROUP',
@@ -139,7 +142,7 @@ const CoursesPage: React.FC = () => {
     mutationFn: () => {
       if (!selectedGroupCourse || plan.data?.plan?.studyPlanVersion == null ||
           courseOptions.isError || courseOptions.isFetching || courseSearch.trim() !== deferredCourseSearch) {
-        throw new Error('Select an available course and reload the study plan before linking.');
+        throw new LocalizedError('advising:studentCourses.linkRequired');
       }
       return idempotency.run(
         'linkGroupCourse',
@@ -169,7 +172,7 @@ const CoursesPage: React.FC = () => {
           !Number(oneOnOne.instructorId) || !oneOnOne.startDate || !oneOnOne.endDate ||
           oneOnOne.endDate < oneOnOne.startDate || !oneOnOne.startTime ||
           !oneOnOne.endTime || oneOnOne.endTime <= oneOnOne.startTime) {
-        throw new Error('Check the study plan, instructor, term dates, and session times.');
+        throw new LocalizedError('advising:studentCourses.requiredFields');
       }
       return idempotency.run(
         'createOneOnOneCourse',
@@ -218,9 +221,9 @@ const CoursesPage: React.FC = () => {
     meta: {advisingStudentId: id},
     mutationFn: async ({action, course, reason}: {action: EnrollmentAction; course: AdvisorStudentCourseResponse; reason?: string}) => {
       const courseId = course.courseId;
-      if (courseId == null) throw new Error('Course response is missing courseId');
+      if (courseId == null) throw new LocalizedError("advising:studentCourses.missingCourseId");
       if (action === 'withdraw' && (!reason?.trim() || course.courseLinkVersion == null)) {
-        throw new Error('Provide a withdrawal reason and reload the current enrollment.');
+        throw new LocalizedError('advising:enrollment.reviewWithdrawal');
       }
       if (action === 'ready')
         return idempotency.run(
@@ -399,30 +402,27 @@ const CoursesPage: React.FC = () => {
       {planningCourse.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(planningCourse.error, t('records.courseActionsLoadError'))}</p> : null}
       {error ? (
         <p className={styles.error} role="alert">
-          {advisingErrorMessage(error, 'Course planning could not be completed.')}
+          {advisingErrorMessage(error, t('advising:studentCourses.failed'))}
         </p>
       ) : null}
 
       {needsReload ? (
         <div role="alert">
-          <p>The record version changed. Your input is preserved.</p>
+          <p>{t("advising:studentCourses.conflict")}</p>
           <button type="button" onClick={() => void reloadVersions()}>
-            Load latest planning records
-          </button>
+            {t("advising:studentCourses.reload")}</button>
         </div>
       ) : null}
 
       {!plan.isPending && !plan.data ? (
         <div className={styles.emptyState}>
-          <strong>A study plan is required before courses can be changed</strong>
-          <span>Create the student profile and study plan first. Available courses depend on this student’s study plan.</span>
+          <strong>{t("advising:studentCourses.planRequired")}</strong>
+          <span>{t("advising:studentCourses.planHelp")}</span>
           <div className={styles.actions}>
             <Link className={styles.secondaryLink} to={`/advisor/students/${id}/profile`}>
-              Open profile
-            </Link>
+              {t("advising:studentCourses.openProfile")}</Link>
             <Link className={styles.primaryLink} to={`/advisor/students/${id}/study-plan`}>
-              Open study plan
-            </Link>
+              {t("advising:studentCourses.openPlan")}</Link>
           </div>
         </div>
       ) : null}
@@ -430,7 +430,7 @@ const CoursesPage: React.FC = () => {
       {/* Header: All Courses & Add Course Button */}
       <section className={styles.courseCollection}>
         <div className={cStyles.coursesHeader}>
-          <h2>Current courses ({courses.data?.length ?? 0})</h2>
+          <h2>{t('advising:studentCourses.current', {number: courses.isSuccess ? formatNumber(courses.data.length) : '—'})}</h2>
           <div className={cStyles.headerActions}>
             <button type="button" className={cStyles.updateCourseBtn} onClick={() => openUpdateDialog()}
               disabled={!editableCourses.length || courses.isFetching}>
@@ -447,8 +447,8 @@ const CoursesPage: React.FC = () => {
           </div>
         </div>
 
-        {courses.isPending ? <p className={styles.status}>Loading courses…</p> : null}
-        {courses.data?.length === 0 ? <p className={styles.status}>No course is linked to this study plan.</p> : null}
+        {courses.isPending ? <p className={styles.status}>{t("advising:owned.loading")}</p> : null}
+        {courses.data?.length === 0 ? <p className={styles.status}>{t("advising:studentCourses.empty")}</p> : null}
 
         <CourseCardGrid>
           {(courses.data ?? []).map((course, index) => {
@@ -462,27 +462,27 @@ const CoursesPage: React.FC = () => {
             <CourseIdentityCard
               key={course.courseId ?? index}
               courseId={course.courseId ?? index}
-              title={course.title || course.courseCode || `Course #${course.courseId}`}
+              title={course.title || course.courseCode || t('assistant:courseFallback', {id: course.courseId == null ? '—' : formatNumber(course.courseId)})}
               code={course.courseCode}
-              status={<AdvisingBadge kind="status" value={course.launchState || course.status || ''} label={course.launchState || course.status || 'Status unavailable'}/>}
-              instructor={formatPersonName({firstName: course.instructorFirstName, middleName: course.instructorMiddleName, lastName: course.instructorLastName}, 'Instructor not assigned')}
+              status={<AdvisingBadge kind="status" value={course.launchState || course.status || ''} label={statusLabel(course.launchState || course.status) || t('common:feedback.statusUnavailable')}/>}
+              instructor={formatPersonName({firstName: course.instructorFirstName, middleName: course.instructorMiddleName, lastName: course.instructorLastName}, t('course:catalogue.unassignedInstructor'))}
               progress={{completed: course.lectureCompleted, total: course.lectureTotal}}
               metadata={
                 <>
                   <span>
                     {course.deliveryMode === 'ONE_ON_ONE'
-                      ? 'One-to-one'
+                      ? t("advising:studentCourses.oneToOne")
                       : course.deliveryMode === 'GROUP'
-                        ? 'Group course'
-                        : 'Course'}
+                        ? t("courseTools:delivery.group")
+                        : t("common:fields.course")}
                   </span>
                 </>
               }
               footer={<div className={cStyles.cardSchedule}>
                 <CalendarClock size={17} aria-hidden="true" />
                 <span>
-                  <small>Weekly schedule</small>
-                  <strong>{formattedSchedule || 'Not scheduled'}</strong>
+                  <small>{t("advising:studentCourses.weeklySchedule")}</small>
+                  <strong>{formattedSchedule || t("advising:studentCourses.notScheduled")}</strong>
                 </span>
                 {primarySchedule?.location ? (
                   <span className={cStyles.scheduleLocation}>
@@ -492,11 +492,11 @@ const CoursesPage: React.FC = () => {
                 ) : null}
               </div>}
               actions={<>
-                <button type="button" onClick={() => setSelectedCourse(course)}>View Course</button>
+                <button type="button" onClick={() => setSelectedCourse(course)}>{t("advising:studentCourses.view")}</button>
                 {!['COMPLETED', 'HIDDEN'].includes(course.lifecycleStatus ?? '') && course.status !== 'WITHDRAWN' ? (
-                  <button type="button" data-variant="secondary" disabled={planningCourse.isPending} onClick={() => {if (!needsReload) transition.reset(); planningCourse.mutate(course, {onSuccess: setEnrollmentCourse});}}>Manage enrollment</button>
+                  <button type="button" data-variant="secondary" disabled={planningCourse.isPending} onClick={() => {if (!needsReload) transition.reset(); planningCourse.mutate(course, {onSuccess: setEnrollmentCourse});}}>{t("advising:enrollment.manage")}</button>
                 ) : (
-                  <span className={styles.readOnlyBadge}>{course.lifecycleStatus || course.status}</span>
+                  <span className={styles.readOnlyBadge}>{statusLabel(course.lifecycleStatus || course.status)}</span>
                 )}
               </>}
             />
@@ -508,7 +508,7 @@ const CoursesPage: React.FC = () => {
       {selectedCourse ? <CourseSummaryDialog course={selectedCourse} onClose={() => setSelectedCourse(undefined)}/> : null}
       {enrollmentCourse ? <EnrollmentDialog course={enrollmentCourse} pending={transition.isPending}
         needsReload={needsReload} hasPlan={Boolean(plan.data)}
-        error={transition.isError ? advisingErrorMessage(transition.error, 'Enrollment could not be updated.') : undefined}
+        error={transition.isError ? advisingErrorMessage(transition.error, t('advising:enrollment.failed')) : undefined}
         onReload={() => void reloadVersions()} onClose={() => setEnrollmentCourse(undefined)}
         onAction={(action, reason) => {if (!transition.isPending) transition.mutate({action, course: enrollmentCourse, reason});}}
         onEditSchedule={() => {
@@ -528,45 +528,44 @@ const CoursesPage: React.FC = () => {
         onClose={() => setIsAddDialogOpen(false)}
         onCancel={event => {if (linkGroup.isPending || createOneOnOne.isPending) event.preventDefault();}}
       >
-        <div className={cStyles.dialogHeader}><h2 id="add-course-title">Add Course</h2><button type="button" className={cStyles.closeBtn} onClick={closeAddDialog} aria-label="Close add course" disabled={linkGroup.isPending || createOneOnOne.isPending}><X size={20}/></button></div>
+        <div className={cStyles.dialogHeader}><h2 id="add-course-title">{t("advising:studentCourses.add")}</h2><button type="button" className={cStyles.closeBtn} onClick={closeAddDialog} aria-label={t("advising:studentCourses.closeAdd")} disabled={linkGroup.isPending || createOneOnOne.isPending}><X size={20}/></button></div>
         <div className={cStyles.dialogBody}>
-          <div className={cStyles.segmentGroup} aria-label="Course delivery mode">
-            <button type="button" className={cStyles.segmentCard} aria-label="Join Group Course" aria-pressed={addMode === 'GROUP'} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => setAddMode('GROUP')}>
-              <strong><UsersRound size={18} aria-hidden="true" />Join Group Course<span className={cStyles.selectionIndicator} aria-hidden="true" /></strong>
-              <span>Join an existing group course.</span>
+          <div className={cStyles.segmentGroup} aria-label={t("advising:studentCourses.deliveryMode")}>
+            <button type="button" className={cStyles.segmentCard} aria-label={t("advising:studentCourses.joinGroup")} aria-pressed={addMode === 'GROUP'} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => setAddMode('GROUP')}>
+              <strong><UsersRound size={18} aria-hidden="true" />{t("advising:studentCourses.joinGroup")}<span className={cStyles.selectionIndicator} aria-hidden="true" /></strong>
+              <span>{t("advising:studentCourses.joinGroupHelp")}</span>
             </button>
-            <button type="button" className={cStyles.segmentCard} aria-label="Create 1-on-1 Course" aria-pressed={addMode === 'ONE_ON_ONE'} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => setAddMode('ONE_ON_ONE')}>
-              <strong><UserRound size={18} aria-hidden="true" />Create 1-on-1 Course<span className={cStyles.selectionIndicator} aria-hidden="true" /></strong>
-              <span>Create a personalized course for this student.</span>
+            <button type="button" className={cStyles.segmentCard} aria-label={t("advising:studentCourses.createOneToOne")} aria-pressed={addMode === 'ONE_ON_ONE'} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={() => setAddMode('ONE_ON_ONE')}>
+              <strong><UserRound size={18} aria-hidden="true" />{t("advising:studentCourses.createOneToOne")}<span className={cStyles.selectionIndicator} aria-hidden="true" /></strong>
+              <span>{t("advising:studentCourses.oneToOneHelp")}</span>
             </button>
           </div>
-          {addMode === 'GROUP' && courseOptions.isFetching ? <p role="status">Loading available courses…</p> : null}
+          {addMode === 'GROUP' && courseOptions.isFetching ? <p role="status">{t("advising:studentCourses.loadingOptions")}</p> : null}
           {addMode === 'GROUP' && courseOptions.isError ? (
             <div className={styles.error} role="alert">
               <p>{getApiErrorCode(courseOptions.error) === ADVISING_ERROR_CODES.studyPlanNotFound
-                ? 'Create a study plan for this student before choosing an available group course.'
-                : advisingErrorMessage(courseOptions.error, 'Available courses could not be loaded. This does not mean there are no courses.')}</p>
-              <button type="button" className={styles.secondary} onClick={() => void courseOptions.refetch()} disabled={courseOptions.isFetching}>Retry course search</button>
+                ? t("advising:studentCourses.optionsNeedPlan")
+                : advisingErrorMessage(courseOptions.error, t('advising:studentCourses.optionsFailed'))}</p>
+              <button type="button" className={styles.secondary} onClick={() => void courseOptions.refetch()} disabled={courseOptions.isFetching}>{t("advising:studentCourses.retrySearch")}</button>
             </div>
           ) : null}
-          {error ? <p className={styles.error} role="alert">{advisingErrorMessage(error, 'Course planning could not be completed.')}</p> : null}
+          {error ? <p className={styles.error} role="alert">{advisingErrorMessage(error, t('advising:studentCourses.failed'))}</p> : null}
           {addMode === 'GROUP' ? <>
-      <section aria-label="Link a group course">
-        <form
+      <section aria-label={t("advising:studentCourses.linkGroup")}>
+        <form noValidate
           id="link-group-course"
           className={styles.form}
           onSubmit={event => {
             event.preventDefault();
-            linkGroup.mutate();
+            if (!linkGroup.isPending) linkGroup.mutate();
           }}
         >
           <label>
-            Search available courses
-            <input
+            {t("advising:studentCourses.search")}<input
               maxLength={120}
               value={courseSearch}
               onChange={event => {setCourseSearch(event.target.value); setGroupCourseId('');}}
-              placeholder="Course code or title"
+              placeholder={t("advising:studentCourses.searchPlaceholder")}
             />
           </label>
           <div className={cStyles.courseOptionsList}>
@@ -580,11 +579,11 @@ const CoursesPage: React.FC = () => {
                 onClick={() => setGroupCourseId(String(option.courseId ?? ''))}
               >
                 <span className={cStyles.optionMain}>
-                  <strong>{option.title || 'Untitled course'}</strong>
+                  <strong>{option.title || t("advising:studentCourses.untitledCourse")}</strong>
                   <span className={cStyles.optionMetaLine}>
-                    <span>{option.courseCode || option.catalogCode || `Course #${option.courseId}`}</span>
-                    {option.activeStudents != null && option.capacity != null ? <span><UsersRound size={16} aria-hidden="true" />{option.activeStudents} / {option.capacity} students</span> : null}
-                    {option.remainingCapacity != null ? <span>{option.remainingCapacity} places remaining</span> : null}
+                    <span>{option.courseCode || option.catalogCode || t('assistant:courseFallback', {id: option.courseId == null ? '—' : formatNumber(option.courseId)})}</span>
+                    {option.activeStudents != null && option.capacity != null ? <span><UsersRound size={16} aria-hidden="true" />{t('advising:studentCourses.capacity', {active: formatNumber(option.activeStudents), capacity: formatNumber(option.capacity)})}</span> : null}
+                    {option.remainingCapacity != null ? <span>{t('advising:studentCourses.remainingPlaces', {count: option.remainingCapacity, number: formatNumber(option.remainingCapacity)})}</span> : null}
                   </span>
                 </span>
                 <span className={cStyles.selectionIndicator} aria-hidden="true">{String(option.courseId) === groupCourseId ? <Check size={12} /> : null}</span>
@@ -594,40 +593,38 @@ const CoursesPage: React.FC = () => {
           {courseOptions.isSuccess && !courseOptions.isFetching ? (
             <p className={cStyles.optionCount} role="status">
               {courseOptions.data.items.length
-                ? `Showing ${courseOptions.data.items.length} of ${courseOptions.data.total} available courses${courseOptions.data.total > courseOptions.data.items.length ? '. Search by code or title to find another course.' : '.'}`
+                ? [t('advising:studentCourses.optionsCount', {number: formatNumber(courseOptions.data.items.length), total: formatNumber(courseOptions.data.total)}), courseOptions.data.total > courseOptions.data.items.length ? t('advising:studentCourses.searchMore') : ''].filter(Boolean).join(' ')
                 : deferredCourseSearch
-                  ? 'No courses match this search. Clear the search to see available courses.'
-                  : 'No available group courses were returned for this student. Courses in Course management may not be eligible for this study plan.'}
+                  ? t("advising:studentCourses.noMatches")
+                  : t("advising:studentCourses.noOptions")}
             </p>
           ) : null}
           {selectedGroupCourse ? (
             <div className={styles.selectionSummary}>
-              <span>Selected course</span>
+              <span>{t("advising:studentCourses.selected")}</span>
               <strong>
-                {selectedGroupCourse.courseCode || selectedGroupCourse.catalogCode || `Course #${selectedGroupCourse.courseId}`} · {selectedGroupCourse.title || 'Untitled'}
+                {selectedGroupCourse.courseCode || selectedGroupCourse.catalogCode || t('assistant:courseFallback', {id: selectedGroupCourse.courseId == null ? '—' : formatNumber(selectedGroupCourse.courseId)})} · {selectedGroupCourse.title || t("course:assignmentList.untitled")}
               </strong>
             </div>
           ) : null}
           <label>
-            Alignment notes
-            <textarea maxLength={4000} value={alignmentNotes} onChange={event => setAlignmentNotes(event.target.value)} />
+            {t("advising:studentCourses.alignmentNotes")}<textarea maxLength={4000} value={alignmentNotes} onChange={event => setAlignmentNotes(event.target.value)} />
           </label>
         </form>
       </section>
 
           </> : <>
-      <section aria-label="Create a one-to-one course">
-        <form
+      <section aria-label={t("advising:studentCourses.createOneToOneRegion")}>
+        <form noValidate
           id="create-one-on-one-course"
           className={styles.form}
           onSubmit={event => {
             event.preventDefault();
-            createOneOnOne.mutate();
+            if (!createOneOnOne.isPending) createOneOnOne.mutate();
           }}
         >
           <label>
-            Title
-            <input
+            {t("common:fields.title")}<input
               required
               value={oneOnOne.title}
               onChange={event => setOneOnOne(current => ({...current, title: event.target.value}))}
@@ -639,57 +636,50 @@ const CoursesPage: React.FC = () => {
             onChange={instructorId => setOneOnOne(current => ({...current, instructorId}))}
           />
           <label>
-            Term start
-            <EnglishDateInput
+            {t("courseTools:owner.termStart")}<EnglishDateInput
               required
               value={oneOnOne.startDate}
               onChangeValue={startDate => setOneOnOne(current => ({...current, startDate}))}
             />
           </label>
           <label>
-            Term end
-            <EnglishDateInput
+            {t("courseTools:owner.termEnd")}<EnglishDateInput
               required
               value={oneOnOne.endDate}
               onChangeValue={endDate => setOneOnOne(current => ({...current, endDate}))}
             />
           </label>
           <label>
-            Session type
-            <select value={oneOnOne.type} onChange={event => setOneOnOne(current => ({...current, type: event.target.value as SessionType}))}>
-              {COURSE_SESSION_TYPES.map(type => <option key={type}>{type}</option>)}
+            {t("advising:studentCourses.sessionType")}<select value={oneOnOne.type} onChange={event => setOneOnOne(current => ({...current, type: event.target.value as SessionType}))}>
+              {COURSE_SESSION_TYPES.map(type => <option key={type} value={type}>{statusLabel(type)}</option>)}
             </select>
           </label>
           <label>
-            Day of week
-            <select
+            {t("advising:studentCourses.weekday")}<select
               value={oneOnOne.dayOfWeek}
               onChange={event => setOneOnOne(current => ({...current, dayOfWeek: event.target.value as SessionDayOfWeek}))}
             >
               {COURSE_SESSION_DAYS.map(day => (
-                <option key={day.value} value={day.value}>{day.label}</option>
+                <option key={day.value} value={day.value}>{formatWeekday(day.value, 'long')}</option>
               ))}
             </select>
           </label>
           <label>
-            Start time
-            <EnglishTimeInput
+            {t("auth:preview.startTime")}<EnglishTimeInput
               required
               value={oneOnOne.startTime}
               onChangeValue={startTime => setOneOnOne(current => ({...current, startTime}))}
             />
           </label>
           <label>
-            End time
-            <EnglishTimeInput
+            {t("operations:endTime")}<EnglishTimeInput
               required
               value={oneOnOne.endTime}
               onChangeValue={endTime => setOneOnOne(current => ({...current, endTime}))}
             />
           </label>
           <label>
-            Location
-            <input
+            {t("calendar:details.location")}<input
               value={oneOnOne.location}
               onChange={event => setOneOnOne(current => ({...current, location: event.target.value}))}
             />
@@ -700,11 +690,11 @@ const CoursesPage: React.FC = () => {
           </>}
         </div>
         <footer className={cStyles.dialogFooter}>
-          <button type="button" className={cStyles.cancelBtn} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={closeAddDialog}>Cancel</button>
+          <button type="button" className={cStyles.cancelBtn} disabled={linkGroup.isPending || createOneOnOne.isPending} onClick={closeAddDialog}>{t("common:actions.cancel")}</button>
           {addMode === 'GROUP' ? (
-            <button type="submit" form="link-group-course" className={cStyles.enrollBtn} disabled={needsReload || plan.data?.plan?.studyPlanVersion == null || !selectedGroupCourse || courseOptions.isFetching || linkGroup.isPending}>{linkGroup.isPending ? 'Linking…' : 'Link selected course'}</button>
+            <button type="submit" form="link-group-course" className={cStyles.enrollBtn} disabled={needsReload || plan.data?.plan?.studyPlanVersion == null || !selectedGroupCourse || courseOptions.isFetching || linkGroup.isPending}>{linkGroup.isPending ? t("advising:studentCourses.linking") : t("advising:studentCourses.linkSelected")}</button>
           ) : (
-            <button type="submit" form="create-one-on-one-course" className={cStyles.enrollBtn} disabled={needsReload || plan.data?.plan?.studyPlanVersion == null || createOneOnOne.isPending}>{createOneOnOne.isPending ? 'Creating…' : 'Create course'}</button>
+            <button type="submit" form="create-one-on-one-course" className={cStyles.enrollBtn} disabled={needsReload || plan.data?.plan?.studyPlanVersion == null || createOneOnOne.isPending}>{createOneOnOne.isPending ? t("common:actions.creating") : t("course:list.createCourse")}</button>
           )}
         </footer>
       </dialog>

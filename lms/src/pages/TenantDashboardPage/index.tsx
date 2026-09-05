@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import {Link} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {
@@ -18,7 +20,7 @@ import {TENANT_PATHS} from '@/configs/tenantNavigation';
 import {PersonCell} from '@/components/TenantWorkspace/PersonCell';
 import {useTenantPeople} from '@/components/TenantWorkspace/useTenantPeople';
 import {
-  readableValue,
+  tenantAuditValue,
   tenantDate,
 } from '@/components/TenantWorkspace/presentation';
 import {validCount, publishedTemplateCount} from './summary';
@@ -28,31 +30,32 @@ import styles from './index.module.scss';
 const actions = [
   {
     to: TENANT_PATHS.createIntake,
-    title: 'Create student intake',
-    description: 'Start a new intake process',
+    titleKey: "advising:intake.create",
+    descriptionKey: "operations:tenantDashboard.createIntakeHelp",
     Icon: Plus,
   },
   {
     to: TENANT_PATHS.createTemplate,
-    title: 'Create mock exam',
-    description: 'Draft a new mock test paper',
+    titleKey: "operations:tenantDashboard.createExam",
+    descriptionKey: "operations:tenantDashboard.createExamHelp",
     Icon: FileCheck2,
   },
   {
     to: TENANT_PATHS.people,
-    title: 'Manage people',
-    description: 'Manage accounts and identities',
+    titleKey: "operations:tenantDashboard.managePeople",
+    descriptionKey: "operations:tenantDashboard.managePeopleHelp",
     Icon: UsersRound,
   },
   {
     to: TENANT_PATHS.audit,
-    title: 'View audit log',
-    description: 'Review governance changes',
+    titleKey: "operations:tenantDashboard.audit",
+    descriptionKey: "operations:tenantDashboard.auditHelp",
     Icon: ShieldCheck,
   },
 ];
 
 export default function TenantDashboardPage() {
+  const { t: translate } = useTranslation();
   const {user} = useRequiredAuth();
   const users = useQuery({
     queryKey: ['tenant', 'users', 'count'],
@@ -138,40 +141,40 @@ export default function TenantDashboardPage() {
   const assignedCount = pipelineReady ? openCount - unassignedCount : undefined;
   const metrics = [
     {
-      label: 'Total users',
+      labelKey: "operations:tenantDashboard.totalUsers",
       count: validCount(users.data?.total),
       query: users,
-      hint: 'Tenant accounts',
+      hint: translate("operations:tenantDashboard.accounts"),
       Icon: UsersRound,
       to: TENANT_PATHS.people,
     },
     {
-      label: 'Active student accounts',
+      labelKey: "operations:tenantDashboard.activeStudents",
       count: validCount(students.data?.total),
       query: students,
-      hint: 'Login enabled',
+      hint: translate("operations:tenantDashboard.loginEnabled"),
       Icon: UserRoundCheck,
       to: TENANT_PATHS.people,
     },
     {
-      label: 'Open intakes',
+      labelKey: "operations:tenantDashboard.openIntakes",
       count: openCount,
       query: open,
       hint:
         unassignedCount === undefined
-          ? 'Intake overview'
-          : `${unassignedCount} unassigned`,
+          ? translate('operations:tenantDashboard.intakeOverview')
+          : translate('operations:tenantDashboard.unassignedCount', {count: unassignedCount, number: formatNumber(unassignedCount)}),
       Icon: ClipboardList,
       to: TENANT_PATHS.intakes,
     },
     {
-      label: 'Published templates',
+      labelKey: "operations:tenantDashboard.publishedTemplates",
       count:
         templates.data === undefined
           ? undefined
           : publishedTemplateCount(templates.data),
       query: templates,
-      hint: 'Available for assignment',
+      hint: translate("operations:tenantDashboard.availableAssignment"),
       Icon: FileCheck2,
       to: TENANT_PATHS.templates,
     },
@@ -182,17 +185,16 @@ export default function TenantDashboardPage() {
         <div>
           <h1>
             {greetingName
-              ? `Welcome back, ${greetingName}`
-              : 'Administration overview'}
+              ? translate('dashboard:welcome', {name: greetingName})
+              : translate("operations:tenantDashboard.title")}
           </h1>
           <p>
-            Your institution’s accounts, intakes, and assessments at a glance.
-          </p>
+            {translate("operations:tenantDashboard.description")}</p>
         </div>
       </header>
-      <section className={styles.metrics} aria-label="Administration summary">
-        {metrics.map(({label, count, query, hint, Icon, to}) => (
-          <article className={styles.metric} key={label}>
+      <section className={styles.metrics} aria-label={translate("operations:tenantDashboard.summary")}>
+        {metrics.map(({labelKey, count, query, hint, Icon, to}) => (
+          <article className={styles.metric} key={labelKey}>
             <div className={styles.metricTop}>
               <span className={styles.icon}>
                 <Icon size={23} />
@@ -200,7 +202,7 @@ export default function TenantDashboardPage() {
               <span>{hint}</span>
             </div>
             <Link to={to}>
-              {label}
+              {translate(labelKey)}
               <ArrowUpRight size={15} />
             </Link>
             <strong>
@@ -208,7 +210,7 @@ export default function TenantDashboardPage() {
                 ? '…'
                 : query.isError || count === undefined
                   ? '—'
-                  : count.toLocaleString('en-US')}
+                  : formatNumber(count)}
             </strong>
             {query.isError ? (
               <button
@@ -216,10 +218,9 @@ export default function TenantDashboardPage() {
                 className={ui.textButton}
                 onClick={() => void query.refetch()}
               >
-                Unable to load · Retry
-              </button>
+                {translate("operations:tenantDashboard.retryMetric")}</button>
             ) : !query.isPending && count === undefined ? (
-              <small>Count unavailable</small>
+              <small>{translate("operations:tenantDashboard.countUnavailable")}</small>
             ) : null}
           </article>
         ))}
@@ -227,26 +228,24 @@ export default function TenantDashboardPage() {
       <div className={styles.overview}>
         <section className={ui.surface}>
           <div className={ui.sectionHeading}>
-            <h2>Recent activity</h2>
+            <h2>{translate("dashboard:recentActivity")}</h2>
             <Link className={ui.textButton} to={TENANT_PATHS.audit}>
-              View all
-              <ArrowUpRight size={16} />
+              {translate("common:actions.viewAll")}<ArrowUpRight size={16} />
             </Link>
           </div>
           {audit.isPending ? (
-            <p className={ui.status}>Loading governance events…</p>
+            <p className={ui.status}>{translate("operations:tenantDashboard.loadingActivity")}</p>
           ) : audit.isError ? (
             <div className={ui.errorNotice}>
-              Activity could not be loaded.{' '}
+              {translate("operations:tenantDashboard.activityFailed")}{' '}
               <button
                 className={ui.textButton}
                 onClick={() => void audit.refetch()}
               >
-                Try again
-              </button>
+                {translate("common:actions.tryAgain")}</button>
             </div>
           ) : events.length === 0 ? (
-            <p className={ui.empty}>No governance activity yet.</p>
+            <p className={ui.empty}>{translate("operations:tenantDashboard.noActivity")}</p>
           ) : (
             <ol className={styles.activity}>
               {events.map((event) => (
@@ -257,7 +256,7 @@ export default function TenantDashboardPage() {
                         id: event.actorUserId,
                       }
                     }
-                    secondary={readableValue(event.action)}
+                    secondary={tenantAuditValue(event.action)}
                   />
                   <time dateTime={event.createdAt}>
                     {tenantDate(event.createdAt, true)}
@@ -269,16 +268,16 @@ export default function TenantDashboardPage() {
         </section>
         <section className={ui.surface}>
           <div className={ui.sectionHeading}>
-            <h2>Quick actions</h2>
+            <h2>{translate("operations:tenantDashboard.quickActions")}</h2>
           </div>
           <div className={styles.actions}>
-            {actions.map(({to, title, description, Icon}) => (
-              <Link to={to} key={title}>
+            {actions.map(({to, titleKey, descriptionKey, Icon}) => (
+              <Link to={to} key={titleKey}>
                 <span className={styles.icon}>
                   <Icon size={21} />
                 </span>
-                <strong>{title}</strong>
-                <small>{description}</small>
+                <strong>{translate(titleKey)}</strong>
+                <small>{translate(descriptionKey)}</small>
               </Link>
             ))}
           </div>
@@ -286,27 +285,25 @@ export default function TenantDashboardPage() {
       </div>
       <section className={`${ui.surface} ${styles.pipeline}`}>
         <div className={ui.sectionHeading}>
-          <h2>Intake pipeline</h2>
+          <h2>{translate("operations:tenantDashboard.pipeline")}</h2>
           <Link className={ui.textButton} to={TENANT_PATHS.intakes}>
             {openCount === undefined
-              ? 'View intakes'
-              : `${openCount} open intakes`}
+              ? translate("operations:tenantDashboard.viewIntakes")
+              : translate('operations:tenantDashboard.openCount', {count: openCount, number: formatNumber(openCount)})}
             <ArrowUpRight size={16} />
           </Link>
         </div>
         {!pipelineReady ? (
           <p className={ui.hint}>
-            Distribution is unavailable until both intake counts are loaded.
-          </p>
+            {translate("operations:tenantDashboard.distributionUnavailable")}</p>
         ) : openCount === 0 ? (
           <p className={ui.empty}>
-            No open intakes. Create an intake to begin.
-          </p>
+            {translate("operations:tenantDashboard.noOpenIntakes")}</p>
         ) : (
           <>
             <div
               className={styles.pipelineBar}
-              aria-label={`${assignedCount} assigned and ${unassignedCount} unassigned out of ${openCount} open intakes`}
+              aria-label={translate('operations:tenantDashboard.distribution', {assigned: assignedCount === undefined ? '—' : formatNumber(assignedCount), unassigned: unassignedCount === undefined ? '—' : formatNumber(unassignedCount), total: openCount === undefined ? '—' : formatNumber(openCount)})}
             >
               <span style={{flexGrow: assignedCount}} data-part="assigned" />
               <span
@@ -317,12 +314,10 @@ export default function TenantDashboardPage() {
             <div className={styles.legend}>
               <span>
                 <i />
-                {assignedCount} Assigned
-              </span>
+                {translate('operations:tenantDashboard.assignedCount', {count: assignedCount, number: assignedCount === undefined ? '—' : formatNumber(assignedCount)})}</span>
               <span>
                 <i />
-                {unassignedCount} Unassigned
-              </span>
+                {translate('operations:tenantDashboard.unassignedCount', {count: unassignedCount, number: unassignedCount === undefined ? '—' : formatNumber(unassignedCount)})}</span>
             </div>
           </>
         )}

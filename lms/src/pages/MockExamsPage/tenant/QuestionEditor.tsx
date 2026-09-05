@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useId, useState} from 'react';
 import type {QuestionDraft} from './model';
 import {ContentFields} from './ContentFields';
@@ -24,6 +25,7 @@ export function QuestionEditor({
   onChange: (patch: Partial<QuestionDraft>) => void;
   suggestedNumber: number;
 }) {
+  const {t: translate} = useTranslation();
   const definition = questionDefinition(subject, question.kind);
   const helpId = useId();
   const content = parseContent(question.payload);
@@ -67,9 +69,9 @@ export function QuestionEditor({
   return (
     <div className={styles.fields}>
       <label>
-        <span>Question type</span>
+        <span>{translate("common:admin.examFields.questionType")}</span>
         <select
-          aria-label="Question type"
+          aria-label={translate("common:admin.examFields.questionType")}
           aria-describedby={helpId}
           value={definition ? question.kind : question.kind ? '__custom' : ''}
           onChange={(event) => {
@@ -86,52 +88,44 @@ export function QuestionEditor({
           }}
         >
           <option value="" disabled>
-            Select a question type
-          </option>
+            {translate("exams:authoring.selectType")}</option>
           {QUESTION_TYPES[subject].map((item) => (
             <option key={item.kind} value={item.kind}>
-              {item.label}
+              {translate(item.labelKey)}
             </option>
           ))}
-          <option value="__custom">Custom type · advanced data</option>
+          <option value="__custom">{translate("exams:authoring.customType")}</option>
         </select>
         <small id={helpId}>
-          {definition?.description ??
-            'Choose how students will answer this group of questions.'}
+          {definition ? translate(definition.descriptionKey) :
+            translate("exams:authoring.chooseTypeHelp")}
         </small>
       </label>
       {pendingKind !== null ? (
         <div className={styles.notice} role="alert">
-          <strong>Replace the question content?</strong>
+          <strong>{translate("exams:authoring.replaceQuestion")}</strong>
           <p>
-            Changing the type starts a new content form. Existing question
-            content and any answer data in this group will be removed. The
-            title, instructions and attached image stay.
-          </p>
+            {translate("exams:authoring.replaceQuestionHelp")}</p>
           <div className={ui.actions}>
             <button
               className={ui.secondaryButton}
               type="button"
               onClick={() => chooseType(pendingKind)}
             >
-              Replace content
-            </button>
+              {translate("exams:authoring.replaceContent")}</button>
             <button
               className={ui.textButton}
               type="button"
               onClick={() => setPendingKind(null)}
             >
-              Keep current type
-            </button>
+              {translate("exams:authoring.keepType")}</button>
           </div>
         </div>
       ) : null}
       {guided && definition?.schema ? (
         <>
           <p className={ui.hint}>
-            Question numbers update the group range automatically. Use a
-            different number for every answer.
-          </p>
+            {translate("exams:authoring.questionNumbersHelp")}</p>
           <ContentFields
             field={definition.schema}
             value={content}
@@ -141,32 +135,26 @@ export function QuestionEditor({
         </>
       ) : question.kind ? (
         <p className={styles.notice}>
-          This content needs Advanced data. Nothing has been changed or
-          discarded. Use a payload verified by your content or integration team.
-        </p>
+          {translate("exams:authoring.advancedRequired")}</p>
       ) : null}
       <details
         open={advanced || Boolean(question.kind && !guided)}
         onToggle={(event) => setAdvanced(event.currentTarget.open)}
         className={styles.advanced}
       >
-        <summary>Advanced data and answer keys</summary>
+        <summary>{translate(guided ? 'exams:authoring.advancedOptional' : 'exams:authoring.advanced')}</summary>
         <p className={ui.hint}>
-          For imported content, custom types and existing answer keys. Extra
-          fields are preserved when you edit the form. Ordinary questions
-          require either answer (one string) or answers (official equivalent
-          strings). Multiple-selection questions retain answersByQuestion.
-        </p>
+          {translate("exams:authoring.advancedHelp")}</p>
         <label>
-          <span>Question type code</span>
+          <span>{translate("exams:authoring.typeCode")}</span>
           <input
             value={question.kind}
             onChange={(event) => onChange({kind: event.target.value})}
-            placeholder="Use a verified type code"
+            placeholder={translate("exams:authoring.typeCodeHint")}
           />
         </label>
         <label>
-          <span>Question data (JSON)</span>
+          <span>{translate("exams:authoring.questionData")}</span>
           <textarea
             className={styles.code}
             value={question.payload}
@@ -176,9 +164,7 @@ export function QuestionEditor({
         </label>
         {content === undefined ? (
           <p className={ui.inlineError} role="alert">
-            The JSON cannot be read. Check quotes, commas and brackets. Your
-            text is preserved.
-          </p>
+            {translate("exams:authoring.invalidJsonPreserved")}</p>
         ) : null}
       </details>
     </div>

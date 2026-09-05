@@ -1,8 +1,9 @@
-import {useTranslation} from 'react-i18next';
 import {formatInstructorName} from '@/utils/personName';
+import { useTranslation } from 'react-i18next';
 import {FileText} from 'lucide-react';
 import type {CourseResponse, CourseSession} from '@/apis';
-import {COURSE_SESSION_DAYS} from '@/configs/courseSessions';
+import {formatNumber, formatWeekday} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
 import {courseTermLabel, formatCourseTime} from '../advising/courseManagement';
 import styles from '../advising/CourseManagement.module.scss';
 
@@ -12,23 +13,23 @@ export function CourseDeliverySummary({course, sessions, sessionsPending, onView
   sessionsPending: boolean;
   onViewSchedule: () => void;
 }) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const primary = sessions?.[0];
-  const weekday = primary ? COURSE_SESSION_DAYS.find(day => day.value === primary.dayOfWeek)?.label ?? primary.dayOfWeek : '';
+  const weekday = primary ? formatWeekday(primary.dayOfWeek, 'long') : '';
 
   return <>
     <section className={styles.panel} aria-labelledby="delivery-schedule-summary-title">
-      <header className={styles.panelHeader}><h2 id="delivery-schedule-summary-title">Schedule summary</h2></header>
-      {sessionsPending ? <p role="status" className={styles.helper}>Loading schedule…</p> : primary ? <div className={styles.scheduleSummaryRow}>
-        <span className={styles.sessionType} data-type={primary.type}>{primary.type}</span>
-        <span className={styles.scheduleSummaryCopy}><strong>Every {weekday} · {formatCourseTime(primary.startTime)} — {formatCourseTime(primary.endTime)}</strong><small>{primary.location || 'Location not provided'} · {primary.timezone || 'Timezone not provided'}</small></span>
-        <span className={styles.scheduleSummaryCount}><strong>{sessions?.length ?? 0} recurring {sessions?.length === 1 ? 'slot' : 'slots'}</strong><small>{course ? courseTermLabel(course) : 'Term loading…'}</small></span>
-      </div> : <p className={styles.helper}>{sessions ? 'No recurring sessions have been added.' : 'The weekly schedule could not be loaded.'}</p>}
+      <header className={styles.panelHeader}><h2 id="delivery-schedule-summary-title">{translate("courseTools:delivery.scheduleSummary")}</h2></header>
+      {sessionsPending ? <p role="status" className={styles.helper}>{translate("dashboard:loadingSchedule")}</p> : primary ? <div className={styles.scheduleSummaryRow}>
+        <span className={styles.sessionType} data-type={primary.type}>{statusLabel(primary.type)}</span>
+        <span className={styles.scheduleSummaryCopy}><strong>{translate("courseTools:schedule.everyWeekday", {day: weekday})} · {formatCourseTime(primary.startTime)} — {formatCourseTime(primary.endTime)}</strong><small>{primary.location || translate("course:catalogue.noLocation")} · {primary.timezone || translate("courseTools:delivery.timezoneMissing")}</small></span>
+        <span className={styles.scheduleSummaryCount}><strong>{translate('courseTools:delivery.slots', {count: sessions?.length ?? 0, number: formatNumber(sessions?.length ?? 0)})}</strong><small>{course ? courseTermLabel(course) : translate("courseTools:delivery.termLoading")}</small></span>
+      </div> : <p className={styles.helper}>{sessions ? translate("courseTools:delivery.noSessions") : translate("courseTools:delivery.scheduleFailed")}</p>}
       <button type="button" className={styles.textAction} onClick={onViewSchedule}>{translate('common:navigationControls.viewFullSchedule')} </button>
     </section>
     <section className={styles.panel} aria-labelledby="teaching-workspace-title">
-      <header className={styles.panelHeader}><h2 id="teaching-workspace-title">Teaching workspace</h2><span className={styles.mutedMeta}>Instructor managed</span></header>
-      <div className={styles.handoffRow}><span className={styles.fileIcon}><FileText size={19} aria-hidden="true" /></span><span><strong>Materials and assessments</strong><small>{formatInstructorName(course?.primaryInstructor, course?.primaryInstructor?.email || 'The assigned instructor')} manages teaching content in the existing course workspace.</small></span></div>
+      <header className={styles.panelHeader}><h2 id="teaching-workspace-title">{translate("courseTools:delivery.workspace")}</h2><span className={styles.mutedMeta}>{translate("courseTools:delivery.instructorManaged")}</span></header>
+      <div className={styles.handoffRow}><span className={styles.fileIcon}><FileText size={19} aria-hidden="true" /></span><span><strong>{translate("courseTools:delivery.materialsAssessments")}</strong><small>{translate('courseTools:delivery.contentOwner', {instructor: formatInstructorName(course?.primaryInstructor, course?.primaryInstructor?.email || translate('courseTools:delivery.assignedInstructor'))})}</small></span></div>
     </section>
   </>;
 }

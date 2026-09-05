@@ -4,6 +4,7 @@ import workspaceStyles from '../pages/aibot/StudySupportWorkspace.module.scss';
 import {useState, useRef, useEffect, forwardRef, useImperativeHandle, useCallback} from 'react';
 import {FileText, Paperclip, X, ArrowDown} from 'lucide-react';
 import {prompts} from '@/components/DashboardAssistant/prompts';
+import {Trans, useTranslation} from 'react-i18next';
 import {ChatMessage} from '@/components/ChatMessage';
 import TypingText from "../utils/typing-text";
 import {renderMessageText} from '@/utils/render-message-text';
@@ -21,9 +22,9 @@ import {safeStudySupportProgress} from '@/utils/studySupportProgress';
 import {isInstructorLevel} from '@/utils/roleCapabilities';
 
 const STUDY_SUPPORT_THINKING_STEPS = [
-  {id: 'understand', text: 'Understanding your question.'},
-  {id: 'context', text: 'Reviewing the relevant course context.'},
-  {id: 'response', text: 'Preparing a clear response.'},
+  {id: 'understand', text: '', translationKey: 'assistant:thinking.question'},
+  {id: 'context', text: '', translationKey: 'assistant:thinking.courseContext'},
+  {id: 'response', text: '', translationKey: 'assistant:thinking.response'},
 ];
 
 interface Props {
@@ -45,6 +46,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     props,
     ref
   ) => {
+    const {t: translate} = useTranslation();
     const getBrowserTimeZone = () => Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/Los_Angeles';
     const handoffRef = useRef(false);
     if (!handoffRef.current) {
@@ -107,7 +109,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
       }
     }, [user?.accessToken, user?.id]);
     const selectedCourse = courses.find(course => Number(course.id) === Number(selectedCourseId));
-    const currentCourseName = selectedCourseId === 0 ? 'All Courses' : selectedCourse?.title || selectedCourse?.name || `Course ${selectedCourseId}`;
+    const currentCourseName = selectedCourseId === 0 ? translate('dashboard:allCourses') : selectedCourse?.title || selectedCourse?.name || translate('assistant:courseFallback', {id: selectedCourseId});
     const relevantCourseIds = selectedCourseId === 0
       ? courses.map(course => Number(course.id))
       : [selectedCourseId];
@@ -124,17 +126,17 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
       || examLockdown.status === 'error';
     const lockedCourseNames = courses
       .filter(course => examLockdown.lockedCourseIds.includes(Number(course.id)))
-      .map(course => course.title || course.name || `Course ${course.id}`)
+      .map(course => course.title || course.name || translate('assistant:courseFallback', {id: course.id}))
       .join(', ');
     const examLockdownMessage = courseFetchFailed
-      ? 'Study Support is temporarily unavailable because your course list could not be verified.'
+      ? translate('assistant:courseListError')
       : isExamStatusPending
-        ? 'Checking quiz attempt status before enabling Study Support…'
+        ? translate('assistant:checkingAttempts')
         : examLockdown.status === 'error'
-          ? 'Study Support is temporarily unavailable because quiz attempt status could not be verified. Try again shortly.'
+          ? translate('assistant:attemptCheckError')
           : selectedCourseId === 0
-            ? `Study Support is locked because an active quiz attempt is open in ${lockedCourseNames || 'one of your courses'}. Select a course without an active attempt to continue.`
-            : `Study Support is unavailable for ${currentCourseName} while you have an active quiz attempt. Submit or finalize the attempt before using course assistance.`;
+            ? translate('assistant:lockedCourses', {courses: lockedCourseNames || translate('assistant:oneOfCourses')})
+            : translate('assistant:lockedCourse', {course: currentCourseName});
     const menuItemStyle = (active) => ({
       display: 'block',
       width: '100%',
@@ -206,7 +208,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     const handleSend = async (overrideText, overrideCourseId, overrideFile) => {
       const fileForSend = overrideFile ?? (overrideText == null ? selectedFile : null);
       const question = (overrideText ?? input)?.trim()
-        || (fileForSend ? 'Review the attached file.' : '');
+        || (fileForSend ? translate('assistant:reviewFile') : '');
       if (!question || isStudySupportUnavailable) return;
       
       const courseForSend = (typeof overrideCourseId === 'number')
@@ -217,7 +219,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
         setMessages(prev => [
           ...prev,
           {
-            text: 'Select a course before asking Study Support.',
+            text: '', translationKey: 'assistant:selectCourseFirst',
             sender: 'chatbot',
           },
         ]);
@@ -270,7 +272,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                   progress,
                   `${progress.phase}-${thinkingStepId.current++}`,
                 );
-                return current.at(-1)?.text === nextStep.text
+                return current.at(-1)?.translationKey === nextStep.translationKey
                   ? current
                   : [...current, nextStep];
               });
@@ -294,7 +296,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
         setMessages(prev => [
           ...prev,
           {
-            text: 'Study Support could not respond. Please try again.',
+            text: '', translationKey: 'assistant:responseError',
             sender: 'chatbot',
           }
         ]);
@@ -360,14 +362,14 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
           <>
             <div className={styles.chatHeader}>
               <div className={styles.chatTitle}>
-                <h1 className="text-[1.5rem] font-medium">New Chat</h1>
+                <h1 className="text-[1.5rem] font-medium">{translate('assistant:newChat')}</h1>
               </div>
               <div className={styles.spacer}/>
               <button className={styles.glassButton} onClick={() => {
                 handleNewChat()
               }}>
-                <img className="w-[1.3rem]" src="/icons/chat/add_plus.png" alt="plus"/>
-                <span className="text-[1rem]">New</span>
+                <img className="w-[1.3rem]" src="/icons/chat/add_plus.png" alt=""/>
+                <span className="text-[1rem]">{translate('assistant:new')}</span>
               </button>
               {props.isPopup && (
                 <button
@@ -376,7 +378,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                     props.setIsChatbotOpen(false);
                   }}
                 >
-                  <img className="w-[1.3rem]" src="/icons/add-content/close-circle.png" alt="close"/>
+                  <img className="w-[1.3rem]" src="/icons/add-content/close-circle.png" alt={translate('common:actions.close')}/>
                 </button>
               )}
             </div>
@@ -385,7 +387,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
         )}
         {/*  Main Content */}
         <div data-compact={props.isCompact || undefined} data-empty={!props.isCompact && props.isWorkspace && messages.length === 0 && !isStudySupportUnavailable || undefined} className={props.isWorkspace ? workspaceStyles.content : `flex flex-col p-2 ${props.isDashboard ? 'h-[90%]' : props.isSummary ? 'h-[87%]' : 'h-[95%]'}`}>
-          {props.isCompact ? <header className={workspaceStyles.compactHeader}><h2>New Chat</h2><button type="button" aria-label="Start a new chat" onClick={handleNewChat}>+</button><button type="button" aria-label="Close course assistant" onClick={props.onClose}><X size={18}/></button></header> : props.isWorkspace ? <div className={workspaceStyles.toolbar}><button type="button" onClick={handleNewChat}>+ New chat</button></div> : null}
+          {props.isCompact ? <header className={workspaceStyles.compactHeader}><h2>{translate('assistant:newChat')}</h2><button type="button" aria-label={translate('assistant:startNew')} onClick={handleNewChat}>+</button><button type="button" aria-label={translate('assistant:closeCourse')} onClick={props.onClose}><X size={18}/></button></header> : props.isWorkspace ? <div className={workspaceStyles.toolbar}><button type="button" onClick={handleNewChat}>{translate('assistant:createChat')}</button></div> : null}
           <div className={props.isWorkspace ? workspaceStyles.messageArea : "flex flex-1 flex-col gap-3 overflow-y-auto p-4"} ref={containerRef} onScroll={event => {const element = event.currentTarget; setIsUserScrolled(element.scrollHeight - element.scrollTop - element.clientHeight > 100);}}>
             {isStudySupportUnavailable ? (
               <div
@@ -393,50 +395,44 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                 className="m-auto max-w-xl rounded-xl border border-amber-300 bg-amber-50 p-5 text-left text-amber-950"
                 role={courseFetchFailed || examLockdown.status === 'error' ? 'alert' : 'status'}
               >
-                <strong>{examLockdown.status === 'locked' ? 'Exam lockdown active' : 'Study Support unavailable'}</strong>
+                <strong>{examLockdown.status === 'locked' ? translate('assistant:lockdownActive') : translate('assistant:supportUnavailable')}</strong>
                 <p className="mt-2 text-sm">{examLockdownMessage}</p>
                 {courseFetchFailed ? (
                   <button
                     type="button"
                     className="mt-3 rounded-lg border border-amber-500 bg-white px-3 py-2 text-sm font-semibold"
                     onClick={() => void fetchCourses()}
-                  >
-                    Try again
-                  </button>
+                  >{translate('common:actions.tryAgain')}</button>
                 ) : null}
               </div>
             ) : messages.length === 0 ? (
-              props.isCompact ? <div className={workspaceStyles.compactPrompts}>{prompts.student.map(prompt => <button type="button" key={prompt} onClick={() => {setInput(prompt); compactInput.current?.focus();}}>{prompt}</button>)}</div> : props.isSummary ? (
+              props.isCompact ? <div className={workspaceStyles.compactPrompts}>{prompts.student.map(key => <button type="button" key={key} onClick={() => {setInput(translate(key)); compactInput.current?.focus();}}>{translate(key)}</button>)}</div> : props.isSummary ? (
                 <div className="flex-1 flex flex-col justify-start mb-8 ml-3">
                   <div
                     className="cursor-pointer hover:bg-[#EDF2F7] transition-all duration-300 flex items-center p-4 border border-[rgba(226,232,240,1)] rounded-xl  bg-transparent max-w-xl">
                     <div className="flex-1">
-                      <h3 className="text-lg text-gray-900 mb-1">Summarize it for me</h3>
-                      <p className="text-sm text-[rgba(160,174,192,1)]">
-                        Ripan will summarize this material as clearly as possible.
-                      </p>
+                      <h3 className="text-lg text-gray-900 mb-1">{translate('assistant:summarize')}</h3>
+                      <p className="text-sm text-[rgba(160,174,192,1)]">{translate('assistant:summarizeHelp')}</p>
                     </div>
                     <div className="ml-3 mt-1">
-                      <img src="/icons/roster/suggestion.png" alt="suggestion"/>
+                      <img src="/icons/roster/suggestion.png" alt=""/>
                     </div>
                   </div>
                 </div>
-              ) : props.isWorkspace ? <div className={workspaceStyles.welcome}><img src="/icons/figma-ai/chat-mark.svg" alt=""/><h2>Your personal <span>learning assistant</span></h2></div> : (
+              ) : props.isWorkspace ? <div className={workspaceStyles.welcome}><img src="/icons/figma-ai/chat-mark.svg" alt=""/><h2><Trans i18nKey="assistant:personalHeading" components={[<span key="emphasis"/>]}/></h2></div> : (
                 <div
                   className={`flex-1 flex flex-col items-start text-left mb-8 ml-3 ${props.isIntroTop ? 'justify-start' : 'justify-end'
                   }`}
                 >
-                  <h1 className="text-2xl font-bold">Welcome back, {user?.name}! 👋</h1>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Every small step forward brings you closer to your big dream.
-                  </p>
+                  <h1 className="text-2xl font-bold">{translate('assistant:welcomeBack', {name: user?.name ?? ''})}</h1>
+                  <p className="text-sm text-gray-500 mt-2">{translate('assistant:encouragement')}</p>
                 </div>
               )
             ) : (
               // {/* Chat messages area (scrollable) */}
               <>
                 {messages.map((msg, index) => (
-                  <ChatMessage key={index} user={msg.sender === 'user'} text={msg.text} pending={isWriting && index === messages.length - 1 && msg.sender !== 'user'}>
+                  <ChatMessage key={index} user={msg.sender === 'user'} text={msg.translationKey ? translate(msg.translationKey) : msg.text} pending={isWriting && index === messages.length - 1 && msg.sender !== 'user'}>
                     {msg.attachmentName ? (
                       <span className={styles.messageAttachment}>
                         <FileText aria-hidden="true"/>
@@ -448,7 +444,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                       <TypingText text={msg.text} speed={5} onDone={() => setIsWriting(false)}/>
                     ) : (
                       <div className="whitespace-pre-line text-base text-gray-900">
-                        {renderMessageText(msg.text)}
+                        {renderMessageText(msg.translationKey ? translate(msg.translationKey) : msg.text)}
                       </div>
                     )}
                   </ChatMessage>
@@ -464,14 +460,14 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
               </>
             )}
           </div>
-          {isUserScrolled && messages.length > 0 ? <button type="button" className={styles.latestMessage} onClick={() => scrollChatToBottom()}><ArrowDown size={16}/>Latest response</button> : null}
+          {isUserScrolled && messages.length > 0 ? <button type="button" className={styles.latestMessage} onClick={() => scrollChatToBottom()}><ArrowDown size={16}/>{translate('assistant:latestResponse')}</button> : null}
           {/* Input area */}
           {props.isCompact ? <div className={workspaceStyles.compactComposer}>
-            {selectedFile ? <div className={workspaceStyles.compactAttachment}><FileText size={16}/><span>{selectedFile.name}</span><button type="button" aria-label={`Remove ${selectedFile.name}`} onClick={() => setSelectedFile(null)}><X size={16}/></button></div> : null}
-            <input ref={fileInputRef} type="file" className={styles.visuallyHidden} accept=".pdf,.doc,.docx,.txt,.md,image/*" aria-label="Choose a file for Study Support" onChange={event => setSelectedFile(event.target.files?.[0] ?? null)}/>
-            <button type="button" className={workspaceStyles.compactAttach} aria-label="Attach a file" disabled={isStudySupportUnavailable || isLoading} onClick={() => fileInputRef.current?.click()}>+</button>
-            <input ref={compactInput} aria-label="Ask Study Support" placeholder="Ask me anything…" value={input} onChange={event => setInput(event.target.value)} disabled={isStudySupportUnavailable || isLoading} onKeyDown={event => {if (event.key === 'Enter' && !event.nativeEvent.isComposing) {event.preventDefault(); handleSendClick();}}}/>
-            <button type="button" className={workspaceStyles.compactSend} aria-label="Send" disabled={isStudySupportUnavailable || isLoading || (!input.trim() && !selectedFile)} onClick={handleSendClick}><img src="/icons/figma-dashboard/send.svg" alt=""/></button>
+            {selectedFile ? <div className={workspaceStyles.compactAttachment}><FileText size={16}/><span>{selectedFile.name}</span><button type="button" aria-label={translate('common:actions.removeItem', {item: selectedFile.name})} onClick={() => setSelectedFile(null)}><X size={16}/></button></div> : null}
+            <input ref={fileInputRef} type="file" className={styles.visuallyHidden} accept=".pdf,.doc,.docx,.txt,.md,image/*" aria-label={translate('assistant:chooseFile')} onChange={event => setSelectedFile(event.target.files?.[0] ?? null)}/>
+            <button type="button" className={workspaceStyles.compactAttach} aria-label={translate('assistant:attachFile')} disabled={isStudySupportUnavailable || isLoading} onClick={() => fileInputRef.current?.click()}>+</button>
+            <input ref={compactInput} aria-label={translate('assistant:askSupport')} placeholder={translate('assistant:ask')} value={input} onChange={event => setInput(event.target.value)} disabled={isStudySupportUnavailable || isLoading} onKeyDown={event => {if (event.key === 'Enter' && !event.nativeEvent.isComposing) {event.preventDefault(); handleSendClick();}}}/>
+            <button type="button" className={workspaceStyles.compactSend} aria-label={translate('common:actions.send')} disabled={isStudySupportUnavailable || isLoading || (!input.trim() && !selectedFile)} onClick={handleSendClick}><img src="/icons/figma-dashboard/send.svg" alt=""/></button>
           </div> : <div className={styles.chatInputContainer}>
             <div ref={courseBoxRef} style={{position: 'relative', display: 'inline-block'}}>
               <button
@@ -491,7 +487,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                   whiteSpace: 'nowrap',
                   textOverflow: 'ellipsis',
                 }}>
-                  {isCoursesFetched ? currentCourseName : 'Loading...'}
+                  {isCoursesFetched ? currentCourseName : translate('common:feedback.loading')}
                 </p>
               </button>
               
@@ -521,7 +517,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                       style={menuItemStyle(Number(selectedCourseId) === Number(c.id))}
                       title={c.title || c.name}
                     >
-                      {c.title || c.name || `Course ${c.id}`}
+                      {c.title || c.name || translate('assistant:courseFallback', {id: c.id})}
                     </button>
                   ))}
                 </div>
@@ -537,19 +533,19 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                 content={input}
                 onChange={setInput}
                 onSubmit={handleSendClick}
-                placeholder="Ask a question about your course materials…"
+                placeholder={translate('assistant:askMaterials')}
                 disabled={isStudySupportUnavailable}
-                ariaLabel="Ask Study Support"
+                ariaLabel={translate('assistant:askSupport')}
               />
             </div>
 
             {selectedFile ? (
-              <div className={styles.selectedFile} aria-label={`Attached file: ${selectedFile.name}`}>
+              <div className={styles.selectedFile} aria-label={translate('assistant:attachedFile', {name: selectedFile.name})}>
                 <FileText aria-hidden="true"/>
                 <span title={selectedFile.name}>{selectedFile.name}</span>
                 <button
                   type="button"
-                  aria-label={`Remove ${selectedFile.name}`}
+                  aria-label={translate('common:actions.removeItem', {item: selectedFile.name})}
                   onClick={() => {
                     setSelectedFile(null);
                     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -569,14 +565,14 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                     className={styles.visuallyHidden}
                     type="file"
                     accept=".pdf,.doc,.docx,.txt,.md,image/*"
-                    aria-label="Choose a file for Study Support"
+                    aria-label={translate('assistant:chooseFile')}
                     onChange={event => setSelectedFile(event.target.files?.[0] ?? null)}
                   />
                   <button
                     type="button"
                     className={styles.chatFooterIconButton}
-                    aria-label="Attach a file"
-                    title="Attach a file"
+                    aria-label={translate('assistant:attachFile')}
+                    title={translate('assistant:attachFile')}
                     disabled={isStudySupportUnavailable || isLoading}
                     onClick={() => fileInputRef.current?.click()}
                   >
@@ -584,7 +580,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                   </button>
                 </>
               ) : (
-                <span className="text-xs text-slate-500">Enter to send · Shift+Enter for a new line</span>
+                <span className="text-xs text-slate-500">{translate('assistant:keyboardHelp')}</span>
               )}
               <div className={styles.spacer}/>
               <button
@@ -592,9 +588,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
                 className={styles.chatFooterSend}
                 onClick={handleSendClick}
                 disabled={isStudySupportUnavailable || isLoading || (!input.trim() && !selectedFile)}
-              >
-                Send
-                <img src="/icons/chat/send-star.png" alt=""/>
+              >{translate('common:actions.send')}<img src="/icons/chat/send-star.png" alt=""/>
               </button>
             </div>
           </div>}

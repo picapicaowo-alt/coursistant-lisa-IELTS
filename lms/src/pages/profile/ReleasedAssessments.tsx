@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next';
+import {formatNumber, formatNumericText} from '@/i18n/formatting';
 import {useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {generatePath, Link} from 'react-router-dom';
@@ -10,6 +12,7 @@ import {formatPlanDate} from '@/utils/studyPlan';
 import styles from './LearningProfile.module.scss';
 
 export function ReleasedAssessments() {
+  const { t: translate } = useTranslation();
   const courses = useMyCourses();
   const [selectedId, setSelectedId] = useState<number>();
   const [page, setPage] = useState(0);
@@ -32,10 +35,9 @@ export function ReleasedAssessments() {
     Math.max(0, Math.ceil(released.length / 6) - 1),
   );
   return (
-    <section aria-label="Released assessments">
+    <section aria-label={translate("settings:learning.released")}>
       <label className={styles.assessmentFilter}>
-        Course
-        <select
+        {translate("common:fields.course")}<select
           value={selected?.id ?? ''}
           onChange={(event) => {
             setSelectedId(Number(event.target.value));
@@ -43,8 +45,7 @@ export function ReleasedAssessments() {
           }}
         >
           <option value="" disabled>
-            Select course
-          </option>
+            {translate("settings:learning.selectCourse")}</option>
           {courses.data?.map((course) => (
             <option key={course.id} value={course.id}>
               {course.title || course.courseCode}
@@ -53,44 +54,42 @@ export function ReleasedAssessments() {
         </select>
       </label>
       {courses.isPending || (selected && grades.isPending) ? (
-        <p role="status">Loading assessments…</p>
+        <p role="status">{translate("advising:studentWorkspace.loadingAssessments")}</p>
       ) : null}
       {courses.isError || grades.isError ? (
         <p role="alert">
-          Assessments could not be loaded.{' '}
+          {translate("settings:learning.failed")}{' '}
           <button
             type="button"
             onClick={() =>
               void (courses.isError ? courses.refetch() : grades.refetch())
             }
           >
-            Retry
-          </button>
+            {translate("common:actions.retry")}</button>
         </p>
       ) : null}
       {!courses.isPending &&
       !courses.isError &&
       (!selected || (grades.isSuccess && !released.length)) ? (
         <p className={styles.empty}>
-          No released assessments for this course yet.
-        </p>
+          {translate("settings:learning.empty")}</p>
       ) : null}
       <div className={styles.assessmentCards}>
         {released.slice(currentPage * 6, currentPage * 6 + 6).map((grade) => (
           <article key={grade.assignmentId}>
             <ClipboardCheck size={27} aria-hidden="true" />
-            <h3>{grade.assignmentTitle || grade.title || 'Assessment'}</h3>
+            <h3>{grade.assignmentTitle || grade.title || translate("exams:staff.assessment")}</h3>
             <small>{selected?.title}</small>
             <strong>
               {grade.gradeDisplay || (grade.score ?? grade.pointsEarned) != null
                 ? grade.gradeDisplay ||
-                  `${grade.score ?? grade.pointsEarned}${grade.pointsPossible != null ? ` / ${grade.pointsPossible}` : ''}`
-                : 'Score not provided'}
+                  `${formatNumericText(grade.score ?? grade.pointsEarned)}${grade.pointsPossible != null ? ` / ${formatNumber(grade.pointsPossible)}` : ''}`
+                : translate("settings:learning.noScore")}
             </strong>
             <small>
               {grade.releasedAt
-                ? `Released ${formatPlanDate(grade.releasedAt)}`
-                : 'Released result'}
+                ? translate('settings:learning.releasedAt', {date: formatPlanDate(grade.releasedAt)})
+                : translate("settings:learning.result")}
             </small>
             <Link
               to={generatePath(
@@ -101,30 +100,27 @@ export function ReleasedAssessments() {
                 },
               )}
             >
-              View feedback
-            </Link>
+              {translate("dashboard:viewFeedback")}</Link>
           </article>
         ))}
       </div>
       {released.length > 6 ? (
-        <nav className={styles.assessmentPages} aria-label="Assessment pages">
+        <nav className={styles.assessmentPages} aria-label={translate("settings:learning.pages")}>
           <button
             type="button"
             disabled={!currentPage}
             onClick={() => setPage(currentPage - 1)}
           >
-            Previous
-          </button>
+            {translate("common:actions.previous")}</button>
           <span>
-            Page {currentPage + 1} of {Math.ceil(released.length / 6)}
+            {translate('common:pagination.pageOf', {page: formatNumber(currentPage + 1), total: formatNumber(Math.ceil(released.length / 6))})}
           </span>
           <button
             type="button"
             disabled={(currentPage + 1) * 6 >= released.length}
             onClick={() => setPage(currentPage + 1)}
           >
-            Next
-          </button>
+            {translate("common:actions.next")}</button>
         </nav>
       ) : null}
     </section>

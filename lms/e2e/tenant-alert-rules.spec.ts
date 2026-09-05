@@ -121,7 +121,7 @@ test("low-density rules and focused editor work across device widths", async ({
       });
     }
     const edit = list.getByRole("button", {
-      name: "Edit completion",
+      name: "Edit Completion",
       exact: true,
     });
     await edit.click();
@@ -165,7 +165,7 @@ test("editor drafts, real switch fields, whole-policy save, and reload stay cons
 }) => {
   const { writes } = await install(page);
   await page.goto("/admin?section=alerts");
-  await page.getByRole("button", { name: "Edit learning inactivity" }).click();
+  await page.getByRole("button", { name: "Edit Learning inactivity" }).click();
   await page.getByLabel("Inactivity (days)", { exact: true }).fill("12");
   await page.getByRole("button", { name: "Apply to draft" }).click();
   await expect(page.getByText("Inactivity: 12 days")).toBeVisible();

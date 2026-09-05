@@ -1,4 +1,4 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {BookOpenCheck, Check, Clock3, Layers3, RefreshCcw, Shuffle, Square, X} from 'lucide-react';
@@ -11,6 +11,9 @@ import {ProgressRing} from '@/pages/vocabulary/components/ProgressRing';
 import {vocabularyQueryKeys} from '@/pages/vocabulary/queryKeys';
 import {VOCABULARY_PATHS} from '@/pages/vocabulary/routes';
 import {getApiErrorMessage} from '@/utils/apiError';
+import i18n from '@/i18n';
+import {formatNumber, formatPercent} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
 import styles from './index.module.scss';
 
 const VocabularyListPage = () => {
@@ -51,8 +54,8 @@ const VocabularyListPage = () => {
     onSuccess: () => queryClient.invalidateQueries({queryKey: vocabularyQueryKeys.all}),
   });
 
-  if (query.isPending) return <main className={styles.page}><PageState kind="loading" title="Loading units" detail="Preparing this list and your current pass…"/></main>;
-  if (query.isError || !query.data) return <main className={styles.page}><PageState kind="error" title="This list is unavailable" detail="The list may have moved, or the Vocabulary service may be temporarily unavailable." onRetry={() => void query.refetch()}/></main>;
+  if (query.isPending) return <main className={styles.page}><PageState kind="loading" title={translate("vocabulary:units.loading")} detail={translate("vocabulary:units.loadingHelp")}/></main>;
+  if (query.isError || !query.data) return <main className={styles.page}><PageState kind="error" title={translate("vocabulary:units.unavailable")} detail={translate("vocabulary:units.unavailableHelp")} onRetry={() => void query.refetch()}/></main>;
 
   const list = query.data;
   return (
@@ -64,41 +67,40 @@ const VocabularyListPage = () => {
           <h1>{list.name}</h1>
           <p>{list.description}</p>
           <div className={styles.facts}>
-            <span><Layers3 size={17}/>{list.units.length} {list.units.length === 1 ? 'unit' : 'units'}</span>
-            <span><BookOpenCheck size={17}/>{list.totalWords} words</span>
-            <span><RefreshCcw size={17}/>{list.progress.completionCount} complete passes</span>
+            <span><Layers3 size={17}/>{translate("vocabulary:units.count", {count: list.units.length, number: formatNumber(list.units.length)})}</span>
+            <span><BookOpenCheck size={17}/>{translate("vocabulary:words", {count: list.totalWords, number: formatNumber(list.totalWords)})}</span>
+            <span><RefreshCcw size={17}/>{translate("vocabulary:units.passes", {count: list.progress.completionCount, number: formatNumber(list.progress.completionCount)})}</span>
           </div>
         </div>
-        <ProgressRing value={list.progress.clearedWords} max={list.progress.totalWords} label="current pass" size="large"/>
+        <ProgressRing value={list.progress.clearedWords} max={list.progress.totalWords} label={translate("vocabulary:units.currentPass")} size="large"/>
       </section>
 
       <section className={styles.modeSection} aria-labelledby="mode-heading">
         <div>
-          <span className={styles.kicker}>Study setup</span>
-          <h2 id="mode-heading">Choose a mode, then a unit</h2>
+          <span className={styles.kicker}>{translate("vocabulary:units.setup")}</span>
+          <h2 id="mode-heading">{translate("vocabulary:units.choose")}</h2>
         </div>
         <div className={styles.modeControls}>
-          <div className={styles.segmented} aria-label="Study mode">
-            <button type="button" className={mode === 'TEST' ? styles.selected : ''} onClick={() => setMode('TEST')}>
-              <Check size={17}/><span><strong>Test</strong><small>Word first · flip, then rate</small></span>
+          <div className={styles.segmented} aria-label={translate("vocabulary:mode.label")}>
+            <button type="button" aria-pressed={mode === 'TEST'} className={mode === 'TEST' ? styles.selected : ''} onClick={() => setMode('TEST')}>
+              <Check size={17}/><span><strong>{translate("vocabulary:mode.test")}</strong><small>{translate("vocabulary:mode.testBrief")}</small></span>
             </button>
-            <button type="button" className={mode === 'REMEMBER' ? styles.selected : ''} onClick={() => setMode('REMEMBER')}>
-              <BookOpenCheck size={17}/><span><strong>Remember</strong><small>Full card · browse only</small></span>
+            <button type="button" aria-pressed={mode === 'REMEMBER'} className={mode === 'REMEMBER' ? styles.selected : ''} onClick={() => setMode('REMEMBER')}>
+              <BookOpenCheck size={17}/><span><strong>{translate("vocabulary:mode.remember")}</strong><small>{translate("vocabulary:mode.rememberBrief")}</small></span>
             </button>
           </div>
           <p className={styles.modeDescription}>
             {mode === 'TEST'
-              ? "See the word first. Recall the meaning, flip to check, then choose a rating—including Don't remember."
-              : 'See the complete card from the start. Browsing does not record a rating or change completion.'}
+              ? translate("vocabulary:mode.testHelp")
+              : translate("vocabulary:mode.rememberHelp")}
           </p>
           <div className={styles.modeOption}>
             {mode === 'REMEMBER' ? (
               <label className={styles.shuffle}>
                 <input type="checkbox" checked={shuffle} onChange={event => setShuffle(event.target.checked)}/>
-                <Shuffle size={16}/> Shuffle this session
-              </label>
+                <Shuffle size={16}/> {' '}{translate("vocabulary:mode.shuffle")}</label>
             ) : (
-              <span className={styles.testNote}><Shuffle size={16}/> Test mode always shuffles</span>
+              <span className={styles.testNote}><Shuffle size={16}/> {' '}{translate("vocabulary:mode.alwaysShuffle")}</span>
             )}
           </div>
         </div>
@@ -107,12 +109,12 @@ const VocabularyListPage = () => {
       {startMutation.isError || endMutation.isError ? (
         <div className={styles.inlineError} role="alert">
           {startMutation.isError
-            ? getApiErrorMessage(startMutation.error, 'The session could not start. Review the active session shown below.')
-            : getApiErrorMessage(endMutation.error, 'The session could not be ended. It is still available to resume.')}
+            ? getApiErrorMessage(startMutation.error, translate("vocabulary:session.startFailed"))
+            : getApiErrorMessage(endMutation.error, translate("vocabulary:session.endFailed"))}
         </div>
       ) : null}
 
-      <section className={styles.units} aria-label="Units">
+      <section className={styles.units} aria-label={translate("vocabulary:units.title")}>
         {list.units.map(unit => (
           <UnitCard
             key={unit.id}
@@ -138,15 +140,15 @@ interface UnitCardProps {
   onEnd: (sessionId: string) => void;
 }
 
-const modeLabel = (mode: StudyMode): string => mode === 'TEST' ? 'Test' : 'Remember';
+const modeLabel = (mode: StudyMode): string => i18n.t(mode === 'TEST' ? 'vocabulary:mode.test' : 'vocabulary:mode.remember');
 
 const UnitCard = ({unit, mode, pending, ending, onStart, onEnd}: UnitCardProps) => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const [confirmingEnd, setConfirmingEnd] = useState(false);
-  const percent = Math.round((unit.progress.clearedWords / unit.progress.totalWords) * 100);
+  const percent = unit.progress.totalWords > 0 ? Math.max(0, Math.min(100, Math.round((unit.progress.clearedWords / unit.progress.totalWords) * 100))) : 0;
   const activeSession = unit.activeSession;
   const activeModeLabel = activeSession ? modeLabel(activeSession.mode) : null;
-  const activeStatusLabel = activeSession?.status === 'ACTIVE' ? 'Active' : 'Paused';
+  const activeStatusLabel = statusLabel(activeSession?.status);
   const selectedModeLabel = modeLabel(mode);
   const blockedByDifferentMode = Boolean(activeSession && activeSession.mode !== mode);
   const currentCard = activeSession
@@ -154,39 +156,39 @@ const UnitCard = ({unit, mode, pending, ending, onStart, onEnd}: UnitCardProps) 
     : null;
   return (
     <article className={styles.unitCard}>
-      <div className={styles.unitNumber}>{String(unit.number).padStart(2, '0')}</div>
+      <div className={styles.unitNumber}>{formatNumber(unit.number, {minimumIntegerDigits: 2})}</div>
       <div className={styles.unitMain}>
-        <span className={styles.kicker}>Unit {unit.number}</span>
+        <span className={styles.kicker}>{translate('common:records.unit', {number: formatNumber(unit.number)})}</span>
         <h3>{unit.name}</h3>
-        <div className={styles.progressTrack} aria-label={`${percent}% of current pass cleared`}>
+        <div className={styles.progressTrack} aria-label={translate("vocabulary:units.clearedProgress", {percent: formatPercent(percent / 100)})}>
           <span style={{width: `${percent}%`}}/>
         </div>
-        <p>{unit.progress.clearedWords} of {unit.progress.totalWords} words cleared in this pass</p>
+        <p>{translate("vocabulary:units.clearedWords", {cleared: formatNumber(unit.progress.clearedWords), total: formatNumber(unit.progress.totalWords)})}</p>
       </div>
       <dl className={styles.unitStats}>
-        <div><dt>Words</dt><dd>{unit.wordCount}</dd></div>
-        <div><dt>Completions</dt><dd>{unit.progress.completionCount}</dd></div>
-        <div><dt>Ready to review</dt><dd>{unit.progress.readyForReview}</dd></div>
+        <div><dt>{translate("vocabulary:units.words")}</dt><dd>{formatNumber(unit.wordCount)}</dd></div>
+        <div><dt>{translate("vocabulary:units.completions")}</dt><dd>{formatNumber(unit.progress.completionCount)}</dd></div>
+        <div><dt>{translate("vocabulary:units.readyReview")}</dt><dd>{formatNumber(unit.progress.readyForReview)}</dd></div>
       </dl>
       <div className={styles.unitActions}>
         {activeSession ? (
           <div className={styles.activeSession}>
             <div className={styles.activeSessionCopy}>
-              <span className={styles.sessionLabel}><Clock3 size={15}/> Current session</span>
-              <strong>{activeStatusLabel} {activeModeLabel} session · card {currentCard} of {activeSession.totalScheduled}</strong>
+              <span className={styles.sessionLabel}><Clock3 size={15}/> {' '}{translate("vocabulary:session.current")}</span>
+              <strong>{translate("vocabulary:session.position", {status: activeStatusLabel, mode: activeModeLabel, current: formatNumber(currentCard ?? 0), total: formatNumber(activeSession.totalScheduled)})}</strong>
               <p>
                 {blockedByDifferentMode
-                  ? `This session must be resumed or ended before ${selectedModeLabel} can start.`
-                  : `Continue from the exact saved position, or end this session to start over.`}
+                  ? translate("vocabulary:session.otherMode", {mode: selectedModeLabel})
+                  : translate("vocabulary:session.resumeHelp")}
               </p>
             </div>
             {confirmingEnd ? (
               <div className={styles.endConfirmation} role="alert">
-                <p>End this {activeModeLabel} session? Saved ratings remain, but this position cannot be resumed.</p>
+                <p>{translate("vocabulary:session.endConfirm", {mode: activeModeLabel})}</p>
                 <div>
-                  <button type="button" onClick={() => setConfirmingEnd(false)} disabled={ending}>Keep session</button>
+                  <button type="button" onClick={() => setConfirmingEnd(false)} disabled={ending}>{translate("vocabulary:session.keep")}</button>
                   <button type="button" className={styles.dangerButton} onClick={() => onEnd(activeSession.id)} disabled={ending}>
-                    {ending ? <Clock3 size={16}/> : <Square size={15}/>} {ending ? 'Ending…' : 'End session'}
+                    {ending ? <Clock3 size={16}/> : <Square size={15}/>} {ending ? translate("vocabulary:session.ending") : translate("vocabulary:session.end")}
                   </button>
                 </div>
               </div>
@@ -196,8 +198,7 @@ const UnitCard = ({unit, mode, pending, ending, onStart, onEnd}: UnitCardProps) 
                   {pending ? <Clock3 size={17}/> : null}{pending ? translate('common:navigationControls.resuming') : translate(activeSession.mode === 'TEST' ? 'common:navigationControls.resumeTest' : 'common:navigationControls.resumeRemember')}
                 </button>
                 <button type="button" className={styles.endButton} onClick={() => setConfirmingEnd(true)} disabled={pending || ending}>
-                  <X size={16}/> End session
-                </button>
+                  <X size={16}/> {' '}{translate("vocabulary:session.end")}</button>
               </div>
             )}
           </div>

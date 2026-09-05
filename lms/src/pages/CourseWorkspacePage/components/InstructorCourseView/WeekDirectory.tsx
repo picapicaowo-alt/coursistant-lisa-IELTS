@@ -1,4 +1,5 @@
-import {useTranslation} from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
+import { useTranslation } from 'react-i18next';
 import { useState } from "react";
 import {
   BookOpen,
@@ -25,7 +26,7 @@ export function WeekDirectory({
   onSelect: (id: number) => void;
   onCreate?: () => void;
 }) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const [search, setSearch] = useState("");
   const [showFilters, setShowFilters] = useState(false);
   const [state, setState] = useState<WeekFilter>("All");
@@ -69,9 +70,9 @@ export function WeekDirectory({
       week.id === activeId && !ordered.some((item) => item.id === activeId),
   );
   return (
-    <section className={styles.directory} aria-label="Course weeks">
+    <section className={styles.directory} aria-label={translate("course:weeks.directory")}>
       <header className={styles.directoryHeader}>
-        <h2>Course content</h2>
+        <h2>{translate("course:learning.content")}</h2>
         {onCreate ? (
           <button
             type="button"
@@ -79,8 +80,7 @@ export function WeekDirectory({
             onClick={onCreate}
           >
             <Plus size={17} />
-            Add week
-          </button>
+            {translate("course:weeks.add")}</button>
         ) : null}
       </header>
       <button
@@ -90,8 +90,7 @@ export function WeekDirectory({
         onClick={() => setShowFilters(!showFilters)}
       >
         <Search size={16} />
-        Search & filter
-      </button>
+        {translate("course:weeks.searchFilter")}</button>
       <div
         className={`${styles.filters} ${showFilters ? styles.filtersExpanded : ""}`}
       >
@@ -99,8 +98,8 @@ export function WeekDirectory({
           <Search size={17} />
           <input
             type="search"
-            aria-label="Search weeks"
-            placeholder="Search weeks"
+            aria-label={translate("course:weeks.search")}
+            placeholder={translate("course:weeks.search")}
             value={search}
             onChange={(event) => {
               setSearch(event.target.value);
@@ -110,54 +109,50 @@ export function WeekDirectory({
         </label>
         <div className={styles.filterRow}>
           <label>
-            Status
-            <select
-              aria-label="Status"
+            {translate("common:fields.status")}<select
+              aria-label={translate("common:fields.status")}
               value={state}
               onChange={(event) => {
                 setState(event.target.value as WeekFilter);
                 setPage(0);
               }}
             >
-              <option value="All">All statuses</option>
-              <option value="Published">Published</option>
-              <option value="Draft">Draft</option>
+              <option value="All">{translate("common:admin.allStatuses")}</option>
+              <option value="Published">{translate("common:status.PUBLISHED")}</option>
+              <option value="Draft">{translate("common:status.DRAFT")}</option>
             </select>
           </label>
           <label>
-            Sort by
-            <select
-              aria-label="Sort by"
+            {translate("course:weeks.sort")}<select
+              aria-label={translate("course:weeks.sort")}
               value={reverse ? "reverse" : "order"}
               onChange={(event) => {
                 setReverse(event.target.value === "reverse");
                 setPage(0);
               }}
             >
-              <option value="order">Week order</option>
-              <option value="reverse">Reverse order</option>
+              <option value="order">{translate("course:weeks.order")}</option>
+              <option value="reverse">{translate("course:weeks.reverse")}</option>
             </select>
           </label>
         </div>
       </div>
       <div className={styles.mobilePicker}>
         <label>
-          Selected week
-          <select
+          {translate("course:weeks.selected")}<select
             value={activeId ?? ""}
             onChange={(event) => onSelect(Number(event.target.value))}
           >
             <option value="" disabled>
-              Select a week
-            </option>
+              {translate("course:weeks.select")}</option>
             {selectedOutsideFilter ? (
               <option value={selectedOutsideFilter.id}>
-                {selectedOutsideFilter.title} (selected)
+                {translate('course:weeks.selectedNamed', {name: selectedOutsideFilter.title})}
               </option>
             ) : null}
             {ordered.map((week, index) => (
               <option key={week.id} value={week.id}>
-                {week.title || `Week ${index + 1}`}
+                {week.title || translate('common:records.week', {number: formatNumber(index + 1)})}
               </option>
             ))}
           </select>
@@ -180,12 +175,11 @@ export function WeekDirectory({
                 <span className={styles.weekIdentity}>
                   <strong>{week.title}</strong>
                   <span>
-                    Week {weeks.findIndex((item) => item.id === week.id) + 1} ·{" "}
-                    {week.materials.length}{" "}
-                    {week.materials.length === 1 ? "material" : "materials"}
+                    {translate('common:records.week', {number: formatNumber(weeks.findIndex((item) => item.id === week.id) + 1)})} ·{" "}
+                    {translate('courseTools:subject.materialCount', {count: week.materials.length, number: formatNumber(week.materials.length)})}
                   </span>
                 </span>
-                <TeachingBadge value={week.state}>{week.state}</TeachingBadge>
+                <TeachingBadge value={week.state}/>
               </button>
             </li>
           ))}
@@ -195,8 +189,8 @@ export function WeekDirectory({
           <BookOpen size={24} />
           <p>
             {weeks.length
-              ? "No weeks match these filters."
-              : "Build your course one week at a time."}
+              ? translate("course:weeks.emptyFilter")
+              : translate("course:weeks.empty")}
           </p>
           {weeks.length ? (
             <button
@@ -208,19 +202,18 @@ export function WeekDirectory({
                 setPage(0);
               }}
             >
-              Clear filters
-            </button>
+              {translate("common:actions.clearFilters")}</button>
           ) : null}
         </div>
       )}
       <footer className={styles.directoryFooter}>
         <span>
           {ordered.length
-            ? `${currentPage * WEEK_PAGE_SIZE + 1}–${Math.min((currentPage + 1) * WEEK_PAGE_SIZE, ordered.length)} of ${ordered.length} weeks`
-            : "0 weeks"}
+            ? translate('course:weeks.range', {start: formatNumber(currentPage * WEEK_PAGE_SIZE + 1), end: formatNumber(Math.min((currentPage + 1) * WEEK_PAGE_SIZE, ordered.length)), total: formatNumber(ordered.length)})
+            : translate('course:weeks.count', {count: 0, formattedCount: formatNumber(0)})}
         </span>
         {pageCount > 1 ? (
-          <nav aria-label="Week pages">
+          <nav aria-label={translate("course:weeks.pages")}>
             <button
               type="button"
               aria-label={translate('common:navigationControls.previousWeeks')} title={translate('common:navigationControls.previousWeeks')}
@@ -230,7 +223,7 @@ export function WeekDirectory({
               <ChevronLeft size={17}  aria-hidden="true"/>
             </button>
             <span>
-              {currentPage + 1} / {pageCount}
+              {translate('common:pagination.pageOf', {page: formatNumber(currentPage + 1), total: formatNumber(pageCount)})}
             </span>
             <button
               type="button"

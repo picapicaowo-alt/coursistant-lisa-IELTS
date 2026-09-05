@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react'
+import {useTranslation} from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import type { ListeningSection, TableCell } from '../../data/listening/types'
 import { QuestionReviewMark, type QuestionReview } from '../QuestionReviewMark'
 
@@ -27,6 +29,7 @@ function GapInput({
   onFocus: () => void
   review?: QuestionReview | null
 }) {
+  const {t: translate} = useTranslation();
   return (
     <span className={`lq-gap ${active ? 'is-active' : ''}`}>
       <span className="lq-gap__num">{id}</span>
@@ -36,7 +39,7 @@ function GapInput({
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onFocus={onFocus}
-        aria-label={`Question ${id}`}
+        aria-label={translate('common:records.question', {number: formatNumber(id)})}
       />
       <QuestionReviewMark review={review} />
     </span>
@@ -72,6 +75,7 @@ export function ListeningSectionView({
   onSelectQuestion,
   reviewByQuestion = null,
 }: CommonProps & { section: ListeningSection }) {
+  const {t: translate} = useTranslation();
   const common: CommonProps = {
     answers,
     currentQuestion,
@@ -343,7 +347,7 @@ export function ListeningSectionView({
             })}
           </ul>
           <p className="lq-section__instruction">
-            Selected slots:{' '}
+            {translate('exams:runner.selectedSlots')}{' '}
             {section.questionIds.map((id) => (
               <span key={id} style={{ marginRight: 8 }}>
                 {id}: <strong>{answers[id] || '—'}</strong>
@@ -401,7 +405,7 @@ export function ListeningSectionView({
             <img className="lq-plan__img" src={section.imageSrc} alt={section.imageAlt} />
           </div>
           <div className="lq-plan__answers">
-            <h4>Answers</h4>
+            <h4>{translate('exams:runner.answerArea')}</h4>
             {section.labels.map((label) => {
               const active = currentQuestion === label.id
               return (

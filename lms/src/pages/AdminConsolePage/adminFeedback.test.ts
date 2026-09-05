@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import type { ApiError } from "@/apis";
 import { getManagedUserCreateError } from "./adminFeedback";
+import i18n from '@/i18n';
 
 describe("getManagedUserCreateError", () => {
-  it("shows the backend domain message to the administrator", () => {
+  it("preserves conflict guidance without displaying an untranslated server message", () => {
     const error: ApiError = {
       code: 409,
       message: "Request failed with status code 409",
@@ -14,16 +15,16 @@ describe("getManagedUserCreateError", () => {
     };
 
     expect(getManagedUserCreateError(error)).toBe(
-      "Managed user was not created. An account already uses this email. The email or generated username may already belong to an existing identity.",
+      i18n.t('common:admin.createRejected', {detail: i18n.t('common:admin.createFallback'), guidance: i18n.t('common:admin.createConflict')}),
     );
   });
 
-  it("uses the shared calm fallback when no domain message is available", () => {
+  it("uses contextual guidance for a transport failure", () => {
     expect(
       getManagedUserCreateError({
         code: 503,
         message: "Request failed with status code 503",
       }),
-    ).toBe("Managed user was not created. The server rejected the request without an explanation.");
+    ).toBe(i18n.t('common:admin.createRejected', {detail: i18n.t('common:admin.createFallback'), guidance: ''}));
   });
 });

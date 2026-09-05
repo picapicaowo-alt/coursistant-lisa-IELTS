@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {useEffect, useState} from "react";
 import {useMutation, useQueryClient} from "@tanstack/react-query";
 import styles from "../CourseDetailView/index.module.scss";
@@ -40,6 +41,7 @@ export const CourseEditView: React.FC<CourseEditViewProps> = ({
   canUploadMaterials,
   canManageEvents,
 }) => {
+  const {t: translate} = useTranslation();
   const {courseId, course, weeks, sessions, isLoading, isError, sessionsFailed, refetch} =
     useCourseWorkspaceData();
   const queryClient = useQueryClient();
@@ -73,7 +75,7 @@ export const CourseEditView: React.FC<CourseEditViewProps> = ({
     onSuccess: invalidate,
   });
 
-  if (isLoading) return <div className={styles.status}>Loading course…</div>;
+  if (isLoading) return <div className={styles.status}>{translate("course:learning.loading")}</div>;
 
   // courseId is null only on a route with no course in it, which this screen
   // is never reached from — isError already covers it, and naming it here
@@ -81,8 +83,8 @@ export const CourseEditView: React.FC<CourseEditViewProps> = ({
   if (isError || !course || courseId === null) {
     return (
       <div className={styles.status} role="alert">
-        <p>This course couldn&apos;t be loaded.</p>
-        <button type="button" className={styles.retry} onClick={refetch}>Try again</button>
+        <p>{translate("course:learning.loadFailed")}</p>
+        <button type="button" className={styles.retry} onClick={refetch}>{translate("common:actions.tryAgain")}</button>
       </div>
     );
   }
@@ -107,7 +109,7 @@ export const CourseEditView: React.FC<CourseEditViewProps> = ({
                 type="button"
                 className={editStyles.inlineEdit}
                 onClick={() => setTitleDraft(currentTitle)}
-                aria-label="Rename course"
+                aria-label={translate("course:workspace.rename")}
               >
                 ✎
               </button>
@@ -128,7 +130,7 @@ export const CourseEditView: React.FC<CourseEditViewProps> = ({
         )}
 
         {renameCourse.isError && (
-          <p className={editStyles.error} role="alert">Couldn&apos;t rename the course.</p>
+          <p className={editStyles.error} role="alert">{translate("course:workspace.renameFailed")}</p>
         )}
 
         <div className={styles.divider}/>

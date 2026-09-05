@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import {useEditorState} from '@tiptap/react';
 import type {Editor} from '@tiptap/react';
@@ -21,7 +22,7 @@ import {
 import styles from './index.module.scss';
 import MediaInsertDialog from './MediaInsertDialog';
 import type {MediaInsertPayload} from './MediaInsertDialog';
-import {normalizeSafeUrl} from './url';
+import {editLink, useTextPromptDialog} from './useTextPromptDialog';
 
 interface ToolbarProps {
   editor: Editor | null;
@@ -41,17 +42,17 @@ const shortcut = (key: string, {shift = false, alt = false} = {}) => {
 };
 
 const TEXT_COLORS = [
-  {name: 'Default', value: ''},
-  {name: 'Black', value: '#000000'},
-  {name: 'Gray', value: '#64748B'},
-  {name: 'Red', value: '#DC2626'},
-  {name: 'Orange', value: '#EA580C'},
-  {name: 'Yellow', value: '#EAB308'},
-  {name: 'Green', value: '#16A34A'},
-  {name: 'Teal', value: '#0D9488'},
-  {name: 'Blue', value: '#2563EB'},
-  {name: 'Purple', value: '#9333EA'},
-  {name: 'Pink', value: '#DB2777'},
+  {name: "editor:color.default", value: ''},
+  {name: "editor:color.black", value: '#000000'},
+  {name: "editor:color.gray", value: '#64748B'},
+  {name: "editor:color.red", value: '#DC2626'},
+  {name: "editor:color.orange", value: '#EA580C'},
+  {name: "editor:color.yellow", value: '#EAB308'},
+  {name: "editor:color.green", value: '#16A34A'},
+  {name: "editor:color.teal", value: '#0D9488'},
+  {name: "editor:color.blue", value: '#2563EB'},
+  {name: "editor:color.purple", value: '#9333EA'},
+  {name: "editor:color.pink", value: '#DB2777'},
 ];
 
 interface ToolbarButtonProps {
@@ -77,6 +78,8 @@ const ToolbarButton: React.FC<ToolbarButtonProps> = ({label, hint, active, onCli
 );
 
 const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = true, toggleToolbar}) => {
+  const { t: translate } = useTranslation();
+  const {prompt, dialog} = useTextPromptDialog();
   const colorMenuRef = React.useRef<HTMLDetailsElement>(null);
   const insertMenuRef = React.useRef<HTMLDetailsElement>(null);
   const [insertOpen, setInsertOpen] = React.useState(false);
@@ -100,10 +103,10 @@ const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = tru
   if (!editor || disabled) return null;
 
   const headings = [
-    {level: 0, label: 'Normal text'},
-    {level: 1, label: 'Heading 1'},
-    {level: 2, label: 'Heading 2'},
-    {level: 3, label: 'Heading 3'},
+    {level: 0, label: "editor:normal"},
+    {level: 1, label: "editor:heading1"},
+    {level: 2, label: "editor:heading2"},
+    {level: 3, label: "editor:heading3"},
   ];
 
   const closeMenu = (ref: React.RefObject<HTMLDetailsElement | null>) => {
@@ -111,19 +114,7 @@ const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = tru
   };
 
   const toggleLink = () => {
-    const previousUrl = editor.getAttributes('link').href as string | undefined;
-    const value = window.prompt('Link URL', previousUrl ?? '');
-    if (value === null) return;
-    if (value.trim() === '') {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run();
-      return;
-    }
-    const url = normalizeSafeUrl(value, {allowRelative: true});
-    if (!url) {
-      window.alert('Enter a valid HTTP, HTTPS, email, or relative link.');
-      return;
-    }
-    editor.chain().focus().extendMarkRange('link').setLink({href: url}).run();
+    void editLink(editor, prompt);
   };
 
   const activeColor = formattingState?.textColor ?? '';
@@ -170,7 +161,7 @@ const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = tru
   };
 
   return (
-    <div className={styles.toolbarContainer} aria-label="Text formatting toolbar">
+    <div className={styles.toolbarContainer} aria-label={translate("editor:toolbar")}>
       {insertOpen ? (
         <MediaInsertDialog
           onClose={() => setInsertOpen(false)}
@@ -181,8 +172,8 @@ const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = tru
         <>
           <div className={styles.toolbarGroup}>
             <select
-              aria-label="Text style"
-              title="Text style"
+              aria-label={translate("editor:textStyle")}
+              title={translate("editor:textStyle")}
               value={formattingState?.headingLevel ?? 0}
               onChange={event => {
                 const level = Number(event.target.value);
@@ -191,41 +182,41 @@ const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = tru
               }}
               className={styles.toolbarSelect}
             >
-              {headings.map(heading => <option key={heading.level} value={heading.level}>{heading.label}</option>)}
+              {headings.map(heading => <option key={heading.level} value={heading.level}>{translate(heading.label)}</option>)}
             </select>
           </div>
 
           <div className={styles.toolbarGroup}>
-            <ToolbarButton label="Bold" hint={shortcut('B')} active={formattingState?.bold} onClick={() => toggleInlineMark('bold')}>
+            <ToolbarButton label={translate("editor:bold")} hint={shortcut('B')} active={formattingState?.bold} onClick={() => toggleInlineMark('bold')}>
               <strong>B</strong>
             </ToolbarButton>
-            <ToolbarButton label="Italic" hint={shortcut('I')} active={formattingState?.italic} onClick={() => toggleInlineMark('italic')}>
+            <ToolbarButton label={translate("editor:italic")} hint={shortcut('I')} active={formattingState?.italic} onClick={() => toggleInlineMark('italic')}>
               <em>I</em>
             </ToolbarButton>
-            <ToolbarButton label="Underline" hint={shortcut('U')} active={formattingState?.underline} onClick={() => toggleInlineMark('underline')}>
+            <ToolbarButton label={translate("editor:underline")} hint={shortcut('U')} active={formattingState?.underline} onClick={() => toggleInlineMark('underline')}>
               <u>U</u>
             </ToolbarButton>
-            <ToolbarButton label="Strikethrough" hint={shortcut('S', {shift: true})} active={formattingState?.strike} onClick={() => toggleInlineMark('strike')}>
+            <ToolbarButton label={translate("editor:strikethrough")} hint={shortcut('S', {shift: true})} active={formattingState?.strike} onClick={() => toggleInlineMark('strike')}>
               <s>S</s>
             </ToolbarButton>
           </div>
 
           <div className={styles.toolbarGroup}>
-            <ToolbarButton label="Bullet list" hint={shortcut('8', {shift: true})} active={formattingState?.bulletList} onClick={() => editor.chain().focus().toggleBulletList().run()}>
+            <ToolbarButton label={translate("editor:bulletList")} hint={shortcut('8', {shift: true})} active={formattingState?.bulletList} onClick={() => editor.chain().focus().toggleBulletList().run()}>
               <List size={17}/>
             </ToolbarButton>
-            <ToolbarButton label="Numbered list" hint={shortcut('7', {shift: true})} active={formattingState?.orderedList} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
+            <ToolbarButton label={translate("editor:numberedList")} hint={shortcut('7', {shift: true})} active={formattingState?.orderedList} onClick={() => editor.chain().focus().toggleOrderedList().run()}>
               <ListOrdered size={17}/>
             </ToolbarButton>
           </div>
 
           <div className={styles.toolbarGroup}>
             <details className={styles.toolbarMenu} ref={colorMenuRef}>
-              <summary className={`${styles.toolbarButton} ${styles.tooltipHost}`} aria-label="Text color" data-tooltip="Text color">
+              <summary className={`${styles.toolbarButton} ${styles.tooltipHost}`} aria-label={translate("editor:textColor")} data-tooltip={translate("editor:textColor")}>
                 <Palette size={16} color={activeColor || undefined}/><ChevronDown size={13}/>
               </summary>
               <div className={styles.colorMenu}>
-                <p className={styles.menuLabel}>Text color</p>
+                <p className={styles.menuLabel}>{translate("editor:textColor")}</p>
                 <div className={styles.colorGrid}>
                   {TEXT_COLORS.map(color => {
                     const selected = activeColor === color.value.toLowerCase();
@@ -233,9 +224,9 @@ const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = tru
                       <button
                         key={color.name}
                         type="button"
-                        aria-label={color.name}
+                        aria-label={translate(color.name)}
                         aria-pressed={selected}
-                        data-tooltip={color.name}
+                        data-tooltip={translate(color.name)}
                         className={`${styles.colorSwatch} ${styles.tooltipHost} ${selected ? styles.colorSwatchSelected : ''}`}
                         onClick={() => applyColor(color.value)}
                       >
@@ -252,25 +243,25 @@ const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = tru
                 </div>
               </div>
             </details>
-            <ToolbarButton label="Insert link" hint={shortcut('K')} active={formattingState?.link} onClick={toggleLink}>
+            <ToolbarButton label={translate("editor:insertLink")} hint={shortcut('K')} active={formattingState?.link} onClick={toggleLink}>
               <Link2 size={16}/>
             </ToolbarButton>
-            <ToolbarButton label="Blockquote" hint={shortcut('B', {shift: true})} active={formattingState?.blockquote} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
+            <ToolbarButton label={translate("editor:blockquote")} hint={shortcut('B', {shift: true})} active={formattingState?.blockquote} onClick={() => editor.chain().focus().toggleBlockquote().run()}>
               <Quote size={16}/>
             </ToolbarButton>
-            <ToolbarButton label="Inline code" hint={shortcut('E')} active={formattingState?.code} onClick={() => toggleInlineMark('code')}>
+            <ToolbarButton label={translate("editor:inlineCode")} hint={shortcut('E')} active={formattingState?.code} onClick={() => toggleInlineMark('code')}>
               <CodeXml size={17}/>
             </ToolbarButton>
           </div>
 
           <div className={styles.toolbarGroup}>
             <details className={styles.toolbarMenu} ref={insertMenuRef}>
-              <summary className={styles.insertButton}>Insert <ChevronDown size={14}/></summary>
+              <summary className={styles.insertButton}>{translate("editor:insert")}<ChevronDown size={14}/></summary>
               <div className={styles.insertMenu}>
-                <button type="button" onClick={openInsertDialog}><ImagePlus size={16}/>Image</button>
-                <button type="button" onClick={openInsertDialog}><Video size={16}/>Video</button>
-                <button type="button" onClick={openInsertDialog}><FilePlus2 size={16}/>File</button>
-                <button type="button" onClick={insertDivider}><Minus size={16}/>Divider</button>
+                <button type="button" onClick={openInsertDialog}><ImagePlus size={16}/>{translate("editor:image")}</button>
+                <button type="button" onClick={openInsertDialog}><Video size={16}/>{translate("editor:video")}</button>
+                <button type="button" onClick={openInsertDialog}><FilePlus2 size={16}/>{translate("editor:file")}</button>
+                <button type="button" onClick={insertDivider}><Minus size={16}/>{translate("editor:divider")}</button>
               </div>
             </details>
           </div>
@@ -279,13 +270,14 @@ const Toolbar: React.FC<ToolbarProps> = ({editor, disabled, toolbarVisible = tru
 
       <div className={styles.toolbarGroup}>
         <ToolbarButton
-          label={toolbarVisible ? 'Collapse toolbar' : 'Expand toolbar'}
+          label={toolbarVisible ? translate("editor:collapseToolbar") : translate("editor:expandToolbar")}
           onClick={() => toggleToolbar?.()}
         >
           {toolbarVisible ? <PanelTopClose size={17}/> : <PanelTopOpen size={17}/>}
-          <span className={styles.visuallyHidden}>{toolbarVisible ? 'Hide' : 'Format'}</span>
+          <span className={styles.visuallyHidden}>{toolbarVisible ? translate("editor:hide") : translate("editor:format")}</span>
         </ToolbarButton>
       </div>
+      {dialog}
     </div>
   );
 };
