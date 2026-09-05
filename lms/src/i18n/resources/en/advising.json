@@ -37,6 +37,10 @@
     "profileLoadError": "Profile could not be loaded.",
     "profileRetry": "Retry profile",
     "planLoadError": "Study plan could not be loaded.",
-    "planRetry": "Retry plan"
+    "planRetry": "Retry plan",
+    "planProfileLoading": "Loading the student profile…",
+    "planProfileRequired": "Create the student profile before preparing a study plan.",
+    "planProfileOpen": "Open student profile",
+    "courseActionsLoadError": "Course actions could not be loaded. Open Manage enrollment to try again."
   }
 }

@@ -37,6 +37,10 @@
     "profileLoadError": "無法載入學生檔案。",
     "profileRetry": "重試載入檔案",
     "planLoadError": "無法載入學習計畫。",
-    "planRetry": "重試載入計畫"
+    "planRetry": "重試載入計畫",
+    "planProfileLoading": "正在讀取學生檔案…",
+    "planProfileRequired": "請先建立學生檔案，再制定學習計畫。",
+    "planProfileOpen": "開啟學生檔案",
+    "courseActionsLoadError": "暫時無法讀取課程操作所需的資訊。請再次開啟「管理選課」重試。"
   }
 }

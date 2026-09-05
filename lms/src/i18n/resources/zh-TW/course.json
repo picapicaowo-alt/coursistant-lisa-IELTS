@@ -355,5 +355,24 @@
     "itemCount_other": "{{count}} 項",
     "assignmentFallback": "作業 {{id}}",
     "due": "截止日期：{{date}}"
+  },
+  "mockResults": {
+    "submitted": "科目已提交",
+    "title": "模考結果",
+    "back": "返回考試列表",
+    "sections": {
+      "reading": "閱讀",
+      "listening": "聽力",
+      "writing": "寫作"
+    },
+    "saved": "本次作答已儲存，此科目已結束作答。",
+    "feedback": "教師回饋",
+    "feedbackPending": "教師回饋將在提供後顯示於此。",
+    "task": "任務 {{number}}",
+    "words": "{{number}} 詞",
+    "responseUnavailable": "此紀錄中暫無已提交的作答內容。",
+    "result": "成績",
+    "correct": "答對 {{score}} / {{total}} 題",
+    "pending": "等待結果"
   }
 }

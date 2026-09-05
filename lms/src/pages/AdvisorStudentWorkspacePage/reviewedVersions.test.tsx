@@ -112,4 +112,20 @@ describe('missing-record creation boundaries', () => {
     await waitFor(() => expect(api.getStudentProfile).toHaveBeenCalled());
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
+  it('directs a new student to create a profile before drafting a plan', async () => {
+    api.getStudyPlan.mockRejectedValue({code: 404, details: {code: 'STUDY_PLAN_NOT_FOUND'}});
+    api.getStudentProfile.mockRejectedValue({code: 404, details: {code: 'STUDENT_PROFILE_NOT_FOUND'}});
+    mount(<StudyPlanPage/>);
+    expect(await screen.findByRole('link', {name: 'Open student profile'})).toHaveAttribute('href', '/advisor/students/301/profile');
+    expect(screen.queryByRole('textbox', {name: 'Strategy'})).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Create study plan'})).not.toBeInTheDocument();
+  });
+  it('recovers profile loading before offering a new plan', async () => {
+    api.getStudyPlan.mockRejectedValue({code: 404, details: {code: 'STUDY_PLAN_NOT_FOUND'}});
+    api.getStudentProfile.mockRejectedValueOnce({code: 500, details: {code: 'INTERNAL_SERVER_ERROR'}}).mockResolvedValue(response(profile));
+    mount(<StudyPlanPage/>);
+    fireEvent.click(await screen.findByRole('button', {name: 'Retry profile'}));
+    expect(await screen.findByRole('button', {name: 'Create study plan'})).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
 });

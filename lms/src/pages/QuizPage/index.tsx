@@ -103,8 +103,10 @@ const QuizPage = () => {
   const attemptsQuery = useQuery({
     queryKey: ['quiz-attempts', courseId, quizId, 'mine'],
     queryFn: async () => unwrapData(
-      await quizApiService.listMyAttempts(courseId, quizId),
-      'listMyAttempts',
+      // The results projection omits attempt IDs and timestamps. History needs
+      // the attempt collection, which the API scopes to the signed-in student.
+      await quizApiService.listAttempts(courseId, quizId),
+      'listAttempts',
     ),
     enabled: valid && access.isResolved && !isStaff,
     retry: 1,

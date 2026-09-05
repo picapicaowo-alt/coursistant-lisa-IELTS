@@ -1,5 +1,8 @@
 import {expect, test} from '@playwright/test';
 import {fixture, reply} from './workspace-fixtures';
+import en from '../src/i18n/resources/en/course.json' with {type: 'json'};
+import cn from '../src/i18n/resources/zh-CN/course.json' with {type: 'json'};
+import tw from '../src/i18n/resources/zh-TW/course.json' with {type: 'json'};
 
 test('exam navigation preserves answers and displays only released results', async ({page}) => {
   await fixture(page);
@@ -43,3 +46,74 @@ test('exam navigation preserves answers and displays only released results', asy
   await expect(page.getByLabel('Released question results')).toContainText('Incorrect 1');
   await expect(page.getByRole('button', {name: 'Submitted', exact: true})).toBeDisabled();
 });
+
+for (const section of ['reading', 'listening'] as const) {
+  test(`${section} submits unanswered questions with empty values`, async ({page}) => {
+    await fixture(page);
+    let submittedAnswers: unknown;
+    const questions = [{kind: 'shortAnswer', title: 'Questions', instruction: 'Write one word.', questionStart: 11, questionEnd: 12, payload: {questions: [{id: 11, prompt: 'First question'}, {id: 12, prompt: 'Second question'}]}}];
+    const paper = section === 'reading'
+      ? {id: 77, totalMinutes: 60, passages: [{id: 4, title: 'Practice', shortLabel: 'Passage 1', intro: 'Answer the questions.', paragraphs: ['Practice text.'], questionNumbers: [11, 12], questions}]}
+      : {id: 77, totalMinutes: 40, parts: [{id: 4, seq: 1, label: 'Part 1', questionNumbers: [11, 12], sections: questions}]};
+    await page.route('**/v2/student/mock-exams/77**', route => {
+      const path = new URL(route.request().url()).pathname;
+      if (route.request().method() === 'POST') {
+        if (path.endsWith('/attempts')) return route.fulfill({json: reply({attemptId: 81})});
+        submittedAnswers = route.request().postDataJSON().answers;
+        return route.fulfill({json: reply({submissionId: 91, readingId: 77, listeningId: 77, totalQuestions: 2, correctCount: 0, results: [{questionNumber: 11, submitted: section === 'reading' ? 'practice' : '', correct: false, blank: section === 'listening'}, {questionNumber: 12, submitted: '', correct: false, blank: true}]})});
+      }
+      return route.fulfill({json: reply(path.endsWith(`/${section}`) ? paper : {id: 77, title: 'Practice', status: 'READY', readingSelected: true, listeningSelected: true})});
+    });
+    await page.goto(`/mock-exams/77/${section}`);
+    await expect(page.getByRole('textbox')).toHaveCount(2);
+    if (section === 'reading') await page.getByRole('textbox').first().fill('practice');
+    await page.getByRole('button', {name: 'Finish section', exact: true}).click();
+    await page.getByRole('button', {name: 'Submit section', exact: true}).click();
+    await expect(page.getByRole('button', {name: 'View results', exact: true})).toBeVisible();
+    expect(submittedAnswers).toEqual({'11': section === 'reading' ? 'practice' : '', '12': ''});
+  });
+}
+
+for (const [locale, copy] of [['en', en.mockResults], ['zh-CN', cn.mockResults], ['zh-TW', tw.mockResults]] as const) {
+  test(`submitted writing opens saved responses and feedback in ${locale}`, async ({page}, testInfo) => {
+    await fixture(page);
+    await page.addInitScript(locale => localStorage.setItem('coursistant.locale', locale), locale);
+    const unexpected: string[] = [];
+    await page.route('**/v2/student/mock-exams/77**', route => {
+      const path = new URL(route.request().url()).pathname;
+      if (!path.endsWith('/mock-exams/77') || route.request().method() !== 'GET') unexpected.push(path);
+      return route.fulfill({json: reply({id: 77, title: 'Saved writing audit', status: 'COMPLETED', writingScore: 6.5, writingGradeStatus: 'GRADED', writingFeedback: 'QA feedback', writingTasks: [{taskKey: 'TASK1', seq: 1, content: 'QA submitted response', wordCount: 3}]})});
+    });
+    await page.goto('/mock-exams/77/writing');
+    await expect(page.getByRole('heading', {name: copy.sections.writing, exact: true})).toBeVisible();
+    await expect(page.getByText('QA submitted response', {exact: true})).toBeVisible();
+    await expect(page.getByText('QA feedback', {exact: true})).toBeVisible();
+    await expect(page.getByText('6.5', {exact: true})).toBeVisible();
+    await expect(page.getByRole('textbox')).toHaveCount(0);
+    await expect(page.getByRole('button', {name: 'Finish section', exact: true})).toHaveCount(0);
+    await page.setViewportSize({width: 390, height: 844});
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    await page.screenshot({path: testInfo.outputPath(`submitted-writing-${locale}-390.png`), fullPage: true});
+    await page.reload();
+    await expect(page.getByText('QA submitted response', {exact: true})).toBeVisible();
+    await expect(page.getByRole('button', {name: copy.back, exact: true})).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', locale);
+    expect(unexpected).toEqual([]);
+  });
+}
+
+for (const section of ['reading', 'listening'] as const) {
+  test(`an already-submitted ${section} section cannot start again during an active exam`, async ({page}) => {
+    await fixture(page);
+    const unexpected: string[] = [];
+    await page.route('**/v2/student/mock-exams/77**', route => {
+      const path = new URL(route.request().url()).pathname;
+      if (!path.endsWith('/mock-exams/77') || route.request().method() !== 'GET') unexpected.push(path);
+      return route.fulfill({json: reply({id: 77, title: 'Partial exam', status: 'IN_PROGRESS', [`${section}Correct`]: 0, [`${section}Total`]: 40})});
+    });
+    await page.goto(`/mock-exams/77/${section}`);
+    await expect(page.getByText('0 / 40 correct', {exact: true})).toBeVisible();
+    await expect(page.getByRole('button', {name: 'Finish section', exact: true})).toHaveCount(0);
+    expect(unexpected).toEqual([]);
+  });
+}

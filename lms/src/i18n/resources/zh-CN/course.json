@@ -355,5 +355,24 @@
         "itemCount_other": "{{count}} 项",
         "assignmentFallback": "作业 {{id}}",
         "due": "截止日期：{{date}}"
+    },
+    "mockResults": {
+        "submitted": "科目已提交",
+        "title": "模考结果",
+        "back": "返回考试列表",
+        "sections": {
+            "reading": "阅读",
+            "listening": "听力",
+            "writing": "写作"
+        },
+        "saved": "本次作答已保存，此科目已结束作答。",
+        "feedback": "教师反馈",
+        "feedbackPending": "教师反馈将在提供后显示于此。",
+        "task": "任务 {{number}}",
+        "words": "{{number}} 词",
+        "responseUnavailable": "此记录中暂无已提交的作答内容。",
+        "result": "成绩",
+        "correct": "答对 {{score}} / {{total}} 题",
+        "pending": "等待结果"
     }
 }

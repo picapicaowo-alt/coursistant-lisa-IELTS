@@ -112,3 +112,76 @@ test('student messages expose read and attachment failures without unhandled err
   await expect(page.getByRole('button', {name: en.attachments.preview, exact: true})).toBeEnabled();
   expect(errors).toEqual([]);
 });
+
+test('course enrollment recovers missing launch versions through the delivery read', async ({page}) => {
+  await fixtureSession(page, 'ADVISOR');
+  let configReads = 0;
+  let readyVersion: unknown;
+  let ready = false;
+  await page.route('**/v2/**', route => {
+    const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
+    const method = route.request().method();
+    if (path.endsWith('/delivery-config')) {
+      configReads += 1;
+      if (configReads === 1) return route.fulfill({status: 503, json: {status: 503, code: 'SERVICE_UNAVAILABLE'}});
+      return route.fulfill({json: response({courseId: 42, deliveryMode: 'ONE_ON_ONE', launchState: ready ? 'READY' : 'DRAFT', courseLaunchVersion: ready ? 1 : 0})});
+    }
+    if (path.endsWith('/launch/ready') && method === 'POST') {
+      readyVersion = route.request().postDataJSON().expectedCourseLaunchVersion;
+      ready = true;
+      return route.fulfill({json: response({courseId: 42, launchState: 'READY', courseLaunchVersion: 1})});
+    }
+    let data: unknown = {items: [], total: 0, page: 0, size: 20};
+    if (path.endsWith('/unread-count')) data = {unreadCount: 0};
+    if (path.endsWith('/hub')) data = {studentUserId: 901, firstName: 'Audit', lastName: 'Learner'};
+    if (path.endsWith('/profile')) data = {studentUserId: 901, profileVersion: 0, skills: []};
+    if (path.endsWith('/study-plan')) data = {studentUserId: 901, profileContext: {currentProfileVersion: 0}, plan: {studyPlanVersion: 0, checkpoints: []}};
+    if (path === '/v2/advisor/students/901/courses') data = [{courseId: 42, title: 'Test planning course', deliveryMode: 'ONE_ON_ONE', launchState: ready ? 'READY' : 'DRAFT', courseLaunchVersion: null, courseLinkVersion: 0, completionVersion: 0, status: 'ACTIVE', schedule: []}];
+    return route.fulfill({json: response(data)});
+  });
+  await page.goto('/advisor/students/901/courses');
+  await page.getByRole('button', {name: 'Manage enrollment'}).click();
+  await expect(page.getByRole('alert')).toHaveText(en.records.courseActionsLoadError);
+  await expect(page.getByRole('button', {name: 'Manage enrollment'})).toBeEnabled();
+  await page.getByRole('button', {name: 'Manage enrollment'}).click();
+  const dialog = page.getByRole('dialog', {name: 'Manage enrollment'});
+  await expect(dialog.getByRole('button', {name: 'Ready', exact: true})).toBeEnabled();
+  await dialog.getByRole('button', {name: 'Ready', exact: true}).click();
+  await expect(dialog).toHaveCount(0);
+  expect(readyVersion).toBe(0);
+  await page.getByRole('button', {name: 'Manage enrollment'}).click();
+  await expect(dialog.getByRole('button', {name: 'Publish', exact: true})).toBeEnabled();
+  expect(configReads).toBe(3);
+});
+
+test('student quiz history reads attempt metadata and opens the matching result and receipt', async ({page}) => {
+  await fixtureSession(page, 'STUDENT');
+  const reads: string[] = [];
+  const errors: string[] = [];
+  page.on('pageerror', error => errors.push(error.message));
+  await page.route('**/v2/**', route => {
+    const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
+    reads.push(path);
+    const result = {quizId: 1, countedAttemptId: 9, gradeStatus: 'Released', releasedAt: '2026-09-05T01:15:21Z', receiptId: 'qa-receipt', totalScore: 1, manualGradingPending: false};
+    let data: unknown = [];
+    if (path === '/v2/me/courses') data = {items: [{courseId: 42, role: 'Student'}], total: 1, page: 0, size: 100};
+    if (path.endsWith('/unread-count')) data = {unreadCount: 0};
+    if (path === '/v2/courses/42/quizzes/1') data = {id: 1, courseId: 42, title: 'QA objective quiz', state: 'Published', windowOpen: true, opensAtLocal: '2026-09-01T09:00:00', closesAtLocal: '2026-09-30T17:00:00', timezone: 'Asia/Shanghai', attemptsAllowed: 1, totalPoints: 1, resultVisibility: 'AfterRelease'};
+    if (path.endsWith('/attempts/current')) return route.fulfill({status: 404, json: {status: 404, code: 'QUIZ_ATTEMPT_NOT_FOUND'}});
+    if (path.endsWith('/my-attempts')) data = [{...result, totalScore: null}];
+    if (path.endsWith('/attempts')) data = [{id: 9, attemptNumber: 1, status: 'Submitted', startedAt: '2026-09-05T01:14:13.634', submittedAt: '2026-09-05T01:14:53Z', receiptId: 'qa-receipt'}];
+    if (path.endsWith('/my-result') || path.endsWith('/attempts/9/result')) data = result;
+    if (path.endsWith('/attempts/9/receipt')) data = {attemptId: 9, receiptId: 'qa-receipt', submittedAt: '2026-09-05T01:14:53Z'};
+    return route.fulfill({json: response(data)});
+  });
+  await page.goto('/course/42/quizzes/1');
+  await expect(page.getByRole('heading', {name: 'Quiz submitted'})).toBeVisible();
+  const history = page.getByRole('region', {name: 'Attempt history'});
+  await expect(history.getByText('Attempt 1', {exact: true})).toBeVisible();
+  await history.getByRole('button', {name: 'View result', exact: true}).click();
+  await expect(history.getByText('1 / 1', {exact: true})).toBeVisible();
+  await expect(history.getByText(/Receipt qa-receipt/)).toBeVisible();
+  expect(reads).toContain('/v2/courses/42/quizzes/1/attempts/9/receipt');
+  expect(reads.some(path => path.endsWith('/my-attempts'))).toBe(false);
+  expect(errors).toEqual([]);
+});

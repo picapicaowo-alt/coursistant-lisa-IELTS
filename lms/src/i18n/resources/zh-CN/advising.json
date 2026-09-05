@@ -37,6 +37,10 @@
     "profileLoadError": "无法加载学生档案。",
     "profileRetry": "重试加载档案",
     "planLoadError": "无法加载学习计划。",
-    "planRetry": "重试加载计划"
+    "planRetry": "重试加载计划",
+    "planProfileLoading": "正在读取学生档案…",
+    "planProfileRequired": "请先创建学生档案，再制定学习计划。",
+    "planProfileOpen": "打开学生档案",
+    "courseActionsLoadError": "暂时无法读取课程操作所需的信息。请再次打开“管理选课”重试。"
   }
 }

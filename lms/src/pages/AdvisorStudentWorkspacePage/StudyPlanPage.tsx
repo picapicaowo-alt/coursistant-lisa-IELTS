@@ -6,10 +6,11 @@ import {StudyPlanHistory} from './StudyPlanHistory';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {getApiErrorCode} from '@/utils/apiError';
 import React, {FormEvent, useEffect, useRef, useState} from 'react';
-import {useParams, useSearchParams} from 'react-router-dom';
+import {generatePath, Link, useParams, useSearchParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {AdvisorTaskRequest, CheckpointRequest, unwrapData} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {EnglishDateInput} from '@/components/EnglishDateInput';
 import {isMissingResource} from '@/utils/apiError';
@@ -205,6 +206,17 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
   if (planQuery.isPending) return <p className={styles.status}>Loading study plan…</p>;
   if (planQuery.isError && !missing) {
     return <p className={styles.error} role="alert">{advisingErrorMessage(planQuery.error, t('records.planLoadError'))} <button type="button" onClick={() => void planQuery.refetch()}>{t('records.planRetry')}</button></p>;
+  }
+  // Creating a plan requires an existing profile version. Do not offer a form
+  // whose only possible outcome is a missing-version error after drafting.
+  if (missing) {
+    if (profileQuery.isPending) return <p className={styles.status} role="status">{t('records.planProfileLoading')}</p>;
+    if (profileQuery.isError && isMissingResource(profileQuery.error, ADVISING_ERROR_CODES.profileNotFound)) {
+      return <div className={styles.status}><p>{t('records.planProfileRequired')}</p><Link to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdProfile, {studentUserId: String(id)})}>{t('records.planProfileOpen')}</Link></div>;
+    }
+    if (profileQuery.isError || !Number.isInteger(profileQuery.data?.profileVersion)) {
+      return <p className={styles.error} role="alert">{advisingErrorMessage(profileQuery.error, t('records.profileLoadError'))} <button type="button" onClick={() => void profileQuery.refetch()}>{t('records.profileRetry')}</button></p>;
+    }
   }
 
   return (

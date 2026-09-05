@@ -1,4 +1,6 @@
 import {teachingLabel} from '@/components/TeachingWorkspace/presentation';
+import {useTranslation} from 'react-i18next';
+import {teachingAlertTitle} from '@/utils/teachingAlert';
 import { useMemo, useState, type ReactNode } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { generatePath, Link, useSearchParams } from "react-router-dom";
@@ -124,6 +126,7 @@ const coursePath = (id: number) =>
   generatePath(APP_ROUTE_PATHS.courseCourseId, { courseId: String(id) });
 
 function TeachingOverview() {
+  useTranslation('dashboard');
   const today = useQuery({
     queryKey: ["me", "teaching-today"],
     queryFn: async () =>
@@ -383,7 +386,7 @@ function TeachingOverview() {
             const content = (
               <>
                 <span className={local.alertIcon}>
-                  {textValue(item, "type", "alertType") ===
+                  {textValue(item, "kind", "type", "alertType") ===
                   "SCHEDULE_CONFLICT" ? (
                     <TriangleAlert size={19} />
                   ) : (
@@ -391,8 +394,7 @@ function TeachingOverview() {
                   )}
                 </span>
                 <span>
-                  {textValue(item, "message", "title") ||
-                    teachingLabel(textValue(item, "type", "alertType"))}
+                  {teachingAlertTitle(item)}
                 </span>
               </>
             );
