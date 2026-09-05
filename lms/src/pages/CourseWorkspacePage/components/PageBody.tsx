@@ -68,7 +68,7 @@ export const PageBody: React.FC<PageBodyProps> = ({
   return (
     <div className={`${styles.contentArea} ${instructorView ? styles.instructorBody : ''}`}>
       <CourseDetailView
-        key={instructorView ? 'instructor' : 'standard'}
+        key={`${courseId}:${instructorView ? 'instructor' : 'standard'}`}
         instructorView={instructorView}
         canCreateAssignments={canCreateAssignments}
         canManageEvents={canManageEvents}

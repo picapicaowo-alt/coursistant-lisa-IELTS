@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -7,21 +7,36 @@ import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {AdvisingPagination} from '../advising/AdvisingPagination';
 import {useActionTaskTransition} from './useActionTaskTransition';
 import {AdvisingBadge} from '@/components/AdvisingBadge';
-import {ACTION_CATEGORY_LABELS} from '@/components/AdvisingBadge/labels';
+import {ACTION_CATEGORY_KEYS, ACTION_STATUS_KEYS, PRIORITY_KEYS} from '@/components/AdvisingBadge/labels';
+import {useTranslation} from 'react-i18next';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import styles from '../advising/advising.module.scss';
+import taskStyles from './AdvisorTasksPage.module.scss';
+import {formatDateTime, formatNumber} from '@/i18n/formatting';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {ADVISOR_PAGE_SIZE, ACTION_TASK_TYPES} from '@/apis/types/advisorWorkspace';
 import {actionTaskTargetPath} from './actionTaskTarget';
-const formatDateTime = (value?: string): string => {
+const formatTaskDateTime = (value?: string): string => {
   if (!value) return '';
   const parsed = new Date(value);
-  return Number.isNaN(parsed.getTime()) ? value : parsed.toLocaleString();
+  return Number.isNaN(parsed.getTime()) ? value : formatDateTime(parsed, {dateStyle: 'medium', timeStyle: 'short'});
 };
 
 export default function AdvisorTasksPage() {
-  const [searchParams] = useSearchParams();
-  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(() => Number(searchParams.get('taskId')) || null);
+  const {t} = useTranslation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedTaskId = Number(searchParams.get('taskId')) || null;
+  const detailTrigger = useRef<HTMLButtonElement | null>(null);
+  const setSelectedTaskId = (id: number | null) => setSearchParams(current => {
+    const next = new URLSearchParams(current);
+    if (id == null) next.delete('taskId');
+    else next.set('taskId', String(id));
+    return next;
+  }, {replace: true});
+  const closeDetail = () => {
+    detailTrigger.current?.focus();
+    setSelectedTaskId(null);
+  };
   const [taskPage, setTaskPage] = useState(0);
   const [taskFilters, setTaskFilters] = useState({status: '', priority: '', type: '', studentType: ''});
   const tasks = useQuery({
@@ -52,31 +67,28 @@ export default function AdvisorTasksPage() {
 
   const tasksError = tasks.error || taskMutation.error;
   return <div className={styles.page}>
-    <header className={styles.header}><div><h1>Action tasks</h1><p className={styles.lede}>Review priorities, track progress, and open the student record.</p></div><Link className={styles.secondaryLink} to={APP_ROUTE_PATHS.advisorOperations}>Back to dashboard</Link></header>
+    <header className={styles.header}><div><h1>{t("navigation:actionTasks")}</h1><p className={styles.lede}>{t("advising:actionTasks.description")}</p></div><Link className={styles.secondaryLink} to={APP_ROUTE_PATHS.advisorOperations}>{t("course:detail.backToDashboard")}</Link></header>
         <WorkspaceSection
-          title="Action tasks"
+          title={t("navigation:actionTasks")}
           id="action-tasks"
-          className={styles.disclosureLayout}
-          meta={<span className={styles.countBadge}>{tasks.data?.total ?? 0}</span>}
+          className={`${styles.disclosureLayout} ${taskStyles.taskSection}`}
+          meta={<span className={styles.countBadge}>{formatNumber(tasks.data?.total ?? 0)}</span>}
         >
-          <div className={`${styles.form} ${styles.formGrid}`}>
+          <div className={`${styles.form} ${styles.formGrid} ${taskStyles.filters}`}>
             <label>
-              Status
-              <select
+              {t("common:fields.status")}<select
                 value={taskFilters.status}
                 onChange={event => {
                   setTaskFilters(current => ({...current, status: event.target.value}));
                   setTaskPage(0);
                 }}
               >
-                <option value="">All statuses</option>
-                <option>PENDING</option>
-                <option>IN_PROGRESS</option>
-                <option>RESOLVED</option>
+                <option value="">{t("advising:actionTasks.allStatuses")}</option>
+                {Object.entries(ACTION_STATUS_KEYS).map(([value, key]) => <option key={value} value={value}>{t(key)}</option>)}
               </select>
             </label>
             <label>
-              Priority
+              {t("advising:actionTasks.priority")}
               <select
                 value={taskFilters.priority}
                 onChange={event => {
@@ -84,29 +96,26 @@ export default function AdvisorTasksPage() {
                   setTaskPage(0);
                 }}
               >
-                <option value="">All priorities</option>
-                <option>HIGH</option>
-                <option>MEDIUM</option>
-                <option>LOW</option>
+                <option value="">{t("advising:actionTasks.allPriorities")}</option>
+                {Object.entries(PRIORITY_KEYS).map(([value, key]) => <option key={value} value={value}>{t(key)}</option>)}
               </select>
             </label>
             <label>
-              Type
-              <select
+              {t("common:fields.type")}<select
                 value={taskFilters.type}
                 onChange={event => {
                   setTaskFilters(current => ({...current, type: event.target.value}));
                   setTaskPage(0);
                 }}
               >
-                <option value="">All types</option>
+                <option value="">{t("advising:actionTasks.allTypes")}</option>
                 {ACTION_TASK_TYPES.map(type => (
-                  <option key={type}>{type}</option>
+                  <option key={type} value={type}>{t(`advising:actionTasks.types.${type}`)}</option>
                 ))}
               </select>
             </label>
             <label>
-              Student type
+              {t("advising:actionTasks.studentType")}
               <select
                 value={taskFilters.studentType}
                 onChange={event => {
@@ -114,79 +123,78 @@ export default function AdvisorTasksPage() {
                   setTaskPage(0);
                 }}
               >
-                <option value="">All students</option>
-                <option value="ACTIVE">Active</option>
-                <option value="INTAKE">Intake</option>
-                <option value="TRANSITION">Transition</option>
+                <option value="">{t("advising:actionTasks.allStudents")}</option>
+                <option value="ACTIVE">{t("common:status.ACTIVE")}</option>
+                <option value="INTAKE">{t("advising:actionTasks.intake")}</option>
+                <option value="TRANSITION">{t("advising:actionTasks.transition")}</option>
               </select>
             </label>
           </div>
 
           {tasksError ? (
             <p className={styles.error} role="alert">
-              {advisingErrorMessage(tasksError, 'Action tasks could not be loaded.')}
+              {advisingErrorMessage(tasksError, t("advising:actionTasks.loadFailed"))}
             </p>
           ) : null}
-          {tasks.isPending ? <p className={styles.status}>Loading action tasks…</p> : null}
+          {tasks.isPending ? <p className={styles.status} role="status">{t("advising:actionTasks.loading")}</p> : null}
           {!tasks.isPending && !tasks.isError && (tasks.data?.items.length ?? 0) === 0 ? (
             <div className={styles.emptyState}>
-              <strong>No open action tasks match your filter</strong>
-              <span>New items appear when checkpoints near deadlines or support tickets escalate.</span>
+              <strong>{t("advising:actionTasks.empty")}</strong>
+              <span>{t("advising:actionTasks.emptyHint")}</span>
             </div>
           ) : null}
 
-          <div className={styles.inboxList}>
+          <div className={taskStyles.taskList}>
+            {(tasks.data?.items.length ?? 0) > 0 ? <div className={taskStyles.columnHeadings} aria-hidden="true"><span>{t("advising:actionTasks.task")}</span><span>{t("common:fields.status")}</span><span>{t("advising:actionTasks.priority")}</span><span>{t("common:fields.actions")}</span></div> : null}
             {(tasks.data?.items ?? []).map(task => (
-              <article className={styles.inboxRow} key={task.taskId}>
-                  <div className={styles.inboxMain}>
-                    <div className={styles.rowTitle}>
-                      <strong>{task.description || `Task #${task.taskId}`}</strong>
-                      <AdvisingBadge value={task.status} kind="status"/>
-                      <AdvisingBadge value={task.priority}/>
-                    </div>
-                    <span>
-                      {task.category ? ACTION_CATEGORY_LABELS[task.category] ?? task.category : task.taskType?.replace(/_/g, ' ').toLowerCase() || 'Advising task'}
-                      {task.createdAt ? ` · ${formatDateTime(task.createdAt)}` : ''}
-                    </span>
+              <article className={taskStyles.taskRow} key={task.taskId}>
+                  <div className={taskStyles.taskMain}>
+                    <h3>{task.description || t("advising:actionTasks.fallbackTitle", {id: task.taskId})}</h3>
+                    <p>
+                      {task.category ? (ACTION_CATEGORY_KEYS[task.category] ? t(ACTION_CATEGORY_KEYS[task.category]) : task.category) : task.taskType && ACTION_TASK_TYPES.some(type => type === task.taskType) ? t(`advising:actionTasks.types.${task.taskType}`) : t('common:tasks.advisingTask')}
+                      {task.createdAt ? ` · ${formatTaskDateTime(task.createdAt)}` : ''}
+                    </p>
                   </div>
-                  <div className={styles.actions}>
+                  <AdvisingBadge value={task.status} kind="status"/>
+                  <AdvisingBadge value={task.priority}/>
+                  <div className={taskStyles.taskActions}>
                     {task.taskId != null ? (
                       <button
                         type="button"
-                        className={styles.secondary}
+                        className={`${styles.secondary} ${taskStyles.detailsAction}`}
+                        ref={selectedTaskId === task.taskId ? detailTrigger : undefined}
+                        aria-controls={selectedTaskId === task.taskId ? `task-detail-${task.taskId}` : undefined}
                         aria-expanded={selectedTaskId === task.taskId}
-                        onClick={() => setSelectedTaskId(current => (current === task.taskId ? null : task.taskId!))}
+                        onClick={() => setSelectedTaskId(selectedTaskId === task.taskId ? null : task.taskId!)}
                       >
-                        Details
-                      </button>
+                        {t("common:fields.details")}</button>
                     ) : null}
                     {actionTaskTargetPath(task.target) ? (
-                      <Link className={styles.secondaryLink} to={actionTaskTargetPath(task.target)!}>
-                        Open task record
+                      <Link className={`${styles.secondaryLink} ${taskStyles.recordAction}`} to={actionTaskTargetPath(task.target)!}>
+                        {t("advising:actionTasks.openRecord")}
                       </Link>
                     ) : null}
                     {task.status === 'PENDING' && task.taskId != null ? (
                       <button
                         type="button"
-                        className={styles.secondary}
+                        className={`${styles.secondary} ${taskStyles.transitionAction}`}
                         disabled={taskMutation.isPending || task.version == null}
                         onClick={() =>
                           taskMutation.mutate({action: 'start', taskId: task.taskId!, version: task.version})
                         }
                       >
-                        Start
-                      </button>
+                        {t("course:scheduleModal.startLabel")}</button>
                     ) : null}
                     {task.status === 'IN_PROGRESS' && task.taskId != null ? (
                       <button
                         type="button"
-                        className={styles.primary}
+                        className={`${styles.primary} ${taskStyles.transitionAction}`}
                         disabled={taskMutation.isPending || task.version == null}
                         onClick={() =>
                           taskMutation.mutate({action: 'resolve', taskId: task.taskId!, version: task.version})
                         }
                       >
-                        Resolve
+                        {t("advising:actionTasks.resolve")}
                       </button>
                     ) : null}
                   </div>
@@ -195,32 +203,32 @@ export default function AdvisorTasksPage() {
           </div>
 
           {selectedTaskId != null ? (
-            <section className={styles.detailCard} aria-label="Task detail">
+            <section id={`task-detail-${selectedTaskId}`} className={`${styles.detailCard} ${taskStyles.detail}`} aria-label={t("advising:actionTasks.details")}>
               <div className={styles.detailHeader}>
-                <h2>Task details</h2>
+                <h2>{t("advising:actionTasks.details")}</h2>
                 <button
                   type="button"
                   className={styles.secondary}
-                  onClick={() => setSelectedTaskId(null)}
+                  onClick={closeDetail}
                 >
-                  Close
-                </button>
+                  {t("common:actions.close")}</button>
               </div>
-              {taskDetail.isPending ? <p role="status">Loading task…</p> : null}
+              {taskDetail.isPending ? <p role="status">{t("advising:actionTasks.loadingDetail")}</p> : null}
               {taskDetail.isError ? (
                 <p className={styles.error} role="alert">
-                  {advisingErrorMessage(taskDetail.error, 'This task is unavailable.')}
+                  {advisingErrorMessage(taskDetail.error, t("advising:actionTasks.unavailable"))}
                 </p>
               ) : null}
               {taskDetail.data ? (
                 <>
-                  <h3>{taskDetail.data.description || 'Action task'}</h3>
-                  <p>
-                    {taskDetail.data.status} · {taskDetail.data.priority}
-                  </p>
-                  <p>{taskDetail.data.createdAt ? `Created ${formatDateTime(taskDetail.data.createdAt)}` : ''}</p>
+                  <h3>{taskDetail.data.description || t("navigation:actionTasks")}</h3>
+                  <div className={taskStyles.taskBadges}>
+                    <AdvisingBadge value={taskDetail.data.status} kind="status"/>
+                    <AdvisingBadge value={taskDetail.data.priority}/>
+                  </div>
+                  <p>{taskDetail.data.createdAt ? t("advising:actionTasks.createdAt", {date: formatTaskDateTime(taskDetail.data.createdAt)}) : ''}</p>
                   {taskDetail.data.resolvedAt ? (
-                    <p>Resolved {formatDateTime(taskDetail.data.resolvedAt)}</p>
+                    <p>{t('common:records.resolvedAt', {date: formatTaskDateTime(taskDetail.data.resolvedAt)})}</p>
                   ) : null}
                 </>
               ) : null}
@@ -228,7 +236,7 @@ export default function AdvisorTasksPage() {
           ) : null}
 
           <AdvisingPagination
-            label="Action task pages"
+            label={t("advising:actionTasks.pages")}
             page={taskPage}
             total={tasks.data?.total ?? 0}
             onPage={setTaskPage}

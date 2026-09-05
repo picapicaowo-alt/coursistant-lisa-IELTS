@@ -30,7 +30,7 @@ test('course cards and material reader preserve real progress and discussion wri
   await expect(page.getByRole('link', {name: /Read and reflect/})).toHaveCount(0);
   await page.getByRole('button', {name: 'Courses', exact: true}).click();
   await page.getByRole('link', {name: 'Open learning materials'}).click();
-  await page.getByRole('button', {name: material.displayName, exact: true}).click();
+  await page.getByRole('button', {name: `Open ${material.displayName}`, exact: true}).click();
   await expect(page).toHaveURL(/materialId=121/);
   await expect(page.getByRole('link', {name: /Open learning resource/})).toHaveAttribute('href', material.linkUrl);
   await capture(page, info.outputPath.bind(info), 'course-reader');

@@ -1,0 +1,40 @@
+{
+  "actionTasks": {
+    "description": "Review priorities, track progress, and open the student record.",
+    "allStatuses": "All statuses",
+    "priority": "Priority",
+    "allPriorities": "All priorities",
+    "allTypes": "All types",
+    "studentType": "Student type",
+    "allStudents": "All students",
+    "intake": "Intake",
+    "transition": "Transition",
+    "loadFailed": "Action tasks could not be loaded. Please try again.",
+    "loading": "Loading action tasks…",
+    "empty": "No action tasks match your filter",
+    "emptyHint": "New items appear when checkpoints near deadlines or support tickets escalate.",
+    "task": "Task",
+    "fallbackTitle": "Task #{{id}}",
+    "openRecord": "Open task record",
+    "resolve": "Resolve",
+    "details": "Task details",
+    "loadingDetail": "Loading task…",
+    "unavailable": "This task is unavailable. Refresh the list and try again.",
+    "createdAt": "Created {{date}}",
+    "pages": "Action task pages",
+    "types": {
+      "ABSENCE_APPROVAL": "Absence approval",
+      "SCHEDULE_CHANGE_APPROVAL": "Schedule change approval",
+      "REPORT_REVIEW": "Report review",
+      "REPEATED_ABSENCE": "Repeated absence",
+      "LOW_ASSIGNMENT_COMPLETION": "Low assignment completion",
+      "STUDENT_INACTIVITY": "Student inactivity",
+      "POOR_PERFORMANCE": "Poor performance",
+      "NEGATIVE_HOURS": "Negative course hours",
+      "OVERDUE_STUDENT_ASSIGNMENT": "Overdue student assignment",
+      "DELAYED_GRADING": "Delayed grading",
+      "REACHED_INCOMPLETE_CHECKPOINT": "Incomplete checkpoint reached",
+      "OVERDUE_STUDY_PLAN_TASK": "Overdue study plan task"
+    }
+  }
+}

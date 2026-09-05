@@ -1,0 +1,40 @@
+{
+  "actionTasks": {
+    "description": "查看優先級、跟進任務進度，並開啟學生記錄。",
+    "allStatuses": "全部狀態",
+    "priority": "優先級",
+    "allPriorities": "全部優先級",
+    "allTypes": "全部類型",
+    "studentType": "學生類型",
+    "allStudents": "全部學生",
+    "intake": "待分配",
+    "transition": "過渡階段",
+    "loadFailed": "暫時無法載入行動任務，請重試。",
+    "loading": "正在載入行動任務…",
+    "empty": "沒有符合篩選條件的行動任務",
+    "emptyHint": "檢查點臨近截止日期或支援工單升級時，新任務會顯示在這裡。",
+    "task": "任務",
+    "fallbackTitle": "任務 #{{id}}",
+    "openRecord": "開啟任務記錄",
+    "resolve": "標記已解決",
+    "details": "任務詳情",
+    "loadingDetail": "正在載入任務…",
+    "unavailable": "此任務暫不可用，請重新整理列表後重試。",
+    "createdAt": "建立於 {{date}}",
+    "pages": "行動任務分頁",
+    "types": {
+      "ABSENCE_APPROVAL": "請假審批",
+      "SCHEDULE_CHANGE_APPROVAL": "調課審批",
+      "REPORT_REVIEW": "報告審核",
+      "REPEATED_ABSENCE": "多次缺勤",
+      "LOW_ASSIGNMENT_COMPLETION": "作業完成率偏低",
+      "STUDENT_INACTIVITY": "學生長期未活動",
+      "POOR_PERFORMANCE": "學習表現待提升",
+      "NEGATIVE_HOURS": "課時餘額為負",
+      "OVERDUE_STUDENT_ASSIGNMENT": "學生作業逾期",
+      "DELAYED_GRADING": "批改延遲",
+      "REACHED_INCOMPLETE_CHECKPOINT": "檢查點到期未完成",
+      "OVERDUE_STUDY_PLAN_TASK": "學習計劃任務逾期"
+    }
+  }
+}

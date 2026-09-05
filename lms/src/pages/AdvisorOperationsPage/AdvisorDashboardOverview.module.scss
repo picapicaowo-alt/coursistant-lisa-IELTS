@@ -8,18 +8,18 @@
 .column { display: grid; min-width: 0; gap: t.$space-5; }
 .viewAll { display: inline-flex; flex-shrink: 0; align-items: center; gap: t.$space-1; color: t.$action-primary; font-size: t.$font-size-caption; font-weight: t.$fw-medium; text-decoration: none; }
 .viewAll:hover { text-decoration: underline; }
-.attentionBody { container-type: inline-size; gap: t.$space-4; }
-.attentionRow { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(3.5rem, auto) minmax(0, 1fr) auto; gap: t.$space-3; align-items: center; font-size: t.$font-size-body; }
+.attentionBody { container-type: inline-size; grid-template-columns: minmax(0, 1.1fr) max-content minmax(0, 1fr) max-content; gap: t.$space-4; }
+.attentionRow { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; gap: t.$space-3; align-items: center; font-size: t.$font-size-body; }
 .person { display: flex; align-items: center; min-width: 0; gap: t.$space-3; }
 .person > div, .reason { display: grid; min-width: 0; gap: t.$space-1; overflow-wrap: anywhere; }
 .person strong { font-weight: t.$fw-semibold; }
 .person small, .reason small, .taskTitle small { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
 .avatar { width: 2.5rem; height: 2.5rem; border: 2px solid t.$border-default; }
-.viewButton { display: inline-flex; min-width: 3.75rem; min-height: 2rem; padding: t.$space-1 t.$space-4; align-items: center; justify-content: center; border: 1px solid t.$border-strong; border-radius: t.$radius-pill; color: t.$content-primary; text-decoration: none; }
+.viewButton { display: inline-flex; min-width: 3.75rem; min-height: t.$touch-target; padding: t.$space-1 t.$space-4; align-items: center; justify-content: center; border: 1px solid t.$border-strong; border-radius: t.$radius-pill; color: t.$content-primary; text-decoration: none; }
 .viewButton[data-primary], .viewButton:hover { background: t.$action-primary; border-color: t.$action-primary; color: t.$content-on-color; }
-.taskBody { container-type: inline-size; gap: t.$space-3; }
-.taskRow { display: grid; grid-template-columns: 1.5rem 1rem minmax(0, 1fr) auto auto; align-items: center; gap: t.$space-3; }
-.taskCheck { display: grid; place-items: center; min-height: 2.5rem; cursor: pointer; }
+.taskBody { container-type: inline-size; grid-template-columns: t.$touch-target 1rem minmax(0, 1fr) max-content max-content; gap: t.$space-3; }
+.taskRow { display: grid; grid-template-columns: subgrid; grid-column: 1 / -1; align-items: center; gap: t.$space-3; }
+.taskCheck { display: grid; place-items: center; min-height: t.$touch-target; cursor: pointer; }
 .taskCheck input {appearance:none; width:1.4rem; height:1.4rem; margin:0; border:2px solid t.$border-strong; border-radius:.4rem; background:t.$surface-raised; display:grid; place-content:center; cursor:pointer;}
 .taskCheck input:checked, .taskCheck input:indeterminate {background:t.$action-primary; border-color:t.$action-primary;}
 .taskCheck input:checked::after {content:''; width:.4rem; height:.65rem; border:solid t.$content-on-color; border-width:0 2px 2px 0; transform:translateY(-.1rem) rotate(45deg);}
@@ -60,6 +60,11 @@
 .requestSummary span { display: grid; gap: t.$space-1; }
 .requestSummary small, .empty { margin: 0; color: t.$content-secondary; font-size: t.$font-size-body; line-height: t.$line-height-body; }
 .error { color: t.$feedback-danger; }
-@container (max-width: 510px) { .attentionRow { grid-template-columns: minmax(0, 1fr) auto auto; } .reason { grid-column: 1 / -1; padding-left: calc(2.5rem + #{t.$space-3}); } .viewButton { grid-column: 3; grid-row: 1; } .taskRow { grid-template-columns: 1.5rem 1rem minmax(0, 1fr) auto; } .taskRow > :last-child { grid-column: 3; } }
+@container (max-width: 510px) { .attentionRow { grid-template-columns: minmax(0, 1fr) auto auto; } .reason { grid-column: 1 / -1; padding-left: calc(2.5rem + #{t.$space-3}); } .viewButton { grid-column: 3; grid-row: 1; } .taskRow { grid-template-columns: t.$touch-target 1rem minmax(0, 1fr) auto; } .taskRow > :last-child { grid-column: 3; } }
 @media (max-width: 1200px) { .grid { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); } .grid > .column:last-child { grid-column: auto; grid-template-columns: minmax(0, 1fr); align-items: start; } }
 @media (max-width: 760px) { .grid, .grid > .column:last-child { grid-template-columns: minmax(0, 1fr); } .welcome h1 { font-size: t.$font-size-headline; } .viewButton { min-height: t.$touch-target; } }
+
+.attentionBody > .empty, .taskBody > .empty, .taskBody > .error { grid-column: 1 / -1; }
+.viewAll { min-height: t.$touch-target; }
+.taskTime { font-variant-numeric: tabular-nums; }
+.viewButton:focus-visible, .taskTitle:focus-visible, .viewAll:focus-visible, .messageRow:focus-visible, .requestSummary:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 3px; }

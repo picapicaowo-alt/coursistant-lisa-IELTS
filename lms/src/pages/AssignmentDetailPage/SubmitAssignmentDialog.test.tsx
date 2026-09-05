@@ -4,7 +4,8 @@ import type {AssignmentDetail, SubmissionState} from '@/apis';
 import {assignmentApiService} from '@/apis/services/assignment-api';
 import {SubmitAssignmentDialog} from './SubmitAssignmentDialog';
 
-vi.mock('react-i18next', () => ({
+vi.mock('react-i18next', async (importOriginal) => ({
+  ...await importOriginal<typeof import('react-i18next')>(),
   useTranslation: () => ({t: (key: string) => key}),
 }));
 

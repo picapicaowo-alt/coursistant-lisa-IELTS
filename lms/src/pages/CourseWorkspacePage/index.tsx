@@ -73,7 +73,7 @@ const Container: React.FC = () => {
           canManageMaterials={access.canUploadMaterials}
         />
       )}
-      <PageBody
+      {access.isLoading ? <LoadingOverlay/> : <PageBody
         instructorView={access.isInstructor}
         canEditCourse={access.canEditCourse}
         canManageTeachingContent={access.canManageTeachingContent}
@@ -83,7 +83,7 @@ const Container: React.FC = () => {
         canManageGroups={access.canManageGroups}
         canPostAnnouncements={access.canPostAnnouncements}
         canViewOwnGrades={access.isStudent}
-      />
+      />}
     </div>
   );
 }
