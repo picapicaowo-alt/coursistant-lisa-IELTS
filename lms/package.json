@@ -4,6 +4,11 @@
     "version": "0.0.0",
     "type": "module",
     "scripts": {
+        "deps:ci": "node --experimental-strip-types scripts/ci.ts install",
+        "deps:audit": "node --experimental-strip-types scripts/ci.ts audit",
+        "ci:step": "node --experimental-strip-types scripts/ci.ts step",
+        "typecheck:ci-tools": "tsc --noEmit -p tsconfig.ci-tools.json",
+        "test:ci-tools": "node --experimental-strip-types --test scripts/ci.node-check.ts",
         "start": "vite dev",
         "dev": "vite",
         "dev:mock-api": "node scripts/mock-lms-api.mjs",
