@@ -1,0 +1,51 @@
+.filters {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 3fr) auto;
+  align-items: end;
+  gap: t.$space-4;
+  margin-block: t.$space-5 t.$space-6;
+}
+.filters label {
+  display: grid;
+  gap: t.$space-2;
+  min-width: 0;
+  font-weight: t.$fw-medium;
+  color: t.$content-primary;
+}
+.filters input {
+  width: 100%;
+  min-width: 0;
+  height: t.$control-height-lg;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control-sm;
+  background: t.$surface-raised;
+  padding-inline: t.$space-3;
+  font: inherit;
+  color: t.$content-primary;
+}
+.filters button {
+  min-height: t.$control-height-lg;
+  padding-inline: t.$space-5;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-control-sm;
+  background: t.$surface-raised;
+  color: t.$action-primary;
+  cursor: pointer;
+  font-weight: t.$fw-semibold;
+}
+.filters :is(button, input):focus-visible {
+  outline: 2px solid t.$action-primary;
+  outline-offset: 3px;
+}
+.filters button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+@media (max-width: 640px) {
+  .filters {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .filters > :first-child {
+    grid-column: 1/-1;
+  }
+}

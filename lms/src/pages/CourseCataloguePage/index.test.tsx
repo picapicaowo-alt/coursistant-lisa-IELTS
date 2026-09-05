@@ -32,9 +32,7 @@ vi.mock('./components/CoursePreview', () => ({
   CoursePreview: ({courseCode}: {courseCode: string}) => <div>{courseCode}</div>,
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({t: (key: string) => key}),
-}));
+import '@/i18n';
 
 import CourseCataloguePage from './index';
 

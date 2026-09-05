@@ -1,4 +1,5 @@
-import {teachingLabel} from './presentation';
+import { useTranslation } from 'react-i18next';
+import {statusLabel} from '@/i18n/presentation';
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import {
   AlertCircle,
@@ -9,6 +10,7 @@ import {
   X,
 } from "lucide-react";
 import { getApiErrorMessage, isHttpStatus } from "@/utils/apiError";
+import { formatNumber } from '@/i18n/formatting';
 import styles from "./index.module.scss";
 
 export function TeachingDialog({
@@ -26,6 +28,7 @@ export function TeachingDialog({
   busy?: boolean;
   className?: string;
 }) {
+  const { t: translate } = useTranslation();
   const ref = useRef<HTMLDialogElement>(null);
   const heading = useId();
   useEffect(() => {
@@ -57,15 +60,13 @@ export function TeachingDialog({
           type="button"
           className={styles.iconButton}
           disabled={busy}
-          aria-label="Close dialog"
+          aria-label={translate("common:actions.closeDialog")}
           onClick={onClose}
         >
           <X size={20} />
         </button>
       </header>
-      <fieldset className={styles.dialogBody} disabled={busy} aria-busy={busy}>
-        {children}
-      </fieldset>
+      <fieldset className={styles.dialogBody} disabled={busy} aria-busy={busy}>{children}</fieldset>
     </dialog>
   );
 }
@@ -73,7 +74,7 @@ export function TeachingDialog({
 export function TeachingState({
   loading,
   error,
-  errorMessage = "This section could not be loaded.",
+  errorMessage,
   empty,
   onRetry,
   compact = false,
@@ -85,23 +86,23 @@ export function TeachingState({
   onRetry?: () => void;
   compact?: boolean;
 }) {
+  const { t: translate } = useTranslation();
   const className = `${styles.state} ${compact ? styles.compactState : ''}`;
   if (loading)
     return (
       <div className={className} role="status">
         <LoaderCircle className={styles.spinner} size={24} />
-        <span>Loading…</span>
+        <span>{translate("common:feedback.loading")}</span>
       </div>
     );
   if (error)
     return (
       <div className={className} role="alert">
         <AlertCircle size={24} />
-        <p>{getApiErrorMessage(error, errorMessage)}</p>
+        <p>{getApiErrorMessage(error, errorMessage ?? translate('common:feedback.sectionFailed'))}</p>
         {onRetry && !isHttpStatus(error, 403) && !isHttpStatus(error, 404) ? (
           <button type="button" className={styles.secondary} onClick={onRetry}>
-            Try again
-          </button>
+            {translate("common:actions.tryAgain")}</button>
         ) : null}
       </div>
     );
@@ -114,11 +115,12 @@ export function TeachingState({
 }
 
 export function TeachingError({ error }: { error: unknown }) {
+  const {t} = useTranslation();
   return error ? (
     <p className={styles.error} role="alert">
       {getApiErrorMessage(
         error,
-        "The change could not be saved. Your entries are preserved.",
+        t('common:feedback.savePreserved'),
       )}
     </p>
   ) : null;
@@ -147,6 +149,7 @@ export function TeachingBadge({
   value?: string;
   children?: ReactNode;
 }) {
+  useTranslation();
   const normalized = value?.toUpperCase() ?? "";
   const tone = success.has(normalized)
     ? "success"
@@ -159,7 +162,7 @@ export function TeachingBadge({
           : "neutral";
   return (
     <span className={styles.badge} data-tone={tone}>
-      {children ?? teachingLabel(value)}
+      {children ?? statusLabel(value)}
     </span>
   );
 }
@@ -179,7 +182,7 @@ export function TeachingPagination({
   count,
   loading,
   onChange,
-  label = "Records",
+  label,
 }: {
   page: number;
   size: number;
@@ -189,14 +192,16 @@ export function TeachingPagination({
   onChange: (page: number) => void;
   label?: string;
 }) {
+  const { t: translate } = useTranslation();
+  const recordLabel = label ?? translate('common:pagination.records');
   if (!page && count < size && (total == null || total <= size)) return null;
   const hasNext = total == null ? count >= size : (page + 1) * size < total;
   return (
-    <nav className={styles.pagination} aria-label={`${label} pages`}>
+    <nav className={styles.pagination} aria-label={translate('common:pagination.pages', {label: recordLabel})}>
       <span>
         {total == null
-          ? `Page ${page + 1}`
-          : `${total} ${label.toLowerCase()} · Page ${page + 1} of ${Math.max(1, Math.ceil(total / size))}`}
+          ? translate('common:pagination.page', {page: formatNumber(page + 1)})
+          : translate('common:pagination.total', {total: formatNumber(total), label: recordLabel, page: formatNumber(page + 1), pages: formatNumber(Math.max(1, Math.ceil(total / size)))})}
       </span>
       <div>
         <button
@@ -206,16 +211,14 @@ export function TeachingPagination({
           onClick={() => onChange(page - 1)}
         >
           <ChevronLeft size={16} />
-          Previous
-        </button>
+          {translate("common:actions.previous")}</button>
         <button
           type="button"
           className={styles.secondary}
           disabled={loading || !hasNext}
           onClick={() => onChange(page + 1)}
         >
-          Next
-          <ChevronRight size={16} />
+          {translate("common:actions.next")}<ChevronRight size={16} />
         </button>
       </div>
     </nav>

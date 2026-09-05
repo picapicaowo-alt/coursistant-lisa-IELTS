@@ -5,6 +5,8 @@ import {CalendarDays, ChevronLeft, ChevronRight, Clock3} from 'lucide-react';
 import {roundUpToMinutes} from '@/utils/dateTimeRange';
 import {datePopoverPosition} from './datePopoverPosition';
 import styles from './DateTimePickerPopover.module.scss';
+import {useTranslation} from 'react-i18next';
+import {formatDateTime, formatNumber} from '@/i18n/formatting';
 
 export type DateTimePickerKind = 'date' | 'time' | 'datetime';
 
@@ -23,11 +25,6 @@ interface CalendarDay {
   isOutsideMonth: boolean;
 }
 
-const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
-];
-const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const HOURS = Array.from({length: 12}, (_, index) => String(index + 1));
 const MINUTES = Array.from({length: 60}, (_, index) => String(index).padStart(2, '0'));
 
@@ -91,6 +88,7 @@ export const DateTimePickerPopover = ({
   onChangeValue,
   onClose,
 }: DateTimePickerPopoverProps) => {
+  const {t} = useTranslation('common');
   const popoverRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState('');
   const [visibleMonth, setVisibleMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
@@ -205,7 +203,7 @@ export const DateTimePickerPopover = ({
     dismiss();
   };
 
-  const title = kind === 'date' ? 'Select date' : kind === 'time' ? 'Select time' : 'Select date & time';
+  const title = t(kind === 'date' ? 'dateTime.selectDate' : kind === 'time' ? 'dateTime.selectTime' : 'dateTime.selectDateTime');
 
   return createPortal(
     <div
@@ -225,22 +223,22 @@ export const DateTimePickerPopover = ({
           <div className={styles.monthNavigation}>
             <button
               type="button"
-              aria-label="Previous month"
+              aria-label={t('dateTime.previousMonth')}
               onClick={() => setVisibleMonth(current => new Date(current.getFullYear(), current.getMonth() - 1, 1))}
             >
               <ChevronLeft size={18}/>
             </button>
-            <strong aria-live="polite">{MONTHS[visibleMonth.getMonth()]} {visibleMonth.getFullYear()}</strong>
+            <strong aria-live="polite">{formatDateTime(visibleMonth, {month: 'long', year: 'numeric'})}</strong>
             <button
               type="button"
-              aria-label="Next month"
+              aria-label={t('dateTime.nextMonth')}
               onClick={() => setVisibleMonth(current => new Date(current.getFullYear(), current.getMonth() + 1, 1))}
             >
               <ChevronRight size={18}/>
             </button>
           </div>
           <div className={styles.weekdays} aria-hidden="true">
-            {WEEKDAYS.map(day => <span key={day}>{day}</span>)}
+            {days.slice(0, 7).map(day => <span key={day.key}>{formatDateTime(day.date, {weekday: 'short'})}</span>)}
           </div>
           <div className={styles.days}>
             {days.map(day => (
@@ -249,12 +247,12 @@ export const DateTimePickerPopover = ({
                 key={day.key}
                 className={day.key === selectedDate ? styles.selectedDay : undefined}
                 data-outside-month={day.isOutsideMonth || undefined}
-                aria-label={day.date.toLocaleDateString('en-US', {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'})}
+                aria-label={formatDateTime(day.date, {weekday: 'long', month: 'long', day: 'numeric', year: 'numeric'})}
                 aria-pressed={day.key === selectedDate}
                 aria-current={day.key === todayKey ? 'date' : undefined}
                 onClick={() => selectDate(day.key)}
               >
-                {day.date.getDate()}
+                {formatNumber(day.date.getDate())}
               </button>
             ))}
           </div>
@@ -263,25 +261,25 @@ export const DateTimePickerPopover = ({
 
       {showTime ? (
         <fieldset className={styles.timePicker}>
-          <legend>Time</legend>
+          <legend>{t('dateTime.time')}</legend>
           <label>
-            <span>Hour</span>
-            <select aria-label="Hour" value={hour} onChange={event => setHour(event.target.value)}>
+            <span>{t('dateTime.hour')}</span>
+            <select aria-label={t('dateTime.hour')} value={hour} onChange={event => setHour(event.target.value)}>
               {HOURS.map(option => <option key={option} value={option}>{pad(Number(option))}</option>)}
             </select>
           </label>
           <span className={styles.timeSeparator} aria-hidden="true">:</span>
           <label>
-            <span>Minute</span>
-            <select aria-label="Minute" value={minute} onChange={event => setMinute(event.target.value)}>
+            <span>{t('dateTime.minute')}</span>
+            <select aria-label={t('dateTime.minute')} value={minute} onChange={event => setMinute(event.target.value)}>
               {MINUTES.map(option => <option key={option} value={option}>{option}</option>)}
             </select>
           </label>
           <label>
-            <span>AM or PM</span>
-            <select aria-label="AM or PM" value={period} onChange={event => setPeriod(event.target.value)}>
-              <option value="AM">AM</option>
-              <option value="PM">PM</option>
+            <span>{t('dateTime.period')}</span>
+            <select aria-label={t('dateTime.period')} value={period} onChange={event => setPeriod(event.target.value)}>
+              <option value="AM">{t('dateTime.am')}</option>
+              <option value="PM">{t('dateTime.pm')}</option>
             </select>
           </label>
         </fieldset>
@@ -289,12 +287,12 @@ export const DateTimePickerPopover = ({
 
       <div className={styles.footer}>
         <div className={styles.shortcuts}>
-          <button type="button" className={styles.textButton} onClick={setNow}>{kind === 'date' ? 'Today' : 'Now'}</button>
-          {value ? <button type="button" className={styles.textButton} onClick={clear}>Clear</button> : null}
+          <button type="button" className={styles.textButton} onClick={setNow}>{t(kind === 'date' ? 'dateTime.today' : 'dateTime.now')}</button>
+          {value ? <button type="button" className={styles.textButton} onClick={clear}>{t('actions.clear')}</button> : null}
         </div>
         <div className={styles.actions}>
-          <button type="button" className={styles.cancelButton} onClick={dismiss}>Cancel</button>
-          {showTime ? <button type="button" className={styles.applyButton} onClick={apply}>{kind === 'time' ? 'Set time' : 'Set date & time'}</button> : null}
+          <button type="button" className={styles.cancelButton} onClick={dismiss}>{t('actions.cancel')}</button>
+          {showTime ? <button type="button" className={styles.applyButton} onClick={apply}>{t(kind === 'time' ? 'dateTime.setTime' : 'dateTime.setDateTime')}</button> : null}
         </div>
       </div>
     </div>,

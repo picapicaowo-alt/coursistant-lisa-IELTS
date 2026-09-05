@@ -1,7 +1,8 @@
+import { useTranslation } from "react-i18next";
 import React, { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { unwrapData, type ManagedUser } from "@/apis";
-import { RecordSummaryList } from "@/components/RecordSummaryList";
+import { PersonCell } from "@/components/PersonCell";
 import { EnglishDateInput } from "@/components/EnglishDateInput";
 import { adminApiService } from "@/apis/services/admin-api";
 import { courseOperationsApiService } from "@/apis/services/course-operations-api";
@@ -24,10 +25,21 @@ const numberValue = (
 export const AdminContractOperations: React.FC<{
   isSystemAdmin: boolean;
   users: ManagedUser[];
-}> = ({ isSystemAdmin, users }) => {
+  view?: "directory" | "digest";
+}> = ({ isSystemAdmin, users, view }) => {
+  const { t: translate } = useTranslation();
   const queryClient = useQueryClient();
   const [selectedAdminId, setSelectedAdminId] = useState<number>();
-  const adminDetail = useQuery({queryKey: ["admin", "directory-detail", selectedAdminId], queryFn: async () => unwrapData(await adminApiService.getAdmin(selectedAdminId!), "adminDetail"), enabled: isSystemAdmin && selectedAdminId != null, retry: false});
+  const adminDetail = useQuery({
+    queryKey: ["admin", "directory-detail", selectedAdminId],
+    queryFn: async () =>
+      unwrapData(
+        await adminApiService.getAdmin(selectedAdminId!),
+        "adminDetail",
+      ),
+    enabled: isSystemAdmin && selectedAdminId != null,
+    retry: false,
+  });
   const [adminSearch, setAdminSearch] = useState("");
   const [submittedAdminSearch, setSubmittedAdminSearch] = useState("");
   const [digest, setDigest] = useState({ date: "", tenantId: "" });
@@ -50,7 +62,7 @@ export const AdminContractOperations: React.FC<{
         }),
         "adminDirectory",
       ),
-    enabled: isSystemAdmin,
+    enabled: isSystemAdmin && view !== "digest",
     retry: false,
   });
   const alertRules = useQuery({
@@ -109,54 +121,125 @@ export const AdminContractOperations: React.FC<{
       queryClient.invalidateQueries({ queryKey: ["tenant", "alert-rules"] }),
   });
 
+  const selectedAdministrator = asRecord(adminDetail.data);
   const directoryRecord = asRecord(directory.data);
-  const directoryItems = Array.isArray(directory.data) ? directory.data : Array.isArray(directoryRecord?.items) ? directoryRecord.items : [];
-  const administratorRows = directoryItems.flatMap(value => {
+  const directoryItems = Array.isArray(directory.data)
+    ? directory.data
+    : Array.isArray(directoryRecord?.items)
+      ? directoryRecord.items
+      : [];
+  const administratorRows = directoryItems.flatMap((value) => {
     const row = asRecord(value);
-    const id = numberValue(row, 'id', 'adminId');
-    return id == null ? [] : [{id, label: typeof row?.email === 'string' ? row.email : `Administrator #${id}`}];
+    const id = numberValue(row, "id", "adminId");
+    return id == null
+      ? []
+      : [
+          {
+            id,
+            person: {
+              id,
+              name: typeof row?.name === "string" ? row.name : undefined,
+              firstName:
+                typeof row?.firstName === "string" ? row.firstName : undefined,
+              lastName:
+                typeof row?.lastName === "string" ? row.lastName : undefined,
+              email: typeof row?.email === "string" ? row.email : undefined,
+            },
+          },
+        ];
   });
 
   return (
     <>
-      {isSystemAdmin ? (
+      {isSystemAdmin && view !== "digest" ? (
         <section className={styles.card}>
-          <h2>Administrator directory</h2>
+          <h2>{translate("common:admin.operations.directory")}</h2>
           <form
             className={styles.form}
             onSubmit={(event) => {
               event.preventDefault();
-              if (submittedAdminSearch === adminSearch.trim()) void directory.refetch();
-              else {setSelectedAdminId(undefined); setSubmittedAdminSearch(adminSearch.trim());}
+              if (submittedAdminSearch === adminSearch.trim())
+                void directory.refetch();
+              else {
+                setSelectedAdminId(undefined);
+                setSubmittedAdminSearch(adminSearch.trim());
+              }
             }}
           >
             <label>
-              <span>Name, email, or username</span>
+              <span>{translate("common:admin.adminSearch")}</span>
               <input
                 value={adminSearch}
                 onChange={(event) => setAdminSearch(event.target.value)}
               />
             </label>
             <button className={styles.primaryButton}>
-              Search administrators
+              {translate("common:admin.searchAdmins")}
             </button>
           </form>
           {directory.isPending ? (
-            <p role="status">Loading administrators…</p>
+            <p role="status">{translate("common:admin.loadingAdmins")}</p>
           ) : directory.isError ? (
             <p role="alert" className={styles.errorMessage}>
-              Administrators could not be loaded.{" "}
+              {translate("common:admin.adminsFailed")}{" "}
               <button type="button" onClick={() => void directory.refetch()}>
-                Retry
+                {translate("common:actions.retry")}
               </button>
             </p>
           ) : (
             <div className={styles.adminDirectoryWorkspace}>
-              <div className={styles.adminDirectoryList} aria-label="Administrators">
-                {administratorRows.length ? administratorRows.map(row => <button type="button" key={row.id} aria-pressed={selectedAdminId === row.id} onClick={() => setSelectedAdminId(row.id)}>{row.label}</button>) : <p>No administrators match this search.</p>}
+              <div
+                className={styles.adminDirectoryList}
+                aria-label={translate("common:admin.administrators")}
+              >
+                {administratorRows.length ? (
+                  administratorRows.map((row) => (
+                    <button
+                      type="button"
+                      key={row.id}
+                      aria-pressed={selectedAdminId === row.id}
+                      onClick={() => setSelectedAdminId(row.id)}
+                    >
+                      <PersonCell person={row.person} />
+                    </button>
+                  ))
+                ) : (
+                  <p>{translate("common:admin.noAdmins")}</p>
+                )}
               </div>
-              <section aria-label="Administrator details">
-                {selectedAdminId != null ? adminDetail.isPending ? <p role="status">Loading administrator…</p> : adminDetail.isError ? <p role="alert">Administrator details could not be loaded. <button type="button" onClick={() => void adminDetail.refetch()}>Retry details</button></p> : <RecordSummaryList value={adminDetail.data} emptyMessage="No additional details are available."/> : <p>Select an administrator to view their account details.</p>}
+              <section aria-label={translate("common:admin.adminDetails")}>
+                {selectedAdminId != null ? (
+                  adminDetail.isPending ? (
+                    <p role="status">
+                      {translate("common:admin.loadingAdmin")}
+                    </p>
+                  ) : adminDetail.isError ? (
+                    <p role="alert">
+                      {translate("common:admin.adminDetailFailed")}
+                      <button
+                        type="button"
+                        onClick={() => void adminDetail.refetch()}
+                      >
+                        {translate("common:admin.retryDetails")}
+                      </button>
+                    </p>
+                  ) : (
+                    <dl className={styles.accountFacts}>
+                      {["name", "email", "username"].map((field) =>
+                        typeof selectedAdministrator?.[field] === "string" ? (
+                          <div key={field}>
+                            <dt>
+                              {translate(`common:admin.adminFields.${field}`)}
+                            </dt>
+                            <dd>{String(selectedAdministrator[field])}</dd>
+                          </div>
+                        ) : null,
+                      )}
+                    </dl>
+                  )
+                ) : (
+                  <p>{translate("common:admin.selectAdmin")}</p>
+                )}
               </section>
             </div>
           )}
@@ -165,13 +248,15 @@ export const AdminContractOperations: React.FC<{
 
       {!isSystemAdmin ? (
         <section className={styles.card}>
-          <h2>Tenant alert rules</h2>
+          <h2>{translate("common:admin.alertRules")}</h2>
           {alertRules.isPending ? (
-            <p className={styles.status}>Loading alert rules…</p>
+            <p className={styles.status}>
+              {translate("common:admin.loadingAlerts")}
+            </p>
           ) : null}
           {alertRules.isError ? (
             <p className={styles.errorMessage}>
-              Alert rules could not be loaded.
+              {translate("common:admin.alertsFailed")}
             </p>
           ) : null}
           {alerts.version ? (
@@ -183,7 +268,7 @@ export const AdminContractOperations: React.FC<{
               }}
             >
               <label>
-                <span>Inactivity days</span>
+                <span>{translate("common:admin.inactivityDays")}</span>
                 <input
                   type="number"
                   min="0"
@@ -197,7 +282,7 @@ export const AdminContractOperations: React.FC<{
                 />
               </label>
               <label>
-                <span>Grading delay days</span>
+                <span>{translate("common:admin.gradingDelayDays")}</span>
                 <input
                   type="number"
                   min="0"
@@ -211,7 +296,7 @@ export const AdminContractOperations: React.FC<{
                 />
               </label>
               <label>
-                <span>Absence count</span>
+                <span>{translate("common:admin.absenceCount")}</span>
                 <input
                   type="number"
                   min="0"
@@ -225,7 +310,7 @@ export const AdminContractOperations: React.FC<{
                 />
               </label>
               <label>
-                <span>Absence window days</span>
+                <span>{translate("common:admin.absenceWindowDays")}</span>
                 <input
                   type="number"
                   min="0"
@@ -242,24 +327,21 @@ export const AdminContractOperations: React.FC<{
                 className={styles.primaryButton}
                 disabled={alertMutation.isPending}
               >
-                Save alert rules
+                {translate("common:admin.saveAlerts")}
               </button>
             </form>
           ) : !alertRules.isPending && !alertRules.isError ? (
             <p className={styles.hint}>
-              Alert settings are unavailable. Reload this page to try again.
+              {translate("common:admin.alertsUnavailable")}
             </p>
           ) : null}
         </section>
       ) : null}
 
-      {isSystemAdmin ? (
+      {isSystemAdmin && view !== "directory" ? (
         <section className={styles.card}>
-          <h2>Notification digest</h2>
-          <p className={styles.hint}>
-            Run the digest for a selected date. Leave tenant blank for a
-            system-wide run.
-          </p>
+          <h2>{translate("common:admin.operations.digest")}</h2>
+          <p className={styles.hint}>{translate("common:admin.digestHelp")}</p>
           <form
             className={styles.form}
             onSubmit={(event) => {
@@ -268,7 +350,7 @@ export const AdminContractOperations: React.FC<{
             }}
           >
             <label>
-              <span>Digest date</span>
+              <span>{translate("common:admin.digestDate")}</span>
               <EnglishDateInput
                 required
                 value={digest.date}
@@ -278,7 +360,7 @@ export const AdminContractOperations: React.FC<{
               />
             </label>
             <label>
-              <span>Tenant</span>
+              <span>{translate("common:admin.tenant")}</span>
               <select
                 value={digest.tenantId}
                 onChange={(event) =>
@@ -288,14 +370,14 @@ export const AdminContractOperations: React.FC<{
                   }))
                 }
               >
-                <option value="">All tenants</option>
+                <option value="">{translate("common:admin.allTenants")}</option>
                 {[
                   ...new Map(
                     users.map((user) => [user.tenantId, user.tenantId]),
                   ).values(),
                 ].map((tenantId) => (
                   <option key={tenantId} value={tenantId}>
-                    Tenant #{tenantId}
+                    {translate("common:admin.tenantNumber", { id: tenantId })}
                   </option>
                 ))}
               </select>
@@ -304,28 +386,27 @@ export const AdminContractOperations: React.FC<{
               className={styles.primaryButton}
               disabled={!digest.date || digestMutation.isPending}
             >
-              Run digest
+              {translate("common:admin.runDigest")}
             </button>
           </form>
           {digestMutation.isError ? (
             <p role="alert" className={styles.errorMessage}>
-              The notification digest could not be started. Please try again.
+              {translate("common:admin.digestFailed")}
             </p>
           ) : digestMutation.isSuccess ? (
             <p role="status" className={styles.message}>
-              The notification digest completed.
+              {translate("common:admin.digestSuccess")}
             </p>
           ) : null}
         </section>
       ) : null}
       {alertMutation.isError ? (
         <p role="alert" className={styles.errorMessage}>
-          Alert rules could not be saved. Please reload the latest settings and
-          try again.
+          {translate("common:admin.alertsSaveFailed")}
         </p>
       ) : alertMutation.isSuccess ? (
         <p role="status" className={styles.message}>
-          Alert rules saved.
+          {translate("common:admin.alertsSaved")}
         </p>
       ) : null}
     </>

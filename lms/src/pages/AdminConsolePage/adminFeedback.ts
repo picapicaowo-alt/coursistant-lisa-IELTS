@@ -1,13 +1,9 @@
-import {getApiErrorMessage, isConflict} from '@/utils/apiError';
+import i18n from "@/i18n";
+import { getApiErrorMessage, isConflict } from "@/utils/apiError";
 
-const MANAGED_USER_FALLBACK = 'Please try again. Your entries are preserved.';
-
-/** Keeps privileged identity errors actionable without guessing at a backend domain code. */
-export const getManagedUserCreateError = (error: unknown): string => {
-  const detail = getApiErrorMessage(error, MANAGED_USER_FALLBACK);
-  const conflictGuidance = isConflict(error)
-    ? ' The email or generated username may already belong to an existing identity.'
-    : '';
-
-  return `Managed user was not created. ${detail}${conflictGuidance}`;
-};
+/** Keep server-provided reasons intact; local guidance uses the selected locale. */
+export const getManagedUserCreateError = (error: unknown): string =>
+  i18n.t("common:admin.createRejected", {
+    detail: getApiErrorMessage(error, i18n.t("common:admin.createFallback")),
+    guidance: isConflict(error) ? i18n.t("common:admin.createConflict") : "",
+  });

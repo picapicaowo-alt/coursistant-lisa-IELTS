@@ -602,7 +602,9 @@ test('tenant admin can complete governance work using only the handoff routes', 
   await page.getByRole('button', {name: 'Review transfer'}).click();
   await page.getByRole('button', {name: 'Confirm transfer'}).click();
   await expect(page.getByText(/Ownership transferred to Ari Advisor/)).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Close transfer owner'})).toBeEnabled();
   await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toHaveCount(0);
 
   await page.getByRole('button', {name: 'Alert rules'}).click();
   await page.getByText('Tenant override', {exact: true}).click();

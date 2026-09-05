@@ -384,6 +384,10 @@
   gap: t.$space-2;
 }
 .dialog {
+  // Restore native modal centering after the global margin reset.
+  position: fixed;
+  inset: 0;
+  margin: auto;
   overscroll-behavior: contain;
   width: min(42rem, calc(100vw - 2rem));
   max-height: calc(100dvh - 2rem);
@@ -534,6 +538,9 @@
   }
   .dialogHeader,
   .dialogBody {
+  border: 0;
+  margin: 0;
+  min-width: 0;
     padding: t.$space-4;
   }
   .table.responsive thead {

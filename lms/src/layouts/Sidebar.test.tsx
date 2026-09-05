@@ -14,9 +14,7 @@ vi.mock('@/contexts/RequiredAuthContext', () => ({
   useRequiredAuth: () => ({user: mocks.user}),
 }));
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({t: (key: string) => key}),
-}));
+import '@/i18n';
 
 import Sidebar from './Sidebar';
 

@@ -237,14 +237,15 @@ test("system administration uses the managed-user contract without speculative t
     });
   });
   await page.goto("/admin");
+  await page.getByRole("button", { name: "Create user", exact: true }).click();
   await page.getByLabel("First name", { exact: true }).fill("Alex");
   await page.getByLabel("Last name", { exact: true }).fill("Chen");
   await page.getByLabel("Email", { exact: true }).fill("alex@example.test");
   await expect(
-    page.getByRole("button", { name: "Create user", exact: true }),
+    page.getByRole("dialog").getByRole("button", { name: "Create user", exact: true }),
   ).toBeDisabled();
   await page.getByLabel("Tenant ID", { exact: true }).fill("7");
-  await page.getByRole("button", { name: "Create user", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Create user", exact: true }).click();
   await expect
     .poll(() => created)
     .toMatchObject({
@@ -255,9 +256,10 @@ test("system administration uses the managed-user contract without speculative t
       role: "USER",
       level: "STUDENT",
     });
+  await page.getByRole("dialog").getByRole("button", { name: "Done", exact: true }).click();
   await page.getByRole("button", { name: "Tenants", exact: true }).click();
   await expect(
-    page.getByRole("heading", { name: "Tenant management" }),
+    page.getByRole("heading", { name: "Accounts by tenant" }),
   ).toBeVisible();
   expect(requests.some((path) => path.includes("/admin/tenants"))).toBe(false);
 });

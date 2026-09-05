@@ -200,3 +200,5 @@
 .viewToggle button[aria-pressed='true'] { background: t.$surface-muted; }
 .viewToggle img { width: t.$space-6; height: t.$space-6; }
 .pageNumbers { flex-wrap: wrap; }
+
+.scopeDescription { color: t.$text-muted; margin-bottom: t.$space-4; }

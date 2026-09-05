@@ -1,10 +1,7 @@
 {
     "list": {
         "title": "我的课程",
-        "noCourses": "当前视图下暂无课程。",
-        "noCurrentCourses": "你目前没有正在学习的课程。",
-        "noCompletedCourses": "你还没有已完成的课程。",
-        "noCourseUnits": "暂未添加课程单元。",
+        "noCourses": "没有符合当前筛选条件的课程。",
         "createCourse": "创建课程",
         "joinCourse": "加入课程",
         "tabs": {
@@ -12,7 +9,10 @@
             "myCollection": "我的收藏"
         },
         "newContent": "新建内容",
-        "linesPerPage": "每页行数"
+        "linesPerPage": "每页行数",
+        "noCurrentCourses": "目前没有在读课程。",
+        "noCompletedCourses": "目前没有已完成的课程。",
+        "noCourseUnits": "尚未添加课程单元。"
     },
     "card": {
         "instructor": "授课教师",
@@ -220,7 +220,8 @@
         "addNew": "新增",
         "addAssignmentTitle": "添加作业",
         "addingNewContent": "添加新内容",
-        "confirmDelete": "你确定要删除这个作业吗？"
+        "confirmDelete": "你确定要删除这个作业吗？",
+        "noAssignments": "暂无作业。"
     },
     "fileUploadBox": {
         "prompt": "将文件拖放到此处，或",
@@ -311,5 +312,48 @@
         "allowLateSubmission": "允许迟交",
         "allowedResubmissionCount": "允许重新提交次数",
         "remainingResubmissions": "剩余提交次数"
+    },
+    "catalogue": {
+        "operations": "课程运营",
+        "allStatuses": "全部状态",
+        "display": "课程显示方式",
+        "grid": "网格视图",
+        "list": "列表视图",
+        "previousPage": "上一页课程",
+        "nextPage": "下一页课程",
+        "unassignedInstructor": "尚未分配教师",
+        "archived": "已归档课程",
+        "noLocation": "未提供地点",
+        "deliverySetup": "教学安排",
+        "restoring": "正在恢复…",
+        "restore": "恢复课程",
+        "confirmDelete": "永久删除？",
+        "deletePermanently": "永久删除",
+        "deleteFailure": "无法删除此课程。已有学生或课程任务的课程必须保留。",
+        "restoreFailure": "无法恢复课程。",
+        "weeklyClass": "每周上课：{{day}} {{time}}"
+    },
+    "grades": {
+        "invalid": "课程无效。",
+        "loading": "正在加载成绩…",
+        "ownOnly": "此页面仅显示学生本人的成绩。",
+        "back": "返回课程",
+        "title": "课程成绩",
+        "label": "成绩",
+        "visibility": "成绩可见性说明",
+        "visibilityHelp": "这里显示已公布的成绩及已开启即时评分的测验自动评分。本页不计算课程总成绩。",
+        "partialFailure": "部分成绩无法加载，请刷新重试。",
+        "noAssignments": "暂无已发布的作业。",
+        "notGraded": "尚未评分",
+        "noQuizzes": "暂无已发布的测验。",
+        "instant": "即时自动评分",
+        "afterRelease": "教师公布后可见",
+        "autoScore": "自动评分",
+        "autoScoreSoFar": "当前自动评分",
+        "itemCount": "{{count}} 项",
+        "itemCount_one": "{{count}} 项",
+        "itemCount_other": "{{count}} 项",
+        "assignmentFallback": "作业 {{id}}",
+        "due": "截止日期：{{date}}"
     }
 }
