@@ -36,5 +36,38 @@
       "REACHED_INCOMPLETE_CHECKPOINT": "检查点到期未完成",
       "OVERDUE_STUDY_PLAN_TASK": "学习计划任务逾期"
     }
+  },
+  "studentTasks": {
+    "description": "顾问为你安排的个性化任务，帮助你实现学习目标。",
+    "statusFilters": "任务状态筛选",
+    "allTasks": "全部任务",
+    "board": "阶段任务",
+    "checkpoints": "学习阶段",
+    "step": "第 {{number}} 步",
+    "checkpoint": "第 {{number}} 阶段",
+    "task": "顾问任务",
+    "viewTask": "查看任务",
+    "noMatches": "本阶段暂无符合此状态的任务。",
+    "empty": "顾问尚未添加任务。",
+    "comments": "顾问反馈",
+    "noFeedback": "顾问对任务的反馈将显示在这里。",
+    "deadlines": "即将截止",
+    "noDeadlines": "暂无设有截止日期的待完成任务。",
+    "activeStep": "（当前）",
+    "start": "开始",
+    "continue": "继续",
+    "dueToday": "今天截止",
+    "dueTomorrow": "明天截止",
+    "inDays": "{{count}} 天后截止",
+    "showLess": "收起",
+    "inDays_one": "{{count}} 天后截止",
+    "inDays_other": "{{count}} 天后截止"
+  },
+  "studentPlan": {
+    "description": "你的学习目标、阶段进度与下一步安排。",
+    "views": "学习计划视图",
+    "overview": "概览",
+    "learning": "学习概况",
+    "messages": "顾问消息"
   }
 }

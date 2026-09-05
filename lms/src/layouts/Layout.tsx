@@ -7,12 +7,16 @@ import styles from './Layout.module.scss';
 import {shouldShowAppShell} from "@/configs/routes.config";
 import {ErrorBoundary} from "@/components/ErrorBoundary";
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
-import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {APP_ROUTE_PATHS, STUDENT_PLAN_VIEWS, STUDY_PLAN_QUERY_PARAMS} from '@/configs/routePaths';
 
 const Layout: React.FC = () => {
   const {t} = useTranslation('common');
   const location = useLocation();
   const {user} = useRequiredAuth();
+  const planParams = new URLSearchParams(location.search);
+  const taskCanvas = location.pathname === APP_ROUTE_PATHS.myPlan
+    && planParams.get('view') === STUDENT_PLAN_VIEWS.tasks
+    && !planParams.has(STUDY_PLAN_QUERY_PARAMS.checkpoint);
   const mainContentRef = React.useRef<HTMLElement | null>(null);
 
   // Course overview uses the application shell for students and instructors.
@@ -33,7 +37,7 @@ const Layout: React.FC = () => {
     <div className={styles.layoutContainer}>
       <a className={styles.skipLink} href="#main-content">{t('accessibility.skipToContent')}</a>
       {showLayout && <Sidebar/>}
-      <div className={`${styles.contentArea} ${showLayout ? styles.withNavigation : ''}`}>
+      <div className={`${styles.contentArea} ${showLayout ? styles.withNavigation : ''} ${taskCanvas ? styles.studyPlanCanvas : ''}`}>
         {showLayout && <Header/>}
         {/* Scoped to the page so a failed route keeps the shell — the user can
             still navigate somewhere else instead of facing a blank window.

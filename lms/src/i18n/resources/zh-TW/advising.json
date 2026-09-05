@@ -36,5 +36,38 @@
       "REACHED_INCOMPLETE_CHECKPOINT": "檢查點到期未完成",
       "OVERDUE_STUDY_PLAN_TASK": "學習計劃任務逾期"
     }
+  },
+  "studentTasks": {
+    "description": "顧問為你安排的個人化任務，幫助你實現學習目標。",
+    "statusFilters": "任務狀態篩選",
+    "allTasks": "全部任務",
+    "board": "階段任務",
+    "checkpoints": "學習階段",
+    "step": "第 {{number}} 步",
+    "checkpoint": "第 {{number}} 階段",
+    "task": "顧問任務",
+    "viewTask": "查看任務",
+    "noMatches": "本階段暫無符合此狀態的任務。",
+    "empty": "顧問尚未新增任務。",
+    "comments": "顧問回饋",
+    "noFeedback": "顧問對任務的回饋將顯示在這裡。",
+    "deadlines": "即將截止",
+    "noDeadlines": "暫無設有截止日期的待完成任務。",
+    "activeStep": "（目前）",
+    "start": "開始",
+    "continue": "繼續",
+    "dueToday": "今天截止",
+    "dueTomorrow": "明天截止",
+    "inDays": "{{count}} 天後截止",
+    "showLess": "收起",
+    "inDays_one": "{{count}} 天後截止",
+    "inDays_other": "{{count}} 天後截止"
+  },
+  "studentPlan": {
+    "description": "你的學習目標、階段進度與下一步安排。",
+    "views": "學習計畫檢視",
+    "overview": "概覽",
+    "learning": "學習概況",
+    "messages": "顧問訊息"
   }
 }

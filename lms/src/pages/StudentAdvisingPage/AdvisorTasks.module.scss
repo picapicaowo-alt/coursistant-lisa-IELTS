@@ -1,0 +1,213 @@
+.tasksLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.95fr) minmax(19rem, 1fr);
+  align-items: start;
+  gap: t.$space-8;
+  font-size: clamp(t.$font-size-body, .98vw, t.$font-size-subhead);
+  line-height: 1.5;
+}
+
+.tasksMain, .tasksRail { display: grid; gap: t.$space-8; min-width: 0; }
+
+.taskOverview, .taskBoard, .railCard {
+  min-width: 0;
+  padding: clamp(t.$space-6, 1.6vw, t.$space-8);
+  border: 1px solid t.$border-strong;
+  border-radius: t.$space-6;
+  background: t.$surface-raised;
+}
+
+.taskOverview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(8rem, 11vw, 13rem);
+  align-content: center;
+  align-items: center;
+  column-gap: t.$space-6;
+  row-gap: t.$space-3;
+  min-height: clamp(15rem, 15.3vw, 18rem);
+  h2 { margin: 0 0 t.$space-2; font-size: t.$font-size-title-1; font-weight: t.$fw-bold; line-height: 1.25; }
+  p { margin: 0; color: t.$content-secondary; font-size: .95em; line-height: 1.5; }
+  img { grid-column: 2; width: 100%; }
+}
+
+.taskCounts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: t.$space-1 t.$space-6;
+  margin-top: t.$space-3;
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: t.$space-2;
+    min-height: t.$touch-target;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: t.$content-secondary;
+    font: inherit;
+    cursor: pointer;
+  }
+  strong { color: t.$content-primary; font-weight: t.$fw-semibold; }
+  button[aria-pressed='true']:not(:first-child) { color: t.$action-primary; }
+  button > span { width: .7rem; height: .7rem; border: 2px solid t.$content-secondary; border-radius: t.$radius-pill; }
+  button > span[data-tone='active'] { border-color: t.$type-mint; }
+  button > span[data-tone='complete'] { border-color: t.$action-primary; }
+}
+
+.taskBoard {
+  container-type: inline-size;
+  h3 { margin: 0 0 t.$space-5; font-size: inherit; font-weight: t.$fw-medium; line-height: 1.5; overflow-wrap: anywhere; }
+}
+
+.steps {
+  display: flex;
+  gap: t.$space-3;
+  overflow-x: auto;
+  padding: t.$space-1 t.$space-1 t.$space-6;
+  border-bottom: 1px solid t.$border-default;
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: t.$space-2;
+    flex: 1 0 7.5rem;
+    min-height: t.$touch-target;
+    padding: t.$space-2 t.$space-3;
+    border: 1px solid t.$border-default;
+    border-radius: t.$radius-md;
+    background: t.$surface-subtle;
+    color: t.$content-secondary;
+    font: inherit;
+    font-weight: t.$fw-semibold;
+    white-space: nowrap;
+    cursor: pointer;
+    &:only-child { flex: 0 1 11rem; }
+    span { font-weight: t.$fw-regular; font-size: .9em; }
+  }
+  button[aria-pressed='true'] { border-color: t.$action-primary; background: t.$action-primary; color: t.$content-on-color; }
+}
+
+.taskRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 9.5rem 6.5rem 8rem;
+  align-items: center;
+  gap: t.$space-4;
+  min-height: clamp(6rem, 6vw, 7rem);
+  padding-block: t.$space-6;
+  border-bottom: 1px solid t.$border-default;
+  &:last-child { border-bottom: 0; }
+  > div { min-width: 0; overflow-wrap: anywhere; }
+  strong { font-size: clamp(t.$font-size-body-lg, 1.08vw, t.$font-size-title-compact); font-weight: t.$fw-semibold; }
+  p { margin: t.$space-1 0 0; color: t.$content-secondary; font-size: .95em; }
+}
+
+.taskAction {
+  justify-self: end;
+  min-height: t.$touch-target;
+  padding: t.$space-2 t.$space-5;
+  border: 1px solid t.$border-strong;
+  border-radius: t.$radius-md;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+  font: inherit;
+  font-weight: t.$fw-semibold;
+  white-space: nowrap;
+  cursor: pointer;
+  &:hover { border-color: t.$action-primary; color: t.$action-primary; }
+  &[data-primary] { border-color: t.$action-primary; background: t.$action-primary; color: t.$content-on-color; }
+  &[data-primary]:hover { background: t.$action-primary-hover; }
+}
+
+.taskDate {
+  display: flex;
+  align-items: center;
+  gap: t.$space-2;
+  font-size: .95em;
+  white-space: nowrap;
+  color: t.$content-secondary;
+  svg { flex-shrink: 0; color: t.$content-secondary; }
+}
+
+.taskStatus {
+  justify-self: center;
+  padding: t.$space-1 t.$space-2;
+  border-radius: t.$radius-xs;
+  background: t.$surface-muted;
+  color: t.$content-secondary;
+  font-size: .8em;
+  line-height: 1.2;
+  white-space: nowrap;
+  &[data-tone='active'] { background: t.$success-subtle; color: t.$feedback-success; }
+  &[data-tone='complete'] { background: t.$brand-subtle; color: t.$action-primary; }
+}
+
+.railCard {
+  display: grid;
+  align-content: start;
+  gap: t.$space-5;
+  padding-block: t.$space-8;
+  h2 { display: flex; align-items: center; gap: t.$space-4; margin: 0; font-size: clamp(t.$font-size-headline, 1.3vw, t.$space-6); font-weight: t.$fw-bold; line-height: 1.3; }
+  h2 svg { flex-shrink: 0; color: t.$action-primary; }
+  p { margin: 0; line-height: 1.45; overflow-wrap: anywhere; }
+}
+
+.railHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: t.$space-3;
+  button { display: inline-flex; align-items: center; min-height: t.$touch-target; padding: 0; border: 0; background: transparent; color: t.$content-primary; font: inherit; font-size: .85em; cursor: pointer; white-space: nowrap; }
+  button[aria-expanded='true'] svg { transform: rotate(-90deg); }
+}
+
+.reminders { display: grid; gap: t.$space-4; }
+.task {
+  display: flex;
+  align-items: center;
+  gap: t.$space-3;
+  width: 100%;
+  min-height: t.$space-12;
+  padding: t.$space-3;
+  border: 1px solid transparent;
+  border-radius: t.$radius-md;
+  background: t.$surface-detail-panel;
+  color: t.$content-primary;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+  strong { flex: 1; font-weight: t.$fw-medium; overflow-wrap: anywhere; }
+  small { color: t.$content-secondary; font-size: .95em; text-align: right; }
+  &:hover { border-color: t.$action-primary; }
+}
+.reminderDot { flex: 0 0 .75rem; height: .75rem; border-radius: t.$radius-pill; background: t.$type-cyan; &[data-tone='active'] { background: t.$type-mint; } }
+.taskDate, .task small {
+  &[data-tone='urgent'] { color: t.$feedback-danger; }
+  &[data-tone='soon'] { color: t.$feedback-warning; }
+}
+.taskEmpty { margin: 0; padding-block: t.$space-8; color: t.$content-secondary; }
+.tasksLayout button:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+
+@media (max-width: 1250px) {
+  .tasksLayout { grid-template-columns: minmax(0, 1fr); }
+  .tasksRail { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@container (max-width: 38rem) {
+  .taskRow { grid-template-columns: minmax(0, 1fr) auto; gap: t.$space-3; }
+  .taskRow > div { grid-column: 1 / -1; }
+  .taskDate { grid-column: 1; }
+  .taskStatus { grid-column: 1; justify-self: start; }
+  .taskAction { grid-column: 2; grid-row: 2 / 4; }
+}
+
+@media (max-width: 700px) {
+  .tasksMain, .tasksRail, .tasksLayout { gap: t.$space-5; }
+  .taskOverview, .taskBoard, .railCard { padding: t.$space-5; border-radius: t.$radius-lg; }
+  .taskOverview { grid-template-columns: minmax(0, 1fr) 6rem; column-gap: t.$space-3; min-height: 0; }
+  .taskOverview h2 { font-size: t.$font-size-headline; }
+  .taskOverview > div { display: contents; }
+  .taskOverview h2, .taskOverview p { grid-column: 1; }
+  .taskCounts { grid-column: 1 / -1; column-gap: t.$space-5; }
+  .taskOverview img { grid-row: 1 / 3; }
+  .tasksRail { grid-template-columns: minmax(0, 1fr); }
+}
