@@ -1,9 +1,10 @@
-﻿export const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return "0 Bytes";
-  const k = 1024;
-  const sizes = ["Bytes", "KB", "MB", "GB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+import {formatNumber} from '@/i18n/formatting';
+
+export const formatFileSize = (bytes: number): string => {
+  if (!Number.isFinite(bytes) || bytes < 0) return '';
+  const units = ['B', 'KB', 'MB', 'GB'];
+  const index = bytes === 0 ? 0 : Math.max(0, Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1));
+  return `${formatNumber(bytes / 1024 ** index, {maximumFractionDigits: 2})}\u00a0${units[index]}`;
 };
 
 export const getFileIcon = (type: string) => {

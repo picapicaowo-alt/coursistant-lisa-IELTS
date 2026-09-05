@@ -1,4 +1,6 @@
+import { useTranslation } from 'react-i18next';
 import type {CourseProgressResponse} from '@/apis';
+import {formatNumber, formatPercent} from '@/i18n/formatting';
 import styles from './index.module.scss';
 
 export function AssignmentProgress({
@@ -10,6 +12,7 @@ export function AssignmentProgress({
   loading?: boolean;
   failed?: boolean;
 }) {
+  const { t: translate } = useTranslation();
   const completed = progress?.completedAssignmentCount;
   const total = progress?.totalAssignmentCount;
   const valid =
@@ -21,31 +24,30 @@ export function AssignmentProgress({
   return (
     <div className={styles.progress}>
       <span>
-        Assignment completion
-        {valid ? (
-          <strong>{Math.round((completed! / total!) * 100)}%</strong>
+        {translate("common:progress.assignment")}{valid ? (
+          <strong>{formatPercent(completed! / total!)}</strong>
         ) : null}
       </span>
       {valid ? (
         <>
           <progress
-            aria-label="Assignment completion"
+            aria-label={translate("common:progress.assignment")}
             max={total}
             value={completed}
           />
           <small>
-            {completed} / {total} completed
+            {translate('common:progress.completed', {completed: formatNumber(completed!), total: formatNumber(total!)})}
           </small>
         </>
       ) : (
         <small>
           {loading
-            ? 'Loading progress…'
+            ? translate("common:progress.loading")
             : failed
-              ? 'Progress could not be loaded.'
+              ? translate('common:progress.failed')
               : total === 0
-                ? 'No assignments published yet.'
-                : 'No progress record available.'}
+                ? translate('common:progress.noAssignments')
+                : translate('common:progress.empty')}
         </small>
       )}
     </div>

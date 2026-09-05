@@ -1,0 +1,71 @@
+.taskSection { container-type: inline-size; }
+
+.filters { max-width: none; margin-bottom: t.$space-6; }
+
+// Shared tracks keep badges and optional actions aligned across every task.
+.taskList {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(5, max-content);
+  column-gap: t.$space-5;
+}
+
+.columnHeadings,
+.taskRow {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
+}
+
+.columnHeadings {
+  padding-block: t.$space-3;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+  font-weight: t.$fw-medium;
+}
+
+.columnHeadings > :last-child { grid-column: 4 / -1; }
+
+.taskRow {
+  padding-block: t.$space-5;
+  border-top: 1px solid t.$border-default;
+}
+
+.taskMain {
+  display: grid;
+  min-width: 0;
+  gap: t.$space-2;
+  overflow-wrap: anywhere;
+
+  h3 { margin: 0; font-size: t.$font-size-body; line-height: t.$line-height-body; font-weight: t.$fw-semibold; }
+  p { margin: 0; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+}
+
+.taskActions {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 4 / -1;
+  align-items: center;
+
+  > button, > a { min-height: t.$touch-target; font-size: t.$font-size-caption; white-space: nowrap; }
+}
+
+.detailsAction { grid-column: 1; }
+.recordAction { grid-column: 2; }
+.transitionAction { grid-column: 3; }
+.taskBadges { display: flex; flex-wrap: wrap; align-items: center; gap: t.$space-3; margin-block: t.$space-3; }
+.detail h2 { font-size: t.$font-size-subhead; font-weight: t.$fw-semibold; }
+.detail h3 { font-size: t.$font-size-body; line-height: t.$line-height-body; font-weight: t.$fw-semibold; overflow-wrap: anywhere; }
+.detail p { margin-block: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-caption; }
+
+@container (max-width: 62rem) {
+  .taskList { grid-template-columns: max-content minmax(0, 1fr); column-gap: t.$space-3; }
+  .columnHeadings { display: none; }
+  .taskRow { row-gap: t.$space-4; }
+  .taskMain { grid-column: 1 / -1; }
+  .taskActions { display: flex; flex-wrap: wrap; grid-column: 1 / -1; gap: t.$space-3; }
+}
+
+@container (max-width: 32rem) {
+  .filters { grid-template-columns: minmax(0, 1fr); }
+}

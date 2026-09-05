@@ -11,7 +11,7 @@
   line-height: t.$line-height-caption;
   white-space: nowrap;
 
-  &[data-value='HIGH'], &[data-value='NEEDS_ATTENTION'], &[data-value='RISK'] { background: t.$type-pink-subtle; color: t.$type-pink; }
+  &[data-value='HIGH'], &[data-value='NEEDS_ATTENTION'], &[data-value='RISK'] { background: t.$type-pink-subtle; color: t.$feedback-danger; }
   &[data-value='MEDIUM'], &[data-value='AT_RISK'], &[data-value='IN_PROGRESS'], &[data-value='APPROVAL'], &[data-value='ONGOING'], &[data-value='REACHED_INCOMPLETE'] { background: t.$type-orange-subtle; color: t.$feedback-warning; }
   &[data-value='LOW'], &[data-value='ON_TRACK'], &[data-value='FOLLOW_UP'], &[data-value='RESOLVED'], &[data-value='PLANNING'], &[data-value='COMPLETED'], &[data-value='PUBLISHED'], &[data-value='SUBMITTED'], &[data-value='PRESENT'], &[data-value='REACHED_COMPLETED'] { background: t.$type-green-subtle; color: t.$feedback-success; }
   &[data-value='REVIEW'] { background: t.$type-cyan-subtle; color: t.$type-cyan; }

@@ -1,8 +1,8 @@
 .link { display: inline-flex; align-items: center; gap: t.$space-2; min-height: t.$touch-target; color: t.$action-primary; font-size: t.$font-size-caption; text-decoration: none; }
 .list { display: grid; gap: t.$space-4; }
-.list a { display: flex; align-items: flex-start; justify-content: space-between; gap: t.$space-4; min-height: t.$space-8; color: t.$content-secondary; font-size: t.$font-size-body; line-height: 1.6; text-decoration: none; }
+.list a { display: flex; align-items: baseline; justify-content: space-between; gap: t.$space-4; min-height: t.$touch-target; color: t.$content-secondary; font-size: t.$font-size-body; line-height: 1.6; text-decoration: none; }
 .list span { min-width: 0; overflow-wrap: anywhere; }
-.list strong { color: t.$content-secondary; font-size: t.$font-size-body; font-weight: t.$fw-semibold; text-align: right; }
+.list strong { flex: 0 0 auto; font-variant-numeric: tabular-nums; color: t.$content-secondary; font-size: t.$font-size-body; font-weight: t.$fw-semibold; text-align: right; }
 .list strong[data-released] { color: t.$feedback-success; }
 .list a:hover span { color: t.$action-primary; }
 .list a:focus-visible, .link:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 3px; }

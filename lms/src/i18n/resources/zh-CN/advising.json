@@ -1,0 +1,40 @@
+{
+  "actionTasks": {
+    "description": "查看优先级、跟进任务进度，并打开学生记录。",
+    "allStatuses": "全部状态",
+    "priority": "优先级",
+    "allPriorities": "全部优先级",
+    "allTypes": "全部类型",
+    "studentType": "学生类型",
+    "allStudents": "全部学生",
+    "intake": "待分配",
+    "transition": "过渡阶段",
+    "loadFailed": "暂时无法加载行动任务，请重试。",
+    "loading": "正在加载行动任务…",
+    "empty": "没有符合筛选条件的行动任务",
+    "emptyHint": "检查点临近截止日期或支持工单升级时，新任务会显示在这里。",
+    "task": "任务",
+    "fallbackTitle": "任务 #{{id}}",
+    "openRecord": "打开任务记录",
+    "resolve": "标记已解决",
+    "details": "任务详情",
+    "loadingDetail": "正在加载任务…",
+    "unavailable": "此任务暂不可用，请刷新列表后重试。",
+    "createdAt": "创建于 {{date}}",
+    "pages": "行动任务分页",
+    "types": {
+      "ABSENCE_APPROVAL": "请假审批",
+      "SCHEDULE_CHANGE_APPROVAL": "调课审批",
+      "REPORT_REVIEW": "报告审核",
+      "REPEATED_ABSENCE": "多次缺勤",
+      "LOW_ASSIGNMENT_COMPLETION": "作业完成率偏低",
+      "STUDENT_INACTIVITY": "学生长期未活动",
+      "POOR_PERFORMANCE": "学习表现待提升",
+      "NEGATIVE_HOURS": "课时余额为负",
+      "OVERDUE_STUDENT_ASSIGNMENT": "学生作业逾期",
+      "DELAYED_GRADING": "批改延迟",
+      "REACHED_INCOMPLETE_CHECKPOINT": "检查点到期未完成",
+      "OVERDUE_STUDY_PLAN_TASK": "学习计划任务逾期"
+    }
+  }
+}
