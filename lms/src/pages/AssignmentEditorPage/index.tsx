@@ -1,6 +1,7 @@
+import {useTranslation} from 'react-i18next';
 import {ChangeEvent, FormEvent, useRef, useState} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
-import {ArrowLeft, CalendarClock, CheckCircle2, Eye, FileText, Trash2, Upload, UsersRound, X} from 'lucide-react';
+import {CalendarClock, CheckCircle2, Eye, FileText, Trash2, Upload, UsersRound, X} from 'lucide-react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import type {ApiResponse, AssignmentDetail, AssignmentLearningType, AssignmentSubmissionType, CreateAssignmentPayload, PatchAssignmentPayload} from '@/apis';
 import {ASSIGNMENT_LEARNING_TYPES, unwrapData} from '@/apis';
@@ -35,6 +36,7 @@ type EditorPayload = Omit<CreateAssignmentPayload, 'weekId' | 'learningType'> & 
 const LEARNING_LABELS: Record<AssignmentLearningType, string> = {PRE_CLASS: 'Pre-class', HOMEWORK: 'Homework', PRACTICE: 'Practice'};
 
 export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFormProps) => {
+  const {t: translate} = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [title, setTitle] = useState(assignment?.title ?? '');
@@ -585,7 +587,7 @@ export const AssignmentEditorForm = ({courseId, assignment}: AssignmentEditorFor
       </form>
 
       <Link to={`/course/${courseId}`} className={styles.backLink}>
-        <ArrowLeft size={18}/> Back to course
+        {translate("course:grades.back")}
       </Link>
     </div>
   );

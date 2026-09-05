@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {advisingErrorMessage} from '@/pages/advising/advisingErrors';
 import {useEffect, useRef, useState, type SetStateAction} from 'react';
 import {
@@ -5,7 +6,7 @@ import {
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import {ChevronLeft, ChevronRight, Plus} from 'lucide-react';
+import {Plus} from 'lucide-react';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {
   SECTION_META,
@@ -52,6 +53,7 @@ export function TenantSectionComposer({
   onBack: () => void;
   onSaved: () => Promise<void>;
 }) {
+  const {t: translate} = useTranslation();
   const [active, setActive] = useState(0);
   const [review, setReview] = useState(false);
   const [error, setError] = useState('');
@@ -742,8 +744,8 @@ export function TenantSectionComposer({
                   setReview(false);
                 }}
               >
-                <ChevronLeft size={16} />
-                Previous {meta.unit.toLowerCase()}
+
+          {translate(`common:navigationControls.previousExamUnit.${section}`)}
               </button>
               <button
                 type="button"
@@ -754,8 +756,8 @@ export function TenantSectionComposer({
                   setReview(false);
                 }}
               >
-                Next {meta.unit.toLowerCase()}
-                <ChevronRight size={16} />
+          {translate(`common:navigationControls.nextExamUnit.${section}`)}
+
               </button>
             </div>
           </footer>

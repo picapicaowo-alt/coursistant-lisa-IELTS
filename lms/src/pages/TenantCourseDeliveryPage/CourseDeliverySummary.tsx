@@ -1,5 +1,6 @@
+import {useTranslation} from 'react-i18next';
 import {formatInstructorName} from '@/utils/personName';
-import {ArrowRight, FileText} from 'lucide-react';
+import {FileText} from 'lucide-react';
 import type {CourseResponse, CourseSession} from '@/apis';
 import {COURSE_SESSION_DAYS} from '@/configs/courseSessions';
 import {courseTermLabel, formatCourseTime} from '../advising/courseManagement';
@@ -11,6 +12,7 @@ export function CourseDeliverySummary({course, sessions, sessionsPending, onView
   sessionsPending: boolean;
   onViewSchedule: () => void;
 }) {
+  const {t: translate} = useTranslation();
   const primary = sessions?.[0];
   const weekday = primary ? COURSE_SESSION_DAYS.find(day => day.value === primary.dayOfWeek)?.label ?? primary.dayOfWeek : '';
 
@@ -22,7 +24,7 @@ export function CourseDeliverySummary({course, sessions, sessionsPending, onView
         <span className={styles.scheduleSummaryCopy}><strong>Every {weekday} · {formatCourseTime(primary.startTime)} — {formatCourseTime(primary.endTime)}</strong><small>{primary.location || 'Location not provided'} · {primary.timezone || 'Timezone not provided'}</small></span>
         <span className={styles.scheduleSummaryCount}><strong>{sessions?.length ?? 0} recurring {sessions?.length === 1 ? 'slot' : 'slots'}</strong><small>{course ? courseTermLabel(course) : 'Term loading…'}</small></span>
       </div> : <p className={styles.helper}>{sessions ? 'No recurring sessions have been added.' : 'The weekly schedule could not be loaded.'}</p>}
-      <button type="button" className={styles.textAction} onClick={onViewSchedule}>View full schedule <ArrowRight size={15} aria-hidden="true" /></button>
+      <button type="button" className={styles.textAction} onClick={onViewSchedule}>{translate('common:navigationControls.viewFullSchedule')} </button>
     </section>
     <section className={styles.panel} aria-labelledby="teaching-workspace-title">
       <header className={styles.panelHeader}><h2 id="teaching-workspace-title">Teaching workspace</h2><span className={styles.mutedMeta}>Instructor managed</span></header>

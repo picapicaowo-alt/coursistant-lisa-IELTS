@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useMemo, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowRight, BookOpen, Filter, Layers3, Play, Sparkles} from 'lucide-react';
@@ -21,6 +22,7 @@ interface LibraryFilters {
 const EMPTY_FILTERS: LibraryFilters = {theme: '', skillFocus: '', difficulty: ''};
 
 const VocabularyPage = () => {
+  const {t: translate} = useTranslation();
   const {user} = useRequiredAuth();
   const studentId = String(user.userId);
   const navigate = useNavigate();
@@ -82,7 +84,7 @@ const VocabularyPage = () => {
             disabled={resumeMutation.isPending}
             onClick={() => resumeMutation.mutate(resumableSession)}
           >
-            {resumeMutation.isPending ? 'Resuming…' : 'Resume session'} <ArrowRight size={18}/>
+            {resumeMutation.isPending ? translate('common:navigationControls.resuming') : translate('common:navigationControls.resumeSession')}
           </button>
           {resumeMutation.isError ? (
             <p className={styles.continueError} role="alert">

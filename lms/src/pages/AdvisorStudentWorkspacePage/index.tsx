@@ -1,12 +1,8 @@
+import {useTranslation} from 'react-i18next';
 import React, {useId, useState} from 'react';
 import {generatePath, Link, NavLink, Outlet, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
-import {
-  ArrowLeft,
-  MessageSquare,
-  Calendar,
-  ChevronDown,
-} from 'lucide-react';
+import {MessageSquare, Calendar, ChevronDown} from 'lucide-react';
 import {unwrapData} from '@/apis';
 import {UserAvatar} from '@/components/UserAvatar';
 import {ProgressRing} from '@/components/ProgressRing';
@@ -22,6 +18,7 @@ import styles from '../advising/advising.module.scss';
 import layout from './index.module.scss';
 
 const AdvisorStudentLayout: React.FC = () => {
+  const {t: translate} = useTranslation();
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
   const summaryId = useId();
@@ -71,8 +68,8 @@ const AdvisorStudentLayout: React.FC = () => {
   return (
     <div className={`${styles.page} ${layout.workspace}`}>
       <Link to={APP_ROUTE_PATHS.advisorStudents} className={layout.back}>
-        <ArrowLeft size={16} aria-hidden="true" />
-        <span>Back to Students</span>
+
+        <span>{translate('common:navigationControls.backToStudents')}</span>
       </Link>
 
       <header className={layout.studentSummary} aria-label="Student profile summary">

@@ -19,7 +19,7 @@ export function AdvisorTasksPanel() {
   })).slice(0, 3);
   const error = query.isError && !isNotFound(query.error);
   return <section className={`${styles.panel} ${styles.advisorPanel}`} aria-labelledby="advisor-tasks-title">
-    <header className={styles.panelHeader}><h2 id="advisor-tasks-title">Advisor Tasks</h2><Link to={`${APP_ROUTE_PATHS.myPlan}?view=tasks`} className={styles.viewAll}>View all <img src="/icons/figma-dashboard/arrow-right.svg" alt=""/></Link></header>
+    <header className={styles.panelHeader}><h2 id="advisor-tasks-title">Advisor Tasks</h2><Link to={`${APP_ROUTE_PATHS.myPlan}?view=tasks`} className={styles.viewAll}>View all </Link></header>
     {query.isPending ? <p className={styles.regionStatus} role="status">Loading tasks…</p> : error ? <div className={styles.regionStatus} role="alert">This section could not be loaded. <button type="button" onClick={() => void query.refetch()}>Retry</button></div> : tasks.length === 0 ? <p className={styles.regionStatus}>No advisor tasks right now.</p> : <div className={styles.taskList}>
       {tasks.map(({task, key, to}) => <Link to={to} className={styles.taskRow} key={key}>
         <span className={styles.taskCopy}><strong>{task.title || 'Learning task'}</strong><small>{taskStatusLabel(task.status)}</small></span>

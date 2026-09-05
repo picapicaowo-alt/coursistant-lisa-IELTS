@@ -1,6 +1,7 @@
+import {useTranslation} from 'react-i18next';
 import {useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {ArrowRight, Check, CheckCircle2, ChevronLeft, Headphones, HelpCircle, RefreshCcw, X} from 'lucide-react';
+import {Check, CheckCircle2, Headphones, HelpCircle, RefreshCcw, X} from 'lucide-react';
 import {useNavigate, useParams} from 'react-router-dom';
 import type {RecallRating, StudyMode, StudySessionResponse} from '@/apis/types/vocabulary';
 import {vocabularyApi} from '@/apis/services/vocabulary-api';
@@ -18,6 +19,7 @@ const RATING_OPTIONS: Array<{rating: RecallRating; label: string; hint: string; 
 ];
 
 const VocabularySessionPage = () => {
+  const {t: translate} = useTranslation();
   const {sessionId = '', unitId = ''} = useParams();
   const {user} = useRequiredAuth();
   const studentId = String(user.userId);
@@ -134,7 +136,7 @@ const VocabularySessionPage = () => {
             </>
           ) : <p>You browsed all {session.totalScheduled} cards. Remember mode did not change ratings, history, or completion.</p>}
           <div className={styles.resultActions}>
-            <button type="button" className={styles.primary} onClick={() => navigate(VOCABULARY_PATHS.list(unit.listId))}>Back to units <ArrowRight size={18}/></button>
+            <button type="button" className={styles.primary} onClick={() => navigate(VOCABULARY_PATHS.list(unit.listId))}>{translate('common:navigationControls.backToUnits')} </button>
             <button type="button" onClick={() => navigate(VOCABULARY_PATHS.root)}>Vocabulary library</button>
           </div>
         </section>
@@ -254,10 +256,10 @@ const VocabularySessionPage = () => {
         ) : (
           <div className={styles.navigationControls}>
             {session.mode === 'REMEMBER' ? (
-              <button type="button" onClick={() => advanceMutation.mutate('PREVIOUS')} disabled={!session.canGoPrevious || isBusy}><ChevronLeft size={18}/> Previous</button>
+              <button type="button" onClick={() => advanceMutation.mutate('PREVIOUS')} disabled={!session.canGoPrevious || isBusy}> {translate("common:actions.previous")}</button>
             ) : <span className={styles.lockedRating}><Check size={16}/> Rating saved</span>}
             <button type="button" className={styles.nextButton} onClick={() => advanceMutation.mutate('NEXT')} disabled={isBusy}>
-              {session.position + 1 >= session.totalScheduled ? 'Finish session' : 'Next card'} <ArrowRight size={18}/>
+              {session.position + 1 >= session.totalScheduled ? translate('common:navigationControls.finishSession') : translate('common:navigationControls.nextCard')}
             </button>
           </div>
         )}

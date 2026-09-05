@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import type { PassageData } from '../data/types'
 import type { NoteItem, ToolMode } from '../types/annotation'
 import { NotesPanel } from './NotesPanel'
@@ -38,6 +39,7 @@ export function QuestionPane({
   onPrev,
   onNext,
 }: QuestionPaneProps) {
+  const {t: translate} = useTranslation();
   return (
     <section className="question-pane" aria-label="Questions">
       <div className="question-pane__scroll" key={passage.id}>
@@ -70,10 +72,10 @@ export function QuestionPane({
       ) : null}
 
       <div className="question-pane__nav">
-        <button type="button" className="nav-arrow" onClick={onPrev} aria-label="Previous question">
+        <button type="button" className="nav-arrow" onClick={onPrev} aria-label={translate('exams:runner.previousQuestion')} title={translate('exams:runner.previousQuestion')}>
           ‹
         </button>
-        <button type="button" className="nav-arrow nav-arrow--primary" onClick={onNext} aria-label="Next question">
+        <button type="button" className="nav-arrow nav-arrow--primary" onClick={onNext} aria-label={translate('exams:runner.nextQuestion')} title={translate('exams:runner.nextQuestion')}>
           ›
         </button>
       </div>

@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {FormEvent, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, Clock3, Lock, Plus, Users, X} from 'lucide-react';
@@ -22,6 +23,7 @@ const defaultDraft = (): CreateGroupSetPayload => ({
 });
 
 const CourseGroupsPage = () => {
+  const {t: translate} = useTranslation();
   const {courseId: rawCourseId} = useParams();
   const courseId = Number(rawCourseId);
   const valid = Number.isInteger(courseId) && courseId > 0;
@@ -84,7 +86,7 @@ const CourseGroupsPage = () => {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link to={`/course/${courseId}`} className={styles.backLink} aria-label="Back to course"><ArrowLeft size={22}/></Link>
+        <Link to={`/course/${courseId}`} className={styles.backLink} aria-label={translate("course:grades.back")} title={translate("course:grades.back")}><ArrowLeft size={22} aria-hidden="true"/></Link>
         <div className={styles.headerText}><p className={styles.eyebrow}>Course groups</p><h1>Group management</h1></div>
         {access.canManageGroups && !creating ? <button type="button" className={styles.primaryButton} onClick={() => { setDraft(defaultDraft()); setCreating(true); setMessage(null); }}><Plus size={17}/> New group set</button> : null}
       </div>

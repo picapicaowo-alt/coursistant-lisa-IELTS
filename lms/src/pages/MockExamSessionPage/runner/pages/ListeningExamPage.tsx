@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {getApiErrorMessage} from '@/utils/apiError';
 import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -25,6 +26,7 @@ function formatClock(date: Date): string {
 }
 
 export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, onExit }: ListeningExamPageProps) {
+  const {t: translate} = useTranslation();
   const questionIds = useMemo(() => allListeningQuestionNumbers(paper), [paper])
   const firstQuestion = questionIds[0] ?? 1
 
@@ -298,14 +300,14 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
           </div>
         </div>
         <div className="question-pane__nav">
-          <button type="button" className="nav-arrow" onClick={handlePrev} aria-label="Previous question">
+          <button type="button" className="nav-arrow" onClick={handlePrev} aria-label={translate('exams:runner.previousQuestion')} title={translate('exams:runner.previousQuestion')}>
             ‹
           </button>
           <button
             type="button"
             className="nav-arrow nav-arrow--primary"
             onClick={handleNext}
-            aria-label="Next question"
+            aria-label={translate('exams:runner.nextQuestion')} title={translate('exams:runner.nextQuestion')}
           >
             ›
           </button>

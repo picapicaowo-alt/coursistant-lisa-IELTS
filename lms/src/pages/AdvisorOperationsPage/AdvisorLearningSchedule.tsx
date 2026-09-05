@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useMemo, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {addDays, addWeeks, format, isSameDay, startOfWeek} from 'date-fns';
@@ -35,6 +36,7 @@ async function loadOwnedCourseSchedule(from: string, to: string) {
 
 /** Advisors use dated occurrences for courses they own, not the student-only activity feed. */
 export function AdvisorLearningSchedule() {
+  const {t: translate} = useTranslation();
   const [cursor, setCursor] = useState(() => new Date());
   const [selected, setSelected] = useState<string>();
   const week = useMemo(() => startOfWeek(cursor, {weekStartsOn: 1}), [cursor]);
@@ -43,12 +45,12 @@ export function AdvisorLearningSchedule() {
   const query = useQuery({queryKey: ['advisor', 'owned-course-schedule', from, to], queryFn: () => loadOwnedCourseSchedule(from, to), retry: false});
   const sessions = query.data?.sessions.filter(session => !selected || session.date === selected) ?? [];
   return <WorkspaceSection title="Learning Schedule" bodyClassName={styles.body}>
-    <div className={styles.weekNavigation}><button type="button" aria-label="Previous schedule week" onClick={() => {setCursor(addWeeks(cursor, -1)); setSelected(undefined);}}><ChevronLeft size={16}/></button><span>{format(week, 'MMM d')} – {format(addDays(week, 6), 'MMM d, yyyy')}</span><button type="button" aria-label="Next schedule week" onClick={() => {setCursor(addWeeks(cursor, 1)); setSelected(undefined);}}><ChevronRight size={16}/></button></div>
+    <div className={styles.weekNavigation}><button type="button" aria-label={translate('common:navigationControls.previousWeek')} title={translate('common:navigationControls.previousWeek')} onClick={() => {setCursor(addWeeks(cursor, -1)); setSelected(undefined);}}><ChevronLeft size={16} aria-hidden="true"/></button><span>{format(week, 'MMM d')} – {format(addDays(week, 6), 'MMM d, yyyy')}</span><button type="button" aria-label={translate('common:navigationControls.nextWeek')} title={translate('common:navigationControls.nextWeek')} onClick={() => {setCursor(addWeeks(cursor, 1)); setSelected(undefined);}}><ChevronRight size={16} aria-hidden="true"/></button></div>
     <div className={styles.days}>{Array.from({length: 7}, (_, index) => {const date = addDays(week, index); const key = format(date, 'yyyy-MM-dd'); return <div key={key}><span>{format(date, 'EEEEE')}</span><button type="button" aria-label={format(date, 'EEEE, MMMM d, yyyy')} aria-pressed={selected === key} aria-current={isSameDay(date, new Date()) ? 'date' : undefined} data-event={query.data?.sessions.some(session => session.date === key) || undefined} onClick={() => setSelected(current => current === key ? undefined : key)}>{format(date, 'd')}</button></div>;})}</div>
     {query.isPending ? <p className={styles.status}>Loading schedule…</p> : query.isError ? <p role="alert" className={styles.status}>Schedule could not be loaded. <button type="button" onClick={() => void query.refetch()}>Retry</button></p> : <>
       {query.data?.unavailable ? <p className={styles.status} role="alert">Some course sessions could not be displayed. <button type="button" onClick={() => void query.refetch()}>Retry</button></p> : null}
       <div className={styles.timeline}>{sessions.length ? sessions.map(session => <Link key={`${session.courseId}-${session.id}`} to={generatePath(APP_ROUTE_PATHS.advisorCoursesCourseIdDelivery, {courseId: String(session.courseId)})}><i aria-hidden="true"/><div><small>{session.date === format(new Date(), 'yyyy-MM-dd') ? 'Today' : format(new Date(`${session.date}T00:00:00`), 'MMM d, EEE')}</small><strong>{session.title}</strong><span>{session.start}{session.end ? ` – ${session.end}` : ''}</span></div></Link>) : !query.data?.unavailable ? <p className={styles.status}>No course sessions {selected ? 'on this day' : 'this week'}.</p> : null}</div>
     </>}
-    <Link className={styles.manage} to={APP_ROUTE_PATHS.advisorSchedule}>Manage schedule requests <ChevronRight size={16}/></Link>
+    <Link className={styles.manage} to={APP_ROUTE_PATHS.advisorSchedule}>{translate('common:navigationControls.manageScheduleRequests')} </Link>
   </WorkspaceSection>;
 }

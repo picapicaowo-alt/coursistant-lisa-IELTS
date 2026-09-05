@@ -223,18 +223,18 @@ export const DateTimePickerPopover = ({
           <div className={styles.monthNavigation}>
             <button
               type="button"
-              aria-label={t('dateTime.previousMonth')}
+              aria-label={t('dateTime.previousMonth')} title={t('dateTime.previousMonth')}
               onClick={() => setVisibleMonth(current => new Date(current.getFullYear(), current.getMonth() - 1, 1))}
             >
-              <ChevronLeft size={18}/>
+              <ChevronLeft size={18} aria-hidden="true"/>
             </button>
             <strong aria-live="polite">{formatDateTime(visibleMonth, {month: 'long', year: 'numeric'})}</strong>
             <button
               type="button"
-              aria-label={t('dateTime.nextMonth')}
+              aria-label={t('dateTime.nextMonth')} title={t('dateTime.nextMonth')}
               onClick={() => setVisibleMonth(current => new Date(current.getFullYear(), current.getMonth() + 1, 1))}
             >
-              <ChevronRight size={18}/>
+              <ChevronRight size={18} aria-hidden="true"/>
             </button>
           </div>
           <div className={styles.weekdays} aria-hidden="true">

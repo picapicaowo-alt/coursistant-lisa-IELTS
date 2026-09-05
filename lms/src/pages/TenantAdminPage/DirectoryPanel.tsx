@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import { TenantDrawer } from "@/components/TenantWorkspace/TenantDrawer";
 import { PersonCell } from "@/components/TenantWorkspace/PersonCell";
 import { readableValue } from "@/components/TenantWorkspace/presentation";
@@ -114,6 +115,7 @@ export const DirectoryPanel = ({
   createRequested?: boolean;
   onCreateHandled?: () => void;
 }) => {
+  const {t: translate} = useTranslation();
   const { user: currentUser } = useRequiredAuth();
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
@@ -335,6 +337,7 @@ export const DirectoryPanel = ({
     },
   });
 
+  const hasFilters = [draftFilters, filters].some(current => Object.values(current).some(Boolean));
   const submitFilters = (event: FormEvent) => {
     event.preventDefault();
     const next = { ...draftFilters, q: draftFilters.q.trim() };
@@ -467,7 +470,7 @@ export const DirectoryPanel = ({
             <div
               className={`${styles.filterActions} ${styles.directorySecondaryActions}`}
             >
-              <button
+              {hasFilters ? <button
                 type="button"
                 className={styles.secondaryButton}
                 onClick={() => {
@@ -476,13 +479,12 @@ export const DirectoryPanel = ({
                   setPage(0);
                   setDirectoryFeedback("Filters cleared.");
                 }}
-              >
-                Clear filters
-              </button>
+              >{translate("common:actions.clearFilters")}</button> : null}
               <button
                 type="button"
                 className={styles.iconButton}
-                aria-label="Refresh directory"
+                aria-label={translate('common:refreshControls.directory')}
+            title={translate('common:refreshControls.directory')}
                 disabled={directory.isFetching}
                 onClick={() => {
                   setDirectoryFeedback("");

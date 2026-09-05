@@ -65,9 +65,9 @@ test('counsellor workspace selects records and paginates using only existing rea
   await expect(preview.getByText('Helen Chen')).toHaveCount(0);
   await expect(preview.getByRole('link', {name: 'Edit intake'})).toHaveAttribute('href', '/counsellor/intakes/102');
   await expect(preview.getByRole('link', {name: 'Select advisor'})).toHaveAttribute('href', '/counsellor/intakes/102/assign');
-  await page.getByRole('button', {name: 'Next intake pages'}).click();
+  await page.getByRole('navigation', {name: 'intake pages'}).getByRole('button', {name: 'Next page'}).click();
   await expect(preview.getByRole('link', {name: 'Select advisor'})).not.toHaveAttribute('href', '/counsellor/intakes/102/assign');
-  await page.getByRole('button', {name: 'Next advisor pages'}).click();
+  await page.getByRole('navigation', {name: 'advisor pages'}).getByRole('button', {name: 'Next page'}).click();
   await expect(page.getByText('Robin Park')).toBeVisible();
   await preview.getByRole('link', {name: 'Select advisor'}).click();
   await expect(page.getByRole('heading', {name: 'Assign advisor', exact: true})).toBeVisible();
@@ -120,7 +120,7 @@ test('all operational panels and controls fit the available viewport without scr
   const preview = page.getByRole('region', {name: 'Intake preview'});
   await expect(preview.getByRole('link', {name: 'Select advisor'})).toBeVisible();
   const initial = await preview.getByRole('link', {name: 'Select advisor'}).getAttribute('href');
-  await page.getByRole('button', {name: 'Next intake pages'}).click();
+  await page.getByRole('navigation', {name: 'intake pages'}).getByRole('button', {name: 'Next page'}).click();
   await expect(preview.getByRole('link', {name: 'Select advisor'})).not.toHaveAttribute('href', initial ?? '');
   expect(await page.locator('main').evaluate(node => node.scrollTop)).toBe(0);
 });

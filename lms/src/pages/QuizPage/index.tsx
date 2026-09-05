@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, CalendarClock, CheckCircle2, Clock3, History, Pencil, RotateCcw, ShieldCheck} from 'lucide-react';
@@ -39,6 +40,7 @@ const toDrafts = (attempt: QuizAttempt | null): Record<number, AnswerDraft> =>
   }]));
 
 const QuizPage = () => {
+  const {t: translate} = useTranslation();
   const {courseId: courseIdParam, quizId: quizIdParam} = useParams();
   const courseId = Number(courseIdParam);
   const quizId = Number(quizIdParam);
@@ -258,7 +260,14 @@ const QuizPage = () => {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link to={`/course/${courseId}`} className={styles.backLink} aria-label="Back to course"><ArrowLeft size={22}/></Link>
+        <Link
+          to={`/course/${courseId}`}
+          className={styles.backLink}
+          aria-label={translate("course:grades.back")}
+          title={translate("course:grades.back")}
+        >
+          <ArrowLeft size={22} aria-hidden="true" />
+        </Link>
         <div className={styles.headerText}>
           <p className={styles.eyebrow}>
             {quiz ? (isStaff ? `${quiz.state} · ${quizWindowStatusLabel(windowStatus)}` : quizWindowStatusLabel(windowStatus)) : 'Quiz'}

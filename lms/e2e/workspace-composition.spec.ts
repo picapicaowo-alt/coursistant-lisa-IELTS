@@ -113,7 +113,11 @@ test('directory refresh preserves filters and visibly updates records', async ({
     return route.fulfill({json: reply({items: [{id: 21, firstName: 'Rachel', lastName: filteredReads > 1 ? 'Updated' : 'Wong', email: 'rachel@example.test', role: 'USER', level: 'PARENT', status: 'ACTIVE'}], total: 1, page: 0, size: 20})});
   });
   await page.goto('/admin');
+  await expect(page.getByRole('button', {name: 'Refresh directory'})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Clear filters'})).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Refresh directory'})).toHaveAttribute('title', 'Refresh directory');
   await page.getByRole('textbox', {name: 'Search by name or email'}).fill('Rachel');
+  await expect(page.getByRole('button', {name: 'Clear filters'})).toBeVisible();
   await page.getByRole('button', {name: 'Apply filters', exact: true}).click();
   await expect(page.getByRole('region', {name: 'User directory'}).getByText('Rachel Wong')).toBeVisible();
   await expect(page.getByRole('button', {name: 'Refresh directory'})).toBeEnabled();
@@ -125,6 +129,7 @@ test('directory refresh preserves filters and visibly updates records', async ({
   await page.screenshot({path: info.outputPath('directory-refreshed.png'), fullPage: true});
   await page.getByRole('button', {name: 'Clear filters'}).click();
   await expect(page.getByRole('textbox', {name: 'Search by name or email'})).toHaveValue('');
+  await expect(page.getByRole('button', {name: 'Clear filters'})).toHaveCount(0);
 });
 
 test('create intake modal preserves drafts after errors and restores focus on dismissal', async ({page}, info) => {
@@ -289,4 +294,35 @@ test('public registration links are hidden and bookmarked signup returns to logi
   await expect(page.getByRole('heading', {name: 'Forgot password?', exact: true})).toBeVisible();
   await expect(page.locator('a[href="/signup"]')).toHaveCount(0);
   expect(registrationRequests).toEqual([]);
+});
+
+test('intake clear filters appears only for draft or applied criteria and refresh preserves them', async ({page}) => {
+  await adminFixture(page);
+  const reads: URLSearchParams[] = [];
+  await page.route('**/v2/tenant/student-intakes?**', route => {
+    reads.push(new URL(route.request().url()).searchParams);
+    return route.fulfill({json: reply({items: [], total: 0, page: 0, size: 20})});
+  });
+  await page.goto('/admin/intakes');
+  const refresh = page.getByRole('button', {name: 'Refresh intakes'});
+  const clear = page.getByRole('button', {name: 'Clear filters'});
+  await expect(refresh).toBeEnabled();
+  await expect(refresh).toHaveAttribute('title', 'Refresh intakes');
+  await expect(clear).toHaveCount(0);
+  await page.getByPlaceholder('Search intakes').fill('Rachel');
+  await expect(clear).toBeVisible();
+  await page.getByRole('button', {name: 'Apply filters'}).click();
+  await expect.poll(() => reads.at(-1)?.get('q')).toBe('Rachel');
+  await expect(refresh).toBeEnabled();
+  const previousReads = reads.length;
+  await refresh.click();
+  await expect.poll(() => reads.length).toBeGreaterThan(previousReads);
+  expect(reads.at(-1)?.get('q')).toBe('Rachel');
+  await page.getByPlaceholder('Search intakes').fill('');
+  await expect(clear).toBeVisible();
+  await clear.click();
+  await expect(clear).toHaveCount(0);
+  // The unfiltered list may already be fresh in the query cache.
+  await expect.poll(() => new URL(page.url()).searchParams.get('q')).toBe(null);
+  await expect(page.getByPlaceholder('Search intakes')).toHaveValue('');
 });

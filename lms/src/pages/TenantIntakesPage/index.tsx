@@ -1,7 +1,8 @@
+import {useTranslation} from 'react-i18next';
 import React, {FormEvent, useEffect, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {ArrowLeft, Plus, RefreshCw, Search} from 'lucide-react';
+import {Plus, RefreshCw, Search} from 'lucide-react';
 import {TenantDrawer} from '@/components/TenantWorkspace/TenantDrawer';
 import {PersonCell} from '@/components/TenantWorkspace/PersonCell';
 import {useTenantPeople} from '@/components/TenantWorkspace/useTenantPeople';
@@ -64,6 +65,7 @@ const formFromIntake = (
 });
 
 const TenantIntakesPage: React.FC = () => {
+  const {t: translate} = useTranslation();
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -274,6 +276,9 @@ const TenantIntakesPage: React.FC = () => {
     setFilters({...draftFilters, q: draftFilters.q.trim()});
     syncListLocation({...draftFilters, q: draftFilters.q.trim()}, 0);
   };
+  const hasFilters = [draftFilters, filters].some(
+    current => current.q || current.lifecycleStatus || current.assignmentStatus || current.searchBy !== emptyFilters.searchBy,
+  );
   const clearFilters = () => {
     setDraftFilters(emptyFilters);
     setFilters(emptyFilters);
@@ -300,8 +305,8 @@ const TenantIntakesPage: React.FC = () => {
         </div>
         <div className={ui.headerActions}>
           <Link className={ui.secondaryButton} to={TENANT_PATHS.governance}>
-            <ArrowLeft size={18} />
-            Back to governance
+
+            {translate('common:navigationControls.backToGovernance')}
           </Link>
           <button
             type="button"
@@ -412,21 +417,20 @@ const TenantIntakesPage: React.FC = () => {
             </select>
           </label>
           <button className={ui.primaryButton}>Apply filters</button>
-          <button
+          {hasFilters ? <button
             type="button"
             className={ui.secondaryButton}
             onClick={clearFilters}
-          >
-            Clear filters
-          </button>
+          >{translate("common:actions.clearFilters")}</button> : null}
           <button
             type="button"
             className={ui.iconButton}
-            aria-label="Refresh intakes"
+            aria-label={translate('common:refreshControls.intakes')}
+            title={translate('common:refreshControls.intakes')}
             disabled={intakes.isFetching}
             onClick={() => void intakes.refetch()}
           >
-            <RefreshCw size={17} />
+            <RefreshCw size={17} aria-hidden="true" />
           </button>
         </form>
 

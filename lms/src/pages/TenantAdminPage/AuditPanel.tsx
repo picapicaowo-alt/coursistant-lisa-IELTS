@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import { TenantUserPicker } from "@/components/TenantUserPicker";
 import { PersonCell } from "@/components/TenantWorkspace/PersonCell";
 import { ResponsiveFilters } from "@/components/TenantWorkspace/ResponsiveFilters";
@@ -39,6 +40,7 @@ const dateTimeParam = (value: string) =>
   value ? new Date(value).toISOString() : undefined;
 
 export const AuditPanel = () => {
+  const {t: translate} = useTranslation();
   const [draft, setDraft] = useState<AuditDraft>(emptyDraft);
   const [filters, setFilters] = useState<TenantAuditEventParams>({
     page: 0,
@@ -75,15 +77,14 @@ export const AuditPanel = () => {
       size: PAGE_SIZE,
     });
   };
+  const hasFilters = Object.values(draft).some(Boolean) || Object.entries(filters).some(
+    ([key, value]) => key !== 'page' && key !== 'size' && value != null && value !== '',
+  );
   const clear = () => {
-    const alreadyClear =
-      Object.values(draft).every((value) => value === "") &&
-      Object.keys(filters).every((key) => key === "page" || key === "size");
     setDraft(emptyDraft);
     setActor(null);
     setFilters({ page: 0, size: PAGE_SIZE });
     setFilterFeedback("Filters cleared. Showing all governance events.");
-    if (alreadyClear) void audit.refetch();
   };
   const page = filters.page ?? 0;
 
@@ -116,10 +117,11 @@ export const AuditPanel = () => {
         <button
           type="button"
           className={styles.iconButton}
-          aria-label="Refresh audit"
+          aria-label={translate('common:refreshControls.audit')}
+            title={translate('common:refreshControls.audit')}
           onClick={() => void audit.refetch()}
         >
-          <RefreshCw size={18} />
+          <RefreshCw size={18} aria-hidden="true" />
         </button>
       </div>
       <ResponsiveFilters>
@@ -170,13 +172,11 @@ export const AuditPanel = () => {
             <Search size={17} />
             Apply filters
           </button>
-          <button
+          {hasFilters ? <button
             type="button"
             className={styles.secondaryButton}
             onClick={clear}
-          >
-            Clear filters
-          </button>
+          >{translate("common:actions.clearFilters")}</button> : null}
           <details className={auditStyles.advanced}>
             <summary>Filter by user ID</summary>
             <div className={styles.filterBar}>

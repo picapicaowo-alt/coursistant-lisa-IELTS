@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {FormEvent, useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, Lock, Pencil, Plus, Shuffle, Trash2, UserMinus, UserPlus, Users, X} from 'lucide-react';
@@ -21,6 +22,7 @@ interface GroupDraft { name: string; capacityOverride: number | null; }
 interface MembershipAction { kind: 'move' | 'remove'; userId: number; fromGroupId: number; targetGroupId?: number; displayName: string; }
 
 const GroupSetDetailPage = () => {
+  const {t: translate} = useTranslation();
   const params = useParams();
   const courseId = Number(params.courseId);
   const groupSetId = Number(params.groupSetId);
@@ -191,7 +193,7 @@ const GroupSetDetailPage = () => {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link to={`/course/${courseId}/groups`} className={styles.backLink} aria-label="Back to group sets"><ArrowLeft size={22}/></Link>
+        <Link to={`/course/${courseId}/groups`} className={styles.backLink} aria-label={translate('common:navigationControls.backToGroupSets')} title={translate('common:navigationControls.backToGroupSets')}><ArrowLeft size={22} aria-hidden="true"/></Link>
         <div className={styles.headerText}><p className={styles.eyebrow}>Course group set</p><h1>{groupSet?.name || 'Loading group set…'}</h1>{groupSet ? <p>{groupSet.locked ? 'Membership locked' : groupSet.openForSelfService ? 'Student choice open' : 'Instructor managed'} · {groupSet.timezone}</p> : null}</div>
         {access.canManageGroups && groupSet && !editingSettings ? <button type="button" className={styles.secondaryButton} onClick={() => setEditingSettings(true)}><Pencil size={16}/> Edit settings</button> : null}
       </div>

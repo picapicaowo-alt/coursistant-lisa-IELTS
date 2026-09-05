@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {TenantDrawer} from '@/components/TenantWorkspace/TenantDrawer';
 import {readableValue} from '@/components/TenantWorkspace/presentation';
 import {
@@ -31,6 +32,7 @@ const ownerName = (ownership: TenantCourseOwnership) =>
   );
 
 export const OwnershipPanel = () => {
+  const {t: translate} = useTranslation();
   const queryClient = useQueryClient();
   const [searchDraft, setSearchDraft] = useState('');
   const [query, setQuery] = useState('');
@@ -140,10 +142,11 @@ export const OwnershipPanel = () => {
           <button
             type="button"
             className={styles.iconButton}
-            aria-label="Refresh ownerships"
+            aria-label={translate('common:refreshControls.ownerships')}
+            title={translate('common:refreshControls.ownerships')}
             onClick={() => void ownerships.refetch()}
           >
-            <RefreshCw size={18} />
+            <RefreshCw size={18} aria-hidden="true" />
           </button>
         </form>
         <div className={styles.filterBar}>

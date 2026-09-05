@@ -22,13 +22,21 @@ describe('Tenant Admin audit filters', () => {
   it('clears visible fields and reloads the unfiltered audit list', async () => {
     renderPanel();
     await waitFor(() => expect(mocks.listTenantAuditEvents).toHaveBeenCalled());
+    expect(screen.queryByRole('button', {name: 'Clear filters'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Refresh audit'})).toHaveAttribute('title', 'Refresh audit');
     fireEvent.change(screen.getByLabelText('Action'), {target: {value: 'INTAKE_CREATED'}});
     fireEvent.click(screen.getByRole('button', {name: 'Apply filters'}));
     await waitFor(() => expect(mocks.listTenantAuditEvents).toHaveBeenLastCalledWith(expect.objectContaining({action: 'INTAKE_CREATED'})));
 
+    fireEvent.click(screen.getByRole('button', {name: 'Refresh audit'}));
+    await waitFor(() => expect(mocks.listTenantAuditEvents).toHaveBeenCalledTimes(3));
+    expect(mocks.listTenantAuditEvents).toHaveBeenLastCalledWith(expect.objectContaining({action: 'INTAKE_CREATED'}));
+    // Clearing the draft alone must not hide the reset for an applied filter.
+    fireEvent.change(screen.getByLabelText('Action'), {target: {value: ''}});
     fireEvent.click(screen.getByRole('button', {name: 'Clear filters'}));
 
     expect(screen.getByLabelText('Action')).toHaveValue('');
+    expect(screen.queryByRole('button', {name: 'Clear filters'})).not.toBeInTheDocument();
     expect(await screen.findByRole('status')).toHaveTextContent('Filters cleared');
     await waitFor(() => expect(mocks.listTenantAuditEvents).toHaveBeenLastCalledWith({page: 0, size: 20}));
   });

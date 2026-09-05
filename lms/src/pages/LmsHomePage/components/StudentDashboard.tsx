@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useEffect, useRef, useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {generatePath, Link} from 'react-router-dom';
@@ -27,21 +28,26 @@ import s from './StudentDashboard.module.scss';
 const PREVIEW_LIMIT = 3;
 const TASK_PREVIEW_LIMIT = 4;
 const DAY_LABELS: Record<string, string> = {MON: 'Mon', TUE: 'Tue', WED: 'Wed', THU: 'Thu', FRI: 'Fri', SAT: 'Sat', SUN: 'Sun'};
-const viewAll = (to: string) => <Link className={s.textLink} to={to}>View all <ChevronRight size={15} aria-hidden="true"/></Link>;
+function ViewAll({to}: {to: string}) {
+  const {t} = useTranslation();
+  return <Link className={s.textLink} to={to}>{t('common:actions.viewAll')}</Link>;
+}
 
 function DashboardCourseCard({course}: {course: DashboardCourse}) {
+  const {t: translate} = useTranslation();
   const progress = useStudentProgress(true);
   const sessions = useQuery({queryKey: ['course-sessions', course.id], queryFn: async () => unwrapData(await courseApiService.getCourseSessions(course.id), 'course sessions'), staleTime: 300_000, retry: false});
   const session = sessions.data?.[0];
   return <CourseIdentityCard courseId={course.id} title={course.title || course.courseCode}
     icon={<BookOpen size={23} aria-hidden="true"/>} code={course.courseCode} instructor={course.instructorName ?? undefined}
     metadata={<span className={s.schedule}><CalendarDays size={15} aria-hidden="true"/>{sessions.isError ? <button type="button" onClick={() => void sessions.refetch()}>Retry schedule</button> : session ? `${DAY_LABELS[session.dayOfWeek] ?? session.dayOfWeek} · ${session.startTime.slice(0, 5)}–${session.endTime.slice(0, 5)}` : sessions.isPending ? 'Loading schedule…' : 'No schedule published'}</span>}
-    actions={<Link to={generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(course.id)})} aria-label={`${course.title}: View course`}>View course <ChevronRight size={14} aria-hidden="true"/></Link>}>
+    actions={<Link to={generatePath(APP_ROUTE_PATHS.courseCourseId, {courseId: String(course.id)})} aria-label={translate('dashboard:viewNamedCourse', {title: course.title})}>{translate("dashboard:viewCourse")}</Link>}>
     <AssignmentProgress progress={progress.data?.courses?.find(item => item.courseId === course.id)} loading={progress.isPending} failed={progress.isError}/>
   </CourseIdentityCard>;
 }
 
 function DashboardCourses() {
+  const {t: translate} = useTranslation();
   const query = useCourseList();
   const strip = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({previous: false, next: false});
@@ -56,15 +62,16 @@ function DashboardCourses() {
     return () => {observer.disconnect(); element.removeEventListener('scroll', update);};
   }, [query.courses.length]);
   const move = (direction: number) => strip.current?.scrollBy({left: direction * strip.current.clientWidth, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
-  return <WorkspaceSection title="My courses" appearance="record" meta={viewAll(APP_ROUTE_PATHS.course)} className={s.courses} bodyClassName={s.courseBody}>
+  return <WorkspaceSection title="My courses" appearance="record" meta={<ViewAll to={APP_ROUTE_PATHS.course}/>} className={s.courses} bodyClassName={s.courseBody}>
     <LearningQueryState query={{...query, isPending: query.isLoading}}/>
     {!query.isLoading && !query.isError && !query.courses.length ? <LearningEmpty icon={BookOpen} title="No active courses" description="Your enrolled courses will appear here."/> : null}
     <div className={s.courseStrip} ref={strip} aria-label="Active courses">{query.courses.map(course => <DashboardCourseCard key={course.id} course={course}/>)}</div>
-    {position.previous || position.next ? <nav className={s.carouselNav} aria-label="Course cards"><button type="button" aria-label="Previous courses" disabled={!position.previous} onClick={() => move(-1)}><ChevronLeft size={18}/></button><span>{query.courses.length} active courses</span><button type="button" aria-label="Next courses" disabled={!position.next} onClick={() => move(1)}><ChevronRight size={18}/></button></nav> : null}
+    {position.previous || position.next ? <nav className={s.carouselNav} aria-label="Course cards"><button type="button" aria-label={translate("dashboard:previousCourses")} title={translate("dashboard:previousCourses")} disabled={!position.previous} onClick={() => move(-1)}><ChevronLeft size={18} aria-hidden="true"/></button><span>{query.courses.length} active courses</span><button type="button" aria-label={translate("dashboard:nextCourses")} title={translate("dashboard:nextCourses")} disabled={!position.next} onClick={() => move(1)}><ChevronRight size={18} aria-hidden="true"/></button></nav> : null}
   </WorkspaceSection>;
 }
 
 function DashboardTasks() {
+  const {t: translate} = useTranslation();
   const [expanded, setExpanded] = useState(false);
   const query = useQuery({queryKey: advisingQueryKeys.studentStudyPlan, queryFn: async () => unwrapData(await advisorApiService.getOwnStudyPlan(), 'student study plan'), retry: false});
   const tasks = (query.data?.plan?.checkpoints ?? []).flatMap((checkpoint, index) => (checkpoint.tasks ?? []).map((task, taskIndex) => {
@@ -76,7 +83,7 @@ function DashboardTasks() {
   const today = new Date();
   const todayKey = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const missingPlan = query.isError && isNotFound(query.error);
-  return <WorkspaceSection title="Advisor Tasks" appearance="record" meta={viewAll(`${APP_ROUTE_PATHS.myPlan}?view=tasks`)}>
+  return <WorkspaceSection title="Advisor Tasks" appearance="record" meta={<ViewAll to={`${APP_ROUTE_PATHS.myPlan}?view=tasks`}/>}>
     {!missingPlan ? <LearningQueryState query={query}/> : null}
     {(!query.isPending && !query.isError || missingPlan) && !tasks.length ? <LearningEmpty icon={ClipboardList} title="No advisor tasks right now" description="Your next steps will appear when your advisor updates your plan."/> : null}
     <div className={s.taskList}>{tasks.slice(0, expanded ? TASK_PREVIEW_LIMIT * 2 : TASK_PREVIEW_LIMIT).map(({task, key, to, checkpoint}) => {
@@ -86,7 +93,7 @@ function DashboardTasks() {
         <span className={s.taskIcon} data-complete={completed || undefined}>{completed ? <CheckCircle2 size={21}/> : <Circle size={21}/>}</span>
         <span className={s.taskCopy}><strong>{task.title || 'Learning task'}</strong>{checkpoint ? <small>{checkpoint}</small> : null}</span>
         <span className={s.taskMeta}><LearningBadge value={overdue ? 'OVERDUE' : task.status} label={overdue ? 'Overdue' : taskStatusLabel(task.status)}/><small>{formatPlanDate(task.dueDate)}</small></span>
-        <span className={s.taskAction}>{task.advisorFeedback ? 'View feedback' : completed ? 'View detail' : 'Open'}<ChevronRight size={14} aria-hidden="true"/></span>
+        <span className={s.taskAction}>{translate(task.advisorFeedback ? 'dashboard:viewFeedback' : completed ? 'common:actions.viewDetail' : 'common:actions.open')}</span>
       </Link>;
     })}</div>
     {tasks.length > TASK_PREVIEW_LIMIT ? <button className={s.showMore} type="button" onClick={() => setExpanded(value => !value)}>{expanded ? 'Show fewer tasks' : 'Show more tasks'}</button> : null}
@@ -94,24 +101,26 @@ function DashboardTasks() {
 }
 
 function DashboardExams() {
+  useTranslation();
   const query = useQuery({queryKey: ['dashboard', 'mock-exams'], queryFn: async () => unwrapData(await mockExamApiService.listStudentExams(), 'student exams'), retry: false});
   const exams = (collection(query.data) ?? []).flatMap(value => {const item = asRecord(value); return item ? [item] : [];});
-  return <WorkspaceSection title="Exams" appearance="record" meta={viewAll(APP_ROUTE_PATHS.mockExams)}>
+  return <WorkspaceSection title="Exams" appearance="record" meta={<ViewAll to={APP_ROUTE_PATHS.mockExams}/>}>
     <LearningQueryState query={query}/>
     {!query.isPending && !query.isError && !exams.length ? <LearningEmpty icon={GraduationCap} title="No mock exams have been assigned." description="Check back here for updates."/> : null}
     <div className={s.examList}>{exams.slice(0, PREVIEW_LIMIT).map((exam, index) => {
       const title = String(exam.title ?? exam.templateTitle ?? 'IELTS Mock Test');
       const status = String(exam.status ?? exam.attemptStatus ?? 'Not started');
       const destination = resolveDashboardExamRoute(exam);
-      return <Link to={destination} key={String(exam.id ?? index)} className={s.exam}><span className={s.examIcon}><GraduationCap size={22}/></span><span><strong>{title}</strong><LearningBadge value={status}/></span><span className={s.textLink}>{dashboardExamActionLabel(status, typeof exam.score === 'number' ? exam.score : undefined, destination !== APP_ROUTE_PATHS.mockExams)}<ChevronRight size={15}/></span></Link>;
+      return <Link to={destination} key={String(exam.id ?? index)} className={s.exam}><span className={s.examIcon}><GraduationCap size={22}/></span><span><strong>{title}</strong><LearningBadge value={status}/></span><span className={s.textLink}>{dashboardExamActionLabel(status, typeof exam.score === 'number' ? exam.score : undefined, destination !== APP_ROUTE_PATHS.mockExams)}</span></Link>;
     })}</div>
   </WorkspaceSection>;
 }
 
 function DashboardAlerts() {
+  const {t: translate} = useTranslation();
   const query = useQuery({queryKey: ['me', 'alerts'], queryFn: async () => unwrapData(await courseOperationsApiService.getMyAlerts(), 'my alerts'), retry: false});
   const alerts = (collection(query.data) ?? []).flatMap(value => {const item = asRecord(value); return item ? [item] : [];});
-  return <WorkspaceSection title="Alerts" appearance="record" meta={query.isSuccess ? <Link className={s.textLink} to={`${STUDENT_LEARNING_PATH}&learningDetail=alerts`}>{alerts.length} alerts <ChevronRight size={15}/></Link> : undefined}>
+  return <WorkspaceSection title="Alerts" appearance="record" meta={query.isSuccess ? <Link className={s.textLink} to={`${STUDENT_LEARNING_PATH}&learningDetail=alerts`}>{translate('dashboard:alertCount', {count: alerts.length})} </Link> : undefined}>
     <LearningQueryState query={query}/>
     {query.isSuccess && !alerts.length ? <LearningEmpty icon={Bell} title="No active alerts."/> : null}
     <div className={s.alertList}>{alerts.slice(0, PREVIEW_LIMIT).map((alert, index) => <Link to={`${STUDENT_LEARNING_PATH}&learningDetail=alerts`} key={String(alert.id ?? index)}><Bell size={17}/><span>{String(alert.title ?? alert.message ?? 'Learning update')}</span><ChevronRight size={16}/></Link>)}</div>

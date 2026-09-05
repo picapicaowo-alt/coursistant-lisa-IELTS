@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {ChevronLeft, ChevronRight, RotateCcw} from 'lucide-react';
 import {usePdfMaterialPreview} from './usePdfMaterialPreview';
 import styles from './PdfMaterialPreview.module.scss';
@@ -10,6 +11,7 @@ interface PdfMaterialPreviewProps {
 
 /** Render protected PDF bytes locally; browser PDF plugins may show an empty iframe. */
 export default function PdfMaterialPreview({blob, title, onRetry}: PdfMaterialPreviewProps) {
+  const {t: translate} = useTranslation();
   const {
     canvas, viewport, pageNumber, setPageNumber, pageCount,
     zoom, setZoom, loading, error, pageText, retry,
@@ -21,20 +23,20 @@ export default function PdfMaterialPreview({blob, title, onRetry}: PdfMaterialPr
         <nav aria-label="PDF pages">
           <button
             type="button"
-            aria-label="Previous PDF page"
+            aria-label={translate('common:navigationControls.previousPdfPage')} title={translate('common:navigationControls.previousPdfPage')}
             disabled={!pageCount || pageNumber <= 1}
             onClick={() => setPageNumber(page => page - 1)}
           >
-            <ChevronLeft size={18}/>
+            <ChevronLeft size={18} aria-hidden="true"/>
           </button>
           <span aria-live="polite">Page {pageNumber} of {pageCount ?? '…'}</span>
           <button
             type="button"
-            aria-label="Next PDF page"
+            aria-label={translate('common:navigationControls.nextPdfPage')} title={translate('common:navigationControls.nextPdfPage')}
             disabled={!pageCount || pageNumber >= pageCount}
             onClick={() => setPageNumber(page => page + 1)}
           >
-            <ChevronRight size={18}/>
+            <ChevronRight size={18} aria-hidden="true"/>
           </button>
         </nav>
         <label>

@@ -1,7 +1,8 @@
+import {useTranslation} from 'react-i18next';
 import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, FileText, UserRound, UserRoundCog } from "lucide-react";
+import {FileText, UserRound, UserRoundCog} from "lucide-react";
 import { unwrapData } from "@/apis";
 import { ParentLinksPanel } from "@/components/ParentLinksPanel";
 import { WorkspaceSection } from "@/components/WorkspaceSection";
@@ -21,6 +22,7 @@ import ui from "@/components/TenantWorkspace/workspace.module.scss";
 import styles from "./index.module.scss";
 
 function StudentRecord({ id }: { id: number }) {
+  const {t: translate} = useTranslation();
   const queryClient = useQueryClient();
   const location = useLocation();
   const [assignmentOpen, setAssignmentOpen] = useState(false);
@@ -100,8 +102,8 @@ function StudentRecord({ id }: { id: number }) {
           </p>
         </div>
         <Link className={ui.secondaryButton} to={returnTo}>
-          <ArrowLeft size={18} aria-hidden="true" />
-          Back to intakes
+
+          {translate('common:navigationControls.backToIntakes')}
         </Link>
       </header>
       <div className={styles.grid}>

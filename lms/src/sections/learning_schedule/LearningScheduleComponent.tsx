@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import React, {useMemo, useState} from 'react';
 import {Link} from 'react-router-dom';
 import {
@@ -18,6 +19,7 @@ import './LearningScheduleComponent.scss';
 const DATE_KEY = 'yyyy-MM-dd';
 
 const LearningScheduleComponent: React.FC<{spacious?: boolean}> = ({spacious = false}) => {
+  const {t: translate} = useTranslation();
   const {activities, isLoading, isError, refetch} = useDashboardActivities();
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -46,11 +48,11 @@ const LearningScheduleComponent: React.FC<{spacious?: boolean}> = ({spacious = f
 
       <div className="learning-schedule__calendar">
         <div className="learning-schedule__month">
-          <button type="button" aria-label="Previous month" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+          <button type="button" aria-label={translate('common:dateTime.previousMonth')} title={translate('common:dateTime.previousMonth')} onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
             <img src="/icons/figma-dashboard/arrow-left.svg" alt=""/>
           </button>
           <strong>{format(currentMonth, 'MMMM yyyy')}</strong>
-          <button type="button" aria-label="Next month" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+          <button type="button" aria-label={translate('common:dateTime.nextMonth')} title={translate('common:dateTime.nextMonth')} onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
             <img src="/icons/figma-dashboard/arrow-right.svg" alt=""/>
           </button>
         </div>

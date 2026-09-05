@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useDeferredValue, useEffect, useMemo, useRef, useState} from 'react';
 import {createPortal} from 'react-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -85,6 +86,7 @@ const loadAllQuizAttempts = async (courseId: number, quizId: number, userIds: nu
 };
 
 const QuizGradingPage = () => {
+  const {t: translate} = useTranslation();
   const {courseId: courseIdParam, quizId: quizIdParam} = useParams();
   const courseId = Number(courseIdParam);
   const quizId = Number(quizIdParam);
@@ -328,7 +330,14 @@ const QuizGradingPage = () => {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link to={`/course/${courseId}/quizzes/${quizId}`} className={styles.backLink} aria-label="Back to quiz"><ArrowLeft size={22}/></Link>
+        <Link
+          to={`/course/${courseId}/quizzes/${quizId}`}
+          className={styles.backLink}
+          aria-label={translate("common:navigationControls.backToQuiz")}
+          title={translate("common:navigationControls.backToQuiz")}
+        >
+          <ArrowLeft size={22} aria-hidden="true" />
+        </Link>
         <div><p className={styles.eyebrow}>Quiz grading</p><h1>{quizQuery.data?.title || 'Loading quiz…'}</h1></div>
         <div className={styles.headerActions}>
           {access.canReleaseGrades ? <><button type="button" className={styles.secondaryButton} onClick={() => updateRelease.mutate({action: 'retract'})} disabled={updateRelease.isPending}><RotateCcw size={16}/> Retract all</button>

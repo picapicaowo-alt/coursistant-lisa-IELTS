@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {FormEvent, useEffect, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowLeft, CalendarDays, Clock3, MapPin, Pencil, Plus, Trash2, X} from 'lucide-react';
@@ -66,6 +67,7 @@ interface DeleteEventAttempt {
 }
 
 const CourseEventsPage = () => {
+  const {t: translate} = useTranslation();
   const params = useParams();
   const courseId = Number(params.courseId);
   const eventId = params.eventId ? Number(params.eventId) : null;
@@ -197,7 +199,7 @@ const CourseEventsPage = () => {
   return (
     <main className={styles.page}>
       <div className={styles.header}>
-        <Link to={eventId === null ? `/course/${courseId}` : `/course/${courseId}/events`} className={styles.backLink} aria-label={eventId === null ? 'Back to course' : 'Back to all events'}><ArrowLeft size={22}/></Link>
+        <Link to={eventId === null ? `/course/${courseId}` : `/course/${courseId}/events`} className={styles.backLink} aria-label={eventId === null ? translate("course:grades.back") : translate('common:navigationControls.backToEvents')} title={eventId === null ? translate("course:grades.back") : translate('common:navigationControls.backToEvents')}><ArrowLeft size={22} aria-hidden="true"/></Link>
         <div className={styles.headerText}><p className={styles.eyebrow}>Course events</p><h1>{selectedEvent?.name || (eventId === null ? 'Events' : 'Loading event…')}</h1></div>
         {access.canManageCourseEvents && editorMode === null ? <button type="button" className={styles.primaryButton} onClick={eventId === null ? openCreate : openEdit}>{eventId === null ? <><Plus size={17}/> Add event</> : <><Pencil size={17}/> Edit event</>}</button> : null}
       </div>

@@ -1,4 +1,5 @@
-import { ArrowLeft } from "lucide-react";
+import {useTranslation} from 'react-i18next';
+
 import { useEffect, useState } from "react";
 import {
   generatePath,
@@ -29,6 +30,7 @@ export function InstructorCourseOperations({
   courseId: number;
   title: string;
 }) {
+  const {t: translate} = useTranslation();
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
   const [editing, setEditing] = useState({ dirty: false, busy: false });
@@ -90,8 +92,7 @@ export function InstructorCourseOperations({
           <h1>{title}</h1>
         </div>
         <Link to={routes.course} className={styles.textButton}>
-          <ArrowLeft size={18} />
-          Back to courses
+          {translate("course:detail.backToCourses")}
         </Link>
       </div>
       <nav
