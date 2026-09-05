@@ -80,5 +80,6 @@
     "grading": "Submissions awaiting grading",
     "upcomingClass": "Upcoming class",
     "scheduleConflict": "Schedule conflict"
-  }
+  },
+  "assistantAttachment": "Open chat to add an attachment"
 }

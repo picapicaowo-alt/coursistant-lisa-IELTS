@@ -80,5 +80,6 @@
     "grading": "有提交待批改",
     "upcomingClass": "即将上课",
     "scheduleConflict": "排课冲突"
-  }
+  },
+  "assistantAttachment": "打开对话以添加附件"
 }

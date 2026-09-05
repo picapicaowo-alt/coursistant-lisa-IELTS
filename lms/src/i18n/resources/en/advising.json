@@ -113,5 +113,36 @@
     "planProfileRequired": "Create the student profile before preparing a study plan.",
     "planProfileOpen": "Open student profile",
     "courseActionsLoadError": "Course actions could not be loaded. Open Manage enrollment to try again."
+  },
+  "studentCourses": {
+    "add": "Add Course",
+    "updateOneToOne": "Update one-to-one course",
+    "selectOneToOne": "Select a one-to-one course to edit",
+    "newInstructor": "New instructor",
+    "reassign": "Reassign instructor",
+    "weekday": "Day of week",
+    "replaceSessions": "Update schedule",
+    "invalidSchedule": "Enter valid start and end times. The end time must be after the start time.",
+    "failed": "Course planning could not be completed.",
+    "conflict": "This course changed elsewhere. Your input is preserved.",
+    "reload": "Reload course",
+    "course": "Course",
+    "sessionType": "Session type",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "location": "Location",
+    "saved": "Course updated.",
+    "loading": "Loading course…",
+    "selectRequired": "Select a course and instructor before saving.",
+    "changed": "This course changed. Select it again before saving.",
+    "scheduleMissing": "The course schedule could not be loaded. Reload the course before saving.",
+    "types": {
+      "Lecture": "Lecture",
+      "Lab": "Lab",
+      "Tutorial": "Tutorial"
+    }
+  },
+  "studentIntake": {
+    "description": "The intake captures the student’s starting context at handover."
   }
 }

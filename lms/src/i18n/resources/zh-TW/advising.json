@@ -113,5 +113,36 @@
     "planProfileRequired": "請先建立學生檔案，再制定學習計畫。",
     "planProfileOpen": "開啟學生檔案",
     "courseActionsLoadError": "暫時無法讀取課程操作所需的資訊。請再次開啟「管理選課」重試。"
+  },
+  "studentCourses": {
+    "add": "新增課程",
+    "updateOneToOne": "更新一對一課程",
+    "selectOneToOne": "選擇要編輯的一對一課程",
+    "newInstructor": "新任教師",
+    "reassign": "重新分配教師",
+    "weekday": "星期",
+    "replaceSessions": "更新排課",
+    "invalidSchedule": "請輸入有效的開始和結束時間，結束時間須晚於開始時間。",
+    "failed": "無法完成課程規劃操作。",
+    "conflict": "課程已在其他位置更新，您的輸入已保留。",
+    "reload": "重新載入課程",
+    "course": "課程",
+    "sessionType": "課時類型",
+    "startTime": "開始時間",
+    "endTime": "結束時間",
+    "location": "地點",
+    "saved": "課程已更新。",
+    "loading": "正在載入課程…",
+    "selectRequired": "儲存前請選擇課程和教師。",
+    "changed": "課程已有更新，請重新選擇課程後儲存。",
+    "scheduleMissing": "無法載入課程排課，請重新載入課程後儲存。",
+    "types": {
+      "Lecture": "講授課",
+      "Lab": "實驗課",
+      "Tutorial": "輔導課"
+    }
+  },
+  "studentIntake": {
+    "description": "入學檔案記錄學生在交接時的初始情況。"
   }
 }
