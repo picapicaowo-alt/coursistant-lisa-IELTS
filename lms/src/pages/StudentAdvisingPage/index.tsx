@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {ADVISING_ERROR_CODES} from '@/apis';
 import {WorkspaceSection as CollapsibleSection} from '@/components/WorkspaceSection';
 import {PlanOverview} from './PlanOverview';
 import React, {lazy, Suspense, useState} from 'react';
@@ -14,14 +16,17 @@ import {sendStableMessage} from '@/utils/sendStableMessage';
 import {unwrapData} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/downloadBlob';
-import {isNotFound} from '@/utils/apiError';
+import {getApiErrorMessage, isMissingResource} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import {advisorConversationPage} from '../AdvisorOperationsPage/advisorViewModels';
 import styles from '../advising/advising.module.scss';
 
 const StudentAdvisingPage: React.FC = () => {
+  const {t} = useTranslation('advising');
   const queryClient = useQueryClient();
+  const [fileIssue, setFileIssue] = useState<{kind: 'popupBlocked'} | {kind: 'loadError'; error: unknown} | null>(null);
+  const [filePending, setFilePending] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const view = searchParams.get('view');
   const showLearning = view === STUDENT_PLAN_VIEWS.learning;
@@ -43,6 +48,7 @@ const StudentAdvisingPage: React.FC = () => {
   });
   const conversation = useInfiniteQuery({
     queryKey: ['student', 'advisor-conversation'],
+    enabled: showMessages,
     queryFn: async ({pageParam}) => advisorConversationPage(unwrapData(await advisorApiService.listOwnConversationMessages(pageParam), 'studentAdvisorConversation')),
     initialPageParam: undefined as number | undefined,
     getNextPageParam: (lastPage, _pages, lastCursor) => lastPage.hasMore && lastPage.nextBeforeId != null && (lastCursor == null || lastPage.nextBeforeId < lastCursor) ? lastPage.nextBeforeId : undefined,
@@ -72,14 +78,31 @@ const StudentAdvisingPage: React.FC = () => {
   const markReadMutation = useMutation({mutationFn: (messageId: number) => advisorApiService.markOwnConversationRead({messageId})});
 
   const previewAttachment = async (attachmentId: number): Promise<void> => {
+    if (filePending) return;
+    setFileIssue(null);
     const popup = openPreviewWindow();
-    if (!popup) throw new Error('Allow pop-ups to preview this attachment.');
+    if (!popup) {setFileIssue({kind: 'popupBlocked'}); return;}
+    setFilePending(true);
     try {
       const blob = await advisorApiService.previewOwnConversationAttachment(attachmentId);
       showBlobInPreviewWindow(popup, blob);
     } catch (error) {
       popup.close();
-      throw error;
+      setFileIssue({kind: 'loadError', error});
+    } finally {
+      setFilePending(false);
+    }
+  };
+  const downloadAttachment = async (attachmentId: number, name?: string): Promise<void> => {
+    if (filePending) return;
+    setFileIssue(null);
+    setFilePending(true);
+    try {
+      saveBlob(await advisorApiService.downloadOwnConversationAttachment(attachmentId), name || `advisor-attachment-${attachmentId}`);
+    } catch (error) {
+      setFileIssue({kind: 'loadError', error});
+    } finally {
+      setFilePending(false);
     }
   };
   const conversationRows = conversation.data?.pages.flatMap(page => page.items) ?? [];
@@ -127,23 +150,25 @@ const StudentAdvisingPage: React.FC = () => {
       {showLearning ? <Suspense fallback={<p role="status">Loading learning overview…</p>}><MyOperationsPage embedded/></Suspense> : null}
       {!showLearning && !showMessages ? <>
       {profile.isPending || plan.isPending ? <p role="status">Loading your learning plan…</p> : null}
-      {profile.isError && !isNotFound(profile.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')} <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
-      {plan.isError && !isNotFound(plan.error) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, 'Study plan could not be loaded.')} <button type="button" onClick={() => void plan.refetch()}>Retry plan</button></p> : null}
-      {!profile.isPending && !plan.isPending && (!profile.isError || isNotFound(profile.error)) && (!plan.isError || isNotFound(plan.error)) ? <PlanOverview profile={profile.data} plan={plan.data?.plan} onCheckpoint={openCheckpoint}/> : null}
+      {profile.isError && !isMissingResource(profile.error, ADVISING_ERROR_CODES.profileNotFound) ? <p className={styles.error} role="alert">{advisingErrorMessage(profile.error, 'Profile could not be loaded.')} <button type="button" onClick={() => void profile.refetch()}>Retry profile</button></p> : null}
+      {plan.isError && !isMissingResource(plan.error, ADVISING_ERROR_CODES.studyPlanNotFound) ? <p className={styles.error} role="alert">{advisingErrorMessage(plan.error, 'Study plan could not be loaded.')} <button type="button" onClick={() => void plan.refetch()}>Retry plan</button></p> : null}
+      {!profile.isPending && !plan.isPending && (!profile.isError || isMissingResource(profile.error, ADVISING_ERROR_CODES.profileNotFound)) && (!plan.isError || isMissingResource(plan.error, ADVISING_ERROR_CODES.studyPlanNotFound)) ? <PlanOverview profile={profile.data} plan={plan.data?.plan} onCheckpoint={openCheckpoint}/> : null}
       {taskMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskMutation.error, 'The task could not be updated.')}</p> : null}
       </> : null}
       {showMessages ? <CollapsibleSection title="Advisor conversation" className={styles.disclosureLayout} summary="Ask questions, share context, or attach supporting files." meta={<span className={styles.countBadge}>{conversationRows.length}</span>}>
 
+        {fileIssue ? <p className={styles.error} role="alert">{fileIssue.kind === 'popupBlocked' ? t('attachments.popupBlocked') : getApiErrorMessage(fileIssue.error, t('attachments.loadError'))}</p> : null}
+        {markReadMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(markReadMutation.error, t('conversation.markReadError'))}</p> : null}
         {messageMutation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(messageMutation.error, 'Message could not be sent.')}</p> : null}
         {conversation.isPending ? <p className={styles.status}>Loading messages…</p> : null}
-        {conversation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(conversation.error, 'Messages could not be loaded.')}</p> : null}
-        {!conversation.isPending && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>No messages yet</strong><span>Send a message or attachment to start the conversation.</span></div> : null}
+        {conversation.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(conversation.error, t('conversation.loadError'))} <button type="button" onClick={() => void conversation.refetch()}>{t('conversation.retry')}</button></p> : null}
+        {conversation.isSuccess && conversationRows.length === 0 ? <div className={styles.emptyState}><strong>{t('conversation.empty')}</strong><span>{t('conversation.emptyHelp')}</span></div> : null}
         <div className={styles.messageList}>{conversationRows.map((item, index) => <article className={styles.messageRow} key={item.messageId ?? index}>
           <div className={styles.rowTitle}><strong>{item.senderUserId == null ? 'Conversation message' : `User #${item.senderUserId}`}</strong><small>{item.createdAt || ''}</small></div>
           <p>{item.body || 'Message has no text content.'}</p>
           {(item.attachments?.length ?? 0) > 0 ? <div className={styles.attachmentList}>{item.attachments?.map(attachment => attachment.attachmentId == null ? null : <div className={styles.attachmentRow} key={attachment.attachmentId}>
             <span>{attachment.originalName || `Attachment #${attachment.attachmentId}`}</span>
-            <div className={styles.actions}>{attachment.previewAvailable ? <button type="button" className={styles.secondary} onClick={() => void previewAttachment(attachment.attachmentId!)}>Preview</button> : null}<button type="button" className={styles.secondary} onClick={() => void advisorApiService.downloadOwnConversationAttachment(attachment.attachmentId!).then(blob => saveBlob(blob, attachment.originalName || `advisor-attachment-${attachment.attachmentId}`))}>Download</button></div>
+            <div className={styles.actions}>{attachment.previewAvailable ? <button type="button" className={styles.secondary} disabled={filePending} onClick={() => void previewAttachment(attachment.attachmentId!)}>{t('attachments.preview')}</button> : null}<button type="button" className={styles.secondary} disabled={filePending} onClick={() => void downloadAttachment(attachment.attachmentId!, attachment.originalName)}>{t('attachments.download')}</button></div>
           </div>)}</div> : null}
           {item.messageId != null ? <button type="button" className={styles.textButton} disabled={markReadMutation.isPending} onClick={() => markReadMutation.mutate(item.messageId!)}>Mark read through this message</button> : null}
         </article>)}</div>

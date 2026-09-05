@@ -1,3 +1,4 @@
+import {ApiResponseDataError} from '@/apis/types/common';
 const PREVIEWABLE_EXTENSIONS = new Set(['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp']);
 
 export const isPreviewableFile = (filename?: string, contentType?: string): boolean => {
@@ -16,7 +17,7 @@ export const isPreviewableFile = (filename?: string, contentType?: string): bool
 export const assertFileBlob = (blob: Blob): Blob => {
   const contentType = blob.type.toLowerCase();
   if (blob.size === 0 || contentType.includes('application/json') || contentType.includes('text/html')) {
-    throw new Error('The file endpoint did not return usable file bytes.');
+    throw new ApiResponseDataError('The file endpoint did not return usable file bytes.');
   }
   return blob;
 };

@@ -546,6 +546,7 @@ export interface MarkConversationReadRequest {
 export type AdvisingOpenApiRead = unknown;
 
 export const ADVISING_ERROR_CODES = {
+  instructorNotFound: 'USER_NOT_FOUND',
   featureDisabled: 'ADVISING_FEATURE_DISABLED',
   idempotencyMismatch: 'IDEMPOTENCY_KEY_MISMATCH',
   userAlreadyExists: 'USER_ALREADY_EXISTS',

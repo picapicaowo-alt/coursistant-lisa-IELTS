@@ -22,6 +22,7 @@ import type {
   TenantCourseOwnership,
   TenantCourseOwnershipPage,
   TeachingAvailabilityResponse,
+  InstructorAvailabilityResponse,
   TeachingGradingItemResponse,
   TeachingStudentSupportResponse,
   TeachingTodayClassResponse,
@@ -50,7 +51,7 @@ export class CourseOperationsApiService {
     return this.apiClient.delete(`/v2/admin/courses/${courseId}/enrollments/${userId}`, idempotent(key));
   }
 
-  getAdvisorInstructorAvailability(instructorUserId: number): Promise<ApiResponse<CourseOperationRead>> {
+  getAdvisorInstructorAvailability(instructorUserId: number): Promise<ApiResponse<InstructorAvailabilityResponse>> {
     return this.apiClient.get(`/v2/advisor/instructors/${instructorUserId}/availability`);
   }
 

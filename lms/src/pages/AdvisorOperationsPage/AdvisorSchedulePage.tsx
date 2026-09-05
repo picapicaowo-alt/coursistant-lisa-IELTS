@@ -14,8 +14,7 @@ import {courseOperationsApiService} from '@/apis/services/course-operations-api'
 import {ADVISOR_PAGE_SIZE} from '@/apis/types/advisorWorkspace';
 import {idempotencyFingerprint} from '@/hooks/useIdempotencyCheckpoint';
 import {isConflict} from '@/utils/apiError';
-import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
-import {RecordSummaryList} from '@/components/RecordSummaryList';
+import {InstructorAvailabilityPanel} from './InstructorAvailabilityPanel';
 import {advisorScheduleRequestViews, type AdvisorScheduleRequestView} from './advisorViewModels';
 
 export default function AdvisorSchedulePage() {
@@ -30,8 +29,6 @@ export default function AdvisorSchedulePage() {
   const [scheduleConflict, setScheduleConflict] = useState(false);
   const [scheduleDecision, setScheduleDecision] = useState('APPROVE');
   const [rejectionReason, setRejectionReason] = useState('');
-  const [instructorId, setInstructorId] = useState('');
-  const [availabilityInstructorId, setAvailabilityInstructorId] = useState<number | null>(null);
 
   const scheduleRequests = useQuery({
     queryKey: ['advisor', 'schedule-requests', schedulePage, requestType, studentFilter],
@@ -45,17 +42,6 @@ export default function AdvisorSchedulePage() {
         }),
         'advisorScheduleRequests'
       ),
-    retry: false,
-  });
-
-  const availability = useQuery({
-    queryKey: ['advisor', 'instructor-availability', availabilityInstructorId],
-    queryFn: async () =>
-      unwrapData(
-        await courseOperationsApiService.getAdvisorInstructorAvailability(availabilityInstructorId!),
-        'advisorInstructorAvailability'
-      ),
-    enabled: availabilityInstructorId != null,
     retry: false,
   });
 
@@ -258,39 +244,7 @@ export default function AdvisorSchedulePage() {
           ) : null}
         </WorkspaceSection>
 
-        {/* Instructor Availability Section */}
-        <WorkspaceSection title="Instructor availability" className={layout.secondary}>
-          <form
-            className={styles.inlineLookup}
-            onSubmit={event => {
-              event.preventDefault();
-              setAvailabilityInstructorId(Number(instructorId));
-            }}
-          >
-            <AdvisorInstructorPicker required value={instructorId} onChange={setInstructorId} />
-            <button
-              type="submit"
-              className={styles.primary}
-              disabled={!Number(instructorId) || availability.isFetching}
-            >
-              Check availability
-            </button>
-          </form>
-
-          {availability.isError ? (
-            <p className={styles.error} role="alert">
-              {advisingErrorMessage(availability.error, 'Instructor availability could not be loaded.')}
-            </p>
-          ) : null}
-          {availability.data !== undefined ? (
-            <div className={styles.compactResult}>
-              <RecordSummaryList
-                value={availability.data}
-                emptyMessage="No availability is recorded for this instructor."
-              />
-            </div>
-          ) : null}
-        </WorkspaceSection>
+        <InstructorAvailabilityPanel/>
         </div>
   </div>;
 }

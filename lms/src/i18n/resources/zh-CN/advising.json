@@ -1,0 +1,42 @@
+{
+  "availability": {
+    "title": "教师可用时间",
+    "check": "查询可用时间",
+    "loading": "正在查询可用时间…",
+    "empty": "此教师尚未设置可用时间。",
+    "windows": "每周可用时间",
+    "exceptions": "例外日期",
+    "sessionExpired": "登录已过期，请重新登录。",
+    "forbidden": "你没有权限查看此教师的可用时间。",
+    "instructorUnavailable": "暂时无法查询所选教师的可用时间。请重试或选择其他教师。",
+    "loadError": "无法加载教师可用时间，请重试。",
+    "fields": {
+      "dayOfWeek": "星期",
+      "startTime": "开始时间",
+      "endTime": "结束时间",
+      "timezone": "时区",
+      "effectiveFrom": "生效日期",
+      "effectiveTo": "截止日期",
+      "exceptionDate": "例外日期"
+    }
+  },
+  "conversation": {
+    "loadError": "无法加载消息。",
+    "retry": "重试加载消息",
+    "empty": "暂无消息",
+    "emptyHelp": "发送消息或附件以开始对话。",
+    "markReadError": "无法将消息标记为已读，请重试。"
+  },
+  "attachments": {
+    "preview": "预览",
+    "download": "下载",
+    "popupBlocked": "请允许弹出窗口以预览此附件。",
+    "loadError": "无法打开或下载附件，请重试。"
+  },
+  "records": {
+    "profileLoadError": "无法加载学生档案。",
+    "profileRetry": "重试加载档案",
+    "planLoadError": "无法加载学习计划。",
+    "planRetry": "重试加载计划"
+  }
+}

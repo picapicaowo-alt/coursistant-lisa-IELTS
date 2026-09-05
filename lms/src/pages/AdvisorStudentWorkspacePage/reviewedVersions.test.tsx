@@ -81,3 +81,35 @@ describe('reviewed draft versions', () => {
     expect(api.updateStudyPlan.mock.calls[1][1]).toMatchObject({expectedProfileVersion: 7, expectedStudyPlanVersion: 4, strategySummary: 'Preserve my edits'});
   });
 });
+
+
+describe('missing-record creation boundaries', () => {
+  beforeEach(() => {vi.resetAllMocks(); api.getStudentProfile.mockResolvedValue(response(profile));});
+  it.each(['USER_NOT_FOUND', 'NOT_FOUND', 'STUDY_PLAN_NOT_FOUND'])('does not create a profile for 404 %s', async code => {
+    api.getStudentProfile.mockRejectedValue({code: 404, details: {code}});
+    mount(<ProfilePage/>);
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByRole('textbox', {name: 'Target goal'})).not.toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Retry profile'})).toBeInTheDocument();
+  });
+  it.each(['USER_NOT_FOUND', 'NOT_FOUND', 'STUDENT_PROFILE_NOT_FOUND'])('does not create a plan for 404 %s', async code => {
+    api.getStudyPlan.mockRejectedValue({code: 404, details: {code}});
+    mount(<StudyPlanPage/>);
+    expect(await screen.findByRole('alert')).toBeInTheDocument();
+    expect(screen.queryByRole('button', {name: 'Create study plan'})).not.toBeInTheDocument();
+    expect(api.getStudentProfile).not.toHaveBeenCalled();
+  });
+  it('keeps initial profile creation for its specific missing code', async () => {
+    api.getStudentProfile.mockRejectedValue({code: 404, details: {code: 'STUDENT_PROFILE_NOT_FOUND'}});
+    mount(<ProfilePage/>);
+    expect(await screen.findByRole('textbox', {name: 'Target goal'})).toBeInTheDocument();
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+  it('keeps initial plan creation for its specific missing code', async () => {
+    api.getStudyPlan.mockRejectedValue({code: 404, details: {code: 'STUDY_PLAN_NOT_FOUND'}});
+    mount(<StudyPlanPage/>);
+    expect(await screen.findByRole('button', {name: 'Create study plan'})).toBeInTheDocument();
+    await waitFor(() => expect(api.getStudentProfile).toHaveBeenCalled());
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+});

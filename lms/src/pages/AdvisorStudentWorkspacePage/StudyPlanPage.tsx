@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {ADVISING_ERROR_CODES} from '@/apis';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {LearningJourney} from './LearningJourney';
 import {StudyPlanHistory} from './StudyPlanHistory';
@@ -10,7 +12,7 @@ import {AdvisorTaskRequest, CheckpointRequest, unwrapData} from '@/apis';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {EnglishDateInput} from '@/components/EnglishDateInput';
-import {isNotFound} from '@/utils/apiError';
+import {isMissingResource} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
@@ -48,6 +50,7 @@ const emptyForm: PlanFormState = {
 };
 
 const AdvisorStudentStudyPlanPage: React.FC = () => {
+  const {t} = useTranslation('advising');
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -70,7 +73,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
     enabled: Number.isInteger(id),
     retry: false,
   });
-  const missing = planQuery.isError && isNotFound(planQuery.error);
+  const missing = planQuery.isError && isMissingResource(planQuery.error, ADVISING_ERROR_CODES.studyPlanNotFound);
   const profileQuery = useQuery({meta: {advisingStudentId: id},
     queryKey: advisingQueryKeys.advisorProfile(id),
     queryFn: async () => unwrapData(await advisorApiService.getStudentProfile(id), 'getProfile'),
@@ -201,7 +204,7 @@ const AdvisorStudentStudyPlanPage: React.FC = () => {
 
   if (planQuery.isPending) return <p className={styles.status}>Loading study plan…</p>;
   if (planQuery.isError && !missing) {
-    return <p className={styles.error} role="alert">{advisingErrorMessage(planQuery.error, 'Study plan could not be loaded.')}</p>;
+    return <p className={styles.error} role="alert">{advisingErrorMessage(planQuery.error, t('records.planLoadError'))} <button type="button" onClick={() => void planQuery.refetch()}>{t('records.planRetry')}</button></p>;
   }
 
   return (
