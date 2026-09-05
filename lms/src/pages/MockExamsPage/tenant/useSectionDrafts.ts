@@ -27,6 +27,7 @@ const isOptionalOrder = (value: unknown) =>
 function isDraft(value: unknown): value is SectionDraft {
   return (
     isRecord(value) &&
+    (value.contentRevision === undefined || (typeof value.contentRevision === 'number' && Number.isSafeInteger(value.contentRevision) && value.contentRevision >= 0)) &&
     typeof value.minutes === 'string' &&
     Array.isArray(value.units) &&
     value.units.length > 0 &&

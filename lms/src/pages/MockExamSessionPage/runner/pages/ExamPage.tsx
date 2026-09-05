@@ -2,7 +2,7 @@ import {useTranslation} from 'react-i18next'
 import {formatDateTime} from '@/i18n/formatting';
 import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
 import {getApiErrorMessage} from '@/utils/apiError'
-import {buildQuestionSubmission} from '../utils/questionSubmission'
+import {completeMockExamAnswers} from '@/utils/mockExamAnswers'
 import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { submitReading } from '../api/readings'
@@ -145,7 +145,7 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
     setSubmissionOpen(true)
     setSubmissionError('')
     try {
-      const payload = buildQuestionSubmission(questionIds, answers)
+      const payload = completeMockExamAnswers(questionIds, answers)
       const attemptId = await ensureAttemptId(testId)
       const result = await submitReading(testId, {
         attemptId,

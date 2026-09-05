@@ -653,7 +653,8 @@ test('tenant admin reviews protected mock-exam media and publishes only after th
     }
     if (path.endsWith('/publish') && route.request().method() === 'POST') {
       publishRequests += 1;
-      return route.fulfill({json: response({...template.versions[0], status: 'PUBLISHED'})});
+      template.versions[0].status = 'PUBLISHED';
+      return route.fulfill({json: response(template.versions[0])});
     }
     if (path.endsWith('/listening')) {
       sectionRequests.push('listening');
@@ -677,15 +678,13 @@ test('tenant admin reviews protected mock-exam media and publishes only after th
   await page.getByRole('button', {name: 'Open template', exact: true}).click();
   await expect(page.getByRole('button', {name: 'Copy to new draft'})).toBeVisible();
   await expect(page.getByRole('button', {name: 'Delete draft'})).toBeVisible();
+  await page.getByRole('button', {name: 'Publish complete draft'}).click();
+  await expect.poll(() => publishRequests).toBe(1);
   await page.getByRole('button', {name: 'View section', exact: true}).first().click();
-  await expect(page.getByText(/This saved section is read only/)).toBeVisible();
+  await expect(page.getByText('Published or archived content is read-only.', {exact: false})).toBeVisible();
   await page.getByRole('button', {name: 'Load audio'}).click();
   await expect(page.locator('audio')).toBeVisible();
   await expect.poll(() => audioRequests).toBe(1);
-
-  await page.getByRole('button', {name: 'Back to version', exact: true}).click();
-  await page.getByRole('button', {name: 'Publish complete draft'}).click();
-  await expect.poll(() => publishRequests).toBe(1);
   expect(sectionRequests).toEqual(expect.arrayContaining(['listening', 'reading', 'writing']));
 });
 

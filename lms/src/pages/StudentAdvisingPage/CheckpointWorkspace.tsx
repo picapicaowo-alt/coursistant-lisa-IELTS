@@ -1,3 +1,4 @@
+import {TASK_FILE_ACCEPT} from './useTaskSubmission';
 import {formatNumber, getFormattingLocale} from '@/i18n/formatting';
 import { useTranslation } from 'react-i18next';
 import {useEffect, useId, useRef, useState} from 'react';
@@ -26,6 +27,7 @@ export function CheckpointWorkspace({checkpoint, index, onBack, ...interaction}:
   const returnTarget = useRef<HTMLButtonElement | null>(null);
   const detailId = useId();
   const noteId = useId();
+  const taskFileInput = useRef<HTMLInputElement>(null);
   const rows = (checkpoint.tasks ?? []).map((task, taskIndex) => ({task, key: studyPlanRecordKey(task, taskIndex)}));
   const taskKey = params.get(STUDY_PLAN_PARAMS.task);
   const selected = rows.find(row => row.key === taskKey);
@@ -132,12 +134,21 @@ export function CheckpointWorkspace({checkpoint, index, onBack, ...interaction}:
             {task.advisorFeedback ? <section><h3>{translate("learning:checkpoint.feedback")}</h3><p>{task.advisorFeedback}</p></section> : null}
           </div>
           <div className={styles.submission}>
+            {task.submissionFile ? <p>{translate('learning:taskFile.attached', {name: task.submissionFile.originalName})}</p> : null}
             {canAct && task.id != null ? <>
               <label htmlFor={noteId}>{translate("learning:checkpoint.note")}</label><textarea id={noteId} value={interaction.submissions[task.id] ?? task.submissionText ?? ''} onChange={event => interaction.onSubmission(task.id!, event.target.value)} rows={4} maxLength={TASK_SUBMISSION_MAX_LENGTH} placeholder={translate("learning:checkpoint.placeholder")}/>
+              {interaction.onUpload ? <div>
+                <button type="button" className={styles.secondary} disabled={interaction.isPending} onClick={() => taskFileInput.current?.click()}>{translate(task.submissionFile ? 'learning:taskFile.replace' : 'learning:taskFile.upload')}</button>
+                <input hidden ref={taskFileInput} aria-label={translate('learning:taskFile.upload')} type="file" accept={TASK_FILE_ACCEPT} disabled={interaction.isPending} onChange={event => {
+                  const file = event.target.files?.[0];
+                  event.target.value = '';
+                  if (file && task.id != null && task.version != null) interaction.onUpload?.(task.id, task.version, file);
+                }}/><small>{translate('learning:taskFile.help')}</small>
+              </div> : null}
               {interaction.error && interaction.actionTaskId === task.id ? <p className={styles.error} role="alert">{interaction.error}</p> : null}
               <div className={styles.actions}>
                 {task.status === TASK_STATUS.notStarted ? <button type="button" className={styles.secondary} disabled={interaction.isPending} onClick={() => interaction.onAction({action: 'start', taskId: task.id!, version: task.version!})}>{translate("learning:checkpoint.start")}</button> : null}
-                <button type="button" className={styles.primary} disabled={interaction.isPending} onClick={() => interaction.onAction({action: 'complete', taskId: task.id!, version: task.version!})}>{interaction.isPending ? translate("common:actions.saving") : translate("learning:checkpoint.complete")}</button>
+                <button type="button" className={styles.primary} disabled={interaction.isPending || (!(interaction.submissions[task.id] ?? task.submissionText ?? '').trim() && !task.submissionFile)} onClick={() => interaction.onAction({action: 'complete', taskId: task.id!, version: task.version!})}>{interaction.isPending ? translate("common:actions.saving") : translate("learning:checkpoint.complete")}</button>
               </div>
             </> : task.submissionText ? <section><h3>{translate("assessment:submission.yourSubmission")}</h3><p>{task.submissionText}</p></section> : null}
           </div>

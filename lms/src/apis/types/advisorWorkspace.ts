@@ -62,6 +62,7 @@ export interface AdvisorStudentHub {
   activeTasks?: AdvisorActionTaskResponse[];
   activeCourseCount?: number;
   publishedReportCount?: number;
+  /** Current Advisor PENDING_ADVISOR schedule requests; excludes activeTasks. */
   pendingRequestCount?: number;
 }
 export interface AdvisorActionTaskTarget {

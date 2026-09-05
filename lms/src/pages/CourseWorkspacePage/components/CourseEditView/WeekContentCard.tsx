@@ -1,5 +1,5 @@
-import {useTranslation} from 'react-i18next';
 import {LocalizedError} from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
 import React, {useRef, useState} from 'react';
 import {useMutation} from '@tanstack/react-query';
 import {
@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import type {CourseMaterial, CourseWeek} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
+import {isHttpStatus} from '@/utils/apiError';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import styles from '../CourseDetailView/index.module.scss';
 import editStyles from './index.module.scss';
@@ -29,6 +30,7 @@ interface WeekContentCardProps {
   currentUserId: number;
   canManageExistingMaterials: boolean;
   canUploadMaterials: boolean;
+  canDeleteOwnPublishedMaterials?: boolean;
   onChanged: () => void;
   compactControls?: boolean;
 }
@@ -44,7 +46,11 @@ interface LinkAttempt {
   idempotencyKey: string;
 }
 
-/** Upload does not imply Course Manager permissions; own uploads remain deletable. */
+/**
+ * Upload permission never grants management of existing materials. Only a
+ * separately verified Course Manager may publish, rename, move or reorder;
+ * active TAs may delete their own items; primary Instructors only their drafts.
+ */
 export const WeekContentCard: React.FC<WeekContentCardProps> = ({
   courseId,
   week,
@@ -52,10 +58,11 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
   currentUserId,
   canManageExistingMaterials,
   canUploadMaterials,
+  canDeleteOwnPublishedMaterials = false,
   onChanged,
   compactControls = false,
 }) => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const idempotency = useIdempotencyCheckpoint();
   const [linkUrl, setLinkUrl] = useState('');
@@ -64,6 +71,10 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
   const [editingName, setEditingName] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<number | null>(null);
   const [failure, setFailure] = useState<string | null>(null);
+  const canDeleteMaterial = (material: CourseMaterial) => canManageExistingMaterials || (
+    canUploadMaterials && material.uploadedBy === currentUserId &&
+    (canDeleteOwnPublishedMaterials || material.publicationState === 'DRAFT')
+  );
 
   const finishChange = () => {
     setFailure(null);
@@ -127,6 +138,8 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
   const deleteMaterial = useMutation({
     mutationFn: (materialId: number) => {
       if (!week) throw new LocalizedError("course:materialEditor.noWeek");
+      const material = week.materials.find(item => item.id === materialId);
+      if (!material || !canDeleteMaterial(material)) throw new LocalizedError('course:materialEditor.deleteForbidden');
       const operation = `material-delete-${courseId}-${week.id}-${materialId}`;
       return courseApiService.deleteMaterial(courseId, week.id, materialId, idempotency.keyFor(operation, operation));
     },
@@ -136,7 +149,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
       setConfirmDeleteId(null);
       finishChange();
     },
-    onError: () => setFailure("course:materialEditor.deleteFailed"),
+    onError: error => setFailure(isHttpStatus(error, 403) ? 'course:materialEditor.deleteForbidden' : 'course:materialEditor.deleteFailed'),
   });
 
   const moveMaterial = useMutation({
@@ -278,8 +291,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
           ) : (
             <ul className={styles.materialList}>
               {week.materials.map((material, index) => {
-                const canDelete = canManageExistingMaterials
-                  || (canUploadMaterials && material.uploadedBy === currentUserId);
+                const canDelete = canDeleteMaterial(material);
 
                 return (
                   <li key={material.id} className={styles.material}>
@@ -317,7 +329,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                       </span>
                     )}
 
-                    <MaterialActionDisclosure compact={compactControls} name={material.displayName}><span className={editStyles.materialControls}>
+                    {canManageExistingMaterials || canDelete ? <MaterialActionDisclosure compact={compactControls} name={material.displayName}><span className={editStyles.materialControls}>
                       {canManageExistingMaterials ? (
                         <>
                           {material.publicationState === 'PUBLISHED' ? (
@@ -417,7 +429,7 @@ export const WeekContentCard: React.FC<WeekContentCardProps> = ({
                           </button>
                         )
                       ) : null}
-                    </span></MaterialActionDisclosure>
+                    </span></MaterialActionDisclosure> : null}
                   </li>
                 );
               })}

@@ -1,3 +1,4 @@
+import {TaskSubmissionFile} from './TaskSubmissionFile';
 import {formatUtcTimestamp} from '@/utils/datetime';
 import {LocalizedError} from '@/i18n/errors';
 import { useTranslation } from 'react-i18next';
@@ -678,6 +679,7 @@ const SupportPage: React.FC<{studentId?: number; conversationOnly?: boolean}> = 
               ><option value="">{translate("advising:support.chooseTask")}</option>{planTasks.filter(task => task.id != null).map(task => <option key={task.id} value={task.id}>{task.title || translate('advising:actionTasks.fallbackTitle', {id: formatNumber(task.id!)})}</option>)}</select>
             </label>
 
+            <TaskSubmissionFile key={advanced.taskId} studentUserId={id} task={planTasks.find(task => String(task.id) === advanced.taskId)}/>
             {plan.isError ? <p className={styles.error} role="alert">{translate("advising:support.tasksFailed")}{' '}<button type="button" onClick={() => void plan.refetch()}>{translate("advising:support.retryTasks")}</button></p> : null}
             {taskFeedback.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(taskFeedback.error, translate("advising:support.feedbackFailed"))} <button type="button" onClick={() => void plan.refetch().then(result => {
               if (result.isError) return;

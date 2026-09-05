@@ -256,6 +256,18 @@ export interface UpdateStudyPlanRequest extends CreateStudyPlanRequest {
   expectedStudyPlanVersion: number;
 }
 
+export interface AdvisorTaskSubmissionFile {
+  taskId: number;
+  originalName: string;
+  contentType: string;
+  sizeBytes: number;
+  previewAvailable: boolean;
+}
+
+export interface AdvisorTaskSubmissionFileResponse extends AdvisorTaskSubmissionFile {
+  taskVersion: number;
+}
+
 export interface AdvisorTaskResponse {
   id?: number;
   title?: string;
@@ -267,7 +279,7 @@ export interface AdvisorTaskResponse {
   startedAt?: string;
   completedAt?: string;
   submissionText?: string;
-  submissionFileObjectKey?: string;
+  submissionFile?: AdvisorTaskSubmissionFile | null;
   advisorFeedback?: string;
   version?: number;
 }
@@ -275,7 +287,6 @@ export interface AdvisorTaskResponse {
 export interface CompleteAdvisorTaskRequest {
   expectedVersion: number;
   submissionText?: string;
-  fileObjectKey?: string;
 }
 
 export interface AdvisorTaskFeedbackRequest {

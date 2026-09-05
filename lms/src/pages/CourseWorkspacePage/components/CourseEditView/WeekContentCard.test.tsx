@@ -71,17 +71,18 @@ const weeks: CourseWeek[] = [
   },
 ];
 
-const renderCard = (canManageExistingMaterials: boolean) => {
+const renderCard = (canManageExistingMaterials: boolean, canDeleteOwnPublishedMaterials = false, week = weeks[0]) => {
   const client = new QueryClient({defaultOptions: {mutations: {retry: false}}});
   return render(
     <QueryClientProvider client={client}>
       <WeekContentCard
         courseId={31}
-        week={weeks[0]}
+        week={week}
         weeks={weeks}
         currentUserId={385}
         canManageExistingMaterials={canManageExistingMaterials}
         canUploadMaterials
+        canDeleteOwnPublishedMaterials={canDeleteOwnPublishedMaterials}
         onChanged={vi.fn()}
       />
     </QueryClientProvider>
@@ -113,7 +114,7 @@ describe('WeekContentCard', () => {
   });
 
   it('limits a content-enabled TA to uploads and deleting their own material', () => {
-    renderCard(false);
+    renderCard(false, true);
 
     expect(screen.getByRole('button', {name: 'Upload files'})).toBeTruthy();
     expect(screen.getByLabelText('Delete Reading')).toBeTruthy();
@@ -122,6 +123,15 @@ describe('WeekContentCard', () => {
     expect(screen.queryByLabelText('Move Reading to another week')).toBeNull();
     expect(screen.queryByLabelText('Publish Reading')).toBeNull();
     expect(screen.queryByLabelText('Unpublish Reading')).toBeNull();
+  });
+
+  it.each([
+    ['DRAFT', true], ['PUBLISHED', false], [undefined, false],
+  ] as const)('limits Instructor own material deletion in %s state', (publicationState, allowed) => {
+    const week = {...weeks[0], materials: weeks[0].materials.map(material => ({...material, publicationState}))};
+    renderCard(false, false, week);
+    expect(Boolean(screen.queryByLabelText('Delete Reading'))).toBe(allowed);
+    expect(screen.queryByLabelText('Delete Slides')).toBeNull();
   });
 
   it('shows publish and unpublish controls for course managers', () => {

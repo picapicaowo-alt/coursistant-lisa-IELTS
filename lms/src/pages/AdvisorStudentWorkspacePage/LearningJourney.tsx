@@ -1,3 +1,5 @@
+import {TaskSubmissionFile} from './TaskSubmissionFile';
+import {isAdvisorSchedulePending} from '../advising/scheduleRequests';
 import { useTranslation } from 'react-i18next';
 import {formatClockTime, formatDateValue, formatNumber, formatPercent} from '@/i18n/formatting';
 import {statusLabel} from '@/i18n/presentation';
@@ -87,7 +89,7 @@ interface PendingRequestItem {
   version?: number;
 }
 
-  const rawPendingRequests = (scheduleRequests.data?.items ?? []).filter(r => r.status === 'PENDING');
+  const rawPendingRequests = (scheduleRequests.data?.items ?? []).filter(r => isAdvisorSchedulePending(r.status));
   const pendingRequests: PendingRequestItem[] = rawPendingRequests.filter(r => r.id != null).map(r => ({
     id: r.id!, courseTitle: r.courseId ? translate('assistant:courseFallback', {id: formatNumber(r.courseId)}) : translate('operations:teacher.request'),
     requestedDate: r.proposedOccurrenceDate ? formatDateValue(r.proposedOccurrenceDate) : translate('advising:studentWorkspace.notSupplied'),
@@ -195,7 +197,7 @@ interface PendingRequestItem {
         <header className={styles.requestsHeader}>
           <div className={styles.headerGroup}>
             <h3>{translate("records:fields.requests")}</h3>
-            <span className={styles.pendingBadge}>{scheduleRequests.isSuccess ? translate((scheduleRequests.data?.total ?? 0) > (scheduleRequests.data?.items?.length ?? 0) ? 'advising:journey.pendingPage' : 'operations:teacher.pending', {count: pendingRequests.length, number: formatNumber(pendingRequests.length)}) : '—'}</span>
+            <span className={styles.pendingBadge}>{scheduleRequests.isSuccess ? translate('operations:teacher.pending', {count: scheduleRequests.data?.total ?? 0, number: formatNumber(scheduleRequests.data?.total ?? 0)}) : '—'}</span>
           </div>
         </header>
 
@@ -292,6 +294,8 @@ interface PendingRequestItem {
           <button type="button" onClick={() => setSelectedTask(null)}>{translate("advising:journey.backToTasks")}</button>
           <h3>{selectedTask.title || translate("advising:studentTasks.task")}</h3>
           <p>{selectedTask.description || translate("advising:journey.noTaskDescription")}</p>
+          {selectedTask.submissionText ? <p>{selectedTask.submissionText}</p> : null}
+          {studentUserId != null ? <TaskSubmissionFile key={selectedTask.id} studentUserId={studentUserId} task={selectedTask}/> : null}
           <dl><dt>{translate("learning:checkpoint.deadline")}</dt><dd>{formatPlanDate(selectedTask.dueDate)}</dd><dt>{translate("advising:journey.submissionRequirement")}</dt><dd>{selectedTask.submissionRequirement || translate("advising:journey.noRequirement")}</dd></dl>
           <button type="button" onClick={() => {dialog.current?.close(); onEdit(checkpoint?.id, selectedTask.id);}}>{translate("advising:journey.editTask")}</button>
         </section> :

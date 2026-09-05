@@ -25,17 +25,17 @@ export interface ParentStudentLinkResponse {
   parentEmail?: string;
 }
 
-/** The parent-facing directory returns student summaries, not management link records. */
-export interface ParentStudentSummary {
+/** Parent-facing identity projection, distinct from staff link management. */
+export interface ParentLinkedStudent {
   studentUserId: number;
-  firstName?: string | null;
-  middleName?: string | null;
-  lastName?: string | null;
-  email?: string | null;
-  avatarUrl?: string | null;
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  email: string | null;
+  avatarUrl: string | null;
 }
 
-export type ParentLinkedStudentPage = AdvisingPage<ParentStudentSummary>;
+export type ParentLinkedStudentPage = AdvisingPage<ParentLinkedStudent>;
 
 export interface ParentCreateScheduleRequest {
   courseId: number;

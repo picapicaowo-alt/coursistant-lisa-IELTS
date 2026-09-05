@@ -88,6 +88,7 @@ async function install(page: Page) {
       hasReading: Boolean(saved.reading),
       hasWriting: Boolean(saved.writing),
     };
+    if (section === 'authoring') return route.fulfill({json: envelope({...saved[path.split('/').at(-2)!] as object, contentRevision: 1})});
     if (path === '/v2/tenant/mock-exam-templates')
       return route.fulfill({
         json: envelope([
@@ -344,7 +345,7 @@ for (const width of [1752, 1440, 1024, 390]) {
       .getByRole('button', {name: 'Confirm and create section'})
       .click();
     await expect(
-      page.getByText('This saved section is read only.', {exact: false}),
+      page.getByRole('button', {name: 'Review & save', exact: true}),
     ).toBeVisible();
     expect(writes).toHaveLength(2);
     expect(writes[0].body).toEqual(writes[1].body);
@@ -472,7 +473,7 @@ for (const width of [1440, 768, 390, 320]) {
       .getByRole('button', {name: 'Confirm and create section'})
       .click();
     await expect(
-      page.getByText('This saved section is read only.', {exact: false}),
+      page.getByRole('button', {name: 'Review & save', exact: true}),
     ).toBeVisible();
     expect(writes).toHaveLength(1);
     const expected = structuredClone(importedReading);
@@ -664,7 +665,7 @@ test('reading and writing use text fields and retain drafts across section navig
   await page.getByRole('button', {name: 'Review & save', exact: true}).click();
   await page.getByRole('button', {name: 'Confirm and create section'}).click();
   await expect(
-    page.getByText('This saved section is read only.', {exact: false}),
+    page.getByRole('button', {name: 'Review & save', exact: true}),
   ).toBeVisible();
   await page.goto(`${basePath}&section=writing`);
   await page
@@ -680,7 +681,7 @@ test('reading and writing use text fields and retain drafts across section navig
   ).toContainText('Discuss how libraries support a community.');
   await page.getByRole('button', {name: 'Confirm and create section'}).click();
   await expect(
-    page.getByText('This saved section is read only.', {exact: false}),
+    page.getByRole('button', {name: 'Review & save', exact: true}),
   ).toBeVisible();
   expect(writes[0].body).toMatchObject({
     passages: [
@@ -776,7 +777,7 @@ test('official answers reject invalid input and save equivalent alternatives thr
   await page.getByRole('button', {name: 'Confirm and create section'}).click();
   await expect(page.getByRole('alert')).toBeVisible();
   await page.getByRole('button', {name: 'Confirm and create section'}).click();
-  await expect(page.getByText('This saved section is read only.', {exact: false})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Review & save', exact: true})).toBeVisible();
   expect(writes).toHaveLength(2);
   expect(writes[0].body).toEqual(writes[1].body);
   expect(writes[1].body).toMatchObject({parts: [{sections: [{payload: {
