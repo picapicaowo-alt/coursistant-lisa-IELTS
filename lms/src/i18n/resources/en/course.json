@@ -419,6 +419,7 @@
         "clearFilters": "Clear filters"
     },
     "roster": {
+    "withdrawAction": "Withdraw",
         "accessDenied": "You do not have permission to view this course roster.",
         "notFound": "This course does not exist or is not visible to you.",
         "chooseHint": "Open a course to see its roster.",

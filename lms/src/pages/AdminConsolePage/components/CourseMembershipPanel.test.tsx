@@ -134,8 +134,8 @@ describe("CourseMembershipPanel", () => {
     expect(screen.getByText("Teacher: Professor Ada")).toBeInTheDocument();
     expect(await screen.findByText("Taylor Assistant")).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: "Return to student" }),
-    ).toBeInTheDocument();
+      screen.queryByRole("button", { name: "Return to student" }),
+    ).not.toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Add course member" }));
     await user.type(
@@ -154,92 +154,15 @@ describe("CourseMembershipPanel", () => {
     ).toBeInTheDocument();
   });
 
-  it("enrolls a user and assigns the course-scoped TA role in one action", async () => {
+  it("does not expose TA assignment, role changes, or enrollment options", async () => {
     const user = userEvent.setup();
     renderPanel();
-
-    await screen.findByText("Professor Ada");
-    await user.click(screen.getByRole("button", { name: "Add course member" }));
-    await user.selectOptions(
-      screen.getByRole("combobox", { name: "Course role" }),
-      "TA",
-    );
-    await user.type(
-      screen.getByRole("textbox", { name: "User email or ID" }),
-      "new.ta@example.edu",
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Enroll and assign TA" }),
-    );
-
-    await waitFor(() =>
-      expect(mocks.enrolStudents).toHaveBeenCalledWith(31, {
-        emails: ["new.ta@example.edu"],
-      }),
-    );
-    await waitFor(() =>
-      expect(mocks.promoteToTa).toHaveBeenCalledWith(31, 490),
-    );
-    expect(
-      await screen.findByText(
-        "User enrolled and assigned as a TA for the selected course.",
-      ),
-    ).toBeInTheDocument();
-  });
-
-  it("reports partial success when enrollment succeeds but TA assignment fails", async () => {
-    const user = userEvent.setup();
-    mocks.promoteToTa.mockRejectedValueOnce({
-      code: 409,
-      message: "Request failed with status code 409",
-      details: { message: "The course rejected the TA role change." },
-    });
-    renderPanel();
-
-    await screen.findByText("Professor Ada");
-    await user.click(screen.getByRole("button", { name: "Add course member" }));
-    await user.selectOptions(
-      screen.getByRole("combobox", { name: "Course role" }),
-      "TA",
-    );
-    await user.type(
-      screen.getByRole("textbox", { name: "User email or ID" }),
-      "partial.ta@example.edu",
-    );
-    await user.click(
-      screen.getByRole("button", { name: "Enroll and assign TA" }),
-    );
-
-    expect(
-      await screen.findByText(
-        "The user was enrolled, but TA access was not assigned. The course rejected the TA role change.",
-      ),
-    ).toBeInTheDocument();
-  });
-
-  it("requires review before changing a student into a course-scoped TA", async () => {
-    const user = userEvent.setup();
-    renderPanel();
-
     await screen.findByText("Jiarui Zhang");
-    await user.click(screen.getByRole("button", { name: "Set as TA" }));
-
-    expect(
-      screen.getByText(
-        /Existing student submissions in this course will be frozen/,
-      ),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole("button", {name: /Set as TA|Return to student/})).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", {name: "Add course member"}));
+    expect(screen.queryByRole("combobox", {name: "Course role"})).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", {name: /assign TA/})).not.toBeInTheDocument();
     expect(mocks.promoteToTa).not.toHaveBeenCalled();
-
-    await user.click(
-      screen.getByRole("button", { name: "Confirm TA assignment" }),
-    );
-
-    await waitFor(() =>
-      expect(mocks.promoteToTa).toHaveBeenCalledWith(31, 485),
-    );
-    expect(
-      await screen.findByText("TA assigned for the selected course."),
-    ).toBeInTheDocument();
+    expect(mocks.demoteTa).not.toHaveBeenCalled();
   });
 });

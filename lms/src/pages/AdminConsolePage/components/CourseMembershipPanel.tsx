@@ -22,20 +22,6 @@ type Feedback = {
   text: string;
 };
 
-type RoleChange = {
-  member: CourseMember;
-  targetRole: "TA" | "Student";
-};
-
-type EnrollmentRole = "Student" | "TA";
-
-class PartialTaAssignmentError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = "PartialTaAssignmentError";
-  }
-}
-
 const instructorLabel = (course: CourseSummary): string => {
   const instructor = course.primaryInstructor;
   if (!instructor) return i18n.t("common:admin.noInstructor");
@@ -52,25 +38,8 @@ const memberRoleClass = (member: CourseMember): string => {
   return styles.roleStudent;
 };
 
-const CourseMemberRow = ({
-  member,
-  course,
-  busy,
-  pendingChange,
-  onReviewChange,
-  onConfirmChange,
-  onCancelChange,
-}: {
-  member: CourseMember;
-  course: CourseSummary;
-  busy: boolean;
-  pendingChange: RoleChange | null;
-  onReviewChange: (change: RoleChange) => void;
-  onConfirmChange: (change: RoleChange) => void;
-  onCancelChange: () => void;
-}) => {
+const CourseMemberRow = ({member}: {member: CourseMember}) => {
   const { t: translate } = useTranslation();
-  const isThisMemberPending = pendingChange?.member.userId === member.userId;
   const displayName =
     member.userName ||
     member.userEmail ||
@@ -91,64 +60,6 @@ const CourseMemberRow = ({
         </span>
       </div>
 
-      {isThisMemberPending && pendingChange ? (
-        <div className={styles.roleChangeReview}>
-          <p>
-            {pendingChange.targetRole === "TA"
-              ? translate("common:admin.taQuestion", {
-                  name: displayName,
-                  course: course.courseCode,
-                })
-              : translate("common:admin.studentQuestion", {
-                  name: displayName,
-                  course: course.courseCode,
-                })}
-          </p>
-          <div className={styles.confirmRow}>
-            <button
-              type="button"
-              className={styles.primaryButton}
-              disabled={busy}
-              onClick={() => onConfirmChange(pendingChange)}
-            >
-              {busy
-                ? translate("settings:updating")
-                : pendingChange.targetRole === "TA"
-                  ? translate("common:admin.confirmTa")
-                  : translate("common:admin.confirmCourseRole")}
-            </button>
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              disabled={busy}
-              onClick={onCancelChange}
-            >
-              {translate("common:actions.cancel")}
-            </button>
-          </div>
-        </div>
-      ) : (
-        <div className={styles.memberActions}>
-          {member.courseRole === "Student" && member.active ? (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => onReviewChange({ member, targetRole: "TA" })}
-            >
-              {translate("common:admin.setTa")}
-            </button>
-          ) : null}
-          {member.courseRole === "TA" && member.active ? (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => onReviewChange({ member, targetRole: "Student" })}
-            >
-              {translate("common:admin.returnStudent")}
-            </button>
-          ) : null}
-        </div>
-      )}
     </article>
   );
 };
@@ -174,15 +85,10 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const [enrollOpen, setEnrollOpen] = useState(false);
   const [identifier, setIdentifier] = useState("");
-  const [enrollmentRole, setEnrollmentRole] =
-    useState<EnrollmentRole>("Student");
   const [memberSearchInput, setMemberSearchInput] = useState("");
   const [memberSearch, setMemberSearch] = useState("");
   const [memberPage, setMemberPage] = useState(0);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
-  const [pendingRoleChange, setPendingRoleChange] = useState<RoleChange | null>(
-    null,
-  );
 
   const coursesQuery = useQuery({
     queryKey: ["admin", "active-courses", scope],
@@ -245,11 +151,9 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
     mutationFn: async ({
       courseId,
       value,
-      targetRole,
     }: {
       courseId: number;
       value: string;
-      targetRole: EnrollmentRole;
     }) => {
       const userId = /^[1-9]\d*$/.test(value) ? Number(value) : null;
       const result = unwrapData(
@@ -270,84 +174,22 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
         );
       }
 
-      if (targetRole === "TA") {
-        const enrolledUserId =
-          successfulItem.userId ?? successfulItem.member?.userId;
-        if (!enrolledUserId) {
-          throw new PartialTaAssignmentError(
-            translate("common:admin.partialTaMissingId"),
-          );
-        }
-        try {
-          await courseApiService.promoteToTa(courseId, enrolledUserId);
-        } catch (error) {
-          throw new PartialTaAssignmentError(
-            translate("common:admin.partialTa", {
-              detail: getApiErrorMessage(
-                error,
-                translate("common:admin.taRetry"),
-              ),
-            }),
-          );
-        }
-      }
-
-      return { result, targetRole };
+      return result;
     },
-    onSuccess: async ({ targetRole }, variables) => {
+    onSuccess: async (_result, variables) => {
       setIdentifier("");
       setFeedback({
         tone: "success",
-        text:
-          targetRole === "TA"
-            ? translate("common:admin.enrollTaSuccess")
-            : translate("common:admin.enrollSuccess"),
+        text: translate("common:admin.enrollSuccess"),
       });
       await refreshMembers(variables.courseId);
     },
-    onError: async (error, variables) => {
+    onError: (error) => {
       setFeedback({
         tone: "error",
         text: getApiErrorMessage(error, translate("common:admin.accessFailed")),
       });
-      if (error instanceof PartialTaAssignmentError) {
-        await refreshMembers(variables.courseId);
-      }
     },
-  });
-
-  const changeCourseRole = useMutation({
-    mutationFn: ({
-      courseId,
-      member,
-      targetRole,
-    }: {
-      courseId: number;
-      member: CourseMember;
-      targetRole: "TA" | "Student";
-    }) =>
-      targetRole === "TA"
-        ? courseApiService.promoteToTa(courseId, member.userId)
-        : courseApiService.demoteTa(courseId, member.userId),
-    onSuccess: async (_response, variables) => {
-      setPendingRoleChange(null);
-      setFeedback({
-        tone: "success",
-        text:
-          variables.targetRole === "TA"
-            ? translate("common:admin.taSuccess")
-            : translate("common:admin.studentSuccess"),
-      });
-      await refreshMembers(variables.courseId);
-    },
-    onError: (_error, variables) =>
-      setFeedback({
-        tone: "error",
-        text:
-          variables.targetRole === "TA"
-            ? translate("common:admin.taFailed")
-            : translate("common:admin.demoteFailed"),
-      }),
   });
 
   const submitEnrollment = (event: FormEvent) => {
@@ -358,7 +200,6 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
     enrolStudent.mutate({
       courseId: effectiveCourseId,
       value,
-      targetRole: enrollmentRole,
     });
   };
 
@@ -368,9 +209,7 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
     setMemberSearchInput("");
     setMemberSearch("");
     setIdentifier("");
-    setEnrollmentRole("Student");
     setFeedback(null);
-    setPendingRoleChange(null);
   };
 
   if (coursesQuery.isPending) {
@@ -406,7 +245,6 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
     1,
     Math.ceil((membersQuery.data?.total ?? 0) / MEMBER_PAGE_SIZE),
   );
-  const roleChangeBusy = changeCourseRole.isPending;
 
   return (
     <div className={styles.membersLayout}>
@@ -476,36 +314,13 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
                   placeholder={translate("common:admin.userEmailPlaceholder")}
                 />
               </label>
-              <label>
-                <span>{translate("common:admin.courseRole")}</span>
-                <select
-                  value={enrollmentRole}
-                  onChange={(event) =>
-                    setEnrollmentRole(event.target.value as EnrollmentRole)
-                  }
-                >
-                  <option value={"Student"}>
-                    {translate("common:roles.STUDENT")}
-                  </option>
-                  <option value="TA">
-                    {translate("common:admin.taLabel")}
-                  </option>
-                </select>
-              </label>
               <button
                 className={styles.primaryButton}
                 disabled={!identifier.trim() || enrolStudent.isPending}
               >
-                {enrolStudent.isPending
-                  ? enrollmentRole === "TA"
-                    ? translate("common:admin.assigningTa")
-                    : translate("common:admin.enrolling")
-                  : enrollmentRole === "TA"
-                    ? translate("common:admin.enrollTa")
-                    : translate("common:admin.enrollStudent")}
+{enrolStudent.isPending ? translate("common:admin.enrolling") : translate("common:admin.enrollStudent")}
               </button>
             </form>
-            <p className={styles.hint}>{translate("common:admin.taHelp")}</p>
             {feedback ? (
               <p
                 className={
@@ -588,17 +403,6 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
               <CourseMemberRow
                 key={member.id}
                 member={member}
-                course={selectedCourse}
-                busy={roleChangeBusy}
-                pendingChange={pendingRoleChange}
-                onReviewChange={setPendingRoleChange}
-                onCancelChange={() => setPendingRoleChange(null)}
-                onConfirmChange={(change) =>
-                  changeCourseRole.mutate({
-                    courseId: selectedCourse.id,
-                    ...change,
-                  })
-                }
               />
             ))}
           </div>

@@ -419,6 +419,7 @@
         "clearFilters": "清除筛选"
     },
     "roster": {
+    "withdrawAction": "移出课程",
         "accessDenied": "你没有查看此课程成员名单的权限。",
         "notFound": "课程不存在，或你无法查看此课程。",
         "chooseHint": "打开课程以查看成员名单。",

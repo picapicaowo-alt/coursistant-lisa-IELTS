@@ -52,53 +52,12 @@ request schemas and the required DELETE version parameter. This is a scoped
 handoff alignment, **not** a claim that the full latest backend export was
 retrieved or regenerated. Import/reconcile that full export when provided.
 
-The API base URL, environment inputs, backend services, databases and deployment
-were not changed by this work. The shared checkout contains other uncommitted
-frontend work; this change does not represent a clean release snapshot.
+The API base URL and tracked environment inputs are unchanged. Backend services, databases and infrastructure configuration are outside this frontend change.
 
-## Verification
+## Release validation
 
-See the verification results recorded below. All browser API calls use local
-fixtures. They do not establish authenticated Production acceptance or prove
-that the updated backend permits the real Instructor account. The three real
-Production workflows still need post-deployment acceptance using current event
-versions and course enrollment: delete a disposable personal event, read members
-and select a report student, upload a file and a link.
+The release is isolated on `codex/production-contract-followup` from current main, preserving the existing report pagination, course delivery capabilities, vocabulary routing and materials browser. The unrelated shared-worktree edits are excluded. Required checks cover lint, both TypeScript configurations, unit tests, the Production build and the full browser suite. Fixture tests are separate from authenticated Production acceptance; final results and rollback metadata are recorded in `output/production-contract-release-20260905/` and the release summary.
 
-### Results
+## IELTS TA availability
 
-- Full Vitest run: 155 files / 778 tests passed. This run preceded the final
-  error-copy helper/test-fixture refinements and shared compile alignment.
-- Subsequent focused runs: 20 tests passed for the final error helper, Calendar
-  conflict recovery, roster and report picker; 10 tests passed after the final
-  typed picker fixture correction, including the learning-data regression.
-- Shared i18n checks: static references/parity passed; 42 locale tests passed.
-- Final production-preview Chromium run: **14 passed**, covering the roster,
-  forbidden/not-found/inactive access, file/link multipart headers and UUIDs,
-  and Calendar create/edit/delete retries in all three locales at 390/1440 px.
-- Final application typecheck, production typecheck and lint passed.
-- Final Production build passed, retaining the existing >500 kB chunk warning.
-  An intermediate build exposed a shared StudentLearningPage import mismatch:
-  `DETAIL_LABELS` had been renamed to `DETAIL_LABEL_KEYS`. Its four stale usages
-  now consume the keys and translate at render time; the final build passed.
-- Consumed OpenAPI YAML parsed successfully with all three operation IDs intact.
-- Scoped diff whitespace checks passed. No full-site browser suite, merge,
-  deployment or authenticated Production mutations were performed.
-
-## Production release preparation
-
-The user subsequently authorized push, merge and Production deployment. Release
-work is isolated on `codex/production-contract-followup`, based on current
-`origin/main` (`7faf370` at preparation). Only the three-operation fixes and
-necessary shared locale entries were ported; current main's report pagination,
-course delivery capabilities, production vocabulary routing and material browsing
-remain intact. The unrelated shared-worktree StudentLearningPage compilation fix
-and unfinished sitewide locale migration are not included in this release branch.
-
-Clean-branch dependency installation retained the lockfile. Both typechecks,
-lint, Production build and 157 Vitest files / 773 tests passed. The old Instructor
-material rename and TA-management browser expectations were aligned to the new
-permission boundary: Instructor upload/own deletion is separate from management;
-the existing System Admin TA-management modal still has focus/mobile coverage.
-Final browser and deployment results are recorded in the local release evidence
-under `output/production-contract-release-20260905/` and the release summary.
+The IELTS product hides TA role filters, promotion/demotion, permission editors, and TA enrollment across the roster and System Admin membership workspace. Student enrollment and authorized withdrawal remain available. Existing API role values and response-backed historical members remain readable; this frontend change does not migrate memberships or change backend permissions. The administrator help text is aligned in all three locales.

@@ -12,7 +12,7 @@ for (const status of [403, 404]) {
     await page.goto('/roster/71');
     await expect(page.getByRole('alert')).toContainText(status === 403 ? 'permission' : 'does not exist');
     await expect(page.getByRole('table')).toHaveCount(0);
-    await expect(page.getByRole('button', {name: /Make TA|Withdraw|Permissions|Enrol/})).toHaveCount(0);
+    await expect(page.getByRole('button', {name: /^TA$|Make TA|Withdraw|Permissions|Enrol/})).toHaveCount(0);
     expect(reads).toBe(1);
   });
 }

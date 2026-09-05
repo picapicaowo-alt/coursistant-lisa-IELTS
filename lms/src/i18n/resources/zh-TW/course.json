@@ -419,6 +419,7 @@
     "clearFilters": "清除篩選"
   },
   "roster": {
+    "withdrawAction": "移出課程",
     "accessDenied": "你沒有檢視此課程成員名單的權限。",
     "notFound": "課程不存在，或你無法檢視此課程。",
     "chooseHint": "開啟課程以檢視成員名單。",

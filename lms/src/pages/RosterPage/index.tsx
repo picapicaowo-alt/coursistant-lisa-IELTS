@@ -11,7 +11,7 @@ import {MemberRow} from './MemberRow';
 import {useRoster} from './useRoster';
 import styles from './index.module.scss';
 
-const ROLE_FILTERS: Array<CourseRole | 'All'> = ['All', 'Instructor', 'TA', 'Student'];
+const ROLE_FILTERS: Array<CourseRole | 'All'> = ['All', 'Instructor', 'Student'];
 
 const RosterPage: React.FC = () => {
   const { t: translate } = useTranslation();
@@ -79,7 +79,7 @@ const RosterPage: React.FC = () => {
         <div className={styles.tableWrap}>
           <table className={styles.table}>
             <thead><tr><th>{translate("common:fields.name")}</th><th>{translate("common:fields.email")}</th><th>{translate("course:roster.role")}</th><th>{translate("common:fields.status")}</th>{canManageMembers ? <th><span className={styles.visuallyHidden}>{translate("common:fields.actions")}</span></th> : null}</tr></thead>
-            <tbody>{members.map(member => <MemberRow canManageMembers={canManageMembers} key={member.id} member={member} onWithdraw={() => withdraw.mutate(member)} onPromote={() => promote.mutate(member)} onDemote={() => demote.mutate(member)} onUpdatePermissions={permissions => updatePermissions.mutate({member, permissions})} isBusy={isBusy}/>)}</tbody>
+            <tbody>{members.map(member => <MemberRow canManageMembers={canManageMembers} key={member.id} member={member} onWithdraw={() => withdraw.mutate(member)} isBusy={isBusy}/>)}</tbody>
           </table>
         </div>
       ) : null}

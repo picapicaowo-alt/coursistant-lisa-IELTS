@@ -149,24 +149,11 @@ test('instructor results preserve pagination, errors and the selected identity a
   await expect(dialog.getByRole('button', {name: 'Create group course', exact: true})).toBeDisabled();
 });
 
-test('System Admin TA permissions reuse the modal focus and small-screen behavior', async ({page}) => {
+test('IELTS System Admin roster hides all TA configuration controls', async ({page}) => {
   await fixture(page, 'NOT_APPLICABLE', 'Instructor', 'SYSTEM_ADMIN');
   await page.route('**/v2/courses/71/members?*', route => route.fulfill({json: reply({items: [{id: 1, courseId: 71, userId: 51, userName: 'Taylor Assistant', userEmail: 'taylor@example.test', courseRole: 'TA', active: true, canGrade: true}], total: 1, page: 0, size: 20})}));
   await page.goto('/roster/71');
-  const trigger = page.getByRole('button', {name: 'Permissions', exact: true});
-  await trigger.click();
-  const dialog = page.getByRole('dialog', {name: 'TA permissions'});
-  const close = dialog.getByRole('button', {name: 'Close dialog'});
-  await close.focus();
-  await close.press('Tab');
-  await expect(dialog.getByRole('checkbox').first()).toBeFocused();
-  await trigger.evaluate(node => (node as HTMLElement).focus());
-  await expect(dialog.getByRole('checkbox').first()).toBeFocused();
-  await page.setViewportSize({width: 320, height: 568});
-  await dialog.getByRole('button', {name: 'Save permissions'}).scrollIntoViewIfNeeded();
-  await expect(dialog.getByRole('button', {name: 'Save permissions'})).toBeInViewport();
-  expect(await dialog.evaluate(node => node.scrollWidth <= node.clientWidth)).toBe(true);
-  await page.keyboard.press('Escape');
-  await expect(dialog).toHaveCount(0);
-  await expect(trigger).toBeFocused();
+  await expect(page.getByText('Taylor Assistant', {exact: true})).toBeVisible();
+  await expect(page.getByRole('button', {name: /^(TA|Permissions|Make TA|Remove TA)$/})).toHaveCount(0);
+  await expect(page.getByRole('dialog')).toHaveCount(0);
 });
