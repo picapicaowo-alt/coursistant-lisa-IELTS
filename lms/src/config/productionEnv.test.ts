@@ -24,6 +24,7 @@ describe('training frontend deployment environments', () => {
     }
     expect(env.VITE_BASE_DOMAIN).toBe('api-cn.xlearnedu.com');
     expect(env.VITE_BASE_PORT).toBe('443');
+    expect(env.VITE_VOCABULARY_API_DOMAIN_NAME).toBe('https://api-cn.xlearnedu.com/vocabulary-api');
   });
 
   it('does not inherit USC, Dev or the unconfirmed legacy chat origin in production', () => {

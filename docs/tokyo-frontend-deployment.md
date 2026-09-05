@@ -26,7 +26,9 @@ Removed production-only inputs:
 - `VITE_STATIC_BASE_URL` was only declared in a type and had no runtime consumer; Vite serves application assets from the frontend origin.
 - `VITE_ROCKETCHAT_BASE_URL` pointed at an unconfirmed legacy service. Its guarded logout consumer tolerates absence, and the legacy chat page is not part of the active training route tree.
 
-Independent Workflow/AI Agent, Study Support and Vocabulary paths are preserved, not silently reassigned to the LMS API. Their Tokyo public services remain outside this release's authenticated acceptance until confirmed. An S3 SPA fallback is not proof that any such API is live.
+Vocabulary uses `https://api-cn.xlearnedu.com/vocabulary-api`, which proxies to the independent Vocabulary service and verifies the student's LMS bearer token. Its credentialed CORS responses allow the exact frontend origin. A relative `/vocabulary-api` path on the frontend S3 origin returns SPA HTML and must not be used as its Production API base.
+
+Independent Workflow/AI Agent and Study Support paths are preserved, not silently reassigned to the LMS API. Their Tokyo public services remain outside this release's authenticated acceptance until confirmed. An S3 SPA fallback is not proof that any such API is live.
 
 The existing legacy chat-cookie cleanup includes old domain strings. It only expires cookies and does not make network requests; do not confuse these literals with configured production API destinations. Preserve that compatibility logic during this scoped environment change.
 
