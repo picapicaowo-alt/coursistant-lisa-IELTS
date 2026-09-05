@@ -2,14 +2,15 @@ import React, {useDeferredValue, useRef, useState} from 'react';
 import {useTranslation} from 'react-i18next';
 import {Link, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
-import {CalendarClock, Check, MapPin, Plus, UserRound, UsersRound, X} from 'lucide-react';
+import {CalendarClock, Check, MapPin, Pencil, Plus, UserRound, UsersRound, X} from 'lucide-react';
 import {ADVISING_ERROR_CODES, unwrapData, type AdvisorStudentCourseResponse, type AdvisingSessionRequest} from '@/apis';
 import {COURSE_SESSION_DAYS, COURSE_SESSION_TYPES} from '@/configs/courseSessions';
 import type {SessionDayOfWeek, SessionType} from '@/apis/types/course';
 import {ADVISOR_PAGE_SIZE} from '@/apis/types/advisorWorkspace';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {AdvisorInstructorPicker} from '@/components/AdvisorInstructorPicker';
-import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {OneOnOneCourseDialog} from './OneOnOneCourseDialog';
+import {LocalizedError} from '@/i18n/errors';
 import {CourseIdentityCard} from '@/components/CourseIdentityCard';
 import {CourseCardGrid} from '@/components/CourseIdentityCard/CourseCardGrid';
 import {AdvisingBadge} from '@/components/AdvisingBadge';
@@ -46,7 +47,7 @@ const CoursesPage: React.FC = () => {
   const addDialogRef = useRef<HTMLDialogElement>(null);
 
   const [selectedCourse, setSelectedCourse] = useState<AdvisorStudentCourseResponse>();
-  const [editorReveal, setEditorReveal] = useState(0);
+  const [isUpdateDialogOpen, setIsUpdateDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [addMode, setAddMode] = useState<'GROUP' | 'ONE_ON_ONE'>('GROUP');
   const [groupCourseId, setGroupCourseId] = useState('');
@@ -262,26 +263,26 @@ const CoursesPage: React.FC = () => {
     mutationFn: (action: 'instructor' | 'sessions') => {
       if (!Number(courseEdit.courseId) || !courseEdit.expectedVersion ||
           (action === 'instructor' && !Number(courseEdit.instructorId))) {
-        throw new Error('Select a course with a current version and instructor.');
+        throw new LocalizedError('advising:studentCourses.selectRequired');
       }
       const original = courses.data?.find(course => String(course.courseId) === courseEdit.courseId);
       if (!original || (original.courseLaunchVersion != null && original.courseLaunchVersion !== Number(courseEdit.expectedVersion))) {
-        throw new Error('The course changed. Select it again before saving.');
+        throw new LocalizedError('advising:studentCourses.changed');
       }
       const remainingSessions: AdvisingSessionRequest[] = [];
       if (action === 'sessions') {
         if (!Array.isArray(original.schedule)) {
-          throw new Error('The existing schedule was not returned. Reload it before making changes.');
+          throw new LocalizedError('advising:studentCourses.scheduleMissing');
         }
         if (!courseEdit.startTime || !courseEdit.endTime || courseEdit.endTime <= courseEdit.startTime) {
-          throw new Error('The session end time must be after the start time.');
+          throw new LocalizedError('advising:studentCourses.invalidSchedule');
         }
         // The API replaces the entire collection. Preserve all other sessions.
         for (const session of original.schedule?.slice(1) ?? []) {
           const type = COURSE_SESSION_TYPES.find(value => value === session.type);
           const day = COURSE_SESSION_DAYS.find(value => value.value === session.dayOfWeek);
           if (!type || !day || !session.startTime || !session.endTime || session.location == null) {
-            throw new Error('The full schedule could not be verified. Reload before editing.');
+            throw new LocalizedError('advising:studentCourses.scheduleMissing');
           }
           remainingSessions.push({type, dayOfWeek: day.value, startTime: session.startTime, endTime: session.endTime, location: session.location});
         }
@@ -366,6 +367,32 @@ const CoursesPage: React.FC = () => {
   };
 
   const selectedGroupCourse = courseOptions.data?.items.find(option => String(option.courseId) === groupCourseId);
+  const editableCourses = (courses.data ?? []).filter(course => course.deliveryMode === 'ONE_ON_ONE' &&
+    course.courseId != null && !['COMPLETED', 'HIDDEN'].includes(course.lifecycleStatus ?? '') && course.status !== 'WITHDRAWN');
+  const selectCourseToEdit = (course?: AdvisorStudentCourseResponse) => {
+    updateOneOnOne.reset();
+    planningCourse.reset();
+    setCourseEdit(current => ({...current, courseId: course?.courseId == null ? '' : String(course.courseId), expectedVersion: ''}));
+    if (!course) return;
+    planningCourse.mutate(course, {onSuccess: selected => {
+      const session = selected.schedule?.[0];
+      setCourseEdit({
+        courseId: String(selected.courseId),
+        expectedVersion: selected.courseLaunchVersion == null ? '' : String(selected.courseLaunchVersion),
+        instructorId: selected.instructorUserId == null ? '' : String(selected.instructorUserId),
+        type: COURSE_SESSION_TYPES.find(type => type === session?.type) ?? COURSE_SESSION_TYPES[0],
+        dayOfWeek: COURSE_SESSION_DAYS.find(day => day.value === session?.dayOfWeek)?.value ?? COURSE_SESSION_DAYS[0].value,
+        startTime: session?.startTime?.slice(0, 5) ?? '',
+        endTime: session?.endTime?.slice(0, 5) ?? '',
+        location: session?.location ?? '',
+      });
+    }});
+  };
+  const openUpdateDialog = (course?: AdvisorStudentCourseResponse) => {
+    selectCourseToEdit(course ?? (editableCourses.length === 1 ? editableCourses[0] : undefined));
+    setIsUpdateDialogOpen(true);
+  };
+
 
   return (
     <div className={styles.grid}>
@@ -404,14 +431,20 @@ const CoursesPage: React.FC = () => {
       <section className={styles.courseCollection}>
         <div className={cStyles.coursesHeader}>
           <h2>Current courses ({courses.data?.length ?? 0})</h2>
+          <div className={cStyles.headerActions}>
+            <button type="button" className={cStyles.updateCourseBtn} onClick={() => openUpdateDialog()}
+              disabled={!editableCourses.length || courses.isFetching}>
+              <Pencil size={16} aria-hidden="true"/><span>{t('studentCourses.updateOneToOne')}</span>
+            </button>
           <button
             type="button"
             className={cStyles.addCourseBtn}
             onClick={openAddDialog}
           >
             <Plus size={16} />
-            <span>Add Course</span>
+            <span>{t('studentCourses.add')}</span>
           </button>
+          </div>
         </div>
 
         {courses.isPending ? <p className={styles.status}>Loading courses…</p> : null}
@@ -479,109 +512,14 @@ const CoursesPage: React.FC = () => {
         onReload={() => void reloadVersions()} onClose={() => setEnrollmentCourse(undefined)}
         onAction={(action, reason) => {if (!transition.isPending) transition.mutate({action, course: enrollmentCourse, reason});}}
         onEditSchedule={() => {
-          const primarySchedule = enrollmentCourse.schedule?.[0];
-          setEditorReveal(current => current + 1);
-          setCourseEdit(current => ({
-            ...current,
-            courseId: String(enrollmentCourse.courseId),
-            expectedVersion: enrollmentCourse.courseLaunchVersion == null ? '' : String(enrollmentCourse.courseLaunchVersion),
-            instructorId: enrollmentCourse.instructorUserId == null ? '' : String(enrollmentCourse.instructorUserId),
-            type: COURSE_SESSION_TYPES.find(type => type === primarySchedule?.type) ?? COURSE_SESSION_TYPES[0],
-            dayOfWeek: COURSE_SESSION_DAYS.find(day => day.value === primarySchedule?.dayOfWeek)?.value ?? COURSE_SESSION_DAYS[0].value,
-            startTime: primarySchedule?.startTime?.slice(0, 5) ?? '',
-            endTime: primarySchedule?.endTime?.slice(0, 5) ?? '',
-            location: primarySchedule?.location ?? '',
-          }));
+          openUpdateDialog(enrollmentCourse);
           setEnrollmentCourse(undefined);
         }}/>: null}
-      <CollapsibleSection title="Update a one-to-one course" revealKey={editorReveal}>
-        {!courseEdit.courseId ? (
-          <div className={styles.emptyState}>
-            <strong>Select a one-to-one course to edit</strong>
-            <span>Use “Edit schedule” on a current one-to-one course. Course and record versions are carried into this form automatically.</span>
-          </div>
-        ) : null}
-        <div className={styles.form}>
-          {courseEdit.courseId ? (
-            <div className={styles.selectionSummary}>
-              <span>Editing</span>
-              <strong>Course #{courseEdit.courseId} · launch version {courseEdit.expectedVersion || 'not supplied'}</strong>
-            </div>
-          ) : null}
-          <AdvisorInstructorPicker
-            label="New instructor"
-            value={courseEdit.instructorId}
-            onChange={instructorId => setCourseEdit(current => ({...current, instructorId}))}
-          />
-          <button
-            type="button"
-            className={styles.primary}
-            disabled={
-              needsReload ||
-              !Number(courseEdit.courseId) ||
-              !courseEdit.expectedVersion ||
-              !Number(courseEdit.instructorId) ||
-              updateOneOnOne.isPending
-            }
-            onClick={() => updateOneOnOne.mutate('instructor')}
-          >
-            Reassign instructor
-          </button>
-          <label>
-            Session type
-            <select value={courseEdit.type} onChange={event => setCourseEdit(current => ({...current, type: event.target.value as SessionType}))}>
-              {COURSE_SESSION_TYPES.map(type => <option key={type}>{type}</option>)}
-            </select>
-          </label>
-          <label>
-            Day of week
-            <select
-              value={courseEdit.dayOfWeek}
-              onChange={event => setCourseEdit(current => ({...current, dayOfWeek: event.target.value as SessionDayOfWeek}))}
-            >
-              {COURSE_SESSION_DAYS.map(day => (
-                <option key={day.value} value={day.value}>{day.label}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Start time
-            <EnglishTimeInput
-              value={courseEdit.startTime}
-              onChangeValue={startTime => setCourseEdit(current => ({...current, startTime}))}
-            />
-          </label>
-          <label>
-            End time
-            <EnglishTimeInput
-              value={courseEdit.endTime}
-              onChangeValue={endTime => setCourseEdit(current => ({...current, endTime}))}
-            />
-          </label>
-          <label>
-            Location
-            <input
-              value={courseEdit.location}
-              onChange={event => setCourseEdit(current => ({...current, location: event.target.value}))}
-            />
-          </label>
-          <button
-            type="button"
-            className={styles.primary}
-            disabled={
-              needsReload ||
-              !Number(courseEdit.courseId) ||
-              !courseEdit.expectedVersion ||
-              !courseEdit.startTime ||
-              !courseEdit.endTime ||
-              updateOneOnOne.isPending
-            }
-            onClick={() => updateOneOnOne.mutate('sessions')}
-          >
-            Replace sessions
-          </button>
-        </div>
-      </CollapsibleSection>
+      {isUpdateDialogOpen ? <OneOnOneCourseDialog courses={editableCourses} draft={courseEdit} onDraft={setCourseEdit}
+        loading={planningCourse.isPending} pending={updateOneOnOne.isPending} needsReload={needsReload}
+        error={planningCourse.error || updateOneOnOne.error} saved={updateOneOnOne.isSuccess}
+        onSelect={selectCourseToEdit} onReload={() => void reloadVersions()} onClose={() => setIsUpdateDialogOpen(false)}
+        onSave={action => {if (!updateOneOnOne.isPending && !planningCourse.isPending) updateOneOnOne.mutate(action);}}/> : null}
 
       <dialog
         ref={addDialogRef}

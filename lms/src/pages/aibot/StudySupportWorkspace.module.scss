@@ -56,7 +56,7 @@
 @media (max-width: t.$breakpoint-shell-mobile) { .welcome img { width: 4rem; height: 4rem; } .content[data-empty] { justify-content: flex-start; } }
 
 .content[data-compact] {padding:0; max-width:none;}
-.compactHeader {display:grid; grid-template-columns:t.$touch-target minmax(0,1fr) t.$touch-target t.$touch-target; align-items:center; flex-shrink:0; gap:t.$space-1;}
+.compactHeader {display:grid; grid-template-columns:minmax(0,1fr) t.$touch-target t.$touch-target; align-items:center; flex-shrink:0; gap:t.$space-1;}
 .compactHeader h2 {text-align:center; font-size:t.$font-size-headline; font-weight:t.$fw-semibold; margin:0;}
 .compactHeader button {display:grid; place-items:center; width:t.$touch-target; height:t.$touch-target; border:0; background:transparent; color:t.$content-secondary; cursor:pointer; font-size:t.$font-size-headline;}
 .compactHeader button:disabled {opacity:.5; cursor:not-allowed;}

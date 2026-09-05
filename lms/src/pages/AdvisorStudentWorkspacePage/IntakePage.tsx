@@ -1,4 +1,5 @@
 import React from 'react';
+import {useTranslation} from 'react-i18next';
 import {useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -12,6 +13,7 @@ import {ParentLinksPanel} from '@/components/ParentLinksPanel';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
 
 const AdvisorStudentIntakePage: React.FC = () => {
+  const {t} = useTranslation('advising');
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
   const query = useQuery({meta: {advisingStudentId: id},
@@ -33,7 +35,7 @@ const AdvisorStudentIntakePage: React.FC = () => {
         title="Counsellor intake"
         meta={<span className={styles.readOnlyBadge}>Read only</span>}
       >
-      <p className={layout.intakeDescription}>The intake captures the student&apos;s starting context at handover. It is read-only for Advisors.</p>
+      <p className={layout.intakeDescription}>{t('studentIntake.description')}</p>
       <dl className={layout.intakeRecord}>
         <div><dt>Name</dt><dd>{formatPersonName(intake, '—')}</dd></div>
         <div><dt>Email</dt><dd>{intake.email || '—'}</dd></div>

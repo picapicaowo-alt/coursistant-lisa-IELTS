@@ -113,5 +113,36 @@
     "planProfileRequired": "请先创建学生档案，再制定学习计划。",
     "planProfileOpen": "打开学生档案",
     "courseActionsLoadError": "暂时无法读取课程操作所需的信息。请再次打开“管理选课”重试。"
+  },
+  "studentCourses": {
+    "add": "添加课程",
+    "updateOneToOne": "更新一对一课程",
+    "selectOneToOne": "选择要编辑的一对一课程",
+    "newInstructor": "新任教师",
+    "reassign": "重新分配教师",
+    "weekday": "星期",
+    "replaceSessions": "更新排课",
+    "invalidSchedule": "请输入有效的开始和结束时间，结束时间须晚于开始时间。",
+    "failed": "无法完成课程规划操作。",
+    "conflict": "课程已在其他位置更新，您的输入已保留。",
+    "reload": "重新加载课程",
+    "course": "课程",
+    "sessionType": "课时类型",
+    "startTime": "开始时间",
+    "endTime": "结束时间",
+    "location": "地点",
+    "saved": "课程已更新。",
+    "loading": "正在加载课程…",
+    "selectRequired": "保存前请选择课程和教师。",
+    "changed": "课程已有更新，请重新选择课程后保存。",
+    "scheduleMissing": "无法加载课程排课，请重新加载课程后保存。",
+    "types": {
+      "Lecture": "讲授课",
+      "Lab": "实验课",
+      "Tutorial": "辅导课"
+    }
+  },
+  "studentIntake": {
+    "description": "入学档案记录学生在交接时的初始情况。"
   }
 }
