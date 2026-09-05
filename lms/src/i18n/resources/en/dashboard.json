@@ -80,5 +80,8 @@
     "grading": "Submissions awaiting grading",
     "upcomingClass": "Upcoming class",
     "scheduleConflict": "Schedule conflict"
+  },
+  "teaching": {
+    "assignmentQueueFallback": "Showing assignment submissions. The grading queue is temporarily unavailable."
   }
 }

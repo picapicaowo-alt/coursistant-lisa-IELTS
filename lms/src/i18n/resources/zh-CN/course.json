@@ -354,7 +354,8 @@
         "itemCount_one": "{{count}} 项",
         "itemCount_other": "{{count}} 项",
         "assignmentFallback": "作业 {{id}}",
-        "due": "截止日期：{{date}}"
+        "due": "截止日期：{{date}}",
+        "visibilityNotice": "此处显示已发布的作业成绩，不计算课程总成绩。"
     },
     "learning": {
         "loading": "正在加载课程…",
@@ -471,5 +472,10 @@
         "ungroupedError": "暂时无法加载未分组学生。",
         "ungroupedCount_one": "当前有 {{count}} 名学生尚未分组。",
         "ungroupedCount_other": "当前有 {{count}} 名学生尚未分组。"
+    },
+    "studySupport": {
+        "courseLoadFailed": "暂时无法核实课程列表，学习支持目前不可用。",
+        "checkingCourses": "正在加载你的课程…",
+        "unavailable": "学习支持暂不可用"
     }
 }

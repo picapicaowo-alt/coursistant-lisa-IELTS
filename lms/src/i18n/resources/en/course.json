@@ -354,7 +354,8 @@
         "itemCount_one": "{{count}} item",
         "itemCount_other": "{{count}} items",
         "assignmentFallback": "Assignment {{id}}",
-        "due": "Due {{date}}"
+        "due": "Due {{date}}",
+        "visibilityNotice": "Released assignment scores appear here. This page does not calculate a course total."
     },
     "learning": {
         "loading": "Loading course…",
@@ -471,5 +472,10 @@
         "ungroupedCount_one": "{{count}} student currently ungrouped.",
         "ungroupedCount_other": "{{count}} students currently ungrouped.",
         "ungroupedError": "Ungrouped students could not be loaded."
+    },
+    "studySupport": {
+        "courseLoadFailed": "Study Support is temporarily unavailable because your course list could not be verified.",
+        "checkingCourses": "Loading your courses…",
+        "unavailable": "Study Support unavailable"
     }
 }

@@ -122,10 +122,11 @@ export class DashboardApiService {
     }
   }
 
-  /** Work waiting on the instructor, oldest first. Empty buckets are omitted. */
+  /** IELTS excludes legacy Quiz buckets while the shared backend still returns them. */
   async getGradingQueue(): Promise<ApiResponse<GradingQueueItem[]>> {
     try {
-      return await this.apiClient.get<GradingQueueItem[]>('/v2/me/teaching/grading-queue');
+      const response = await this.apiClient.get<GradingQueueItem[]>('/v2/me/teaching/grading-queue');
+      return {...response, data: response.data?.filter(item => item.kind === 'AssignmentUngraded' || item.kind === 'AssignmentAwaitingRelease') ?? response.data};
     } catch (error) {
       console.error('Failed to get grading queue', error);
       throw error;
@@ -149,14 +150,15 @@ export class DashboardApiService {
     }
   }
 
-  /** Published assignment and quiz deadlines with submission progress. */
+  /** IELTS assignment deadlines with submission progress. */
   async getTeachingDeadlines(
     days: number = DASHBOARD_LIMITS.deadlineDays.default
   ): Promise<ApiResponse<TeachingDeadline[]>> {
     try {
-      return await this.apiClient.get<TeachingDeadline[]>('/v2/me/teaching/deadlines/upcoming', {
+      const response = await this.apiClient.get<TeachingDeadline[]>('/v2/me/teaching/deadlines/upcoming', {
         params: {days},
       });
+      return {...response, data: response.data?.filter(item => item.kind === 'Assignment') ?? response.data};
     } catch (error) {
       console.error('Failed to get teaching deadlines', error);
       throw error;

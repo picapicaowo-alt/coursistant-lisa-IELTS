@@ -1,4 +1,5 @@
 import { formatInstructorName } from "@/utils/personName";
+import {useTranslation} from "react-i18next";
 import { useState } from "react";
 import { generatePath, Link, useSearchParams } from "react-router-dom";
 import { BookOpen, ArrowUpRight } from "lucide-react";
@@ -11,7 +12,6 @@ import { WeekWorkspace } from "./WeekWorkspace";
 import { CourseSettings } from "./CourseSettings";
 import { MaterialReader } from "../CourseDetailView/MaterialReader";
 import { AssignmentsCard } from "../CourseDetailView/AssignmentsCard";
-import { QuizzesCard } from "../CourseDetailView/QuizzesCard";
 import { AnnouncementsCard } from "../CourseDetailView/AnnouncementsCard";
 import { DiscussionPanel } from "../CourseDetailView/DiscussionPanel";
 import { ScheduleCard } from "../CourseDetailView/ScheduleCard";
@@ -23,7 +23,7 @@ import styles from "./index.module.scss";
 
 const TABS = [
   ["courses", "Course content"],
-  ["assignments", "Assignments & Quizzes"],
+  ["assignments", "course:detail.assignments"],
   ["discussion", "Discussion"],
   ["announcements", "Announcements"],
   ["schedule", "Schedule & Groups"],
@@ -47,6 +47,7 @@ export function InstructorCourseView({
   canManageGroups: boolean;
   canPostAnnouncements: boolean;
 }) {
+  const {t} = useTranslation();
   const data = useCourseWorkspaceData();
   const { user } = useRequiredAuth();
   const { workspaceMode, setWorkspaceMode } = useCourseWorkspaceStore();
@@ -165,14 +166,6 @@ export function InstructorCourseView({
                     ? "…"
                     : data.assignments.length,
               ],
-              [
-                "Quizzes",
-                data.quizzesFailed
-                  ? "Unavailable"
-                  : data.quizzesLoading
-                    ? "…"
-                    : data.quizzes.length,
-              ],
             ].map(([label, count]) => (
               <div key={label}>
                 <dt>{label}</dt>
@@ -190,7 +183,7 @@ export function InstructorCourseView({
             aria-pressed={id === activeTab}
             onClick={() => setTab(id)}
           >
-            {title}
+            {id === "assignments" ? t(title) : title}
           </button>
         ))}
       </nav>
@@ -210,25 +203,12 @@ export function InstructorCourseView({
         <div className={styles.sectionStack}>
           <div className={styles.sectionIntro}>
             <p>Manage coursework, assessments and feedback.</p>
-            <Link
-              className={styles.textButton}
-              to={path(routes.courseCourseIdGrades)}
-            >
-              Course grades
-              <ArrowUpRight size={16} />
-            </Link>
           </div>
-          <div className={styles.pairedPanels}>
+          <div>
             <AssignmentsCard
               courseId={course.id}
               assignments={data.assignments}
               failed={data.assignmentsFailed}
-              canCreate={canCreateAssignments && writable}
-            />
-            <QuizzesCard
-              courseId={course.id}
-              quizzes={data.quizzes}
-              failed={data.quizzesFailed}
               canCreate={canCreateAssignments && writable}
             />
           </div>
@@ -287,7 +267,7 @@ export function InstructorCourseView({
             </Link>
           </div>
           {scheduleSection === "schedule" ? (
-            <div className={styles.pairedPanels}>
+            <div>
               <ScheduleCard
                 sessions={data.sessions}
                 failed={data.sessionsFailed}

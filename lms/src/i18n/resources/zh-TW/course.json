@@ -354,7 +354,8 @@
     "itemCount_one": "{{count}} 項",
     "itemCount_other": "{{count}} 項",
     "assignmentFallback": "作業 {{id}}",
-    "due": "截止日期：{{date}}"
+    "due": "截止日期：{{date}}",
+    "visibilityNotice": "此處顯示已公布的作業成績，不計算課程總成績。"
   },
   "learning": {
     "loading": "正在載入課程…",
@@ -471,5 +472,10 @@
     "ungroupedError": "暫時無法載入未分組學生。",
     "ungroupedCount_one": "目前有 {{count}} 名學生尚未分組。",
     "ungroupedCount_other": "目前有 {{count}} 名學生尚未分組。"
+  },
+  "studySupport": {
+    "courseLoadFailed": "暫時無法核實課程清單，學習支援目前無法使用。",
+    "checkingCourses": "正在載入你的課程…",
+    "unavailable": "學習支援暫時無法使用"
   }
 }

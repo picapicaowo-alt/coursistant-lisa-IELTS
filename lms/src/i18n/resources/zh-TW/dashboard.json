@@ -80,5 +80,8 @@
     "grading": "有提交待批改",
     "upcomingClass": "即將上課",
     "scheduleConflict": "排課衝突"
+  },
+  "teaching": {
+    "assignmentQueueFallback": "目前顯示作業提交紀錄，批改佇列暫時無法使用。"
   }
 }

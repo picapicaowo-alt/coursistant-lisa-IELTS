@@ -9,7 +9,7 @@ import TypingText from "../utils/typing-text";
 import {renderMessageText} from '@/utils/render-message-text';
 import {useAuth} from '@/contexts/AuthContext.js';
 import {useNavigate, useSearchParams} from 'react-router-dom';
-import {useAiExamLockdown} from '@/hooks/useAiExamLockdown';
+import {useTranslation} from 'react-i18next';
 import {loadActiveChatCourses} from '@/utils/chatCourses';
 import DynamicThinking from '@/components/DynamicThinking/DynamicThinking';
 import {RichTextEditor} from '@/components/RichTextEditor';
@@ -18,7 +18,6 @@ import {studySupportEndpoint} from '@/utils/studySupportEndpoint';
 import {buildStudySupportFormData, buildStudySupportStreamBody} from '@/utils/studySupportRequest';
 import {queryStudySupportWithFile, streamStudySupport} from '@/utils/studySupportStream';
 import {safeStudySupportProgress} from '@/utils/studySupportProgress';
-import {isInstructorLevel} from '@/utils/roleCapabilities';
 
 const STUDY_SUPPORT_THINKING_STEPS = [
   {id: 'understand', text: 'Understanding your question.'},
@@ -53,6 +52,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const {user} = useAuth();
+    const {t: translate} = useTranslation();
     const chatAuthHeaders = () => ({
       Authorization: `Bearer ${user.accessToken}`,
       'X-Timezone': getBrowserTimeZone(),
@@ -108,33 +108,13 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
     }, [user?.accessToken, user?.id]);
     const selectedCourse = courses.find(course => Number(course.id) === Number(selectedCourseId));
     const currentCourseName = selectedCourseId === 0 ? 'All Courses' : selectedCourse?.title || selectedCourse?.name || `Course ${selectedCourseId}`;
-    const relevantCourseIds = selectedCourseId === 0
-      ? courses.map(course => Number(course.id))
-      : [selectedCourseId];
-    const requiresStudentExamLockdown = user ? !isInstructorLevel(user) : true;
-    const examLockdown = useAiExamLockdown(
-      relevantCourseIds,
-      user?.id ?? null,
-      Boolean(requiresStudentExamLockdown && isCoursesFetched && user?.accessToken && user?.id),
-    );
-    const isExamStatusPending = (!isCoursesFetched && !courseFetchFailed) || examLockdown.status === 'checking';
-    const isStudySupportUnavailable = isExamStatusPending
-      || courseFetchFailed
-      || examLockdown.status === 'locked'
-      || examLockdown.status === 'error';
-    const lockedCourseNames = courses
-      .filter(course => examLockdown.lockedCourseIds.includes(Number(course.id)))
-      .map(course => course.title || course.name || `Course ${course.id}`)
-      .join(', ');
-    const examLockdownMessage = courseFetchFailed
-      ? 'Study Support is temporarily unavailable because your course list could not be verified.'
-      : isExamStatusPending
-        ? 'Checking quiz attempt status before enabling Study Support…'
-        : examLockdown.status === 'error'
-          ? 'Study Support is temporarily unavailable because quiz attempt status could not be verified. Try again shortly.'
-          : selectedCourseId === 0
-            ? `Study Support is locked because an active quiz attempt is open in ${lockedCourseNames || 'one of your courses'}. Select a course without an active attempt to continue.`
-            : `Study Support is unavailable for ${currentCourseName} while you have an active quiz attempt. Submit or finalize the attempt before using course assistance.`;
+    // IELTS has no legacy Quiz module. Course availability still gates support;
+    // Mock Exam attempt controls belong to the separate exam workspace.
+    const isCourseStatusPending = !isCoursesFetched && !courseFetchFailed;
+    const isStudySupportUnavailable = isCourseStatusPending || courseFetchFailed;
+    const supportAvailabilityMessage = translate(courseFetchFailed
+      ? 'course:studySupport.courseLoadFailed'
+      : 'course:studySupport.checkingCourses');
     const menuItemStyle = (active) => ({
       display: 'block',
       width: '100%',
@@ -321,7 +301,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
       
       const raw = sessionStorage.getItem('pendingChat');
       if (!raw) return;
-      if (isExamStatusPending) return;
+      if (isCourseStatusPending) return;
       
       sessionStorage.removeItem('pendingChat');
       
@@ -332,7 +312,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
             setSelectedCourseId(Number(courseId));
             localStorage.setItem('selectedCourseId', String(courseId));
           }
-          if (examLockdown.status !== 'unlocked') {
+          if (isStudySupportUnavailable) {
             if (text && text.trim()) setInput(text.trim());
             return;
           }
@@ -352,7 +332,7 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
         }
       })();
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [props.isDashboard, isExamStatusPending, examLockdown.status]);
+    }, [props.isDashboard, isStudySupportUnavailable]);
     
     return (
       <>
@@ -389,12 +369,12 @@ const ChatContent = forwardRef<HTMLDivElement, Props>(
           <div className={props.isWorkspace ? workspaceStyles.messageArea : "flex flex-1 flex-col gap-3 overflow-y-auto p-4"} ref={containerRef} onScroll={event => {const element = event.currentTarget; setIsUserScrolled(element.scrollHeight - element.scrollTop - element.clientHeight > 100);}}>
             {isStudySupportUnavailable ? (
               <div
-                id="study-support-lockdown-message"
+                id="study-support-availability-message"
                 className="m-auto max-w-xl rounded-xl border border-amber-300 bg-amber-50 p-5 text-left text-amber-950"
-                role={courseFetchFailed || examLockdown.status === 'error' ? 'alert' : 'status'}
+                role={courseFetchFailed ? 'alert' : 'status'}
               >
-                <strong>{examLockdown.status === 'locked' ? 'Exam lockdown active' : 'Study Support unavailable'}</strong>
-                <p className="mt-2 text-sm">{examLockdownMessage}</p>
+                <strong>{translate('course:studySupport.unavailable')}</strong>
+                <p className="mt-2 text-sm">{supportAvailabilityMessage}</p>
                 {courseFetchFailed ? (
                   <button
                     type="button"

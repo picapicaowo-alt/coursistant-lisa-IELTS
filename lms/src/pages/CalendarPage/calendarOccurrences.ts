@@ -28,7 +28,7 @@ export function calendarOccurrences(
     }
     const id = row.occurrenceId ?? row.sessionOccurrenceId;
     // The unified feed also contains other kinds; their typed course endpoints
-    // supply the assignment, quiz and event details below the timetable.
+    // supply the assignment and event details below the timetable.
     if (id == null) continue;
     const course = courses.find((course) => course.id === row.courseId);
     const timezone = envelope?.timezone ?? row.timezone;

@@ -8,9 +8,7 @@ import {parseZonedTimestamp} from '@/utils/datetime';
 import {formatDateTime} from '@/i18n/formatting';
 import styles from './InstructorWorkComponent.module.scss';
 
-const queueLink = (item: GradingQueueItem) => item.assignmentId
-  ? `/course/${item.courseId}/assignments/${item.assignmentId}/grading`
-  : `/course/${item.courseId}/quizzes/${item.quizId}/grading`;
+const queueLink = (item: GradingQueueItem) => `/course/${item.courseId}/assignments/${item.assignmentId}/grading`;
 
 const activityLink = (item: RecentActivityItem) => {
   if (item.assignmentId) return `/course/${item.courseId}/assignments/${item.assignmentId}/grading`;
@@ -64,7 +62,7 @@ const InstructorWorkComponent: React.FC = () => {
             {!queueQuery.isError && queue.length === 0 ? <p className={styles.empty}>No grading work is waiting.</p> : null}
             <div className={styles.list}>
               {queue.map(item => (
-                <Link key={`${item.kind}-${item.courseId}-${item.assignmentId ?? item.quizId}`} to={queueLink(item)} className={styles.item}>
+                <Link key={`${item.kind}-${item.courseId}-${item.assignmentId}`} to={queueLink(item)} className={styles.item}>
                   <span className={styles.itemMain}><strong>{item.title}</strong><small>{item.courseCode} · {queueLabel(item.kind)}</small></span>
                   <span className={styles.count}>{item.pendingCount}</span>
                 </Link>

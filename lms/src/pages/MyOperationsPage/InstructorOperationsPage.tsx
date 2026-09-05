@@ -126,7 +126,7 @@ const coursePath = (id: number) =>
   generatePath(APP_ROUTE_PATHS.courseCourseId, { courseId: String(id) });
 
 function TeachingOverview() {
-  useTranslation('dashboard');
+  const {t} = useTranslation('dashboard');
   const today = useQuery({
     queryKey: ["me", "teaching-today"],
     queryFn: async () =>
@@ -277,25 +277,14 @@ function TeachingOverview() {
           <div>
             {queue.isError ? (
               <p className={s.notice}>
-                Showing assignment submissions. The combined assignment/quiz
-                queue is unavailable.
+                {t('teaching.assignmentQueueFallback')}
               </p>
             ) : null}
             {groups.map((item) => (
               <Link
                 className={local.row}
-                key={`${item.kind}-${item.courseId}-${item.assignmentId ?? item.quizId}`}
-                to={
-                  item.assignmentId
-                    ? assignmentGradingPath(item.courseId, item.assignmentId)
-                    : generatePath(
-                        APP_ROUTE_PATHS.courseCourseIdQuizzesQuizIdGrading,
-                        {
-                          courseId: String(item.courseId),
-                          quizId: String(item.quizId),
-                        },
-                      )
-                }
+                key={`${item.kind}-${item.courseId}-${item.assignmentId}`}
+                to={assignmentGradingPath(item.courseId, item.assignmentId!)}
               >
                 <span>
                   <strong>{item.title}</strong>

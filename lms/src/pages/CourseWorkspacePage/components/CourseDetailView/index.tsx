@@ -10,7 +10,6 @@ import {useCourseWorkspaceData} from "../../hooks/useCourseWorkspaceData";
 import {ContentCard} from "./ContentCard";
 import {AssignmentsCard} from "./AssignmentsCard";
 import {ScheduleCard} from "./ScheduleCard";
-import {QuizzesCard} from './QuizzesCard';
 import {EventsCard} from './EventsCard';
 import {GroupsCard} from './GroupsCard';
 import {RosterCard} from './RosterCard';
@@ -36,8 +35,8 @@ interface CourseDetailViewProps {
 export const CourseDetailView: React.FC<CourseDetailViewProps> = ({instructorView = false, canCreateAssignments = false, canManageEvents = false, canManageGroups = false, canPostAnnouncements = false, canViewOwnGrades = false}) => {
   const { t: translate } = useTranslation();
   const {
-    course, weeks, sessions, assignments, quizzes, events, groupSets, announcements,
-    isLoading, isError, isUnavailable, sessionsFailed, assignmentsFailed, quizzesFailed, eventsFailed, groupSetsFailed, announcementsFailed, refetch,
+    course, weeks, sessions, assignments, events, groupSets, announcements,
+    isLoading, isError, isUnavailable, sessionsFailed, assignmentsFailed, eventsFailed, groupSetsFailed, announcementsFailed, refetch,
   } = useCourseWorkspaceData();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -146,13 +145,13 @@ export const CourseDetailView: React.FC<CourseDetailViewProps> = ({instructorVie
               <div id={`week-content-${week.id}`} hidden={!expanded}>{expanded ? <ContentCard embedded compact={instructorView} showDownloadAll={!search} week={week} onOpenMaterial={openMaterial}/> : null}</div>
             </section>;})}
           </> : null}
-          {activeTab === 'assignments' ? <><AssignmentsCard courseId={course.id} assignments={assignments} failed={assignmentsFailed} canCreate={canCreateAssignments}/><QuizzesCard courseId={course.id} quizzes={quizzes} failed={quizzesFailed} canCreate={canCreateAssignments}/></> : null}
+          {activeTab === 'assignments' ? <><AssignmentsCard courseId={course.id} assignments={assignments} failed={assignmentsFailed} canCreate={canCreateAssignments}/></> : null}
           {activeTab === 'discussion' ? <DiscussionPanel courseId={course.id}/> : null}
           {activeTab === 'announcements' ? <AnnouncementsCard courseId={course.id} announcements={announcements} failed={announcementsFailed} canManage={canPostAnnouncements}/> : null}
           {activeTab === 'schedule' ? <><ScheduleCard sessions={sessions} failed={sessionsFailed} courseId={course.id} canManage={canManageEvents}/><EventsCard courseId={course.id} events={events} failed={eventsFailed} canManage={canManageEvents}/><GroupsCard courseId={course.id} groupSets={groupSets} failed={groupSetsFailed} canManage={canManageGroups}/>{canCreateAssignments ? <RosterCard courseId={course.id}/> : null}</> : null}
         </div>
         <aside className={styles.learningRail} aria-label={translate("course:learning.information")}>
-          {canViewOwnGrades ? <GradesCard courseId={course.id}/> : <section className={styles.card}><h2 className={styles.cardTitle}>{translate("course:learning.overview")}</h2><dl className={styles.overviewCounts}><div><dt>{translate("course:learning.units")}</dt><dd>{formatNumber(weeks.length)}</dd></div><div><dt>{translate("course:detail.assignments")}</dt><dd>{assignmentsFailed ? translate('course:learning.dataUnavailable') : formatNumber(assignments.length)}</dd></div><div><dt>{translate("course:detail.quizzes")}</dt><dd>{quizzesFailed ? translate('course:learning.dataUnavailable') : formatNumber(quizzes.length)}</dd></div></dl></section>}
+          {canViewOwnGrades ? <GradesCard courseId={course.id}/> : <section className={styles.card}><h2 className={styles.cardTitle}>{translate("course:learning.overview")}</h2><dl className={styles.overviewCounts}><div><dt>{translate("course:learning.units")}</dt><dd>{formatNumber(weeks.length)}</dd></div><div><dt>{translate("course:detail.assignments")}</dt><dd>{assignmentsFailed ? translate('course:learning.dataUnavailable') : formatNumber(assignments.length)}</dd></div></dl></section>}
           {canViewOwnGrades ? <section className={styles.card}><h2 className={styles.cardTitle}>{translate("course:learning.assignmentProgress")}</h2><AssignmentProgress progress={studentProgress.data?.courses?.find(item => item.courseId === course.id)} loading={studentProgress.isFetching} failed={studentProgress.isError}/></section> : null}
         </aside>
       </div>
