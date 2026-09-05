@@ -36,5 +36,38 @@
       "REACHED_INCOMPLETE_CHECKPOINT": "Incomplete checkpoint reached",
       "OVERDUE_STUDY_PLAN_TASK": "Overdue study plan task"
     }
+  },
+  "studentTasks": {
+    "description": "Personalized tasks from your advisor to help you reach your learning goal.",
+    "statusFilters": "Task status filters",
+    "allTasks": "All tasks",
+    "board": "Tasks by checkpoint",
+    "checkpoints": "Checkpoints",
+    "step": "Step {{number}}",
+    "checkpoint": "Checkpoint {{number}}",
+    "task": "Advisor task",
+    "viewTask": "View task",
+    "noMatches": "No tasks match this status in this checkpoint.",
+    "empty": "Your advisor has not added tasks yet.",
+    "comments": "Advisor Comments",
+    "noFeedback": "Your advisor’s task feedback will appear here.",
+    "deadlines": "Upcoming deadlines",
+    "noDeadlines": "No pending tasks with a deadline.",
+    "activeStep": "(Active)",
+    "start": "Start",
+    "continue": "Continue",
+    "dueToday": "Due today",
+    "dueTomorrow": "Due tomorrow",
+    "inDays_one": "In {{count}} day",
+    "inDays_other": "In {{count}} days",
+    "showLess": "Show less",
+    "inDays": "In {{count}} days"
+  },
+  "studentPlan": {
+    "description": "Your goals, checkpoints, and next steps.",
+    "views": "Study plan views",
+    "overview": "Overview",
+    "learning": "Learning overview",
+    "messages": "Advisor messages"
   }
 }

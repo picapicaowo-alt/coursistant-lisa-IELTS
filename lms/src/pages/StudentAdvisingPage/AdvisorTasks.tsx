@@ -1,7 +1,9 @@
+import { useTranslation } from 'react-i18next';
 import {useState} from 'react';
-import {CalendarDays, Sparkles} from 'lucide-react';
+import {CalendarDays, ChevronRight, Sparkle} from 'lucide-react';
+import {differenceInCalendarDays, parseISO} from 'date-fns';
 import type {StudyPlanAggregate} from '@/apis';
-import {WorkspaceSection} from '@/components/WorkspaceSection';
+import {formatNumber} from '@/i18n/formatting';
 import {
   TASK_STATUS,
   formatPlanDate,
@@ -9,7 +11,7 @@ import {
   taskStatusTone,
 } from '@/utils/studyPlan';
 import {studyPlanRecordKey} from './studyPlanView';
-import styles from './PlanOverview.module.scss';
+import styles from './AdvisorTasks.module.scss';
 
 export function AdvisorTasks({
   plan,
@@ -18,8 +20,10 @@ export function AdvisorTasks({
   plan?: StudyPlanAggregate;
   onCheckpoint: (key: string, taskId?: number) => void;
 }) {
+  const { t: translate } = useTranslation();
   const [step, setStep] = useState(0);
   const [status, setStatus] = useState('');
+  const [showAllReminders, setShowAllReminders] = useState(false);
   const checkpoints = plan?.checkpoints ?? [];
   const selectedIndex = Math.min(step, Math.max(0, checkpoints.length - 1));
   const checkpoint = checkpoints[selectedIndex];
@@ -34,9 +38,19 @@ export function AdvisorTasks({
   );
   const reminders = allTasks
     .filter(({task}) => task.dueDate && task.status !== TASK_STATUS.completed)
-    .sort((a, b) => a.task.dueDate!.localeCompare(b.task.dueDate!))
-    .slice(0, 5);
+    .sort((a, b) => a.task.dueDate!.localeCompare(b.task.dueDate!));
+  const visibleReminders = showAllReminders ? reminders : reminders.slice(0, 3);
   const feedback = allTasks.filter(({task}) => task.advisorFeedback);
+  const deadline = (dueDate?: string, taskStatus?: string) => {
+    if (!dueDate || taskStatus === TASK_STATUS.completed) return undefined;
+    // Contract deadlines are calendar dates in the viewer's locale, not UTC instants.
+    const days = differenceInCalendarDays(parseISO(dueDate.slice(0, 10)), new Date());
+    if (!Number.isFinite(days)) return undefined;
+    if (days < 0) return {tone: 'urgent', label: translate('common:status.OVERDUE')};
+    if (days === 0) return {tone: 'urgent', label: translate('advising:studentTasks.dueToday')};
+    if (days === 1) return {tone: 'soon', label: translate('advising:studentTasks.dueTomorrow')};
+    return {tone: 'later', label: translate('advising:studentTasks.inDays', {count: days})};
+  };
   return (
     <div className={styles.tasksLayout}>
       <div className={styles.tasksMain}>
@@ -45,19 +59,16 @@ export function AdvisorTasks({
           aria-labelledby="advisor-tasks-title"
         >
           <div>
-            <h2 id="advisor-tasks-title">Advisor Tasks</h2>
+            <h2 id="advisor-tasks-title">{translate("dashboard:advisorTasks")}</h2>
             <p>
-              Personalized tasks from your advisor to help you reach your
-              learning goal.
+              {translate('advising:studentTasks.description')}
             </p>
-          </div>
-          <img src="/icons/figma-study-plan/celebration.svg" alt="" />
-          <nav className={styles.taskCounts} aria-label="Task status filters">
+          <nav className={styles.taskCounts} aria-label={translate('advising:studentTasks.statusFilters')}>
             {[
-              {value: '', label: 'All tasks'},
-              {value: TASK_STATUS.notStarted, label: 'Not started'},
-              {value: TASK_STATUS.inProgress, label: 'In progress'},
-              {value: TASK_STATUS.completed, label: 'Completed'},
+              {value: '', label: translate('advising:studentTasks.allTasks')},
+              {value: TASK_STATUS.notStarted, label: taskStatusLabel(TASK_STATUS.notStarted)},
+              {value: TASK_STATUS.inProgress, label: taskStatusLabel(TASK_STATUS.inProgress)},
+              {value: TASK_STATUS.completed, label: taskStatusLabel(TASK_STATUS.completed)},
             ].map((filter) => (
               <button
                 type="button"
@@ -65,21 +76,30 @@ export function AdvisorTasks({
                 aria-pressed={filter.value === status}
                 onClick={() => setStatus(filter.value)}
               >
-                <span data-tone={taskStatusTone(filter.value)} />
+                {filter.value ? <span data-tone={taskStatusTone(filter.value)} /> : null}
                 {filter.label}
                 <strong>
                   {
-                    allTasks.filter(
+                    formatNumber(allTasks.filter(
                       ({task}) => !filter.value || task.status === filter.value,
-                    ).length
+                    ).length)
                   }
                 </strong>
               </button>
             ))}
           </nav>
+          </div>
+          <img src="/icons/figma-study-plan/celebration.svg" alt="" />
         </section>
-        <section className={styles.taskBoard} aria-label="Tasks by checkpoint">
-          <nav className={styles.steps} aria-label="Checkpoints">
+        <section className={styles.taskBoard} aria-label={translate('advising:studentTasks.board')}>
+          {checkpoint ? (
+            <h3>
+              {checkpoint.description ||
+                checkpoint.goal ||
+                translate('advising:studentTasks.checkpoint', {number: formatNumber(selectedIndex + 1)})}
+            </h3>
+          ) : null}
+          <nav className={styles.steps} aria-label={translate('advising:studentTasks.checkpoints')}>
             {checkpoints.map((record, index) => (
               <button
                 type="button"
@@ -88,27 +108,25 @@ export function AdvisorTasks({
                 title={record.description || record.goal}
                 onClick={() => setStep(index)}
               >
-                Step {index + 1}
+                {translate('advising:studentTasks.step', {number: formatNumber(index + 1)})}
+                {selectedIndex === index ? <span>{translate('advising:studentTasks.activeStep')}</span> : null}
               </button>
             ))}
           </nav>
-          {checkpoint ? (
-            <h3>
-              {checkpoint.description ||
-                checkpoint.goal ||
-                `Checkpoint ${selectedIndex + 1}`}
-            </h3>
-          ) : null}
           {tasks.length ? (
-            tasks.map((task, index) => (
-              <article className={styles.taskRow} key={task.id ?? index}>
+            tasks.map((task, index) => {
+              const due = deadline(task.dueDate, task.status);
+              const canAct = task.id != null && task.version != null;
+              return <article className={styles.taskRow} key={task.id ?? index}>
                 <div>
-                  <strong>{task.title || 'Advisor task'}</strong>
+                  <strong>{task.title || translate('advising:studentTasks.task')}</strong>
                   {task.description ? <p>{task.description}</p> : null}
                 </div>
-                <span className={styles.taskDate}>
-                  <CalendarDays size={15} aria-hidden="true" />
-                  {formatPlanDate(task.dueDate)}
+                <span className={styles.taskDate} data-tone={due?.tone}>
+                  <CalendarDays size={18} strokeWidth={1.5} aria-hidden="true" />
+                  {task.dueDate ? <time dateTime={task.dueDate.slice(0, 10)} title={formatPlanDate(task.dueDate)} aria-label={formatPlanDate(task.dueDate)}>
+                    {due && due.tone !== 'later' ? due.label : formatPlanDate(task.dueDate, {compact: true})}
+                  </time> : <span>{formatPlanDate()}</span>}
                 </span>
                 <span
                   className={styles.taskStatus}
@@ -118,56 +136,69 @@ export function AdvisorTasks({
                 </span>
                 <button
                   type="button"
+                  className={styles.taskAction}
+                  data-primary={(canAct && task.status === TASK_STATUS.notStarted) || undefined}
                   onClick={() =>
                     onCheckpoint(studyPlanRecordKey(checkpoint!, selectedIndex), task.id)
                   }
                 >
-                  View task
+                  {canAct && task.status === TASK_STATUS.notStarted
+                    ? translate('advising:studentTasks.start')
+                    : canAct && task.status === TASK_STATUS.inProgress
+                      ? translate('advising:studentTasks.continue')
+                      : translate('advising:studentTasks.viewTask')}
                 </button>
-              </article>
-            ))
+              </article>;
+            })
           ) : (
             <p className={styles.taskEmpty}>
               {checkpoints.length
-                ? 'No tasks match this status in this checkpoint.'
-                : 'Your advisor has not added tasks yet.'}
+                ? translate('advising:studentTasks.noMatches')
+                : translate('advising:studentTasks.empty')}
             </p>
           )}
         </section>
       </div>
       <aside className={styles.tasksRail}>
-        <WorkspaceSection
-          title="Advisor Comments"
-          meta={<Sparkles size={22} aria-hidden="true" />}
-        >
+        <section className={styles.railCard} aria-labelledby="advisor-comments-title">
+          <h2 id="advisor-comments-title"><Sparkle size={36} fill="currentColor" strokeWidth={1} aria-hidden="true" />{translate('advising:studentTasks.comments')}</h2>
           {feedback.length ? (
             feedback.slice(-3).map(({task}, index) => (
               <div key={task.id ?? index}>
-                <strong>{task.title}</strong>
                 <p>{task.advisorFeedback}</p>
               </div>
             ))
           ) : (
-            <p>Your advisor’s task feedback will appear here.</p>
+            <p>{translate('advising:studentTasks.noFeedback')}</p>
           )}
-        </WorkspaceSection>
-        <WorkspaceSection title="Upcoming deadlines">
+        </section>
+        <section className={styles.railCard} aria-labelledby="advisor-deadlines-title">
+          <header className={styles.railHeading}>
+            <h2 id="advisor-deadlines-title">{translate('dashboard:alerts')}</h2>
+            {reminders.length > 3 ? <button type="button" aria-expanded={showAllReminders} aria-controls="advisor-deadlines" onClick={() => setShowAllReminders(current => !current)}>
+              {showAllReminders ? translate('advising:studentTasks.showLess') : translate('common:actions.viewAll')}<ChevronRight size={20} aria-hidden="true" />
+            </button> : null}
+          </header>
+          <div id="advisor-deadlines" className={styles.reminders}>
           {reminders.length ? (
-            reminders.map(({task, key}, index) => (
-              <button
+            visibleReminders.map(({task, key}, index) => {
+              const due = deadline(task.dueDate, task.status);
+              return <button
                 type="button"
                 key={task.id ?? index}
                 className={styles.task}
                 onClick={() => onCheckpoint(key, task.id)}
               >
-                <strong>{task.title || 'Advisor task'}</strong>
-                <small>{formatPlanDate(task.dueDate)}</small>
-              </button>
-            ))
+                <span className={styles.reminderDot} data-tone={taskStatusTone(task.status)} aria-hidden="true" />
+                <strong>{task.title || translate('advising:studentTasks.task')}</strong>
+                <small data-tone={due?.tone}>{due && due.tone !== 'later' ? due.label : formatPlanDate(task.dueDate)}</small>
+              </button>;
+            })
           ) : (
-            <p>No pending tasks with a deadline.</p>
+            <p>{translate('advising:studentTasks.noDeadlines')}</p>
           )}
-        </WorkspaceSection>
+          </div>
+        </section>
       </aside>
     </div>
   );

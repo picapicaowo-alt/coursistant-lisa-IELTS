@@ -56,7 +56,7 @@ test('tasks use actual status counts and open their checkpoint', async ({page}, 
   await capture(page, info.outputPath.bind(info), 'advisor-tasks');
   await page.getByRole('navigation', {name: 'Task status filters'}).getByRole('button', {name: /Not started/}).click();
   await expect(page.getByRole('region', {name: 'Tasks by checkpoint'}).getByText('Review advisor feedback')).toHaveCount(0);
-  await page.getByRole('button', {name: 'View task', exact: true}).click();
+  await page.getByRole('button', {name: 'Start', exact: true}).click();
   await expect(page).toHaveURL(/checkpoint=91/);
 });
 
