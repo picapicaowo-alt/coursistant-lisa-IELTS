@@ -213,7 +213,9 @@
     "WRITING": "写作",
     "SPEAKING": "口语",
     "NOT_APPLICABLE": "不适用",
-    "UNKNOWN": "未知"
+    "UNKNOWN": "未知",
+    "READY": "就绪",
+    "PENDING_WRITING_GRADING": "等待写作评分"
   },
   "pagination": {
     "summary": "第 {{page}} 页 · 共 {{total}} 条结果",

@@ -69,5 +69,49 @@
     "overview": "Overview",
     "learning": "Learning overview",
     "messages": "Advisor messages"
+  },
+  "availability": {
+    "title": "Instructor availability",
+    "check": "Check availability",
+    "loading": "Checking availability…",
+    "empty": "No availability is recorded for this instructor.",
+    "windows": "Weekly availability",
+    "exceptions": "Exceptions",
+    "sessionExpired": "Your session has expired. Sign in again.",
+    "forbidden": "You do not have permission to view this instructor’s availability.",
+    "instructorUnavailable": "Availability is unavailable for the selected instructor. Try again or choose another instructor.",
+    "loadError": "Instructor availability could not be loaded. Please try again.",
+    "fields": {
+      "dayOfWeek": "Day",
+      "startTime": "Start time",
+      "endTime": "End time",
+      "timezone": "Time zone",
+      "effectiveFrom": "Effective from",
+      "effectiveTo": "Effective until",
+      "exceptionDate": "Exception date"
+    }
+  },
+  "conversation": {
+    "loadError": "Messages could not be loaded.",
+    "retry": "Retry messages",
+    "empty": "No messages yet",
+    "emptyHelp": "Send a message or attachment to start the conversation.",
+    "markReadError": "The message could not be marked as read. Please try again."
+  },
+  "attachments": {
+    "preview": "Preview",
+    "download": "Download",
+    "popupBlocked": "Allow pop-ups to preview this attachment.",
+    "loadError": "The attachment could not be opened or downloaded. Please try again."
+  },
+  "records": {
+    "profileLoadError": "Profile could not be loaded.",
+    "profileRetry": "Retry profile",
+    "planLoadError": "Study plan could not be loaded.",
+    "planRetry": "Retry plan",
+    "planProfileLoading": "Loading the student profile…",
+    "planProfileRequired": "Create the student profile before preparing a study plan.",
+    "planProfileOpen": "Open student profile",
+    "courseActionsLoadError": "Course actions could not be loaded. Open Manage enrollment to try again."
   }
 }

@@ -44,6 +44,10 @@ export const isHttpStatus = (error: unknown, status: number): boolean =>
 export const isNotFound = (error: unknown): boolean =>
   isHttpStatus(error, 404);
 
+/** A hidden resource or unknown 404 must not unlock a first-use creation flow. */
+export const isMissingResource = (error: unknown, resourceCode: string): boolean =>
+  isNotFound(error) && getApiErrorCode(error) === resourceCode;
+
 export const isMethodNotAllowed = (error: unknown): boolean =>
   isHttpStatus(error, 405);
 

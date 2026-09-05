@@ -109,7 +109,7 @@ test('course materials preview actual media, retry failures and preserve ordered
   await expect(pdfPreview).toContainText('Academic reading guide');
   await expect(viewer.locator('video')).toHaveCount(0);
   await viewer.getByRole('button', {name: 'Download material', exact: true}).click();
-  await expect(viewer.getByRole('alert')).toContainText('usable file bytes');
+  await expect(viewer.getByRole('alert')).toHaveText('The file could not be downloaded.');
   const downloadEvent = page.waitForEvent('download');
   await viewer.getByRole('button', {name: 'Download material', exact: true}).click();
   const download = await downloadEvent;

@@ -73,5 +73,12 @@
     "needsGrading": "待评分",
     "manualGrading": "人工评分",
     "readyRelease": "待公布"
+  },
+  "teachingAlerts": {
+    "pendingGrading_one": "{{displayCount}} 份提交待批改",
+    "pendingGrading_other": "{{displayCount}} 份提交待批改",
+    "grading": "有提交待批改",
+    "upcomingClass": "即将上课",
+    "scheduleConflict": "排课冲突"
   }
 }

@@ -1,3 +1,4 @@
+import {isMissingResource} from './apiError';
 import {describe, expect, it} from 'vitest';
 import {unwrapData} from '@/apis/types/common';
 import {
@@ -65,5 +66,16 @@ describe('apiError helpers', () => {
     expect(getHttpStatusDescription({code: 405, message: 'Not allowed'})).toMatch(/not supported/i);
     expect(getHttpStatusDescription({code: 409, message: 'Conflict'})).toMatch(/conflict/i);
     expect(getHttpStatusDescription({code: 500, message: 'Error'})).toMatch(/unexpected server error/i);
+  });
+});
+
+
+describe('contract-specific missing resources', () => {
+  it.each(['STUDENT_PROFILE_NOT_FOUND', 'STUDY_PLAN_NOT_FOUND'])('recognizes only the matching 404 %s', code => {
+    expect(isMissingResource({code: 404, details: {code}}, code)).toBe(true);
+    for (const error of [{code: 404}, {code: 404, details: {code: 'USER_NOT_FOUND'}}, {code: 403, details: {code}}, {code: 500, details: {code}}]) {
+      expect(isMissingResource(error, code)).toBe(false);
+    }
+    expect(isMissingResource({code: 404, details: {code}}, 'OTHER_RESOURCE_NOT_FOUND')).toBe(false);
   });
 });

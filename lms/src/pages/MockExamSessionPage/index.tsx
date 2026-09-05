@@ -1,7 +1,7 @@
 import {useEffect} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {Navigate, useNavigate, useParams} from 'react-router-dom'
-import {unwrapData} from '@/apis'
+import {unwrapData, type StudentMockExamDetail} from '@/apis'
 import {mockExamApiService} from '@/apis/services/mock-exam-api'
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext'
 import {advisingErrorMessage} from '@/pages/advising/advisingErrors'
@@ -21,10 +21,11 @@ import {ExamPage} from './runner/pages/ExamPage'
 import {ListeningExamPage} from './runner/pages/ListeningExamPage'
 import {WritingExamPage} from './runner/pages/WritingExamPage'
 import styles from './runner.module.scss'
-
-type MockExamSection = 'listening' | 'reading' | 'writing'
+import {SubmittedExamSection} from './SubmittedExamSection'
+import {isSectionSubmitted, type MockExamSection} from './submissionState'
 
 type LoadedSession =
+  | {section: 'submitted'; exam: StudentMockExamDetail; submittedSection: MockExamSection; objectUrls: string[]}
   | {section: 'reading'; title: string; reading: ReadingTest; objectUrls: string[]}
   | {section: 'listening'; title: string; paper: ListeningPaper; objectUrls: string[]}
   | {section: 'writing'; title: string; writing: ApiWritingDetail; objectUrls: string[]}
@@ -34,11 +35,10 @@ function isMockExamSection(value: string | undefined): value is MockExamSection 
 }
 
 async function loadSession(studentMockExamId: number, section: MockExamSection): Promise<LoadedSession> {
-  const [examResponse, sectionResponse] = await Promise.all([
-    mockExamApiService.getStudentExam(studentMockExamId),
-    mockExamApiService.getStudentSection(studentMockExamId, section),
-  ])
+  const examResponse = await mockExamApiService.getStudentExam(studentMockExamId)
   const exam = unwrapData(examResponse, 'getStudentMockExam')
+  if (isSectionSubmitted(exam, section)) return {section: 'submitted', exam, submittedSection: section, objectUrls: []}
+  const sectionResponse = await mockExamApiService.getStudentSection(studentMockExamId, section)
   const sectionPayload = unwrapData(sectionResponse, `getStudentMockExam${section}`)
   const title = readExamTitle(exam, `Mock exam ${studentMockExamId}`)
 
@@ -138,6 +138,10 @@ const MockExamSessionPage = () => {
 
   const candidateLabel = user.name || user.email || 'Candidate'
   const onExit = () => navigate('/mock-exams')
+
+  if (session.data.section === 'submitted') {
+    return <SubmittedExamSection exam={session.data.exam} section={session.data.submittedSection} onExit={onExit}/>
+  }
 
   return (
     <div className={styles.root}>

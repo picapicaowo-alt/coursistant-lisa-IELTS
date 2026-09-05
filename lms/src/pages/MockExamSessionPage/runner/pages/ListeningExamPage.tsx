@@ -12,6 +12,7 @@ import {
   findPartForQuestion,
 } from '../data/listening/helpers'
 import type { ListeningPaper } from '../data/listening/types'
+import { buildQuestionSubmission } from '../utils/questionSubmission'
 
 type ListeningExamPageProps = {
   paper: ListeningPaper
@@ -181,10 +182,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
 
     setAudioStopSignal((n) => n + 1)
 
-    const payload: Record<string, string> = {}
-    for (const [key, value] of Object.entries(answers)) {
-      payload[String(key)] = value
-    }
+    const payload = buildQuestionSubmission(questionIds, answers)
 
     setSubmitting(true)
     setSubmissionOpen(true)
@@ -216,7 +214,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
     } finally {
       setSubmitting(false)
     }
-  }, [answers, testId, scoreSummary, submitting])
+  }, [answers, questionIds, testId, scoreSummary, submitting])
 
   submitSectionRef.current = submitSection
 

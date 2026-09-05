@@ -1,0 +1,264 @@
+{
+  "generatedAt": "2026-09-05T07:46:59.443Z",
+  "environment": {
+    "frontend": "https://app.xlearnedu.com",
+    "api": "https://api-cn.xlearnedu.com/api",
+    "tenantId": 1,
+    "liveRevision": "a6f137631a668dfb0ac6806c708e527c02377723"
+  },
+  "accounts": [
+    {
+      "label": "Counsellor 1",
+      "userId": 3,
+      "expectedUserId": 3,
+      "level": "COUNSELLOR",
+      "expectedLevel": "COUNSELLOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Counsellor 2",
+      "userId": 4,
+      "expectedUserId": 4,
+      "level": "COUNSELLOR",
+      "expectedLevel": "COUNSELLOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Counsellor 4",
+      "userId": 6,
+      "expectedUserId": 6,
+      "level": "COUNSELLOR",
+      "expectedLevel": "COUNSELLOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Counsellor 3",
+      "userId": 5,
+      "expectedUserId": 5,
+      "level": "COUNSELLOR",
+      "expectedLevel": "COUNSELLOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Advisor 2",
+      "userId": 8,
+      "expectedUserId": 8,
+      "level": "ADVISOR",
+      "expectedLevel": "ADVISOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Advisor 1",
+      "userId": 7,
+      "expectedUserId": 7,
+      "level": "ADVISOR",
+      "expectedLevel": "ADVISOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Advisor 3",
+      "userId": 9,
+      "expectedUserId": 9,
+      "level": "ADVISOR",
+      "expectedLevel": "ADVISOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Advisor 4",
+      "userId": 10,
+      "expectedUserId": 10,
+      "level": "ADVISOR",
+      "expectedLevel": "ADVISOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Advisor 5",
+      "userId": 11,
+      "expectedUserId": 11,
+      "level": "ADVISOR",
+      "expectedLevel": "ADVISOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Advisor 6",
+      "userId": 12,
+      "expectedUserId": 12,
+      "level": "ADVISOR",
+      "expectedLevel": "ADVISOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Advisor 8",
+      "userId": 14,
+      "expectedUserId": 14,
+      "level": "ADVISOR",
+      "expectedLevel": "ADVISOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Advisor 7",
+      "userId": 13,
+      "expectedUserId": 13,
+      "level": "ADVISOR",
+      "expectedLevel": "ADVISOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 1",
+      "userId": 15,
+      "expectedUserId": 15,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 2",
+      "userId": 16,
+      "expectedUserId": 16,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 3",
+      "userId": 17,
+      "expectedUserId": 17,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 4",
+      "userId": 18,
+      "expectedUserId": 18,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 5",
+      "userId": 19,
+      "expectedUserId": 19,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 6",
+      "userId": 20,
+      "expectedUserId": 20,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 8",
+      "userId": 22,
+      "expectedUserId": 22,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 7",
+      "userId": 21,
+      "expectedUserId": 21,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 10",
+      "userId": 24,
+      "expectedUserId": 24,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Instructor 9",
+      "userId": 23,
+      "expectedUserId": 23,
+      "level": "INSTRUCTOR",
+      "expectedLevel": "INSTRUCTOR",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    },
+    {
+      "label": "Student",
+      "userId": 26,
+      "level": "STUDENT",
+      "expectedLevel": "STUDENT",
+      "role": "USER",
+      "login": "passed",
+      "identityMatches": true
+    }
+  ],
+  "recordedRequests": {
+    "initial": 328,
+    "workflow": 67,
+    "auth": 20,
+    "vocabulary": 13,
+    "total": 428,
+    "note": "Recorded requests only; extra login/logout, public preflight and browser actions are excluded. Response coverage is not all-state workflow acceptance."
+  },
+  "contracts": {
+    "entries": 432,
+    "uniqueOperations": 423,
+    "entriesWithResponse": 104,
+    "uniqueOperationsWithResponse": 99
+  },
+  "validation": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "productionTypecheck": "passed",
+    "unitFiles": 163,
+    "unitTests": 810,
+    "build": "passed",
+    "e2e": 314,
+    "deployed": false
+  }
+}

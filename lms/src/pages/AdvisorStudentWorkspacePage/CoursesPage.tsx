@@ -1,4 +1,5 @@
 import React, {useDeferredValue, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
 import {Link, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {CalendarClock, Check, MapPin, Plus, UserRound, UsersRound, X} from 'lucide-react';
@@ -23,6 +24,7 @@ import styles from '../advising/advising.module.scss';
 import cStyles from './CoursesPage.module.scss';
 import {CourseSummaryDialog} from './CourseSummaryDialog';
 import {EnrollmentDialog, type EnrollmentAction} from './EnrollmentDialog';
+import {loadPlanningCourse} from './planningCourse';
 
 const scheduleLabel = (dayOfWeek?: string, startTime?: string, endTime?: string) => {
   if (!dayOfWeek && !startTime) return null;
@@ -36,6 +38,7 @@ const scheduleLabel = (dayOfWeek?: string, startTime?: string, endTime?: string)
 };
 
 const CoursesPage: React.FC = () => {
+  const {t} = useTranslation('advising');
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
   const queryClient = useQueryClient();
@@ -87,6 +90,10 @@ const CoursesPage: React.FC = () => {
     queryFn: async () => unwrapData(await advisorApiService.listStudentCourses(id), 'advisorStudentCourses'),
     enabled: Number.isInteger(id),
     retry: false,
+  });
+  const planningCourse = useMutation({
+    meta: {advisingStudentId: id},
+    mutationFn: loadPlanningCourse,
   });
 
   const courseOptions = useQuery({
@@ -258,7 +265,7 @@ const CoursesPage: React.FC = () => {
         throw new Error('Select a course with a current version and instructor.');
       }
       const original = courses.data?.find(course => String(course.courseId) === courseEdit.courseId);
-      if (original?.courseLaunchVersion !== Number(courseEdit.expectedVersion)) {
+      if (!original || (original.courseLaunchVersion != null && original.courseLaunchVersion !== Number(courseEdit.expectedVersion))) {
         throw new Error('The course changed. Select it again before saving.');
       }
       const remainingSessions: AdvisingSessionRequest[] = [];
@@ -337,12 +344,19 @@ const CoursesPage: React.FC = () => {
   const reloadVersions = async () => {
     const [latestPlan, latestCourses] = await Promise.all([plan.refetch(), courses.refetch()]);
     if (latestPlan.isError || latestCourses.isError) return;
+    let selected = latestCourses.data?.find(course => String(course.courseId) === courseEdit.courseId);
+    let latestEnrollment = latestCourses.data?.find(course => course.courseId === enrollmentCourse?.courseId);
+    try {
+      if (latestEnrollment) latestEnrollment = await planningCourse.mutateAsync(latestEnrollment);
+      if (selected) selected = await planningCourse.mutateAsync(selected);
+    } catch {
+      // Keep reviewed snapshots and conflict state until all required reads succeed.
+      return;
+    }
     if (enrollmentCourse) {
       // Advance the reviewed enrollment only after an explicit conflict reload.
-      const latestEnrollment = latestCourses.data?.find(course => course.courseId === enrollmentCourse.courseId);
       setEnrollmentCourse(latestEnrollment && !['COMPLETED', 'HIDDEN'].includes(latestEnrollment.lifecycleStatus ?? '') && latestEnrollment.status !== 'WITHDRAWN' ? latestEnrollment : undefined);
     }
-    const selected = latestCourses.data?.find(course => String(course.courseId) === courseEdit.courseId);
     if (selected?.courseLaunchVersion != null)
       setCourseEdit(current => ({...current, expectedVersion: String(selected.courseLaunchVersion)}));
     linkGroup.reset();
@@ -355,6 +369,7 @@ const CoursesPage: React.FC = () => {
 
   return (
     <div className={styles.grid}>
+      {planningCourse.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(planningCourse.error, t('records.courseActionsLoadError'))}</p> : null}
       {error ? (
         <p className={styles.error} role="alert">
           {advisingErrorMessage(error, 'Course planning could not be completed.')}
@@ -446,7 +461,7 @@ const CoursesPage: React.FC = () => {
               actions={<>
                 <button type="button" onClick={() => setSelectedCourse(course)}>View Course</button>
                 {!['COMPLETED', 'HIDDEN'].includes(course.lifecycleStatus ?? '') && course.status !== 'WITHDRAWN' ? (
-                  <button type="button" data-variant="secondary" onClick={() => {if (!needsReload) transition.reset(); setEnrollmentCourse(course);}}>Manage enrollment</button>
+                  <button type="button" data-variant="secondary" disabled={planningCourse.isPending} onClick={() => {if (!needsReload) transition.reset(); planningCourse.mutate(course, {onSuccess: setEnrollmentCourse});}}>Manage enrollment</button>
                 ) : (
                   <span className={styles.readOnlyBadge}>{course.lifecycleStatus || course.status}</span>
                 )}

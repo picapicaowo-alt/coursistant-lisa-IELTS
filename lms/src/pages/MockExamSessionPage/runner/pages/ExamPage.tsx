@@ -14,6 +14,7 @@ import {
   type ReadingTest,
 } from '../data/reading'
 import type { NoteItem, TextSpan, ToolMode } from '../types/annotation'
+import { buildQuestionSubmission } from '../utils/questionSubmission'
 
 type ExamPageProps = {
   reading: ReadingTest
@@ -135,10 +136,7 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
   const submitSection = useCallback(async () => {
     if (submitting || scoreSummary) return
 
-    const payload: Record<string, string> = {}
-    for (const [key, value] of Object.entries(answers)) {
-      payload[String(key)] = value
-    }
+    const payload = buildQuestionSubmission(questionIds, answers)
 
     setSubmitting(true)
     setSubmissionOpen(true)
@@ -170,7 +168,7 @@ export function ExamPage({ reading, testId, testTitle, candidateLabel, onExit }:
     } finally {
       setSubmitting(false)
     }
-  }, [answers, testId, scoreSummary, submitting])
+  }, [answers, questionIds, testId, scoreSummary, submitting])
 
   submitSectionRef.current = submitSection
 

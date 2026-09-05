@@ -69,5 +69,49 @@
     "overview": "概覽",
     "learning": "學習概況",
     "messages": "顧問訊息"
+  },
+  "availability": {
+    "title": "教師可用時間",
+    "check": "查詢可用時間",
+    "loading": "正在查詢可用時間…",
+    "empty": "此教師尚未設定可用時間。",
+    "windows": "每週可用時間",
+    "exceptions": "例外日期",
+    "sessionExpired": "登入已過期，請重新登入。",
+    "forbidden": "你沒有權限查看此教師的可用時間。",
+    "instructorUnavailable": "暫時無法查詢所選教師的可用時間。請重試或選擇其他教師。",
+    "loadError": "無法載入教師可用時間，請重試。",
+    "fields": {
+      "dayOfWeek": "星期",
+      "startTime": "開始時間",
+      "endTime": "結束時間",
+      "timezone": "時區",
+      "effectiveFrom": "生效日期",
+      "effectiveTo": "截止日期",
+      "exceptionDate": "例外日期"
+    }
+  },
+  "conversation": {
+    "loadError": "無法載入訊息。",
+    "retry": "重試載入訊息",
+    "empty": "暫無訊息",
+    "emptyHelp": "傳送訊息或附件以開始對話。",
+    "markReadError": "無法將訊息標記為已讀，請重試。"
+  },
+  "attachments": {
+    "preview": "預覽",
+    "download": "下載",
+    "popupBlocked": "請允許彈出視窗以預覽此附件。",
+    "loadError": "無法開啟或下載附件，請重試。"
+  },
+  "records": {
+    "profileLoadError": "無法載入學生檔案。",
+    "profileRetry": "重試載入檔案",
+    "planLoadError": "無法載入學習計畫。",
+    "planRetry": "重試載入計畫",
+    "planProfileLoading": "正在讀取學生檔案…",
+    "planProfileRequired": "請先建立學生檔案，再制定學習計畫。",
+    "planProfileOpen": "開啟學生檔案",
+    "courseActionsLoadError": "暫時無法讀取課程操作所需的資訊。請再次開啟「管理選課」重試。"
   }
 }

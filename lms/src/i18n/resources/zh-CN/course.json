@@ -419,7 +419,7 @@
         "clearFilters": "清除筛选"
     },
     "roster": {
-    "withdrawAction": "移出课程",
+        "withdrawAction": "移出课程",
         "accessDenied": "你没有查看此课程成员名单的权限。",
         "notFound": "课程不存在，或你无法查看此课程。",
         "chooseHint": "打开课程以查看成员名单。",
@@ -446,5 +446,30 @@
         "unnamedMember": "未命名成员",
         "view": "查看成员名单",
         "readSummary": "查看课程成员及其角色。"
+    },
+    "mockResults": {
+        "submitted": "科目已提交",
+        "title": "模考结果",
+        "back": "返回考试列表",
+        "sections": {
+            "reading": "阅读",
+            "listening": "听力",
+            "writing": "写作"
+        },
+        "saved": "本次作答已保存，此科目已结束作答。",
+        "feedback": "教师反馈",
+        "feedbackPending": "教师反馈将在提供后显示于此。",
+        "task": "任务 {{number}}",
+        "words": "{{number}} 词",
+        "responseUnavailable": "此记录中暂无已提交的作答内容。",
+        "result": "成绩",
+        "correct": "答对 {{score}} / {{total}} 题",
+        "pending": "等待结果"
+    },
+    "groupReadiness": {
+        "moveMember": "移动 {{name}}",
+        "ungroupedError": "暂时无法加载未分组学生。",
+        "ungroupedCount_one": "当前有 {{count}} 名学生尚未分组。",
+        "ungroupedCount_other": "当前有 {{count}} 名学生尚未分组。"
     }
 }

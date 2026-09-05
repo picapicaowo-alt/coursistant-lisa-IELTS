@@ -182,6 +182,10 @@ export interface QuizGradingSummary {
   manualIncompleteAttemptCount: number;
 }
 
+/** Result summaries do not contain the attempt metadata required by history. */
+export type QuizAttemptResultSummary = Pick<QuizResult,
+  'quizId' | 'countedAttemptId' | 'gradeStatus' | 'closeReason' | 'receiptId' | 'releasedAt'>;
+
 export interface QuizShortAnswerGradingItem {
   attemptId: number;
   userId: number;

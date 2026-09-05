@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {ADVISING_ERROR_CODES} from '@/apis';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {getApiErrorCode} from '@/utils/apiError';
@@ -8,7 +10,7 @@ import {CreateStudentProfileRequest, ProfileSkillRequest, unwrapData} from '@/ap
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {EnglishDateInput} from '@/components/EnglishDateInput';
-import {isNotFound} from '@/utils/apiError';
+import {isMissingResource} from '@/utils/apiError';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import styles from '../advising/advising.module.scss';
@@ -79,6 +81,7 @@ const toPayload = (form: ProfileFormState): CreateStudentProfileRequest => ({
 });
 
 const AdvisorStudentProfilePage: React.FC = () => {
+  const {t} = useTranslation('advising');
   const {studentUserId} = useParams();
   const id = Number(studentUserId);
   const queryClient = useQueryClient();
@@ -95,7 +98,7 @@ const AdvisorStudentProfilePage: React.FC = () => {
     enabled: Number.isInteger(id),
     retry: false,
   });
-  const missing = query.isError && isNotFound(query.error);
+  const missing = query.isError && isMissingResource(query.error, ADVISING_ERROR_CODES.profileNotFound);
 
   useEffect(() => {
     if (!query.data || initialized.current) return;
@@ -172,7 +175,7 @@ const AdvisorStudentProfilePage: React.FC = () => {
   };
 
   if (query.isPending) return <p className={styles.status}>Loading profile…</p>;
-  if (query.isError && !missing) return <p className={styles.error} role="alert">{advisingErrorMessage(query.error, 'Profile could not be loaded.')}</p>;
+  if (query.isError && !missing) return <p className={styles.error} role="alert">{advisingErrorMessage(query.error, t('records.profileLoadError'))} <button type="button" onClick={() => void query.refetch()}>{t('records.profileRetry')}</button></p>;
 
   return (
     <div className={styles.editorPage}>
