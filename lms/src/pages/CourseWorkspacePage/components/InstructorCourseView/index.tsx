@@ -268,7 +268,7 @@ export function InstructorCourseView({
             </Link>
           </div>
           {scheduleSection === "schedule" ? (
-            <div>
+            <div className={styles.pairedPanels}>
               <ScheduleCard
                 sessions={data.sessions}
                 failed={data.sessionsFailed}
