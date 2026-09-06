@@ -6,11 +6,12 @@ import {formatUtcTimestamp} from '@/utils/datetime';
 import styles from './index.module.scss';
 
 export function QueryError({error, fallback, onRetry}: {error: unknown; fallback: string; onRetry: () => void}) {
+  const {t: translate} = useTranslation();
   const code = getApiErrorCode(error);
   const retryAllowed = !isNotFound(error) && !['INVALID_TOKEN', 'FORBIDDEN', 'ACCESS_DENIED'].includes(code ?? '');
   return <div className={styles.feedback} role="alert">
     <p>{advisingErrorMessage(error, fallback)}</p>
-    {retryAllowed ? <button className={styles.secondary} type="button" onClick={onRetry}>Try again</button> : null}
+    {retryAllowed ? <button className={styles.secondary} type="button" onClick={onRetry}>{translate("common:actions.tryAgain")}</button> : null}
   </div>;
 }
 

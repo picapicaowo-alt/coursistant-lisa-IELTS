@@ -39,6 +39,14 @@ describe('locale resources', () => {
       }
     }
   });
+
+  it('retains reviewed Taiwan product terminology instead of ambiguous conversion output', () => {
+    for (const [key, value] of Object.entries(leaves(resources['zh-TW']))) {
+      expect(value, key).not.toMatch(/學習計劃|學生髮送|反饋|許可權|稽覈|考試型別|釋出|行動資料|周次|電子電子郵件|身份|諮詢師/);
+    }
+    expect(leaves(resources['zh-CN'])['advising.actionTasks.intake']).toBe('入学档案');
+    expect(leaves(resources['zh-TW'])['advising.actionTasks.intake']).toBe('入學檔案');
+  });
 });
 
 describe('locale persistence and fallback', () => {
@@ -87,6 +95,8 @@ describe('locale-aware formatting', () => {
       expect(formatDateTime(instant, options)).toBe(new Intl.DateTimeFormat(locale, options).format(instant));
       expect(formatNumber(12345.6)).toBe(new Intl.NumberFormat(locale).format(12345.6));
       expect(formatPercent(0.25)).toBe(new Intl.NumberFormat(locale, {style: 'percent'}).format(0.25));
+      // Count stays numeric for plural selection; only the displayed value is formatted.
+      expect(i18n.t('common:admin.resultCount', {count: 12345})).toContain(new Intl.NumberFormat(locale).format(12345));
       expect(instant.toISOString()).toBe('2026-09-04T15:20:00.000Z');
     });
   }

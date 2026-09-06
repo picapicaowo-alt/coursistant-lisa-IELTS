@@ -1,3 +1,6 @@
+import {formatNumber, formatPercent} from '@/i18n/formatting';
+import {recordFieldLabel} from '@/components/RecordSummaryList/recordPresentation';
+import {useTranslation} from 'react-i18next';
 import {Link} from 'react-router-dom';
 import {
   ArrowRight,
@@ -18,8 +21,9 @@ import {asRecord, parentNumber, withoutFields} from './parentPresentation';
 import styles from './index.module.scss';
 
 export function ParentOverview({value, params}: {value: unknown; params: URLSearchParams}) {
+  const {t: translate} = useTranslation();
   const record = asRecord(value);
-  if (!record || !Object.keys(record).length) return <WorkspaceSection title="Academic overview"><RecordSummaryList value={value} emptyMessage="Academic updates will appear here when the advising team shares them."/></WorkspaceSection>;
+  if (!record || !Object.keys(record).length) return <WorkspaceSection title={translate("learning:parent.overview")}><RecordSummaryList value={value} emptyMessage={translate("learning:parent.overviewEmpty")}/></WorkspaceSection>;
   const hours = asRecord(record.hours);
   const attendance = asRecord(record.attendance);
   const attended = attendance ? parentNumber(attendance, 'attended') : undefined;
@@ -29,48 +33,48 @@ export function ParentOverview({value, params}: {value: unknown; params: URLSear
   // information in a disclosure instead of silently assuming or discarding it.
   const additional = withoutFields(record, ['student', 'currentCourses', 'hours', 'attendance']);
   const quickLinks = [
-    {section: 'learning' as const, title: 'Study plan', description: 'Goals, checkpoints and learning tasks', icon: BookOpen},
-    {section: 'schedule' as const, title: 'Schedule', description: 'Classes and schedule change requests', icon: CalendarDays},
-    {section: 'reports' as const, title: 'Reports', description: 'Published learning reports', icon: FileText},
-    {section: 'messages' as const, title: 'Contact advising team', description: 'Conversation and academic notifications', icon: MessageSquare},
+    {section: 'learning' as const, titleKey: "navigation:parent.studyPlan", descriptionKey: "learning:parent.planLinkHelp", icon: BookOpen},
+    {section: 'schedule' as const, titleKey: "course:schedule.title", descriptionKey: "learning:parent.scheduleLinkHelp", icon: CalendarDays},
+    {section: 'reports' as const, titleKey: "navigation:parent.reports", descriptionKey: "learning:parent.reportLinkHelp", icon: FileText},
+    {section: 'messages' as const, titleKey: "learning:parent.contactTeam", descriptionKey: "learning:parent.contactHelp", icon: MessageSquare},
   ];
   return <div className={styles.overviewGrid}>
     <WorkspaceSection
-      title="Current courses"
+      title={translate("learning:parent.currentCourses")}
       className={styles.overviewCourses}
-      meta={<Link className={styles.textLink} to={parentHref('learning', params, 'courses')}>View learning <ArrowUpRight size={16} aria-hidden="true"/></Link>}
+      meta={<Link className={styles.textLink} to={parentHref('learning', params, 'courses')}>{translate("learning:parent.viewLearning")}{' '}<ArrowUpRight size={16} aria-hidden="true"/></Link>}
     >
         <ParentCourseList value={record.currentCourses}/>
     </WorkspaceSection>
-    <WorkspaceSection title="Progress summary" className={styles.overviewSummary} bodyClassName={styles.progressSummary}>
+    <WorkspaceSection title={translate("learning:parent.progressSummary")} className={styles.overviewSummary} bodyClassName={styles.progressSummary}>
       <div className={styles.summaryGroup}>
         <span className={styles.iconTile}><Clock3 size={21} aria-hidden="true"/></span>
         <div className={styles.summaryContent}>
-          <strong>Course hours</strong>
+          <strong>{translate("learning:hours.title")}</strong>
           {hours ? <dl>
-            <div><dt>Purchased minutes</dt><dd>{parentNumber(hours, 'purchasedMinutes') ?? '—'}</dd></div>
-            <div><dt>Used minutes</dt><dd>{parentNumber(hours, 'usedMinutes') ?? '—'}</dd></div>
-            <div className={styles.summaryTotal}><dt>Remaining minutes</dt><dd>{parentNumber(hours, 'remainingMinutes') ?? '—'}</dd></div>
-          </dl> : <p>Course-hour information is not available yet.</p>}
+            <div><dt>{recordFieldLabel('purchasedMinutes')}</dt><dd>{parentNumber(hours, 'purchasedMinutes') == null ? '—' : formatNumber(parentNumber(hours, 'purchasedMinutes')!)}</dd></div>
+            <div><dt>{recordFieldLabel('usedMinutes')}</dt><dd>{parentNumber(hours, 'usedMinutes') == null ? '—' : formatNumber(parentNumber(hours, 'usedMinutes')!)}</dd></div>
+            <div className={styles.summaryTotal}><dt>{recordFieldLabel('remainingMinutes')}</dt><dd>{parentNumber(hours, 'remainingMinutes') == null ? '—' : formatNumber(parentNumber(hours, 'remainingMinutes')!)}</dd></div>
+          </dl> : <p>{translate("learning:parent.hoursUnavailable")}</p>}
         </div>
       </div>
       <div className={styles.summaryGroup}>
         <span className={styles.iconTile}><CalendarCheck2 size={21} aria-hidden="true"/></span>
         <div className={styles.summaryContent}>
-          <strong>Attendance</strong>
+          <strong>{translate("operations:tabs.attendance")}</strong>
           {attendance ? <dl>
-            <div><dt>Attended classes</dt><dd>{attended ?? '—'}</dd></div>
-            <div><dt>Total classes</dt><dd>{total ?? '—'}</dd></div>
-            <div className={styles.summaryTotal}><dt>Attendance rate</dt><dd>{attendanceRate == null ? '—' : `${attendanceRate}%`}</dd></div>
-          </dl> : <p>Attendance information is not available yet.</p>}
+            <div><dt>{translate("learning:parent.attendedClasses")}</dt><dd>{attended == null ? '—' : formatNumber(attended)}</dd></div>
+            <div><dt>{translate("learning:parent.totalClasses")}</dt><dd>{total == null ? '—' : formatNumber(total)}</dd></div>
+            <div className={styles.summaryTotal}><dt>{recordFieldLabel('attendanceRate')}</dt><dd>{attendanceRate == null ? '—' : formatPercent(attendanceRate / 100)}</dd></div>
+          </dl> : <p>{translate("learning:parent.attendanceUnavailable")}</p>}
         </div>
       </div>
-      {Object.entries(additional).some(([key]) => isDisplayField(key)) ? <details className={styles.details}><summary>More progress details</summary><RecordSummaryList value={additional}/></details> : null}
+      {Object.entries(additional).some(([key]) => isDisplayField(key)) ? <details className={styles.details}><summary>{translate("learning:parent.moreProgress")}</summary><RecordSummaryList value={additional}/></details> : null}
     </WorkspaceSection>
-    <WorkspaceSection title="Continue exploring" className={styles.overviewLinks} bodyClassName={styles.quickLinks}>
-      {quickLinks.map(({section, title, description, icon: Icon}) => <Link key={section} to={parentHref(section, params)}>
+    <WorkspaceSection title={translate("learning:parent.explore")} className={styles.overviewLinks} bodyClassName={styles.quickLinks}>
+      {quickLinks.map(({section, titleKey, descriptionKey, icon: Icon}) => <Link key={section} to={parentHref(section, params)}>
         <span className={styles.quickLinkIcon}><Icon size={21} aria-hidden="true"/></span>
-        <span><strong>{title}</strong><small>{description}</small></span>
+        <span><strong>{translate(titleKey)}</strong><small>{translate(descriptionKey)}</small></span>
         <ArrowRight size={18} aria-hidden="true"/>
       </Link>)}
     </WorkspaceSection>

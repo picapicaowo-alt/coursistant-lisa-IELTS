@@ -26,5 +26,73 @@
     "versionConflict": "此事件已被其他請求修改。已重新請求最新詳情，請核對後再操作。",
     "requestVersionMissing": "請求缺少事件版本。請重新載入事件後再操作。",
     "requestVersionInvalid": "請求中的事件版本不是合法整數。請重新載入事件後再操作。"
+  },
+  "categoriesLabel": "日曆分類",
+  "categories": {
+    "all": "全部日程",
+    "personal": "個人日程"
+  },
+  "viewLabel": "日曆檢視",
+  "views": {
+    "week": "週",
+    "month": "月"
+  },
+  "previous": {
+    "day": "前一天",
+    "week": "上一週",
+    "month": "上個月"
+  },
+  "next": {
+    "day": "後一天",
+    "week": "下一週",
+    "month": "下個月"
+  },
+  "addEvent": "+ 新增日程",
+  "loading": "正在載入日曆…",
+  "retryCourses": "重試課程日曆",
+  "retryPersonal": "重試個人日程",
+  "errors": {
+    "courses": "暫時無法載入課程日曆。",
+    "personal": "暫時無法載入個人日程。",
+    "personalIncomplete_one": "{{number}} 個個人日程缺少顯示所需的資訊。",
+    "personalIncomplete_other": "{{number}} 個個人日程缺少顯示所需的資訊。",
+    "assignments": "{{courseCode}}：暫時無法載入作業。",
+    "quizzes": "{{courseCode}}：暫時無法載入測驗。",
+    "events": "{{courseCode}}：暫時無法載入課程活動。",
+    "classes": "暫時無法載入已排課程。",
+    "classesIncomplete_one": "{{number}} 條排課記錄缺少日曆所需的資訊。",
+    "classesIncomplete_other": "{{number}} 條排課記錄缺少日曆所需的資訊。"
+  },
+  "allDay": "全天",
+  "dailyAgenda": "每日日程",
+  "noEvents": "暫無日程",
+  "eventsInView": "當前檢視中的日程",
+  "timezoneHelp": "時間按各日程的時區顯示。",
+  "noEventsInView": "當前檢視中暫無日程。",
+  "details": {
+    "close": "關閉日程詳情",
+    "location": "地點",
+    "category": "分類"
+  },
+  "kinds": {
+    "Session": "課程堂次",
+    "Assignment": "作業",
+    "Quiz": "測驗",
+    "Event": "課程活動",
+    "Personal": "個人日程"
+  },
+  "viewItem": {
+    "Session": "檢視課程堂次",
+    "Assignment": "檢視作業",
+    "Quiz": "檢視測驗",
+    "Event": "檢視課程活動",
+    "Personal": "檢視個人日程"
+  },
+  "editEvent": "編輯日程",
+  "timetable": {
+    "day": "每日時間表",
+    "week": "每週時間表",
+    "scrollLabel": "可捲動的 24 小時時間表",
+    "currentTime": "當前時間 {{time}}"
   }
 }

@@ -386,8 +386,8 @@ test('new group courses prepare recurring sessions before delivery locks their t
   await expect(page.getByRole('button', {name: 'Configure delivery', exact: true})).toBeDisabled();
   await page.getByRole('button', {name: 'Set up schedule', exact: true}).click();
   await page.getByRole('button', {name: 'Add session', exact: true}).click();
-  await page.getByRole('textbox', {name: 'Start time Open time picker', exact: true}).fill('11:00 AM');
-  await page.getByRole('textbox', {name: 'End time Open time picker', exact: true}).fill('11:30 AM');
+  await page.getByRole('textbox', {name: 'Start time', exact: true}).fill('11:00 AM');
+  await page.getByRole('textbox', {name: 'End time', exact: true}).fill('11:30 AM');
   await page.getByRole('region', {name: 'Add recurring session'}).getByRole('button', {name: 'Add session', exact: true}).click();
   await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
   await page.getByRole('button', {name: 'Configure delivery', exact: true}).click();
@@ -412,7 +412,7 @@ test('ready courses can publish without repeating the draft readiness transition
     return route.fulfill({json: reply(config())});
   });
   await page.goto('/advisor/courses/71/delivery?view=delivery');
-  await page.getByRole('button', {name: 'Validate readiness', exact: true}).click();
+  await page.getByRole('complementary', {name: 'Course readiness'}).getByRole('button', {name: 'Validate readiness', exact: true}).click();
   await expect(page.getByRole('button', {name: /Validate readiness|Validate again|Check readiness/})).toHaveCount(0);
   await page.reload();
   await expect(page.getByRole('button', {name: /Validate readiness|Validate again|Check readiness/})).toHaveCount(0);
@@ -433,14 +433,30 @@ test('publish rejection exposes current readiness blockers across delivery views
     : {json: reply({courseId: 71, deliveryMode: 'GROUP', catalogCode: 'IELTS', capacity: 16, launchState: 'PUBLISHED', courseLaunchVersion: 4, blockers: []})}));
   await page.goto('/advisor/courses/71/delivery?view=schedule');
   await page.getByRole('button', {name: 'Publish course', exact: true}).click();
-  await expect(page.getByRole('list', {name: 'Readiness blockers'})).toContainText('Current Syllabus is required');
+  await expect(page.getByRole('list', {name: 'Readiness blockers'})).toContainText('A current course syllabus is required before publication.');
   await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
   const panel = page.getByRole('complementary', {name: 'Course readiness'});
-  await expect(panel.getByRole('list', {name: 'Readiness blockers'})).toContainText('Current Syllabus is required');
+  await expect(panel.getByRole('list', {name: 'Readiness blockers'})).toContainText('A current course syllabus is required before publication.');
   await expect(panel).not.toContainText('No outstanding requirements.');
   await expect(panel).not.toContainText('Ready for publication');
   missingSyllabus = false;
   await panel.getByRole('button', {name: 'Publish course', exact: true}).click();
   await expect(panel).toContainText('Course published');
   await expect(page.getByRole('list', {name: 'Readiness blockers'})).toHaveCount(0);
+});
+
+test('B1 course-not-found remains visible and only a successful empty response is an empty schedule', async ({page}) => {
+  await setupCourse(page);
+  let missing = true;
+  await page.route('**/v2/courses/71/session-occurrences?*', route => route.fulfill(missing
+    ? {status: 404, json: {code: 'COURSE_NOT_FOUND'}} : {json: reply([])}));
+  await page.goto('/advisor/courses/71/delivery?view=schedule');
+  await page.getByRole('button', {name: 'View class dates'}).click();
+  const section = page.getByRole('region', {name: 'Course occurrences'});
+  await expect(section.getByRole('alert')).toContainText('This course does not exist or is not accessible');
+  await expect(page.getByText('No occurrences were returned for this period.')).toHaveCount(0);
+  missing = false;
+  await section.getByRole('button', {name: 'Try again'}).click();
+  await expect(section.getByRole('alert')).toHaveCount(0);
+  await expect(page.getByText('No occurrences were returned for this period.')).toBeVisible();
 });

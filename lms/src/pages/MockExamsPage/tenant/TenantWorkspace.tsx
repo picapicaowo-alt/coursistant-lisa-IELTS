@@ -1,3 +1,6 @@
+import {LocalizedError} from '@/i18n/errors';
+import {formatNumber} from '@/i18n/formatting';
+import { useTranslation } from 'react-i18next';
 import {useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import {useMutation, useQueryClient} from '@tanstack/react-query';
@@ -17,12 +20,14 @@ import ui from '@/components/TenantWorkspace/workspace.module.scss';
 import styles from './tenant.module.scss';
 
 export function TenantWorkspace({value}: {value: unknown}) {
+  const { t: translate } = useTranslation();
   const [params, setParams] = useSearchParams();
   const client = useQueryClient();
   const [createOpen, setCreateOpen] = useState(
     params.get('action') === 'create',
   );
   const [draft, setDraft] = useState({label: '', title: ''});
+  const [invalid, setInvalid] = useState(false);
   const templates = templateItems(value);
   const selectedId = Number(params.get('template'));
   const closeCreate = () => {
@@ -56,7 +61,7 @@ export function TenantWorkspace({value}: {value: unknown}) {
         template.versions?.find((item) => item.status === 'PUBLISHED') ??
         template.versions?.[0];
       if (!template.id || !version?.id)
-        throw new Error('Open the template to select a version to copy.');
+        throw new LocalizedError("exams:templates.copySelectVersion");
       const result = unwrapData(
         await mockExamApiService.copyTenantVersion(
           template.id,
@@ -83,35 +88,32 @@ export function TenantWorkspace({value}: {value: unknown}) {
     <div className={ui.page}>
       <header className={ui.pageHeader}>
         <div>
-          <h1>Mock exam templates</h1>
-          <p>Create, manage, and publish IELTS mock exam papers.</p>
+          <h1>{translate("common:navigationControls.backToTemplates")}</h1>
+          <p>{translate("exams:templates.help")}</p>
         </div>
         <button
           className={ui.primaryButton}
           onClick={() => setCreateOpen(true)}
         >
           <Plus size={18} />
-          New template
-        </button>
+          {translate("exams:templates.new")}</button>
       </header>
       {copy.error ? (
         <p className={ui.inlineError} role="alert">
-          {getApiErrorMessage(copy.error, 'The version could not be copied.')}
+          {getApiErrorMessage(copy.error, translate('exams:templates.copyFailed'))}
         </p>
       ) : null}
       {templates.length === 0 ? (
         <div className={ui.surface}>
-          <h2>Your template library starts here</h2>
+          <h2>{translate("exams:templates.emptyTitle")}</h2>
           <p className={ui.hint}>
-            Create a draft, add its exam sections, and publish when it is ready.
-          </p>
+            {translate("exams:templates.emptyHelp")}</p>
           <button
             className={ui.primaryButton}
             onClick={() => setCreateOpen(true)}
           >
             <Plus size={18} />
-            Create first template
-          </button>
+            {translate("exams:templates.createFirst")}</button>
         </div>
       ) : (
         <div className={styles.templateGrid}>
@@ -131,42 +133,39 @@ export function TenantWorkspace({value}: {value: unknown}) {
               <article className={styles.templateCard} key={template.id}>
                 <div className={styles.cardTop}>
                   <span className={styles.templateId}>
-                    #{template.id}
+                    #{template.id == null ? '—' : formatNumber(template.id)}
                     <span className={styles.internalLabel}>
-                      {template.label || 'No internal label'}
+                      {template.label || translate("exams:templates.noInternalLabel")}
                     </span>
                   </span>
                   <span className={ui.badge} data-tone={status}>
                     {readableValue(status)}
                   </span>
                 </div>
-                <h2>{template.title || 'Untitled template'}</h2>
+                <h2>{template.title || translate("exams:templates.untitled")}</h2>
                 <p>
-                  {template.versions?.length ?? 0}{' '}
-                  {(template.versions?.length ?? 0) === 1
-                    ? 'version'
-                    : 'versions'}
+                  {translate('exams:templates.versionCount', {count: template.versions?.length ?? 0, number: formatNumber(template.versions?.length ?? 0)})}
                   {latest?.versionNo
-                    ? ` · Working version ${latest.versionNo}`
+                    ? <> · {translate('exams:templates.workingVersionNumber', {number: formatNumber(latest.versionNo)})}</>
                     : ''}
                 </p>
                 <div className={styles.sectionChips}>
                   {SECTIONS.filter(
                     (section) => latest?.[SECTION_META[section].flag],
                   ).map((section) => (
-                    <span key={section}>{SECTION_META[section].label}</span>
+                    <span key={section}>{translate(SECTION_META[section].labelKey)}</span>
                   ))}
                   {!SECTIONS.some(
                     (section) => latest?.[SECTION_META[section].flag],
                   ) ? (
-                    <span>No sections yet</span>
+                    <span>{translate("exams:templates.noSections")}</span>
                   ) : null}
                 </div>
                 <footer>
                   <small>
                     {latest?.createdAt
-                      ? `Version created ${tenantDate(latest.createdAt)}`
-                      : 'Select a version to review'}
+                      ? translate('exams:templates.createdAt', {date: tenantDate(latest.createdAt)})
+                      : translate("exams:templates.selectVersion")}
                   </small>
                   <div className={ui.actions}>
                     <button
@@ -176,18 +175,15 @@ export function TenantWorkspace({value}: {value: unknown}) {
                         template.id && openTemplate(template.id, latest?.id)
                       }
                     >
-                      Open template
-
-                    </button>
+                      {translate("common:navigationControls.openTemplate")}</button>
                     <button
                       className={ui.textButton}
                       disabled={copy.isPending || !latest?.id}
-                      aria-label={`Duplicate ${template.title}`}
+                      aria-label={translate('exams:templates.duplicateItem', {title: template.title || translate('exams:templates.untitled')})}
                       onClick={() => copy.mutate(template)}
                     >
                       <Copy size={16} />
-                      Duplicate
-                    </button>
+                      {translate("courseTools:owner.duplicate")}</button>
                   </div>
                 </footer>
               </article>
@@ -197,20 +193,24 @@ export function TenantWorkspace({value}: {value: unknown}) {
       )}
       {createOpen ? (
         <TenantDrawer
-          title="New mock exam template"
-          description="Create a draft before adding exam content and media."
+          title={translate("exams:templates.newTitle")}
+          description={translate("exams:templates.newHelp")}
           busy={create.isPending}
           onClose={closeCreate}
         >
           <form
+            noValidate
             className={ui.form}
             onSubmit={(event) => {
               event.preventDefault();
+              if (create.isPending) return;
+              if (!draft.label.trim() || !draft.title.trim()) {setInvalid(true); return;}
+              setInvalid(false);
               create.mutate();
             }}
           >
             <label>
-              <span>Internal label</span>
+              <span>{translate("exams:templates.internalLabel")}</span>
               <input
                 required
                 value={draft.label}
@@ -220,11 +220,11 @@ export function TenantWorkspace({value}: {value: unknown}) {
                     label: event.target.value,
                   }))
                 }
-                placeholder="For your template library"
+                placeholder={translate("exams:templates.internalPlaceholder")}
               />
             </label>
             <label>
-              <span>Candidate-facing title</span>
+              <span>{translate("exams:templates.candidateFacingTitle")}</span>
               <input
                 required
                 value={draft.title}
@@ -234,18 +234,17 @@ export function TenantWorkspace({value}: {value: unknown}) {
                     title: event.target.value,
                   }))
                 }
-                placeholder="Title shown to students"
+                placeholder={translate("exams:templates.candidatePlaceholder")}
               />
             </label>
             <p className={ui.hint}>
-              Listening, Reading, and Writing content is created once per
-              version. Saved sections are read only.
-            </p>
+              {translate("exams:templates.createHelp")}</p>
+            {invalid ? <p className={ui.inlineError} role="alert">{translate('exams:templates.required')}</p> : null}
             {create.error ? (
               <p className={ui.inlineError} role="alert">
                 {getApiErrorMessage(
                   create.error,
-                  'The template could not be created.',
+                  translate('exams:templates.createFailed'),
                 )}
               </p>
             ) : null}
@@ -256,10 +255,9 @@ export function TenantWorkspace({value}: {value: unknown}) {
                 disabled={create.isPending}
                 onClick={closeCreate}
               >
-                Cancel
-              </button>
+                {translate("common:actions.cancel")}</button>
               <button className={ui.primaryButton} disabled={create.isPending}>
-                {create.isPending ? 'Creating…' : 'Create draft'}
+                {create.isPending ? translate("common:actions.creating") : translate("exams:templates.createDraft")}
               </button>
             </div>
           </form>

@@ -1,3 +1,5 @@
+import {LocalizedError} from '@/i18n/errors';
+
 export type MediaInsertKind = 'image' | 'video' | 'file';
 
 export const MAX_EDITOR_FILE_BYTES = 8 * 1024 * 1024;
@@ -41,18 +43,18 @@ export const SAFE_MEDIA_DATA_MIME = new Set([...IMAGE_MIME, ...VIDEO_MIME]);
 export const SAFE_FILE_DATA_MIME = new Set([...FILE_MIME]);
 
 export const MEDIA_INSERT_COPY = {
-  title: 'Insert file',
+  title: 'editor:media.title',
   accept: [
     'image/png,image/jpeg,image/gif,image/webp',
     'video/mp4,video/webm,video/ogg',
     '.png,.jpg,.jpeg,.gif,.webp,.mp4,.webm,.ogg',
     '.pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.txt,.csv',
   ].join(','),
-  chooseLabel: 'Choose files',
-  chooseHint: 'Opens a file picker so you can select an image or file from your computer.',
-  dropLabel: 'Drag files here',
-  dropHint: 'Drop an image or file into this box to insert it.',
-  typeError: 'Choose an image, video, PDF, Office document, ZIP, or text file.',
+  chooseLabel: 'editor:media.choose',
+  chooseHint: 'editor:media.chooseHint',
+  dropLabel: 'editor:media.drop',
+  dropHint: 'editor:media.dropHint',
+  typeError: 'editor:media.typeError',
 };
 
 export const extensionOf = (filename: string) => {
@@ -88,11 +90,11 @@ export const insertKindFromMime = (mime: string): MediaInsertKind => {
   return 'file';
 };
 
-export const validateEditorFile = (file: File): string | null => {
+export const validateEditorFile = (file: File): LocalizedError | null => {
   if (file.size > MAX_EDITOR_FILE_BYTES) {
-    return 'Choose a file smaller than 8 MB.';
+    return new LocalizedError('editor:media.sizeError', {size: MAX_EDITOR_FILE_BYTES / (1024 * 1024)});
   }
-  return inferredMime(file) ? null : MEDIA_INSERT_COPY.typeError;
+  return inferredMime(file) ? null : new LocalizedError(MEDIA_INSERT_COPY.typeError);
 };
 
 export const mimeForEditorFile = (file: File): string | null => inferredMime(file);

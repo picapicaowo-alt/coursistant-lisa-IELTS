@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {AlertCircle, BookOpen, RefreshCw} from 'lucide-react';
 import styles from './PageState.module.scss';
 
@@ -17,7 +18,9 @@ export const PageState = ({
   onRetry,
   actionLabel = 'Try again',
   actionPending = false,
-}: PageStateProps) => (
+}: PageStateProps) => {
+  const {t: translate} = useTranslation();
+  return (
   <div className={styles.state} role={kind === 'error' ? 'alert' : 'status'}>
     <div className={styles.icon} aria-hidden="true">
       {kind === 'error' ? <AlertCircle/> : <BookOpen/>}
@@ -27,8 +30,9 @@ export const PageState = ({
     {onRetry ? (
       <button type="button" onClick={onRetry} disabled={actionPending}>
         <RefreshCw size={16}/>
-        {actionPending ? 'Resuming…' : actionLabel}
+        {actionPending ? translate("common:navigationControls.resuming") : actionLabel}
       </button>
     ) : null}
   </div>
 );
+};

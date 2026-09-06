@@ -8,6 +8,8 @@ import type {
   CreateStudentMockExamRequest,
   GradeMockExamWritingRequest,
   MockExamRead,
+  MockExamSectionRequests,
+  MockExamContentRevision,
   ObserverMockExamDetail,
   MockExamTemplateSummary,
   MockExamMediaKind,
@@ -142,6 +144,15 @@ export class MockExamApiService {
 
   getTenantSection(templateId: number, versionId: number, section: MockExamSection): Promise<ApiResponse<MockExamRead>> {
     return this.apiClient.get(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/${section}`);
+  }
+
+  getTenantAuthoring(templateId: number, versionId: number, section: MockExamSection): Promise<ApiResponse<MockExamRead>> {
+    return this.apiClient.get(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/${section}/authoring`);
+  }
+
+  replaceTenantSection<S extends MockExamSection>(templateId: number, versionId: number, section: S, request: MockExamSectionRequests[S] & {expectedContentRevision: number}): Promise<ApiResponse<MockExamContentRevision>> {
+    // PUT replaces the entire existing section and shares the version revision.
+    return this.apiClient.put(`/v2/tenant/mock-exam-templates/${templateId}/versions/${versionId}/${section}`, request);
   }
 
   createTenantListening(templateId: number, versionId: number, request: CreateMockExamListeningRequest): Promise<ApiResponse<MockExamRead>> {

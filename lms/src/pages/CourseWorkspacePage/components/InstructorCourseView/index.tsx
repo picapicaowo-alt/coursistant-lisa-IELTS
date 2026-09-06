@@ -1,5 +1,7 @@
-import { formatInstructorName } from "@/utils/personName";
-import {useTranslation} from "react-i18next";
+import {formatInstructorName} from '@/utils/personName';
+import {LocalizedError} from '@/i18n/errors';
+import {formatDateValue, formatNumber} from '@/i18n/formatting';
+import { useTranslation } from 'react-i18next';
 import { useState } from "react";
 import { generatePath, Link, useSearchParams } from "react-router-dom";
 import { BookOpen, ArrowUpRight } from "lucide-react";
@@ -22,12 +24,12 @@ import { SyllabusCard } from "../SyllabusCard";
 import styles from "./index.module.scss";
 
 const TABS = [
-  ["courses", "Course content"],
+  ["courses", "course:learning.content"],
   ["assignments", "course:detail.assignments"],
-  ["discussion", "Discussion"],
-  ["announcements", "Announcements"],
-  ["schedule", "Schedule & Groups"],
-  ["syllabus", "Syllabus"],
+  ["discussion", "course:learning.tabs.discussion"],
+  ["announcements", "course:detail.announcements"],
+  ["schedule", "course:learning.tabs.schedule"],
+  ["syllabus", "course:syllabusCard.title"],
 ] as const;
 type Tab = (typeof TABS)[number][0];
 export function InstructorCourseView({
@@ -47,7 +49,7 @@ export function InstructorCourseView({
   canManageGroups: boolean;
   canPostAnnouncements: boolean;
 }) {
-  const {t} = useTranslation();
+  const { t: translate } = useTranslation();
   const data = useCourseWorkspaceData();
   const { user } = useRequiredAuth();
   const { workspaceMode, setWorkspaceMode } = useCourseWorkspaceStore();
@@ -86,10 +88,10 @@ export function InstructorCourseView({
       <div className={styles.page}>
         <TeachingState
           error={
-            new Error(
+            new LocalizedError(
               data.isUnavailable
-                ? "This course does not exist, or you do not have access."
-                : "This course could not be loaded.",
+                ? "course:learning.unavailable"
+                : "course:workspace.loadFailed",
             )
           }
           onRetry={data.isUnavailable ? undefined : data.refetch}
@@ -126,56 +128,56 @@ export function InstructorCourseView({
           ) : null}
           <div className={styles.courseContext}>
             <span>
-              Course code <strong>{course.courseCode}</strong>
+              {translate("course:form.codeLabel")}<strong>{course.courseCode}</strong>
             </span>
             <span>
-              Instructor{" "}
+              {translate("common:people.instructor")}{" "}
               <strong>
-                {formatInstructorName(course.primaryInstructor, "Not assigned")}
+                {formatInstructorName(course.primaryInstructor, translate('course:learning.notAssigned'))}
               </strong>
             </span>
             <span>
-              Term{" "}
+              {translate("course:learning.term")}{" "}
               <strong>
                 {[course.termStartDate, course.termEndDate]
-                  .filter(Boolean)
-                  .join(" – ") || "Not provided"}
+                  .filter((date): date is string => Boolean(date))
+                  .map(date => formatDateValue(date))
+                  .join(" – ") || translate("common:feedback.notProvided")}
               </strong>
             </span>
-            <TeachingBadge value={course.state}>{course.state}</TeachingBadge>
+            <TeachingBadge value={course.state}/>
           </div>
         </div>
         <section
           className={styles.courseSummary}
-          aria-label="Course content totals"
+          aria-label={translate("course:workspace.totals")}
         >
           <div className={styles.summaryTitle}>
             <span>
               <BookOpen size={20} />
             </span>
-            Course content
-          </div>
+            {translate("course:learning.content")}</div>
           <dl>
-            {[
-              ["Learning units", weeks.length],
+            {([
+              ["course:learning.units", weeks.length],
               [
-                "Assignments",
+                "course:detail.assignments",
                 data.assignmentsFailed
-                  ? "Unavailable"
+                  ? translate("course:learning.dataUnavailable")
                   : data.assignmentsLoading
                     ? "…"
                     : data.assignments.length,
               ],
-            ].map(([label, count]) => (
+            ] as const).map(([label, count]) => (
               <div key={label}>
-                <dt>{label}</dt>
-                <dd>{count}</dd>
+                <dt>{translate(label)}</dt>
+                <dd>{typeof count === "number" ? formatNumber(count) : count}</dd>
               </div>
             ))}
           </dl>
         </section>
       </header>
-      <nav className={styles.tabs} aria-label="Course sections">
+      <nav className={styles.tabs} aria-label={translate("course:learning.sections")}>
         {TABS.map(([id, title]) => (
           <button
             key={id}
@@ -183,7 +185,7 @@ export function InstructorCourseView({
             aria-pressed={id === activeTab}
             onClick={() => setTab(id)}
           >
-            {id === "assignments" ? t(title) : title}
+            {translate(title)}
           </button>
         ))}
       </nav>
@@ -202,7 +204,7 @@ export function InstructorCourseView({
       {activeTab === "assignments" ? (
         <div className={styles.sectionStack}>
           <div className={styles.sectionIntro}>
-            <p>Manage coursework, assessments and feedback.</p>
+            <p>{translate("course:workspace.assessmentHelp")}</p>
           </div>
           <div>
             <AssignmentsCard
@@ -240,12 +242,12 @@ export function InstructorCourseView({
       {activeTab === "schedule" ? (
         <div className={styles.sectionStack}>
           <div className={styles.sectionIntro}>
-            <nav className={styles.subnav} aria-label="Schedule sections">
+            <nav className={styles.subnav} aria-label={translate("course:workspace.scheduleSections")}>
               {(
                 [
-                  ["schedule", "Schedule"],
-                  ["groups", "Groups"],
-                  ["members", "Members"],
+                  ["schedule", "course:schedule.title"],
+                  ["groups", "courseTools:groups.groups"],
+                  ["members", "course:workspace.members"],
                 ] as const
               ).map(([id, label]) => (
                 <button
@@ -254,7 +256,7 @@ export function InstructorCourseView({
                   aria-pressed={scheduleSection === id}
                   onClick={() => setScheduleSection(id)}
                 >
-                  {label}
+                  {translate(label)}
                 </button>
               ))}
             </nav>
@@ -262,12 +264,11 @@ export function InstructorCourseView({
               className={styles.textButton}
               to={path(routes.courseCourseIdOperations)}
             >
-              Classes, attendance & reports
-              <ArrowUpRight size={16} />
+              {translate("course:workspace.operations")}<ArrowUpRight size={16} />
             </Link>
           </div>
           {scheduleSection === "schedule" ? (
-            <div>
+            <div className={styles.pairedPanels}>
               <ScheduleCard
                 sessions={data.sessions}
                 failed={data.sessionsFailed}

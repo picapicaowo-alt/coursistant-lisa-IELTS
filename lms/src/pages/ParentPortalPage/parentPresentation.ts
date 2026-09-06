@@ -1,4 +1,7 @@
-import {asRecord, collection, humanize} from '@/components/RecordSummaryList/recordPresentation';
+import i18n from '@/i18n';
+import {formatDateValue, formatClockTime} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
+import {asRecord, collection} from '@/components/RecordSummaryList/recordPresentation';
 import {formatPersonName} from '@/utils/personName';
 
 export {asRecord};
@@ -16,14 +19,12 @@ export function parentStudentName(value: unknown, fallback: string): string {
 
 /** Date-only and class wall-clock values must not move with the viewer's time zone. */
 export function parentDate(value?: string): string {
-  if (!value) return 'Date not provided';
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
-  const date = new Date(`${value}T00:00:00Z`);
-  return Number.isNaN(date.getTime()) ? value : new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC'}).format(date);
+  if (!value) return i18n.t("learning:parent.noDate");
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? formatDateValue(value) : value;
 }
 
-export const parentTime = (value?: string): string | undefined => value?.replace(/^(\d{2}:\d{2}):\d{2}$/, '$1');
-export const parentLabel = (value: string): string => /^[A-Z_]+$/.test(value) ? humanize(value.toLowerCase()) : humanize(value);
+export const parentTime = (value?: string): string | undefined => value ? formatClockTime(value) : undefined;
+export const parentLabel = statusLabel;
 
 export function withoutFields(record: Record<string, unknown>, keys: string[]): Record<string, unknown> {
   return Object.fromEntries(Object.entries(record).filter(([key]) => !keys.includes(key)));

@@ -1,4 +1,5 @@
 import {useEffect, useId, useRef, type ReactNode} from 'react';
+import {useTranslation} from 'react-i18next';
 import {X} from 'lucide-react';
 import styles from './workspace.module.scss';
 
@@ -16,6 +17,7 @@ export function TenantDrawer({
   onClose: () => void;
   busy?: boolean;
 }) {
+  const {t} = useTranslation();
   const ref = useRef<HTMLDialogElement>(null);
   const titleId = useId();
   useEffect(() => {
@@ -48,7 +50,7 @@ export function TenantDrawer({
         <button
           type="button"
           className={styles.iconButton}
-          aria-label={`Close ${title.toLowerCase()}`}
+          aria-label={t('common:actions.closeItem', {item: title.toLowerCase()})}
           disabled={busy}
           onClick={onClose}
         >

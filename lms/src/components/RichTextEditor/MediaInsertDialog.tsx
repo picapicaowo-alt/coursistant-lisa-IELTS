@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import React from 'react';
 import {createPortal} from 'react-dom';
 import {FolderOpen, Upload, X} from 'lucide-react';
@@ -11,6 +12,7 @@ import {
   validateEditorFile,
 } from './media';
 import {normalizeSafeUrl} from './url';
+import {LocalizedError} from '@/i18n/errors';
 
 export interface MediaInsertPayload {
   url: string;
@@ -24,13 +26,14 @@ interface MediaInsertDialogProps {
 }
 
 const MediaInsertDialog: React.FC<MediaInsertDialogProps> = ({onClose, onInsert}) => {
+  const { t: translate } = useTranslation();
   const copy = MEDIA_INSERT_COPY;
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const chooseRef = React.useRef<HTMLButtonElement>(null);
   const busyRef = React.useRef(false);
   const [isDragging, setIsDragging] = React.useState(false);
   const [busy, setBusy] = React.useState(false);
-  const [error, setError] = React.useState<string | null>(null);
+  const [error, setError] = React.useState<LocalizedError | null>(null);
   busyRef.current = busy;
 
   React.useEffect(() => {
@@ -68,7 +71,7 @@ const MediaInsertDialog: React.FC<MediaInsertDialogProps> = ({onClose, onInsert}
     }
     const mime = mimeForEditorFile(file);
     if (!mime) {
-      setError(copy.typeError);
+      setError(new LocalizedError(copy.typeError));
       return;
     }
 
@@ -79,12 +82,12 @@ const MediaInsertDialog: React.FC<MediaInsertDialogProps> = ({onClose, onInsert}
       const dataUrl = await fileToDataUrl(file, mime);
       const url = normalizeSafeUrl(dataUrl, {mediaOnly: kind !== 'file'});
       if (!url) {
-        setError(copy.typeError);
+        setError(new LocalizedError(copy.typeError));
         return;
       }
       onInsert({url, name: file.name, kind});
     } catch {
-      setError('The file could not be read. Try another file.');
+      setError(new LocalizedError('editor:media.readError'));
     } finally {
       setBusy(false);
     }
@@ -113,8 +116,8 @@ const MediaInsertDialog: React.FC<MediaInsertDialogProps> = ({onClose, onInsert}
         onMouseDown={event => event.stopPropagation()}
       >
         <div className={styles.header}>
-          <h2 id="media-insert-title" className={styles.title}>{copy.title}</h2>
-          <button type="button" className={styles.closeButton} aria-label="Close" onClick={onClose} disabled={busy}>
+          <h2 id="media-insert-title" className={styles.title}>{translate(copy.title)}</h2>
+          <button type="button" className={styles.closeButton} aria-label={translate("common:actions.close")} onClick={onClose} disabled={busy}>
             <X size={18}/>
           </button>
         </div>
@@ -128,8 +131,8 @@ const MediaInsertDialog: React.FC<MediaInsertDialogProps> = ({onClose, onInsert}
             disabled={busy}
           >
             <FolderOpen size={28} aria-hidden="true"/>
-            <span className={styles.zoneLabel}>{copy.chooseLabel}</span>
-            <span className={styles.zoneHint}>{copy.chooseHint}</span>
+            <span className={styles.zoneLabel}>{translate(copy.chooseLabel)}</span>
+            <span className={styles.zoneHint}>{translate(copy.chooseHint)}</span>
           </button>
 
           <button
@@ -145,8 +148,8 @@ const MediaInsertDialog: React.FC<MediaInsertDialogProps> = ({onClose, onInsert}
             onDrop={onDrop}
           >
             <Upload size={28} aria-hidden="true"/>
-            <span className={styles.zoneLabel}>{copy.dropLabel}</span>
-            <span className={styles.zoneHint}>{copy.dropHint}</span>
+            <span className={styles.zoneLabel}>{translate(copy.dropLabel)}</span>
+            <span className={styles.zoneHint}>{translate(copy.dropHint)}</span>
           </button>
         </div>
 
@@ -163,7 +166,7 @@ const MediaInsertDialog: React.FC<MediaInsertDialogProps> = ({onClose, onInsert}
           className={`${styles.status} ${error ? styles.error : ''} ${busy ? styles.busy : ''}`}
           role={error ? 'alert' : 'status'}
         >
-          {error ?? (busy ? 'Reading file…' : '')}
+          {error?.localizedMessage() ?? (busy ? translate('editor:media.reading') : '')}
         </p>
       </section>
     </div>,

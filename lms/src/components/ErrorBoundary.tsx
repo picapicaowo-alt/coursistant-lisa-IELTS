@@ -1,6 +1,6 @@
 import React from 'react';
-import styles from './ErrorBoundary.module.scss';
 import {frontendErrorReporter} from '@/utils/frontendErrorReporter';
+import {ErrorFallback} from './ErrorFallback';
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -33,23 +33,6 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
   render() {
     if (!this.state.error) return this.props.children;
 
-    return (
-      <div className={styles.container} role="alert">
-        <h2 className={styles.title}>Something went wrong</h2>
-        <p className={styles.message}>
-          This page couldn&apos;t be loaded. Try again, and if it keeps
-          happening, reload the page.
-        </p>
-        <div className={styles.actions}>
-          <button
-            type="button"
-            className={styles.retry}
-            onClick={() => this.setState({error: null})}
-          >
-            Try again
-          </button>
-        </div>
-      </div>
-    );
+    return <ErrorFallback onRetry={() => this.setState({error: null})}/>;
   }
 }

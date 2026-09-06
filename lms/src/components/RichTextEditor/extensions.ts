@@ -67,7 +67,7 @@ export const MarkdownBlockMath = BlockMath.extend({
   },
 });
 
-export const createEditorExtensions = (options: {placeholder: string; disabled: boolean}) => [
+export const createEditorExtensions = (options: {placeholder: string | (() => string); disabled: boolean}) => [
   StarterKit.configure({
     heading: {levels: [1, 2, 3]},
     link: {

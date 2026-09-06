@@ -1,0 +1,49 @@
+.preview { position: relative; container-type: inline-size; }
+.dashboard {
+  display: grid;
+  grid-template-columns: 36% minmax(0, 1fr);
+  gap: 2%;
+  aspect-ratio: 1000 / 902;
+  padding: 1%;
+  border-radius: t.$radius-md;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+  font-size: 1.25cqw;
+  line-height: 1.3;
+  svg { width: 1.5em; height: 1.5em; flex-shrink: 0; }
+  strong { font-weight: t.$fw-semibold; }
+  small { display: block; margin-top: .3em; font-size: .86em; color: t.$content-secondary; }
+}
+.assistant {
+  display: flex; flex-direction: column; min-width: 0; gap: 3cqw; padding: 2cqw;
+  background: linear-gradient(135deg, t.$surface-assistant-end, t.$surface-assistant-start);
+  border-radius: 2cqw;
+  header { display: flex; align-items: center; justify-content: space-between; font-size: 2.3cqw; }
+}
+.greeting { margin: 3cqw 0 0; font-size: 2.6cqw; line-height: 1.4; }
+.prompts { display: grid; gap: 1cqw; span { padding: 1.3cqw 2cqw; background: t.$surface-raised; border-radius: 1cqw; font-size: 1.65cqw; } }
+.composer { display: flex; align-items: center; gap: 1cqw; margin-top: auto; padding: 1cqw; border: 1px solid t.$border-default; border-radius: 2cqw; background: t.$surface-raised; color: t.$content-secondary; span { flex: 1; } }
+.workspace { display: grid; grid-template-rows: 1.1fr .85fr 1fr; gap: 2cqw; min-width: 0; }
+.card {
+  min-width: 0; border: 1px solid t.$border-default; border-radius: 2cqw; overflow: hidden;
+  > header { display: flex; justify-content: space-between; gap: 1cqw; padding: 1.6cqw 2cqw; border-bottom: 1px dashed t.$border-default; strong { font-size: 1.7cqw; } span { display: flex; align-items: center; } }
+}
+.courseRows, .taskRows { display: grid; gap: 1.9cqw; padding: 1.8cqw 2cqw; }
+.courseRow { display: grid; grid-template-columns: 3.8cqw 1.5fr 1fr auto; align-items: center; gap: 1.3cqw; min-width: 0; strong { font-size: 1.4cqw; } }
+.fileIcon { box-sizing: content-box; padding: .8cqw; border-radius: 1cqw; color: t.$action-primary; background: t.$surface-brand-subtle; &[data-kind='homework'] { color: t.$feedback-warning; background: t.$feedback-warning-surface; } &[data-kind='practice'] { color: t.$feedback-success; background: t.$feedback-success-surface; } }
+.outline { display: block; padding: .45cqw .8cqw; border: 1px solid t.$border-default; border-radius: 1cqw; text-align: center; }
+.status { display: inline-block !important; width: fit-content; padding: .2cqw .6cqw; margin-top: .5cqw; border-radius: .5cqw; color: t.$content-secondary; background: t.$surface-muted; &[data-status='OVERDUE'] { color: t.$feedback-danger; background: t.$feedback-danger-surface; } &[data-status='NOT_SUBMITTED'] { color: t.$feedback-warning; background: t.$feedback-warning-surface; } &[data-status='SUBMITTED'], &[data-status='GRADED'] { color: t.$feedback-success; background: t.$feedback-success-surface; } }
+.taskRow { display: grid; grid-template-columns: minmax(0, 2.5fr) 1fr auto; gap: 1.2cqw; align-items: center; strong { font-size: 1.4cqw; } }
+.exams { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1cqw; padding: 1.8cqw 2cqw; }
+.exam { display: flex; flex-direction: column; align-items: flex-start; padding: 1.2cqw; background: t.$surface-dashboard-card; border-radius: 1.6cqw; p { flex: 1; margin: 2cqw 0; span { display: block; } } .outline { align-self: stretch; } }
+.goal {
+  position: absolute; right: -3%; bottom: -10%; width: 52%; padding: 2.2cqw; border: 1cqw solid t.$surface-raised; border-radius: 2.4cqw; box-shadow: t.$shadow-card;
+  background: linear-gradient(120deg, t.$profile-gradient-start, t.$action-primary); color: t.$content-on-color;
+  font-size: 1cqw; line-height: 1.3;
+  h3 { margin: 0; font-size: 2cqw; } > p { margin: .7cqw 0 2.2cqw; }
+  strong { display: block; }
+}
+.goalBody { display: grid; grid-template-columns: 1.5fr 1fr; gap: 1.5cqw; align-items: center; }
+.scores { display: flex; gap: 1.8cqw; align-items: center; strong { font-size: 2.8cqw; } svg { width: 4cqw; } }
+.ring { grid-column: 2; grid-row: span 2; display: flex; flex-direction: column; align-items: center; justify-content: center; aspect-ratio: 1; border: 1cqw solid t.$surface-brand-subtle; border-right-color: t.$action-primary; border-bottom-color: t.$action-primary; border-radius: 50%; strong { font-size: 2.4cqw; } span { max-width: 9cqw; text-align: center; } }
+.completion { display: flex; gap: 1cqw; align-items: center; svg { width: 1.8cqw; } strong { font-size: 1.35cqw; margin-top: .4cqw; } }

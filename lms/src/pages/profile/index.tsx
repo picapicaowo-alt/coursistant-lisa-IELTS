@@ -1,3 +1,6 @@
+import { useTranslation } from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
+import {roleLabel} from '@/i18n/presentation';
 import {UserAvatar} from '@/components/UserAvatar';
 import {useEffect, useRef, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -16,10 +19,12 @@ import {LearningProfileDetails, LearningProfileSummary} from './LearningProfile'
 
 interface StatusMessage {
   kind: 'success' | 'error';
-  text: string;
+  key: string;
+  error?: unknown;
 }
 
 const ProfilePage = () => {
+  const { t: translate } = useTranslation();
   const [editing, setEditing] = useState(false);
   const editDialog = useRef<HTMLDialogElement>(null);
   const [cropFile, setCropFile] = useState<File>();
@@ -58,53 +63,52 @@ const ProfilePage = () => {
     onSuccess: data => {
       commitProfile(data);
       setEditing(false);
-      setStatus({kind: 'success', text: 'Profile updated.'});
+      setStatus({kind: 'success', key: 'settings:profile.saved'});
     },
-    onError: error => setStatus({kind: 'error', text: getApiErrorMessage(error, 'Could not update profile.')}),
+    onError: error => setStatus({kind: 'error', key: 'settings:profile.saveFailed', error}),
   });
 
   const uploadAvatar = useMutation({
     mutationFn: async (file: File) => unwrapData(await profileApiService.uploadAvatar(file), 'Upload avatar'),
     onSuccess: data => {
       commitProfile(data);
-      setStatus({kind: 'success', text: 'Avatar updated.'});
+      setStatus({kind: 'success', key: 'settings:avatar.updated'});
       setCropFile(undefined);
     },
-    onError: error => setStatus({kind: 'error', text: getApiErrorMessage(error, 'Could not upload avatar.')}),
+    onError: error => setStatus({kind: 'error', key: 'settings:avatar.uploadFailed', error}),
   });
 
   const deleteAvatar = useMutation({
     mutationFn: async () => unwrapData(await profileApiService.deleteAvatar(), 'Delete avatar'),
     onSuccess: data => {
       commitProfile(data);
-      setStatus({kind: 'success', text: 'Avatar removed.'});
+      setStatus({kind: 'success', key: 'settings:avatar.removed'});
     },
-    onError: error => setStatus({kind: 'error', text: getApiErrorMessage(error, 'Could not remove avatar.')}),
+    onError: error => setStatus({kind: 'error', key: 'settings:avatar.removeFailed', error}),
   });
 
-  if (profileQuery.isLoading) return <main className={styles.profilePage}>Loading profile…</main>;
+  if (profileQuery.isLoading) return <main className={styles.profilePage}>{translate("advising:profile.loading")}</main>;
   if (profileQuery.isError) {
     return (
       <main className={styles.profilePage} role="alert">
-        Could not load profile.
-        <button type="button" className={styles.secondaryButton} onClick={() => void profileQuery.refetch()}>
-          Try again
-        </button>
+        {translate("settings:profile.loadFailed")}<button type="button" className={styles.secondaryButton} onClick={() => void profileQuery.refetch()}>
+          {translate("common:actions.tryAgain")}</button>
       </main>
     );
   }
 
   const profile = profileQuery.data;
-  if (!profile) return <main className={styles.profilePage}>Could not load profile.</main>;
+  if (!profile) return <main className={styles.profilePage}>{translate("settings:profile.loadFailed")}</main>;
   const avatar = normalizeAvatarUrl(profile.avatarUrl);
 
   return (
     <main className={styles.profilePage}>
       <section className={styles.profileCard} aria-labelledby="profile-title">
         <div className={styles.avatarColumn}>
-          <UserAvatar src={avatar} alt="Profile avatar" className={styles.profileAvatar}/>
+          <UserAvatar src={avatar} alt={translate("settings:profile.avatar")} className={styles.profileAvatar}/>
           <input
             ref={fileInputRef}
+            hidden
             className={styles.visuallyHidden}
             type="file"
             accept="image/png,image/jpeg,image/webp"
@@ -120,8 +124,7 @@ const ProfilePage = () => {
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadAvatar.isPending}
           >
-            Change avatar
-          </button>
+            {translate("settings:profile.changeAvatar")}</button>
           {profile.avatarUrl ? (
             <button
               type="button"
@@ -129,15 +132,14 @@ const ProfilePage = () => {
               onClick={() => deleteAvatar.mutate()}
               disabled={deleteAvatar.isPending}
             >
-              Remove avatar
-            </button>
+              {translate("settings:profile.removeAvatar")}</button>
           ) : null}
         </div>
 
         <div className={styles.profileDetails}>
           <div className={styles.profileHeading}>
             <div>
-              <p className={styles.eyebrow}>{isStudent ? `Student ID: ${profile.userId}` : profile.role}</p>
+              <p className={styles.eyebrow}>{isStudent ? translate('advising:studentWorkspace.studentId', {id: formatNumber(profile.userId)}) : roleLabel(profile.role)}</p>
               <h1 id="profile-title">{formatPersonName(profile)}</h1>
             </div>
             {!editing ? (
@@ -153,60 +155,59 @@ const ProfilePage = () => {
                   setStatus(null);
                 }}
               >
-                Edit profile
-              </button>
+                {translate("settings:profile.edit")}</button>
             ) : null}
           </div>
           {status ? (
             <p role="status" className={status.kind === 'success' ? styles.profileSuccess : styles.profileError}>
-              {status.text}
+              {getApiErrorMessage(status.error, translate(status.key))}
             </p>
           ) : null}
 
           {learningProfile.data ? <LearningProfileSummary profile={learningProfile.data}/> : (
             <dl className={styles.profileFacts}>
-              <div><dt>Email</dt><dd>{profile.email}</dd></div>
-              <div><dt>Account role</dt><dd>{profile.role}</dd></div>
-              <div><dt>Level</dt><dd>{profile.level || 'Not applicable'}</dd></div>
-              <div><dt>Email notifications</dt><dd>{profile.emailNotifications ? 'Enabled' : 'Disabled'}</dd></div>
+              <div><dt>{translate("common:fields.email")}</dt><dd>{profile.email}</dd></div>
+              <div><dt>{translate("settings:accountRole")}</dt><dd>{roleLabel(profile.role)}</dd></div>
+              <div><dt>{translate("records:fields.level")}</dt><dd>{roleLabel(profile.level) || translate("common:status.NOT_APPLICABLE")}</dd></div>
+              <div><dt>{translate("settings:emailNotifications")}</dt><dd>{profile.emailNotifications ? translate("settings:profile.enabled") : translate("common:admin.status.DISABLED")}</dd></div>
             </dl>
           )}
         </div>
       </section>
-      {isStudent && learningProfile.isPending ? <p role="status">Loading learning profile…</p> : null}
-      {isStudent && learningProfile.isError ? <p role="alert">Learning profile could not be loaded. <button type="button" className={styles.secondaryButton} onClick={() => void learningProfile.refetch()}>Retry</button></p> : null}
+      {isStudent && learningProfile.isPending ? <p role="status">{translate("learning:parent.loadingProfile")}</p> : null}
+      {isStudent && learningProfile.isError ? <p role="alert">{translate("settings:profile.learningFailed")}{' '}<button type="button" className={styles.secondaryButton} onClick={() => void learningProfile.refetch()}>{translate("common:actions.retry")}</button></p> : null}
       {learningProfile.data ? <LearningProfileDetails profile={learningProfile.data}/> : null}
-      {editing ? <dialog ref={editDialog} className={styles.editDialog} aria-labelledby="edit-profile-title" onClose={() => setEditing(false)} onCancel={event => {if (updateName.isPending) event.preventDefault();}}><h2 id="edit-profile-title">Edit Profile</h2>            <form
+      {editing ? <dialog ref={editDialog} className={styles.editDialog} aria-labelledby="edit-profile-title" onClose={() => setEditing(false)} onCancel={event => {if (updateName.isPending) event.preventDefault();}}><h2 id="edit-profile-title">{translate("settings:profile.edit")}</h2>            <form
               className={styles.profileForm}
+              noValidate
               onSubmit={event => {
                 event.preventDefault();
-                updateName.mutate();
+                if (!updateName.isPending && firstName.trim() && lastName.trim()) updateName.mutate();
               }}
             >
-              <label htmlFor="profile-first-name">First name</label>
+              <label htmlFor="profile-first-name">{translate("common:fields.firstName")}</label>
               <input id="profile-first-name" value={firstName} onChange={event => setFirstName(event.target.value)} required autoFocus maxLength={100}/>
-              <label htmlFor="profile-middle-name">Middle name</label>
+              <label htmlFor="profile-middle-name">{translate("auth:signup.middleNameLabel")}</label>
               <input id="profile-middle-name" value={middleName} onChange={event => setMiddleName(event.target.value)} maxLength={100}/>
-              <label htmlFor="profile-last-name">Last name</label>
+              <label htmlFor="profile-last-name">{translate("common:fields.lastName")}</label>
               <input id="profile-last-name" value={lastName} onChange={event => setLastName(event.target.value)} required maxLength={100}/>
-              <label htmlFor="profile-phone">Phone</label>
+              <label htmlFor="profile-phone">{translate("settings:phone")}</label>
               <input id="profile-phone" value={phone} onChange={event => setPhone(event.target.value)} maxLength={64} autoComplete="tel"/>
-              {status?.kind === 'error' ? <p role="alert" className={styles.profileError}>{status.text}</p> : null}
+              {status?.kind === 'error' ? <p role="alert" className={styles.profileError}>{getApiErrorMessage(status.error, translate(status.key))}</p> : null}
               <div className={styles.profileActions}>
                 <button type="button" className={styles.secondaryButton} disabled={updateName.isPending} onClick={() => setEditing(false)}>
-                  Cancel
-                </button>
+                  {translate("common:actions.cancel")}</button>
                 <button
                   type="submit"
                   className={styles.primaryButton}
                   disabled={updateName.isPending || !firstName.trim() || !lastName.trim()}
                 >
-                  {updateName.isPending ? 'Saving…' : 'Save changes'}
+                  {updateName.isPending ? translate("common:actions.saving") : translate("common:actions.saveChanges")}
                 </button>
               </div>
             </form>
 </dialog> : null}
-      {cropFile ? <AvatarCropDialog file={cropFile} pending={uploadAvatar.isPending} error={uploadAvatar.isError ? getApiErrorMessage(uploadAvatar.error, 'The photo could not be uploaded.') : undefined} onSave={file => uploadAvatar.mutate(file)} onClose={() => setCropFile(undefined)}/> : null}
+      {cropFile ? <AvatarCropDialog file={cropFile} pending={uploadAvatar.isPending} error={uploadAvatar.isError ? getApiErrorMessage(uploadAvatar.error, translate('settings:avatar.uploadFailed')) : undefined} onSave={file => uploadAvatar.mutate(file)} onClose={() => setCropFile(undefined)}/> : null}
     </main>
   );
 };

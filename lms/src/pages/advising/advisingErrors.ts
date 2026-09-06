@@ -1,33 +1,37 @@
+import i18n from '@/i18n';
 import {ADVISING_ERROR_CODES} from '@/apis';
-import {getApiErrorCode, getApiErrorMessage} from '@/utils/apiError';
+import {getApiErrorCode, getApiErrorMessage, isTransportOrServerFailure} from '@/utils/apiError';
 
 const CODE_COPY: Record<string, string> = {
-  INVALID_TOKEN: 'Your session has expired. Sign in again.',
-  FORBIDDEN: 'You do not have permission to use this feature.',
-  ACCESS_DENIED: 'You do not have permission to use this feature.',
-  [ADVISING_ERROR_CODES.featureDisabled]: 'This action is not available yet.',
-  [ADVISING_ERROR_CODES.idempotencyMismatch]: 'This action has changed since the last attempt. Copy your changes, then reload the page before trying again.',
-  [ADVISING_ERROR_CODES.userAlreadyExists]: 'A user with this email already exists.',
-  [ADVISING_ERROR_CODES.intakeNotFound]: 'This intake is no longer available. If it was just assigned, that is expected.',
-  [ADVISING_ERROR_CODES.intakeVersionConflict]: 'Someone else updated this intake. Reload and try again.',
-  [ADVISING_ERROR_CODES.alreadyAssigned]: 'This student is already assigned. They have left the unassigned queue.',
-  [ADVISING_ERROR_CODES.advisorNotEligible]: 'That advisor is not available. Refresh the advisor list.',
-  [ADVISING_ERROR_CODES.intakeNotCancellable]: 'This intake cannot be cancelled.',
-  [ADVISING_ERROR_CODES.assignmentVersionConflict]: 'The advisor assignment changed. Reload and try again.',
-  [ADVISING_ERROR_CODES.profileAlreadyExists]: 'This student already has a profile. Reload it instead of creating another.',
-  [ADVISING_ERROR_CODES.profileRequired]: 'Create a student profile before the study plan.',
-  [ADVISING_ERROR_CODES.profileNotFound]: 'No profile yet for this student.',
-  [ADVISING_ERROR_CODES.profileVersionConflict]: 'The profile changed. Reload the current version and save again.',
-  [ADVISING_ERROR_CODES.intakeRequired]: 'This student has no intake the current advisor can read.',
-  [ADVISING_ERROR_CODES.studyPlanAlreadyExists]: 'This student already has a study plan. Reload it instead of creating another.',
-  [ADVISING_ERROR_CODES.studyPlanNotFound]: 'No study plan yet for this student.',
-  [ADVISING_ERROR_CODES.studyPlanVersionConflict]: 'The study plan changed. Reload the current version and save again.',
-  [ADVISING_ERROR_CODES.studyPlanInvalidTimeline]: 'Check the plan start and end dates.',
-  [ADVISING_ERROR_CODES.studyPlanChildInvalid]: 'Check checkpoint and task fields, including positions.',
+  INVALID_TOKEN: "advising:errors.sessionExpired",
+  FORBIDDEN: "advising:errors.forbidden",
+  ACCESS_DENIED: "advising:errors.forbidden",
+  [ADVISING_ERROR_CODES.featureDisabled]: "advising:errors.featureDisabled",
+  [ADVISING_ERROR_CODES.idempotencyMismatch]: "advising:errors.idempotencyMismatch",
+  [ADVISING_ERROR_CODES.userAlreadyExists]: "advising:errors.userAlreadyExists",
+  [ADVISING_ERROR_CODES.intakeNotFound]: "advising:errors.intakeNotFound",
+  [ADVISING_ERROR_CODES.intakeVersionConflict]: "advising:errors.intakeVersionConflict",
+  [ADVISING_ERROR_CODES.alreadyAssigned]: "advising:errors.alreadyAssigned",
+  [ADVISING_ERROR_CODES.advisorNotEligible]: "advising:errors.advisorNotEligible",
+  [ADVISING_ERROR_CODES.intakeNotCancellable]: "advising:errors.intakeNotCancellable",
+  [ADVISING_ERROR_CODES.assignmentVersionConflict]: "advising:errors.assignmentVersionConflict",
+  [ADVISING_ERROR_CODES.profileAlreadyExists]: "advising:errors.profileAlreadyExists",
+  [ADVISING_ERROR_CODES.profileRequired]: "advising:errors.profileRequired",
+  [ADVISING_ERROR_CODES.profileNotFound]: "advising:errors.profileNotFound",
+  [ADVISING_ERROR_CODES.profileVersionConflict]: "advising:errors.profileVersionConflict",
+  [ADVISING_ERROR_CODES.intakeRequired]: "advising:errors.intakeRequired",
+  [ADVISING_ERROR_CODES.studyPlanAlreadyExists]: "advising:errors.studyPlanAlreadyExists",
+  [ADVISING_ERROR_CODES.studyPlanNotFound]: "advising:errors.studyPlanNotFound",
+  [ADVISING_ERROR_CODES.studyPlanVersionConflict]: "advising:errors.studyPlanVersionConflict",
+  [ADVISING_ERROR_CODES.studyPlanInvalidTimeline]: "advising:errors.studyPlanInvalidTimeline",
+  [ADVISING_ERROR_CODES.studyPlanChildInvalid]: "advising:errors.studyPlanChildInvalid",
 };
 
 export const advisingErrorMessage = (error: unknown, fallback: string): string => {
   const code = getApiErrorCode(error);
-  if (code && CODE_COPY[code]) return CODE_COPY[code];
+  if (code && CODE_COPY[code]) return i18n.t(CODE_COPY[code]);
+  // Server/transport diagnostics are not reliable user instructions. Keep the
+  // contextual failure message while retaining known validation/permission copy.
+  if (isTransportOrServerFailure(error)) return fallback;
   return getApiErrorMessage(error, fallback);
 };

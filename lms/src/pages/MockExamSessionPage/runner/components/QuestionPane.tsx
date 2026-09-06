@@ -41,7 +41,7 @@ export function QuestionPane({
 }: QuestionPaneProps) {
   const {t: translate} = useTranslation();
   return (
-    <section className="question-pane" aria-label="Questions">
+    <section className="question-pane" aria-label={translate('exams:runner.questions')}>
       <div className="question-pane__scroll" key={passage.id}>
         {passage.sections.map((section) => (
           <SectionView

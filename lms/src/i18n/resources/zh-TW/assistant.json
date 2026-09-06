@@ -1,0 +1,145 @@
+{
+  "newChat": "新對話",
+  "greeting": "你好！",
+  "help": {
+    "student": "今天的學習有什麼需要我幫忙的嗎？",
+    "instructor": "今天的教學有什麼需要我幫忙的嗎？",
+    "advisor": "今天的學業指導有什麼需要我幫忙的嗎？"
+  },
+  "input": {
+    "student": "向學習助手提問",
+    "instructor": "向教學助手提問",
+    "advisor": "向學業指導助手提問"
+  },
+  "startNew": "開始新對話",
+  "attachmentOpen": "開啟對話以新增附件",
+  "ask": "有什麼想問的…",
+  "send": "傳送訊息",
+  "prompts": {
+    "explain": "解釋一個概念",
+    "reviewWriting": "點評我的作文",
+    "speaking": "練習口語",
+    "advice": "學習建議",
+    "lesson": "規劃一堂課",
+    "questions": "建立練習題",
+    "materials": "審閱課程資料",
+    "feedback": "起草學生回饋",
+    "progress": "檢視學生進度",
+    "plan": "制定學習計畫",
+    "goals": "回顧學習目標",
+    "followUp": "安排跟進"
+  },
+  "copy": {
+    "label": "複製回覆",
+    "copied": "已複製",
+    "copy": "複製",
+    "failed": "複製失敗，請選中回覆文字後複製。",
+    "success": "已複製回覆。"
+  },
+  "thinking": {
+    "understand": "正在理解您的請求。",
+    "context": "正在查閱相關資訊。",
+    "response": "正在整理回覆。",
+    "label": "AI 正在思考",
+    "progress": "AI 回覆進度",
+    "elapsed": "{{seconds}} 秒",
+    "status": "{{label}}：{{step}}",
+    "question": "正在理解你的問題。",
+    "courseContext": "正在檢視相關課程背景。",
+    "route": "正在選擇合適的輔助方式。",
+    "search": "正在檢索課程材料。",
+    "tools": "正在檢視相關學習平臺資訊。",
+    "working": "正在處理你的請求。"
+  },
+  "courseFallback": "課程 {{id}}",
+  "courseListError": "暫時無法核實你的課程列表，學習助手目前不可用。",
+  "checkingAttempts": "正在核查測驗作答狀態，完成後即可使用學習助手…",
+  "attemptCheckError": "暫時無法核實測驗作答狀態，學習助手目前不可用。請稍後重試。",
+  "lockedCourses": "你正在作答{{courses}}的測驗，學習助手已鎖定。請選擇沒有進行中測驗的課程繼續。",
+  "oneOfCourses": "某門課程",
+  "lockedCourse": "你正在作答「{{course}}」的測驗，該課程的學習助手暫不可用。請先提交或結束作答。",
+  "reviewFile": "請閱讀附件並提供建議。",
+  "selectCourseFirst": "請先選擇課程，再向學習助手提問。",
+  "responseError": "學習助手暫時無法回覆，請重試。",
+  "new": "新建",
+  "closeCourse": "關閉課程助手",
+  "createChat": "+ 新對話",
+  "lockdownActive": "考試鎖定已啟用",
+  "supportUnavailable": "學習助手暫不可用",
+  "summarize": "幫我總結",
+  "summarizeHelp": "Ripan 將為你清晰地總結這份學習材料。",
+  "welcomeBack": "歡迎回來，{{name}}！👋",
+  "encouragement": "每一小步的進步，都讓你離夢想更近。",
+  "latestResponse": "最新回覆",
+  "chooseFile": "選擇傳送給學習助手的檔案",
+  "attachFile": "新增附件",
+  "askSupport": "向學習助手提問",
+  "askMaterials": "就課程材料提出問題…",
+  "attachedFile": "附件：{{name}}",
+  "keyboardHelp": "按 Enter 傳送 · 按 Shift+Enter 換行",
+  "personalHeading": "你的專屬<0>學習助手</0>",
+  "errors": {
+    "invalidResponse": "AI 助理傳回的內容無效，請重試。",
+    "emptyResponse": "AI 助理未傳回內容，請重試。",
+    "approvalDetails": "AI 助理的確認請求缺少詳情，暫時無法確認此操作。",
+    "workflowUnavailable": "任務助手暫時無法使用，請重試。"
+  },
+  "workspace": {
+    "title": "AI 助手",
+    "tools": "AI 工具",
+    "study": "學習支援",
+    "workflow": "任務助手",
+    "loading": "正在載入學習支援…"
+  },
+  "workflow": {
+    "badge": "執行任務 · 制定計劃 · 整理安排",
+    "description": "讓 AI 助手檢視平臺資料並完成支援的任務。重要變更必須由你明確批准。",
+    "suggestions": "任務助手建議",
+    "tryAsking": "試著問問",
+    "thinking": "AI 助手正在思考",
+    "input": "告訴任務助手你想做什麼",
+    "run": "執行",
+    "detailsTitle": "確認作業資訊",
+    "reviewDetails": "核對資訊",
+    "detailsWarning": "確認後將進入截止時間變更審批環節，目前截止時間尚未改變。",
+    "approvalTitle": "截止時間變更審批",
+    "actionRequired": "需要你操作",
+    "approvalWarning": "截止時間尚未改變。",
+    "allow": "批准",
+    "expand": "展開{{panel}}",
+    "exitExpanded": "退出{{panel}}全屏檢視",
+    "prompts": {
+      "due": "未來 14 天有哪些作業到期？",
+      "courses": "列出我的課程。",
+      "deadline": "幫我修改作業截止時間。"
+    },
+    "steps": {
+      "understand": "正在理解你的請求。",
+      "response": "正在準備下一步。"
+    },
+    "greeting": {
+      "instructor": "我可以檢視你的課程和教學截止時間，也可以準備作業截止時間變更，交由你批准。",
+      "student": "我可以檢視你的課程和即將到期的作業。"
+    },
+    "role": {
+      "instructor": "教師任務助手",
+      "student": "學生任務助手"
+    },
+    "errors": {
+      "lockdown": "測驗作答期間無法使用 AI 輔助。",
+      "empty": "AI 助手未返回內容，請重試。",
+      "studentChange": "學生可以檢視作業截止時間，但只有教師可以修改。",
+      "incompleteApproval": "AI 助手的審批請求資訊不完整，尚未進行任何變更。請重試。",
+      "incompleteConfirmation": "AI 助手的確認請求資訊不完整，尚未進行任何變更。請重試。",
+      "reset": "資訊已確認，但助手未能繼續進入截止時間審批環節。請重新傳送完整的截止時間變更請求。"
+    },
+    "cancelled": "已取消截止時間變更。準備好後可以傳送新的請求。",
+    "approved": "已批准截止時間變更。",
+    "rejected": "已拒絕截止時間變更。",
+    "placeholder": {
+      "approval": "請批准或拒絕上方待審批的變更。",
+      "confirmation": "請確認或取消上方資訊。",
+      "request": "告訴任務助手你想做什麼…"
+    }
+  }
+}

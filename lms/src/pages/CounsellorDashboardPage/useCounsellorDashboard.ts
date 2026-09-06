@@ -1,3 +1,4 @@
+import {LocalizedError} from '@/i18n/errors';
 import {useEffect, useState} from 'react';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
 import {ApiResponseDataError, unwrapData, type AdvisingPage} from '@/apis';
@@ -42,7 +43,7 @@ export function useCounsellorDashboard(intakePageSize: number, advisorPageSize: 
   const detail = useQuery({
     queryKey: selectedId === null ? ['counsellor', 'no-selection'] : advisingQueryKeys.counsellorIntake(selectedId),
     queryFn: async () => {
-      if (selectedId === null) throw new Error('Select an intake first.');
+      if (selectedId === null) throw new LocalizedError("advising:counsellor.selectFirst");
       return unwrapData(await counsellorApiService.getStudentIntake(selectedId), 'getIntake');
     },
     enabled: selectedId !== null,
@@ -51,7 +52,7 @@ export function useCounsellorDashboard(intakePageSize: number, advisorPageSize: 
   const parents = useQuery({
     queryKey: selectedId === null ? ['parent-links', 'no-selection'] : parentLinkQueryKeys.subject('counsellor', selectedId),
     queryFn: async () => {
-      if (selectedId === null) throw new Error('Select an intake first.');
+      if (selectedId === null) throw new LocalizedError("advising:counsellor.selectFirst");
       return unwrapData(await parentApiService.listCounsellorParentLinks(selectedId), 'parentLinks');
     },
     enabled: selectedId !== null && detail.isSuccess && !detail.isError,

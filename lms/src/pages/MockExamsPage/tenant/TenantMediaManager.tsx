@@ -1,3 +1,7 @@
+import {LocalizedError} from '@/i18n/errors';
+import {formatNumber} from '@/i18n/formatting';
+import {formatFileSize} from '@/utils/file-utils';
+import {useTranslation} from 'react-i18next';
 import {useEffect, useId, useRef, useState} from 'react';
 import {
   useIsMutating,
@@ -32,6 +36,7 @@ export function TenantMediaManager({
   onSelect: (id: number | null) => void;
   onDeleted: (id: number) => void;
 }) {
+  const {t: translate} = useTranslation();
   const client = useQueryClient();
   const mutationKey = tenantContentWriteKey(templateId, versionId);
   const contentBusy = useIsMutating({mutationKey}) > 0;
@@ -40,7 +45,7 @@ export function TenantMediaManager({
   const idempotency = useIdempotencyCheckpoint();
   const rule = MEDIA_RULES[kind];
   const [file, setFile] = useState<File | null>(null);
-  const [error, setError] = useState('');
+  const [invalidFile, setInvalidFile] = useState(false);
   const [preview, setPreview] = useState<{id: number; url: string} | null>(
     null,
   );
@@ -61,13 +66,13 @@ export function TenantMediaManager({
     [preview],
   );
   const choose = (next: File | null) => {
-    setError('');
+    setInvalidFile(false);
     if (!next) return;
     if (
       next.size > rule.maxBytes ||
       !rule.extensions.includes(next.name.split('.').pop()?.toLowerCase() ?? '')
     ) {
-      setError(`Choose ${rule.label}.`);
+      setInvalidFile(true);
       setFile(null);
       return;
     }
@@ -77,7 +82,7 @@ export function TenantMediaManager({
     mutationKey,
     mutationFn: async ({file}: {file: File; select: typeof onSelect}) => {
       if (client.isMutating({mutationKey}) > 1)
-        throw new Error('Wait for the current content operation to finish.');
+        throw new LocalizedError("exams:templates.contentBusy");
       const fingerprint = idempotencyFingerprint({
         kind,
         name: file.name,
@@ -124,7 +129,7 @@ export function TenantMediaManager({
     mutationKey,
     mutationFn: async (id: number) => {
       if (client.isMutating({mutationKey}) > 1)
-        throw new Error('Wait for the current content operation to finish.');
+        throw new LocalizedError("exams:templates.contentBusy");
       await mockExamApiService.deleteTenantMedia(templateId, versionId, id);
       return id;
     },
@@ -151,14 +156,14 @@ export function TenantMediaManager({
         <FileUp size={30} />
         <strong>
           {file?.name ??
-            `Drag & drop ${kind === 'LISTENING_AUDIO' ? 'audio' : 'an image'}`}
+            translate(kind === 'LISTENING_AUDIO' ? 'exams:media.dropAudio' : 'exams:media.dropImage')}
         </strong>
-        <small>{rule.label}</small>
+        <small>{translate(rule.labelKey)}</small>
         <input
           ref={input}
           type="file"
           className={ui.srOnly}
-          aria-label="Choose media file"
+          aria-label={translate("exams:media.choose")}
           accept={rule.accept}
           disabled={contentBusy}
           onChange={(event) => choose(event.target.files?.[0] ?? null)}
@@ -170,7 +175,7 @@ export function TenantMediaManager({
             disabled={contentBusy}
             onClick={() => input.current?.click()}
           >
-            {file ? 'Change file' : 'Choose file'}
+            {file ? translate("exams:media.change") : translate("exams:media.chooseFile")}
           </button>
           {file ? (
             <button
@@ -179,13 +184,13 @@ export function TenantMediaManager({
               disabled={contentBusy}
               onClick={() => upload.mutate({file, select: onSelect})}
             >
-              {upload.isPending ? 'Uploading…' : 'Upload and use'}
+              {upload.isPending ? translate("assessment:submission.uploading") : translate("exams:media.uploadUse")}
             </button>
           ) : null}
         </div>
       </div>
       {media.isPending ? (
-        <p className={ui.hint}>Loading uploaded media…</p>
+        <p className={ui.hint}>{translate("exams:media.loading")}</p>
       ) : null}
       {items.map((item) => (
         <article
@@ -203,14 +208,14 @@ export function TenantMediaManager({
             />
             <Headphones size={18} />
             <span>
-              <strong>{item.fileName ?? `Media #${item.mediaId}`}</strong>
+              <strong>{item.fileName ?? translate('exams:media.fallbackName', {id: formatNumber(item.mediaId)})}</strong>
               <small>
                 {item.sizeBytes == null
                   ? ''
-                  : `${(item.sizeBytes / 1024 / 1024).toFixed(1)} MB · `}
+                  : `${formatFileSize(item.sizeBytes)} · `}
                 {item.status === 'UPLOADED'
-                  ? 'Ready to use'
-                  : 'Bound to saved content'}
+                  ? translate("exams:media.ready")
+                  : translate("exams:media.bound")}
               </small>
             </span>
           </label>
@@ -218,7 +223,7 @@ export function TenantMediaManager({
             <button
               type="button"
               className={ui.iconButton}
-              aria-label={`Preview ${item.fileName ?? item.mediaId}`}
+              aria-label={translate('course:materials.previewNamed', {name: item.fileName ?? translate('exams:media.fallbackName', {id: formatNumber(item.mediaId)})})}
               disabled={previewMedia.isPending}
               onClick={() => previewMedia.mutate(item.mediaId)}
             >
@@ -227,7 +232,7 @@ export function TenantMediaManager({
             <button
               type="button"
               className={ui.iconButton}
-              aria-label={`Delete ${item.fileName ?? item.mediaId}`}
+              aria-label={translate('common:actions.deleteNamed', {name: item.fileName ?? translate('exams:media.fallbackName', {id: formatNumber(item.mediaId)})})}
               disabled={contentBusy || item.status !== 'UPLOADED'}
               onClick={() => remove.mutate(item.mediaId)}
             >
@@ -243,8 +248,7 @@ export function TenantMediaManager({
           disabled={contentBusy}
           onClick={() => onSelect(null)}
         >
-          Clear media selection
-        </button>
+          {translate("exams:media.clear")}</button>
       ) : null}
       {preview ? (
         kind === 'LISTENING_AUDIO' ? (
@@ -253,20 +257,20 @@ export function TenantMediaManager({
           <img
             className={styles.mediaPreview}
             src={preview.url}
-            alt="Selected exam media"
+            alt={translate("exams:media.selectedAlt")}
           />
         )
       ) : null}
-      {error ||
+      {invalidFile ||
       upload.error ||
       previewMedia.error ||
       remove.error ||
       media.error ? (
         <p className={ui.inlineError} role="alert">
-          {error ||
+          {invalidFile ? translate('exams:media.invalidFile', {formats: translate(rule.labelKey)}) :
             getApiErrorMessage(
               upload.error || previewMedia.error || remove.error || media.error,
-              'Media could not be processed. Try again; saved media remains protected.',
+              translate('exams:media.failed'),
             )}
         </p>
       ) : null}

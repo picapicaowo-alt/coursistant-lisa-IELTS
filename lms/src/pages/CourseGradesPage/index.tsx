@@ -10,9 +10,10 @@ import {formatCourseName} from '@/utils/course';
 import {formatUtcTimestamp} from '@/utils/datetime';
 import {formatGradePoints} from './gradeDisplay';
 import styles from './index.module.scss';
+import {statusLabel} from '@/i18n/presentation';
 
 const CourseGradesPage = () => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const {courseId: courseIdParam} = useParams();
   const courseId = Number(courseIdParam);
   const valid = Number.isInteger(courseId) && courseId > 0;
@@ -30,10 +31,10 @@ const CourseGradesPage = () => {
     enabled: valid && access.isResolved && access.isStudent,
     retry: 1,
   });
-  if (!valid) return <main className={styles.page}><p role="alert">Invalid course.</p></main>;
-  if (access.isLoading) return <main className={styles.page}><p role="status">Loading grades…</p></main>;
+  if (!valid) return <main className={styles.page}><p role="alert">{translate("course:grades.invalid")}</p></main>;
+  if (access.isLoading) return <main className={styles.page}><p role="status">{translate("course:grades.loading")}</p></main>;
   if (access.isResolved && !access.isStudent) {
-    return <main className={styles.page}><p role="alert">This page shows a student&apos;s own grades only.</p></main>;
+    return <main className={styles.page}><p role="alert">{translate("course:grades.ownOnly")}</p></main>;
   }
 
   const loading = courseQuery.isPending || assignmentsQuery.isPending;
@@ -47,8 +48,8 @@ const CourseGradesPage = () => {
           <ArrowLeft aria-hidden="true"/>
         </Link>
         <div>
-          <p className={styles.eyebrow}>Course grades</p>
-          <h1>Grades</h1>
+          <p className={styles.eyebrow}>{translate("course:grades.title")}</p>
+          <h1>{translate("course:grades.label")}</h1>
           {courseQuery.data ? (
             <p className={styles.courseName}>
               {formatCourseName(courseQuery.data.courseCode, courseQuery.data.title ?? courseQuery.data.name)}
@@ -57,13 +58,13 @@ const CourseGradesPage = () => {
         </div>
       </header>
 
-      <section className={styles.notice} aria-label="Grade visibility information">
+      <section className={styles.notice} aria-label={translate("course:grades.visibility")}>
         <Clock3 aria-hidden="true"/>
         <p>{translate('course:grades.visibilityNotice')}</p>
       </section>
 
-      {loading ? <p className={styles.status} role="status">Loading grades…</p> : null}
-      {failed ? <p className={styles.error} role="alert">Some grades could not be loaded. Refresh to try again.</p> : null}
+      {loading ? <p className={styles.status} role="status">{translate("course:grades.loading")}</p> : null}
+      {failed ? <p className={styles.error} role="alert">{translate("course:grades.partialFailure")}</p> : null}
 
       {!loading ? (
         <div className={styles.sections}>
@@ -71,25 +72,25 @@ const CourseGradesPage = () => {
             <div className={styles.cardHeader}>
               <FileCheck2 aria-hidden="true"/>
               <div>
-                <h2>Assignments</h2>
-                <p>{assignments.length} item{assignments.length === 1 ? '' : 's'}</p>
+                <h2>{translate("course:detail.assignments")}</h2>
+                <p>{translate('course:grades.itemCount', {count: assignments.length})}</p>
               </div>
             </div>
-            {assignments.length === 0 ? <p className={styles.empty}>No published assignments.</p> : (
+            {assignments.length === 0 ? <p className={styles.empty}>{translate("course:grades.noAssignments")}</p> : (
               <ul className={styles.gradeList}>
                 {assignments.map(item => {
-                  const title = item.assignmentTitle ?? item.title ?? `Assignment ${item.assignmentId}`;
+                  const title = item.assignmentTitle ?? item.title ?? translate('course:grades.assignmentFallback', {id: item.assignmentId});
                   const score = item.released
                     ? `${formatGradePoints(item.pointsEarned ?? item.score)} / ${formatGradePoints(item.pointsPossible)}`
-                    : item.gradeDisplay === 'DashClosed' ? '—' : 'Not graded yet';
+                    : item.gradeDisplay === 'DashClosed' ? '—' : translate('course:grades.notGraded');
                   return (
                     <li key={item.assignmentId}>
                       <Link to={`/course/${courseId}/assignments/${item.assignmentId}`}>
                         <span className={styles.itemText}>
                           <strong>{title}</strong>
                           <small>
-                            {item.submissionStatus ?? 'Not submitted'}
-                            {item.dueAtUtc ? ` · Due ${formatUtcTimestamp(item.dueAtUtc)}` : ''}
+                            {statusLabel(item.submissionStatus ?? 'NOT_SUBMITTED')}
+                            {item.dueAtUtc ? <> · {translate('course:grades.due', {date: formatUtcTimestamp(item.dueAtUtc)})}</> : null}
                           </small>
                         </span>
                         <span className={item.released ? styles.releasedScore : styles.pendingScore}>{score}</span>

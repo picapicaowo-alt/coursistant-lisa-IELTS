@@ -1,11 +1,18 @@
-import {useEffect, useMemo, useRef, useState} from 'react';
-import {FileSection} from '@/components/FileSection';
-import {assignmentApiService} from '@/apis/services/assignment-api';
-import {unwrapData} from '@/apis';
-import type {AssignmentDetail, SubmissionState} from '@/apis';
-import type {FileView} from '@/types';
-import {isPreviewableFile, openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/downloadBlob';
-import styles from './SubmitAssignmentDialog.module.scss';
+import { LocalizedError } from "@/i18n/errors";
+import { useTranslation } from "react-i18next";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FileSection } from "@/components/FileSection";
+import { assignmentApiService } from "@/apis/services/assignment-api";
+import { unwrapData } from "@/apis";
+import type { AssignmentDetail, SubmissionState } from "@/apis";
+import type { FileView } from "@/types";
+import {
+  isPreviewableFile,
+  openPreviewWindow,
+  saveBlob,
+  showBlobInPreviewWindow,
+} from "@/utils/downloadBlob";
+import styles from "./SubmitAssignmentDialog.module.scss";
 
 interface SubmitAssignmentDialogProps {
   assignment: AssignmentDetail;
@@ -18,7 +25,9 @@ interface SubmitAssignmentDialogProps {
 
 const toAcceptValue = (allowedFileTypes?: string[]) => {
   if (!allowedFileTypes?.length) return undefined;
-  return allowedFileTypes.map(type => type.startsWith('.') ? type : `.${type}`).join(',');
+  return allowedFileTypes
+    .map((type) => (type.startsWith(".") ? type : `.${type}`))
+    .join(",");
 };
 
 export const SubmitAssignmentDialog = ({
@@ -29,70 +38,89 @@ export const SubmitAssignmentDialog = ({
   onStaged,
   onSubmitted,
 }: SubmitAssignmentDialogProps) => {
+  const { t: translate } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [attachmentAction, setAttachmentAction] = useState<'preview' | 'download' | null>(null);
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [attachmentAction, setAttachmentAction] = useState<
+    "preview" | "download" | null
+  >(null);
+  const [submitError, setSubmitError] = useState<LocalizedError | null>(null);
   const idempotencyKeyRef = useRef(crypto.randomUUID());
 
-  const stagedFiles = useMemo<FileView[]>(() => (
-    submission.stagingFiles.map(file => ({
-      id: file.id,
-      filename: file.originalName,
-      mimeType: file.contentType,
-      fileSize: file.sizeBytes,
-      updatedAt: file.createdAt,
-      uploadStatus: 'success',
-      uploadProgress: 100,
-    }))
-  ), [submission.stagingFiles]);
+  const stagedFiles = useMemo<FileView[]>(
+    () =>
+      submission.stagingFiles.map((file) => ({
+        id: file.id,
+        filename: file.originalName,
+        mimeType: file.contentType,
+        fileSize: file.sizeBytes,
+        updatedAt: file.createdAt,
+        uploadStatus: "success",
+        uploadProgress: 100,
+      })),
+    [submission.stagingFiles],
+  );
 
   const accept = toAcceptValue(assignment.allowedFileTypes);
   const instructorAttachment = assignment.attachments?.[0];
   const attachmentPreviewable = instructorAttachment
-    ? (instructorAttachment.previewAvailable
-      ?? isPreviewableFile(instructorAttachment.originalName, instructorAttachment.contentType))
+    ? (instructorAttachment.previewAvailable ??
+      isPreviewableFile(
+        instructorAttachment.originalName,
+        instructorAttachment.contentType,
+      ))
     : false;
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !isSubmitting) onClose();
+      if (event.key === "Escape" && !isSubmitting) onClose();
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isSubmitting, onClose]);
 
-  const uploadFile = async (file: File, signal: AbortSignal): Promise<string> => {
+  const uploadFile = async (
+    file: File,
+    signal: AbortSignal,
+  ): Promise<string> => {
     setSubmitError(null);
     const response = await assignmentApiService.uploadStagingFiles(
       courseId,
       assignment.id,
       [file],
-      signal
+      signal,
     );
-    const uploaded = unwrapData(response, 'uploadStagingFiles');
-    const staged = uploaded.find(item => item.originalName === file.name) ?? uploaded[0];
+    const uploaded = unwrapData(response, "uploadStagingFiles");
+    const staged =
+      uploaded.find((item) => item.originalName === file.name) ?? uploaded[0];
 
-    if (!staged) throw new Error('The API did not return the staged file.');
+    if (!staged)
+      throw new LocalizedError("assessment:submission.stagedFileMissing");
     return String(staged.id);
   };
 
   const deleteFile = async (file: FileView) => {
     const stagingFileId = Number(file.id);
     if (!Number.isInteger(stagingFileId) || stagingFileId <= 0) {
-      throw new Error('The staged file ID is invalid.');
+      throw new LocalizedError("assessment:submission.stagedFileInvalid");
     }
 
     setSubmitError(null);
-    await assignmentApiService.deleteStagingFile(courseId, assignment.id, stagingFileId);
+    await assignmentApiService.deleteStagingFile(
+      courseId,
+      assignment.id,
+      stagingFileId,
+    );
     void onStaged().catch(() => {
-      setSubmitError('The file was deleted, but the upload list could not be refreshed.');
+      setSubmitError(
+        new LocalizedError("assessment:submission.deletedRefreshFailed"),
+      );
     });
   };
 
   const downloadInstructorAttachment = async () => {
     if (!instructorAttachment) return;
-    setAttachmentAction('download');
+    setAttachmentAction("download");
     setSubmitError(null);
     try {
       const blob = await assignmentApiService.downloadAttachment(
@@ -102,7 +130,11 @@ export const SubmitAssignmentDialog = ({
       );
       saveBlob(blob, instructorAttachment.originalName);
     } catch {
-      setSubmitError(`Could not download ${instructorAttachment.originalName}.`);
+      setSubmitError(
+        new LocalizedError("assessment:assignment.errors.download", {
+          name: instructorAttachment.originalName,
+        }),
+      );
     } finally {
       setAttachmentAction(null);
     }
@@ -112,19 +144,27 @@ export const SubmitAssignmentDialog = ({
     if (!instructorAttachment) return;
     const previewWindow = openPreviewWindow();
     if (!previewWindow) {
-      setSubmitError('Allow pop-ups to preview this file.');
+      setSubmitError(new LocalizedError("course:materials.allowPopups"));
       return;
     }
-    setAttachmentAction('preview');
+    setAttachmentAction("preview");
     setSubmitError(null);
     try {
       showBlobInPreviewWindow(
         previewWindow,
-        await assignmentApiService.previewAttachment(courseId, assignment.id, instructorAttachment.id),
+        await assignmentApiService.previewAttachment(
+          courseId,
+          assignment.id,
+          instructorAttachment.id,
+        ),
       );
     } catch {
       previewWindow.close();
-      setSubmitError(`Could not preview ${instructorAttachment.originalName}.`);
+      setSubmitError(
+        new LocalizedError("assessment:assignment.errors.preview", {
+          name: instructorAttachment.originalName,
+        }),
+      );
     } finally {
       setAttachmentAction(null);
     }
@@ -132,7 +172,7 @@ export const SubmitAssignmentDialog = ({
 
   const submit = async () => {
     if (submission.stagingFiles.length === 0) {
-      setSubmitError('Choose at least one file before submitting.');
+      setSubmitError(new LocalizedError("assessment:submission.chooseFile"));
       return;
     }
 
@@ -143,13 +183,13 @@ export const SubmitAssignmentDialog = ({
       await assignmentApiService.submitStagedFiles(
         courseId,
         assignment.id,
-        {stagingFileIds: submission.stagingFiles.map(file => file.id)},
-        idempotencyKeyRef.current
+        { stagingFileIds: submission.stagingFiles.map((file) => file.id) },
+        idempotencyKeyRef.current,
       );
       await onSubmitted();
       onClose();
     } catch {
-      setSubmitError('Your assignment could not be submitted. Your staged files are still available.');
+      setSubmitError(new LocalizedError("assessment:submission.submitFailed"));
     } finally {
       setIsSubmitting(false);
     }
@@ -169,21 +209,35 @@ export const SubmitAssignmentDialog = ({
         aria-modal="true"
         aria-labelledby="submit-assignment-title"
       >
-        <h2 id="submit-assignment-title" className={styles.title}>Submit Assignment</h2>
-        <p className={styles.subtitle}>Upload your responses, then submit them as a new version.</p>
+        <h2 id="submit-assignment-title" className={styles.title}>
+          {translate("course:assignmentStudentModal.title")}
+        </h2>
+        <p className={styles.subtitle}>
+          {translate("assessment:submission.dialogHelp")}
+        </p>
 
         {instructorAttachment && (
           <div className={styles.instructorFile}>
-            <p>Your instructor provided a file to help you complete this assignment.</p>
-            {attachmentPreviewable ? <button
-              type="button"
-              className={styles.downloadLink}
-              onClick={() => void previewInstructorAttachment()}
-              disabled={attachmentAction !== null}
-              title={`Preview ${instructorAttachment.originalName}`}
-            >
-              <span>{attachmentAction === 'preview' ? 'Opening…' : `Preview ${instructorAttachment.originalName}`}</span>
-            </button> : null}
+            <p>{translate("assessment:submission.instructorFileHelp")}</p>
+            {attachmentPreviewable ? (
+              <button
+                type="button"
+                className={styles.downloadLink}
+                onClick={() => void previewInstructorAttachment()}
+                disabled={attachmentAction !== null}
+                title={translate("assessment:files.previewName", {
+                  name: instructorAttachment.originalName,
+                })}
+              >
+                <span>
+                  {attachmentAction === "preview"
+                    ? translate("course:materials.opening")
+                    : translate("assessment:files.previewName", {
+                        name: instructorAttachment.originalName,
+                      })}
+                </span>
+              </button>
+            ) : null}
             <button
               type="button"
               className={styles.downloadLink}
@@ -197,7 +251,13 @@ export const SubmitAssignmentDialog = ({
                 width={24}
                 height={24}
               />
-              <span>{attachmentAction === 'download' ? 'Downloading…' : `Download ${instructorAttachment.originalName}`}</span>
+              <span>
+                {attachmentAction === "download"
+                  ? translate("course:materials.downloading")
+                  : translate("assessment:files.downloadName", {
+                      name: instructorAttachment.originalName,
+                    })}
+              </span>
             </button>
           </div>
         )}
@@ -212,15 +272,26 @@ export const SubmitAssignmentDialog = ({
 
         <p className={styles.fileHint}>
           {assignment.allowedFileTypes?.length
-            ? `Supported file types: ${assignment.allowedFileTypes.join(', ')}`
-            : 'Use one of the file types allowed by your instructor.'}
+            ? translate("assessment:submission.allowedTypes", {
+                types: assignment.allowedFileTypes.join(", "),
+              })
+            : translate("assessment:submission.allowedTypesHelp")}
         </p>
 
-        {submitError && <p className={styles.error} role="alert">{submitError}</p>}
+        {submitError && (
+          <p className={styles.error} role="alert">
+            {submitError.localizedMessage()}
+          </p>
+        )}
 
         <div className={styles.actions}>
-          <button type="button" className={styles.cancel} onClick={onClose} disabled={isSubmitting}>
-            Cancel
+          <button
+            type="button"
+            className={styles.cancel}
+            onClick={onClose}
+            disabled={isSubmitting}
+          >
+            {translate("common:actions.cancel")}
           </button>
           <button
             type="button"
@@ -228,7 +299,9 @@ export const SubmitAssignmentDialog = ({
             onClick={() => void submit()}
             disabled={isSubmitting || !submission.acceptingSubmissions}
           >
-            {isSubmitting ? 'Submitting…' : 'Submit files'}
+            {isSubmitting
+              ? translate("common:actions.submitting")
+              : translate("assessment:submission.submitFiles")}
           </button>
         </div>
       </section>

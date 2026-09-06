@@ -211,7 +211,7 @@ describe('QuizGradingPage', () => {
 
     renderPage();
 
-    expect(await screen.findByText('Attempt history could not be loaded for 1 learner(s).')).toBeInTheDocument();
+    expect(await screen.findByText('Attempt history could not be loaded for 1 learner.')).toBeInTheDocument();
     expect(screen.getByRole('button', {name: 'Review result for Student One'})).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: 'Review result for Student Two'})).not.toBeInTheDocument();
   });

@@ -1,3 +1,4 @@
+# Scoped additions from ../backend-fix-adaptation-source-2026-09-05.md; preserve the existing contract.
 openapi: 3.0.1
 info:
   title: LMS Advising API
@@ -22,6 +23,60 @@ tags:
 - name: TenantCourseConfig
 - name: InstructorContext
 paths:
+  /v2/advisor/students/{studentUserId}/study-plan/tasks/{taskId}/submission-file/download:
+    get:
+      description: Authenticated task file download. PDF and images support preview; Office documents are generally download-only.
+      parameters:
+      - {in: path, name: studentUserId, required: true, schema: {type: integer, format: int64}}
+      - {in: path, name: taskId, required: true, schema: {type: integer, format: int64}}
+      responses:
+        "200":
+          description: Authorized file bytes
+          content:
+            '*/*':
+              schema: {type: string, format: binary}
+  /v2/advisor/students/{studentUserId}/study-plan/tasks/{taskId}/submission-file/preview:
+    get:
+      description: Authenticated task file preview. PDF and images support preview; Office documents are generally download-only.
+      parameters:
+      - {in: path, name: studentUserId, required: true, schema: {type: integer, format: int64}}
+      - {in: path, name: taskId, required: true, schema: {type: integer, format: int64}}
+      responses:
+        "200":
+          description: Authorized file bytes
+          content:
+            '*/*':
+              schema: {type: string, format: binary}
+  /v2/student/study-plan/tasks/{taskId}/submission-file:
+    put:
+      description: Upload or replace one task submission file; allowed pdf, docx, pptx, xlsx, png, jpg, jpeg, gif, webp; maximum 100 MiB. Use returned taskVersion for subsequent completion.
+      parameters:
+      - {in: path, name: taskId, required: true, schema: {type: integer, format: int64}}
+      - {in: query, name: expectedVersion, required: true, schema: {type: integer}}
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file: {type: string, format: binary}
+      responses:
+        "200":
+          description: File metadata and updated taskVersion
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    allOf:
+                    - {$ref: "#/components/schemas/AdvisorTaskSubmissionFile"}
+                    - type: object
+                      required: [taskVersion]
+                      properties:
+                        taskVersion: {type: integer}
   /v2/counsellor/student-intakes:
     post:
       operationId: counsellorCreateStudentIntake
@@ -1758,6 +1813,15 @@ components:
     NotFound:
       description: STUDENT_INTAKE_NOT_FOUND or ADVISOR_ASSIGNMENT_NOT_FOUND or STUDENT_PROFILE_NOT_FOUND or STUDY_PLAN_NOT_FOUND or hidden cross-tenant/owner
   schemas:
+    AdvisorTaskSubmissionFile:
+      type: object
+      required: [taskId, originalName, contentType, sizeBytes, previewAvailable]
+      properties:
+        taskId: {type: integer, format: int64}
+        originalName: {type: string}
+        contentType: {type: string}
+        sizeBytes: {type: integer, format: int64}
+        previewAvailable: {type: boolean}
     CreateStudentIntakeRequest:
       type: object
       required: [firstName, lastName, email, studentType, courseRequest]
@@ -2007,7 +2071,7 @@ components:
           items: { $ref: "#/components/schemas/AdvisorActionTaskResponse" }
         activeCourseCount: { type: integer }
         publishedReportCount: { type: integer }
-        pendingRequestCount: { type: integer }
+        pendingRequestCount: { type: integer, description: "Current Advisor PENDING_ADVISOR schedule requests only; excludes PENDING_INSTRUCTOR, processed requests and activeTasks." }
     AdvisorStudentHubApiResponse:
       type: object
       required: [status, code, data]
@@ -2296,16 +2360,16 @@ components:
         startedAt: { type: string, format: date-time }
         completedAt: { type: string, format: date-time }
         submissionText: { type: string }
-        submissionFileObjectKey: { type: string }
+        submissionFile: { $ref: "#/components/schemas/AdvisorTaskSubmissionFile" }
         advisorFeedback: { type: string }
         version: { type: integer }
     CompleteAdvisorTaskRequest:
+      description: Nonblank submissionText or an already bound submissionFile is sufficient for completion. Object keys are deprecated and are not accepted frontend inputs.
       type: object
       required: [expectedVersion]
       properties:
         expectedVersion: { type: integer }
         submissionText: { type: string, maxLength: 4000 }
-        fileObjectKey: { type: string, maxLength: 512 }
     AdvisorTaskFeedbackRequest:
       type: object
       required: [expectedVersion]

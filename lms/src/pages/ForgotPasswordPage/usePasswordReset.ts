@@ -5,6 +5,7 @@ import {authApiService} from '@/apis/services/auth-api';
 import {idempotencyFingerprint, useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {getApiErrorMessage} from '@/utils/apiError';
 import {isValidPassword} from '@/utils/passwordRules';
+import {LocalizedError} from '@/i18n/errors';
 
 export type PasswordResetStep = 'email' | 'code' | 'password' | 'complete';
 
@@ -38,7 +39,9 @@ const usePasswordReset = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [failure, setError] = useState<unknown>('');
+  const [failureKey, setFailureKey] = useState('forgotPasswordErrors.updateError');
+  const error = failure ? getApiErrorMessage(failure, t(failureKey)) : '';
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   useEffect(() => {
@@ -51,7 +54,7 @@ const usePasswordReset = () => {
   const sendCode = async () => {
     const normalized = email.trim().toLowerCase();
     if (!EMAIL_PATTERN.test(normalized)) {
-      setError(t('forgotPasswordErrors.emailRequired'));
+      setError(new LocalizedError('auth:forgotPasswordErrors.emailRequired'));
       return;
     }
     setSubmitting(true);
@@ -65,7 +68,8 @@ const usePasswordReset = () => {
       setCode('');
       setStep('code');
     } catch (cause) {
-      setError(getApiErrorMessage(cause, t('forgotPasswordErrors.sendVerificationFailed')));
+      setFailureKey('forgotPasswordErrors.sendVerificationFailed');
+      setError(cause);
     } finally {
       setSubmitting(false);
     }
@@ -76,7 +80,7 @@ const usePasswordReset = () => {
     // This step validates shape only. The code is intentionally not consumed
     // until resetPassword verifies it together with the new password.
     if (code.trim().length !== CODE_LENGTH) {
-      setError(t('forgotPasswordErrors.codeRequired'));
+      setError(new LocalizedError('auth:forgotPasswordErrors.codeRequired'));
       return;
     }
     setError('');
@@ -86,11 +90,11 @@ const usePasswordReset = () => {
   const submitPassword = async (event: FormEvent) => {
     event.preventDefault();
     if (!isValidPassword(password)) {
-      setError(t('forgotPasswordErrors.passwordTooShort'));
+      setError(new LocalizedError('auth:forgotPasswordErrors.passwordTooShort'));
       return;
     }
     if (password !== confirmPassword) {
-      setError(t('forgotPasswordErrors.passwordsDontMatch'));
+      setError(new LocalizedError('auth:forgotPasswordErrors.passwordsDontMatch'));
       return;
     }
     setSubmitting(true);
@@ -107,7 +111,8 @@ const usePasswordReset = () => {
       idempotency.complete(operation, idempotencyKey);
       setStep('complete');
     } catch (cause) {
-      setError(getApiErrorMessage(cause, t('forgotPasswordErrors.updateError')));
+      setFailureKey('forgotPasswordErrors.updateError');
+      setError(cause);
     } finally {
       setSubmitting(false);
     }

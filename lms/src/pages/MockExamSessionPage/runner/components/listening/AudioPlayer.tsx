@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 type AudioPlayerProps = {
@@ -16,7 +18,7 @@ function formatTime(seconds: number): string {
 }
 
 function formatSpeed(rate: number): string {
-  return Number.isInteger(rate) ? `${rate}.0` : rate.toFixed(1)
+  return formatNumber(rate, {minimumFractionDigits: 1, maximumFractionDigits: 1})
 }
 
 export function AudioPlayer({
@@ -25,8 +27,10 @@ export function AudioPlayer({
   error = null,
   stopSignal = 0,
 }: AudioPlayerProps) {
+  const {t: translate} = useTranslation();
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [playing, setPlaying] = useState(false)
+  const [playError, setPlayError] = useState(false)
   const [current, setCurrent] = useState(0)
   const [duration, setDuration] = useState(0)
   const [speed, setSpeed] = useState(1)
@@ -88,6 +92,7 @@ export function AudioPlayer({
     audio.pause()
     setPlaying(false)
     setCurrent(0)
+    setPlayError(false)
     setDuration(0)
     if (!src) {
       audio.removeAttribute('src')
@@ -103,13 +108,14 @@ export function AudioPlayer({
     const audio = audioRef.current
     if (!audio || !ready) return
     if (audio.paused) {
+      setPlayError(false)
       void audio.play().catch(() => {
-        window.alert('The audio could not be played. Please try again.')
+        if (audio.getAttribute('src') === src) setPlayError(true);
       })
     } else {
       audio.pause()
     }
-  }, [ready])
+  }, [ready, src])
 
   const rewind10 = useCallback(() => {
     const audio = audioRef.current
@@ -133,20 +139,21 @@ export function AudioPlayer({
       aria-busy={loading || !src}
     >
       <audio ref={audioRef} preload="auto" />
+      {playError ? <span className="audio-player__loading-text" role="alert">{translate('exams:audio.playError')}</span> : null}
       {error ? (
         <span className="audio-player__loading-text" role="alert">
           {error}
         </span>
       ) : loading || !src ? (
-        <span className="audio-player__loading-text">Loading audio…</span>
+        <span className="audio-player__loading-text">{translate('exams:audio.loading')}</span>
       ) : (
         <>
           <button
             type="button"
             className="audio-player__btn"
             onClick={togglePlay}
-            aria-label={playing ? 'Pause' : 'Play'}
-            title={playing ? 'Pause' : 'Play'}
+            aria-label={playing ? translate('exams:runner.pause') : translate('exams:audio.play')}
+            title={playing ? translate('exams:runner.pause') : translate('exams:audio.play')}
           >
             {playing ? (
               <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
@@ -163,8 +170,8 @@ export function AudioPlayer({
             type="button"
             className="audio-player__btn"
             onClick={rewind10}
-            aria-label="Rewind 10 seconds"
-            title="Rewind 10 seconds"
+            aria-label={translate('exams:audio.rewind')}
+            title={translate('exams:audio.rewind')}
           >
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.8">
               <path d="M3 12a9 9 0 1 0 3-6.7" />
@@ -183,7 +190,7 @@ export function AudioPlayer({
               step={0.1}
               value={Math.min(current, duration || 0)}
               onChange={(e) => seek(Number(e.target.value))}
-              aria-label="Seek"
+              aria-label={translate('exams:audio.seek')}
             />
             <div className="audio-player__times">
               <span>{formatTime(current)}</span>
@@ -191,13 +198,13 @@ export function AudioPlayer({
             </div>
           </div>
           <label className="audio-player__speed-wrap">
-            <span className="audio-player__speed-label">Speed</span>
+            <span className="audio-player__speed-label">{translate('exams:audio.speed')}</span>
             <select
               className="audio-player__speed"
               value={speed}
               onChange={(e) => setSpeed(Number(e.target.value))}
-              aria-label="Playback speed"
-              title="Playback speed"
+              aria-label={translate('exams:audio.playbackSpeed')}
+              title={translate('exams:audio.playbackSpeed')}
             >
               {speeds.map((rate) => (
                 <option key={rate} value={rate}>

@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import { FileText } from "lucide-react";
 import { RecordSummaryList } from "@/components/RecordSummaryList";
 import { asRecord } from "@/components/RecordSummaryList/recordPresentation";
@@ -17,6 +18,7 @@ export function SupportReportList({
   courseId?: number;
   onOpen: (courseId: number, reportId: number) => void;
 }) {
+  const {t: translate} = useTranslation();
   return (
     <div className={styles.reportList}>
       {contractItems(value).map((value, index) => {
@@ -25,7 +27,7 @@ export function SupportReportList({
         const subjectCourseId =
           contractRecordNumber(report, "courseId") ?? courseId;
         const title =
-          typeof report?.title === "string" ? report.title : "Published report";
+          typeof report?.title === "string" ? report.title : translate("learning:reports.publishedReport");
         const summary =
           typeof report?.overallSummary === "string"
             ? report.overallSummary

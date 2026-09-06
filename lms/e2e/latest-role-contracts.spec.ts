@@ -29,7 +29,7 @@ test('Parent calendar uses the date-window contract and displays UTC session tim
     return route.fulfill({json: reply({timezone: 'Asia/Singapore', fromUtc: '2026-09-13T16:00:00Z', toUtc: '2026-09-15T16:00:00Z', items: [{eventType: 'SESSION', sourceId: 'SESSION:51', occurrenceId: 51, courseId: 71, courseTitle: 'Writing studio', startsAtUtc: '2026-09-14T02:00:00Z', endsAtUtc: '2026-09-14T03:30:00Z', timezone: 'Asia/Singapore', instructorFirstName: 'Sarah', instructorLastName: 'Lim'}, {eventType: 'ASSIGNMENT_DEADLINE', sourceId: 'ASSIGNMENT:91', assignmentId: 91, title: 'Essay deadline', startsAtUtc: '2026-09-14T02:00:00Z', endsAtUtc: '2026-09-14T02:00:00Z', timezone: 'Asia/Singapore'}]})});
   });
   await page.goto('/parent?section=schedule&studentUserId=302');
-  await expect(page.getByText('10:00 – 11:30')).toBeVisible();
+  await expect(page.getByText('10:00 AM – 11:30 AM')).toBeVisible();
   await expect(page.getByText('Instructor: Sarah Lim')).toBeVisible();
   await expect(page.getByRole('button', {name: 'Request change', exact: true})).toHaveCount(1);
   for (const width of [390, 1440]) {

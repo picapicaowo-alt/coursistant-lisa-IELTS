@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {durationLabel} from '@/utils/dateTimeRange';
 
 interface DurationSelectProps {
@@ -7,11 +8,13 @@ interface DurationSelectProps {
   disabled?: boolean;
 }
 
-export const DurationSelect = ({minutes, options, onChange, disabled = false}: DurationSelectProps) => (
+export const DurationSelect = ({minutes, options, onChange, disabled = false}: DurationSelectProps) => {
+  const { t: translate } = useTranslation();
+  return (
   <label>
-    <span>Duration</span>
+    <span>{translate("common:fields.duration")}</span>
     <select
-      aria-label="Duration"
+      aria-label={translate("common:fields.duration")}
       disabled={disabled}
       value={minutes === null ? 'custom' : String(minutes)}
       onChange={event => {
@@ -21,7 +24,8 @@ export const DurationSelect = ({minutes, options, onChange, disabled = false}: D
       {options.map(option => (
         <option key={option} value={option}>{durationLabel(option)}</option>
       ))}
-      {minutes === null ? <option value="custom">{disabled ? 'Set start first' : 'Custom'}</option> : null}
+      {minutes === null ? <option value="custom">{translate(disabled ? 'common:dateTime.setStartFirst' : 'common:dateTime.customDuration')}</option> : null}
     </select>
   </label>
 );
+};

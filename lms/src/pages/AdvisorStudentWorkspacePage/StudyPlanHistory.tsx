@@ -1,3 +1,7 @@
+import {useTranslation} from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
+import {formatUtcTimestamp} from '@/utils/datetime';
+import {displayScalar, recordFieldLabel} from '@/components/RecordSummaryList/recordPresentation';
 import {useState} from 'react';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
@@ -10,22 +14,22 @@ import {advisingQueryKeys} from '../advising/queryKeys';
 import shared from '../advising/advising.module.scss';
 import styles from './StudyPlanHistory.module.scss';
 
-const fieldLabel = (key: string) => key.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').replace(/^./, letter => letter.toUpperCase());
-
 /** The contract leaves snapshot as an open object: retain its actual keys and nested values. */
-function SnapshotValue({value}: {value: unknown}) {
-  if (value == null || value === '') return <span className={styles.empty}>Not recorded</span>;
+function SnapshotValue({value, fieldKey}: {value: unknown; fieldKey?: string}) {
+  const {t: translate} = useTranslation();
+  if (value == null || value === '') return <span className={styles.empty}>{translate("operations:notRecorded")}</span>;
   if (Array.isArray(value)) return value.length
-    ? <ol className={styles.items}>{value.map((item, index) => <li key={index}><SnapshotValue value={item}/></li>)}</ol>
-    : <span className={styles.empty}>No items</span>;
+    ? <ol className={styles.items}>{value.map((item, index) => <li key={index}><SnapshotValue value={item} fieldKey={fieldKey}/></li>)}</ol>
+    : <span className={styles.empty}>{translate("advising:history.noItems")}</span>;
   if (typeof value === 'object') {
     const entries = Object.entries(value);
-    return entries.length ? <dl className={styles.fields}>{entries.map(([key, item]) => <div key={key}><dt>{fieldLabel(key)}</dt><dd><SnapshotValue value={item}/></dd></div>)}</dl> : <span className={styles.empty}>No recorded fields</span>;
+    return entries.length ? <dl className={styles.fields}>{entries.map(([key, item]) => <div key={key}><dt>{recordFieldLabel(key)}</dt><dd><SnapshotValue value={item} fieldKey={key}/></dd></div>)}</dl> : <span className={styles.empty}>{translate("advising:history.noFields")}</span>;
   }
-  return <span className={styles.value}>{typeof value === 'boolean' ? value ? 'Yes' : 'No' : String(value)}</span>;
+  return <span className={styles.value}>{displayScalar(value, fieldKey) ?? String(value)}</span>;
 }
 
 export function StudyPlanHistory({studentUserId}: {studentUserId: number}) {
+  const {t: translate} = useTranslation();
   const [page, setPage] = useState(0);
   const query = useQuery({
     meta: {advisingStudentId: studentUserId},
@@ -34,28 +38,28 @@ export function StudyPlanHistory({studentUserId}: {studentUserId: number}) {
     retry: false,
   });
   return <CollapsibleSection
-    title="Version history"
+    title={translate("advising:history.title")}
     id="study-plan-history"
     className={styles.history}
-    summary={query.isError ? 'History could not be loaded. Open to retry.' : 'Review saved study plans without changing your current draft.'}
+    summary={query.isError ? translate("advising:history.failedSummary") : translate("advising:history.help")}
     count={query.data?.total}
   >
-    {query.isPending ? <p role="status">Loading version history…</p> : query.isError ? <div role="alert"><p>{advisingErrorMessage(query.error, 'Version history could not be loaded.')}</p><button type="button" className={shared.secondary} onClick={() => void query.refetch()}>Retry history</button></div> : <>
-      {query.data?.items?.length === 0 ? <p>No saved revisions were returned.</p> : null}
+    {query.isPending ? <p role="status">{translate("advising:history.loading")}</p> : query.isError ? <div role="alert"><p>{advisingErrorMessage(query.error, translate('advising:history.loadFailed'))}</p><button type="button" className={shared.secondary} onClick={() => void query.refetch()}>{translate("advising:history.retry")}</button></div> : <>
+      {query.data?.items?.length === 0 ? <p>{translate("advising:history.empty")}</p> : null}
       {(query.data?.items ?? []).map((revision, index) => {
         const hasSnapshot = revision.snapshot != null && Object.keys(revision.snapshot).length > 0;
-        const action = revision.action === 'STUDY_PLAN_CREATED' ? 'Plan created' : revision.action === 'STUDY_PLAN_UPDATED' ? 'Plan updated' : 'Plan saved';
+        const action = revision.action === 'STUDY_PLAN_CREATED' ? translate("advising:history.created") : revision.action === 'STUDY_PLAN_UPDATED' ? translate("advising:history.updated") : translate("advising:history.saved");
         return <CollapsibleSection
           key={`${studentUserId}-${page}-${revision.entityVersion}-${revision.createdAt}-${index}`}
-          title={revision.entityVersion == null ? 'Saved version' : `Version ${revision.entityVersion}`}
+          title={revision.entityVersion == null ? translate("advising:history.savedVersion") : translate('operations:availability.version', {number: formatNumber(revision.entityVersion)})}
           headingLevel={3}
-          summary={[action, revision.createdAt, revision.actorId == null ? null : `Actor #${revision.actorId}`].filter(Boolean).join(' · ')}
-          meta={<span className={shared.readOnlyBadge}>Read only</span>}
+          summary={[action, revision.createdAt ? formatUtcTimestamp(revision.createdAt) : null, revision.actorId == null ? null : translate('advising:history.actor', {number: formatNumber(revision.actorId)})].filter(Boolean).join(' · ')}
+          meta={<span className={shared.readOnlyBadge}>{translate("courseTools:owner.readOnly")}</span>}
         >
-          {hasSnapshot ? <SnapshotValue value={revision.snapshot}/> : <p>The saved content for this version was not included. Only its revision details are available.</p>}
+          {hasSnapshot ? <SnapshotValue value={revision.snapshot}/> : <p>{translate("advising:history.noSnapshot")}</p>}
         </CollapsibleSection>;
       })}
-      {query.data ? <AdvisingPagination label="Version history pages" page={page} size={ADVISOR_PAGE_SIZE} total={query.data.total} onPage={setPage}/> : null}
+      {query.data ? <AdvisingPagination label={translate("advising:history.pages")} page={page} size={ADVISOR_PAGE_SIZE} total={query.data.total} onPage={setPage}/> : null}
     </>}
   </CollapsibleSection>;
 }

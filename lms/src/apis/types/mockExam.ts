@@ -41,11 +41,11 @@ export interface GradeMockExamWritingRequest {
 }
 
 export interface SubmitMockExamListeningRequest {
-  answers?: unknown;
+  answers: Record<string, string | null>;
 }
 
 export interface SubmitMockExamReadingRequest {
-  answers?: unknown;
+  answers: Record<string, string | null>;
 }
 
 export interface SubmitMockExamWritingTask {
@@ -101,10 +101,22 @@ export interface StudentMockExamDetail extends ObserverMockExamDetail {
   writingTasks?: StudentWritingTaskView[];
 }
 
+export type MockExamObjectiveAnswer = {answer: string; answers?: never} | {answer?: never; answers: string[]};
+export type MockExamPayloadValue = string | number | boolean | null | MockExamPayloadValue[] | {[key: string]: MockExamPayloadValue};
+/** Renderer-specific question data retains its JSON structure. Numbered slots
+ * carry MockExamObjectiveAnswer; multiSelect uses answersByQuestion instead. */
+export type MockExamAnswerBearingQuestionPayload = Record<string, MockExamPayloadValue>;
+export interface MockExamMultipleChoiceAnswer {
+  questionIds: number[];
+  chooseCount: number;
+  options: string[];
+  answersByQuestion: Record<string, string>;
+}
+
 export interface CreateMockExamListeningSectionRequest {
   instruction: string;
   kind: string;
-  payload: unknown;
+  payload: MockExamAnswerBearingQuestionPayload;
   questionEnd: number;
   questionStart: number;
   sortOrder: number;
@@ -155,6 +167,14 @@ export interface CreateMockExamWritingRequest {
   tasks: CreateMockExamWritingTaskRequest[];
   totalMinutes: number;
 }
+
+export interface MockExamSectionRequests {
+  reading: CreateMockExamReadingRequest;
+  listening: CreateMockExamListeningRequest;
+  writing: CreateMockExamWritingRequest;
+}
+
+export interface MockExamContentRevision {contentRevision: number}
 
 export type MockExamMediaKind = 'LISTENING_AUDIO' | 'READING_IMAGE' | 'WRITING_IMAGE';
 

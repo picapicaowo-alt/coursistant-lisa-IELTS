@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useState} from 'react';
 import {isRecord} from '@/utils/apiError';
 import {SectionView} from '@/pages/MockExamSessionPage/runner/components/QuestionSections';
@@ -59,6 +60,7 @@ export function QuestionPreview({
   subject: QuestionSubject;
   question: QuestionDraft;
 }) {
+  const {t: translate} = useTranslation();
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [current, setCurrent] = useState(0);
   const value = parseContent(question.payload);
@@ -69,9 +71,7 @@ export function QuestionPreview({
   )
     return (
       <p className={ui.hint}>
-        A student-view preview is available after the supported question content
-        is complete. Custom payloads require a separate review.
-      </p>
+        {translate("exams:authoring.previewUnavailable")}</p>
     );
   const content = displayContent(definition.schema, value);
   if (!isRecord(content)) return null;
@@ -106,14 +106,10 @@ export function QuestionPreview({
   return (
     <div className={styles.preview}>
       <p className={ui.hint}>
-        Student-view content preview. Try answering below; responses here are
-        not saved or graded.
-      </p>
+        {translate("exams:authoring.previewHelp")}</p>
       {question.kind === 'diagram' ? (
         <p className={ui.hint}>
-          Preview the attached diagram with Question image. This preview shows
-          its answer fields.
-        </p>
+          {translate("exams:authoring.diagramPreviewHelp")}</p>
       ) : null}
       {subject === 'listening' && isListeningPreview(data) ? (
         <ListeningSectionView section={data} {...props} />

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import i18n from '@/i18n';
 import type { TextSpan } from '../types/annotation'
 
 export function renderHighlightedParagraph(
@@ -25,7 +26,7 @@ export function renderHighlightedParagraph(
       <mark
         key={mark.id}
         className="passage-highlight"
-        title="Click to remove highlight"
+        title={i18n.t('exams:runner.removeHighlight')}
         onClick={(e) => {
           e.stopPropagation()
           onRemove(mark.id)

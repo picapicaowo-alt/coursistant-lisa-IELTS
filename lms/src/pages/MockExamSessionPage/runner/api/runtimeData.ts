@@ -1,3 +1,4 @@
+import {LocalizedError} from '@/i18n/errors';
 import type {
   ApiListeningDetail,
   ApiListeningPart,
@@ -31,9 +32,9 @@ function asNumber(value: unknown, fallback: number): number {
   return typeof value === 'number' && Number.isFinite(value) ? value : fallback
 }
 
-function requiredPositiveNumber(value: unknown, field: string): number {
+function requiredPositiveNumber(value: unknown): number {
   if (typeof value !== 'number' || !Number.isFinite(value) || value <= 0) {
-    throw new Error(`Mock-exam response is missing a valid ${field}.`)
+    throw new LocalizedError('exams:session.invalidTiming')
   }
   return value
 }
@@ -62,6 +63,8 @@ function nestedSection(value: unknown, key: 'listening' | 'reading' | 'writing')
 }
 
 function parseQuestion(value: unknown, index: number): ApiQuestion {
+  // These fallbacks belong to the original IELTS paper, not the UI locale.
+  // Parsing must produce the same labels, question identities and content in all locales.
   const record = isRecord(value) ? value : {}
   const payload = isRecord(record.payload) ? record.payload : {}
   return {
@@ -76,7 +79,7 @@ function parseQuestion(value: unknown, index: number): ApiQuestion {
 
 export function parseReadingDetail(value: unknown, fallbackId: number): ApiReadingDetail {
   const source = nestedSection(value, 'reading')
-  if (!isRecord(source)) throw new Error('Reading data is not an object.')
+  if (!isRecord(source)) throw new LocalizedError('exams:session.invalidData')
 
   const passages: ApiPassage[] = asArray(source.passages).map((item, index) => {
     const record = isRecord(item) ? item : {}
@@ -97,10 +100,10 @@ export function parseReadingDetail(value: unknown, fallbackId: number): ApiReadi
     }
   })
 
-  if (passages.length === 0) throw new Error('This mock exam has no Reading passages yet.')
+  if (passages.length === 0) throw new LocalizedError('exams:session.noReading')
   return {
     id: asNumber(source.id, fallbackId),
-    totalMinutes: requiredPositiveNumber(source.totalMinutes, 'Reading totalMinutes'),
+    totalMinutes: requiredPositiveNumber(source.totalMinutes),
     passages,
   }
 }
@@ -119,7 +122,7 @@ function parseListeningSection(value: unknown, index: number): ApiListeningSecti
 
 export function parseListeningDetail(value: unknown, fallbackId: number): ApiListeningDetail {
   const source = nestedSection(value, 'listening')
-  if (!isRecord(source)) throw new Error('Listening data is not an object.')
+  if (!isRecord(source)) throw new LocalizedError('exams:session.invalidData')
 
   const parts: ApiListeningPart[] = asArray(source.parts).map((item, index) => {
     const record = isRecord(item) ? item : {}
@@ -137,17 +140,17 @@ export function parseListeningDetail(value: unknown, fallbackId: number): ApiLis
     }
   })
 
-  if (parts.length === 0) throw new Error('This mock exam has no Listening parts yet.')
+  if (parts.length === 0) throw new LocalizedError('exams:session.noListening')
   return {
     id: asNumber(source.id, fallbackId),
-    totalMinutes: requiredPositiveNumber(source.totalMinutes, 'Listening totalMinutes'),
+    totalMinutes: requiredPositiveNumber(source.totalMinutes),
     parts,
   }
 }
 
 export function parseWritingDetail(value: unknown, fallbackId: number): ApiWritingDetail {
   const source = nestedSection(value, 'writing')
-  if (!isRecord(source)) throw new Error('Writing data is not an object.')
+  if (!isRecord(source)) throw new LocalizedError('exams:session.invalidData')
 
   const tasks: ApiWritingTask[] = asArray(source.tasks).map((item, index) => {
     const record = isRecord(item) ? item : {}
@@ -163,10 +166,10 @@ export function parseWritingDetail(value: unknown, fallbackId: number): ApiWriti
     }
   })
 
-  if (tasks.length === 0) throw new Error('This mock exam has no Writing tasks yet.')
+  if (tasks.length === 0) throw new LocalizedError('exams:session.noWriting')
   return {
     id: asNumber(source.id, fallbackId),
-    totalMinutes: requiredPositiveNumber(source.totalMinutes, 'Writing totalMinutes'),
+    totalMinutes: requiredPositiveNumber(source.totalMinutes),
     tasks,
   }
 }

@@ -1,3 +1,6 @@
+import {LocalizedError} from '@/i18n/errors';
+import {getApiErrorMessage} from '@/utils/apiError';
+import { useTranslation } from 'react-i18next';
 import {useEffect, useRef, useState} from 'react';
 import Cropper, {type Area} from 'react-easy-crop';
 import styles from './AvatarCropDialog.module.scss';
@@ -15,12 +18,13 @@ export function AvatarCropDialog({
   onSave: (file: File) => void;
   onClose: () => void;
 }) {
+  const { t: translate } = useTranslation();
   const dialog = useRef<HTMLDialogElement>(null);
   const [source, setSource] = useState<string>();
   const [crop, setCrop] = useState({x: 0, y: 0});
   const [zoom, setZoom] = useState(1);
   const [area, setArea] = useState<Area>();
-  const [cropError, setCropError] = useState<string>();
+  const [cropError, setCropError] = useState<unknown>();
   const [processing, setProcessing] = useState(false);
   useEffect(() => {
     const url = URL.createObjectURL(file);
@@ -42,7 +46,7 @@ export function AvatarCropDialog({
       canvas.height = Math.round(area.height);
       const context = canvas.getContext('2d');
       if (!context)
-        throw new Error('Image cropping is unavailable in this browser.');
+        throw new LocalizedError("settings:avatar.unavailable");
       context.drawImage(
         image,
         area.x,
@@ -59,7 +63,7 @@ export function AvatarCropDialog({
           (value) =>
             value
               ? resolve(value)
-              : reject(new Error('The crop could not be prepared.')),
+              : reject(new LocalizedError("settings:avatar.prepareFailed")),
           'image/png',
         ),
       );
@@ -68,8 +72,8 @@ export function AvatarCropDialog({
           type: 'image/png',
         }),
       );
-    } catch {
-      setCropError('The image could not be cropped. Try selecting it again.');
+    } catch (failure) {
+      setCropError(failure);
     } finally {
       setProcessing(false);
     }
@@ -85,10 +89,10 @@ export function AvatarCropDialog({
       }}
     >
       <header>
-        <h2 id="crop-photo-title">Crop photo</h2>
+        <h2 id="crop-photo-title">{translate("settings:avatar.crop")}</h2>
         <button
           type="button"
-          aria-label="Close crop photo"
+          aria-label={translate("settings:avatar.close")}
           disabled={pending || processing}
           onClick={onClose}
         >
@@ -99,6 +103,7 @@ export function AvatarCropDialog({
         {source ? (
           <Cropper
             image={source}
+            mediaProps={{alt: translate('settings:avatar.original')}}
             crop={crop}
             zoom={zoom}
             aspect={1}
@@ -111,9 +116,8 @@ export function AvatarCropDialog({
         ) : null}
       </div>
       <label className={styles.zoom}>
-        Zoom
-        <input
-          aria-label="Photo zoom"
+        {translate("course:pdf.zoom")}<input
+          aria-label={translate("settings:avatar.photoZoom")}
           type="range"
           min="1"
           max="3"
@@ -122,22 +126,21 @@ export function AvatarCropDialog({
           onChange={(event) => setZoom(Number(event.target.value))}
         />
       </label>
-      {cropError || error ? <p role="alert">{cropError || error}</p> : null}
+      {cropError || error ? <p role="alert">{cropError ? getApiErrorMessage(cropError, translate('settings:avatar.cropFailed')) : error}</p> : null}
       <footer>
         <button
           type="button"
           disabled={pending || processing}
           onClick={onClose}
         >
-          Cancel
-        </button>
+          {translate("common:actions.cancel")}</button>
         <button
           type="button"
           className={styles.primary}
           disabled={pending || processing || !area}
           onClick={() => void saveCrop()}
         >
-          {pending || processing ? 'Saving…' : 'Save photo'}
+          {pending || processing ? translate("common:actions.saving") : translate("settings:avatar.save")}
         </button>
       </footer>
     </dialog>

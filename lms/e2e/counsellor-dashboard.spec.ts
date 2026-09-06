@@ -133,7 +133,7 @@ test('small-screen help and parent-link failures keep actions visible', async ({
   await expect(page.getByText('Parent links unavailable')).toBeVisible();
   await expect(page.getByRole('link', {name: 'Parents', exact: true})).toBeVisible();
   await expect(page.getByRole('link', {name: 'Select advisor'})).toBeVisible();
-  for (const label of ['About unassigned count', 'About assigned count', 'About created count']) {
+  for (const label of ['About the Unassigned count', 'About the Assigned count', 'About the Created count']) {
     await page.getByLabel(label).click();
     const popup = page.locator('details[open] p');
     const bounds = await popup.boundingBox();

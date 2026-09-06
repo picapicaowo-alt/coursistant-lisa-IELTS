@@ -35,7 +35,7 @@ export function InstructorAvailabilityPanel() {
   const exceptions = result?.exceptions ?? [];
 
   return <WorkspaceSection title={t('availability.title')} className={layout.secondary}>
-    <form className={styles.inlineLookup} onSubmit={event => {
+    <form noValidate className={styles.inlineLookup} onSubmit={event => {
       event.preventDefault();
       if (!Number.isInteger(selectedId) || selectedId <= 0) return;
       // Setting the same query key again does not retry a failed request.

@@ -42,6 +42,7 @@ test('advisor sidebar routes operations out of the dashboard', async ({page}, in
   await expect(page.getByLabel('Search conversations')).toHaveCount(0);
   await expect(page.getByRole('heading', {name: 'New Chat'})).toHaveCount(0);
   await expect(page.getByRole('textbox', {name: 'Ask the advising assistant'})).toHaveCount(0);
+  await expect(page.getByRole('button', {name: 'Send message', exact: true})).toHaveCount(0);
   await noOverflow(page, 1440);
   await page.getByRole('heading', {name: /Welcome back/}).scrollIntoViewIfNeeded();
   await page.screenshot({path: info.outputPath('advisor-dashboard.png'), fullPage: true});

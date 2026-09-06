@@ -1,3 +1,7 @@
+import {formatNumber} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
+import {LocalizedError} from '@/i18n/errors';
+import {useTranslation} from 'react-i18next';
 import {useRef, useState} from 'react';
 import {CalendarPlus, FileCheck2, X} from 'lucide-react';
 import {useParams} from 'react-router-dom';
@@ -18,6 +22,7 @@ const initialSections = () => ({
 });
 
 export default function AdvisorStudentExamsPage() {
+  const {t: translate} = useTranslation();
   const studentId = Number(useParams().studentUserId);
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
@@ -45,7 +50,7 @@ export default function AdvisorStudentExamsPage() {
       if (!Number.isInteger(studentId) || studentId <= 0 ||
           !published.some((item) => String(item.id) === templateId) ||
           !Object.values(sections).some(Boolean)) {
-        throw new Error('Select a published paper and at least one section.');
+        throw new LocalizedError('exams:assignment.selectRequired');
       }
       const request = {
         templateId: Number(templateId),
@@ -78,8 +83,8 @@ export default function AdvisorStudentExamsPage() {
       <section className={exStyles.examCollection} aria-labelledby="assigned-exams-title">
         <header className={exStyles.examsHeader}>
           <div>
-            <h2 id="assigned-exams-title">All Exams</h2>
-            <p>Review assigned papers and released results for this student.</p>
+            <h2 id="assigned-exams-title">{translate("exams:assignment.all")}</h2>
+            <p>{translate("exams:assignment.description")}</p>
           </div>
           <button
             type="button"
@@ -87,8 +92,7 @@ export default function AdvisorStudentExamsPage() {
             onClick={() => {assign.reset(); dialog.current?.showModal();}}
           >
             <CalendarPlus size={17} aria-hidden="true" />
-            Assign Exam
-          </button>
+            {translate("exams:assignment.assign")}</button>
         </header>
         <ObserverMockExams scope="advisor" studentUserId={studentId} />
       </section>
@@ -101,18 +105,18 @@ export default function AdvisorStudentExamsPage() {
           if (assign.isPending) event.preventDefault();
         }}
       >
-        <form
+        <form noValidate
           className={exStyles.assignmentForm}
           onSubmit={(event) => {
             event.preventDefault();
-            assign.mutate();
+            if (!assign.isPending) assign.mutate();
           }}
         >
           <div className={exStyles.dialogHeading}>
-            <h2 id="assign-exam-title">Assign Exam</h2>
+            <h2 id="assign-exam-title">{translate("exams:assignment.assign")}</h2>
             <button
               type="button"
-              aria-label="Close assign exam"
+              aria-label={translate("exams:assignment.close")}
               disabled={assign.isPending}
               onClick={() => dialog.current?.close()}
             >
@@ -122,36 +126,32 @@ export default function AdvisorStudentExamsPage() {
 
           <div className={exStyles.dialogBody}>
             <p className={exStyles.dialogIntro}>
-              Choose a published paper, the included sections, and an optional
-              writing instructor.
-            </p>
-            {templates.isPending ? <p role="status">Loading published papers…</p> : null}
+              {translate("exams:assignment.help")}</p>
+            {templates.isPending ? <p role="status">{translate("exams:assignment.loading")}</p> : null}
             {templates.isError ? (
               <p role="alert">
-                Papers could not be loaded.{' '}
+                {translate("exams:assignment.loadFailed")}{' '}
                 <button type="button" onClick={() => void templates.refetch()}>
-                  Try again
-                </button>
+                  {translate("common:actions.tryAgain")}</button>
               </p>
             ) : null}
             {templates.isSuccess && published.length === 0 ? (
-              <p>No published papers are available.</p>
+              <p>{translate("exams:assignment.noPapers")}</p>
             ) : null}
 
             <div className={exStyles.fieldGrid}>
               <label>
-                Exam type
-                <span className={exStyles.selectShell}>
+                {translate("exams:assignment.type")}<span className={exStyles.selectShell}>
                   <FileCheck2 size={16} aria-hidden="true" />
                   <select
                     value={templateId}
                     required
                     onChange={(event) => setTemplateId(event.target.value)}
                   >
-                    <option value="">Select published paper</option>
+                    <option value="">{translate("exams:assignment.selectPaper")}</option>
                     {published.map((item) => (
                       <option key={item.id} value={item.id}>
-                        {item.title || item.label || `Paper #${item.id}`}
+                        {item.title || item.label || translate('exams:assignment.paper', {id: item.id == null ? '—' : formatNumber(item.id)})}
                       </option>
                     ))}
                   </select>
@@ -159,7 +159,7 @@ export default function AdvisorStudentExamsPage() {
               </label>
               {sections.writing ? (
                 <AdvisorInstructorPicker
-                  label="Writing instructor"
+                  label={translate("exams:assignment.instructor")}
                   value={instructorId}
                   onChange={setInstructorId}
                 />
@@ -167,7 +167,7 @@ export default function AdvisorStudentExamsPage() {
             </div>
 
             <fieldset className={exStyles.sectionPicker}>
-              <legend>Included sections</legend>
+              <legend>{translate("exams:assignment.sections")}</legend>
               <div>
                 {(Object.keys(sections) as Array<keyof typeof sections>).map(
                   (section) => (
@@ -182,7 +182,7 @@ export default function AdvisorStudentExamsPage() {
                           }))
                         }
                       />
-                      {section[0].toUpperCase() + section.slice(1)}
+                      {statusLabel(section)}
                     </label>
                   ),
                 )}
@@ -190,13 +190,13 @@ export default function AdvisorStudentExamsPage() {
             </fieldset>
 
             <p className={exStyles.contractNote}>
-              The selected sections will be added to this student’s assigned exams.
+              {translate('exams:assignment.selectedSectionsHelp')}
             </p>
             {assign.isError ? (
               <p className={styles.error} role="alert">
                 {advisingErrorMessage(
                   assign.error,
-                  'The exam could not be assigned.',
+                  translate('exams:assignment.failed'),
                 )}
               </p>
             ) : null}
@@ -209,8 +209,7 @@ export default function AdvisorStudentExamsPage() {
               disabled={assign.isPending}
               onClick={() => dialog.current?.close()}
             >
-              Cancel
-            </button>
+              {translate("common:actions.cancel")}</button>
             <button
               type="submit"
               className={exStyles.createButton}
@@ -220,7 +219,7 @@ export default function AdvisorStudentExamsPage() {
                 !Object.values(sections).some(Boolean)
               }
             >
-              {assign.isPending ? 'Assigning…' : 'Assign exam'}
+              {assign.isPending ? translate("exams:assignment.assigning") : translate("exams:assignment.assignButton")}
             </button>
           </footer>
         </form>

@@ -74,19 +74,19 @@ export default function SignUpView() {
 
   const validate = (): SignupFieldErrors => {
     const errors: SignupFieldErrors = {};
-    if (!firstName.trim()) errors.firstName = t('signupErrors.firstNameRequired');
-    if (!lastName.trim()) errors.lastName = t('signupErrors.lastNameRequired');
+    if (!firstName.trim()) errors.firstName = 'signupErrors.firstNameRequired';
+    if (!lastName.trim()) errors.lastName = 'signupErrors.lastNameRequired';
     if (!Number.isInteger(Number(tenantId)) || Number(tenantId) < 1) {
-      errors.tenantId = t('signupErrors.tenantIdRequired');
+      errors.tenantId = 'signupErrors.tenantIdRequired';
     }
-    if (!email.trim()) errors.email = t('signupErrors.emailRequired');
-    else if (!EMAIL_PATTERN.test(email.trim())) errors.email = t('signupErrors.emailInvalid');
-    if (!password) errors.password = t('signupErrors.passwordRequired');
-    else if (!isValidPassword(password)) errors.password = t('signupErrors.passwordFormat');
-    if (!confirmPassword || confirmPassword !== password) errors.confirmPassword = t('signupErrors.passwordMismatch');
-    if (!verificationCode.trim()) errors.verificationCode = t('signupErrors.verificationRequired');
+    if (!email.trim()) errors.email = 'signupErrors.emailRequired';
+    else if (!EMAIL_PATTERN.test(email.trim())) errors.email = 'signupErrors.emailInvalid';
+    if (!password) errors.password = 'signupErrors.passwordRequired';
+    else if (!isValidPassword(password)) errors.password = 'signupErrors.passwordFormat';
+    if (!confirmPassword || confirmPassword !== password) errors.confirmPassword = 'signupErrors.passwordMismatch';
+    if (!verificationCode.trim()) errors.verificationCode = 'signupErrors.verificationRequired';
     else if (!VERIFICATION_CODE_PATTERN.test(verificationCode.trim())) {
-      errors.verificationCode = t('signupErrors.verificationCodeFormat');
+      errors.verificationCode = 'signupErrors.verificationCodeFormat';
     }
     return errors;
   };
@@ -97,7 +97,7 @@ export default function SignUpView() {
     setFormError('');
 
     if (!EMAIL_PATTERN.test(normalizedEmail)) {
-      setFieldErrors(previous => ({...previous, email: t('signupErrors.emailInvalid')}));
+      setFieldErrors(previous => ({...previous, email: 'signupErrors.emailInvalid'}));
       return;
     }
 
@@ -108,15 +108,15 @@ export default function SignUpView() {
       await authApiService.sendRegistrationVerification(normalizedEmail, idempotencyKey);
       idempotency.complete(operation, idempotencyKey);
       setCountdown(60);
-      setNotice(t('signupErrors.verificationCodeSent'));
+      setNotice('signupErrors.verificationCodeSent');
     } catch (error) {
       const code = getApiErrorCode(error);
       if (code === AUTH_ERROR_CODES.verificationResendCooldown) {
-        setFormError(t('signupErrors.resendCooldown'));
+        setFormError('signupErrors.resendCooldown');
       } else if (code === AUTH_ERROR_CODES.verificationHourlyLimit) {
-        setFormError(t('signupErrors.hourlyLimit'));
+        setFormError('signupErrors.hourlyLimit');
       } else {
-        setFormError(t('signupErrors.sendVerificationFailed'));
+        setFormError('signupErrors.sendVerificationFailed');
       }
     } finally {
       setIsSendingCode(false);
@@ -148,7 +148,7 @@ export default function SignUpView() {
       const response = await authApiService.register(request, idempotencyKey);
 
       if (response.status !== 200 || !response.data) {
-        setFormError(t('signupErrors.signupFailed'));
+        setFormError('signupErrors.signupFailed');
         return;
       }
 
@@ -163,16 +163,16 @@ export default function SignUpView() {
       const code = getApiErrorCode(error);
       if (code === AUTH_ERROR_CODES.invalidPasswordFormat) {
         setStep('profile');
-        setFieldErrors({password: t('signupErrors.passwordFormat')});
+        setFieldErrors({password: 'signupErrors.passwordFormat'});
       } else if (code === AUTH_ERROR_CODES.invalidVerificationCode) {
-        setFieldErrors({verificationCode: t('signupErrors.verificationFailed')});
+        setFieldErrors({verificationCode: 'signupErrors.verificationFailed'});
       } else if (code === AUTH_ERROR_CODES.verificationCodeExpired) {
-        setFieldErrors({verificationCode: t('signupErrors.verificationExpired')});
+        setFieldErrors({verificationCode: 'signupErrors.verificationExpired'});
       } else if (code === AUTH_ERROR_CODES.verificationAttemptsExceeded) {
-        setFieldErrors({verificationCode: t('signupErrors.verificationAttemptsExceeded')});
+        setFieldErrors({verificationCode: 'signupErrors.verificationAttemptsExceeded'});
       } else {
         const unavailable = isTransportOrServerFailure(error);
-        setFormError(unavailable ? t('signupErrors.serviceUnavailable') : t('signupErrors.signupFailed'));
+        setFormError(unavailable ? 'signupErrors.serviceUnavailable' : 'signupErrors.signupFailed');
       }
     } finally {
       setIsSubmitting(false);
@@ -209,13 +209,13 @@ export default function SignUpView() {
                 aria-describedby={fieldErrors.email ? 'signup-email-error' : undefined}
                 className={fieldErrors.email ? styles.inputError : undefined}
               />
-              {fieldErrors.email ? <p id="signup-email-error" className={styles.fieldError}>{fieldErrors.email}</p> : null}
+              {fieldErrors.email ? <p id="signup-email-error" className={styles.fieldError}>{t(fieldErrors.email!)}</p> : null}
             </div>
 
               <div className={styles.field}>
                 <label htmlFor="signup-tenant-id">{t('signup.tenantIdLabel')}</label>
                 <input id="signup-tenant-id" type="number" inputMode="numeric" min="1" value={tenantId} onChange={event => { setTenantId(event.target.value); clearFieldError('tenantId'); }} placeholder={t('signup.tenantIdPlaceholder')} aria-invalid={Boolean(fieldErrors.tenantId)} aria-describedby={fieldErrors.tenantId ? 'signup-tenant-id-error' : undefined} className={fieldErrors.tenantId ? styles.inputError : undefined}/>
-                {fieldErrors.tenantId ? <p id="signup-tenant-id-error" className={styles.fieldError}>{fieldErrors.tenantId}</p> : null}
+                {fieldErrors.tenantId ? <p id="signup-tenant-id-error" className={styles.fieldError}>{t(fieldErrors.tenantId!)}</p> : null}
               </div>
             </> : step === 'profile' ? <>
             <div className={styles.fieldRow}>
@@ -235,12 +235,12 @@ export default function SignUpView() {
                   aria-describedby={fieldErrors.firstName ? 'signup-first-name-error' : undefined}
                   className={fieldErrors.firstName ? styles.inputError : undefined}
                 />
-                {fieldErrors.firstName ? <p id="signup-first-name-error" className={styles.fieldError}>{fieldErrors.firstName}</p> : null}
+                {fieldErrors.firstName ? <p id="signup-first-name-error" className={styles.fieldError}>{t(fieldErrors.firstName!)}</p> : null}
               </div>
               <div className={styles.field}>
                 <label htmlFor="signup-last-name">{t('signup.lastNameLabel')}</label>
                 <input id="signup-last-name" type="text" autoComplete="family-name" value={lastName} onChange={event => { setLastName(event.target.value); clearFieldError('lastName'); }} placeholder={t('signup.lastNamePlaceholder')} aria-invalid={Boolean(fieldErrors.lastName)} aria-describedby={fieldErrors.lastName ? 'signup-last-name-error' : undefined} className={fieldErrors.lastName ? styles.inputError : undefined}/>
-                {fieldErrors.lastName ? <p id="signup-last-name-error" className={styles.fieldError}>{fieldErrors.lastName}</p> : null}
+                {fieldErrors.lastName ? <p id="signup-last-name-error" className={styles.fieldError}>{t(fieldErrors.lastName!)}</p> : null}
               </div>
             </div>
 
@@ -279,14 +279,14 @@ export default function SignUpView() {
                 </button>
               </div>
               <p id="signup-password-help" className={fieldErrors.password ? styles.fieldError : styles.helpText}>
-                {fieldErrors.password || t('signup.passwordHint')}
+                {t(fieldErrors.password || 'signup.passwordHint')}
               </p>
             </div>
 
             <div className={styles.field}>
               <label htmlFor="signup-confirm-password">{t('signup.confirmPasswordLabel')}</label>
               <input id="signup-confirm-password" type={showPassword ? 'text' : 'password'} autoComplete="new-password" value={confirmPassword} onChange={event => {setConfirmPassword(event.target.value); clearFieldError('confirmPassword');}} aria-invalid={Boolean(fieldErrors.confirmPassword)} aria-describedby={fieldErrors.confirmPassword ? 'signup-confirm-password-help' : undefined}/>
-              {fieldErrors.confirmPassword ? <p id="signup-confirm-password-help" className={styles.fieldError}>{fieldErrors.confirmPassword}</p> : null}
+              {fieldErrors.confirmPassword ? <p id="signup-confirm-password-help" className={styles.fieldError}>{t(fieldErrors.confirmPassword!)}</p> : null}
             </div>
             </> : <>
               <p className={styles.helpText}>{t('signup.sentTo', {email})}</p>
@@ -318,14 +318,14 @@ export default function SignUpView() {
                   {codeButtonLabel}
                 </button>
               </div>
-              {fieldErrors.verificationCode ? <p id="signup-verification-error" className={styles.fieldError}>{fieldErrors.verificationCode}</p> : null}
+              {fieldErrors.verificationCode ? <p id="signup-verification-error" className={styles.fieldError}>{t(fieldErrors.verificationCode!)}</p> : null}
             </div>
 
             </>}
 
             <div className={styles.messageArea} aria-live="polite">
-              {notice ? <p className={styles.notice}>{notice}</p> : null}
-              {formError ? <p role="alert" className={styles.formError}>{formError}</p> : null}
+              {notice ? <p className={styles.notice}>{t(notice)}</p> : null}
+              {formError ? <p role="alert" className={styles.formError}>{t(formError)}</p> : null}
             </div>
 
             <button

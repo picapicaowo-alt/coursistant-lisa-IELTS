@@ -1,3 +1,5 @@
+import {formatNumber} from '@/i18n/formatting';
+import { useTranslation } from 'react-i18next';
 import type { ListeningPart } from '../../data/listening/types'
 import {AnswerSummary} from '../AnswerSummary'
 
@@ -65,23 +67,24 @@ export function ListeningBottomBar({
   onPause,
   onExit,
 }: ListeningBottomBarProps) {
+  const { t: translate } = useTranslation();
   const currentPart = parts.find((p) => p.id === currentPartId)
   const submitted = Boolean(scoreSummary)
 
   return (
     <footer className="bottom-bar">
       <div className="bottom-bar__left">
-        <h2 className="exam-navigation-title">Listening</h2>
+        <h2 className="exam-navigation-title">{translate("common:status.LISTENING")}</h2>
         <AnswerSummary questionNumbers={questionNumbers} answers={answers} reviewByQuestion={reviewByQuestion} />
         <div className="question-nav">
-          <span className="question-nav__label">{currentPart?.label ?? 'Part'}</span>
+          <span className="question-nav__label">{currentPart?.label ?? translate('exams:runner.part')}</span>
           {questionNumbers.map((n) => (
             <button
               key={n}
               type="button"
               className={chipClass(n, currentQuestion, answers, reviewByQuestion)}
               onClick={() => onJump(n)}
-              aria-label={`Go to question ${n}`}
+              aria-label={translate('exams:runner.goToQuestion', {number: formatNumber(n)})}
               aria-current={currentQuestion === n ? 'step' : undefined}
             >
               {n}
@@ -94,11 +97,11 @@ export function ListeningBottomBar({
             <>
               <span className="bottom-bar__score">
                 {scoreSummary.correctCount !== undefined && scoreSummary.totalQuestions !== undefined
-                  ? `Score: ${scoreSummary.correctCount}/${scoreSummary.totalQuestions}`
-                  : 'Answers submitted'}
+                  ? translate('exams:runner.scoreSummary', {correct: formatNumber(scoreSummary.correctCount), total: formatNumber(scoreSummary.totalQuestions)})
+                  : translate('exams:runner.answersSubmitted')}
               </span>
               {reviewByQuestion && Object.keys(reviewByQuestion).length > 0 ? (
-                <span className="bottom-bar__score-hint">Red = incorrect · Green = correct</span>
+                <span className="bottom-bar__score-hint">{translate('exams:runner.reviewLegend')}</span>
               ) : null}
             </>
           ) : null}
@@ -115,7 +118,7 @@ export function ListeningBottomBar({
               >
                 {submitted
                   ? part.label
-                  : `${part.label} (${answered} of ${total})`}
+                  : translate('exams:runner.partProgress', {part: part.label, answered: formatNumber(answered), total: formatNumber(total)})}
               </button>
             )
           })}
@@ -130,14 +133,12 @@ export function ListeningBottomBar({
           onClick={onFinish}
           disabled={submitting || submitted}
         >
-          {submitting ? 'Submitting…' : submitted ? 'Submitted' : 'Finish section'}
+          {submitting ? translate("common:actions.submitting") : submitted ? translate('common:status.SUBMITTED') : translate('exams:runner.finishSection')}
         </button>
         <button type="button" className="bar-btn" onClick={onPause}>
-          {paused ? 'Resume' : 'Pause'}
+          {paused ? translate('exams:runner.resume') : translate('exams:runner.pause')}
         </button>
-        <button type="button" className="bar-btn bar-btn--danger" onClick={onExit}>
-          Exit
-        </button>
+        <button type="button" className="bar-btn bar-btn--danger" onClick={onExit}>{translate('exams:runner.exit')}</button>
       </div>
     </footer>
   )

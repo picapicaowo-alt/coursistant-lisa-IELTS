@@ -23,6 +23,10 @@ jobs:
       - run: npm run lint:ci
       - run: npm run typecheck
       - run: npm run typecheck:production
+      - run: npm run typecheck:i18n
+      - run: npm run test:i18n-tools
+      - run: npm run i18n:keys
+      - run: npm run i18n:check
       - run: npm run test:run
       - run: npm run build
       - run: npx playwright install --with-deps chromium

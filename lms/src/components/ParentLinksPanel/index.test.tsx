@@ -1,5 +1,5 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {fireEvent, render, screen, waitFor, within} from '@testing-library/react';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 import {ParentLinksPanel} from './index';
 
@@ -29,18 +29,17 @@ describe('Counsellor Parent links', () => {
   });
 
   it('reloads real linked parents and allows an in-scope unlink', async () => {
-    const confirmUnlink = vi.fn().mockReturnValueOnce(false).mockReturnValueOnce(true);
-    vi.stubGlobal('confirm', confirmUnlink);
     const client = new QueryClient({defaultOptions: {queries: {retry: false}, mutations: {retry: false}}});
     render(<QueryClientProvider client={client}><ParentLinksPanel scope="counsellor" subjectId={7}/></QueryClientProvider>);
 
     expect(await screen.findByText('Pat Parent')).toBeInTheDocument();
     expect(mocks.listCounsellorParentLinks).toHaveBeenCalledWith(7);
     fireEvent.click(screen.getByRole('button', {name: 'Unlink'}));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', {name: 'Cancel'}));
     expect(mocks.unlinkIntakeParent).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole('button', {name: 'Unlink'}));
+    fireEvent.click(within(screen.getByRole('dialog')).getByRole('button', {name: 'Confirm'}));
     await waitFor(() => expect(mocks.unlinkIntakeParent).toHaveBeenCalledWith(7, 91, {}, expect.any(String)));
-    expect(confirmUnlink).toHaveBeenCalledTimes(2);
   });
 
   it.each(['FORBIDDEN', 'ACCESS_DENIED'])('renders %s as a permission error, not an empty relationship', async code => {

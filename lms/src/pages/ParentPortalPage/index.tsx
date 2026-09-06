@@ -1,3 +1,6 @@
+import {formatNumber} from '@/i18n/formatting';
+import {useTranslation} from 'react-i18next';
+import {LocalizedError} from '@/i18n/errors';
 import { WorkspaceSection } from "@/components/WorkspaceSection";
 import {ChevronDown, MessageSquareText, Paperclip, UserRound, X} from 'lucide-react';
 import { AdvisingPagination } from "../advising/AdvisingPagination";
@@ -13,7 +16,6 @@ import {ParentOverview} from './ParentOverview';
 import {ParentSchedule, type ParentScheduleDraft} from './ParentSchedule';
 import {ParentReports} from './ParentReports';
 import {ParentMockExams} from './ParentMockExams';
-import {parentStudentName, asRecord, parentText} from './parentPresentation';
 import React, { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useLinkedStudents } from "./useLinkedStudents";
@@ -31,7 +33,7 @@ import {
   unwrapData,
   type ParentConversationMessageResponse,
   type ParentNotification,
-  type ParentStudentSummary,
+  type ParentLinkedStudent,
 } from "@/apis";
 import { parentApiService } from "@/apis/services/parent-api";
 import { advisingErrorMessage } from "../advising/advisingErrors";
@@ -80,21 +82,17 @@ const numberField = (
 const ParentStudentWorkspace: React.FC<{
   studentUserId: number;
   studentIds: number[];
-  students: ParentStudentSummary[];
+  students: ParentLinkedStudent[];
   onStudentChange: (id: number) => void;
 }> = ({ studentUserId, studentIds, students, onStudentChange }) => {
+  const {t: translate} = useTranslation();
+  const selectedStudent = students.find(student => student.studentUserId === studentUserId);
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [notificationPage, setNotificationPage] = useState(0);
   const [params] = useSearchParams();
   const section = getParentSection(params);
   const learningTab = PARENT_LEARNING_TABS.find(tab => tab.id === params.get('tab'))?.id ?? PARENT_LEARNING_TABS[0].id;
-  const studentSummary = useQuery({
-    // Share the overview cache so persistent student context does not duplicate the dashboard request.
-    queryKey: ['parent', studentUserId, 'section', 'dashboard', 0],
-    queryFn: async () => unwrapData(await parentApiService.getStudentDashboard(studentUserId), 'parentDashboard'),
-    retry: false,
-  });
   const [reportPage, setReportPage] = useState(0);
   const [attachmentError, setAttachmentError] = useState<unknown>();
   const [attachmentBusy, setAttachmentBusy] = useState<number>();
@@ -139,7 +137,7 @@ const ParentStudentWorkspace: React.FC<{
           unread: unwrapData(unread, "parentNotificationUnreadCount"),
         };
       }
-      if (studentUserId == null) throw new Error("No linked student selected");
+      if (studentUserId == null) throw new LocalizedError("learning:parent.noSelection");
       if (section === "dashboard")
         return unwrapData(
           await parentApiService.getStudentDashboard(studentUserId),
@@ -194,7 +192,7 @@ const ParentStudentWorkspace: React.FC<{
 
   const sendMessage = useMutation({
     mutationFn: async () => {
-      if (studentUserId == null) throw new Error("No linked student selected");
+      if (studentUserId == null) throw new LocalizedError("learning:parent.noSelection");
       return sendStableMessage(
         idempotency,
         `parent-${studentUserId}`,
@@ -255,7 +253,7 @@ const ParentStudentWorkspace: React.FC<{
 
   const createScheduleRequest = useMutation({
     mutationFn: async () => {
-      if (studentUserId == null) throw new Error("No linked student selected");
+      if (studentUserId == null) throw new LocalizedError("learning:parent.noSelection");
       return idempotency.run(
         "parent-schedule-request",
         [
@@ -296,7 +294,7 @@ const ParentStudentWorkspace: React.FC<{
   const openAttachment = async (
     attachmentId: number,
     preview: boolean,
-    filename = "conversation-attachment",
+    filename = translate('learning:messages.attachmentDownload'),
   ): Promise<void> => {
     setAttachmentError(undefined);
     setAttachmentBusy(attachmentId);
@@ -304,7 +302,7 @@ const ParentStudentWorkspace: React.FC<{
     try {
       if (preview) {
         if (!popup)
-          throw new Error("Allow pop-ups to preview this attachment.");
+          throw new LocalizedError("operations:errors.attachmentPopups");
         showBlobInPreviewWindow(
           popup,
           await parentApiService.previewConversationAttachment(
@@ -348,16 +346,16 @@ const ParentStudentWorkspace: React.FC<{
     <div className={`${styles.page} ${parentStyles.page}`}>
       <header className={parentStyles.pageHeader}>
         <div>
-          <h1>{PARENT_SECTIONS[section].label}</h1>
-          <p>{PARENT_SECTIONS[section].description}</p>
+          <h1>{translate(PARENT_SECTIONS[section].label)}</h1>
+          <p>{translate(PARENT_SECTIONS[section].description)}</p>
         </div>
       </header>
       <div className={parentStyles.studentContext}>
         <span className={parentStyles.studentIcon}><UserRound size={20} aria-hidden="true"/></span>
         {studentIds.length > 1 ? <label className={parentStyles.studentPicker}>
-            <span className={parentStyles.visuallyHidden}>Student</span>
+            <span className={parentStyles.visuallyHidden}>{translate("common:roles.STUDENT")}</span>
             <select
-              aria-label="Student"
+              aria-label={translate("common:roles.STUDENT")}
               name="studentUserId"
               autoComplete="off"
               value={studentUserId}
@@ -368,13 +366,13 @@ const ParentStudentWorkspace: React.FC<{
             >
               {studentIds.map((id) => (
                 <option value={id} key={id}>
-                  {formatPersonName(students.find(student => student.studentUserId === id), parentStudentName(queryClient.getQueryData(['parent', id, 'section', 'dashboard', 0]), `Student #${id}`))}
+                  {formatPersonName(students.find(student => student.studentUserId === id), students.find(student => student.studentUserId === id)?.email || translate('common:people.studentFallback', {id: formatNumber(id)}))}
                 </option>
               ))}
             </select>
             <ChevronDown size={17} aria-hidden="true"/>
-          </label> : <strong>{formatPersonName(students.find(student => student.studentUserId === studentUserId), parentStudentName(studentSummary.data, `Student #${studentUserId}`))}</strong>}
-        {parentText(asRecord(asRecord(studentSummary.data)?.student), 'email') ? <><span className={parentStyles.studentDivider} aria-hidden="true">·</span><span>{parentText(asRecord(asRecord(studentSummary.data)?.student), 'email')}</span></> : null}
+          </label> : <strong>{formatPersonName(students.find(student => student.studentUserId === studentUserId), selectedStudent?.email || translate('common:people.studentFallback', {id: formatNumber(studentUserId)}))}</strong>}
+        {selectedStudent?.email ? <><span className={parentStyles.studentDivider} aria-hidden="true">·</span><span>{selectedStudent?.email}</span></> : null}
       </div>
 
       {studentIds.length > 0 ? (
@@ -385,7 +383,7 @@ const ParentStudentWorkspace: React.FC<{
               <p>
                 {advisingErrorMessage(
                   content.error || conversation.error,
-                  "This section could not be loaded.",
+                  translate('common:feedback.sectionFailed'),
                 )}
               </p>
               <button
@@ -397,8 +395,7 @@ const ParentStudentWorkspace: React.FC<{
                     : content.refetch())
                 }
               >
-                Retry
-              </button>
+                {translate("common:actions.retry")}</button>
             </div>
           ) : null}
           <ParentSectionNav section={section} params={params}/>
@@ -413,21 +410,20 @@ const ParentStudentWorkspace: React.FC<{
           /> : null}
 
           {section === "messages" ? <div className={parentStyles.messageGrid}>
-            <WorkspaceSection title="Conversation" count={messages.length} className={parentStyles.messageThread}>
+            <WorkspaceSection title={translate("navigation:parent.conversation")} count={messages.length} className={parentStyles.messageThread}>
               {conversation.isPending ? (
-                <p role="status">Loading messages…</p>
+                <p role="status">{translate("learning:messages.loading")}</p>
               ) : null}
               {attachmentError ? (
                 <p role="alert" className={styles.error}>
-                  The attachment could not be opened. Please try again.
-                  {" "}{advisingErrorMessage(attachmentError, '')}
+                  {translate("learning:messages.attachmentFailed")}{" "}{advisingErrorMessage(attachmentError, '')}
                 </p>
               ) : null}
               {conversation.isSuccess && messages.length === 0 ? (
                 <div className={styles.emptyState}>
                   <MessageSquareText size={42} aria-hidden="true"/>
-                  <strong>No messages yet</strong>
-                  <span>Start the conversation with the advising team.</span>
+                  <strong>{translate("learning:messages.none")}</strong>
+                  <span>{translate("learning:messages.noneHelp")}</span>
                 </div>
               ) : (
                 <div className={parentStyles.messageList}>
@@ -438,15 +434,15 @@ const ParentStudentWorkspace: React.FC<{
                       key={item.messageId ?? index}
                     >
                       <div className={styles.rowTitle}>
-                        <strong>{item.senderUserId === user.userId ? 'You' : 'Advising team'}</strong>
-                        <span className={parentStyles.messageDirection}>{item.senderUserId === user.userId ? 'Sent' : 'Received'}</span>
+                        <strong>{item.senderUserId === user.userId ? translate("learning:messages.you") : translate("learning:messages.team")}</strong>
+                        <span className={parentStyles.messageDirection}>{item.senderUserId === user.userId ? translate("learning:messages.sent") : translate("learning:messages.received")}</span>
                         <small>
                           {item.createdAt
                             ? formatNotificationTime(item.createdAt)
                             : ""}
                         </small>
                       </div>
-                      <p>{item.body || "Message has no text content."}</p>
+                      <p>{item.body || translate("learning:messages.noText")}</p>
                       {(item.attachments?.length ?? 0) > 0 ? (
                         <div className={styles.attachmentList}>
                           {item.attachments?.map((attachment) =>
@@ -456,7 +452,7 @@ const ParentStudentWorkspace: React.FC<{
                                 key={attachment.attachmentId}
                               >
                                 <span>
-                                  {attachment.originalName || "Attachment"}
+                                  {attachment.originalName || translate("operations:attachment")}
                                 </span>
                                 <div className={styles.actions}>
                                   {attachment.previewAvailable ? (
@@ -471,8 +467,7 @@ const ParentStudentWorkspace: React.FC<{
                                         )
                                       }
                                     >
-                                      Preview
-                                    </button>
+                                      {translate("course:materials.preview")}</button>
                                   ) : null}
                                   <button
                                     type="button"
@@ -483,12 +478,11 @@ const ParentStudentWorkspace: React.FC<{
                                         attachment.attachmentId!,
                                         false,
                                         attachment.originalName ||
-                                          "conversation-attachment",
+                                          translate('learning:messages.attachmentDownload'),
                                       )
                                     }
                                   >
-                                    Download
-                                  </button>
+                                    {translate("common:actions.download")}</button>
                                 </div>
                               </div>
                             ),
@@ -504,8 +498,7 @@ const ParentStudentWorkspace: React.FC<{
                             markMessageRead.mutate(item.messageId!)
                           }
                         >
-                          Mark as read
-                        </button>
+                          {translate("learning:messages.markRead")}</button>
                       ) : null}
                     </article>
                   ))}
@@ -515,7 +508,7 @@ const ParentStudentWorkspace: React.FC<{
                 <p role="alert" className={styles.error}>
                   {advisingErrorMessage(
                     markMessageRead.error,
-                    "The message could not be marked as read.",
+                    translate('learning:messages.readFailed'),
                   )}
                 </p>
               ) : null}
@@ -526,35 +519,37 @@ const ParentStudentWorkspace: React.FC<{
                   disabled={conversation.isFetchingNextPage}
                   onClick={() => void conversation.fetchNextPage()}
                 >
-                  Load older messages
-                </button>
+                  {translate("learning:messages.older")}</button>
               ) : null}
             </WorkspaceSection>
-            <WorkspaceSection title="New message" className={parentStyles.messageComposerPanel}>
+            <WorkspaceSection title={translate("learning:messages.new")} className={parentStyles.messageComposerPanel}>
               <form
+                noValidate
                 className={`${styles.composeBox} ${parentStyles.messageComposer}`}
                 onSubmit={(event) => {
                   event.preventDefault();
+                  if ((!message.trim() && messageFiles.length === 0) || sendMessage.isPending || !conversation.isSuccess) return;
                   sendMessage.mutate();
                 }}
               >
-                <label htmlFor="parent-message">Message</label>
+                <label htmlFor="parent-message">{translate("operations:message")}</label>
                 <div className={parentStyles.messageField}>
                   <textarea
                     maxLength={4000}
                     id="parent-message"
                     name="body"
                     autoComplete="off"
+                    disabled={sendMessage.isPending}
                     value={message}
                     onChange={(event) => setMessage(event.target.value)}
-                    placeholder="Write to the advising team…"
+                    placeholder={translate("learning:messages.placeholder")}
                   />
-                  <span className={parentStyles.characterCount}>{message.length} / 4000</span>
+                  <span className={parentStyles.characterCount}>{formatNumber(message.length)} / {formatNumber(4000)}</span>
                 </div>
-                <span className={parentStyles.fieldLabel}>Attachments</span>
+                <span className={parentStyles.fieldLabel}>{translate("course:assignment.attachments")}</span>
                 <label className={parentStyles.filePicker} htmlFor="parent-message-files">
                   <Paperclip size={24} aria-hidden="true"/>
-                  <span><strong>Add attachments</strong><small>Choose one or more files</small></span>
+                  <span><strong>{translate("learning:messages.addAttachments")}</strong><small>{translate("learning:messages.chooseFiles")}</small></span>
                 </label>
                 <input
                   className={parentStyles.visuallyHidden}
@@ -562,6 +557,7 @@ const ParentStudentWorkspace: React.FC<{
                   id="parent-message-files"
                   name="files"
                   type="file"
+                  disabled={sendMessage.isPending}
                   multiple
                   onChange={(event) =>
                     setMessageFiles(Array.from(event.target.files ?? []))
@@ -574,7 +570,8 @@ const ParentStudentWorkspace: React.FC<{
                         {file.name}
                         <button
                           type="button"
-                          aria-label={`Remove ${file.name}`}
+                          aria-label={translate('common:actions.removeItem', {item: file.name})}
+                          disabled={sendMessage.isPending}
                           onClick={() =>
                             setMessageFiles((current) =>
                               current.filter(
@@ -597,14 +594,13 @@ const ParentStudentWorkspace: React.FC<{
                     !conversation.isSuccess
                   }
                 >
-                  Send message
-                </button>
+                  {translate("assistant:send")}</button>
               </form>
               {sendMessage.isError ? (
                 <p className={styles.error} role="alert">
                   {advisingErrorMessage(
                     sendMessage.error,
-                    "Message could not be sent.",
+                    translate('learning:messages.sendFailed'),
                   )}
                 </p>
               ) : null}
@@ -628,11 +624,11 @@ const ParentStudentWorkspace: React.FC<{
           {section === "notifications" ? (
             <>
               <WorkspaceSection
-                title="Notifications"
+                title={translate("navigation:parent.notifications")}
                 className={styles.disclosureLayout}
               >
                 <AdvisingPagination
-                  label="Notification pages"
+                  label={translate("learning:messages.notificationPages")}
                   page={notificationPage}
                   total={notificationTotal}
                   onPage={setNotificationPage}
@@ -647,15 +643,14 @@ const ParentStudentWorkspace: React.FC<{
                     }
                     onClick={() => markAllNotificationsRead.mutate()}
                   >
-                    Mark all read
-                  </button>
+                    {translate("notification:markAllRead")}</button>
                 </div>
                 {content.isPending ? (
-                  <p role="status">Loading notifications…</p>
+                  <p role="status">{translate("notification:loading")}</p>
                 ) : content.isError ? null : notifications.length === 0 ? (
                   <div className={styles.emptyState}>
-                    <strong>No notifications</strong>
-                    <span>New academic updates will appear here.</span>
+                    <strong>{translate("learning:messages.noNotifications")}</strong>
+                    <span>{translate("learning:messages.noNotificationsHelp")}</span>
                   </div>
                 ) : (
                   <div className={styles.inboxList}>
@@ -670,12 +665,12 @@ const ParentStudentWorkspace: React.FC<{
                               {getNotificationTitle(item.notificationType)}
                             </strong>
                             {item.readAt ? (
-                              <span className={styles.statusPill}>Read</span>
+                              <span className={styles.statusPill}>{translate("learning:messages.read")}</span>
                             ) : (
-                              <span className={styles.unreadBadge}>New</span>
+                              <span className={styles.unreadBadge}>{translate("dashboard:new")}</span>
                             )}
                           </div>
-                          <span>{item.message || "Academic update"}</span>
+                          <span>{item.message || translate("notification:academicUpdate")}</span>
                           <small>
                             {[
                               item.courseCode,
@@ -696,8 +691,7 @@ const ParentStudentWorkspace: React.FC<{
                               markNotificationRead.mutate(item.notificationId!)
                             }
                           >
-                            Mark read
-                          </button>
+                            {translate("learning:messages.markNotificationRead")}</button>
                         ) : null}
                       </article>
                     ))}
@@ -710,7 +704,7 @@ const ParentStudentWorkspace: React.FC<{
                   {advisingErrorMessage(
                     markNotificationRead.error ||
                       markAllNotificationsRead.error,
-                    "Notifications could not be marked as read.",
+                    translate('learning:messages.notificationsReadFailed'),
                   )}
                 </p>
               ) : null}
@@ -720,7 +714,7 @@ const ParentStudentWorkspace: React.FC<{
           {section === "dashboard" || section === "learning" ? (
             <>
               {content.isPending ? (
-                <p role="status">Loading academic updates…</p>
+                <p role="status">{translate("learning:parent.loadingUpdates")}</p>
               ) : null}
               {content.isSuccess ? (
                 section === 'dashboard' ? <ParentOverview value={content.data} params={params}/> :
@@ -735,6 +729,7 @@ const ParentStudentWorkspace: React.FC<{
 };
 
 const ParentPortalPage: React.FC = () => {
+  const {t: translate} = useTranslation();
   const linked = useLinkedStudents();
   const [params, setParams] = useSearchParams();
   const ids = [
@@ -765,16 +760,16 @@ const ParentPortalPage: React.FC = () => {
   return (
     <div className={styles.page}>
       <header className={styles.header}>
-        <h1>Student progress</h1>
+        <h1>{translate("navigation:studentProgress")}</h1>
       </header>
       {linked.isPending ? (
-        <p role="status">Loading linked students…</p>
+        <p role="status">{translate("learning:parent.loadingStudents")}</p>
       ) : linked.isError ? (
         <div role="alert">
           <p>
             {advisingErrorMessage(
               linked.error,
-              "Linked students could not be loaded.",
+              translate('learning:parent.studentsFailed'),
             )}
           </p>
           <button
@@ -782,13 +777,11 @@ const ParentPortalPage: React.FC = () => {
             className={styles.secondary}
             onClick={() => void linked.refetch()}
           >
-            Retry
-          </button>
+            {translate("common:actions.retry")}</button>
         </div>
       ) : (
         <p className={styles.status}>
-          No active student link is available for this account.
-        </p>
+          {translate("learning:parent.noStudent")}</p>
       )}
     </div>
   );

@@ -1,11 +1,13 @@
 import {isRecord} from '@/utils/apiError';
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
 import type {QuestionSection} from '@/pages/MockExamSessionPage/runner/data/types';
 import type {ListeningSection} from '@/pages/MockExamSessionPage/runner/data/listening/types';
 
 export type QuestionSubject = 'listening' | 'reading';
 export type Field = {
-  label: string;
-  hint?: string;
+  labelKey: string;
+  hintKey?: string;
   optional?: boolean;
 } & (
   | {type: 'text'; multiline?: boolean}
@@ -15,131 +17,131 @@ export type Field = {
   | {type: 'list'; item: Field; min?: number}
   | {type: 'variant'; variants: Record<string, Field>}
 );
-const text = (label: string, optional = false, multiline = false): Field => ({
+const text = (labelKey: string, optional = false, multiline = false): Field => ({
   type: 'text',
-  label,
+  labelKey,
   optional,
   multiline,
 });
-const number = (label: string, questionId = false): Field => ({
+const number = (labelKey: string, questionId = false): Field => ({
   type: 'number',
-  label,
+  labelKey,
   questionId,
 });
-const object = (label: string, fields: Record<string, Field>): Field => ({
+const object = (labelKey: string, fields: Record<string, Field>): Field => ({
   type: 'object',
-  label,
+  labelKey,
   fields,
 });
-const list = (label: string, item: Field, min = 1): Field => ({
+const list = (labelKey: string, item: Field, min = 1): Field => ({
   type: 'list',
-  label,
+  labelKey,
   item,
   min,
 });
-const id = number('Question number', true);
-const blank = object('Blank', {
+const id = number("common:admin.examFields.questionNumber", true);
+const blank = object("exams:schema.blank", {
   id,
-  before: text('Text before the blank', true, true),
-  after: text('Text after the blank', true, true),
+  before: text("exams:schema.beforeBlank", true, true),
+  after: text("exams:schema.afterBlank", true, true),
 });
-const choice = object('Option', {
-  key: text('Option label'),
-  text: text('Option text'),
+const choice = object("exams:schema.option", {
+  key: text("exams:schema.optionLabel"),
+  text: text("exams:schema.optionText"),
 });
 const options = list(
-  'Answer options',
-  {...text('Option'), hint: 'Include the letter, for example A. Library.'},
+  "assessment:quiz.options",
+  {...text("exams:schema.option"), hintKey: "exams:schema.optionHint"},
   2,
 );
 const cells: Field = {
   type: 'variant',
-  label: 'Cell',
+  labelKey: "exams:schema.cell",
   variants: {
-    text: object('Text', {value: text('Cell text')}),
-    gap: object('Answer blank', {id}),
+    text: object("common:admin.examFields.text", {value: text("exams:schema.cellText")}),
+    gap: object("exams:schema.answerBlank", {id}),
   },
 };
 const steps: Field = {
   type: 'variant',
-  label: 'Step',
+  labelKey: "exams:schema.step",
   variants: {
-    text: object('Text', {value: text('Step text')}),
-    gap: object('Answer blank', {
+    text: object("common:admin.examFields.text", {value: text("exams:schema.stepText")}),
+    gap: object("exams:schema.answerBlank", {
       id,
-      before: text('Text before the blank', true),
-      after: text('Text after the blank', true),
+      before: text("exams:schema.beforeBlank", true),
+      after: text("exams:schema.afterBlank", true),
     }),
   },
 };
 const summaryPart: Field = {
   type: 'variant',
-  label: 'Summary item',
+  labelKey: "exams:schema.summaryItem",
   variants: {
-    text: object('Text', {value: text('Summary text', false, true)}),
-    gap: object('Answer blank', {id}),
+    text: object("common:admin.examFields.text", {value: text("exams:schema.summaryText", false, true)}),
+    gap: object("exams:schema.answerBlank", {id}),
   },
 };
 const common = {
-  mcq: object('Single-choice questions', {
+  mcq: object("exams:schema.singleChoiceQuestions", {
     questions: list(
-      'Questions',
-      object('Question', {
+      "common:admin.examFields.questions",
+      object("assessment:quiz.question", {
         id,
-        prompt: text('Question text', false, true),
+        prompt: text("exams:schema.questionText", false, true),
         options,
       }),
     ),
   }),
-  multiSelect: object('Multiple-choice question', {
-    prompt: text('Question text', false, true),
-    chooseCount: number('Number of answers to choose'),
-    questionIds: list('Answer slots', id),
+  multiSelect: object("exams:schema.multipleChoiceQuestion", {
+    prompt: text("exams:schema.questionText", false, true),
+    chooseCount: number("exams:schema.chooseCount"),
+    questionIds: list("exams:schema.answerSlots", id),
     options,
   }),
-  sentenceCompletion: object('Sentence completion', {
-    questions: list('Sentences', blank),
+  sentenceCompletion: object("exams:schema.sentenceCompletion", {
+    questions: list("exams:schema.sentences", blank),
   }),
-  summaryBank: object('Summary completion', {
-    wordBank: list('Word bank', text('Word or labelled option')),
-    parts: list('Summary content', summaryPart),
+  summaryBank: object("exams:schema.summaryCompletion", {
+    wordBank: list("exams:schema.wordBank", text("exams:schema.wordOption")),
+    parts: list("exams:schema.summaryContent", summaryPart),
   }),
-  matching: object('Matching', {
-    listLabel: text('Options heading'),
-    choices: list('Options', choice),
+  matching: object("exams:schema.matching", {
+    listLabel: text("exams:schema.optionsHeading"),
+    choices: list("common:admin.examFields.options", choice),
     questions: list(
-      'Questions',
-      object('Question', {
+      "common:admin.examFields.questions",
+      object("assessment:quiz.question", {
         id,
-        statement: text('Statement to match', false, true),
+        statement: text("exams:schema.statementMatch", false, true),
       }),
     ),
   }),
-  shortAnswer: object('Short-answer questions', {
+  shortAnswer: object("exams:schema.shortAnswerQuestions", {
     questions: list(
-      'Questions',
-      object('Question', {id, prompt: text('Question text', false, true)}),
+      "common:admin.examFields.questions",
+      object("assessment:quiz.question", {id, prompt: text("exams:schema.questionText", false, true)}),
     ),
   }),
 };
-const table = object('Table completion', {
-  caption: text('Table title', true),
-  headers: list('Column headings', text('Column heading')),
-  rows: list('Rows', list('Cells', cells)),
+const table = object("exams:schema.tableCompletion", {
+  caption: text("exams:schema.tableTitle", true),
+  headers: list("exams:schema.columnHeadings", text("exams:schema.columnHeading")),
+  rows: list("exams:schema.rows", list("exams:schema.cells", cells)),
 });
-const flowchart = object('Flowchart completion', {
-  steps: list('Steps', steps),
+const flowchart = object("exams:schema.flowchartCompletion", {
+  steps: list("exams:schema.steps", steps),
 });
-const diagram = object('Diagram labels', {
-  caption: text('Diagram title'),
-  imageAlt: text('Image description'),
-  labels: list('Labels', object('Label', {id, prompt: text('Label prompt')})),
+const diagram = object("exams:schema.diagramLabels", {
+  caption: text("exams:schema.diagramTitle"),
+  imageAlt: text("exams:schema.imageDescription"),
+  labels: list("exams:schema.labels", object("common:admin.examFields.label", {id, prompt: text("exams:schema.labelPrompt")})),
 });
 
 export interface QuestionDefinition {
   kind: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   schema?: Field;
   /** Advanced types can validate known answer slots without enabling a form. */
   answerSchema?: Field;
@@ -149,41 +151,41 @@ export interface QuestionDefinition {
 const sharedDefinitions = [
   {
     kind: 'mcq',
-    label: 'Multiple choice · one answer',
-    description:
-      'A question with lettered options. The student selects one answer.',
+    labelKey: "exams:schema.singleChoice",
+    descriptionKey:
+      "exams:schema.singleChoiceHelp",
     schema: common.mcq,
   },
   {
     kind: 'multiSelect',
-    label: 'Multiple choice · several answers',
-    description:
-      'One prompt with several correct selections and a numbered slot for each answer.',
+    labelKey: "exams:schema.multipleChoice",
+    descriptionKey:
+      "exams:schema.multipleChoiceHelp",
     schema: common.multiSelect,
   },
   {
     kind: 'sentenceCompletion',
-    label: 'Sentence completion',
-    description: 'A sentence with an answer blank between two pieces of text.',
+    labelKey: "exams:schema.sentenceCompletion",
+    descriptionKey: "exams:schema.sentenceCompletionHelp",
     schema: common.sentenceCompletion,
   },
   {
     kind: 'summaryBank',
-    label: 'Summary completion · word bank',
-    description:
-      'Build a summary from text and answer blanks, with a shared word bank.',
+    labelKey: "exams:schema.summaryBank",
+    descriptionKey:
+      "exams:schema.summaryBankHelp",
     schema: common.summaryBank,
   },
   {
     kind: 'matching',
-    label: 'Matching',
-    description: 'Students match each statement to a labelled option.',
+    labelKey: "exams:schema.matching",
+    descriptionKey: "exams:schema.matchingHelp",
     schema: common.matching,
   },
   {
     kind: 'shortAnswer',
-    label: 'Short answer',
-    description: 'A question followed by a short written answer.',
+    labelKey: "assessment:quiz.shortAnswer",
+    descriptionKey: "exams:schema.shortAnswerHelp",
     schema: common.shortAnswer,
   },
 ] satisfies (QuestionDefinition & {
@@ -195,121 +197,121 @@ export const QUESTION_TYPES = {
     ...sharedDefinitions,
     {
       kind: 'formCompletion',
-      label: 'Form completion',
-      description: 'A form with a heading and labelled answer blanks.',
-      schema: object('Form', {
-        formTitle: text('Form heading'),
+      labelKey: "exams:schema.formCompletion",
+      descriptionKey: "exams:schema.formCompletionHelp",
+      schema: object("exams:schema.form", {
+        formTitle: text("exams:schema.formHeading"),
         fields: list(
-          'Form fields',
-          object('Form field', {id, label: text('Field label')}),
+          "exams:schema.formFields",
+          object("exams:schema.formField", {id, label: text("exams:schema.fieldLabel")}),
         ),
       }),
     },
     {
       kind: 'notesCompletion',
-      label: 'Note completion',
-      description: 'A heading and notes with answer blanks.',
-      schema: object('Notes', {
-        heading: text('Notes heading', true),
-        blanks: list('Notes', blank),
+      labelKey: "exams:schema.noteCompletion",
+      descriptionKey: "exams:schema.listeningNotesHelp",
+      schema: object("exams:schema.notes", {
+        heading: text("exams:schema.notesHeading", true),
+        blanks: list("exams:schema.notes", blank),
       }),
     },
     {
       kind: 'tableCompletion',
-      label: 'Table completion',
-      description:
-        'Add column headings, then cells containing text or an answer blank.',
+      labelKey: "exams:schema.tableCompletion",
+      descriptionKey:
+        "exams:schema.tableHelp",
       schema: table,
     },
     {
       kind: 'flowchartCompletion',
-      label: 'Flowchart completion',
-      description: 'Add ordered steps containing text or an answer blank.',
+      labelKey: "exams:schema.flowchartCompletion",
+      descriptionKey: "exams:schema.flowchartHelp",
       schema: flowchart,
     },
     {
       kind: 'planMap',
-      answerSchema: object('Map labels', {
-        labels: list('Labels', object('Label', {id})),
+      answerSchema: object("exams:schema.mapLabels", {
+        labels: list("exams:schema.labels", object("common:admin.examFields.label", {id})),
       }),
-      label: 'Plan / map labelling · advanced',
-      description:
-        'Use an existing, verified payload. Listening image authoring is not defined in the supplied API.',
+      labelKey: "exams:schema.planMap",
+      descriptionKey:
+        "exams:schema.planMapHelp",
     },
   ] satisfies (QuestionDefinition & {kind: ListeningSection['kind']})[],
   reading: [
     ...sharedDefinitions,
     {
       kind: 'tfng',
-      label: 'True / False / Not Given',
-      description:
-        'Statements that students compare with the passage. Advanced data can retain Yes / No / Not Given options.',
-      schema: object('Statements', {
+      labelKey: "exams:schema.tfng",
+      descriptionKey:
+        "exams:schema.tfngHelp",
+      schema: object("exams:schema.statements", {
         questions: list(
-          'Statements',
-          object('Statement', {id, statement: text('Statement text')}),
+          "exams:schema.statements",
+          object("exams:schema.statement", {id, statement: text("exams:schema.statementText")}),
         ),
       }),
     },
     {
       kind: 'notes',
-      label: 'Note completion',
-      description:
-        'Organize notes under headings, with an answer blank in each note.',
-      schema: object('Notes', {
+      labelKey: "exams:schema.noteCompletion",
+      descriptionKey:
+        "exams:schema.readingNotesHelp",
+      schema: object("exams:schema.notes", {
         blocks: list(
-          'Note groups',
-          object('Note group', {
-            heading: text('Heading'),
-            blanks: list('Notes', blank),
+          "exams:schema.noteGroups",
+          object("exams:schema.noteGroup", {
+            heading: text("exams:schema.heading"),
+            blanks: list("exams:schema.notes", blank),
           }),
         ),
       }),
     },
     {
       kind: 'headings',
-      label: 'Matching headings',
-      description: 'A bank of headings to match to labelled paragraphs.',
-      schema: object('Headings', {
-        listLabel: text('Headings introduction'),
-        headings: list('Headings', choice),
+      labelKey: "exams:schema.matchingHeadings",
+      descriptionKey: "exams:schema.matchingHeadingsHelp",
+      schema: object("exams:schema.headings", {
+        listLabel: text("exams:schema.headingsIntroduction"),
+        headings: list("exams:schema.headings", choice),
         questions: list(
-          'Paragraphs to match',
-          object('Paragraph', {id, paragraphLabel: text('Paragraph label')}),
+          "exams:schema.paragraphsMatch",
+          object("exams:schema.paragraph", {id, paragraphLabel: text("exams:schema.paragraphLabel")}),
         ),
       }),
     },
     {
       kind: 'sentenceEndings',
-      label: 'Matching sentence endings',
-      description: 'A bank of endings to match to sentence beginnings.',
-      schema: object('Sentence endings', {
-        listLabel: text('Endings introduction'),
-        endings: list('Endings', choice),
+      labelKey: "exams:schema.matchingEndings",
+      descriptionKey: "exams:schema.matchingEndingsHelp",
+      schema: object("exams:schema.sentenceEndings", {
+        listLabel: text("exams:schema.endingsIntroduction"),
+        endings: list("exams:schema.endings", choice),
         questions: list(
-          'Sentence beginnings',
-          object('Sentence', {id, stem: text('Sentence beginning')}),
+          "exams:schema.sentenceBeginnings",
+          object("exams:schema.sentence", {id, stem: text("exams:schema.sentenceBeginning")}),
         ),
       }),
     },
     {
       kind: 'table',
-      label: 'Table completion',
-      description:
-        'Add column headings, then cells containing text or an answer blank.',
+      labelKey: "exams:schema.tableCompletion",
+      descriptionKey:
+        "exams:schema.tableHelp",
       schema: table,
     },
     {
       kind: 'flowchart',
-      label: 'Flowchart completion',
-      description: 'Add ordered steps containing text or an answer blank.',
+      labelKey: "exams:schema.flowchartCompletion",
+      descriptionKey: "exams:schema.flowchartHelp",
       schema: flowchart,
     },
     {
       kind: 'diagram',
-      label: 'Diagram labelling',
-      description:
-        'Write label prompts and attach the diagram in the Media section.',
+      labelKey: "exams:schema.diagramLabelling",
+      descriptionKey:
+        "exams:schema.diagramHelp",
       schema: diagram,
     },
   ] satisfies (QuestionDefinition & {kind: QuestionSection['kind']})[],
@@ -385,36 +387,36 @@ export function fitsField(field: Field, value: unknown): boolean {
   }
 }
 export function fieldErrors(field: Field, value: unknown, path = ''): string[] {
-  const name = path || field.label;
+  const name = path || i18n.t(field.labelKey);
   if (value === undefined && field.optional) return [];
   if (!fitsField(field, value))
     return [
-      `${name}: content does not match this editor. Check Advanced data.`,
+      i18n.t('exams:validation.fieldMismatch', {name}),
     ];
   if (field.type === 'text')
     return !field.optional && !String(value).trim()
-      ? [`${name}: enter text.`]
+      ? [i18n.t('exams:validation.fieldText', {name})]
       : [];
   if (field.type === 'number')
     return !Number.isSafeInteger(value) || Number(value) < 1
-      ? [`${name}: enter a positive whole number.`]
+      ? [i18n.t('exams:validation.fieldInteger', {name})]
       : [];
   if (field.type === 'choice')
     return field.choices.includes(String(value))
       ? []
-      : [`${name}: select an option.`];
+      : [i18n.t('exams:validation.fieldChoice', {name})];
   if (field.type === 'list' && Array.isArray(value))
     return [
       ...(value.length < (field.min ?? 1)
-        ? [`${name}: add at least ${field.min ?? 1} item(s).`]
+        ? [i18n.t('exams:validation.fieldItems', {name, count: field.min ?? 1, number: formatNumber(field.min ?? 1)})]
         : []),
       ...value.flatMap((item, index) =>
-        fieldErrors(field.item, item, `${name} ${index + 1}`),
+        fieldErrors(field.item, item, i18n.t('exams:authoring.numberedField', {field: name, number: formatNumber(index + 1)})),
       ),
     ];
   if (field.type === 'object' && isRecord(value))
     return Object.entries(field.fields).flatMap(([key, item]) =>
-      fieldErrors(item, value[key], `${name} / ${item.label}`),
+      fieldErrors(item, value[key], `${name} / ${i18n.t(item.labelKey)}`),
     );
   if (field.type === 'variant' && isRecord(value))
     return fieldErrors(field.variants[String(value.type)], value, name);
@@ -449,16 +451,16 @@ export function contentErrors(
   if (errors.length || !isRecord(content)) return errors;
   const numbers = questionNumbers(content, schema);
   if (!numbers.length)
-    errors.push('Add at least one numbered question or answer blank.');
+    errors.push(i18n.t('exams:validation.numberedQuestionRequired'));
   if (new Set(numbers).size !== numbers.length)
-    errors.push('Each question number must be used only once in this group.');
+    errors.push(i18n.t('exams:validation.uniqueQuestion'));
   if (Array.isArray(content.options) && kind === 'multiSelect') {
     if (Number(content.chooseCount) !== numbers.length)
       errors.push(
-        'The number of answer slots must match the number of answers to choose.',
+        i18n.t('exams:validation.slotCount'),
       );
     if (Number(content.chooseCount) > content.options.length)
-      errors.push('Add enough options for the number of answers to choose.');
+      errors.push(i18n.t('exams:validation.enoughOptions'));
   }
   const checkOptions = (value: unknown) => {
     if (!isRecord(value) || !Array.isArray(value.options)) return;
@@ -470,7 +472,7 @@ export function contentErrors(
       new Set(labels).size !== labels.length
     )
       errors.push(
-        'Start every option with a different capital letter, for example A. Library.',
+        i18n.t('exams:validation.optionLetters'),
       );
   };
   if (kind === 'mcq' && Array.isArray(content.questions))
@@ -489,13 +491,13 @@ export function contentErrors(
       isRecord(option) ? String(option.key).trim() : '',
     );
     if (new Set(keys).size !== keys.length)
-      errors.push('Use a different label for each answer option.');
+      errors.push(i18n.t('exams:validation.uniqueOptionLabel'));
   }
   if (Array.isArray(content.rows) && Array.isArray(content.headers)) {
     const width = content.headers.length;
     if (content.rows.some((row) => !Array.isArray(row) || row.length !== width))
       errors.push(
-        'Every table row must have one cell for each column heading.',
+        i18n.t('exams:validation.tableWidth'),
       );
   }
   return errors;

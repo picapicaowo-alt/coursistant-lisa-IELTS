@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {useState} from 'react';
 import {ContentFields} from './ContentFields';
 import {parseContent, type Field} from './questionSchema';
@@ -6,8 +7,8 @@ import styles from './authoring.module.scss';
 
 const paragraphsField: Field = {
   type: 'list',
-  label: 'Passage paragraphs',
-  item: {type: 'text', label: 'Paragraph', multiline: true},
+  labelKey: "exams:schema.paragraphs",
+  item: {type: 'text', labelKey: "exams:schema.paragraph", multiline: true},
 };
 export function PassageEditor({
   value,
@@ -16,6 +17,7 @@ export function PassageEditor({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const {t: translate} = useTranslation();
   const paragraphs = parseContent(value);
   const plain =
     Array.isArray(paragraphs) &&
@@ -32,22 +34,18 @@ export function PassageEditor({
         />
       ) : (
         <p className={styles.notice}>
-          This passage uses imported structured content. Edit its data below;
-          converting it automatically could lose formatting.
-        </p>
+          {translate("exams:authoring.structuredPassageHelp")}</p>
       )}
       <details
         className={styles.advanced}
         open={advanced || !plain}
         onToggle={(event) => setAdvanced(event.currentTarget.open)}
       >
-        <summary>Advanced paragraph data</summary>
+        <summary>{translate("exams:authoring.advancedParagraphs")}</summary>
         <p className={ui.hint}>
-          Existing structured paragraphs remain unchanged unless you edit them
-          here.
-        </p>
+          {translate("exams:authoring.paragraphsPreserved")}</p>
         <label>
-          <span>Paragraph data (JSON)</span>
+          <span>{translate("exams:authoring.paragraphData")}</span>
           <textarea
             className={styles.code}
             value={value}

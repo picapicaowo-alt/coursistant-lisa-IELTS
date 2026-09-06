@@ -81,7 +81,7 @@ describe('AiAgentApiService', () => {
     await expect(service.decideDeadlineChange({
       actionId: 'expired-action',
       decision: 'ALLOW',
-    })).rejects.toThrow('No matching pending deadline change');
+    })).rejects.toThrow('Workflow is temporarily unavailable. Please try again.');
   });
 
   it('normalizes snake_case pending actions and conversation ids', async () => {

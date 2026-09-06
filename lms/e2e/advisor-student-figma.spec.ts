@@ -125,7 +125,7 @@ test('advisor student list keeps the Figma hierarchy across desktop and mobile',
   await page.screenshot({path: testInfo.outputPath('students-desktop.png'), fullPage: true});
 
   await page.setViewportSize({width: 390, height: 844});
-  await expect(page.locator('td[data-label="Target goal"]')).toBeVisible();
+  await expect(page.locator('td[data-label="Target Goal"]')).toBeVisible();
   await expect(page.getByRole('link', {name: 'Open Alex Chen'})).toBeVisible();
   await expect.poll(() => page.getByRole('rowheader', {name: /Alex Chen/}).evaluate(element => element.getBoundingClientRect().width)).toBeGreaterThan(200);
   await expectNoViewportOverflow(page);

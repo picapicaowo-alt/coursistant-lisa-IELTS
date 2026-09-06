@@ -45,10 +45,10 @@ const CourseCataloguePage: React.FC = () => {
   return (
     <div className={styles.pageContainer}>
       <div className={styles.contentContainer}>
-        {user.level === 'INSTRUCTOR' ? <p className={styles.eyebrow}>Course operations <span>/</span> My courses</p> : null}
+        {user.level === 'INSTRUCTOR' ? <p className={styles.eyebrow}>{t("course:catalogue.operations")}{' '}<span>/</span> {' '}{t("dashboard:myCourses")}</p> : null}
         <h1 className={styles.pageTitle}>{isUserAccount ? t("list.tabs.myCourses") : t('common:fields.courses')}</h1>
         <div className={styles.tabsContainer}>
-          {student ? (['CURRENT', 'COMPLETED'] as const).map(value => <button key={value} type="button" className={`${styles.tab} ${courseView === value ? styles.active : ''}`} aria-pressed={courseView === value} onClick={() => setCourseView(value)}>{value === 'CURRENT' ? 'Current' : 'Completed'}</button>) : ([{value: undefined, label: t('course:catalogue.allStatuses')}, {value: 'Active', label: t('common:status.ACTIVE')}, {value: 'Archived', label: t('common:status.ARCHIVED')}] as const).map(tab => <button key={tab.label} type="button" className={`${styles.tab} ${courseState === tab.value ? styles.active : ''}`} aria-pressed={courseState === tab.value} onClick={() => setCourseState(tab.value)}>{tab.label}</button>)}
+          {student ? (['CURRENT', 'COMPLETED'] as const).map(value => <button key={value} type="button" className={`${styles.tab} ${courseView === value ? styles.active : ''}`} aria-pressed={courseView === value} onClick={() => setCourseView(value)}>{value === 'CURRENT' ? t("assessment:submission.current") : t("common:status.COMPLETED")}</button>) : ([{value: undefined, label: t('course:catalogue.allStatuses')}, {value: 'Active', label: t('common:status.ACTIVE')}, {value: 'Archived', label: t('common:status.ARCHIVED')}] as const).map(tab => <button key={tab.value ?? 'all'} type="button" className={`${styles.tab} ${courseState === tab.value ? styles.active : ''}`} aria-pressed={courseState === tab.value} onClick={() => setCourseState(tab.value)}>{tab.label}</button>)}
           <div className={styles.tabSpacer}/>
           
           {canCreateCourse ? (

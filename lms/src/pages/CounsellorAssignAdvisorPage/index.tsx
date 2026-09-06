@@ -1,4 +1,6 @@
 import {useTranslation} from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
+import {roleLabel} from '@/i18n/presentation';
 import React, {FormEvent, useDeferredValue, useMemo, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -14,7 +16,7 @@ import {Search, X} from 'lucide-react';
 import {PersonSelectRow} from '@/components/PersonSelectRow';
 import local from './index.module.scss';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {ADVISOR_LEVEL_LABELS, intakePath} from '../CounsellorDashboardPage/presentation';
+import {intakePath} from '../CounsellorDashboardPage/presentation';
 
 const PAGE_SIZE = 100;
 
@@ -79,8 +81,8 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
   if (handover) {
     return (
       <div className={styles.page}>
-        <p className={styles.success} role="status">This student has left the counsellor queue. First assignment is complete.</p>
-        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>Back to unassigned queue</Link>
+        <p className={styles.success} role="status">{t("advising:counsellor.handoverComplete")}</p>
+        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>{t("advising:counsellor.backToUnassigned")}</Link>
       </div>
     );
   }
@@ -89,15 +91,15 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
     <div className={styles.page}>
       <header className={styles.header}>
         <div>
-          <h1>Assign advisor</h1>
+          <h1>{t("advising:intake.assign")}</h1>
           <p className={styles.lede}>
-            {intake.data ? `${formatPersonName(intake.data, 'Student')} · version ${intake.data.intakeVersion}` : 'Load the current intake version, then assign. You cannot cancel or reassign afterwards.'}
+            {intake.data ? t('advising:counsellor.versionedLabel', {label: formatPersonName(intake.data, t('common:roles.STUDENT')), number: formatNumber(intake.data.intakeVersion)}) : t("advising:counsellor.assignmentHelp")}
           </p>
         </div>
-        <Link className={styles.link} to={intakePath(numericId)}>Back to intake</Link>
+        <Link className={styles.link} to={intakePath(numericId)}>{t("advising:counsellor.backToIntake")}</Link>
       </header>
-      {assign.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(assign.error, 'Assignment failed.')}</p> : null}
-      {intake.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(intake.error, 'Intake could not be loaded.')}</p> : null}
+      {assign.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(assign.error, t('advising:counsellor.assignmentFailed'))}</p> : null}
+      {intake.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(intake.error, t('advising:studentWorkspace.intakeFailed'))}</p> : null}
       <section className={styles.card}>
         <form className={local.form} onSubmit={onSubmit}>
           <div className={local.search}>
@@ -107,29 +109,29 @@ const CounsellorAssignAdvisorPage: React.FC = () => {
             </div>
             <small>{t('intake.pageSearchHelp')}</small>
           </div>
-          {advisors.isPending ? <p className={styles.status} role="status">Loading eligible advisors…</p> : null}
-          {advisors.isError ? <div className={styles.error} role="alert"><p>{advisingErrorMessage(advisors.error, 'Eligible advisors could not be loaded.')}</p><button type="button" className={styles.secondary} onClick={() => void advisors.refetch()}>Try again</button></div> : null}
+          {advisors.isPending ? <p className={styles.status} role="status">{t("advising:counsellor.loadingEligible")}</p> : null}
+          {advisors.isError ? <div className={styles.error} role="alert"><p>{advisingErrorMessage(advisors.error, t('advising:counsellor.eligibleFailed'))}</p><button type="button" className={styles.secondary} onClick={() => void advisors.refetch()}>{t("common:actions.tryAgain")}</button></div> : null}
           <fieldset className={local.list}>
             <legend>{t('intake.chooseAdvisor')}</legend>
             {visibleAdvisors.map(advisor => <PersonSelectRow key={advisor.advisorUserId}
-              person={{...advisor, id: advisor.advisorUserId}} roleLabel={ADVISOR_LEVEL_LABELS[advisor.level]}
+              person={{...advisor, id: advisor.advisorUserId}} roleLabel={roleLabel(advisor.level)}
               name="advisor" value={String(advisor.advisorUserId)} selected={advisorUserId === String(advisor.advisorUserId)}
               disabled={assign.isPending} onSelect={() => setAdvisorUserId(String(advisor.advisorUserId))}/>
             )}
           </fieldset>
           {!advisors.isPending && !advisors.isError && visibleAdvisors.length === 0 ? (
-            <p className={styles.status}>{search.trim() ? t('intake.noAdvisorMatches') : 'This tenant has no active advisors.'}</p>
+            <p className={styles.status}>{search.trim() ? t('intake.noAdvisorMatches') : t("advising:counsellor.noActive")}</p>
           ) : null}
           {advisors.data && advisors.data.total > PAGE_SIZE ? (
-            <nav className={styles.pagination} aria-label="Advisor pages">
-              <button type="button" className={styles.secondary} disabled={page === 0} onClick={() => {setPage(page - 1); setAdvisorUserId('');}}>Previous</button>
-              <span>Page {page + 1} · {advisors.data.total} eligible advisors</span>
-              <button type="button" className={styles.secondary} disabled={(page + 1) * PAGE_SIZE >= advisors.data.total} onClick={() => {setPage(page + 1); setAdvisorUserId('');}}>Next</button>
+            <nav className={styles.pagination} aria-label={t("advising:counsellor.advisorPages")}>
+              <button type="button" className={styles.secondary} disabled={page === 0} onClick={() => {setPage(page - 1); setAdvisorUserId('');}}>{t("common:actions.previous")}</button>
+              <span>{t('advising:counsellor.eligiblePage', {page: formatNumber(page + 1), number: formatNumber(advisors.data.total)})}</span>
+              <button type="button" className={styles.secondary} disabled={(page + 1) * PAGE_SIZE >= advisors.data.total} onClick={() => {setPage(page + 1); setAdvisorUserId('');}}>{t("common:actions.next")}</button>
             </nav>
           ) : null}
-          <p className={styles.fieldHelp}>Assigning an Advisor completes the handover. This intake will leave your queue, and you will no longer be able to edit its record or parent links.</p>
+          <p className={styles.fieldHelp}>{t("advising:counsellor.handoverWarning")}</p>
           <div className={styles.formActions}><button className={styles.primary} disabled={assign.isPending || !Number(advisorUserId) || !intake.data || advisors.isError || !visibleAdvisors.some(advisor => String(advisor.advisorUserId) === advisorUserId)}>
-            {assign.isPending ? 'Assigning…' : 'Assign advisor'}
+            {assign.isPending ? t("exams:assignment.assigning") : t("advising:intake.assign")}
           </button></div>
         </form>
       </section>

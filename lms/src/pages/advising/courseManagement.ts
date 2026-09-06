@@ -1,6 +1,9 @@
 import {contractItems} from '@/pages/AdvisorOperationsPage/advisorViewModels';
 import type {AdvisorOwnedCourse} from '@/apis/types/advisorWorkspace';
-import type {CourseDeliveryConfigResponse} from '@/apis';
+import type {CourseDeliveryConfigResponse, CourseReadinessBlocker} from '@/apis';
+import i18n from '@/i18n';
+import {formatClockTime, formatDateValue} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
 
 // PutCourseDeliveryConfigRequest in docs/api/advising.openapi.yaml.
 export const CATALOG_CODE_MAX_LENGTH = 64;
@@ -23,9 +26,15 @@ export const hasVersionedGroupConfig = (config?: CourseDeliveryConfigResponse | 
   (config.courseLaunchVersion ?? -1) >= 0 && COURSE_LAUNCH_STATES.some(state => state === config.launchState);
 
 export const courseDeliveryLabel = (mode?: string): string =>
-  mode === 'GROUP' ? 'Group course' : mode === 'ONE_ON_ONE' ? 'One-on-one course' : 'Delivery type not available';
+  i18n.t(mode === 'GROUP' ? 'courseTools:delivery.group' : mode === 'ONE_ON_ONE' ? 'courseTools:delivery.oneToOne' : 'courseTools:delivery.typeUnavailable');
 
 export const COURSE_LAUNCH_STATES = ['DRAFT', 'READY', 'PUBLISHED'] as const;
+
+/** Localize observed readiness requirements; keep unknown codes for support without showing raw server prose. */
+export const courseReadinessMessage = (blocker: CourseReadinessBlocker): string => {
+  if (blocker.code === 'SYLLABUS_REQUIRED') return i18n.t('courseTools:readiness.syllabusRequired');
+  return i18n.t('courseTools:readiness.unknownRequirement', {code: blocker.code || i18n.t('courseTools:readiness.requirement')});
+};
 export type CourseLaunchState = typeof COURSE_LAUNCH_STATES[number];
 
 export interface AdvisorCourseOccurrence {
@@ -49,34 +58,21 @@ export const isCourseLaunchState = (value: string): value is CourseLaunchState =
   COURSE_LAUNCH_STATES.some(state => state === value);
 
 export const courseLaunchLabel = (state?: string | null): string => {
-  if (state === 'READY') return 'Ready to publish';
-  if (state === 'PUBLISHED') return 'Published';
-  if (state === 'DRAFT') return 'Draft';
-  return 'Not configured';
+  if (state === 'READY') return i18n.t('courseTools:delivery.readyToPublish');
+  if (state === 'PUBLISHED' || state === 'DRAFT') return statusLabel(state);
+  return i18n.t('courseTools:delivery.notConfigured');
 };
 
 export const courseTermLabel = (course: Pick<AdvisorOwnedCourse, 'termStartDate' | 'termEndDate'>): string => {
-  if (!course.termStartDate && !course.termEndDate) return 'Term dates not provided';
-  if (!course.termStartDate) return `Through ${formatCourseDate(course.termEndDate!)}`;
-  if (!course.termEndDate) return `From ${formatCourseDate(course.termStartDate)}`;
+  if (!course.termStartDate && !course.termEndDate) return i18n.t('courseTools:delivery.termMissing');
+  if (!course.termStartDate) return i18n.t('courseTools:delivery.termThrough', {date: formatCourseDate(course.termEndDate!)});
+  if (!course.termEndDate) return i18n.t('courseTools:delivery.termFrom', {date: formatCourseDate(course.termStartDate)});
   return `${formatCourseDate(course.termStartDate)} – ${formatCourseDate(course.termEndDate)}`;
 };
 
-export const formatCourseDate = (value?: string): string => {
-  if (!value) return 'Not provided';
-  const [year, month, day] = value.split('-').map(Number);
-  if (!year || !month || !day) return value;
-  return new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric'})
-    .format(new Date(year, month - 1, day));
-};
+export const formatCourseDate = (value?: string): string => value ? formatDateValue(value) : i18n.t('common:feedback.notProvided');
 
-export const formatCourseTime = (value?: string): string => {
-  if (!value) return 'Not provided';
-  const [hours, minutes] = value.split(':').map(Number);
-  if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return value;
-  return new Intl.DateTimeFormat('en-US', {hour: 'numeric', minute: '2-digit'})
-    .format(new Date(2000, 0, 1, hours, minutes));
-};
+export const formatCourseTime = (value?: string): string => value ? formatClockTime(value) : i18n.t('common:feedback.notProvided');
 
 export const parseAdvisorCourseOccurrences = (value: unknown): AdvisorCourseOccurrence[] =>
   contractItems(value).flatMap(item => {

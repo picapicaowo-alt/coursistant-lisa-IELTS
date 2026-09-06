@@ -5,16 +5,18 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {FileBlock} from './FileBlock';
 import {FileView} from '@/types';
+import i18n from '@/i18n';
+import type {TOptions} from 'i18next';
 
 vi.mock('react-i18next', async (importOriginal) => ({
   ...await importOriginal<typeof import('react-i18next')>(),
   useTranslation: () => ({
-    t: (key: string) => {
+    t: (key: string, options?: TOptions) => {
       const translations: Record<string, string> = {
         'blockEditor.retryUploadTitle': 'Retry',
         'blockEditor.deleteFileTitle': 'Delete file'
       };
-      return translations[key] || key;
+      return translations[key] || i18n.t(key, {...options, ns: 'course'});
     }
   })
 }));
@@ -94,7 +96,8 @@ describe('FileBlock', () => {
       render(<FileBlock block={errorFile}/>);
       
       expect(screen.getByText(/test-file.pdf/)).toBeInTheDocument();
-      expect(screen.getByText(/Upload failed: Network error/)).toBeInTheDocument();
+      expect(screen.getByText(i18n.t('common:files.uploadFailed'))).toBeInTheDocument();
+      expect(screen.queryByText(/Upload failed: Network error/)).not.toBeInTheDocument();
     });
     
     it('displays success status without error message', () => {

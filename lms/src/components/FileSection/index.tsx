@@ -1,4 +1,3 @@
-import {getApiErrorMessage} from '@/utils/apiError';
 import React from 'react';
 import FileUploadBox from "./FileUploadBox";
 import styles from './index.module.scss';
@@ -118,7 +117,7 @@ export const FileSection: React.FC<FileSectionProps> = ({
       pendingFilesRef.current.set(tempId, {
         ...failedFile,
         uploadStatus: 'error',
-        errorMessage: getApiErrorMessage(error, 'The file could not be uploaded. Please try again.'),
+        uploadError: error,
       });
     }
 
@@ -127,7 +126,7 @@ export const FileSection: React.FC<FileSectionProps> = ({
         return {
           ...file,
           uploadStatus: 'error',
-          errorMessage: getApiErrorMessage(error, 'The file could not be uploaded. Please try again.')
+          uploadError: error,
         };
       }
       return file;

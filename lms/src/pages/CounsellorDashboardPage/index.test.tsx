@@ -46,7 +46,7 @@ describe('Counsellor dashboard interactions', () => {
   it('keeps count explanations contextual and only links the available queue', async () => {
     renderPage();
     expect(await screen.findByRole('link', {name: /1 Unassigned/})).toHaveAttribute('href', '/counsellor/intakes');
-    const help = screen.getByLabelText('About assigned count');
+    const help = screen.getByLabelText('About the Assigned count');
     expect(help.closest('details')).not.toHaveAttribute('open');
     fireEvent.click(help);
     expect(help.closest('details')).toHaveAttribute('open');
@@ -88,7 +88,7 @@ describe('Counsellor dashboard interactions', () => {
     mocks.listStudentIntakes.mockImplementation((page: number, size: number) => Promise.resolve(response({page, size, total: 6, items: page === 0 ? [student] : [secondStudent]})));
     renderPage();
     await screen.findByText('IELTS Academic preparation');
-    fireEvent.click(within(screen.getByRole('navigation', {name: 'intake pages'})).getByRole('button', {name: 'Next page'}));
+    fireEvent.click(within(screen.getByRole('navigation', {name: 'Intake pages'})).getByRole('button', {name: 'Next page'}));
     expect(await screen.findByText('GRE preparation')).toBeVisible();
     expect(mocks.listStudentIntakes).toHaveBeenLastCalledWith(1, 5);
     expect(screen.getByRole('link', {name: 'Select advisor'})).toHaveAttribute('href', '/counsellor/intakes/8/assign');
@@ -117,7 +117,8 @@ describe('Counsellor dashboard interactions', () => {
   it('allows queue work even when aggregate counts fail, without inventing zero counts', async () => {
     mocks.getDashboard.mockRejectedValue(new Error('Counts temporarily unavailable'));
     renderPage();
-    expect(await screen.findByText('Counts temporarily unavailable')).toBeVisible();
+    expect(await screen.findByText('Dashboard counts could not be loaded.')).toBeVisible();
+    expect(screen.queryByText('Counts temporarily unavailable')).not.toBeInTheDocument();
     expect(await screen.findByText('IELTS Academic preparation')).toBeVisible();
     expect(screen.queryByRole('link', {name: /0 Unassigned/})).not.toBeInTheDocument();
   });

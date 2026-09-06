@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import {formatNumber} from '@/i18n/formatting';
 import styles from "./index.module.scss";
 import {MainContent} from "./MainContent";
 import {useTranslation} from "react-i18next";
@@ -21,10 +22,10 @@ export const AssignmentReview: React.FC = () => {
     <div className={styles.container}>
       <div className={styles.sidebar}>
         <PropertyForm
-          title={`${t('assignmentReview.submissions')}: ${submissions.length}`}
+          title={t('operations:teacher.submissions', {count: submissions.length, number: formatNumber(submissions.length)})}
         >
           {submissions.map((student) => (
-            <StudentItem submission={student}
+            <StudentItem key={student.id} submission={student}
                          selected={student.id === selectedSubmissionId}
                          onSelected={(studentId) => {
                            setSelectedSubmissionId(studentId);
@@ -37,7 +38,7 @@ export const AssignmentReview: React.FC = () => {
         <MainContent selectedSubmissionId={selectedSubmissionId}/> :
         <React.Fragment>
           <div className={styles.noStudent}>
-            <span>No selected student</span>
+            <span>{t('courseTools:groups.selectStudent')}</span>
           </div>
         </React.Fragment>
       }

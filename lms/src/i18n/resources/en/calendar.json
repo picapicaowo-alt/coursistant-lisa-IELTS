@@ -26,5 +26,73 @@
     "versionConflict": "This event changed elsewhere. Its latest details have been requested. Review them before trying again.",
     "requestVersionMissing": "The request is missing the event version. Reload the event before trying again.",
     "requestVersionInvalid": "The request contains an invalid event version. Reload the event before trying again."
+  },
+  "categoriesLabel": "Calendar categories",
+  "categories": {
+    "all": "All Events",
+    "personal": "Personal"
+  },
+  "viewLabel": "Calendar view",
+  "views": {
+    "week": "Week",
+    "month": "Month"
+  },
+  "previous": {
+    "day": "Previous day",
+    "week": "Previous week",
+    "month": "Previous month"
+  },
+  "next": {
+    "day": "Next day",
+    "week": "Next week",
+    "month": "Next month"
+  },
+  "addEvent": "+ Add event",
+  "loading": "Loading calendar…",
+  "retryCourses": "Retry courses",
+  "retryPersonal": "Retry personal events",
+  "errors": {
+    "courses": "Course calendar could not be loaded.",
+    "personal": "Personal events could not be loaded.",
+    "personalIncomplete_one": "{{number}} personal event lacks the details required to display it.",
+    "personalIncomplete_other": "{{number}} personal events lack the details required to display them.",
+    "assignments": "{{courseCode}}: assignments could not be loaded.",
+    "quizzes": "{{courseCode}}: quizzes could not be loaded.",
+    "events": "{{courseCode}}: events could not be loaded.",
+    "classes": "Scheduled classes could not be loaded.",
+    "classesIncomplete_one": "{{number}} scheduled class record lacks required calendar details.",
+    "classesIncomplete_other": "{{number}} scheduled class records lack required calendar details."
+  },
+  "allDay": "All day",
+  "dailyAgenda": "Daily agenda",
+  "noEvents": "No events",
+  "eventsInView": "Events in view",
+  "timezoneHelp": "Times shown in each event’s timezone.",
+  "noEventsInView": "No events in this view.",
+  "details": {
+    "close": "Close event details",
+    "location": "Location",
+    "category": "Category"
+  },
+  "kinds": {
+    "Session": "Class session",
+    "Assignment": "Assignment",
+    "Quiz": "Quiz",
+    "Event": "Course event",
+    "Personal": "Personal event"
+  },
+  "viewItem": {
+    "Session": "View class session",
+    "Assignment": "View assignment",
+    "Quiz": "View quiz",
+    "Event": "View course event",
+    "Personal": "View personal event"
+  },
+  "editEvent": "Edit event",
+  "timetable": {
+    "day": "Daily timetable",
+    "week": "Weekly timetable",
+    "scrollLabel": "Scrollable 24-hour timetable",
+    "currentTime": "Current time {{time}}"
   }
 }

@@ -15,7 +15,7 @@ export const ActionButtons: React.FC = () => {
           onClick={() => {
           }}
         >
-          {t("assignmentModal.cancelButton")}
+          {t("common:actions.cancel")}
         </button>
         <button
           type="button"
@@ -23,7 +23,7 @@ export const ActionButtons: React.FC = () => {
           onClick={() => {
           }}
         >
-          {t("assignmentModal.saveButton")}
+          {t("common:actions.save")}
         </button>
       </div>
     </div>

@@ -401,7 +401,7 @@ test("tenant record combines same-student intake and parent management with vers
       page.getByRole("region", { name: "Counsellor intake" }),
     ).toContainText(intake.basicBackground);
     await expect(
-      page.getByRole("region", { name: "Assignment", exact: true }),
+      page.getByRole("region", { name: "Advisor assignment", exact: true }),
     ).toContainText("Emma Wilson");
     await expect(
       page.getByRole("region", { name: "Parent or guardian access" }),
@@ -409,7 +409,7 @@ test("tenant record combines same-student intake and parent management with vers
     const account = await page.getByRole("region", {name: "Account", exact: true}).boundingBox();
     const context = await page.getByRole("region", {name: "Counsellor intake", exact: true}).boundingBox();
     const parents = await page.getByRole("region", {name: "Parent or guardian access", exact: true}).boundingBox();
-    const assignment = await page.getByRole("region", {name: "Assignment", exact: true}).boundingBox();
+    const assignment = await page.getByRole("region", {name: "Advisor assignment", exact: true}).boundingBox();
     if (width > 700) {
       expect(Math.abs(account!.y - parents!.y)).toBeLessThanOrEqual(1);
       expect(Math.abs(context!.y + context!.height - assignment!.y - assignment!.height)).toBeLessThanOrEqual(1);

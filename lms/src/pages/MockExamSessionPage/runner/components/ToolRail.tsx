@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import type { ToolMode } from '../types/annotation'
 
 type ToolRailProps = {
@@ -7,12 +8,13 @@ type ToolRailProps = {
 }
 
 export function ToolRail({ activeTool, onToggleHighlight, onToggleNotes }: ToolRailProps) {
+  const { t: translate } = useTranslation();
   return (
-    <aside className="tool-rail" aria-label="Tools">
+    <aside className="tool-rail" aria-label={translate('exams:runner.tools')}>
       <button
         type="button"
         className={`tool-rail__btn ${activeTool === 'highlight' ? 'is-active' : ''}`}
-        title="Highlight"
+        title={translate('exams:runner.highlight')}
         aria-pressed={activeTool === 'highlight'}
         onClick={onToggleHighlight}
       >
@@ -24,7 +26,7 @@ export function ToolRail({ activeTool, onToggleHighlight, onToggleNotes }: ToolR
       <button
         type="button"
         className={`tool-rail__btn ${activeTool === 'notes' ? 'is-active' : ''}`}
-        title="Notes"
+        title={translate("exams:schema.notes")}
         aria-pressed={activeTool === 'notes'}
         onClick={onToggleNotes}
       >

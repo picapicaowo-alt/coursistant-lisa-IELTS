@@ -3,6 +3,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import i18n from '@/i18n';
 
 const mocks = vi.hoisted(() => ({
   loginApi: vi.fn(),
@@ -53,8 +54,9 @@ const copy: Record<string, string> = {
   'errors.passwordChangeRequired': 'Password change required.',
 };
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({t: (key: string) => copy[key] ?? key}),
+vi.mock('react-i18next', async (importOriginal) => ({
+  ...await importOriginal<typeof import('react-i18next')>(),
+  useTranslation: (namespace = 'auth') => ({i18n, t: (key: string) => (namespace === 'auth' ? copy[key.replace(/^auth:/, '')] : undefined) ?? i18n.t(key, {ns: namespace})}),
 }));
 
 import LoginPage from './index';
@@ -97,7 +99,8 @@ describe('LoginPage branding and sign-in method', () => {
   it('shows the X-Learn hero while keeping email and password as the only sign-in method', () => {
     const {container} = renderLogin();
 
-    expect(container.querySelector('img[src="/icons/figma-auth/dashboard.png"]')).toBeInTheDocument();
+    expect(container.querySelector('aside')).toHaveTextContent('My IELTS goal');
+    expect(container.querySelector('img[src="/icons/figma-auth/dashboard.png"]')).not.toBeInTheDocument();
     expect(screen.getByRole('textbox', {name: 'Email'})).toBeInTheDocument();
     expect(screen.getByLabelText('Password')).toBeInTheDocument();
     expect(screen.queryByRole('button', {name: /google|microsoft|linkedin|facebook/i})).not.toBeInTheDocument();
@@ -168,7 +171,7 @@ describe('LoginPage account routing', () => {
       }));
     renderLogin();
     const user = userEvent.setup();
-    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('combobox')).toEqual([screen.getByRole('combobox', {name: 'Language'})]);
     await user.type(screen.getByRole('textbox', {name: 'Email'}), 'admin@example.com');
     await user.type(screen.getByLabelText('Password'), 'example-password');
 

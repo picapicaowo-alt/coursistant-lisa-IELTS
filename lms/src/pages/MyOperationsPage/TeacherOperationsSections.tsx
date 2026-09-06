@@ -1,3 +1,8 @@
+import { useTranslation } from 'react-i18next';
+import i18n from '@/i18n';
+import {formatClockTime, formatDateValue, formatNumber, formatWeekday} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
+import {parseInputDate} from '@/i18n/dateInput';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
 import {CollapsibleSection} from '@/components/CollapsibleSection';
 import {dashboardApiService} from '@/apis/services/dashboard-api';
@@ -57,9 +62,8 @@ const internalLinkFrom = (record: UnknownRecord): string | undefined => {
   return registeredDestination(destination) ?? undefined;
 };
 
-const humanize = (value?: string): string => value
-  ? value.replace(/_/g, ' ').toLowerCase().replace(/(^|\s)\S/g, letter => letter.toUpperCase())
-  : '';
+// Known contract codes are localized; authored titles and names retain their spelling.
+const humanize = (value?: string): string => value ? statusLabel(value) : '';
 
 const formatName = (record: {
   studentFirstName?: string;
@@ -68,24 +72,15 @@ const formatName = (record: {
   studentUserId: number;
 }): string => [record.studentFirstName, record.studentMiddleName, record.studentLastName]
   .filter(Boolean)
-  .join(' ') || `Student #${record.studentUserId}`;
+  .join(' ') || i18n.t('common:people.studentFallback', {id: formatNumber(record.studentUserId)});
 
 const formatDate = (value?: string): string | undefined => {
   if (!value) return undefined;
-  const dateOnly = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  const parsed = dateOnly
-    ? new Date(Number(dateOnly[1]), Number(dateOnly[2]) - 1, Number(dateOnly[3]))
-    : new Date(value);
-  if (Number.isNaN(parsed.getTime())) return value;
-  return new Intl.DateTimeFormat('en-US', {month: 'short', day: 'numeric', year: 'numeric'}).format(parsed);
+  return formatDateValue(value, {month: 'short', day: 'numeric', year: 'numeric', hour: undefined, minute: undefined});
 };
 
 const formatTime = (value?: string): string | undefined => {
-  const match = value?.match(/^(\d{2}):(\d{2})/);
-  if (!match) return value;
-  const hour = Number(match[1]);
-  const minute = match[2];
-  return `${hour % 12 || 12}:${minute} ${hour >= 12 ? 'PM' : 'AM'}`;
+  return value ? formatClockTime(value) : undefined;
 };
 
 const QueryState: React.FC<{
@@ -94,8 +89,9 @@ const QueryState: React.FC<{
   loading: boolean;
   onRetry: () => void;
 }> = ({empty, error, loading, onRetry}) => {
-  if (loading) return <p className={styles.empty} role="status">Loading…</p>;
-  if (error) return <div className={styles.inlineAlert} role="alert"><span>This section could not be loaded.</span><button type="button" onClick={onRetry}>Retry</button></div>;
+  const { t: translate } = useTranslation();
+  if (loading) return <p className={styles.empty} role="status">{translate("common:feedback.loading")}</p>;
+  if (error) return <div className={styles.inlineAlert} role="alert"><span>{translate("common:feedback.sectionFailed")}</span><button type="button" onClick={onRetry}>{translate("common:actions.retry")}</button></div>;
   return <p className={styles.empty}>{empty}</p>;
 };
 
@@ -104,19 +100,20 @@ const RecordRows: React.FC<{
   items: UnknownRecord[];
   kind: 'alert' | 'request';
 }> = ({empty, items, kind}) => {
+  const {t: translate} = useTranslation();
   if (items.length === 0) return <p className={styles.empty}>{empty}</p>;
   return <div className={styles.operationList}>{items.map((item, index) => {
     const destination = internalLinkFrom(item);
     const title = kind === 'alert'
-      ? textFrom(item, 'title', 'message', 'alertType', 'type') || 'Teaching alert'
-      : textFrom(item, 'title', 'requestType', 'type') || 'Schedule request';
+      ? humanize(textFrom(item, 'alertType', 'type')) || translate("operations:teacher.alert")
+      : textFrom(item, 'title', 'requestType', 'type') || translate("operations:teacher.request");
     const meta = [
       textFrom(item, 'courseCode', 'courseTitle'),
       humanize(textFrom(item, 'status', 'severity')),
       formatDate(textFrom(item, 'createdAt', 'requestedAt', 'occurrenceDate')),
     ].filter(Boolean).join(' · ');
-    const content = <><span><strong>{humanize(title)}</strong><small>{meta || (kind === 'alert' ? 'Review this teaching update' : 'Review request details')}</small></span>{destination ? <ChevronRight size={18} aria-hidden="true"/> : null}</>;
-    const key = idFrom(item, 'alertId', 'requestId', 'id') ?? `${kind}-${title}-${index}`;
+    const content = <><span><strong>{humanize(title)}</strong><small>{meta || (kind === 'alert' ? translate("operations:teacher.alertReview") : translate("operations:teacher.requestReview"))}</small></span>{destination ? <ChevronRight size={18} aria-hidden="true"/> : null}</>;
+    const key = idFrom(item, 'alertId', 'requestId', 'id') ?? `${kind}-${index}`;
     return destination
       ? <Link className={styles.operationRow} to={destination} key={key}>{content}</Link>
       : <article className={styles.operationRow} key={key}>{content}</article>;
@@ -124,6 +121,7 @@ const RecordRows: React.FC<{
 };
 
 const TeachingQueue: React.FC = () => {
+  const { t: translate } = useTranslation();
   const courses = useQuery({queryKey: ['me', 'teaching-courses'], queryFn: async () => unwrapData(await dashboardApiService.getTeachingCourses(), 'teachingCourses'), retry: false});
   const alerts = useQuery({queryKey: ['me', 'teaching-alerts'], queryFn: async () => unwrapData(await courseOperationsApiService.getMyTeachingAlerts(), 'myTeachingAlerts'), retry: false});
   const grading = useQuery({queryKey: ['me', 'teaching-grading-items'], queryFn: async () => unwrapData(await courseOperationsApiService.getMyTeachingGradingItems(), 'myTeachingGradingItems'), retry: false});
@@ -135,40 +133,40 @@ const TeachingQueue: React.FC = () => {
   const todayClasses = today.data ?? [];
 
   return <div className={styles.grid}>
-    <WorkspaceSection title="Today’s classes" headingId="today-classes-title" summary="Your live teaching schedule and class context." meta={<span className={styles.countBadge}>{todayClasses.length}</span>}>
+    <WorkspaceSection title={translate("operations:teacher.today")} headingId="today-classes-title" summary={translate("operations:teacher.todayHelp")} meta={<span className={styles.countBadge}>{today.isSuccess ? formatNumber(todayClasses.length) : '—'}</span>}>
 
-      {today.isPending || today.isError ? <QueryState loading={today.isPending} error={today.isError} empty="No classes today." onRetry={() => void today.refetch()}/> : todayClasses.length === 0 ? <p className={styles.empty}>No classes today.</p> : <div className={styles.operationList}>{todayClasses.map((item: TeachingTodayClassResponse) => <Link to={`/course/${item.courseId}`} className={styles.operationRow} key={item.occurrenceId ?? item.sessionId ?? `${item.courseId}-${item.startTime}`}><span><strong>{item.courseTitle || item.courseCode || `Course #${item.courseId}`}</strong><small>{[item.lectureNumber ? `Lecture ${item.lectureNumber}` : undefined, `${formatTime(item.startTime) ?? 'Time pending'}${item.endTime ? `–${formatTime(item.endTime)}` : ''}`, item.location, typeof item.studentCount === 'number' ? `${item.studentCount} students` : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>)}</div>}
+      {today.isPending || today.isError ? <QueryState loading={today.isPending} error={today.isError} empty={translate("operations:teacher.noClassesShort")} onRetry={() => void today.refetch()}/> : todayClasses.length === 0 ? <p className={styles.empty}>{translate("operations:teacher.noClassesShort")}</p> : <div className={styles.operationList}>{todayClasses.map((item: TeachingTodayClassResponse) => <Link to={`/course/${item.courseId}`} className={styles.operationRow} key={item.occurrenceId ?? item.sessionId ?? `${item.courseId}-${item.startTime}`}><span><strong>{item.courseTitle || item.courseCode || translate('assistant:courseFallback', {id: formatNumber(item.courseId)})}</strong><small>{[item.lectureNumber ? translate('operations:teacher.lecture', {number: formatNumber(item.lectureNumber)}) : undefined, `${formatTime(item.startTime) ?? translate("operations:teacher.timePending")}${item.endTime ? `–${formatTime(item.endTime)}` : ''}`, item.location, typeof item.studentCount === 'number' ? translate('operations:teacher.studentsCount', {count: item.studentCount, number: formatNumber(item.studentCount)}) : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>)}</div>}
     </WorkspaceSection>
 
-    <WorkspaceSection title="Grading queue" headingId="grading-title" summary="Submissions currently waiting for your review." meta={<span className={styles.countBadge}>{grading.isError ? 'Unavailable' : grading.isPending ? '…' : gradingItems.length}</span>}>
+    <WorkspaceSection title={translate("dashboard:gradingQueue")} headingId="grading-title" summary={translate("operations:teacher.queueHelp")} meta={<span className={styles.countBadge}>{grading.isError ? translate("course:learning.dataUnavailable") : grading.isPending ? '…' : formatNumber(gradingItems.length)}</span>}>
 
-      {grading.isPending || grading.isError ? <QueryState loading={grading.isPending} error={grading.isError} empty="Nothing is waiting for grading." onRetry={() => void grading.refetch()}/> : gradingItems.length === 0 ? <p className={styles.empty}>Nothing is waiting for grading.</p> : <div className={styles.operationList}>{gradingItems.map((item: TeachingGradingItemResponse) => {
+      {grading.isPending || grading.isError ? <QueryState loading={grading.isPending} error={grading.isError} empty={translate("operations:teacher.noGrading")} onRetry={() => void grading.refetch()}/> : gradingItems.length === 0 ? <p className={styles.empty}>{translate("operations:teacher.noGrading")}</p> : <div className={styles.operationList}>{gradingItems.map((item: TeachingGradingItemResponse) => {
         const destination = registeredDestination(item.gradingDeepLink) ?? assignmentGradingPath(item.courseId, item.assignmentId);
-        return <Link to={destination} className={styles.operationRow} key={`${item.assignmentId}-${item.groupId ?? item.studentUserId}`}><span><strong>{item.title}</strong><small>{[item.groupName || formatName(item), item.courseCode, humanize(item.status), item.dueAtUtc ? `Due ${formatDate(item.dueAtUtc)}` : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
+        return <Link to={destination} className={styles.operationRow} key={`${item.assignmentId}-${item.groupId ?? item.studentUserId}`}><span><strong>{item.title}</strong><small>{[item.groupName || formatName(item), item.courseCode, humanize(item.status), item.dueAtUtc ? translate('operations:teacher.due', {date: formatDate(item.dueAtUtc)}) : undefined].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
       })}</div>}
     </WorkspaceSection>
 
-    <WorkspaceSection title="Students needing support" headingId="support-title" summary="Signals that may need a timely teaching response." meta={<span className={styles.countBadge}>{supportStudents.length}</span>}>
+    <WorkspaceSection title={translate("operations:teacher.support")} headingId="support-title" summary={translate("operations:teacher.supportHelp")} meta={<span className={styles.countBadge}>{support.isSuccess ? formatNumber(supportStudents.length) : '—'}</span>}>
 
-      {support.isPending || support.isError ? <QueryState loading={support.isPending} error={support.isError} empty="No students currently need attention." onRetry={() => void support.refetch()}/> : supportStudents.length === 0 ? <p className={styles.empty}>No students currently need attention.</p> : <div className={styles.operationList}>{supportStudents.map((item: TeachingStudentSupportResponse) => {
+      {support.isPending || support.isError ? <QueryState loading={support.isPending} error={support.isError} empty={translate("advising:overview.noAttention")} onRetry={() => void support.refetch()}/> : supportStudents.length === 0 ? <p className={styles.empty}>{translate("advising:overview.noAttention")}</p> : <div className={styles.operationList}>{supportStudents.map((item: TeachingStudentSupportResponse) => {
         const destination = registeredDestination(item.deepLink) ?? `/course/${item.courseId}`;
         return <Link to={destination} className={styles.operationRow} key={`${item.courseId}-${item.studentUserId}`}><span><strong>{formatName(item)}</strong><small>{[item.courseTitle, ...(item.reasons ?? []).map(humanize)].filter(Boolean).join(' · ')}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>;
       })}</div>}
     </WorkspaceSection>
 
-    <WorkspaceSection title="Teaching alerts" headingId="alerts-title" summary="Course and learner signals that require attention.">
+    <WorkspaceSection title={translate("operations:teacher.alerts")} headingId="alerts-title" summary={translate("operations:teacher.alertsHelp")}>
 
-      {alerts.isPending || alerts.isError ? <QueryState loading={alerts.isPending} error={alerts.isError} empty="No teaching alerts." onRetry={() => void alerts.refetch()}/> : <RecordRows items={recordsFrom(alerts.data)} kind="alert" empty="No teaching alerts."/>}
+      {alerts.isPending || alerts.isError ? <QueryState loading={alerts.isPending} error={alerts.isError} empty={translate("operations:teacher.noAlertsShort")} onRetry={() => void alerts.refetch()}/> : <RecordRows items={recordsFrom(alerts.data)} kind="alert" empty={translate("operations:teacher.noAlertsShort")}/>}
     </WorkspaceSection>
 
-    <WorkspaceSection title="My teaching courses" className={styles.fullWidthCard}>
+    <WorkspaceSection title={translate("operations:teacher.courses")} className={styles.fullWidthCard}>
 
-      {courses.isPending || courses.isError ? <QueryState loading={courses.isPending} error={courses.isError} empty="No teaching courses." onRetry={() => void courses.refetch()}/> : !courses.data?.length ? <p className={styles.empty}>No teaching courses.</p> : <div className={styles.operationList}>{courses.data.map(course => <Link className={styles.operationRow} to={`/course/${course.id}`} key={course.id}><span><strong>{course.title}</strong><small>{course.courseCode}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>)}</div>}
+      {courses.isPending || courses.isError ? <QueryState loading={courses.isPending} error={courses.isError} empty={translate("operations:teacher.noCoursesShort")} onRetry={() => void courses.refetch()}/> : !courses.data?.length ? <p className={styles.empty}>{translate("operations:teacher.noCoursesShort")}</p> : <div className={styles.operationList}>{courses.data.map(course => <Link className={styles.operationRow} to={`/course/${course.id}`} key={course.id}><span><strong>{course.title}</strong><small>{course.courseCode}</small></span><ChevronRight size={18} aria-hidden="true"/></Link>)}</div>}
     </WorkspaceSection>
 
-    <WorkspaceSection title="Schedule requests" headingId="requests-title" className={styles.fullWidthCard} summary="Student schedule changes that need your review or awareness.">
+    <WorkspaceSection title={translate("operations:scheduleRequests")} headingId="requests-title" className={styles.fullWidthCard} summary={translate("operations:teacher.requestsHelp")}>
 
-      {requests.isPending || requests.isError ? <QueryState loading={requests.isPending} error={requests.isError} empty="No schedule requests." onRetry={() => void requests.refetch()}/> : <RecordRows items={recordsFrom(requests.data)} kind="request" empty="No schedule requests."/>}
+      {requests.isPending || requests.isError ? <QueryState loading={requests.isPending} error={requests.isError} empty={translate("learning:overview.noRequests")} onRetry={() => void requests.refetch()}/> : <RecordRows items={recordsFrom(requests.data)} kind="request" empty={translate("learning:overview.noRequests")}/>}
     </WorkspaceSection>
   </div>;
 };
@@ -181,6 +179,7 @@ const emptyWindow = (timezone: string): AvailabilityWindowRequest => ({
 });
 
 const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
+  const { t: translate } = useTranslation();
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const initialized = useRef(false);
@@ -204,15 +203,23 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
     setDraft(emptyWindow(timezone));
   }, [availability.data, timezone]);
 
-  const validationMessage = useMemo(() => {
-    if (!draft.dayOfWeek || !draft.startTime || !draft.endTime) return 'Choose a day, start time, and end time.';
-    if (draft.endTime <= draft.startTime) return 'End time must be later than start time.';
-    if (draft.effectiveFrom && draft.effectiveTo && draft.effectiveTo < draft.effectiveFrom) return 'Effective end date must be on or after the start date.';
-    return '';
+  const [dateInputError, setDateInputError] = useState(false);
+  const validationKey = useMemo(() => {
+    if (!draft.dayOfWeek || !draft.startTime || !draft.endTime) return 'operations:availability.required';
+    if (draft.endTime <= draft.startTime) return 'operations:invalidTime';
+    if (draft.effectiveFrom && draft.effectiveTo && draft.effectiveTo < draft.effectiveFrom) return 'operations:availability.invalidRange';
+    return null;
   }, [draft]);
 
-  const commitDraft = () => {
-    if (validationMessage) return;
+  const commitDraft = (form: HTMLFormElement) => {
+    // An incomplete optional date is not an instruction to clear the effective boundary.
+    const values = new FormData(form);
+    const invalidDate = ['effectiveFrom', 'effectiveTo'].some(name => {
+      const raw = String(values.get(name) ?? '').trim();
+      return raw !== '' && !parseInputDate(raw);
+    });
+    setDateInputError(invalidDate);
+    if (validationKey || invalidDate) return;
     const normalized = {...draft, timezone: draft.timezone || timezone};
     setWindows(current => selectedIndex == null
       ? [...current, normalized]
@@ -237,45 +244,45 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
     },
   });
 
-  if (availability.isPending) return <section className={styles.card}><p className={styles.empty} role="status">Loading availability…</p></section>;
-  if (availability.isError) return <section className={styles.card}><div className={styles.inlineAlert} role="alert"><span>Availability could not be loaded.</span><button type="button" onClick={() => void availability.refetch()}>Retry</button></div></section>;
+  if (availability.isPending) return <section className={styles.card}><p className={styles.empty} role="status">{translate("operations:availability.loading")}</p></section>;
+  if (availability.isError) return <section className={styles.card}><div className={styles.inlineAlert} role="alert"><span>{translate("operations:availability.loadFailed")}</span><button type="button" onClick={() => void availability.refetch()}>{translate("common:actions.retry")}</button></div></section>;
 
   const errorMessage = mutation.isError
     ? getApiErrorCode(mutation.error)?.includes('VERSION_CONFLICT')
-      ? 'Availability changed in another session. Reload the latest schedule before saving again.'
-      : getApiErrorMessage(mutation.error, 'Availability could not be saved. Your changes remain on this page.')
+      ? translate('operations:availability.conflict')
+      : getApiErrorMessage(mutation.error, translate('operations:availability.saveFailed'))
     : '';
 
   return <div className={styles.workspace}>
-    <WorkspaceSection title="Weekly availability" headingId="availability-title" summary="These windows tell advisors when you can teach. They do not create classes automatically." meta={<span className={styles.versionBadge}>Version {version ?? '—'}</span>}>
+    <WorkspaceSection title={translate("operations:availability.title")} headingId="availability-title" summary={translate("operations:availability.help")} meta={<span className={styles.versionBadge}>{translate('operations:availability.version', {number: version == null ? '—' : formatNumber(version)})}</span>}>
 
-      {windows.length === 0 ? <div className={styles.emptyPanel}><strong>No weekly availability yet</strong><span>Add your first teaching window below.</span></div> : <div className={styles.availabilityList}>{windows.map((item, index) => <article className={styles.availabilityRow} key={`${item.dayOfWeek}-${item.startTime}-${item.effectiveFrom ?? 'ongoing'}-${index}`}>
+      {windows.length === 0 ? <div className={styles.emptyPanel}><strong>{translate("operations:availability.empty")}</strong><span>{translate("operations:availability.emptyHelp")}</span></div> : <div className={styles.availabilityList}>{windows.map((item, index) => <article className={styles.availabilityRow} key={`${item.dayOfWeek}-${item.startTime}-${item.effectiveFrom ?? 'ongoing'}-${index}`}>
         <span className={styles.availabilityIcon}><CalendarClock size={19} aria-hidden="true"/></span>
-        <span><strong>{humanize(item.dayOfWeek)}</strong><small>{formatTime(item.startTime)}–{formatTime(item.endTime)}</small><small>{item.effectiveFrom || item.effectiveTo ? `${formatDate(item.effectiveFrom) ?? 'Now'}–${formatDate(item.effectiveTo) ?? 'Ongoing'}` : 'Ongoing'} · {item.timezone || timezone}</small></span>
-        <span className={styles.rowActions}><button type="button" onClick={() => { setEditorReveal(current => current + 1); setSelectedIndex(index); setDraft({...item}); setSaved(false); }}><Pencil size={16} aria-hidden="true"/> Edit</button><button type="button" className={styles.textDanger} onClick={() => { setWindows(current => current.filter((_, itemIndex) => itemIndex !== index)); if (selectedIndex === index) { setSelectedIndex(null); setDraft(emptyWindow(timezone)); } setSaved(false); }}><Trash2 size={16} aria-hidden="true"/> Remove</button></span>
+        <span><strong>{formatWeekday(item.dayOfWeek ?? '', 'long')}</strong><small>{formatTime(item.startTime)}–{formatTime(item.endTime)}</small><small>{item.effectiveFrom || item.effectiveTo ? `${formatDate(item.effectiveFrom) ?? translate("operations:availability.now")}–${formatDate(item.effectiveTo) ?? translate("operations:availability.ongoing")}` : translate("operations:availability.ongoing")} · {item.timezone || timezone}</small></span>
+        <span className={styles.rowActions}><button type="button" onClick={() => { setEditorReveal(current => current + 1); setDateInputError(false); setSelectedIndex(index); setDraft({...item}); setSaved(false); }}><Pencil size={16} aria-hidden="true"/> {translate("common:actions.edit")}</button><button type="button" className={styles.textDanger} onClick={() => { setWindows(current => current.filter((_, itemIndex) => itemIndex !== index)); if (selectedIndex === index) { setSelectedIndex(null); setDraft(emptyWindow(timezone)); setDateInputError(false); } else if (selectedIndex != null && selectedIndex > index) { setSelectedIndex(selectedIndex - 1); } setSaved(false); }}><Trash2 size={16} aria-hidden="true"/> {translate("common:actions.remove")}</button></span>
       </article>)}</div>}
-      {exceptions.length > 0 ? <div className={styles.exceptionNotice}><strong>{exceptions.length} date exception{exceptions.length === 1 ? '' : 's'} will be preserved</strong><span>Your date exceptions stay unchanged when you save weekly hours.</span></div> : null}
+      {exceptions.length > 0 ? <div className={styles.exceptionNotice}><strong>{translate('operations:availability.exceptions', {count: exceptions.length, number: formatNumber(exceptions.length)})}</strong><span>{translate("operations:availability.exceptionsHelp")}</span></div> : null}
     </WorkspaceSection>
 
-    <CollapsibleSection title={selectedIndex == null ? 'Add teaching window' : 'Edit teaching window'} headingId="availability-editor-title" revealKey={editorReveal} summary="Set a recurring day and the dates when this window applies.">
+    <CollapsibleSection title={selectedIndex == null ? translate("operations:availability.addTitle") : translate("operations:availability.editTitle")} headingId="availability-editor-title" revealKey={editorReveal} summary={translate("operations:availability.editorHelp")}>
 
-      <form className={styles.form} onSubmit={event => { event.preventDefault(); commitDraft(); }}>
-        <label>Day<select value={draft.dayOfWeek} onChange={event => setDraft(current => ({...current, dayOfWeek: event.target.value}))}>{WEEKDAYS.map(day => <option key={day}>{day}</option>)}</select></label>
-        <label>Start time<EnglishTimeInput required value={draft.startTime ?? ''} onChangeValue={startTime => setDraft(current => ({...current, startTime}))}/></label>
-        <label>End time<EnglishTimeInput required value={draft.endTime ?? ''} onChangeValue={endTime => setDraft(current => ({...current, endTime}))}/></label>
-        <label>Effective from<EnglishDateInput value={draft.effectiveFrom ?? ''} onChangeValue={effectiveFrom => setDraft(current => ({...current, effectiveFrom: effectiveFrom || undefined}))}/></label>
-        <label>Effective to<EnglishDateInput value={draft.effectiveTo ?? ''} onChangeValue={effectiveTo => setDraft(current => ({...current, effectiveTo: effectiveTo || undefined}))}/></label>
-        {validationMessage ? <p className={styles.formMessage} role="alert">{validationMessage}</p> : null}
-        <div className={styles.actions}><button className={styles.secondary} disabled={Boolean(validationMessage)}>{selectedIndex == null ? <><Plus size={17} aria-hidden="true"/> Add window</> : 'Apply changes'}</button>{selectedIndex != null ? <button type="button" className={styles.secondary} onClick={() => { setSelectedIndex(null); setDraft(emptyWindow(timezone)); }}>Cancel edit</button> : null}</div>
+      <form noValidate className={styles.form} onSubmit={event => { event.preventDefault(); commitDraft(event.currentTarget); }}>
+        <label>{translate("course:scheduleModal.dayLabel")}<select value={draft.dayOfWeek} onChange={event => setDraft(current => ({...current, dayOfWeek: event.target.value}))}>{WEEKDAYS.map(day => <option key={day} value={day}>{formatWeekday(day, 'long')}</option>)}</select></label>
+        <label>{translate("auth:preview.startTime")}<EnglishTimeInput name="startTime" aria-label={translate("auth:preview.startTime")} required value={draft.startTime ?? ''} onChangeValue={startTime => setDraft(current => ({...current, startTime}))}/></label>
+        <label>{translate("operations:endTime")}<EnglishTimeInput name="endTime" aria-label={translate("operations:endTime")} required value={draft.endTime ?? ''} onChangeValue={endTime => setDraft(current => ({...current, endTime}))}/></label>
+        <label>{translate("operations:availability.effectiveFrom")}<EnglishDateInput name="effectiveFrom" aria-label={translate("operations:availability.effectiveFrom")} value={draft.effectiveFrom ?? ''} onChangeValue={effectiveFrom => setDraft(current => ({...current, effectiveFrom: effectiveFrom || undefined}))}/></label>
+        <label>{translate("operations:availability.effectiveTo")}<EnglishDateInput name="effectiveTo" aria-label={translate("operations:availability.effectiveTo")} value={draft.effectiveTo ?? ''} onChangeValue={effectiveTo => setDraft(current => ({...current, effectiveTo: effectiveTo || undefined}))}/></label>
+        {validationKey || dateInputError ? <p className={styles.formMessage} role="alert">{translate(validationKey ?? "operations:availability.invalidDate")}</p> : null}
+        <div className={styles.actions}><button className={styles.secondary} disabled={Boolean(validationKey)}>{selectedIndex == null ? <><Plus size={17} aria-hidden="true"/> {' '}{translate("operations:availability.add")}</> : translate("operations:availability.apply")}</button>{selectedIndex != null ? <button type="button" className={styles.secondary} onClick={() => { setSelectedIndex(null); setDraft(emptyWindow(timezone)); setDateInputError(false); }}>{translate("operations:availability.cancel")}</button> : null}</div>
       </form>
     </CollapsibleSection>
       <div className={styles.saveBar}>
-        <span>{windows.length} window{windows.length === 1 ? '' : 's'} ready to save</span>
-        <button type="button" className={styles.primary} disabled={reloadRequired || mutation.isPending || version == null} onClick={() => mutation.mutate()}>{mutation.isPending ? 'Saving…' : 'Save all availability'}</button>
+        <span>{translate('operations:availability.ready', {count: windows.length, number: formatNumber(windows.length)})}</span>
+        <button type="button" className={styles.primary} disabled={reloadRequired || mutation.isPending || version == null} onClick={() => mutation.mutate()}>{mutation.isPending ? translate("common:actions.saving") : translate("operations:availability.save")}</button>
       </div>
-      {version == null ? <p className={styles.formMessage} role="alert">Reload your availability before saving changes.</p> : null}
-      {saved ? <p className={styles.successMessage} role="status">Availability saved.</p> : null}
-      {errorMessage ? <div className={styles.inlineAlert} role="alert"><span>{errorMessage}</span>{reloadRequired ? <button type="button" onClick={() => void availability.refetch().then(result => {if (result.data && !result.isError) {setVersion(result.data.version ?? result.data.availabilityVersion ?? null); setReloadRequired(false); mutation.reset();}})}>Reload latest</button> : null}</div> : null}
+      {version == null ? <p className={styles.formMessage} role="alert">{translate("operations:availability.reloadRequired")}</p> : null}
+      {saved ? <p className={styles.successMessage} role="status">{translate("operations:availability.saved")}</p> : null}
+      {errorMessage ? <div className={styles.inlineAlert} role="alert"><span>{errorMessage}</span>{reloadRequired ? <button type="button" onClick={() => void availability.refetch().then(result => {if (result.data && !result.isError) {setVersion(result.data.version ?? result.data.availabilityVersion ?? null); setReloadRequired(false); mutation.reset();}})}>{translate("operations:availability.reload")}</button> : null}</div> : null}
   </div>;
 };
 

@@ -1,13 +1,17 @@
-import {useEffect, useId, useRef, useState} from 'react';
+import {useTranslation} from 'react-i18next';
+import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
+import {useEffect, useId, useMemo, useRef, useState} from 'react';
+import {formatNumber} from '@/i18n/formatting';
 import {useQueryClient} from '@tanstack/react-query';
 import {FileJson, FileUp, X} from 'lucide-react';
-import {unwrapData} from '@/apis';
+import {unwrapData, type MockExamMediaRead} from '@/apis';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {getApiErrorMessage} from '@/utils/apiError';
 import {formatFileSize} from '@/utils/file-utils';
 import {
   draftContent,
   newDraft,
+  unitName,
   tenantContentWriteKey,
   type SectionDraft,
 } from './model';
@@ -23,6 +27,12 @@ import styles from './authoring.module.scss';
 import mediaStyles from './tenant.module.scss';
 import modal from './ReadingImport.module.scss';
 
+type ImportFailure =
+  | {type: 'message'; key: string}
+  | {type: 'json'; raw: string}
+  | {type: 'media'; draft: SectionDraft; media: MockExamMediaRead[]}
+  | {type: 'request'; error: unknown};
+
 export function ReadingImport({
   templateId,
   versionId,
@@ -36,6 +46,7 @@ export function ReadingImport({
   disabled: boolean;
   onApply: (draft: SectionDraft) => void;
 }) {
+  const {t: translate} = useTranslation();
   const panelId = useId();
   const dialog = useRef<HTMLDialogElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -45,6 +56,7 @@ export function ReadingImport({
   const latestDraft = useRef(draft);
   latestDraft.current = draft;
   const [open, setOpen] = useState(false);
+  const confirmation = useConfirmationDialog(`${templateId}/${versionId}/${open}`);
   const [mode, setMode] = useState<'upload' | 'paste'>('upload');
   const [raw, setRaw] = useState('');
   const [file, setFile] = useState<{
@@ -54,15 +66,24 @@ export function ReadingImport({
   }>();
   const [dragging, setDragging] = useState(false);
   const [candidate, setCandidate] = useState<SectionDraft>();
-  const [errors, setErrors] = useState<string[]>([]);
+  const [failure, setFailure] = useState<ImportFailure | null>(null);
   const [working, setWorking] = useState(false);
   const [message, setMessage] = useState('');
+  // Keep the accepted candidate and API result fixed. Re-resolve only diagnostic
+  // copy when the interface locale changes; never re-fetch media or apply data.
+  const errors = useMemo(() => {
+    if (!failure) return [];
+    if (failure.type === 'message') return [translate(failure.key)];
+    if (failure.type === 'json') return parseReadingImport(failure.raw).errors;
+    if (failure.type === 'media') return readingImportMediaErrors(failure.draft, failure.media);
+    return [getApiErrorMessage(failure.error, translate('exams:import.imageFailed'))];
+  }, [failure, translate]);
   const importText = mode === 'upload' ? (file?.content ?? '') : raw;
   useEffect(() => {
     // Keep the validation result visible above the fixed mobile action bar.
-    if (candidate || errors.length)
+    if (candidate || failure)
       feedback.current?.scrollIntoView({block: 'nearest'});
-  }, [candidate, errors]);
+  }, [candidate, failure]);
   useEffect(() => {
     if (!open) return;
     const element = dialog.current;
@@ -88,7 +109,7 @@ export function ReadingImport({
   const resetValidation = () => {
     generation.current += 1;
     setCandidate(undefined);
-    setErrors([]);
+    setFailure(null);
     setMessage('');
   };
   const changeRaw = (value: string) => {
@@ -111,9 +132,7 @@ export function ReadingImport({
       !file.name.toLowerCase().endsWith('.json') ||
       file.size > READING_IMPORT_MAX_BYTES
     ) {
-      setErrors([
-        'Choose a .json file up to 2 MB. The file stays in your browser until you confirm the section save.',
-      ]);
+      setFailure({type: 'message', key: 'exams:import.fileRule'});
       return;
     }
     const request = ++generation.current;
@@ -123,14 +142,12 @@ export function ReadingImport({
       if (generation.current === request) {
         setFile({name: file.name, size: file.size, content});
         setMessage(
-          'File loaded locally. Validate it before loading the editor.',
+          'exams:import.fileLoaded',
         );
       }
     } catch {
       if (generation.current === request)
-        setErrors([
-          'The file could not be read. Choose it again or paste the JSON.',
-        ]);
+        setFailure({type: 'message', key: 'exams:import.fileFailed'});
     } finally {
       if (generation.current === request) setWorking(false);
     }
@@ -138,16 +155,16 @@ export function ReadingImport({
   const apply = async () => {
     if (!candidate || disabled || working) return;
     const approvedDraft = draftContent(draft);
+    const approvalGeneration = generation.current;
     if (
       draftContent(draft) !== draftContent(newDraft()) &&
-      !window.confirm(
-        'Replace this unsaved Reading draft with the imported content? Other sections and uploaded files will not be changed.',
-      )
+      !await confirmation.confirm({titleKey: 'exams:import.title', messageKey: 'exams:import.replaceConfirm'})
     )
       return;
+    if (generation.current !== approvalGeneration) return;
     const request = ++generation.current;
     setWorking(true);
-    setErrors([]);
+    setFailure(null);
     try {
       // Resolve references in the active version just before replacing the draft.
       // Neither file selection nor validation sends content to the backend.
@@ -168,15 +185,13 @@ export function ReadingImport({
         const mediaErrors = readingImportMediaErrors(candidate, media);
         if (generation.current !== request) return;
         if (mediaErrors.length) {
-          setErrors(mediaErrors);
+          setFailure({type: 'media', draft: candidate, media});
           return;
         }
       }
       if (generation.current !== request) return;
       if (draftContent(latestDraft.current) !== approvedDraft) {
-        setErrors([
-          'The Reading draft changed while images were being checked. Your edits are preserved; review the import and load it again.',
-        ]);
+        setFailure({type: 'message', key: 'exams:import.draftChanged'});
         return;
       }
       if (
@@ -184,9 +199,7 @@ export function ReadingImport({
           mutationKey: tenantContentWriteKey(templateId, versionId),
         })
       ) {
-        setErrors([
-          'Wait for the current content operation to finish, then load the draft again.',
-        ]);
+        setFailure({type: 'message', key: 'exams:import.contentBusy'});
         return;
       }
       onApply(candidate);
@@ -195,22 +208,18 @@ export function ReadingImport({
       setFile(undefined);
       setCandidate(undefined);
       setMessage(
-        'Reading imported into this browser draft. You can edit it now. Use Review & save, then confirm, to save the complete section to the server.',
+        'exams:import.imported',
       );
     } catch (error) {
       if (generation.current === request)
-        setErrors([
-          getApiErrorMessage(
-            error,
-            'Image references could not be verified. Your existing draft is unchanged. Try again.',
-          ),
-        ]);
+        setFailure({type: 'request', error});
     } finally {
       if (generation.current === request) setWorking(false);
     }
   };
   return (
     <div className={styles.importTools}>
+      {confirmation.dialog}
       <button
         type="button"
         className={ui.secondaryButton}
@@ -218,11 +227,10 @@ export function ReadingImport({
         aria-haspopup="dialog"
         onClick={() => setOpen(true)}
       >
-        <FileJson size={18} /> Import Reading JSON
-      </button>
+        <FileJson size={18} /> {' '}{translate("exams:import.title")}</button>
       {message && !open ? (
         <p role="status" className={ui.hint}>
-          {message}
+          {translate(message)}
         </p>
       ) : null}
       {open ? (
@@ -239,16 +247,14 @@ export function ReadingImport({
         >
           <header className={modal.header}>
             <div>
-              <h2 id={`${panelId}-title`}>Import Reading JSON</h2>
+              <h2 id={`${panelId}-title`}>{translate("exams:import.title")}</h2>
               <p id={`${panelId}-description`}>
-                Import all passages and question groups. You can review and edit
-                them before saving.
-              </p>
+                {translate("exams:import.help")}</p>
             </div>
             <button
               type="button"
               className={modal.close}
-              aria-label="Close JSON import"
+              aria-label={translate("exams:import.close")}
               onClick={close}
             >
               <X size={20} />
@@ -258,7 +264,7 @@ export function ReadingImport({
             <div
               className={modal.modes}
               role="group"
-              aria-label="JSON import method"
+              aria-label={translate("exams:import.method")}
             >
               {(['upload', 'paste'] as const).map((method) => (
                 <button
@@ -271,7 +277,7 @@ export function ReadingImport({
                     setMode(method);
                   }}
                 >
-                  {method === 'upload' ? 'Upload file' : 'Paste JSON'}
+                  {method === 'upload' ? translate("exams:import.upload") : translate("exams:import.paste")}
                 </button>
               ))}
             </div>
@@ -280,7 +286,7 @@ export function ReadingImport({
                 <div
                   className={`${mediaStyles.dropzone} ${modal.dropzone}`}
                   data-dragging={dragging}
-                  aria-label="Reading JSON upload area"
+                  aria-label={translate("exams:import.uploadArea")}
                   onDragOver={(event) => {
                     event.preventDefault();
                     if (!disabled && !working) setDragging(true);
@@ -298,9 +304,7 @@ export function ReadingImport({
                     if (disabled || working) return;
                     if (event.dataTransfer.files.length !== 1) {
                       resetValidation();
-                      setErrors([
-                        'Choose one JSON file containing the complete Reading section.',
-                      ]);
+                      setFailure({type: 'message', key: 'exams:import.oneFile'});
                       return;
                     }
                     void readFile(event.dataTransfer.files[0]);
@@ -309,18 +313,18 @@ export function ReadingImport({
                   <FileUp size={32} aria-hidden="true" />
                   <strong>
                     {working && !candidate
-                      ? 'Reading your file…'
-                      : 'Drag & drop a JSON file'}
+                      ? translate("exams:import.readingFile")
+                      : translate("exams:import.drop")}
                   </strong>
                   <small>
-                    JSON · up to {formatFileSize(READING_IMPORT_MAX_BYTES)}
+                    {translate('exams:import.maxSize', {size: formatFileSize(READING_IMPORT_MAX_BYTES)})}
                   </small>
                   <input
                     ref={fileInput}
                     type="file"
                     className={ui.srOnly}
                     tabIndex={-1}
-                    aria-label="Reading JSON file · up to 2 MB"
+                    aria-label={translate("exams:import.fileLabel")}
                     accept=".json,application/json"
                     disabled={disabled || working}
                     onChange={(event) => {
@@ -335,7 +339,7 @@ export function ReadingImport({
                     disabled={disabled || working}
                     onClick={() => fileInput.current?.click()}
                   >
-                    {file ? 'Change file' : 'Choose file'}
+                    {translate(file ? 'exams:media.change' : 'exams:media.chooseFile')}
                   </button>
                 </div>
                 {file ? (
@@ -344,7 +348,7 @@ export function ReadingImport({
                     <div>
                       <strong>{file.name}</strong>
                       <small>
-                        {formatFileSize(file.size)} · Loaded locally
+                        {translate('exams:import.loadedSize', {size: formatFileSize(file.size)})}
                       </small>
                     </div>
                     <button
@@ -356,14 +360,13 @@ export function ReadingImport({
                         setFile(undefined);
                       }}
                     >
-                      Remove file
-                    </button>
+                      {translate("exams:import.removeFile")}</button>
                   </div>
                 ) : null}
               </div>
             ) : (
               <label>
-                <span>Or paste complete Reading JSON</span>
+                <span>{translate("exams:import.pasteLabel")}</span>
                 <textarea
                   className={styles.code}
                   rows={10}
@@ -376,24 +379,20 @@ export function ReadingImport({
             )}
             {message ? (
               <p role="status" className={ui.hint}>
-                {message}
+                {translate(message)}
               </p>
             ) : null}
             <details className={styles.advanced}>
-              <summary>View example JSON format</summary>
+              <summary>{translate("exams:import.example")}</summary>
               <p className={ui.hint}>
-                Illustrative content only. Use the existing Reading API body,
-                without template IDs or a response wrapper. Custom payload and
-                paragraph data are preserved. Imported sequence values are
-                retained.
-              </p>
+                {translate("exams:import.exampleHelp")}</p>
               <pre className={styles.importExample}>
                 {JSON.stringify(READING_IMPORT_EXAMPLE, null, 2)}
               </pre>
             </details>
             {errors.length ? (
               <div ref={feedback} role="alert" className={styles.notice}>
-                <strong>Nothing has been imported. Check these items:</strong>
+                <strong>{translate("exams:import.checkItems")}</strong>
                 <ul>
                   {errors.map((error, index) => (
                     <li key={index}>{error}</li>
@@ -408,14 +407,13 @@ export function ReadingImport({
                 className={styles.importSummary}
               >
                 <strong>
-                  Ready to load · {candidate.minutes} minutes ·{' '}
-                  {candidate.units.length} passages
+                  {translate('exams:import.readySummary', {duration: translate('assessment:attempt.duration', {count: Number(candidate.minutes), number: formatNumber(Number(candidate.minutes))}), passages: translate('exams:import.passageCount', {count: candidate.units.length, number: formatNumber(candidate.units.length)})})}
                 </strong>
                 <ul>
-                  {candidate.units.map((unit) => (
+                  {candidate.units.map((unit, index) => (
                     <li key={unit.draftId}>
-                      {unit.label || `Passage ${unit.seq}`} ·{' '}
-                      {unit.questions.length} question groups
+                      {unitName('reading', unit, (unit.seq ?? index + 1) - 1)} ·{' '}
+                      {translate('exams:import.groupCount', {count: unit.questions.length, number: formatNumber(unit.questions.length)})}
                     </li>
                   ))}
                 </ul>
@@ -426,45 +424,35 @@ export function ReadingImport({
                   ),
                 ) ? (
                   <p>
-                    Some custom types use Advanced data. Their payload is
-                    preserved; confirm compatibility and scoring with your
-                    content team.
-                  </p>
+                    {translate("exams:import.customTypes")}</p>
                 ) : null}
                 <p>
-                  Loading replaces only the current Reading draft. Uploaded
-                  files and other sections remain unchanged. Preview and confirm
-                  the final section before saving.
-                </p>
+                  {translate("exams:import.replaceHelp")}</p>
               </div>
             ) : null}
           </div>
           <footer className={modal.footer}>
             <p>
-              Nothing is saved to the server until you review and confirm the
-              complete section.
-            </p>
+              {translate("exams:import.saveHelp")}</p>
             <div className={modal.actions}>
               <button
                 type="button"
                 className={ui.secondaryButton}
                 onClick={close}
               >
-                Cancel import
-              </button>
+                {translate("exams:import.cancel")}</button>
               <button
                 type="button"
                 className={candidate ? ui.secondaryButton : ui.primaryButton}
                 disabled={disabled || working || !importText.trim()}
                 onClick={() => {
                   const result = parseReadingImport(importText);
-                  setErrors(result.errors);
+                  setFailure(result.errors.length ? {type: 'json', raw: importText} : null);
                   setCandidate(result.draft);
                   setMessage('');
                 }}
               >
-                Validate JSON
-              </button>
+                {translate("exams:import.validate")}</button>
               {candidate ? (
                 <button
                   type="button"
@@ -472,7 +460,7 @@ export function ReadingImport({
                   disabled={disabled || working}
                   onClick={() => void apply()}
                 >
-                  {working ? 'Checking image references…' : 'Load into editor'}
+                  {working ? translate("exams:import.checkingImages") : translate("exams:import.load")}
                 </button>
               ) : null}
             </div>

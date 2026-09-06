@@ -1,8 +1,5 @@
+import { useTranslation } from 'react-i18next';
 import React from 'react';
-import {useTranslation} from 'react-i18next';
-import {SystemWorkspace} from './SystemWorkspace';
-import {TeachingState} from '@/components/TeachingWorkspace';
-import systemStyles from './system.module.scss';
 import {useQuery} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
 import {useRequiredAuth} from '@/contexts/RequiredAuthContext';
@@ -10,13 +7,16 @@ import {mockExamApiService} from '@/apis/services/mock-exam-api';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import {StudentMockExamLibrary} from './StudentMockExamLibrary';
 import {AdvisorWorkspace, InstructorWorkspace} from './StaffMockExamWorkspaces';
+import {SystemWorkspace} from './SystemWorkspace';
+import {TeachingState} from '@/components/TeachingWorkspace';
+import systemStyles from './system.module.scss';
 import {TenantWorkspace} from './tenant/TenantWorkspace';
 import studentStyles from './index.module.scss';
 import styles from '../advising/advising.module.scss';
 
 const MockExamsPage: React.FC = () => {
+  const { t: translate } = useTranslation();
   const {user} = useRequiredAuth();
-  const {t} = useTranslation();
 
   const mode = user.role === 'SYSTEM_ADMIN'
     ? 'system'
@@ -43,20 +43,20 @@ const MockExamsPage: React.FC = () => {
     },
   });
 
-  if (mode === 'system') return data.data !== undefined ? <SystemWorkspace value={data.data}/> : <main className={systemStyles.page}><header className={systemStyles.header}><h1>{t('common:admin.examTitle')}</h1></header><TeachingState loading={data.isPending} error={data.error} onRetry={() => void data.refetch()}/></main>;
+  if (mode === 'system') return data.data !== undefined ? <SystemWorkspace value={data.data}/> : <main className={systemStyles.page}><header className={systemStyles.header}><h1>{translate('common:admin.examTitle')}</h1></header><TeachingState loading={data.isPending} error={data.error} onRetry={() => void data.refetch()}/></main>;
 
   if (mode === 'student') {
     return (
       <main className={studentStyles.studentPage}>
         <header className={studentStyles.masthead}>
           <div className={studentStyles.intro}>
-            <h1>Exams</h1>
-            <p>Choose an assigned paper to practise Listening, Reading or Writing.</p>
+            <h1>{translate("navigation:exams")}</h1>
+            <p>{translate("exams:staff.studentHelp")}</p>
           </div>
         </header>
 
-        {data.isPending ? <p className={styles.status} role="status">Loading assigned papers…</p> : null}
-        {data.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(data.error, 'Mock-exam data could not be loaded.')}</p> : null}
+        {data.isPending ? <p className={styles.status} role="status">{translate("exams:staff.loadingAssigned")}</p> : null}
+        {data.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(data.error, translate('exams:staff.loadFailed'))}</p> : null}
         {data.data !== undefined ? <StudentMockExamLibrary value={data.data}/> : null}
       </main>
     );
@@ -73,15 +73,15 @@ const MockExamsPage: React.FC = () => {
     <main className={styles.page}>
       <header className={styles.header}>
         <div>
-          <p className={styles.eyebrow}>Assessment</p>
-          <h1>Mock exams</h1>
-          <p className={styles.lede}>IELTS mock-exam tools available for your account.</p>
+          <p className={styles.eyebrow}>{translate("exams:staff.assessment")}</p>
+          <h1>{translate("navigation:mockExams")}</h1>
+          <p className={styles.lede}>{translate("exams:staff.accountHelp")}</p>
         </div>
       </header>
 
-      {mode === 'unsupported' ? <p className={styles.status}>Mock-exam operations are not available for this account type.</p> : null}
-      {data.isPending ? <p className={styles.status}>Loading…</p> : null}
-      {data.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(data.error, 'Mock-exam data could not be loaded.')}</p> : null}
+      {mode === 'unsupported' ? <p className={styles.status}>{translate("exams:staff.unsupported")}</p> : null}
+      {data.isPending ? <p className={styles.status}>{translate("common:feedback.loading")}</p> : null}
+      {data.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(data.error, translate('exams:staff.loadFailed'))}</p> : null}
     </main>
   );
 };

@@ -3,6 +3,7 @@ import {render, screen} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
+import i18n from '@/i18n';
 
 const mocks = vi.hoisted(() => ({
   register: vi.fn(),
@@ -86,9 +87,12 @@ const copy: Record<string, string> = {
   'login.showPassword': 'Show password',
 };
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
+vi.mock('react-i18next', async (importOriginal) => ({
+  ...await importOriginal<typeof import('react-i18next')>(),
+  useTranslation: (namespace = 'auth') => ({
+    i18n,
     t: (key: string, variables?: {time?: string}) => {
+      if (namespace !== 'auth') return i18n.t(key, {ns: namespace});
       const value = copy[key] ?? key;
       return variables?.time ? value.replace('{{time}}', variables.time) : value;
     },

@@ -8,6 +8,7 @@ import {
   AdvisorStudyPlanResponse,
   AdvisorTaskFeedbackRequest,
   AdvisorTaskResponse,
+  AdvisorTaskSubmissionFileResponse,
   AdvisorActionTaskResponse,
   ActionTaskMutationRequest,
   AdvisingOpenApiRead,
@@ -160,6 +161,20 @@ export class AdvisorApiService {
 
   completeOwnAdvisorTask(taskId: number, request: CompleteAdvisorTaskRequest, idempotencyKey: string = crypto.randomUUID()): Promise<ApiResponse<AdvisorTaskResponse>> {
     return this.apiClient.post(`/v2/student/study-plan/tasks/${taskId}/complete`, request, idempotent(idempotencyKey));
+  }
+
+  uploadOwnTaskSubmission(taskId: number, expectedVersion: number, file: File): Promise<ApiResponse<AdvisorTaskSubmissionFileResponse>> {
+    const form = new FormData();
+    form.append('file', file);
+    return this.apiClient.put(`/v2/student/study-plan/tasks/${taskId}/submission-file`, form, {params: {expectedVersion}});
+  }
+
+  async getTaskSubmissionFile(studentUserId: number, taskId: number, action: 'preview' | 'download'): Promise<Blob> {
+    const response = await this.apiClient.getClient().get<Blob>(
+      `/v2/advisor/students/${studentUserId}/study-plan/tasks/${taskId}/submission-file/${action}`,
+      {responseType: 'blob'},
+    );
+    return response.data;
   }
 
   listStudentCourses(studentUserId: number): Promise<ApiResponse<AdvisorStudentCourseResponse[]>> {

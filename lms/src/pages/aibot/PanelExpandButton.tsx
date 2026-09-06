@@ -1,4 +1,5 @@
 import {Maximize2, Minimize2} from 'lucide-react';
+import {useTranslation} from 'react-i18next';
 import styles from './index.module.scss';
 
 interface PanelExpandButtonProps {
@@ -12,7 +13,8 @@ const PanelExpandButton = ({
   panelName,
   onToggle,
 }: PanelExpandButtonProps) => {
-  const actionLabel = isExpanded ? `Exit ${panelName} full view` : `Expand ${panelName}`;
+  const {t} = useTranslation();
+  const actionLabel = t(isExpanded ? 'assistant:workflow.exitExpanded' : 'assistant:workflow.expand', {panel: panelName});
 
   return (
     <button

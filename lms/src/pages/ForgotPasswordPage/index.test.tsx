@@ -3,6 +3,8 @@ import userEvent from '@testing-library/user-event';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import '@testing-library/jest-dom';
+import i18n from '@/i18n';
+import type {TOptions} from 'i18next';
 
 const authApi = vi.hoisted(() => ({
   sendPasswordResetVerification: vi.fn(),
@@ -46,9 +48,11 @@ const copy: Record<string, string> = {
   'login.hidePassword': 'Hide password',
 };
 
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => copy[key] ?? key,
+vi.mock('react-i18next', async (importOriginal) => ({
+  ...await importOriginal<typeof import('react-i18next')>(),
+  useTranslation: (namespace = 'auth') => ({
+    i18n,
+    t: (key: string, options?: TOptions) => (namespace === 'auth' ? copy[key.replace(/^auth:/, '')] : undefined) ?? i18n.t(key, {...options, ns: namespace}),
   }),
 }));
 

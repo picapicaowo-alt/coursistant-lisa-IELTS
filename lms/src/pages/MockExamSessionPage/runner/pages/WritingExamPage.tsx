@@ -1,4 +1,7 @@
+import { useTranslation } from 'react-i18next';
+import {formatDateTime, formatNumber} from '@/i18n/formatting';
 import {getApiErrorMessage} from '@/utils/apiError';
+import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
 import {ExamSubmissionDialog} from '../components/ExamSubmissionDialog';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { submitWriting, writingTaskImageUrl } from '../api/writings'
@@ -16,10 +19,12 @@ type WritingExamPageProps = {
 }
 
 function formatClock(date: Date): string {
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })
+  return formatDateTime(date, { hour: '2-digit', minute: '2-digit', hour12: false })
 }
 
 export function WritingExamPage({ writing, testId, testTitle, candidateLabel, onExit }: WritingExamPageProps) {
+  const { t: translate } = useTranslation();
+  const {confirm, dialog: exitDialog} = useConfirmationDialog();
   const tasks = writing.tasks
   const firstSeq = tasks[0]?.seq ?? 1
 
@@ -31,10 +36,10 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
   const [currentSeq, setCurrentSeq] = useState(firstSeq)
   const [remainingSeconds, setRemainingSeconds] = useState(writing.totalMinutes * 60)
   const [paused, setPaused] = useState(false)
-  const [clockLabel, setClockLabel] = useState(() => formatClock(new Date()))
+  const [clock, setClock] = useState(() => new Date())
   const [submitting, setSubmitting] = useState(false)
   const [submissionOpen, setSubmissionOpen] = useState(false)
-  const [submissionError, setSubmissionError] = useState('')
+  const [submissionError, setSubmissionError] = useState<unknown>()
   const [result, setResult] = useState<WritingSubmissionResult | null>(null)
   const timeUpTriggered = useRef(false)
   const submitSectionRef = useRef<() => Promise<void>>(async () => {})
@@ -46,7 +51,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
 
   useEffect(() => {
     const id = window.setInterval(() => {
-      setClockLabel(formatClock(new Date()))
+      setClock(new Date())
     }, 1000)
     return () => window.clearInterval(id)
   }, [])
@@ -80,7 +85,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
       })
       setResult(saved)
     } catch (err) {
-      setSubmissionError(getApiErrorMessage(err, 'Your exam could not be submitted. Please try again.'))
+      setSubmissionError(err)
     } finally {
       setSubmitting(false)
     }
@@ -113,14 +118,14 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
     setSubmissionOpen(true)
   }, [result, submitting])
 
-  const handleExit = useCallback(() => {
+  const handleExit = useCallback(async () => {
     if (result) {
       onExit()
       return
     }
-    const ok = window.confirm('Exit Writing? Your current work will not be saved.')
+    const ok = await confirm({titleKey: 'exams:runner.exit', messageKey: 'exams:runner.exitConfirm'})
     if (ok) onExit()
-  }, [onExit, result])
+  }, [confirm, onExit, result])
 
   if (!currentTask) {
     return null
@@ -128,7 +133,8 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
 
   return (
     <div className="exam-shell writing-shell">
-      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(result)} error={submissionError} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
+      {exitDialog}
+      <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(result)} error={submissionError ? getApiErrorMessage(submissionError, translate('exams:submission.failed')) : ''} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
       <TopBar testTitle={testTitle} candidateId={candidateLabel} remainingSeconds={remainingSeconds} paused={paused} />
       <main className="writing-main">
         <aside className="writing-prompt">
@@ -143,7 +149,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
               <figure className="writing-prompt__figure">
                 <img
                   src={writingTaskImageUrl(writing.id, currentTask.seq)}
-                  alt={`${currentTask.title} chart`}
+                  alt={translate('exams:runner.taskImage', {task: currentTask.title})}
                 />
               </figure>
             ) : null}
@@ -156,8 +162,8 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
                 wordCount >= minWords ? 'is-ok' : ''
               }`}
             >
-              Words: {wordCount}
-              {minWords > 0 ? ` / min ${minWords}` : ''}
+              {translate('exams:runner.words', {number: formatNumber(wordCount)})}
+              {minWords > 0 ? <> / {translate('exams:runner.minimumWords', {number: formatNumber(minWords)})}</> : null}
             </span>
           </div>
           <textarea
@@ -165,14 +171,15 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
             value={contents[currentTask.taskKey] ?? ''}
             onChange={(e) => handleContentChange(e.target.value)}
             readOnly={Boolean(result)}
-            placeholder="Type your answer here…"
+            placeholder={translate('exams:runner.writingPlaceholder')}
+            aria-label={translate('exams:runner.writingAnswer')}
             spellCheck
           />
           {result ? (
             <ul className="writing-result">
               {result.tasks.map((t) => (
                 <li key={t.taskKey}>
-                  {t.taskKey}: {t.wordCount} words ({t.contentLength} chars)
+                  {translate('exams:runner.writingResult', {task: tasks.find(task => task.taskKey === t.taskKey)?.title || t.taskKey, words: formatNumber(t.wordCount), characters: formatNumber(t.contentLength)})}
                 </li>
               ))}
             </ul>
@@ -181,9 +188,9 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
       </main>
       <footer className="bottom-bar writing-bottom">
         <div className="bottom-bar__left">
-          <h2 className="exam-navigation-title">Writing</h2>
+          <h2 className="exam-navigation-title">{translate("common:status.WRITING")}</h2>
           <div className="question-nav">
-            <span className="question-nav__label">Tasks</span>
+            <span className="question-nav__label">{translate('records:fields.tasks')}</span>
             {tasks.map((t) => {
               const answered = Boolean((contents[t.taskKey] ?? '').trim())
               const active = t.seq === currentSeq
@@ -195,31 +202,31 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
                   onClick={() => setCurrentSeq(t.seq)}
                   aria-current={active ? 'step' : undefined}
                 >
-                  Task {t.seq}
+                  {translate('exams:authoring.taskNumber', {number: formatNumber(t.seq)})}
                 </button>
               )
             })}
           </div>
           <div className="bottom-bar__meta">
             <span>{testTitle}</span>
-            <span className="muted">Writing · {writing.totalMinutes} min</span>
+            <span className="muted">{translate('common:status.WRITING')} · {translate('assessment:attempt.duration', {count: writing.totalMinutes, number: formatNumber(writing.totalMinutes)})}</span>
           </div>
         </div>
         <div className="bottom-bar__right">
-          <span className="bottom-bar__clock">{clockLabel}</span>
+          <span className="bottom-bar__clock">{formatClock(clock)}</span>
           <button
             type="button"
             className="bar-btn bar-btn--primary"
             onClick={() => void handleFinish()}
             disabled={submitting || Boolean(result)}
           >
-            {submitting ? 'Submitting…' : result ? 'Submitted' : 'Finish section'}
+            {submitting ? translate("common:actions.submitting") : result ? translate('common:status.SUBMITTED') : translate('exams:runner.finishSection')}
           </button>
           <button type="button" className="bar-btn" onClick={() => setPaused((p) => !p)}>
-            {paused ? 'Resume' : 'Pause'}
+            {paused ? translate('exams:runner.resume') : translate('exams:runner.pause')}
           </button>
           <button type="button" className="bar-btn bar-btn--danger" onClick={handleExit}>
-            Exit
+            {translate('exams:runner.exit')}
           </button>
         </div>
       </footer>

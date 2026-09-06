@@ -1,4 +1,5 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import { useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -22,7 +23,7 @@ import ui from "@/components/TenantWorkspace/workspace.module.scss";
 import styles from "./index.module.scss";
 
 function StudentRecord({ id }: { id: number }) {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const queryClient = useQueryClient();
   const location = useLocation();
   const [assignmentOpen, setAssignmentOpen] = useState(false);
@@ -93,11 +94,11 @@ function StudentRecord({ id }: { id: number }) {
     <div className={ui.page}>
       <header className={ui.pageHeader}>
         <div>
-          <h1>Student intake record</h1>
+          <h1>{translate("operations:studentRecord.title")}</h1>
           <p>
-            Student intakes <span aria-hidden="true">›</span>{" "}
+            {translate("operations:governance.intakes")}{' '}<span aria-hidden="true">›</span>{" "}
             <strong>
-              {formatPersonName(user.data, "Student")} (#{id})
+              {formatPersonName(user.data, translate('common:roles.STUDENT'))} (#{id})
             </strong>
           </p>
         </div>
@@ -108,32 +109,30 @@ function StudentRecord({ id }: { id: number }) {
       </header>
       <div className={styles.grid}>
         <div className={styles.main}>
-          <WorkspaceSection appearance="record" title="Account" icon={<UserRound size={22}/> }>
-            {user.isPending ? <p role="status">Loading account…</p> : null}
+          <WorkspaceSection appearance="record" title={translate("auth:signup.steps.account")} icon={<UserRound size={22}/> }>
+            {user.isPending ? <p role="status">{translate("operations:directory.loadingAccount")}</p> : null}
             {user.isError ? (
               <p className={feedback.error} role="alert">
                 {advisingErrorMessage(
                   user.error,
-                  "Account could not be loaded.",
+                  translate("operations:studentRecord.accountFailed"),
                 )}{" "}
                 <button type="button" onClick={() => void user.refetch()}>
-                  Retry account
-                </button>
+                  {translate("operations:studentRecord.retryAccount")}</button>
               </p>
             ) : null}
             {user.isSuccess && !user.data ? (
               <p className={feedback.error} role="alert">
-                The directory returned an unsupported account payload.
-              </p>
+                {translate("operations:studentRecord.invalidAccount")}</p>
             ) : null}
             {user.data ? (
               <dl className={styles.facts}>
                 <div>
-                  <dt>Email</dt>
+                  <dt>{translate("common:fields.email")}</dt>
                   <dd>{user.data.email}</dd>
                 </div>
                 <div>
-                  <dt>Identity</dt>
+                  <dt>{translate('common:admin.identity')}</dt>
                   <dd>
                     {[user.data.role, user.data.level]
                       .filter(Boolean)
@@ -142,7 +141,7 @@ function StudentRecord({ id }: { id: number }) {
                   </dd>
                 </div>
                 <div>
-                  <dt>Status</dt>
+                  <dt>{translate("common:fields.status")}</dt>
                   <dd>
                     <span className={ui.badge} data-tone={user.data.status}>
                       {readableValue(user.data.status)}
@@ -154,44 +153,42 @@ function StudentRecord({ id }: { id: number }) {
           </WorkspaceSection>
           <WorkspaceSection
             appearance="record"
-            title="Counsellor intake"
+            title={translate("advising:studentIntake.title")}
             icon={<FileText size={22}/>}
             bodyClassName={styles.intakeBody}
             meta={
               intake && readOnly ? (
-                <span className={feedback.readOnlyBadge}>Read only</span>
+                <span className={feedback.readOnlyBadge}>{translate("courseTools:owner.readOnly")}</span>
               ) : undefined
             }
           >
             {intakes.isPending ? (
               <p role="status">
                 {user.data
-                  ? "Loading intake…"
-                  : "Load the account to view intake details."}
+                  ? translate("advising:studentIntake.loading")
+                  : translate("operations:studentRecord.loadAccountFirst")}
               </p>
             ) : null}
             {intakes.isError ? (
               <p className={feedback.error} role="alert">
                 {advisingErrorMessage(
                   intakes.error,
-                  "Intake could not be loaded.",
+                  translate("advising:studentWorkspace.intakeFailed"),
                 )}{" "}
                 <button type="button" onClick={() => void intakes.refetch()}>
-                  Retry intake
-                </button>
+                  {translate("operations:studentRecord.retryIntake")}</button>
               </p>
             ) : null}
             {intakes.isSuccess && matching.length === 0 ? (
               <div className={styles.empty}>
-                <strong>No intake record available</strong>
-                <p>No matching intake was returned for this student.</p>
+                <strong>{translate("operations:studentRecord.empty")}</strong>
+                <p>{translate("operations:studentRecord.emptyHelp")}</p>
               </div>
             ) : null}
             {(intakes.data?.total ?? 0) > 1 ? (
               <div className={ui.form}>
                 <label>
-                  Intake record
-                  <select
+                  {translate("operations:studentRecord.chooseIntakeLabel")}<select
                     value={selectedIntakeId ?? ""}
                     onChange={(event) =>
                       setSelectedIntakeId(
@@ -199,18 +196,16 @@ function StudentRecord({ id }: { id: number }) {
                       )
                     }
                   >
-                    <option value="">Choose an intake</option>
+                    <option value="">{translate("operations:studentRecord.chooseIntake")}</option>
                     {matching.map((item) => (
                       <option key={item.intakeId} value={item.intakeId}>
-                        Intake #{item.intakeId} ·{" "}
-                        {readableValue(item.assignmentStatus)} ·{" "}
-                        {readableValue(item.lifecycleStatus)}
+                        {translate('operations:tenantIntakes.option', {id: formatNumber(item.intakeId), assignment: readableValue(item.assignmentStatus), lifecycle: readableValue(item.lifecycleStatus)})}
                       </option>
                     ))}
                   </select>
                 </label>
                 {(intakes.data?.total ?? 0) > TENANT_PAGE_SIZE ? (
-                  <nav className={ui.actions} aria-label="Student intake pages">
+                  <nav className={ui.actions} aria-label={translate("operations:studentRecord.pages")}>
                     <button
                       type="button"
                       className={ui.secondaryButton}
@@ -220,9 +215,8 @@ function StudentRecord({ id }: { id: number }) {
                         setSelectedIntakeId(undefined);
                       }}
                     >
-                      Previous
-                    </button>
-                    <span>Page {intakePage + 1}</span>
+                      {translate("common:actions.previous")}</button>
+                    <span>{translate('common:pagination.page', {page: formatNumber(intakePage + 1)})}</span>
                     <button
                       type="button"
                       className={ui.secondaryButton}
@@ -235,8 +229,7 @@ function StudentRecord({ id }: { id: number }) {
                         setSelectedIntakeId(undefined);
                       }}
                     >
-                      Next
-                    </button>
+                      {translate("common:actions.next")}</button>
                   </nav>
                 ) : null}
               </div>
@@ -245,31 +238,31 @@ function StudentRecord({ id }: { id: number }) {
               <>
                 <dl className={styles.facts}>
                   <div>
-                    <dt>Name</dt>
+                    <dt>{translate("common:fields.name")}</dt>
                     <dd>{formatPersonName(intake, "—")}</dd>
                   </div>
                   <div>
-                    <dt>Student type</dt>
+                    <dt>{translate("advising:actionTasks.studentType")}</dt>
                     <dd>{readableValue(intake.studentType)}</dd>
                   </div>
                   <div>
-                    <dt>Course request</dt>
+                    <dt>{translate("advising:studentIntake.courseRequest")}</dt>
                     <dd>{intake.courseRequest || "—"}</dd>
                   </div>
                   <div>
-                    <dt>Phone</dt>
+                    <dt>{translate("settings:phone")}</dt>
                     <dd>{intake.contactPhone || "—"}</dd>
                   </div>
                   <div>
-                    <dt>Background</dt>
+                    <dt>{translate("advising:studentIntake.background")}</dt>
                     <dd>{intake.basicBackground || "—"}</dd>
                   </div>
                   <div>
-                    <dt>Intake status</dt>
+                    <dt>{translate("operations:studentRecord.intakeStatus")}</dt>
                     <dd><span className={ui.badge} data-tone={intake.lifecycleStatus}>{readableValue(intake.lifecycleStatus)}</span></dd>
                   </div>
                   <div>
-                    <dt>Assignment status</dt>
+                    <dt>{translate("operations:studentRecord.assignmentStatus")}</dt>
                     <dd><span className={ui.badge} data-tone={intake.assignmentStatus}>{readableValue(intake.assignmentStatus)}</span></dd>
                   </div>
                 </dl>
@@ -278,8 +271,7 @@ function StudentRecord({ id }: { id: number }) {
                     className={ui.secondaryButton}
                     to={TENANT_PATHS.manageIntake(intake.intakeId)}
                   >
-                    Edit intake details
-                  </Link>
+                    {translate("operations:studentRecord.editIntake")}</Link>
                 ) : null}
               </>
             ) : null}
@@ -293,7 +285,7 @@ function StudentRecord({ id }: { id: number }) {
               presentation="panel"
             />
           ) : null}
-          <WorkspaceSection appearance="record" title="Assignment" icon={<UserRoundCog size={22}/> }>
+          <WorkspaceSection appearance="record" title={translate("advising:studentIntake.assignment")} icon={<UserRoundCog size={22}/> }>
             {intake ? (
               <>
                 {intake.advisorUserId ? (
@@ -303,10 +295,10 @@ function StudentRecord({ id }: { id: number }) {
                         id: intake.advisorUserId,
                       }
                     }
-                    secondary="Assigned Intake Advisor"
+                    secondary={translate('operations:studentRecord.assignedAdvisor')}
                   />
                 ) : (
-                  <p className={styles.description}>No advisor assigned yet.</p>
+                  <p className={styles.description}>{translate("operations:studentRecord.noAdvisor")}</p>
                 )}
                 {intake.lifecycleStatus === "OPEN" ? (
                   <button
@@ -316,20 +308,19 @@ function StudentRecord({ id }: { id: number }) {
                     onClick={() => setAssignmentOpen(true)}
                   >
                     {intake.assignmentStatus === "ASSIGNED"
-                      ? "Reassign advisor"
-                      : "Assign advisor"}
+                      ? translate("advising:intake.reassign")
+                      : translate("advising:intake.assign")}
                   </button>
                 ) : (
                   <p className={styles.description}>
-                    Cancelled intakes cannot be assigned.
-                  </p>
+                    {translate("operations:studentRecord.cancelledHelp")}</p>
                 )}
               </>
             ) : (
               <p className={styles.description}>
                 {intakes.isPending
-                  ? "Loading assignment…"
-                  : "Select an available intake to view its assignment."}
+                  ? translate("operations:studentRecord.loadingAssignment")
+                  : translate("operations:studentRecord.selectForAssignment")}
               </p>
             )}
           </WorkspaceSection>
@@ -339,10 +330,10 @@ function StudentRecord({ id }: { id: number }) {
         <TenantDrawer
           title={
             intake.assignmentStatus === "ASSIGNED"
-              ? "Reassign advisor"
-              : "Assign advisor"
+              ? translate("advising:intake.reassign")
+              : translate("advising:intake.assign")
           }
-          description={formatPersonName(intake, "Student")}
+          description={formatPersonName(intake, translate('common:roles.STUDENT'))}
           onClose={() => setAssignmentOpen(false)}
           busy={assignmentPending}
         >

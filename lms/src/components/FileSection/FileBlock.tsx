@@ -1,5 +1,7 @@
 import React from 'react';
 import {useTranslation} from 'react-i18next';
+import {formatPercent} from '@/i18n/formatting';
+import {getApiErrorMessage} from '@/utils/apiError';
 import styles from './FileBlock.module.scss';
 import {FileView} from "@/types";
 import {formatFileSize, getFileIcon} from "@/utils/file-utils";
@@ -22,7 +24,7 @@ export const FileBlock: React.FC<FileBlockProps> = ({
                                                     }) => {
   const {t} = useTranslation("course");
   const [isDeleting, setDeleting] = React.useState(false);
-  const [deleteError, setDeleteError] = React.useState<string | null>(null);
+  const [deleteError, setDeleteError] = React.useState<unknown>(null);
   
   const ext = block.filename?.split('.').pop()?.toUpperCase() || '';
   const fileSize = formatFileSize(block.fileSize);
@@ -35,8 +37,8 @@ export const FileBlock: React.FC<FileBlockProps> = ({
     setDeleteError(null);
     try {
       await onDelete(block);
-    } catch {
-      setDeleteError('Could not delete this file. Please try again.');
+    } catch (error) {
+      setDeleteError(error);
     } finally {
       setDeleting(false);
     }
@@ -69,18 +71,18 @@ export const FileBlock: React.FC<FileBlockProps> = ({
               />
             </div>
             <span className={styles.progressText}>
-              {block.uploadProgress || 0}%
+              {formatPercent((block.uploadProgress || 0) / 100)}
             </span>
           </div>
         )}
-        {isError && block.errorMessage && (
+        {isError && (
           <span className={styles.errorMessage}>
-            {block.errorMessage}
+            {getApiErrorMessage(block.uploadError, t('common:files.uploadFailed'))}
           </span>
         )}
       </div>
       <div className={styles.fileActions}>
-        {isError && !disabled ? <span className={styles.errorMessage}>Choose the file again to retry.</span> : null}
+        {isError && !disabled ? <span className={styles.errorMessage}>{t('common:files.retryHelp')}</span> : null}
         {!disabled && onDelete &&
           <button
             type="button"
@@ -89,8 +91,8 @@ export const FileBlock: React.FC<FileBlockProps> = ({
               void handleDelete();
             }}
             className={styles.deleteButton}
-            title={isDeleting ? 'Deleting file' : t("blockEditor.deleteFileTitle")}
-            aria-label={isDeleting ? `Deleting ${block.filename}` : `Delete ${block.filename}`}
+            title={isDeleting ? t('common:files.deleting') : t("blockEditor.deleteFileTitle")}
+            aria-label={t(isDeleting ? 'common:actions.deletingNamed' : 'common:actions.deleteNamed', {name: block.filename})}
             disabled={isUploading || isDeleting}
           >
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -104,7 +106,7 @@ export const FileBlock: React.FC<FileBlockProps> = ({
           </button>
         }
       </div>
-      {deleteError ? <span className={styles.deleteError} role="alert">{deleteError}</span> : null}
+      {deleteError ? <span className={styles.deleteError} role="alert">{getApiErrorMessage(deleteError, t('common:files.deleteFailed'))}</span> : null}
     </div>
   );
 };

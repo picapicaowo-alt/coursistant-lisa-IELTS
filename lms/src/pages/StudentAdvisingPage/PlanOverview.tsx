@@ -1,3 +1,6 @@
+import {formatNumber, formatNumericText} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
+import { useTranslation } from 'react-i18next';
 import {useSearchParams} from 'react-router-dom';
 import {ProgressRing} from '@/components/ProgressRing';
 import {AdvisorTasks} from './AdvisorTasks';
@@ -16,6 +19,7 @@ export function PlanOverview({
   plan?: StudyPlanAggregate;
   onCheckpoint: (key: string, taskId?: number) => void;
 }) {
+  const { t: translate } = useTranslation();
   const [params, setParams] = useSearchParams();
   const view = params.get('view') === 'tasks' ? 'tasks' : 'overview';
   const setView = (next: 'overview' | 'tasks') =>
@@ -44,39 +48,36 @@ export function PlanOverview({
       {view === 'overview' ? (
         <>
           <div className={styles.summary}>
-            <section className={styles.goal} aria-label="Learning goal">
-              <h2>My Learning Goal</h2>
+            <section className={styles.goal} aria-label={translate("learning:plan.goalLabel")}>
+              <h2>{translate("learning:plan.goal")}</h2>
               <p>
                 {profile?.targetGoal ||
-                  'Your advisor will help you set a learning goal.'}
+                  translate("learning:plan.noGoal")}
               </p>
               <div className={styles.goalValues}>
                 <div>
-                  <span>Baseline assessment</span>
+                  <span>{translate("learning:plan.baseline")}</span>
                   <strong>
-                    {profile?.baselineAssessment || 'Not assessed'}
+                    {profile?.baselineAssessment || translate("common:risk.notAssessed")}
                   </strong>
                 </div>
                 <div>
-                  <span>{profile?.targetMetric || 'Target'}</span>
-                  <strong>{profile?.targetValue || 'Not set'}</strong>
+                  <span>{profile?.targetMetric || translate("learning:plan.target")}</span>
+                  <strong>{formatNumericText(profile?.targetValue) || translate("assessment:submission.notSet")}</strong>
                 </div>
               </div>
-              <div className={styles.progress}><ProgressRing value={progress} label="Advisor task completion" inverse/><small>{completed} of {tasks.length} tasks completed</small></div>
+              <div className={styles.progress}><ProgressRing value={progress} label={translate("learning:plan.completion")} inverse/><small>{translate('learning:plan.completedTasks', {completed: formatNumber(completed), total: formatNumber(tasks.length)})}</small></div>
               <small>
-                Target date ·{' '}
-                {profile?.targetDate
-                  ? formatPlanDate(profile.targetDate)
-                  : 'Not set'}
+                {translate('learning:plan.targetDate', {date: profile?.targetDate ? formatPlanDate(profile.targetDate) : translate('assessment:submission.notSet')})}
               </small>
             </section>
             <WorkspaceSection
               appearance="record"
-              title="Current Skills"
-              summary="Current assessments and targets from your learning profile."
+              title={translate("learning:plan.skills")}
+              summary={translate("learning:plan.skillsHelp")}
             >
               {(profile?.skills ?? []).length === 0 ? (
-                <p>No skill assessments yet.</p>
+                <p>{translate("learning:plan.noSkills")}</p>
               ) : (
                 profile?.skills?.map((skill, index) => {
                   const current = skill.currentValue?.trim()
@@ -85,18 +86,19 @@ export function PlanOverview({
                   const target = skill.targetValue?.trim()
                     ? Number(skill.targetValue)
                     : NaN;
+                  const skillName = skill.displayName || statusLabel(skill.skillCode);
                   return (
                     <div
                       className={styles.skill}
                       key={skill.skillCode ?? index}
                     >
-                      <strong>{skill.displayName || skill.skillCode}</strong>
+                      <strong>{skillName}</strong>
                       <div>
                         <span>
-                          Current <b>{skill.currentValue || '—'}</b>
+                          {translate("assessment:submission.current")}{' '}<b>{formatNumericText(skill.currentValue) || '—'}</b>
                         </span>
                         <span>
-                          Target <b>{skill.targetValue || '—'}</b>
+                          {translate("learning:plan.target")}{' '}<b>{formatNumericText(skill.targetValue) || '—'}</b>
                         </span>
                       </div>
                       {Number.isFinite(current) &&
@@ -107,7 +109,7 @@ export function PlanOverview({
                           min={0}
                           max={target}
                           value={Math.min(current, target)}
-                          aria-label={`${skill.displayName || skill.skillCode}: current value relative to target`}
+                          aria-label={translate('learning:plan.skillProgress', {skill: skillName})}
                         />
                       ) : null}
                       <small>{skill.scale}</small>
@@ -120,14 +122,14 @@ export function PlanOverview({
           <div className={styles.journey}>
             <WorkspaceSection
               appearance="record"
-              title="Learning Journey"
+              title={translate("learning:plan.journey")}
               summary={
                 plan?.strategySummary ||
-                'Your personalized roadmap and next checkpoints.'
+                translate("learning:plan.journeyHelp")
               }
             >
               {checkpoints.length === 0 ? (
-                <p>Your advisor has not added checkpoints yet.</p>
+                <p>{translate("learning:plan.noCheckpoints")}</p>
               ) : (
                 checkpoints.map((checkpoint, index) => {
                   const done =
@@ -148,18 +150,18 @@ export function PlanOverview({
                         className={styles.step}
                         data-complete={done || undefined}
                       >
-                        {index + 1}
+                        {formatNumber(index + 1)}
                       </span>
                       <span>
                         <strong>
                           {checkpoint.description ||
                             checkpoint.goal ||
-                            `Checkpoint ${index + 1}`}
+                            translate('advising:studentTasks.checkpoint', {number: formatNumber(index + 1)})}
                         </strong>
                         <small>{checkpoint.goal}</small>
                       </span>
                       <span>
-                        <small>{checkpoint.tasks?.length ?? 0} tasks</small>
+                        <small>{translate('learning:plan.taskCount', {count: checkpoint.tasks?.length ?? 0, number: formatNumber(checkpoint.tasks?.length ?? 0)})}</small>
                         <small>{formatPlanDate(checkpoint.dueDate)}</small>
                       </span>
                       <img
@@ -173,15 +175,14 @@ export function PlanOverview({
             </WorkspaceSection>
             <WorkspaceSection
               appearance="record"
-              title="Advisor Tasks"
+              title={translate("dashboard:advisorTasks")}
               meta={
                 <button type="button" onClick={() => setView('tasks')}>
-                  View all
-                </button>
+                  {translate("common:actions.viewAll")}</button>
               }
             >
               {tasks.length === 0 ? (
-                <p>No advisor tasks yet.</p>
+                <p>{translate("learning:plan.noTasks")}</p>
               ) : (
                 tasks.slice(0, 4).map(({task, checkpointKey}, index) => (
                   <button
@@ -191,7 +192,7 @@ export function PlanOverview({
                     onClick={() => onCheckpoint(checkpointKey, task.id)}
                   >
                     <strong>
-                      {task.title || task.description || 'Advisor task'}
+                      {task.title || task.description || translate("advising:studentTasks.task")}
                     </strong>
                     <small>{taskStatusLabel(task.status)}</small>
                     <small>{formatPlanDate(task.dueDate)}</small>

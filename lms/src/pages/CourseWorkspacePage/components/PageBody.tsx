@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 ﻿import React from "react";
 import {useParams} from "react-router-dom";
 import styles from "./PageBody.module.scss";
@@ -29,6 +30,7 @@ export const PageBody: React.FC<PageBodyProps> = ({
   canPostAnnouncements = false,
   canViewOwnGrades = false,
 }) => {
+  const {t: translate} = useTranslation();
   const {courseId} = useParams();
   const {workspaceMode} = useCourseWorkspaceStore();
   const isCourseRoute = Boolean(courseId);
@@ -38,8 +40,7 @@ export const PageBody: React.FC<PageBodyProps> = ({
     return (
       <div className={styles.contentArea}>
         <p className={styles.unavailable} role="status">
-          This course workspace is not available without a course in the URL.
-        </p>
+          {translate("course:workspace.noCourse")}</p>
       </div>
     );
   }

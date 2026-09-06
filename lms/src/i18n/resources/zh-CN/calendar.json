@@ -26,5 +26,73 @@
     "versionConflict": "此事件已被其他请求修改。已重新请求最新详情，请核对后再操作。",
     "requestVersionMissing": "请求缺少事件版本。请重新加载事件后再操作。",
     "requestVersionInvalid": "请求中的事件版本不是合法整数。请重新加载事件后再操作。"
+  },
+  "categoriesLabel": "日历分类",
+  "categories": {
+    "all": "全部日程",
+    "personal": "个人日程"
+  },
+  "viewLabel": "日历视图",
+  "views": {
+    "week": "周",
+    "month": "月"
+  },
+  "previous": {
+    "day": "前一天",
+    "week": "上一周",
+    "month": "上个月"
+  },
+  "next": {
+    "day": "后一天",
+    "week": "下一周",
+    "month": "下个月"
+  },
+  "addEvent": "+ 添加日程",
+  "loading": "正在加载日历…",
+  "retryCourses": "重试课程日历",
+  "retryPersonal": "重试个人日程",
+  "errors": {
+    "courses": "暂时无法加载课程日历。",
+    "personal": "暂时无法加载个人日程。",
+    "personalIncomplete_one": "{{number}} 个个人日程缺少显示所需的信息。",
+    "personalIncomplete_other": "{{number}} 个个人日程缺少显示所需的信息。",
+    "assignments": "{{courseCode}}：暂时无法加载作业。",
+    "quizzes": "{{courseCode}}：暂时无法加载测验。",
+    "events": "{{courseCode}}：暂时无法加载课程活动。",
+    "classes": "暂时无法加载已排课程。",
+    "classesIncomplete_one": "{{number}} 条排课记录缺少日历所需的信息。",
+    "classesIncomplete_other": "{{number}} 条排课记录缺少日历所需的信息。"
+  },
+  "allDay": "全天",
+  "dailyAgenda": "每日日程",
+  "noEvents": "暂无日程",
+  "eventsInView": "当前视图中的日程",
+  "timezoneHelp": "时间按各日程的时区显示。",
+  "noEventsInView": "当前视图中暂无日程。",
+  "details": {
+    "close": "关闭日程详情",
+    "location": "地点",
+    "category": "分类"
+  },
+  "kinds": {
+    "Session": "课程课次",
+    "Assignment": "作业",
+    "Quiz": "测验",
+    "Event": "课程活动",
+    "Personal": "个人日程"
+  },
+  "viewItem": {
+    "Session": "查看课程课次",
+    "Assignment": "查看作业",
+    "Quiz": "查看测验",
+    "Event": "查看课程活动",
+    "Personal": "查看个人日程"
+  },
+  "editEvent": "编辑日程",
+  "timetable": {
+    "day": "每日时间表",
+    "week": "每周时间表",
+    "scrollLabel": "可滚动的 24 小时时间表",
+    "currentTime": "当前时间 {{time}}"
   }
 }

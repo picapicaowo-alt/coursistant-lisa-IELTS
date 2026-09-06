@@ -1,4 +1,5 @@
 import {unwrapData} from '@/apis'
+import {LocalizedError} from '@/i18n/errors';
 import {mockExamApiService} from '@/apis/services/mock-exam-api'
 import {parseAttemptId} from './runtimeData'
 
@@ -19,7 +20,7 @@ export async function ensureAttemptId(studentMockExamId: number): Promise<number
   )
   const attemptId = parseAttemptId(payload)
   if (attemptId === null) {
-    throw new Error('The attempt was created, but the response did not include an attempt id.')
+    throw new LocalizedError('exams:session.missingAttempt')
   }
   window.sessionStorage.setItem(key, String(attemptId))
   return attemptId

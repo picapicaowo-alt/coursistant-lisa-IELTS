@@ -1,3 +1,4 @@
+import {useTranslation} from 'react-i18next';
 import {ChangeEvent, KeyboardEvent} from 'react';
 import {Icon} from '@iconify/react';
 import {Link} from 'react-router-dom';
@@ -6,6 +7,7 @@ import usePasswordReset from './usePasswordReset';
 import styles from './index.module.scss';
 
 const ForgotPasswordPage = () => {
+  const {t: translate} = useTranslation();
   const reset = usePasswordReset();
   const {
     t, navigate, step, setStep, forced, email, setEmail, code, setCode, password, setPassword,
@@ -41,7 +43,7 @@ const ForgotPasswordPage = () => {
 
   return (
     <AuthShell>
-      <ol className={styles.steps} aria-label="Password reset progress">{(['email', 'code', 'password', 'complete'] as const).map((item, index) => <li key={item} aria-current={step === item ? 'step' : undefined}><span>{index + 1}</span>{['Email', 'Verification', 'New password', 'Complete'][index]}</li>)}</ol>
+      <ol className={styles.steps} aria-label={translate("auth:forgotPassword.progress")}>{(['email', 'code', 'password', 'complete'] as const).map((item, index) => <li key={item} aria-current={step === item ? 'step' : undefined}><span>{index + 1}</span>{translate(`auth:forgotPassword.steps.${item}`)}</li>)}</ol>
             {step === 'email' ? (
               <>
                 <Link to="/login" className={styles.backLink}>{t('forgotPassword.backToLogin')}</Link>
@@ -100,7 +102,7 @@ const ForgotPasswordPage = () => {
                       inputMode="numeric"
                       maxLength={6}
                       value={digit}
-                      aria-label={`Digit ${index + 1}`}
+                      aria-label={translate('auth:forgotPassword.digit', {number: index + 1})}
                       onChange={event => handleCodePaste(event, index)}
                       onKeyDown={event => handleCodeKeyDown(event, index)}
                     />

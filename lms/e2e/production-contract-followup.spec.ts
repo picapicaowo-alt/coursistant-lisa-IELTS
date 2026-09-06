@@ -31,13 +31,13 @@ test('inactive Instructor enrollment cannot open the roster or upload materials'
 test('Instructor uploads files and links with browser multipart boundaries without material-management grants', async ({page}) => {
   await fixture(page, 'INSTRUCTOR', 'Instructor');
   await page.route('**/v2/me/courses?*', route => route.fulfill({json: reply({items: [{...course, courseRole: 'Instructor', role: 'Instructor', active: true}], total: 1})}));
-  let materials = [{...material, uploadedBy: 999}];
+  let materials = [{...material, uploadedBy: 999, publicationState: 'DRAFT'}];
   await page.route('**/v2/courses/71/weeks', route => route.fulfill({json: reply([{id: 81, title: 'Building an argument', state: 'Published', materials}])}));
   const writes: {body: string; contentType: string; key: string}[] = [];
   await page.route('**/v2/courses/71/weeks/81/materials', route => {
     const req = route.request();
     writes.push({body: req.postData() ?? '', contentType: req.headers()['content-type'], key: req.headers()['idempotency-key']});
-    const next = {...material, id: 122 + writes.length, displayName: `Uploaded item ${writes.length}`, uploadedBy: 301};
+    const next = {...material, id: 122 + writes.length, displayName: `Uploaded item ${writes.length}`, uploadedBy: 301, publicationState: 'DRAFT'};
     materials = [...materials, next];
     return route.fulfill({json: reply([next])});
   });
@@ -47,13 +47,13 @@ test('Instructor uploads files and links with browser multipart boundaries witho
   await expect(editor.getByRole('button', {name: /Publish|Unpublish|Rename|Move |Delete Academic/})).toHaveCount(0);
   await editor.locator('input[type=file]').setInputFiles({name: 'contract-check.txt', mimeType: 'text/plain', buffer: Buffer.from('contract test')});
   await expect.poll(() => writes.length).toBe(1);
-  await expect(editor.getByText('Uploaded item 1', {exact: true})).toBeVisible();
+  await expect(editor.getByRole('listitem').filter({hasText: 'Uploaded item 1'})).toBeVisible();
   await editor.getByText('Add external link', {exact: true}).first().click();
   await editor.getByRole('textbox', {name: 'Link URL', exact: true}).fill('https://example.test/resource');
   await editor.getByRole('textbox', {name: 'Link display name'}).fill('Reference link');
   await editor.getByRole('button', {name: 'Add link', exact: true}).click();
   await expect.poll(() => writes.length).toBe(2);
-  await expect(editor.getByText('Uploaded item 2', {exact: true})).toBeVisible();
+  await expect(editor.getByRole('listitem').filter({hasText: 'Uploaded item 2'})).toBeVisible();
   for (const write of writes) {
     expect(write.contentType).toMatch(/^multipart\/form-data; boundary=.+/);
     expect(write.key).toMatch(/^[0-9a-f]{8}-[0-9a-f-]{27}$/i);
@@ -63,4 +63,28 @@ test('Instructor uploads files and links with browser multipart boundaries witho
   expect(writes[1].body).toContain('name="linkUrl"');
   expect(writes[1].body).toContain('name="linkDisplayName"');
   expect(writes[1].key).not.toBe(writes[0].key);
+  let denied = true;
+  const deleted: number[] = [];
+  await page.route('**/v2/courses/71/weeks/81/materials/*', route => {
+    if (route.request().method() !== 'DELETE') return route.fallback();
+    const id = Number(new URL(route.request().url()).pathname.split('/').at(-1));
+    if (denied) return route.fulfill({status: 403, json: {code: 'FORBIDDEN'}});
+    deleted.push(id); materials = materials.filter(item => item.id !== id);
+    return route.fulfill({json: reply(null)});
+  });
+  await editor.getByRole('listitem').filter({hasText: 'Uploaded item 1'}).locator('summary').click();
+  await editor.getByRole('button', {name: 'Delete Uploaded item 1', exact: true}).click();
+  await editor.getByRole('button', {name: 'Confirm', exact: true}).click();
+  await expect(editor.getByRole('alert')).toContainText('You do not have permission to delete this material.');
+  await expect(editor.getByRole('listitem').filter({hasText: 'Uploaded item 1'})).toBeVisible();
+  denied = false;
+  await editor.getByRole('button', {name: 'Confirm', exact: true}).click();
+  await expect(editor.getByRole('listitem').filter({hasText: 'Uploaded item 1'})).toHaveCount(0);
+  await editor.getByRole('listitem').filter({hasText: 'Uploaded item 2'}).locator('summary').click();
+  await editor.getByRole('button', {name: 'Delete Uploaded item 2', exact: true}).click();
+  await editor.getByRole('button', {name: 'Confirm', exact: true}).click();
+  await expect(editor.getByRole('listitem').filter({hasText: 'Uploaded item 2'})).toHaveCount(0);
+  expect(deleted).toEqual([123, 124]);
+  await expect(editor.getByRole('listitem').filter({hasText: 'Academic writing guide'})).toBeVisible();
+
 });

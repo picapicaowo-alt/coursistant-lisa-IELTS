@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import {prompts, type Audience} from './prompts';
 import {useId, useRef, useState} from 'react';
 import styles from './index.module.scss';
@@ -7,25 +8,23 @@ const studentPromptIcons = [Lightbulb, NotebookPen, Mic, GraduationCap];
 
 /** API integration is supplied by the owning feature. An absent adapter never sends a simulated request. */
 export function DashboardAssistant({audience, onPrompt, className}: {audience: Audience; onPrompt?: (prompt: string) => void; className?: string}) {
+  const { t: translate } = useTranslation();
   const [draft, setDraft] = useState('');
   const input = useRef<HTMLInputElement>(null);
   const titleId = useId();
-  const statusId = useId();
-  const context = audience === 'instructor' ? 'teaching' : audience === 'advisor' ? 'advising' : 'learning';
+  if (!onPrompt) return null;
   return <section className={[styles.chatPanel, className].filter(Boolean).join(' ')} aria-labelledby={titleId}>
     <header className={styles.chatHeader}>
-      <button type="button" aria-label="Chat history coming soon" disabled><img src="/icons/figma-dashboard/menu.svg" alt=""/></button>
-      <h2 id={titleId}>New Chat</h2>
-      <button type="button" aria-label="Start a new chat" onClick={() => {setDraft(''); input.current?.focus();}}><img src="/icons/figma-dashboard/add.svg" alt=""/></button>
+      <h2 id={titleId}>{translate("assistant:newChat")}</h2>
+      <button type="button" aria-label={translate("assistant:startNew")} onClick={() => {setDraft(''); input.current?.focus();}}><img src="/icons/figma-dashboard/add.svg" alt=""/></button>
     </header>
-    <div className={styles.chatIntro}><p>Hi there!</p><strong>How can I help you with your {context} today?</strong></div>
-    <div className={styles.quickPrompts}>{prompts[audience].map((prompt, index) => {const Icon = audience === 'student' ? studentPromptIcons[index] : undefined; return <button type="button" key={prompt} onClick={() => {setDraft(prompt); input.current?.focus();}}>{Icon ? <Icon size={20} aria-hidden="true"/> : null}<span>{prompt}</span></button>;})}</div>
+    <div className={styles.chatIntro}><p>{translate("assistant:greeting")}</p><strong>{translate(`assistant:help.${audience}`)}</strong></div>
+    <div className={styles.quickPrompts}>{prompts[audience].map((key, index) => {const prompt = translate(key); const Icon = audience === 'student' ? studentPromptIcons[index] : undefined; return <button type="button" key={key} onClick={() => {setDraft(prompt); input.current?.focus();}}>{Icon ? <Icon size={20} aria-hidden="true"/> : null}<span>{prompt}</span></button>;})}</div>
     <div className={styles.composerArea}>
-      {!onPrompt ? <p className={styles.integrationStatus} id={statusId}>AI assistance is coming soon. You can prepare a question here.</p> : null}
       <form className={styles.chatComposer} onSubmit={event => {event.preventDefault(); if (draft.trim()) onPrompt?.(draft.trim());}}>
-        <button type="button" aria-label={onPrompt ? 'Open chat to add an attachment' : 'Attachments coming soon'} disabled={!onPrompt} onClick={() => onPrompt?.('')} className={styles.composerAdd}>+</button>
-        <input ref={input} value={draft} onChange={event => setDraft(event.target.value)} placeholder="Ask me anything…" aria-label={`Ask the ${context} assistant`} aria-describedby={!onPrompt ? statusId : undefined}/>
-        <button type="submit" aria-label="Send message" disabled={!onPrompt || !draft.trim()} className={styles.sendButton}><img src="/icons/figma-dashboard/send.svg" alt=""/></button>
+        <button type="button" aria-label={translate("assistant:attachmentOpen")} onClick={() => onPrompt('')} className={styles.composerAdd}>+</button>
+        <input ref={input} value={draft} onChange={event => setDraft(event.target.value)} placeholder={translate("assistant:ask")} aria-label={translate(`assistant:input.${audience}`)}/>
+        <button type="submit" aria-label={translate("assistant:send")} disabled={!onPrompt || !draft.trim()} className={styles.sendButton}><img src="/icons/figma-dashboard/send.svg" alt=""/></button>
       </form>
     </div>
   </section>;

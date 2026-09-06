@@ -27,7 +27,7 @@ const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const getFieldError = (field: string) => fieldErrors[field] || '';
+  const getFieldError = (field: string) => fieldErrors[field] ? t(fieldErrors[field]) : '';
   const {login, user} = useAuth();
   const navigate = useNavigate();
   const {t} = useTranslation('auth');
@@ -74,7 +74,7 @@ const LoginPage: React.FC = () => {
       if (response.status === 200 && response.data) {
         const auth = response.data;
         if (auth.mustChangePassword) {
-          setFieldErrors({password: t('errors.passwordChangeRequired')});
+          setFieldErrors({password: 'errors.passwordChangeRequired'});
           return;
         }
 
@@ -86,16 +86,16 @@ const LoginPage: React.FC = () => {
         return;
       }
 
-      setFieldErrors({password: t('errors.unexpected')});
+      setFieldErrors({password: 'errors.unexpected'});
     } catch (error) {
       const errorKind = getLoginErrorKind(error);
       if (errorKind === 'credentials') {
-        setFieldErrors({password: t('errors.invalidCredentials')});
+        setFieldErrors({password: 'errors.invalidCredentials'});
       } else if (errorKind === 'unavailable') {
-        setFieldErrors({password: t('errors.serviceUnavailable')});
+        setFieldErrors({password: 'errors.serviceUnavailable'});
       } else {
         console.error('Login failed', error);
-        setFieldErrors({password: t('errors.unexpected')});
+        setFieldErrors({password: 'errors.unexpected'});
       }
     } finally {
       setIsSubmitting(false);

@@ -8,7 +8,8 @@ describe('safeStudySupportProgress', () => {
       text: 'search_teaching_documents result 10 tokens 4051',
     }, 'step-1')).toEqual({
       id: 'step-1',
-      text: 'Searching your course materials.',
+      text: '',
+      translationKey: 'assistant:thinking.search',
     });
   });
 
@@ -18,7 +19,8 @@ describe('safeStudySupportProgress', () => {
       text: 'gate proceed model gpt-internal',
     }, 'step-2')).toEqual({
       id: 'step-2',
-      text: 'Working on your request.',
+      text: '',
+      translationKey: 'assistant:thinking.working',
     });
   });
 });

@@ -3,7 +3,7 @@ import React, { FormEvent, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CourseMember, CourseSummary, unwrapData } from "@/apis";
 import { courseApiService } from "@/apis/services/course-api";
-import { getApiErrorMessage } from "@/utils/apiError";
+import {LocalizedError} from '@/i18n/errors';
 import { TeachingDialog } from "@/components/TeachingWorkspace";
 import { PersonCell } from "@/components/PersonCell";
 import {
@@ -19,7 +19,7 @@ const MEMBER_PAGE_SIZE = 20;
 
 type Feedback = {
   tone: "success" | "error";
-  text: string;
+  key: string;
 };
 
 const instructorLabel = (course: CourseSummary): string => {
@@ -167,11 +167,8 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
       const successfulItem = result.items.find(
         (item) => item.status === "SUCCESS",
       );
-      const failure = result.items.find((item) => item.status === "ERROR");
       if (!successfulItem) {
-        throw new Error(
-          failure?.message || translate("common:admin.enrollFailed"),
-        );
+        throw new LocalizedError("common:admin.enrollFailed");
       }
 
       return result;
@@ -180,14 +177,14 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
       setIdentifier("");
       setFeedback({
         tone: "success",
-        text: translate("common:admin.enrollSuccess"),
+        key: "common:admin.enrollSuccess",
       });
       await refreshMembers(variables.courseId);
     },
     onError: (error) => {
       setFeedback({
         tone: "error",
-        text: getApiErrorMessage(error, translate("common:admin.accessFailed")),
+        key: error instanceof LocalizedError ? error.translationKey : "common:admin.accessFailed",
       });
     },
   });
@@ -330,7 +327,7 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
                 }
                 role={feedback.tone === "error" ? "alert" : "status"}
               >
-                {feedback.text}
+                {translate(feedback.key)}
               </p>
             ) : null}
           </TeachingDialog>
@@ -417,7 +414,7 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
             }
             role={feedback.tone === "error" ? "alert" : "status"}
           >
-            {feedback.text}
+            {translate(feedback.key)}
           </p>
         ) : null}
         {memberPageCount > 1 ? (

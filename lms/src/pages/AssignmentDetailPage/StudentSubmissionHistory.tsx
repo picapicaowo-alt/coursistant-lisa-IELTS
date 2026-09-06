@@ -1,9 +1,17 @@
-import {useState} from 'react';
-import {Download, Eye, FileText} from 'lucide-react';
-import type {SubmissionFile, SubmissionVersion} from '@/apis';
-import {assignmentApiService} from '@/apis/services/assignment-api';
-import {openPreviewWindow, saveBlob, showBlobInPreviewWindow} from '@/utils/downloadBlob';
-import styles from './index.module.scss';
+import { formatFileSize } from "@/utils/file-utils";
+import { LocalizedError } from "@/i18n/errors";
+import { formatNumber } from "@/i18n/formatting";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
+import { Download, Eye, FileText } from "lucide-react";
+import type { SubmissionFile, SubmissionVersion } from "@/apis";
+import { assignmentApiService } from "@/apis/services/assignment-api";
+import {
+  openPreviewWindow,
+  saveBlob,
+  showBlobInPreviewWindow,
+} from "@/utils/downloadBlob";
+import styles from "./index.module.scss";
 
 interface StudentSubmissionHistoryProps {
   courseId: number;
@@ -12,31 +20,33 @@ interface StudentSubmissionHistoryProps {
   versions: SubmissionVersion[];
 }
 
-const formatFileSize = (bytes: number) => {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
-
 export const StudentSubmissionHistory = ({
   courseId,
   assignmentId,
   submissionId,
   versions,
 }: StudentSubmissionHistoryProps) => {
+  const { t: translate } = useTranslation();
   const [activeAction, setActiveAction] = useState<string | null>(null);
-  const [fileError, setFileError] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<LocalizedError | null>(null);
 
   const downloadFile = async (file: SubmissionFile) => {
     setActiveAction(`download-${file.id}`);
     setFileError(null);
     try {
       const blob = await assignmentApiService.downloadSubmissionFile(
-        courseId, assignmentId, submissionId, file.id,
+        courseId,
+        assignmentId,
+        submissionId,
+        file.id,
       );
       saveBlob(blob, file.originalName);
     } catch {
-      setFileError(`Could not download ${file.originalName}.`);
+      setFileError(
+        new LocalizedError("assessment:assignment.errors.download", {
+          name: file.originalName,
+        }),
+      );
     } finally {
       setActiveAction(null);
     }
@@ -45,7 +55,7 @@ export const StudentSubmissionHistory = ({
   const previewFile = async (file: SubmissionFile) => {
     const previewWindow = openPreviewWindow();
     if (!previewWindow) {
-      setFileError('Allow pop-ups to preview this file.');
+      setFileError(new LocalizedError("course:materials.allowPopups"));
       return;
     }
 
@@ -53,34 +63,57 @@ export const StudentSubmissionHistory = ({
     setFileError(null);
     try {
       const blob = await assignmentApiService.previewSubmissionFile(
-        courseId, assignmentId, submissionId, file.id,
+        courseId,
+        assignmentId,
+        submissionId,
+        file.id,
       );
       showBlobInPreviewWindow(previewWindow, blob);
     } catch {
       previewWindow.close();
-      setFileError(`Could not preview ${file.originalName}.`);
+      setFileError(
+        new LocalizedError("assessment:assignment.errors.preview", {
+          name: file.originalName,
+        }),
+      );
     } finally {
       setActiveAction(null);
     }
   };
 
   return (
-    <div className={styles.submissionVersions} aria-label="Submission version history">
+    <div
+      className={styles.submissionVersions}
+      aria-label={translate("assessment:submission.history")}
+    >
       {versions.map((version, index) => (
         <section className={styles.submissionVersion} key={version.id}>
           <div className={styles.versionHeader}>
             <div>
-              <strong>Version {version.versionNo}</strong>
-              <span>{version.fileCount} file(s)</span>
+              <strong>
+                {translate("assessment:submission.version", {
+                  number: formatNumber(version.versionNo),
+                })}
+              </strong>
+              <span>
+                {translate("assessment:files.count", {
+                  count: version.fileCount,
+                  number: formatNumber(version.fileCount),
+                })}
+              </span>
             </div>
-            <span>{index === 0 ? 'Current' : 'Previous submission'}</span>
+            <span>
+              {index === 0
+                ? translate("assessment:submission.current")
+                : translate("assessment:submission.previousSubmission")}
+            </span>
           </div>
 
           {version.files.length > 0 ? (
             <ul className={styles.submissionFiles}>
-              {version.files.map(file => (
+              {version.files.map((file) => (
                 <li key={file.id}>
-                  <FileText size={20} aria-hidden="true"/>
+                  <FileText size={20} aria-hidden="true" />
                   <span className={styles.submissionFileName}>
                     <strong>{file.originalName}</strong>
                     <small>{formatFileSize(file.sizeBytes)}</small>
@@ -92,8 +125,10 @@ export const StudentSubmissionHistory = ({
                         onClick={() => void previewFile(file)}
                         disabled={activeAction !== null}
                       >
-                        <Eye size={15}/>
-                        {activeAction === `preview-${file.id}` ? 'Opening…' : 'Preview'}
+                        <Eye size={15} />
+                        {activeAction === `preview-${file.id}`
+                          ? translate("course:materials.opening")
+                          : translate("course:materials.preview")}
                       </button>
                     ) : null}
                     <button
@@ -101,19 +136,27 @@ export const StudentSubmissionHistory = ({
                       onClick={() => void downloadFile(file)}
                       disabled={activeAction !== null}
                     >
-                      <Download size={15}/>
-                      {activeAction === `download-${file.id}` ? 'Downloading…' : 'Download'}
+                      <Download size={15} />
+                      {activeAction === `download-${file.id}`
+                        ? translate("course:materials.downloading")
+                        : translate("common:actions.download")}
                     </button>
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className={styles.secondaryText}>No files were attached to this version.</p>
+            <p className={styles.secondaryText}>
+              {translate("assessment:submission.noFiles")}
+            </p>
           )}
         </section>
       ))}
-      {fileError ? <p className={styles.error} role="alert">{fileError}</p> : null}
+      {fileError ? (
+        <p className={styles.error} role="alert">
+          {fileError.localizedMessage()}
+        </p>
+      ) : null}
     </div>
   );
 };

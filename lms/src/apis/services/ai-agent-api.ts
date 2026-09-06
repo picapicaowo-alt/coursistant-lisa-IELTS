@@ -1,6 +1,6 @@
 import {ApiClient} from '@/apis/api-client';
 import {agentApiClient} from '@/apis/v2-api-client';
-import {getApiErrorMessage} from '@/utils/apiError';
+import {LocalizedError} from '@/i18n/errors';
 import {sanitizeAgentAnswer} from '@/utils/studySupportResponse';
 
 export type AiAgentRole = 'STUDENT' | 'INSTRUCTOR';
@@ -58,7 +58,7 @@ const readFlag = (...values: unknown[]): boolean =>
 const unwrapPayload = (body: unknown): Record<string, unknown> => {
   const root = asRecord(body);
   if (!root) {
-    throw new Error('The AI Agent returned an invalid response.');
+    throw new LocalizedError('assistant:errors.invalidResponse');
   }
 
   const nested = asRecord(root.data);
@@ -107,11 +107,11 @@ const normalizeResponse = (body: unknown): AiAgentResponse => {
   );
 
   if (!reply && !pendingAction) {
-    throw new Error('The AI Agent returned an empty response.');
+    throw new LocalizedError('assistant:errors.emptyResponse');
   }
 
   if (pendingAction && !reply) {
-    throw new Error('The AI Agent returned an approval request without details.');
+    throw new LocalizedError('assistant:errors.approvalDetails');
   }
 
   return {
@@ -145,7 +145,8 @@ export class AiAgentApiService {
       const response = await this.client.getClient().post(path, data);
       return normalizeResponse(response.data);
     } catch (error) {
-      throw new Error(getApiErrorMessage(error, 'Workflow is temporarily unavailable. Please try again.'));
+      if (error instanceof LocalizedError) throw error;
+      throw new LocalizedError('assistant:errors.workflowUnavailable');
     }
   }
 }

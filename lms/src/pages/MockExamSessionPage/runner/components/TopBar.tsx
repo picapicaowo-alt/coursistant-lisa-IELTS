@@ -1,3 +1,6 @@
+import i18n from '@/i18n';
+import {formatNumber} from '@/i18n/formatting';
+import {useTranslation} from 'react-i18next';
 import { useCallback, useEffect, useState } from 'react'
 
 type TopBarProps = {
@@ -7,9 +10,9 @@ type TopBarProps = {
   paused: boolean
 }
 
-function formatMinutesLabel(seconds: number): string {
-  const minutes = Math.max(0, Math.ceil(seconds / 60))
-  return minutes === 1 ? '1 minute' : `${minutes} minutes`
+function formatMinutesLabel(seconds: number, paused: boolean): string {
+  const minutes = Math.max(0, Math.ceil(seconds / 60));
+  return i18n.t(paused ? 'exams:runner.pausedRemaining' : 'exams:runner.remaining', {count: minutes, minutes: formatNumber(minutes)});
 }
 
 function isFullscreenActive(): boolean {
@@ -23,13 +26,16 @@ async function toggleFullscreen() {
     } else {
       await document.documentElement.requestFullscreen()
     }
+    return true
   } catch {
-    window.alert('Unable to enter fullscreen. Please allow fullscreen for this page.')
+    return false
   }
 }
 
 export function TopBar({ testTitle, candidateId, remainingSeconds, paused }: TopBarProps) {
+  const {t: translate} = useTranslation();
   const [fullscreen, setFullscreen] = useState(false)
+  const [fullscreenError, setFullscreenError] = useState(false)
 
   useEffect(() => {
     const sync = () => setFullscreen(isFullscreenActive())
@@ -39,25 +45,25 @@ export function TopBar({ testTitle, candidateId, remainingSeconds, paused }: Top
   }, [])
 
   const handleFullscreen = useCallback(() => {
-    void toggleFullscreen()
+    void toggleFullscreen().then(success => setFullscreenError(!success))
   }, [])
 
   return (
     <header className="top-bar">
       <div className="top-bar__left">
         <strong className="top-bar__title">{testTitle}</strong>
-        <span className="top-bar__candidate">Candidate: {candidateId}</span>
+        <span className="top-bar__candidate">{translate('exams:runner.candidate', {id: candidateId})}</span>
       </div>
       <div className="top-bar__right">
         <span className={`top-bar__timer ${paused ? 'is-paused' : ''}`}>
-          {paused ? 'Paused · ' : ''}
-          {formatMinutesLabel(remainingSeconds)} remaining
+                    {formatMinutesLabel(remainingSeconds, paused)}
         </span>
+        {fullscreenError ? <span role="alert">{translate('exams:runner.fullscreenError')}</span> : null}
         <button
           type="button"
           className="icon-btn icon-btn--clickable"
-          title={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-          aria-label={fullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
+          title={fullscreen ? translate('exams:runner.exitFullscreen') : translate('exams:runner.enterFullscreen')}
+          aria-label={fullscreen ? translate('exams:runner.exitFullscreen') : translate('exams:runner.enterFullscreen')}
           aria-pressed={fullscreen}
           onClick={handleFullscreen}
         >

@@ -3,6 +3,8 @@ import React, {useState} from 'react';
 import {useMutation} from '@tanstack/react-query';
 import {RecordSummaryList} from '@/components/RecordSummaryList';
 import styles from './OperationCard.module.scss';
+import {useTranslation} from 'react-i18next';
+import {formatDateTime} from '@/i18n/formatting';
 
 type Tone = 'default' | 'danger';
 
@@ -15,6 +17,7 @@ export const OperationCard = ({
   title,
   description,
   actionLabel,
+  successMessage,
   onRun,
   children,
   disabled = false,
@@ -23,20 +26,22 @@ export const OperationCard = ({
   title: string;
   description?: string;
   actionLabel: string;
+  successMessage?: string;
   onRun: () => Promise<unknown>;
   children?: React.ReactNode;
   disabled?: boolean;
   tone?: Tone;
 }) => {
-  const [completedAt, setCompletedAt] = useState<string | null>(null);
+  const {t} = useTranslation('common');
+  const [completedAt, setCompletedAt] = useState<Date | null>(null);
   const operation = useMutation({
     mutationFn: onRun,
-    onSuccess: () => setCompletedAt(new Date().toLocaleTimeString()),
+    onSuccess: () => setCompletedAt(new Date()),
   });
 
   return (
     <CollapsibleSection title={title} summary={description} headingLevel={3}>
-      {completedAt ? <span className={styles.timestamp}>Updated {completedAt}</span> : null}
+      {completedAt ? <span className={styles.timestamp}>{t('feedback.updatedAt', {time: formatDateTime(completedAt, {hour: 'numeric', minute: '2-digit', second: '2-digit'})})}</span> : null}
       {children ? <div className={styles.fields}>{children}</div> : null}
       <button
         type="button"
@@ -44,12 +49,13 @@ export const OperationCard = ({
         disabled={disabled || operation.isPending}
         onClick={() => operation.mutate()}
       >
-        {operation.isPending ? 'Working…' : actionLabel}
+        {operation.isPending ? t('actions.working') : actionLabel}
       </button>
-      {operation.isError ? <p className={styles.error} role="alert">The operation could not be completed. Check the required fields, permissions, and current record version.</p> : null}
+      {operation.isError ? <p className={styles.error} role="alert">{t('feedback.operationFailed')}</p> : null}
       {operation.isSuccess ? (
         <div className={styles.result} aria-live="polite">
-          <RecordSummaryList value={responseData(operation.data)}/>
+          {successMessage ? <p role="status">{successMessage}</p> : null}
+          {responseData(operation.data) == null && successMessage ? null : <RecordSummaryList value={responseData(operation.data)}/>}
         </div>
       ) : null}
     </CollapsibleSection>

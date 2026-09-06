@@ -2,26 +2,26 @@ import {APP_ROUTE_PATHS} from './routePaths';
 
 /** One owner for Parent navigation, including existing bookmarked section URLs. */
 export const PARENT_SECTIONS = {
-  dashboard: {label: 'Student progress', description: 'A clear view of learning, attendance and course progress.'},
-  learning: {label: 'Learning', description: 'Explore the study plan, coursework and learning record.'},
-  schedule: {label: 'Schedule', description: 'Review scheduled classes and follow up on change requests.'},
-  reports: {label: 'Reports', description: 'Read published learning reports and the advising team’s recommendations.'},
-  exams: {label: 'Mock exams', description: 'Review assigned exams, completed sections and published scores.'},
-  messages: {label: 'Messages', description: 'Stay in touch with the advising team and read academic updates.'},
-  notifications: {label: 'Messages', description: 'Stay in touch with the advising team and read academic updates.'},
+  dashboard: {label: "navigation:studentProgress", description: "navigation:parent.progressDescription"},
+  learning: {label: "navigation:parent.learning", description: "navigation:parent.learningDescription"},
+  schedule: {label: "navigation:parent.schedule", description: "navigation:parent.scheduleDescription"},
+  reports: {label: "navigation:parent.reports", description: "navigation:parent.reportsDescription"},
+  exams: {label: "navigation:mockExams", description: "navigation:parent.examsDescription"},
+  messages: {label: "navigation:messages", description: "navigation:parent.messagesDescription"},
+  notifications: {label: "navigation:messages", description: "navigation:parent.messagesDescription"},
 } as const;
 
 export type ParentSection = keyof typeof PARENT_SECTIONS;
 export type ParentArea = Exclude<ParentSection, 'notifications'>;
 export const PARENT_AREAS: ParentArea[] = ['dashboard', 'learning', 'schedule', 'reports', 'exams', 'messages'];
 export const PARENT_LEARNING_TABS = [
-  {id: 'plan', label: 'Study plan'},
-  {id: 'courses', label: 'Courses & assignments'},
-  {id: 'attendance', label: 'Attendance & hours'},
+  {id: 'plan', label: "navigation:parent.studyPlan"},
+  {id: 'courses', label: "navigation:parent.coursework"},
+  {id: 'attendance', label: "navigation:parent.attendance"},
 ] as const;
 export const PARENT_SCHEDULE_TABS = [
-  {id: 'upcoming', label: 'Scheduled classes'},
-  {id: 'requests', label: 'Request history'},
+  {id: 'upcoming', label: "navigation:parent.scheduledClasses"},
+  {id: 'requests', label: "navigation:parent.requestHistory"},
 ] as const;
 export type ParentLearningTab = typeof PARENT_LEARNING_TABS[number]['id'];
 

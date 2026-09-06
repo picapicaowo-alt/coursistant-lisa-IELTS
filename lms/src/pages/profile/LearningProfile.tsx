@@ -1,3 +1,6 @@
+import {useTranslation} from 'react-i18next';
+import {formatNumber, formatNumericText} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
 import {useState} from 'react';
 import {SkillIcon} from '@/components/SkillIcon';
 import {ReleasedAssessments} from './ReleasedAssessments';
@@ -12,6 +15,7 @@ export function LearningProfileSummary({
 }: {
   profile: StudentFacingProfileResponse;
 }) {
+  const {t: translate} = useTranslation();
   const advisorName = formatPersonName({
     firstName: profile.assignedAdvisorFirstName,
     middleName: profile.assignedAdvisorMiddleName,
@@ -20,38 +24,38 @@ export function LearningProfileSummary({
   return (
     <div className={styles.summary}>
       <div className={styles.goal}>
-        <span>Baseline assessment</span>
-        <strong>{profile.baselineAssessment || 'Not assessed'}</strong>
+        <span>{translate("learning:plan.baseline")}</span>
+        <strong>{formatNumericText(profile.baselineAssessment) || translate("common:risk.notAssessed")}</strong>
       </div>
       <span className={styles.arrow} aria-hidden="true">
         →
       </span>
       <div className={styles.goal}>
-        <span>{profile.targetMetric || 'Learning goal'}</span>
+        <span>{profile.targetMetric || translate("learning:plan.goalLabel")}</span>
         <strong>
-          {profile.targetValue || profile.targetGoal || 'Not set'}
+          {formatNumericText(profile.targetValue) || profile.targetGoal || translate("assessment:submission.notSet")}
         </strong>
       </div>
       <dl>
         <div>
-          <dt>Assigned advisor</dt>
+          <dt>{translate("settings:learning.advisor")}</dt>
           <dd>
             {advisorName ||
               (profile.assignedAdvisorUserId
-                ? `Advisor #${profile.assignedAdvisorUserId}`
-                : 'Not assigned')}
+                ? translate('common:records.advisor', {id: formatNumber(profile.assignedAdvisorUserId)})
+                : translate("course:learning.notAssigned"))}
           </dd>
         </div>
         <div>
-          <dt>Enrollment status</dt>
-          <dd>{profile.enrollmentStatus || 'Not provided'}</dd>
+          <dt>{translate("settings:learning.enrollment")}</dt>
+          <dd>{statusLabel(profile.enrollmentStatus)}</dd>
         </div>
         <div>
-          <dt>Target date</dt>
+          <dt>{translate("advising:studentWorkspace.targetDate")}</dt>
           <dd>
             {profile.targetDate
               ? formatPlanDate(profile.targetDate)
-              : 'Not set'}
+              : translate("assessment:submission.notSet")}
           </dd>
         </div>
       </dl>
@@ -63,6 +67,7 @@ export function LearningProfileDetails({
 }: {
   profile: StudentFacingProfileResponse;
 }) {
+  const {t: translate} = useTranslation();
   const [tab, setTab] = useState<'insights' | 'assessments'>('insights');
   const performance = profile.performanceSummary;
   return (
@@ -75,49 +80,46 @@ export function LearningProfileDetails({
               <span className={styles.skillSymbol} aria-hidden="true">
                 <SkillIcon code={skill.skillCode}/>
               </span>
-              <h2>{skill.displayName || skill.skillCode}</h2>
-              <strong>{skill.currentValue || 'Not assessed'}</strong>
+              <h2>{skill.displayName || statusLabel(skill.skillCode)}</h2>
+              <strong>{formatNumericText(skill.currentValue) || translate("common:risk.notAssessed")}</strong>
               <small>
                 {skill.scale}{' '}
-                {skill.targetValue ? `· Target ${skill.targetValue}` : ''}
+                {skill.targetValue ? <>· {translate('advising:studentWorkspace.targetValue', {value: formatNumericText(skill.targetValue)})}</> : null}
               </small>
             </article>;
           })}
       </div>
       {(profile.skills?.length ?? 0) === 0 ? (
         <p className={styles.empty}>
-          Your advisor has not added skill assessments yet.
-        </p>
+          {translate("settings:learning.noSkills")}</p>
       ) : null}
       <div className={styles.insightLayout}>
         <section>
-          <nav aria-label="Learning profile views">
+          <nav aria-label={translate("settings:learning.views")}>
             <button
               type="button"
               aria-pressed={tab === 'insights'}
               onClick={() => setTab('insights')}
             >
-              Insights
-            </button>
+              {translate("settings:learning.insights")}</button>
             <button
               type="button"
               aria-pressed={tab === 'assessments'}
               onClick={() => setTab('assessments')}
             >
-              Assessments
-            </button>
+              {translate("settings:learning.assessments")}</button>
           </nav>
           {tab === 'insights' ? (
             <div className={styles.insights}>
               <article>
-                <h2>Learning Goal</h2>
+                <h2>{translate("settings:learning.goal")}</h2>
                 <p>
                   {profile.targetGoal ||
-                    'Your advisor will help you set your goal.'}
+                    translate("settings:learning.noGoal")}
                 </p>
               </article>
               <article>
-                <h2>Focus Areas</h2>
+                <h2>{translate("settings:learning.focus")}</h2>
                 {profile.skills?.some((skill) => skill.gapSummary) ? (
                   <ul>
                     {profile.skills
@@ -125,21 +127,21 @@ export function LearningProfileDetails({
                       .map((skill, index) => (
                         <li key={skill.skillCode ?? index}>
                           <strong>
-                            {skill.displayName || skill.skillCode}
+                            {skill.displayName || statusLabel(skill.skillCode)}
                           </strong>
                           <p>{skill.gapSummary}</p>
                         </li>
                       ))}
                   </ul>
                 ) : (
-                  <p>No focus areas recorded yet.</p>
+                  <p>{translate("settings:learning.noFocus")}</p>
                 )}
               </article>
               <article>
-                <h2>Advisor Notes</h2>
+                <h2>{translate("settings:learning.notes")}</h2>
                 <p>
                   {profile.advisorInterpretation ||
-                    'Your advisor has not shared an interpretation yet.'}
+                    translate("settings:learning.noNotes")}
                 </p>
               </article>
             </div>
@@ -147,33 +149,33 @@ export function LearningProfileDetails({
             <>
               <ReleasedAssessments />
               <div className={styles.assessments}>
-                <h2>Learning Summary</h2>
+                <h2>{translate("settings:learning.summary")}</h2>
                 <dl>
                   {[
                     {
-                      label: 'Released assignments',
+                      labelKey: 'settings:learning.releasedAssignments',
                       value: performance?.releasedAssignmentCount,
                     },
                     {
-                      label: 'Released score average',
+                      labelKey: 'settings:learning.average',
                       value: performance?.releasedScoreAverage,
                     },
                     {
-                      label: 'Completed sessions',
+                      labelKey: 'settings:learning.sessions',
                       value: performance?.completedSessionCount,
                     },
                     {
-                      label: 'Completed advisor tasks',
+                      labelKey: 'settings:learning.tasks',
                       value: performance?.completedAdvisorTaskCount,
                     },
                     {
-                      label: 'Published reports',
+                      labelKey: 'settings:learning.reports',
                       value: performance?.publishedReportCount,
                     },
                   ].map((item) => (
-                    <div key={item.label}>
-                      <dt>{item.label}</dt>
-                      <dd>{item.value ?? 'Not available'}</dd>
+                    <div key={item.labelKey}>
+                      <dt>{translate(item.labelKey)}</dt>
+                      <dd>{item.value == null ? translate("common:feedback.notAvailable") : formatNumber(item.value)}</dd>
                     </div>
                   ))}
                 </dl>
@@ -182,10 +184,10 @@ export function LearningProfileDetails({
           )}
         </section>
         <aside>
-          <h2>Recent Activity</h2>
+          <h2>{translate("settings:learning.activity")}</h2>
           <RecordSummaryList
             value={performance?.activityHistory ?? []}
-            emptyMessage="No activity has been recorded yet."
+            emptyMessage={translate("settings:learning.noActivity")}
           />
         </aside>
       </div>

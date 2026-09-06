@@ -1,0 +1,17 @@
+.select {
+  min-height: t.$control-height-sm;
+  max-width: 100%;
+  padding: t.$space-2;
+  border: 1px solid t.$border-default;
+  border-radius: t.$radius-sm;
+  background: t.$surface-raised;
+  color: t.$content-primary;
+  font: inherit;
+  font-size: t.$font-size-caption;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid t.$action-primary;
+    outline-offset: 2px;
+  }
+}

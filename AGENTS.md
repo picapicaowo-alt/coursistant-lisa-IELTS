@@ -66,6 +66,33 @@ stack and ownership boundary. It is not a drop-in replacement for
 - Never add `any`, `as any`, `@ts-nocheck`, ignored lint errors, secrets, or
   production `console.log` calls to avoid doing the real work.
 
+## Internationalization (permanent product requirement)
+
+- Support English (`en`), Simplified Chinese (`zh-CN`) and Traditional Chinese
+  (`zh-TW`) across every role, route, shared component and frontend message.
+- Use the shared `i18next` / `react-i18next` architecture in `lms/src/i18n/`.
+  Do not hardcode translatable UI copy or create page/role localization systems.
+- Add, change or remove semantic keys in all three locale resources together.
+  Reuse equivalent keys and preserve interpolation and pluralization parity.
+- Translate platform controls, statuses, validation, accessibility text and
+  platform-owned artwork. Render only the selected locale in platform UI.
+- This is an IELTS training product: **never translate examination content**.
+  Preserve passages, question stems, paper instructions, answer choices, answer
+  codes, student responses, and original question images/audio. The same rule
+  applies to authored learning content, vocabulary and user-generated text.
+- Locale changes must not change API payloads, IDs, enum values, React keys,
+  concurrency versions, retry identities, drafts or submitted-section locks.
+  Translated labels are presentation, never business conditions or identifiers.
+- Use shared locale-aware formatting without changing API serialization or
+  date-only, wall-clock and timezone semantics. Keep transient feedback as keys
+  or error identities and translate at render time.
+- English is the unexpected-missing-key fallback, not permission to omit a
+  supported locale. Missing keys must warn in development.
+- Verify key parity, locale switching, persistence, single-locale platform UI,
+  and unchanged learning content. Builds and fixtures do not prove real-role
+  Production acceptance. See `docs/internationalization.md` and section 17 of
+  `lms/PROJECT_STANDARDS.md`.
+
 ## Required checks
 
 From `lms/`, run the checks proportionate to the change. Before merging a
@@ -75,6 +102,10 @@ production-facing change, the complete baseline is:
 npm run lint:ci
 npm run typecheck
 npm run typecheck:production
+npm run typecheck:i18n
+npm run test:i18n-tools
+npm run i18n:keys
+npm run i18n:check
 npm run test:run
 npm run build
 npm run test:e2e

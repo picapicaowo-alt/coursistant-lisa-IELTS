@@ -1,4 +1,7 @@
-import {useId} from 'react';
+import { useTranslation } from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
+import {useId, useRef} from 'react';
+import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
 import {Plus, Trash2} from 'lucide-react';
 import {isRecord} from '@/utils/apiError';
 import {emptyValue, type Field} from './questionSchema';
@@ -12,7 +15,7 @@ export function ContentFields({
   value,
   onChange,
   nextNumber,
-  path = field.label,
+  path: parentPath,
 }: {
   field: Field;
   value: unknown;
@@ -20,7 +23,12 @@ export function ContentFields({
   nextNumber: () => number;
   path?: string;
 }) {
+  const { t: translate } = useTranslation();
+  const path = parentPath ?? translate(field.labelKey);
   const helpId = useId();
+  const confirmation = useConfirmationDialog(helpId);
+  const latestValue = useRef(value);
+  latestValue.current = value;
   if (field.type === 'object') {
     const record = isRecord(value) ? value : {};
     return (
@@ -32,7 +40,7 @@ export function ContentFields({
             value={record[key]}
             onChange={(next) => onChange({...record, [key]: next})}
             nextNumber={nextNumber}
-            path={`${path} / ${child.label}`}
+            path={`${path} / ${translate(child.labelKey)}`}
           />
         ))}
         {hasAnswerSlot(field) ? (
@@ -50,9 +58,9 @@ export function ContentFields({
     return (
       <div className={styles.fields}>
         <label>
-          <span>{field.label} content</span>
+          <span>{translate('exams:authoring.fieldContent', {field: translate(field.labelKey)})}</span>
           <select
-            aria-label={`${path} content`}
+            aria-label={translate('exams:authoring.fieldContent', {field: path})}
             value={type}
             onChange={(event) => {
               const next = emptyValue(
@@ -70,7 +78,7 @@ export function ContentFields({
           >
             {Object.entries(field.variants).map(([key, item]) => (
               <option key={key} value={key}>
-                {item.label}
+                {translate(item.labelKey)}
               </option>
             ))}
           </select>
@@ -89,24 +97,24 @@ export function ContentFields({
     const items = Array.isArray(value) ? value : [];
     return (
       <fieldset className={styles.collection}>
-        <legend>{field.label}</legend>
+        {confirmation.dialog}
+        <legend>{translate(field.labelKey)}</legend>
         {items.map((item, index) => (
           <div className={styles.collectionItem} key={index}>
             <div className={styles.itemHeading}>
               <strong>
-                {field.item.label} {index + 1}
+                {translate('exams:authoring.numberedField', {field: translate(field.item.labelKey), number: formatNumber(index + 1)})}
               </strong>
               <button
                 type="button"
                 className={ui.iconButton}
-                aria-label={`Remove ${path} ${index + 1}`}
-                onClick={() => {
+                aria-label={translate('common:actions.removeItem', {item: translate('exams:authoring.numberedField', {field: path, number: formatNumber(index + 1)})})}
+                onClick={async () => {
                   if (
-                    !window.confirm(
-                      `Remove ${field.item.label.toLowerCase()} ${index + 1} and its content?`,
-                    )
+                    !await confirmation.confirm({titleKey: 'common:actions.remove', messageKey: 'exams:authoring.removeFieldConfirm', valueKeys: {field: field.item.labelKey}, values: {number: index + 1}})
                   )
                     return;
+                  if (latestValue.current !== value) return;
                   onChange(items.filter((_, current) => current !== index));
                 }}
               >
@@ -122,7 +130,7 @@ export function ContentFields({
                 )
               }
               nextNumber={nextNumber}
-              path={`${path} ${index + 1}`}
+              path={translate('exams:authoring.numberedField', {field: path, number: formatNumber(index + 1)})}
             />
           </div>
         ))}
@@ -134,7 +142,7 @@ export function ContentFields({
           }
         >
           <Plus size={16} />
-          Add {field.item.label.toLowerCase()}
+          {translate('common:actions.addItem', {item: translate(field.item.labelKey)})}
         </button>
       </fieldset>
     );
@@ -142,8 +150,7 @@ export function ContentFields({
   return (
     <label>
       <span>
-        {field.label}
-        {field.optional ? ' (optional)' : ''}
+        {field.optional ? translate('exams:authoring.optionalField', {field: translate(field.labelKey)}) : translate(field.labelKey)}
       </span>
       {field.type === 'choice' ? (
         <select
@@ -173,18 +180,18 @@ export function ContentFields({
           aria-label={path}
           rows={2}
           value={typeof value === 'string' ? value : ''}
-          aria-describedby={field.hint ? helpId : undefined}
+          aria-describedby={field.hintKey ? helpId : undefined}
           onChange={(event) => onChange(event.target.value)}
         />
       ) : (
         <input
           aria-label={path}
           value={typeof value === 'string' ? value : ''}
-          aria-describedby={field.hint ? helpId : undefined}
+          aria-describedby={field.hintKey ? helpId : undefined}
           onChange={(event) => onChange(event.target.value)}
         />
       )}
-      {field.hint ? <small id={helpId}>{field.hint}</small> : null}
+      {field.hintKey ? <small id={helpId}>{translate(field.hintKey)}</small> : null}
     </label>
   );
 }

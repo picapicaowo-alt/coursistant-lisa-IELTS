@@ -3,6 +3,8 @@ import type {
   TenantAlertRuleRequest,
   TenantAlertRuleResponse,
 } from "@/apis";
+import i18n from '@/i18n';
+import {formatNumericText, formatPercent} from '@/i18n/formatting';
 
 export type NumericField =
   | "inactivityDays"
@@ -26,65 +28,65 @@ export type AlertForm = { mode: TenantAlertRuleMode } & Record<
   Record<ToggleField, number | null>;
 export type RuleGroup = {
   id: string;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
   numeric: NumericField[];
   toggle?: ToggleField;
 };
 
 export const RULE_MODES: {
   value: TenantAlertRuleMode;
-  title: string;
-  description: string;
+  titleKey: string;
+  descriptionKey: string;
 }[] = [
   {
     value: "SYSTEM_DEFAULT",
-    title: "System default",
-    description: "Platform-managed thresholds",
+    titleKey: "operations:alertRules.modes.system.title",
+    descriptionKey: "operations:alertRules.modes.system.description",
   },
   {
     value: "TENANT_OVERRIDE",
-    title: "Tenant override",
-    description: "Customize your thresholds",
+    titleKey: "operations:alertRules.modes.override.title",
+    descriptionKey: "operations:alertRules.modes.override.description",
   },
   {
     value: "DISABLED",
-    title: "Disabled",
-    description: "Pause tenant evaluation",
+    titleKey: "common:admin.status.DISABLED",
+    descriptionKey: "operations:alertRules.modes.disabled.description",
   },
 ];
 export const NUMERIC_FIELDS: Record<
   NumericField,
-  { label: string; step: string }
+  { labelKey: string; step: string }
 > = {
-  inactivityDays: { label: "Inactivity (days)", step: "1" },
-  absenceCount: { label: "Absence count", step: "1" },
-  absenceWindowDays: { label: "Absence window (days)", step: "1" },
-  completionPercentage: { label: "Completion percentage", step: "0.01" },
-  completionWindowDays: { label: "Completion window (days)", step: "1" },
-  completionMinimumSample: { label: "Completion minimum sample", step: "1" },
-  performancePercentage: { label: "Performance percentage", step: "0.01" },
-  performanceMinimumGradedSample: { label: "Minimum graded sample", step: "1" },
-  deadlineWindowDays: { label: "Deadline window (days)", step: "1" },
-  gradingDelayDays: { label: "Grading delay (days)", step: "1" },
+  inactivityDays: { labelKey: "operations:alertRules.fields.inactivityDays", step: "1" },
+  absenceCount: { labelKey: "common:admin.absenceCount", step: "1" },
+  absenceWindowDays: { labelKey: "operations:alertRules.fields.absenceWindowDays", step: "1" },
+  completionPercentage: { labelKey: "operations:alertRules.fields.completionPercentage", step: "0.01" },
+  completionWindowDays: { labelKey: "operations:alertRules.fields.completionWindowDays", step: "1" },
+  completionMinimumSample: { labelKey: "operations:alertRules.fields.completionMinimumSample", step: "1" },
+  performancePercentage: { labelKey: "operations:alertRules.fields.performancePercentage", step: "0.01" },
+  performanceMinimumGradedSample: { labelKey: "operations:alertRules.fields.performanceMinimumGradedSample", step: "1" },
+  deadlineWindowDays: { labelKey: "operations:alertRules.fields.deadlineWindowDays", step: "1" },
+  gradingDelayDays: { labelKey: "operations:alertRules.fields.gradingDelayDays", step: "1" },
 };
 export const RULE_GROUPS: RuleGroup[] = [
   {
     id: "inactivity",
-    title: "Learning inactivity",
-    description: "Time since the last learning activity.",
+    titleKey: "operations:alertRules.groups.inactivity.title",
+    descriptionKey: "operations:alertRules.groups.inactivity.description",
     numeric: ["inactivityDays"],
   },
   {
     id: "attendance",
-    title: "Attendance",
-    description: "Absences within a defined period.",
+    titleKey: "operations:tabs.attendance",
+    descriptionKey: "operations:alertRules.groups.attendance.description",
     numeric: ["absenceCount", "absenceWindowDays"],
   },
   {
     id: "completion",
-    title: "Completion",
-    description: "Completion rate and minimum sample size.",
+    titleKey: "operations:alertRules.groups.completion.title",
+    descriptionKey: "operations:alertRules.groups.completion.description",
     numeric: [
       "completionPercentage",
       "completionWindowDays",
@@ -93,34 +95,34 @@ export const RULE_GROUPS: RuleGroup[] = [
   },
   {
     id: "performance",
-    title: "Performance",
-    description: "Performance threshold and graded samples.",
+    titleKey: "operations:alertRules.groups.performance.title",
+    descriptionKey: "operations:alertRules.groups.performance.description",
     numeric: ["performancePercentage", "performanceMinimumGradedSample"],
   },
   {
     id: "deadlines",
-    title: "Deadlines and grading",
-    description: "Upcoming deadlines and grading delays.",
+    titleKey: "operations:alertRules.groups.deadlines.title",
+    descriptionKey: "operations:alertRules.groups.deadlines.description",
     numeric: ["deadlineWindowDays", "gradingDelayDays"],
   },
   {
     id: "overdue",
-    title: "Overdue tasks",
-    description: "Include overdue tasks in evaluation.",
+    titleKey: "operations:alertRules.groups.overdue.title",
+    descriptionKey: "operations:alertRules.groups.overdue.description",
     numeric: [],
     toggle: "overdueTaskEnabled",
   },
   {
     id: "checkpoints",
-    title: "Incomplete checkpoints",
-    description: "Include incomplete study-plan checkpoints.",
+    titleKey: "operations:alertRules.groups.checkpoints.title",
+    descriptionKey: "operations:alertRules.groups.checkpoints.description",
     numeric: [],
     toggle: "checkpointIncompleteEnabled",
   },
   {
     id: "hours",
-    title: "Negative hours",
-    description: "Include negative course-hour balances.",
+    titleKey: "operations:alertRules.groups.hours.title",
+    descriptionKey: "operations:alertRules.groups.hours.description",
     numeric: [],
     toggle: "negativeHoursEnabled",
   },
@@ -184,30 +186,31 @@ export function ruleSummary(
   form: AlertForm,
   baseline: TenantAlertRuleResponse,
 ) {
-  if (form.mode === "DISABLED") return group.description;
+  if (form.mode === "DISABLED") return i18n.t(group.descriptionKey);
   // A local switch to system mode cannot turn an earlier override into defaults.
   if (form.mode === "SYSTEM_DEFAULT" && baseline.mode !== "SYSTEM_DEFAULT")
-    return group.description;
+    return i18n.t(group.descriptionKey);
   const values = form.mode === "SYSTEM_DEFAULT" ? toAlertForm(baseline) : form;
-  if (group.toggle) return group.description;
+  if (group.toggle) return i18n.t(group.descriptionKey);
   if (group.numeric.every((key) => values[key] === "")) {
     return form.mode === "SYSTEM_DEFAULT"
-      ? group.description
-      : "Not configured";
+      ? i18n.t(group.descriptionKey)
+      : i18n.t('operations:alertRules.notConfigured');
   }
-  const value = (key: NumericField) => values[key] || "—";
+  const value = (key: NumericField) => formatNumericText(values[key]) || "—";
+  const percentage = (key: NumericField) => values[key] === '' ? '—' : formatPercent(Number(values[key]) / 100, {maximumFractionDigits: 2});
   switch (group.id) {
     case "inactivity":
-      return `Inactivity: ${value("inactivityDays")} days`;
+      return i18n.t('operations:alertRules.summary.inactivity', {count: Number(values.inactivityDays), number: value('inactivityDays')});
     case "attendance":
-      return `${value("absenceCount")} absences within ${value("absenceWindowDays")} days`;
+      return i18n.t('operations:alertRules.summary.attendance', {absences: value('absenceCount'), days: value('absenceWindowDays')});
     case "completion":
-      return `${value("completionPercentage")}% completion · ${value("completionWindowDays")} days · min. ${value("completionMinimumSample")} samples`;
+      return i18n.t('operations:alertRules.summary.completion', {percentage: percentage('completionPercentage'), days: value('completionWindowDays'), samples: value('completionMinimumSample')});
     case "performance":
-      return `${value("performancePercentage")}% threshold · min. ${value("performanceMinimumGradedSample")} graded`;
+      return i18n.t('operations:alertRules.summary.performance', {percentage: percentage('performancePercentage'), samples: value('performanceMinimumGradedSample')});
     case "deadlines":
-      return `Deadline window: ${value("deadlineWindowDays")} days · grading delay: ${value("gradingDelayDays")} days`;
+      return i18n.t('operations:alertRules.summary.deadlines', {deadline: value('deadlineWindowDays'), grading: value('gradingDelayDays')});
     default:
-      return group.description;
+      return i18n.t(group.descriptionKey);
   }
 }

@@ -1,4 +1,4 @@
-import {useTranslation} from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {useMemo, useState} from 'react';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {ArrowRight, BookOpen, Filter, Layers3, Play, Sparkles} from 'lucide-react';
@@ -11,6 +11,7 @@ import {ProgressRing} from '@/pages/vocabulary/components/ProgressRing';
 import {vocabularyQueryKeys} from '@/pages/vocabulary/queryKeys';
 import {VOCABULARY_PATHS} from '@/pages/vocabulary/routes';
 import {getApiErrorMessage} from '@/utils/apiError';
+import {formatNumber} from '@/i18n/formatting';
 import styles from './index.module.scss';
 
 interface LibraryFilters {
@@ -22,7 +23,7 @@ interface LibraryFilters {
 const EMPTY_FILTERS: LibraryFilters = {theme: '', skillFocus: '', difficulty: ''};
 
 const VocabularyPage = () => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const {user} = useRequiredAuth();
   const studentId = String(user.userId);
   const navigate = useNavigate();
@@ -52,8 +53,8 @@ const VocabularyPage = () => {
     },
   });
 
-  if (query.isPending) return <main className={styles.page}><PageState kind="loading" title="Opening your library" detail="Loading lists and private study progress…"/></main>;
-  if (query.isError) return <main className={styles.page}><PageState kind="error" title="The library could not be loaded" detail="Your progress is safe. The Vocabulary service is temporarily unavailable; please try again." onRetry={() => void query.refetch()}/></main>;
+  if (query.isPending) return <main className={styles.page}><PageState kind="loading" title={translate("vocabulary:library.opening")} detail={translate("vocabulary:library.loading")}/></main>;
+  if (query.isError) return <main className={styles.page}><PageState kind="error" title={translate("vocabulary:library.failed")} detail={translate("vocabulary:library.failedHelp")} onRetry={() => void query.refetch()}/></main>;
 
   const data = query.data;
   const resumableSession = data.continue;
@@ -61,13 +62,13 @@ const VocabularyPage = () => {
     <main className={styles.page}>
       <header className={styles.hero}>
         <div>
-          <div className={styles.eyebrow}><Sparkles size={15}/> Your independent study space</div>
-          <h1>Vocabulary</h1>
-          <p>Build confident recall at your own pace. Ratings stay private and never affect courses, assignments, or reports.</p>
+          <div className={styles.eyebrow}><Sparkles size={15}/> {' '}{translate("vocabulary:library.eyebrow")}</div>
+          <h1>{translate("common:sidebar.vocabulary")}</h1>
+          <p>{translate("vocabulary:library.help")}</p>
         </div>
         <div className={styles.heroMark} aria-hidden="true">
           <BookOpen/>
-          <span>word<br/>by word</span>
+          <span>{translate("vocabulary:library.wordByWord")}</span>
         </div>
       </header>
 
@@ -75,9 +76,9 @@ const VocabularyPage = () => {
         <section className={styles.continueCard} aria-labelledby="continue-heading">
           <div className={styles.continueIcon}><Play fill="currentColor"/></div>
           <div>
-            <span className={styles.kicker}>Continue where you left off</span>
+            <span className={styles.kicker}>{translate("vocabulary:library.continue")}</span>
             <h2 id="continue-heading">{resumableSession.listName}</h2>
-            <p>{resumableSession.unitName} · {resumableSession.mode === 'TEST' ? 'Test mode' : 'Remember mode'}</p>
+            <p>{resumableSession.unitName} · {resumableSession.mode === 'TEST' ? translate("vocabulary:mode.testMode") : translate("vocabulary:mode.rememberMode")}</p>
           </div>
           <button
             type="button"
@@ -88,7 +89,7 @@ const VocabularyPage = () => {
           </button>
           {resumeMutation.isError ? (
             <p className={styles.continueError} role="alert">
-              {getApiErrorMessage(resumeMutation.error, 'The session could not be resumed. Your saved position is unchanged.')}
+              {getApiErrorMessage(resumeMutation.error, translate("vocabulary:session.resumeFailed"))}
             </p>
           ) : null}
         </section>
@@ -97,55 +98,55 @@ const VocabularyPage = () => {
       <section className={styles.librarySection} aria-labelledby="library-heading">
         <div className={styles.sectionHeading}>
           <div>
-            <span className={styles.kicker}>Curated library</span>
-            <h2 id="library-heading">Choose a word list</h2>
+            <span className={styles.kicker}>{translate("vocabulary:library.curated")}</span>
+            <h2 id="library-heading">{translate("vocabulary:library.choose")}</h2>
           </div>
-          <span className={styles.listCount}><Layers3 size={16}/>{data.items.length} lists</span>
+          <span className={styles.listCount}><Layers3 size={16}/>{translate("vocabulary:library.lists", {count: data.items.length, number: formatNumber(data.items.length)})}</span>
         </div>
 
-        <div className={styles.filters} aria-label="Filter vocabulary lists">
+        <div className={styles.filters} aria-label={translate("vocabulary:library.filters")}>
           <Filter size={18} aria-hidden="true"/>
           <label>
-            <span>Theme</span>
+            <span>{translate("vocabulary:library.theme")}</span>
             <select value={filters.theme} onChange={event => setFilters(current => ({...current, theme: event.target.value}))}>
-              <option value="">All themes</option>
-              {data.filters.themes.map(value => <option key={value}>{value}</option>)}
+              <option value="">{translate("vocabulary:library.allThemes")}</option>
+              {data.filters.themes.map(value => <option key={value} value={value}>{value}</option>)}
             </select>
           </label>
           <label>
-            <span>Skill focus</span>
+            <span>{translate("vocabulary:library.skill")}</span>
             <select value={filters.skillFocus} onChange={event => setFilters(current => ({...current, skillFocus: event.target.value}))}>
-              <option value="">All skills</option>
-              {data.filters.skillFocuses.map(value => <option key={value}>{value}</option>)}
+              <option value="">{translate("vocabulary:library.allSkills")}</option>
+              {data.filters.skillFocuses.map(value => <option key={value} value={value}>{value}</option>)}
             </select>
           </label>
           <label>
-            <span>Difficulty</span>
+            <span>{translate("vocabulary:library.difficulty")}</span>
             <select value={filters.difficulty} onChange={event => setFilters(current => ({...current, difficulty: event.target.value}))}>
-              <option value="">All levels</option>
-              {data.filters.difficulties.map(value => <option key={value}>{value}</option>)}
+              <option value="">{translate("vocabulary:library.allLevels")}</option>
+              {data.filters.difficulties.map(value => <option key={value} value={value}>{value}</option>)}
             </select>
           </label>
           {Object.values(filters).some(Boolean) ? (
-            <button type="button" onClick={() => setFilters(EMPTY_FILTERS)}>Clear</button>
+            <button type="button" onClick={() => setFilters(EMPTY_FILTERS)}>{translate("common:actions.clear")}</button>
           ) : null}
         </div>
 
         {data.items.length === 0 ? (
-          <PageState kind="empty" title="No lists match these filters" detail="Clear one or more filters to see the full library."/>
+          <PageState kind="empty" title={translate("vocabulary:library.noMatches")} detail={translate("vocabulary:library.clearHelp")}/>
         ) : (
           <div className={styles.listGrid}>
             {data.items.map((list, index) => (
               <Link className={styles.listCard} to={VOCABULARY_PATHS.list(list.id)} key={list.id}>
                 <div className={styles.cardTop}>
-                  <span className={styles.ordinal}>{String(index + 1).padStart(2, '0')}</span>
-                  <ProgressRing value={list.progress.clearedWords} max={list.progress.totalWords} label={`${list.name} progress`}/>
+                  <span className={styles.ordinal}>{formatNumber(index + 1, {minimumIntegerDigits: 2})}</span>
+                  <ProgressRing value={list.progress.clearedWords} max={list.progress.totalWords} label={translate("vocabulary:library.progress", {name: list.name})}/>
                 </div>
                 <div className={styles.tags}><span>{list.theme}</span><span>{list.difficulty}</span></div>
                 <h3>{list.name}</h3>
                 <p>{list.description}</p>
                 <div className={styles.cardFooter}>
-                  <span>{list.totalWords} words · {list.skillFocus}</span>
+                  <span>{translate("vocabulary:words", {count: list.totalWords, number: formatNumber(list.totalWords)})} · {list.skillFocus}</span>
                   <ArrowRight size={18}/>
                 </div>
               </Link>

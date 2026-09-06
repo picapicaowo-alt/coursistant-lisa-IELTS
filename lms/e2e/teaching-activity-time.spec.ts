@@ -1,5 +1,6 @@
 import {expect, test} from '@playwright/test';
 import {fixture, reply} from './workspace-fixtures';
+import {tx} from './i18n-fixture';
 
 for (const scenario of [
   {zone: 'America/Los_Angeles', locale: 'en', text: 'Sep 5, 12:36 AM PDT'},
@@ -17,7 +18,7 @@ for (const scenario of [
         {kind: 'GroupMembershipChange', courseId: 71, courseCode: 'WR101', summary: 'Offset event', occurredAt: '2026-09-05T07:36:24Z', timezone: 'Asia/Shanghai', groupSetId: 81},
       ])}));
       await page.goto('/');
-      const activity = page.getByRole('region', {name: 'Recent activity', exact: true});
+      const activity = page.getByRole('region', {name: tx(scenario.locale, 'dashboard:recentActivity'), exact: true});
       await expect(activity.getByRole('link').first()).toContainText(scenario.text);
       await expect(activity.locator('time')).toHaveCount(2);
       for (const item of await activity.locator('time').all()) {

@@ -1,9 +1,13 @@
+import { useTranslation } from 'react-i18next';
 import {useEffect, useState} from 'react';
 import styles from './DynamicThinking.module.scss';
+import {formatNumber} from '@/i18n/formatting';
 
 export interface ThinkingStep {
   id: string;
   text: string;
+  /** Frontend-owned progress retains its semantic key across language changes. */
+  translationKey?: string;
 }
 
 interface DynamicThinkingProps {
@@ -17,18 +21,19 @@ interface DynamicThinkingProps {
 }
 
 const DEFAULT_FALLBACK_STEPS: readonly ThinkingStep[] = [
-  {id: 'understand', text: 'Understanding your request.'},
-  {id: 'context', text: 'Reviewing the relevant context.'},
-  {id: 'response', text: 'Preparing a clear response.'},
+  {id: 'understand', text: 'assistant:thinking.understand'},
+  {id: 'context', text: 'assistant:thinking.context'},
+  {id: 'response', text: 'assistant:thinking.response'},
 ];
 
 const STEP_REVEAL_INTERVAL_SECONDS = 4;
 
 const DynamicThinking = ({
   steps = [],
-  fallbackSteps = DEFAULT_FALLBACK_STEPS,
-  label = 'AI is thinking',
+  fallbackSteps,
+  label,
 }: DynamicThinkingProps) => {
+  const { t: translate } = useTranslation();
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   useEffect(() => {
@@ -40,8 +45,10 @@ const DynamicThinking = ({
     return () => window.clearInterval(intervalId);
   }, []);
 
-  const streamedSteps = steps.filter(step => step.text.trim());
-  const safeFallbackSteps = fallbackSteps.filter(step => step.text.trim());
+  const localizeStep = (step: ThinkingStep) => ({...step, text: step.translationKey ? translate(step.translationKey) : step.text});
+  const streamedSteps = steps.map(localizeStep).filter(step => step.text.trim());
+  const displayLabel = label ?? translate('assistant:thinking.label');
+  const safeFallbackSteps = (fallbackSteps?.map(localizeStep) ?? DEFAULT_FALLBACK_STEPS.map(step => ({...step, text: translate(step.text)}))).filter(step => step.text.trim());
   const fallbackCount = Math.min(
     safeFallbackSteps.length,
     1 + Math.floor(elapsedSeconds / STEP_REVEAL_INTERVAL_SECONDS),
@@ -54,12 +61,12 @@ const DynamicThinking = ({
   return (
     <section
       className={styles.container}
-      aria-label="AI response progress"
+      aria-label={translate("assistant:thinking.progress")}
       aria-busy="true"
     >
       <div className={styles.header} aria-hidden="true">
-        <span>{label}</span>
-        <span className={styles.elapsed}>· {elapsedSeconds}s</span>
+        <span>{displayLabel}</span>
+        <span className={styles.elapsed}>· {translate('assistant:thinking.elapsed', {seconds: formatNumber(elapsedSeconds)})}</span>
       </div>
 
       <ol className={styles.steps} aria-hidden="true">
@@ -75,7 +82,7 @@ const DynamicThinking = ({
       </ol>
 
       <span className={styles.srOnly} role="status" aria-live="polite" aria-atomic="true">
-        {activeStep ? `${label}: ${activeStep.text}` : label}
+        {activeStep ? translate('assistant:thinking.status', {label: displayLabel, step: activeStep.text}) : displayLabel}
       </span>
     </section>
   );

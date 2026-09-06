@@ -1,3 +1,5 @@
+import {formatNumber} from '@/i18n/formatting';
+import {useTranslation} from 'react-i18next';
 import {useEffect, useMemo, useRef, useState} from 'react';
 import {useInfiniteQuery, useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {
@@ -51,6 +53,7 @@ const NotificationRow = ({
   identity?: Pick<LoginResponse, 'role' | 'level'>;
   onOpen: (notification: NotificationItem) => void;
 }) => {
+  const {t: translate} = useTranslation();
   const Icon = ICONS[notification.notificationType] ?? Bell;
   const target = resolveNotificationPath(notification, identity);
   const unread = !notification.readAt;
@@ -63,19 +66,19 @@ const NotificationRow = ({
         className={styles.notificationButton}
         onClick={() => onOpen(notification)}
         disabled={!target}
-        aria-label={target ? `Open notification: ${notification.message}` : `Notification unavailable: ${notification.message}`}
+        aria-label={translate(target ? 'notification:open' : 'notification:unavailable', {message: notification.message})}
       >
         <span className={styles.typeIcon} aria-hidden="true"><Icon size={18}/></span>
         <span className={styles.notificationCopy}>
           <span className={styles.rowHeading}>
             <strong>{getNotificationTitle(notification.notificationType)}</strong>
-            {unread ? <span className={styles.unreadDot} aria-label="Unread"/> : null}
+            {unread ? <span className={styles.unreadDot} aria-label={translate("notification:unread")}/> : null}
           </span>
           <span className={styles.message}>{notification.message}</span>
           <span className={styles.metadata}>
             {notification.courseCode ? <span>{notification.courseCode}</span> : null}
             <time dateTime={notification.createdAt}>{formatNotificationTime(notification.createdAt)}</time>
-            {unavailable ? <span className={styles.unavailable}>No longer available</span> : null}
+            {unavailable ? <span className={styles.unavailable}>{translate("notification:noLongerAvailable")}</span> : null}
           </span>
         </span>
         {target ? <ChevronRight className={styles.chevron} size={18} aria-hidden="true"/> : null}
@@ -85,6 +88,7 @@ const NotificationRow = ({
 };
 
 const NotificationCenter = ({identity}: {identity?: Pick<LoginResponse, 'role' | 'level'>}) => {
+  const {t: translate} = useTranslation();
   const [isOpen, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -183,7 +187,7 @@ const NotificationCenter = ({identity}: {identity?: Pick<LoginResponse, 'role' |
         type="button"
         className={styles.bellButton}
         onClick={() => setOpen(open => !open)}
-        aria-label={unreadCount ? `Notifications, ${unreadCount} unread` : 'Notifications'}
+        aria-label={unreadCount ? translate('notification:unreadCount', {total: formatNumber(unreadCount)}) : translate("navigation:parent.notifications")}
         aria-expanded={isOpen}
         aria-controls="notification-panel"
       >
@@ -192,11 +196,11 @@ const NotificationCenter = ({identity}: {identity?: Pick<LoginResponse, 'role' |
       </button>
 
       {isOpen ? (
-        <section id="notification-panel" className={styles.panel} aria-label="Notifications">
+        <section id="notification-panel" className={styles.panel} aria-label={translate("navigation:parent.notifications")}>
           <header className={styles.panelHeader}>
             <div>
-              <p>Inbox</p>
-              <h2>Notifications</h2>
+              <p>{translate("notification:inbox")}</p>
+              <h2>{translate("navigation:parent.notifications")}</h2>
             </div>
             <div className={styles.headerActions}>
               <button
@@ -208,31 +212,30 @@ const NotificationCenter = ({identity}: {identity?: Pick<LoginResponse, 'role' |
                 aria-busy={markAllMutation.isPending}
               >
                 <CheckCheck size={17}/>
-                <span>{markAllMutation.isPending ? 'Marking…' : 'Mark all read'}</span>
+                <span>{markAllMutation.isPending ? translate("notification:marking") : translate("notification:markAllRead")}</span>
               </button>
-              <button type="button" className={styles.closeButton} onClick={() => setOpen(false)} aria-label="Close notifications">
+              <button type="button" className={styles.closeButton} onClick={() => setOpen(false)} aria-label={translate("notification:close")}>
                 <X size={19}/>
               </button>
             </div>
           </header>
 
           <div className={styles.panelBody}>
-            {inboxQuery.isLoading ? <p className={styles.status}>Loading notifications…</p> : null}
+            {inboxQuery.isLoading ? <p className={styles.status}>{translate("notification:loading")}</p> : null}
 
             {inboxQuery.isError ? (
               <div className={styles.status} role="alert">
-                <p>Notifications couldn&apos;t be loaded.</p>
+                <p>{translate("notification:loadFailed")}</p>
                 <button type="button" onClick={() => void inboxQuery.refetch()}>
-                  <RefreshCw size={16}/> Try again
-                </button>
+                  <RefreshCw size={16}/> {' '}{translate("common:actions.tryAgain")}</button>
               </div>
             ) : null}
 
             {!inboxQuery.isLoading && !inboxQuery.isError && notifications.length === 0 ? (
               <div className={styles.empty}>
                 <span aria-hidden="true"><CheckCheck size={24}/></span>
-                <strong>You&apos;re all caught up</strong>
-                <p>Course and assignment updates will appear here.</p>
+                <strong>{translate("notification:caughtUp")}</strong>
+                <p>{translate("notification:emptyHelp")}</p>
               </div>
             ) : null}
 
@@ -256,12 +259,12 @@ const NotificationCenter = ({identity}: {identity?: Pick<LoginResponse, 'role' |
                 onClick={() => void inboxQuery.fetchNextPage()}
                 disabled={inboxQuery.isFetchingNextPage}
               >
-                {inboxQuery.isFetchingNextPage ? 'Loading…' : 'Load older notifications'}
+                {inboxQuery.isFetchingNextPage ? translate("common:feedback.loading") : translate("notification:loadOlder")}
               </button>
             ) : null}
 
             {markReadMutation.isError || markAllMutation.isError ? (
-              <p className={styles.actionError} role="alert">The read status could not be updated. Please try again.</p>
+              <p className={styles.actionError} role="alert">{translate("notification:readFailed")}</p>
             ) : null}
           </div>
         </section>

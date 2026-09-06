@@ -38,7 +38,7 @@ export const SubmissionForm: React.FC = () => {
   const settings = React.useMemo(() => {
     const result: Record<string, string> = {};
     if (submission === null) {
-      result[t("assignment.allowLateSubmission")] = assignment.settings.allowLateSubmission ? t("common.yes") : t("common.no");
+      result[t("assignment.allowLateSubmission")] = assignment.settings.allowLateSubmission ? t("common:common.yes") : t("common:common.no");
       result[t("assignment.allowedResubmissionCount")] = assignment.settings.allowedResubmissionCount.toFixed();
     } else {
       result[t("assignmentSubmit.submittedAt")] = submission.updatedAt.toLocaleString('en-US');
@@ -72,7 +72,7 @@ export const SubmissionForm: React.FC = () => {
             <RichTextEditor/>
           </PropertyForm>
           
-          <PropertyForm title={t("assignment.uploadFile")}>
+          <PropertyForm title={t("detailWorkspace:assignmentSubmit.uploadFiles")}>
             <FileSection files={submissionFiles}
                          uploadFunction={async () => ""}
                          onUploaded={() => {

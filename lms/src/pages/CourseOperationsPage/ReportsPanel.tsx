@@ -1,3 +1,5 @@
+import { LocalizedError } from "@/i18n/errors";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
@@ -33,17 +35,24 @@ const reportKey = (courseId: number, reportId: number) => [
   ...operationKeys.reports(courseId),
   reportId,
 ];
+import i18n from "@/i18n";
+import { studentRecordLabel } from "./records";
+
 const reportLabel = (type?: string) =>
-  REPORT_TYPES.find((item) => item.value === type)?.label ?? "Student report";
+  i18n.t(
+    REPORT_TYPES.find((item) => item.value === type)?.labelKey ??
+      "operations:studentReport",
+  );
 const FIELDS = [
-  { key: "overallSummary", label: "Overall summary" },
-  { key: "strengths", label: "Strengths" },
-  { key: "weaknesses", label: "Areas for improvement" },
-  { key: "skillEvaluation", label: "Skill evaluation" },
-  { key: "improvementSuggestions", label: "Next steps" },
+  { key: "overallSummary", labelKey: "operations:overallSummary" },
+  { key: "strengths", labelKey: "operations:strengths" },
+  { key: "weaknesses", labelKey: "operations:areasForImprovement" },
+  { key: "skillEvaluation", labelKey: "operations:skillEvaluation" },
+  { key: "improvementSuggestions", labelKey: "operations:nextSteps" },
 ] as const;
 
 export function ReportsPanel({ courseId }: { courseId: number }) {
+  const { t: translate } = useTranslation();
   const [student, setStudent] = useState<SelectedStudent>();
   const [type, setType] = useState<"" | "MID_TERM" | "FINAL">("");
   const [status, setStatus] = useState("");
@@ -88,7 +97,10 @@ export function ReportsPanel({ courseId }: { courseId: number }) {
     });
   };
   return (
-    <section className={s.panel} aria-label="Student reports">
+    <section
+      className={s.panel}
+      aria-label={translate("operations:studentReports")}
+    >
       <div className={s.toolbar}>
         <div className={s.toolbarGroup}>
           <CourseStudentPicker
@@ -101,7 +113,7 @@ export function ReportsPanel({ courseId }: { courseId: number }) {
           />
           <select
             className={s.select}
-            aria-label="Report type"
+            aria-label={translate("operations:reportType")}
             value={type}
             onChange={(event) => {
               setType(
@@ -111,26 +123,28 @@ export function ReportsPanel({ courseId }: { courseId: number }) {
               setPage(0);
             }}
           >
-            <option value="">Type: All</option>
+            <option value="">{translate("operations:allTypes")}</option>
             {REPORT_TYPES.map((item) => (
               <option key={item.value} value={item.value}>
-                {item.label}
+                {translate(item.labelKey)}
               </option>
             ))}
           </select>
           <select
             className={s.select}
-            aria-label="Report status"
+            aria-label={translate("operations:reportStatus")}
             value={status}
             onChange={(event) => {
               setStatus(event.target.value);
               setPage(0);
             }}
           >
-            <option value="">Status: All</option>
+            <option value="">{translate("operations:allStatuses")}</option>
             {REPORT_STATUSES.map((item) => (
               <option key={item} value={item}>
-                {item === "DRAFT" ? "Draft" : "Published"}
+                {item === "DRAFT"
+                  ? translate("common:status.DRAFT")
+                  : translate("common:status.PUBLISHED")}
               </option>
             ))}
           </select>
@@ -141,19 +155,19 @@ export function ReportsPanel({ courseId }: { courseId: number }) {
           onClick={() => setEditor({ mode: "create" })}
         >
           <Plus size={18} />
-          Create new report
+          {translate("operations:createNewReport")}
         </button>
       </div>
       {message ? (
         <p className={s.success} role="status">
-          {message}
+          {translate(message)}
         </p>
       ) : null}
       {query.isPending || query.isError || !query.data?.items.length ? (
         <TeachingState
           loading={query.isPending}
           error={query.error}
-          empty="No reports match these filters. Create a report to share a student's progress."
+          empty={translate("operations:noReportMatches")}
           onRetry={() => void query.refetch()}
         />
       ) : (
@@ -175,7 +189,7 @@ export function ReportsPanel({ courseId }: { courseId: number }) {
         total={query.data?.total}
         loading={query.isFetching}
         onChange={setPage}
-        label="Reports"
+        label={translate("navigation:parent.reports")}
       />
       {editor ? (
         <ReportDialog
@@ -201,6 +215,7 @@ function ReportCard({
   report: StudentReport;
   onOpen: (mode: "view" | "edit" | "publish") => void;
 }) {
+  const { t: translate } = useTranslation();
   // Summary responses intentionally omit narrative fields. Use the shared detail cache, not invented excerpts.
   const detail = useQuery({
     queryKey: reportKey(courseId, report.id),
@@ -218,12 +233,14 @@ function ReportCard({
     <article className={s.record}>
       <div className={s.recordHeader}>
         <div className={s.person}>
-          <TeachingAvatar name={report.name} />
+          <TeachingAvatar name={studentRecordLabel(report)} />
           <div>
-            <h3>{report.name}</h3>
+            <h3>{studentRecordLabel(report)}</h3>
             <small className={s.subline}>
-              {reportLabel(report.reportType)} · Updated{" "}
-              {dateLabel(report.updatedAt)}
+              {reportLabel(report.reportType)} ·{" "}
+              {translate("common:feedback.updatedAt", {
+                time: dateLabel(report.updatedAt),
+              })}
             </small>
           </div>
         </div>
@@ -235,7 +252,7 @@ function ReportCard({
               type="button"
               onClick={() => onOpen("edit")}
             >
-              Edit
+              {translate("common:actions.edit")}
             </button>
           ) : null}
           <button
@@ -243,7 +260,7 @@ function ReportCard({
             type="button"
             onClick={() => onOpen("view")}
           >
-            View
+            {translate("common:actions.view")}
           </button>
           {report.status === "DRAFT" ? (
             <button
@@ -251,17 +268,17 @@ function ReportCard({
               type="button"
               onClick={() => onOpen("publish")}
             >
-              Publish
+              {translate("course:addContent.publishButton")}
             </button>
           ) : null}
         </div>
       </div>
       <p className={s.preview}>
         {detail.isPending
-          ? "Loading summary…"
+          ? translate("operations:loadingSummary")
           : detail.isError
-            ? "Summary unavailable. Open the report to retry."
-            : detail.data?.overallSummary || "No summary has been added yet."}
+            ? translate("operations:summaryUnavailable")
+            : detail.data?.overallSummary || translate("operations:noSummary")}
       </p>
     </article>
   );
@@ -282,6 +299,7 @@ function ReportDialog({
   onClose: () => void;
   onSaved: (message: string) => Promise<void>;
 }) {
+  const { t: translate } = useTranslation();
   const [busy, setBusy] = useState(false);
   const query = useQuery({
     queryKey: reportKey(courseId, reportId ?? 0),
@@ -299,19 +317,19 @@ function ReportDialog({
   });
   const title =
     mode === "create"
-      ? "Create student report"
+      ? "operations:createStudentReport"
       : mode === "publish"
-        ? "Publish student report"
+        ? "operations:publishStudentReport"
         : mode === "edit"
-          ? "Edit student report"
-          : "Student report";
+          ? "operations:editStudentReport"
+          : "operations:studentReport";
   return (
     <TeachingDialog
-      title={title}
+      title={translate(title)}
       description={
         query.data
-          ? `${query.data.name} · ${reportLabel(query.data.reportType)}`
-          : "Write a clear, actionable summary of learning progress."
+          ? `${studentRecordLabel(query.data)} · ${reportLabel(query.data.reportType)}`
+          : translate("operations:reportWritingHelp")
       }
       onClose={onClose}
       busy={busy}
@@ -354,6 +372,7 @@ function ReportEditor({
   onSaved: (message: string) => Promise<void>;
   onBusy: (busy: boolean) => void;
 }) {
+  const { t: translate } = useTranslation();
   const [student, setStudent] = useState(defaultStudent);
   const [snapshot] = useState(initial);
   const [draft, setDraft] = useState<UpsertCourseStudentReportRequest>({
@@ -373,14 +392,12 @@ function ReportEditor({
   const mutation = useMutation({
     mutationFn: () => {
       if (mode === "create" && !student)
-        throw new Error("Choose a course student before saving.");
+        throw new LocalizedError("operations:errors.chooseStudent");
       if (
         mode !== "create" &&
         (!snapshot || snapshot.version == null || snapshot.status !== "DRAFT")
       )
-        throw new Error(
-          "Only a current draft can be changed. Reload this report.",
-        );
+        throw new LocalizedError("operations:errors.currentDraftOnly");
       const payload =
         mode === "create"
           ? { ...draft, studentUserId: student?.id }
@@ -412,8 +429,8 @@ function ReportEditor({
     onSuccess: () =>
       onSaved(
         mode === "publish"
-          ? "Report published. It is now read-only."
-          : "Report draft saved.",
+          ? "operations:reportPublished"
+          : "operations:reportDraftSaved",
       ),
     onError: (error) =>
       setConflict(
@@ -427,16 +444,15 @@ function ReportEditor({
         <TeachingBadge value={initial?.status} />
         {FIELDS.map((field) => (
           <section key={field.key} className={s.notice}>
-            <h3>{field.label}</h3>
+            <h3>{translate(field.labelKey)}</h3>
             <p style={{ whiteSpace: "pre-wrap" }}>
-              {initial?.[field.key] || "Not provided"}
+              {initial?.[field.key] || translate("common:feedback.notProvided")}
             </p>
           </section>
         ))}
         {mode === "publish" && !readOnly ? (
           <p className={s.notice}>
-            Publishing makes this report available to its authorized viewers.
-            Published reports cannot be edited.
+            {translate("operations:publishReadOnlyHelp")}
           </p>
         ) : null}
         <TeachingError error={mutation.error} />
@@ -447,7 +463,7 @@ function ReportEditor({
             disabled={mutation.isPending}
             onClick={onClose}
           >
-            Close
+            {translate("common:actions.close")}
           </button>
           {mode === "publish" && !readOnly ? (
             <button
@@ -458,7 +474,9 @@ function ReportEditor({
               }
               onClick={() => mutation.mutate()}
             >
-              {mutation.isPending ? "Publishing…" : "Confirm publication"}
+              {mutation.isPending
+                ? translate("operations:publishing")
+                : translate("operations:confirmPublication")}
             </button>
           ) : null}
         </div>
@@ -474,7 +492,7 @@ function ReportEditor({
     >
       {mode === "create" ? (
         <div className={`${s.field} ${s.full}`}>
-          <span>Student</span>
+          <span>{translate("common:roles.STUDENT")}</span>
           <CourseStudentPicker
             courseId={courseId}
             selected={student}
@@ -483,7 +501,7 @@ function ReportEditor({
         </div>
       ) : null}
       <label className={`${s.field} ${s.full}`}>
-        Report type
+        {translate("operations:reportType")}
         <select
           value={draft.reportType}
           onChange={(event) => {
@@ -495,14 +513,14 @@ function ReportEditor({
         >
           {REPORT_TYPES.map((item) => (
             <option key={item.value} value={item.value}>
-              {item.label}
+              {translate(item.labelKey)}
             </option>
           ))}
         </select>
       </label>
       {FIELDS.map((field) => (
         <label className={`${s.field} ${s.full}`} key={field.key}>
-          {field.label}
+          {translate(field.labelKey)}
           <textarea
             value={draft[field.key]}
             onChange={(event) =>
@@ -514,10 +532,7 @@ function ReportEditor({
       <div className={s.full}>
         <TeachingError error={mutation.error} />
         {conflict ? (
-          <p className={s.notice}>
-            Close and reopen this report to reload its latest state before
-            retrying.
-          </p>
+          <p className={s.notice}>{translate("operations:reloadReport")}</p>
         ) : null}
       </div>
       <div className={s.actions}>
@@ -527,7 +542,7 @@ function ReportEditor({
           disabled={mutation.isPending}
           onClick={onClose}
         >
-          Cancel
+          {translate("common:actions.cancel")}
         </button>
         <button
           className={s.primary}
@@ -537,7 +552,9 @@ function ReportEditor({
             (mode === "create" ? !student : snapshot?.version == null)
           }
         >
-          {mutation.isPending ? "Saving…" : "Save draft"}
+          {mutation.isPending
+            ? translate("common:actions.saving")
+            : translate("operations:saveDraft")}
         </button>
       </div>
     </form>

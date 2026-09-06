@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {statusLabel} from '@/i18n/presentation';
 import {useEffect} from 'react'
 import {useQuery} from '@tanstack/react-query'
 import {Navigate, useNavigate, useParams} from 'react-router-dom'
@@ -40,7 +42,7 @@ async function loadSession(studentMockExamId: number, section: MockExamSection):
   if (isSectionSubmitted(exam, section)) return {section: 'submitted', exam, submittedSection: section, objectUrls: []}
   const sectionResponse = await mockExamApiService.getStudentSection(studentMockExamId, section)
   const sectionPayload = unwrapData(sectionResponse, `getStudentMockExam${section}`)
-  const title = readExamTitle(exam, `Mock exam ${studentMockExamId}`)
+  const title = readExamTitle(exam, '')
 
   if (section === 'reading') {
     const reading = mapReadingDetail(parseReadingDetail(sectionPayload, studentMockExamId))
@@ -87,6 +89,7 @@ async function loadSession(studentMockExamId: number, section: MockExamSection):
 }
 
 const MockExamSessionPage = () => {
+  const {t: translate} = useTranslation();
   const {studentMockExamId: idParam, section: sectionParam} = useParams<{
     studentMockExamId: string
     section: string
@@ -116,8 +119,8 @@ const MockExamSessionPage = () => {
     return (
       <main className={styles.statusPage} role="status">
         <span className={styles.statusMark} aria-hidden="true">M</span>
-        <h1>Preparing your {section} paper</h1>
-        <p>Loading questions and secured exam media…</p>
+        <h1>{translate('exams:session.preparing', {section: statusLabel(section)})}</h1>
+        <p>{translate("exams:session.loadingMedia")}</p>
       </main>
     )
   }
@@ -126,17 +129,17 @@ const MockExamSessionPage = () => {
     return (
       <main className={styles.statusPage}>
         <span className={styles.statusMark} aria-hidden="true">!</span>
-        <h1>The paper could not be opened</h1>
-        <p role="alert">{advisingErrorMessage(session.error, 'The mock-exam data is unavailable.')}</p>
+        <h1>{translate("exams:session.openError")}</h1>
+        <p role="alert">{advisingErrorMessage(session.error, translate('exams:session.unavailable'))}</p>
         <div className={styles.statusActions}>
-          <button type="button" onClick={() => session.refetch()}>Try again</button>
-          <button type="button" onClick={() => navigate('/mock-exams')}>Back to mock exams</button>
+          <button type="button" onClick={() => session.refetch()}>{translate("common:actions.tryAgain")}</button>
+          <button type="button" onClick={() => navigate('/mock-exams')}>{translate("exams:session.back")}</button>
         </div>
       </main>
     )
   }
 
-  const candidateLabel = user.name || user.email || 'Candidate'
+  const candidateLabel = user.name || user.email || translate('exams:session.candidate')
   const onExit = () => navigate('/mock-exams')
 
   if (session.data.section === 'submitted') {
@@ -149,7 +152,7 @@ const MockExamSessionPage = () => {
         <ExamPage
           reading={session.data.reading}
           testId={studentMockExamId}
-          testTitle={session.data.title}
+          testTitle={session.data.title || translate('exams:untitled', {id: studentMockExamId})}
           candidateLabel={candidateLabel}
           onExit={onExit}
         />
@@ -158,7 +161,7 @@ const MockExamSessionPage = () => {
         <ListeningExamPage
           paper={session.data.paper}
           testId={studentMockExamId}
-          testTitle={session.data.title}
+          testTitle={session.data.title || translate('exams:untitled', {id: studentMockExamId})}
           candidateLabel={candidateLabel}
           onExit={onExit}
         />
@@ -167,7 +170,7 @@ const MockExamSessionPage = () => {
         <WritingExamPage
           writing={session.data.writing}
           testId={studentMockExamId}
-          testTitle={session.data.title}
+          testTitle={session.data.title || translate('exams:untitled', {id: studentMockExamId})}
           candidateLabel={candidateLabel}
           onExit={onExit}
         />

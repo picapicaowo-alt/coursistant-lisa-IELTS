@@ -42,7 +42,7 @@ export function usePdfMaterialPreview(blob: Blob, onRetry: () => Promise<unknown
         if (!cancelled) setDocument(next);
       } catch {
         if (!cancelled) {
-          setError('This PDF could not be opened. Retry, or download it to view it in a PDF application.');
+          setError("course:pdf.openFailed");
           setLoading(false);
         }
       }
@@ -93,7 +93,7 @@ export function usePdfMaterialPreview(blob: Blob, onRetry: () => Promise<unknown
         }
       } catch {
         if (!cancelled) {
-          setError('This page could not be displayed. Retry, or download the PDF.');
+          setError("course:pdf.pageFailed");
           setLoading(false);
         }
       }
@@ -112,13 +112,13 @@ export function usePdfMaterialPreview(blob: Blob, onRetry: () => Promise<unknown
       await onRetry();
       setAttempt(value => value + 1);
     } catch {
-      setError('The PDF could not be reloaded. Retry, or download it to continue.');
+      setError("course:pdf.reloadFailed");
       setLoading(false);
     }
   };
 
   return {
     canvas, viewport, pageNumber, setPageNumber, pageCount: document?.numPages,
-    zoom, setZoom, loading, error, pageText, retry,
+    zoom, setZoom, loading, errorKey: error, pageText, retry,
   };
 }

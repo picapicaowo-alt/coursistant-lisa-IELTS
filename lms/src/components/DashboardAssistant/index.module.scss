@@ -11,7 +11,7 @@
 
 .chatHeader {
   display: grid;
-  grid-template-columns: t.$touch-target minmax(0, 1fr) t.$touch-target;
+  grid-template-columns: minmax(0, 1fr) t.$touch-target;
   align-items: center;
 
   h2 { margin: 0; color: t.$content-primary; font-size: t.$font-size-headline; font-weight: t.$fw-semibold; line-height: t.$line-height-headline; text-align: center; }

@@ -8,6 +8,7 @@
   background: t.$surface-canvas;
 }
 .formPanel { display: flex; flex-direction: column; min-width: 0; }
+.languageControl { align-self: flex-end; }
 .formContent {
   width: min(100%, 28rem);
   margin: auto;
@@ -48,9 +49,6 @@
     white-space: pre-line;
   }
 }
-.productPreview { position: relative; }
-.dashboard { display: block; width: 100%; border-radius: t.$radius-md; }
-.goal { position: absolute; width: 52%; right: -3%; bottom: -10%; border-radius: t.$radius-md; box-shadow: t.$shadow-card; }
 @media (max-width: 56rem) {
   .page { grid-template-columns: minmax(0, 1fr); padding: t.$space-5; }
   .visualPanel { display: none; }

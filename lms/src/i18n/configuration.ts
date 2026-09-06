@@ -3,8 +3,8 @@ export type AppLocale = typeof SUPPORTED_LOCALES[number];
 export const DEFAULT_LOCALE: AppLocale = 'en';
 export const LOCALE_STORAGE_KEY = 'coursistant.locale';
 
-// Expose the shared selector only after route-level single-locale acceptance.
-export const LANGUAGE_SWITCHER_ENABLED = false;
+// Shared across authentication and every role shell; release validation covers both.
+export const LANGUAGE_SWITCHER_ENABLED = true;
 
 /** Autonyms are intentionally stable so a user can recover from a wrong selection. */
 export const LOCALE_LABELS: Record<AppLocale, string> = {

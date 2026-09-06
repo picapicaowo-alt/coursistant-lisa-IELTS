@@ -1,4 +1,7 @@
-import {useTranslation} from 'react-i18next';
+import {LocalizedError} from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import {roleLabel} from '@/i18n/presentation';
+import {formatNumber} from '@/i18n/formatting';
 import { TenantDrawer } from "@/components/TenantWorkspace/TenantDrawer";
 import { PersonCell } from "@/components/TenantWorkspace/PersonCell";
 import { readableValue } from "@/components/TenantWorkspace/presentation";
@@ -61,18 +64,18 @@ const transitionTargets = (account: ManagedUser): StaffLevel[] => {
 
 const blockerGuidance: Record<string, string> = {
   ACTIVE_STUDENT_ASSIGNMENTS:
-    "Reassign the user’s active students in Student intakes.",
-  ACTIVE_COURSE_OWNERSHIP: "Transfer their courses in Course ownership.",
+    "operations:directory.blockers.ACTIVE_STUDENT_ASSIGNMENTS",
+  ACTIVE_COURSE_OWNERSHIP: "operations:directory.blockers.ACTIVE_COURSE_OWNERSHIP",
   ACTIVE_INSTRUCTOR_ENROLLMENTS:
-    "Active instructor enrolments must be resolved by an authorized teaching operator.",
+    "operations:directory.blockers.ACTIVE_INSTRUCTOR_ENROLLMENTS",
   ACTIVE_STUDENT_ENROLLMENTS:
-    "Active student enrolments must be resolved by an authorized teaching operator.",
+    "operations:directory.blockers.ACTIVE_STUDENT_ENROLLMENTS",
   ACTIVE_TA_ENROLLMENTS:
-    "Active teaching-assistant enrolments must be resolved by an authorized teaching operator.",
+    "operations:directory.blockers.ACTIVE_TA_ENROLLMENTS",
   LAST_ACTIVE_TENANT_ADMIN:
-    "Ensure another active Tenant Admin is available before disabling this account.",
+    "operations:directory.blockers.LAST_ACTIVE_TENANT_ADMIN",
   ACTIVE_PARENT_LINKS:
-    "Unlink active Parent relationships from the relevant student record.",
+    "operations:directory.blockers.ACTIVE_PARENT_LINKS",
 };
 
 const getBlockers = (error: unknown): string[] => {
@@ -99,14 +102,17 @@ const blockerCode = (
       : "RESPONSIBILITY_BLOCKER";
 };
 
-const blockerMessage = (
-  blocker: string | { code?: string; type?: string; message?: string },
-): string | undefined => {
-  if (typeof blocker === "string") return blockerGuidance[blocker];
-  return typeof blocker.message === "string"
-    ? blocker.message
-    : blockerGuidance[blockerCode(blocker)];
-};
+// Use the contract code, not an unlocalized server diagnostic, for guidance.
+const blockerMessageKey = (blocker: string | {code?: string; type?: string}): string =>
+  blockerGuidance[blockerCode(blocker)] ?? 'operations:directory.blockers.unknown';
+
+function profileValidation(form: HTMLFormElement, values: {firstName: string; lastName: string; email: string}): string | null {
+  if (!values.firstName.trim()) return 'operations:directory.validation.firstName';
+  if (!values.lastName.trim()) return 'operations:directory.validation.lastName';
+  const email = form.querySelector<HTMLInputElement>('input[type="email"]');
+  if (!values.email.trim() || email?.validity.typeMismatch) return 'auth:signupErrors.emailInvalid';
+  return null;
+}
 
 export const DirectoryPanel = ({
   createRequested = false,
@@ -115,7 +121,7 @@ export const DirectoryPanel = ({
   createRequested?: boolean;
   onCreateHandled?: () => void;
 }) => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const { user: currentUser } = useRequiredAuth();
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
@@ -137,6 +143,8 @@ export const DirectoryPanel = ({
   const [confirmDisable, setConfirmDisable] = useState(false);
   const [transitionLevel, setTransitionLevel] = useState<StaffLevel | "">("");
   const [feedback, setFeedback] = useState<string>("");
+  const [createValidation, setCreateValidation] = useState<string | null>(null);
+  const [editValidation, setEditValidation] = useState<string | null>(null);
   const initializedAccount = useRef<number | null>(null);
   const [reviewedAccountVersion, setReviewedAccountVersion] =
     useState<number>();
@@ -152,6 +160,9 @@ export const DirectoryPanel = ({
     email: "",
     phone: "",
   });
+
+  useEffect(() => {setEditValidation(null);}, [selectedId]);
+  useEffect(() => {setCreateValidation(null);}, [createOpen]);
 
   const directory = useQuery({
     queryKey: ["tenant", "users", filters, page, PAGE_SIZE],
@@ -241,16 +252,14 @@ export const DirectoryPanel = ({
       onCreateHandled?.();
       setSelectedId(id);
       await refresh(
-        "Account created. The user can set their first password through Forgot password.",
+        "operations:directory.created",
       );
     },
   });
   const patchAccount = useMutation({
     mutationFn: async () => {
       if (!reviewedAccount || reviewedAccountVersion == null)
-        throw new Error(
-          "Reload this account before saving changes.",
-        );
+        throw new LocalizedError("operations:directory.reloadRequired");
       const payload: PatchTenantManagedUserRequest = {
         expectedAccountVersion: reviewedAccountVersion,
       };
@@ -270,7 +279,7 @@ export const DirectoryPanel = ({
       if (nextPhone !== (reviewedAccount.phone ?? ""))
         payload.phone = nextPhone;
       if (Object.keys(payload).length === 1)
-        throw new Error("Change at least one profile field before saving.");
+        throw new LocalizedError("operations:directory.changeRequired");
       const key = idempotency.keyFor(
         `tenant-patch-account-${reviewedAccount.id}`,
         idempotencyFingerprint(payload),
@@ -288,7 +297,7 @@ export const DirectoryPanel = ({
       initializedAccount.current = null;
       setConflictReviewed(false);
       await refresh(
-        "Account profile updated. If the email changed, the user must sign in again with the new email.",
+        "operations:directory.saved",
       );
     },
   });
@@ -311,7 +320,7 @@ export const DirectoryPanel = ({
     onSuccess: async () => {
       setConfirmDisable(false);
       await refresh(
-        "Account disabled. Responsibilities are not automatically reassigned.",
+        "operations:directory.disabledReceipt",
       );
     },
   });
@@ -319,7 +328,7 @@ export const DirectoryPanel = ({
     mutationFn: (id: number) => adminApiService.enableTenantManagedUser(id),
     onSuccess: async () =>
       refresh(
-        "Login restored. Previous assignments, enrolments, Parent links, and course ownership were not restored.",
+        "operations:directory.restored",
       ),
   });
   const changeRole = useMutation({
@@ -333,7 +342,7 @@ export const DirectoryPanel = ({
       ),
     onSuccess: async () => {
       setTransitionLevel("");
-      await refresh("Identity updated. Existing sessions were signed out.");
+      await refresh("operations:directory.identityChanged");
     },
   });
 
@@ -383,22 +392,21 @@ export const DirectoryPanel = ({
 
   return (
     <>
-      <section className={styles.surface} aria-label="User directory">
+      <section className={styles.surface} aria-label={translate("operations:directory.title")}>
         <div className={`${styles.sectionHeading} ${styles.directoryHeading}`}>
-          <h2 className={styles.srOnly}>User directory</h2>
-          <span className={styles.hint}>People in your institution</span>
+          <h2 className={styles.srOnly}>{translate("operations:directory.title")}</h2>
+          <span className={styles.hint}>{translate("operations:directory.description")}</span>
           <button
             type="button"
             className={styles.primaryButton}
             onClick={() => setCreateOpen(true)}
           >
             <UserPlus size={18} />
-            Create account
-          </button>
+            {translate("operations:directory.create")}</button>
         </div>
         <form className={styles.filterBar} onSubmit={submitFilters}>
           <label className={styles.searchField}>
-            <span>Search by name or email</span>
+            <span>{translate("common:people.searchLabel")}</span>
             <div>
               <Search size={17} />
               <input
@@ -409,13 +417,13 @@ export const DirectoryPanel = ({
                     q: event.target.value,
                   }))
                 }
-                placeholder="Name or email"
+                placeholder={translate("common:people.nameOrEmail")}
               />
             </div>
           </label>
           <ResponsiveFilters>
             <label>
-              <span>Account</span>
+              <span>{translate("auth:signup.steps.account")}</span>
               <select
                 value={draftFilters.role}
                 onChange={(event) =>
@@ -425,13 +433,13 @@ export const DirectoryPanel = ({
                   }))
                 }
               >
-                <option value="">All</option>
-                <option value="USER">Staff and users</option>
-                <option value="TENANT_ADMIN">Tenant admins</option>
+                <option value="">{translate("course:detail.filterAll")}</option>
+                <option value="USER">{translate("operations:directory.staffAndUsers")}</option>
+                <option value="TENANT_ADMIN">{translate("operations:directory.admins")}</option>
               </select>
             </label>
             <label>
-              <span>Identity</span>
+              <span>{translate("common:admin.identity")}</span>
               <select
                 value={draftFilters.level}
                 onChange={(event) =>
@@ -441,18 +449,18 @@ export const DirectoryPanel = ({
                   }))
                 }
               >
-                <option value="">All</option>
-                <option value="STUDENT">Student</option>
-                <option value="PARENT">Parent</option>
+                <option value="">{translate("course:detail.filterAll")}</option>
+                <option value="STUDENT">{translate("common:roles.STUDENT")}</option>
+                <option value="PARENT">{translate("common:roles.PARENT")}</option>
                 {STAFF_LEVELS.map((level) => (
                   <option value={level} key={level}>
-                    {level}
+                    {roleLabel(level)}
                   </option>
                 ))}
               </select>
             </label>
             <label>
-              <span>Status</span>
+              <span>{translate("common:fields.status")}</span>
               <select
                 value={draftFilters.status}
                 onChange={(event) =>
@@ -462,9 +470,9 @@ export const DirectoryPanel = ({
                   }))
                 }
               >
-                <option value="">All</option>
-                <option value="ACTIVE">Active</option>
-                <option value="DISABLED">Disabled</option>
+                <option value="">{translate("course:detail.filterAll")}</option>
+                <option value="ACTIVE">{translate("common:status.ACTIVE")}</option>
+                <option value="DISABLED">{translate("common:admin.status.DISABLED")}</option>
               </select>
             </label>
             <div
@@ -477,9 +485,10 @@ export const DirectoryPanel = ({
                   setDraftFilters(emptyFilters);
                   setFilters(emptyFilters);
                   setPage(0);
-                  setDirectoryFeedback("Filters cleared.");
+                  setDirectoryFeedback("operations:directory.filtersCleared");
                 }}
-              >{translate("common:actions.clearFilters")}</button> : null}
+              >
+                {translate("common:actions.clearFilters")}</button> : null}
               <button
                 type="button"
                 className={styles.iconButton}
@@ -490,7 +499,7 @@ export const DirectoryPanel = ({
                   setDirectoryFeedback("");
                   void directory.refetch().then((result) => {
                     if (!result.isError)
-                      setDirectoryFeedback("Directory refreshed.");
+                      setDirectoryFeedback("operations:directory.refreshed");
                   });
                 }}
               >
@@ -505,49 +514,46 @@ export const DirectoryPanel = ({
               className={styles.primaryButton}
               disabled={directory.isFetching}
             >
-              Apply filters
-            </button>
+              {translate("operations:directory.applyFilters")}</button>
           </div>
         </form>
 
         <p className={styles.directoryStatus} role="status" aria-live="polite">
           {directory.isFetching
-            ? "Updating directory…"
+            ? translate("operations:directory.updating")
             : directory.isError
               ? ""
-              : `${directory.data?.total ?? 0} users${directoryFeedback ? `. ${directoryFeedback}` : ""}`}
+              : <>{translate('operations:directory.count', {count: directory.data?.total ?? 0, number: formatNumber(directory.data?.total ?? 0)})}{directoryFeedback ? <> · {translate(directoryFeedback)}</> : null}</>}
         </p>
         {directory.isPending ? (
           <p className={styles.status} role="status">
-            Loading directory…
-          </p>
+            {translate("operations:directory.loading")}</p>
         ) : null}
         {directory.isError ? (
           <div className={styles.errorNotice} role="alert">
             <p>
               {getApiErrorMessage(
                 directory.error,
-                "The directory could not be loaded.",
+                translate("operations:directory.failed"),
               )}
             </p>
             <button type="button" onClick={() => void directory.refetch()}>
-              Try again
-            </button>
+              {translate("common:actions.tryAgain")}</button>
           </div>
         ) : null}
         {!directory.isPending &&
         !directory.isError &&
         directory.data.items.length === 0 ? (
-          <p className={styles.empty}>No users match these filters.</p>
+          <p className={styles.empty}>{translate("common:admin.noUsers")}</p>
         ) : null}
         <div className={styles.tableWrap} aria-busy={directory.isFetching}>
           <table className={styles.table}>
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Identity</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>{translate("common:fields.name")}</th>
+                <th>{translate("common:admin.identity")}</th>
+                <th>{translate("common:fields.status")}</th>
+                <th>{translate("common:fields.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -571,7 +577,7 @@ export const DirectoryPanel = ({
                       <PersonCell person={account} />
                     </button>
                   </td>
-                  <td data-label="Identity">
+                  <td data-label={translate("common:admin.identity")}>
                     <span
                       className={styles.badge}
                       data-tone={
@@ -587,7 +593,7 @@ export const DirectoryPanel = ({
                       )}
                     </span>
                   </td>
-                  <td data-label="Status">
+                  <td data-label={translate("common:fields.status")}>
                     <span
                       className={styles.accountStatus}
                       data-active={account.status === "ACTIVE"}
@@ -595,19 +601,18 @@ export const DirectoryPanel = ({
                       {readableValue(account.status)}
                     </span>
                   </td>
-                  <td data-label="Actions">
+                  <td data-label={translate("common:fields.actions")}>
                     {account.level === "STUDENT" ? (
                       <a
                         className={styles.textButton}
                         href={TENANT_PATHS.student(account.id)}
                       >
-                        View record
-                      </a>
+                        {translate("operations:directory.viewRecord")}</a>
                     ) : (
                       <button
                         type="button"
                         className={styles.textButton}
-                        aria-label={`Manage ${formatPersonName(account)}`}
+                        aria-label={translate('common:admin.managePerson', {name: formatPersonName(account)})}
                         onClick={() => {
                           initializedAccount.current = null;
                           setSelectedId(account.id);
@@ -619,8 +624,7 @@ export const DirectoryPanel = ({
                           setFeedback("");
                         }}
                       >
-                        Manage
-                      </button>
+                        {translate("common:admin.manage")}</button>
                     )}
                   </td>
                 </tr>
@@ -629,32 +633,30 @@ export const DirectoryPanel = ({
           </table>
         </div>
         {directory.data && directory.data.total > PAGE_SIZE ? (
-          <nav className={styles.pagination} aria-label="Directory pages">
+          <nav className={styles.pagination} aria-label={translate("common:admin.directoryPages")}>
             <button
               type="button"
               disabled={page === 0}
               onClick={() => setPage((current) => current - 1)}
             >
-              Previous
-            </button>
+              {translate("common:actions.previous")}</button>
             <span>
-              Page {page + 1} · {directory.data.total} users
+              {translate('operations:directory.pageSummary', {count: directory.data.total, page: formatNumber(page + 1), number: formatNumber(directory.data.total)})}
             </span>
             <button
               type="button"
               disabled={(page + 1) * PAGE_SIZE >= directory.data.total}
               onClick={() => setPage((current) => current + 1)}
             >
-              Next
-            </button>
+              {translate("common:actions.next")}</button>
           </nav>
         ) : null}
       </section>
 
       {createOpen ? (
         <TenantDrawer
-          title="Create account"
-          description="Add a staff member or an additional Tenant Admin."
+          title={translate("operations:directory.create")}
+          description={translate("operations:directory.createHelp")}
           busy={create.isPending}
           onClose={() => {
             setCreateOpen(false);
@@ -663,13 +665,17 @@ export const DirectoryPanel = ({
         >
           <form
             className={styles.form}
+            noValidate
             onSubmit={(event) => {
               event.preventDefault();
+              const errorKey = profileValidation(event.currentTarget, createForm);
+              setCreateValidation(errorKey);
+              if (errorKey) return;
               create.mutate();
             }}
           >
             <label>
-              <span>Account type</span>
+              <span>{translate("operations:directory.accountType")}</span>
               <select
                 value={createForm.role}
                 onChange={(event) =>
@@ -679,13 +685,13 @@ export const DirectoryPanel = ({
                   }))
                 }
               >
-                <option value="USER">Staff</option>
-                <option value="TENANT_ADMIN">Tenant admin</option>
+                <option value="USER">{translate("operations:directory.staff")}</option>
+                <option value="TENANT_ADMIN">{translate("common:admin.tenantAdmin")}</option>
               </select>
             </label>
             {createForm.role === "USER" ? (
               <label>
-                <span>Staff identity</span>
+                <span>{translate("operations:directory.staffIdentity")}</span>
                 <select
                   value={createForm.level}
                   onChange={(event) =>
@@ -697,7 +703,7 @@ export const DirectoryPanel = ({
                 >
                   {STAFF_LEVELS.map((level) => (
                     <option value={level} key={level}>
-                      {level}
+                      {roleLabel(level)}
                     </option>
                   ))}
                 </select>
@@ -705,7 +711,7 @@ export const DirectoryPanel = ({
             ) : null}
             <div className={styles.nameGrid}>
               <label>
-                <span>First name</span>
+                <span>{translate("common:fields.firstName")}</span>
                 <input
                   required
                   maxLength={100}
@@ -719,7 +725,7 @@ export const DirectoryPanel = ({
                 />
               </label>
               <label>
-                <span>Middle name</span>
+                <span>{translate("auth:signup.middleNameLabel")}</span>
                 <input
                   maxLength={100}
                   value={createForm.middleName}
@@ -732,7 +738,7 @@ export const DirectoryPanel = ({
                 />
               </label>
               <label>
-                <span>Last name</span>
+                <span>{translate("common:fields.lastName")}</span>
                 <input
                   required
                   maxLength={100}
@@ -747,7 +753,7 @@ export const DirectoryPanel = ({
               </label>
             </div>
             <label>
-              <span>Email</span>
+              <span>{translate("common:fields.email")}</span>
               <input
                 required
                 type="email"
@@ -761,21 +767,19 @@ export const DirectoryPanel = ({
               />
             </label>
             <p className={styles.hint}>
-              Students are created through Student intake. Parents are created
-              or reused from a student’s Parent links.
-            </p>
+              {translate("operations:directory.studentParentHelp")}</p>
             <button
               className={styles.primaryButton}
               disabled={create.isPending}
             >
-              {create.isPending ? "Creating…" : "Create account"}
+              {create.isPending ? translate("common:actions.creating") : translate("operations:directory.create")}
             </button>
           </form>
-          {create.isError ? (
+          {createValidation || create.isError ? (
             <p className={styles.inlineError} role="alert">
-              {getApiErrorMessage(
+              {createValidation ? translate(createValidation) : getApiErrorMessage(
                 create.error,
-                "The account could not be created.",
+                translate("operations:directory.createFailed"),
               )}
             </p>
           ) : null}
@@ -784,8 +788,8 @@ export const DirectoryPanel = ({
 
       {selectedId !== null ? (
         <TenantDrawer
-          title="Account details"
-          description="Identity and lifecycle governance."
+          title={translate("common:admin.accountDetails")}
+          description={translate("operations:directory.detailsHelp")}
           busy={
             patchAccount.isPending ||
             disable.isPending ||
@@ -795,34 +799,33 @@ export const DirectoryPanel = ({
           onClose={() => setSelectedId(null)}
         >
           {detail.isPending ? (
-            <p className={styles.status}>Loading account…</p>
+            <p className={styles.status}>{translate("operations:directory.loadingAccount")}</p>
           ) : null}
           {detail.isError ? (
             <div className={styles.errorNotice} role="alert">
               <p>
                 {getApiErrorMessage(
                   detail.error,
-                  "This account is unavailable.",
+                  translate("operations:directory.accountUnavailable"),
                 )}
               </p>
               <button type="button" onClick={() => void detail.refetch()}>
-                Try again
-              </button>
+                {translate("common:actions.tryAgain")}</button>
             </div>
           ) : null}
           {selected ? (
             <>
               <dl className={styles.detailList}>
-                <dt>Name</dt>
-                <dd>{formatPersonName(selected, `User #${selected.id}`)}</dd>
-                <dt>Email</dt>
+                <dt>{translate("common:fields.name")}</dt>
+                <dd>{formatPersonName(selected, translate('common:admin.userNumber', {id: formatNumber(selected.id)}))}</dd>
+                <dt>{translate("common:fields.email")}</dt>
                 <dd>{selected.email}</dd>
-                <dt>Identity</dt>
+                <dt>{translate("common:admin.identity")}</dt>
                 <dd>
-                  {selected.role} / {selected.level}
+                  {roleLabel(selected.role)} / {roleLabel(selected.level)}
                 </dd>
-                <dt>Status</dt>
-                <dd>{selected.status}</dd>
+                <dt>{translate("common:fields.status")}</dt>
+                <dd>{readableValue(selected.status)}</dd>
               </dl>
               {!isSelf &&
               (selected.role === "TENANT_ADMIN" ||
@@ -830,15 +833,20 @@ export const DirectoryPanel = ({
                   STAFF_LEVELS.some((level) => level === selected.level))) ? (
                 <form
                   className={styles.form}
+                  noValidate
                   onSubmit={(event) => {
                     event.preventDefault();
+                    const errorKey = profileValidation(event.currentTarget, editForm);
+                    setEditValidation(errorKey);
+                    if (errorKey) return;
                     patchAccount.mutate();
                   }}
                 >
-                  <h3 className={styles.subheading}>Correct staff profile</h3>
+                  <h3 className={styles.subheading}>{translate("operations:directory.correctProfile")}</h3>
+                  {editValidation ? <p className={styles.inlineError} role="alert">{translate(editValidation)}</p> : null}
                   <div className={styles.nameGrid}>
                     <label>
-                      <span>First name</span>
+                      <span>{translate("common:fields.firstName")}</span>
                       <input
                         required
                         maxLength={100}
@@ -852,7 +860,7 @@ export const DirectoryPanel = ({
                       />
                     </label>
                     <label>
-                      <span>Middle name</span>
+                      <span>{translate("auth:signup.middleNameLabel")}</span>
                       <input
                         maxLength={100}
                         value={editForm.middleName}
@@ -865,7 +873,7 @@ export const DirectoryPanel = ({
                       />
                     </label>
                     <label>
-                      <span>Last name</span>
+                      <span>{translate("common:fields.lastName")}</span>
                       <input
                         required
                         maxLength={100}
@@ -880,7 +888,7 @@ export const DirectoryPanel = ({
                     </label>
                   </div>
                   <label>
-                    <span>Email</span>
+                    <span>{translate("common:fields.email")}</span>
                     <input
                       required
                       type="email"
@@ -894,7 +902,7 @@ export const DirectoryPanel = ({
                     />
                   </label>
                   <label>
-                    <span>Phone</span>
+                    <span>{translate("settings:phone")}</span>
                     <input
                       value={editForm.phone}
                       onChange={(event) =>
@@ -908,9 +916,7 @@ export const DirectoryPanel = ({
                   {editForm.email.trim().toLowerCase() !==
                   selected.email.toLowerCase() ? (
                     <p className={styles.hint}>
-                      Changing email invalidates this user’s current sessions
-                      and tokens.
-                    </p>
+                      {translate("operations:directory.emailChangeHelp")}</p>
                   ) : null}
                   <button
                     className={styles.secondaryButton}
@@ -922,22 +928,17 @@ export const DirectoryPanel = ({
                     }
                   >
                     {patchAccount.isPending
-                      ? "Saving…"
-                      : "Save profile changes"}
+                      ? translate("common:actions.saving")
+                      : translate("operations:directory.saveProfile")}
                   </button>
                   {selected.accountVersion == null ? (
                     <p className={styles.inlineError}>
-                      The current response has no accountVersion. Update is
-                      disabled to preserve CAS safety.
-                    </p>
+                      {translate("operations:directory.versionMissing")}</p>
                   ) : null}
                   {patchConflict ? (
                     <div className={styles.confirmBox} role="alert">
                       <p>
-                        Someone else changed this account. Your typed values are
-                        preserved. Load the latest account before deciding what
-                        to submit again.
-                      </p>
+                        {translate("operations:directory.versionConflict")}</p>
                       <button
                         type="button"
                         className={styles.secondaryButton}
@@ -952,21 +953,19 @@ export const DirectoryPanel = ({
                           })
                         }
                       >
-                        Load latest account
-                      </button>
+                        {translate("operations:directory.loadLatest")}</button>
                     </div>
                   ) : null}
                 </form>
               ) : null}
               {isSelf ? (
                 <p className={styles.hint}>
-                  You cannot disable, enable, or change your own Tenant Admin
-                  identity.
-                </p>
+                  {translate("operations:directory.selfRestriction")}</p>
               ) : (
                 <div className={styles.governanceActions}>
                   {targets.length > 0 ? (
                     <form
+                      noValidate
                       className={styles.form}
                       onSubmit={(event) => {
                         event.preventDefault();
@@ -978,7 +977,7 @@ export const DirectoryPanel = ({
                       }}
                     >
                       <label>
-                        <span>Convert identity</span>
+                        <span>{translate("operations:directory.convertIdentity")}</span>
                         <select
                           required
                           value={transitionLevel}
@@ -986,10 +985,10 @@ export const DirectoryPanel = ({
                             setTransitionLevel(event.target.value as StaffLevel)
                           }
                         >
-                          <option value="">Choose allowed target</option>
+                          <option value="">{translate("operations:directory.chooseTarget")}</option>
                           {targets.map((level) => (
                             <option value={level} key={level}>
-                              {level}
+                              {roleLabel(level)}
                             </option>
                           ))}
                         </select>
@@ -999,14 +998,13 @@ export const DirectoryPanel = ({
                         disabled={!transitionLevel || changeRole.isPending}
                       >
                         {changeRole.isPending
-                          ? "Updating…"
-                          : "Confirm identity change"}
+                          ? translate("settings:updating")
+                          : translate("operations:directory.confirmIdentity")}
                       </button>
                     </form>
                   ) : (
                     <p className={styles.hint}>
-                      This identity has no permitted conversion.
-                    </p>
+                      {translate("operations:directory.noConversion")}</p>
                   )}
                   {selected.status === "DISABLED" ? (
                     <button
@@ -1015,13 +1013,12 @@ export const DirectoryPanel = ({
                       disabled={enable.isPending}
                       onClick={() => enable.mutate(selected.id)}
                     >
-                      {enable.isPending ? "Restoring…" : "Restore login"}
+                      {enable.isPending ? translate("course:catalogue.restoring") : translate("operations:directory.restoreLogin")}
                     </button>
                   ) : confirmDisable ? (
                     <div className={styles.confirmBox}>
                       <p>
-                        This account has no outstanding responsibilities preventing login from being disabled.
-                      </p>
+                        {translate("operations:directory.disableClear")}</p>
                       <div>
                         <button
                           type="button"
@@ -1029,15 +1026,14 @@ export const DirectoryPanel = ({
                           disabled={disable.isPending}
                           onClick={() => disable.mutate(selected.id)}
                         >
-                          {disable.isPending ? "Disabling…" : "Confirm disable"}
+                          {disable.isPending ? translate("operations:directory.disabling") : translate("operations:directory.confirmDisable")}
                         </button>
                         <button
                           type="button"
                           className={styles.secondaryButton}
                           onClick={() => setConfirmDisable(false)}
                         >
-                          Cancel
-                        </button>
+                          {translate("common:actions.cancel")}</button>
                       </div>
                     </div>
                   ) : (
@@ -1048,8 +1044,8 @@ export const DirectoryPanel = ({
                       onClick={() => disablePreview.mutate(selected.id)}
                     >
                       {disablePreview.isPending
-                        ? "Checking responsibilities…"
-                        : "Check before disabling"}
+                        ? translate("operations:directory.checkingResponsibilities")
+                        : translate("operations:directory.checkDisable")}
                     </button>
                   )}
                 </div>
@@ -1058,20 +1054,20 @@ export const DirectoryPanel = ({
           ) : null}
           {feedback ? (
             <p className={styles.inlineSuccess} role="status">
-              {feedback}
+              {translate(feedback)}
             </p>
           ) : null}
           {operationError && !create.error ? (
             <p className={styles.inlineError} role="alert">
               {getApiErrorMessage(
                 operationError,
-                "The account operation could not be completed.",
+                translate("operations:directory.operationFailed"),
               )}
             </p>
           ) : null}
           {blockers.length > 0 ? (
             <div className={styles.blockers} role="alert">
-              <strong>Resolve these responsibilities, then check again:</strong>
+              <strong>{translate("operations:directory.resolveResponsibilities")}</strong>
               <ul>
                 {blockers.map((blocker, index) => {
                   const code = blockerCode(blocker);
@@ -1079,8 +1075,7 @@ export const DirectoryPanel = ({
                     <li key={`${code}-${index}`}>
                       <code>{code}</code>
                       <span>
-                        {blockerMessage(blocker) ??
-                          "Resolve this responsibility in its owning workflow."}
+                        {translate(blockerMessageKey(blocker))}
                       </span>
                     </li>
                   );

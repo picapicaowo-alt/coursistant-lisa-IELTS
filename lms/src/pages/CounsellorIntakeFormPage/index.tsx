@@ -1,4 +1,6 @@
+import {LocalizedError} from '@/i18n/errors';
 import {useTranslation} from 'react-i18next';
+import {focusFirstInvalidField} from '@/utils/formFocus';
 import React, {FormEvent, useEffect, useRef, useState} from 'react';
 import {Link, useNavigate, useParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -18,6 +20,7 @@ import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import CounsellorIntakesPage from '../CounsellorIntakesPage';
 import {
   emptyStudentIntakeForm,
+  studentIntakeValidationKey,
   type StudentIntakeFormValue,
 } from '@/components/StudentIntakeFormFields/model';
 
@@ -38,6 +41,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
   const [form, setForm] = useState<StudentIntakeFormValue>(emptyStudentIntakeForm);
   const [handover, setHandover] = useState(false);
   const [reloadRequired, setReloadRequired] = useState(false);
+  const [validationKey, setValidationKey] = useState<string>();
   const reviewedIntake = useRef<StudentIntakeResponse>();
   const [reviewedVersion, setReviewedVersion] = useState<number>();
   const [loadedIntakeId, setLoadedIntakeId] = useState<number | null>(null);
@@ -77,15 +81,15 @@ const CounsellorIntakeFormPage: React.FC = () => {
         const key = idempotency.keyFor('create-intake', idempotencyFingerprint(payload));
         return unwrapData(await counsellorApiService.createStudentIntake(payload, key), 'createIntake');
       }
-      if (reviewedVersion == null) throw new Error('Load the intake before saving.');
+      if (reviewedVersion == null) throw new LocalizedError("advising:counsellor.loadBeforeSave");
       const original = reviewedIntake.current;
-      if (!original) throw new Error('Load the intake before saving.');
+      if (!original) throw new LocalizedError("advising:counsellor.loadBeforeSave");
       const payload: PatchStudentIntakeRequest = {expectedIntakeVersion: reviewedVersion};
       for (const field of ['firstName', 'middleName', 'lastName', 'courseRequest', 'contactPhone', 'basicBackground'] as const) {
         if (form[field].trim() !== (original[field] ?? '')) payload[field] = form[field].trim();
       }
       if (form.studentType !== original.studentType) payload.studentType = form.studentType;
-      if (Object.keys(payload).length === 1) throw new Error('Change at least one field before saving.');
+      if (Object.keys(payload).length === 1) throw new LocalizedError("advising:counsellor.changeBeforeSave");
       const key = idempotency.keyFor(`patch-intake-${numericId}`, idempotencyFingerprint(payload));
       return unwrapData(await counsellorApiService.patchStudentIntake(numericId, payload, key), 'patchIntake');
     },
@@ -104,9 +108,12 @@ const CounsellorIntakeFormPage: React.FC = () => {
     },
   });
 
-  const onSubmit = (event: FormEvent) => {
+  const onSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (save.isPending) return;
+    if (save.isPending || reloadRequired || (!isCreate && (!detail.data || detail.isError))) return;
+    const key = studentIntakeValidationKey(event.currentTarget);
+    setValidationKey(key);
+    if (key) {focusFirstInvalidField(event.currentTarget); return;}
     const submitter = (event.nativeEvent as SubmitEvent).submitter;
     save.mutate(submitter instanceof HTMLButtonElement && submitter.value === 'assign');
   };
@@ -118,8 +125,8 @@ const CounsellorIntakeFormPage: React.FC = () => {
   if (handover) {
     return (
       <div className={styles.page}>
-        <p className={styles.error} role="alert">This intake is no longer available. After a first assignment the counsellor loses access immediately.</p>
-        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>Back to unassigned queue</Link>
+        <p className={styles.error} role="alert">{t("advising:counsellor.handoverUnavailable")}</p>
+        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>{t("advising:counsellor.backToUnassigned")}</Link>
       </div>
     );
   }
@@ -128,7 +135,7 @@ const CounsellorIntakeFormPage: React.FC = () => {
     <CounsellorIntakesPage/>
     <CreateIntakeDialog value={form} onChange={setForm} pending={save.isPending}
       onSubmit={onSubmit} onClose={() => navigate(APP_ROUTE_PATHS.counsellorIntakes, {replace: true})}
-      error={save.isError ? advisingErrorMessage(save.error, 'The intake could not be saved.') : undefined}/>
+      error={save.isError ? advisingErrorMessage(save.error, t('advising:counsellor.saveFailed')) : undefined}/>
   </>;
 
   return (
@@ -136,19 +143,20 @@ const CounsellorIntakeFormPage: React.FC = () => {
       <header className={styles.header}>
         <div>
 
-          <h1>{isCreate ? 'Create student intake' : 'Edit intake'}</h1>
+          <h1>{isCreate ? t("advising:intake.create") : t("advising:counsellor.edit")}</h1>
           <p className={styles.lede}>{t('intake.reviewThenAssign')}</p>
         </div>
-        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>Back to queue</Link>
+        <Link className={styles.link} to={APP_ROUTE_PATHS.counsellorIntakes}>{t("advising:counsellor.backToQueue")}</Link>
       </header>
-      {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, 'The intake could not be saved.')}</p> : null}
-      {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>Your changes are preserved. Reload the latest intake before confirming them again.</p><button type="button" className={styles.secondary} onClick={() => void detail.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.intakeVersion); setReloadRequired(false);}})}>Load latest intake</button></div> : null}
-      {detail.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(detail.error, 'Intake could not be loaded.')}</p> : null}
+      {save.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(save.error, t('advising:counsellor.saveFailed'))}</p> : null}
+      {reloadRequired ? <div className={styles.conflictNotice} role="alert"><p>{t("advising:counsellor.reloadPreserved")}</p><button type="button" className={styles.secondary} disabled={detail.isFetching} onClick={() => void detail.refetch().then(result => {if (result.data && !result.isError) {setReviewedVersion(result.data.intakeVersion); setReloadRequired(false); save.reset();}})}>{t("advising:intake.loadLatest")}</button></div> : null}
+      {detail.isError && !handover ? <p className={styles.error} role="alert">{advisingErrorMessage(detail.error, t('advising:studentWorkspace.intakeFailed'))}</p> : null}
       <section className={`${styles.card} ${styles.wideCard}`}>
-        <form className={`${styles.form} ${local.form}`} onSubmit={onSubmit}>
+        <form noValidate className={`${styles.form} ${local.form}`} onSubmit={onSubmit}>
           <fieldset className={local.fields} disabled={save.isPending || !detail.data}>
-            <StudentIntakeFormFields value={form} onChange={value => {setForm(value); save.reset();}} emailDisabled/>
+            <StudentIntakeFormFields value={form} onChange={value => {setForm(value); setValidationKey(undefined); save.reset();}} emailDisabled/>
           </fieldset>
+          {validationKey ? <p className={styles.error} role="alert">{t(validationKey)}</p> : null}
           {save.isSuccess ? <p className={local.saved} role="status">{t('intake.saved')}</p> : null}
           <div className={`${styles.formActions} ${local.actions}`}>
             <button type="submit" name="intent" value="save" className={styles.secondary} disabled={!hasChanges || save.isPending || reloadRequired || !detail.data}>{save.isPending && !save.variables ? t('intake.saving') : t('actions.saveChanges')}</button>

@@ -15,4 +15,6 @@ export interface FileView extends FileDto {
   uploadStatus?: FileUploadStatus;
   uploadProgress?: number;
   errorMessage?: string;
+  /** Retain error identity so frontend-generated feedback follows locale changes. */
+  uploadError?: unknown;
 }

@@ -20,7 +20,8 @@
     color: t.$text;
   }
 
-  .addCourseBtn {
+  .addCourseBtn,
+  .updateCourseBtn {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
@@ -35,14 +36,28 @@
     cursor: pointer;
     transition: background t.$duration-fast t.$ease-out, transform t.$duration-fast t.$ease-out;
 
-    &:hover {
+    &:hover:not(:disabled) {
       background: t.$action-primary-hover;
       transform: translateY(-1px);
     }
 
     &:focus-visible { outline: 3px solid t.$focus-ring; outline-offset: 2px; }
+    &:disabled { opacity: 0.5; cursor: not-allowed; }
+  }
+
+  .updateCourseBtn {
+    background: t.$surface-raised;
+    color: t.$brand;
+    border: 1px solid t.$border;
+    &:hover:not(:disabled) { background: t.$surface-subtle; }
   }
 }
+
+.headerActions { display: flex; flex-wrap: wrap; gap: t.$space-3; }
+.updateFields { min-width: 0; max-width: none; padding: 0; margin: 0; border: 0; }
+.scheduleTimes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: t.$space-4; }
+.updateFooter { justify-content: flex-end; margin-top: t.$space-5; }
+.updateFields input[role='combobox']:not([type='radio']):not([type='checkbox']) { border: 0; padding: 0; height: auto; border-radius: 0; }
 
 .coursesGrid {
   display: grid;

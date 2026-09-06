@@ -1,3 +1,5 @@
+import {useTranslation} from 'react-i18next';
+import {formatNumber, formatPercent} from '@/i18n/formatting';
 import {useId, type ReactNode} from 'react';
 import {UserRound} from 'lucide-react';
 import {UserAvatar} from '@/components/UserAvatar';
@@ -25,6 +27,7 @@ interface CourseIdentityCardProps {
 
 /** Presentation only: callers retain their own contracts, capabilities and mutations. */
 export function CourseIdentityCard({courseId, title, compact = false, icon, headingLevel = 3, code, status, metadata, instructor, instructorAvatar, progress, children, footer, actions, menu}: CourseIdentityCardProps) {
+  const {t: translate} = useTranslation();
   const titleId = useId();
   const Heading = headingLevel === 2 ? 'h2' : 'h3';
   const completed = progress?.completed;
@@ -47,8 +50,8 @@ export function CourseIdentityCard({courseId, title, compact = false, icon, head
     </header>
     {metadata ? <div className={styles.metadata}>{metadata}</div> : null}
     {progress ? <div className={`${progressStyles.progress} ${styles.progress}`}>
-      <span>Lecture progress <strong>{validProgress ? `${Math.round(completed / total * 100)}%` : 'Not available'}</strong></span>
-      {validProgress ? <><progress aria-label={`${title}: lecture progress`} value={completed} max={total}/><small>{completed} / {total} completed</small></> : null}
+      <span>{translate("common:progress.lecture")}{' '}<strong>{validProgress ? formatPercent(completed / total) : translate("common:feedback.notAvailable")}</strong></span>
+      {validProgress ? <><progress aria-label={translate('common:progress.courseLecture', {title})} value={completed} max={total}/><small>{translate('common:progress.completed', {completed: formatNumber(completed), total: formatNumber(total)})}</small></> : null}
     </div> : null}
     {children}
     {footer || actions ? <footer className={styles.footer}>

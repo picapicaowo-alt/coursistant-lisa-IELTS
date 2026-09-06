@@ -1,4 +1,6 @@
-import {useTranslation} from 'react-i18next';
+import {LocalizedError} from '@/i18n/errors';
+import { useTranslation } from 'react-i18next';
+import {formatNumber} from '@/i18n/formatting';
 import React, {FormEvent, useEffect, useState} from 'react';
 import {Link, useSearchParams} from 'react-router-dom';
 import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
@@ -21,6 +23,7 @@ import {StudentIntakeFormFields} from '@/components/StudentIntakeFormFields';
 import {IntakeAssignmentEditor} from '@/components/TenantWorkspace/IntakeAssignmentEditor';
 import {
   emptyStudentIntakeForm,
+  studentIntakeValidationKey,
   type StudentIntakeFormValue,
 } from '@/components/StudentIntakeFormFields/model';
 import {tenantAdvisingApiService} from '@/apis/services/tenant-advising-api';
@@ -65,7 +68,7 @@ const formFromIntake = (
 });
 
 const TenantIntakesPage: React.FC = () => {
-  const {t: translate} = useTranslation();
+  const { t: translate } = useTranslation();
   const queryClient = useQueryClient();
   const idempotency = useIdempotencyCheckpoint();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -89,6 +92,8 @@ const TenantIntakesPage: React.FC = () => {
   const [editForm, setEditForm] = useState<StudentIntakeFormValue>(
     emptyStudentIntakeForm,
   );
+  const [editValidation, setEditValidation] = useState<string>();
+  const [invalidFilter, setInvalidFilter] = useState(false);
 
   const params: TenantIntakeListParams = {
     page,
@@ -172,7 +177,7 @@ const TenantIntakesPage: React.FC = () => {
 
   const patchIntake = useMutation({
     mutationFn: async () => {
-      if (!selected) throw new Error('Select an intake.');
+      if (!selected) throw new LocalizedError("operations:tenantIntakes.selectRequired");
       const payload: PatchStudentIntakeRequest = {
         expectedIntakeVersion: selected.intakeVersion,
       };
@@ -200,7 +205,7 @@ const TenantIntakesPage: React.FC = () => {
       if (fields.basicBackground !== (selected.basicBackground ?? ''))
         payload.basicBackground = fields.basicBackground;
       if (Object.keys(payload).length === 1)
-        throw new Error('Change at least one intake field before saving.');
+        throw new LocalizedError("operations:tenantIntakes.changeRequired");
       const key = idempotency.keyFor(
         `tenant-patch-intake-${selected.intakeId}`,
         idempotencyFingerprint(payload),
@@ -272,6 +277,10 @@ const TenantIntakesPage: React.FC = () => {
   );
   const applyFilters = (event: FormEvent) => {
     event.preventDefault();
+    const query = draftFilters.q.trim();
+    const invalidId = draftFilters.searchBy !== 'q' && query !== '' && (!Number.isSafeInteger(Number(query)) || Number(query) <= 0);
+    setInvalidFilter(invalidId);
+    if (invalidId) return;
     updatePage(0);
     setFilters({...draftFilters, q: draftFilters.q.trim()});
     syncListLocation({...draftFilters, q: draftFilters.q.trim()}, 0);
@@ -280,12 +289,14 @@ const TenantIntakesPage: React.FC = () => {
     current => current.q || current.lifecycleStatus || current.assignmentStatus || current.searchBy !== emptyFilters.searchBy,
   );
   const clearFilters = () => {
+    setInvalidFilter(false);
     setDraftFilters(emptyFilters);
     setFilters(emptyFilters);
     updatePage(0);
     syncListLocation(emptyFilters, 0);
   };
   const manage = (intakeId: number) => {
+    setEditValidation(undefined);
     clearOperationErrors();
     setSelectedIntakeId(intakeId);
   };
@@ -297,11 +308,9 @@ const TenantIntakesPage: React.FC = () => {
     <div className={ui.page}>
       <header className={ui.pageHeader}>
         <div>
-          <h1>Student intakes</h1>
+          <h1>{translate("operations:governance.intakes")}</h1>
           <p>
-            Search, correct, assign, reassign, or cancel intake records within
-            the governance boundary.
-          </p>
+            {translate("operations:tenantIntakes.description")}</p>
         </div>
         <div className={ui.headerActions}>
           <Link className={ui.secondaryButton} to={TENANT_PATHS.governance}>
@@ -314,8 +323,7 @@ const TenantIntakesPage: React.FC = () => {
             onClick={() => setCreateOpen(true)}
             aria-haspopup="dialog"
           >
-            <Plus size={17} /> Create student intake
-          </button>
+            <Plus size={17} /> {translate("advising:intake.create")}</button>
         </div>
       </header>
       {createOpen ? (
@@ -328,7 +336,7 @@ const TenantIntakesPage: React.FC = () => {
             createIntake.isError
               ? advisingErrorMessage(
                   createIntake.error,
-                  'The intake could not be created. Your entries are preserved.',
+                  translate('operations:tenantIntakes.createFailed'),
                 )
               : undefined
           }
@@ -339,15 +347,15 @@ const TenantIntakesPage: React.FC = () => {
         />
       ) : null}
 
-      <section className={ui.surface} aria-label="Student intake records">
-        <form className={ui.filterBar} onSubmit={applyFilters}>
+      <section className={ui.surface} aria-label={translate("operations:tenantIntakes.records")}>
+        <form className={ui.filterBar} noValidate onSubmit={applyFilters}>
           <label className={ui.searchField}>
             <span>
               {draftFilters.searchBy === 'q'
-                ? 'Search by name or email'
+                ? translate("common:people.searchLabel")
                 : draftFilters.searchBy === 'intakeId'
-                  ? 'Intake ID'
-                  : 'Student ID'}
+                  ? translate("operations:tenantIntakes.intakeId")
+                  : translate("records:fields.studentUserId")}
             </span>
             <div>
               <Search size={17} />
@@ -361,12 +369,12 @@ const TenantIntakesPage: React.FC = () => {
                     q: event.target.value,
                   }))
                 }
-                placeholder="Search intakes"
+                placeholder={translate("operations:tenantIntakes.searchPlaceholder")}
               />
             </div>
           </label>
           <label>
-            <span>Search field</span>
+            <span>{translate("operations:tenantIntakes.searchField")}</span>
             <select
               value={draftFilters.searchBy}
               onChange={(event) =>
@@ -377,13 +385,13 @@ const TenantIntakesPage: React.FC = () => {
                 }))
               }
             >
-              <option value="q">Name or email</option>
-              <option value="intakeId">Intake ID</option>
-              <option value="studentUserId">Student ID</option>
+              <option value="q">{translate("common:people.nameOrEmail")}</option>
+              <option value="intakeId">{translate("operations:tenantIntakes.intakeId")}</option>
+              <option value="studentUserId">{translate("records:fields.studentUserId")}</option>
             </select>
           </label>
           <label>
-            <span>Lifecycle</span>
+            <span>{translate("operations:tenantIntakes.lifecycle")}</span>
             <select
               value={draftFilters.lifecycleStatus}
               onChange={(event) =>
@@ -394,13 +402,13 @@ const TenantIntakesPage: React.FC = () => {
                 }))
               }
             >
-              <option value="">All</option>
-              <option value="OPEN">Open</option>
-              <option value="CANCELLED">Cancelled</option>
+              <option value="">{translate("course:detail.filterAll")}</option>
+              <option value="OPEN">{translate("common:status.OPEN")}</option>
+              <option value="CANCELLED">{translate("common:status.CANCELLED")}</option>
             </select>
           </label>
           <label>
-            <span>Assignment</span>
+            <span>{translate("advising:studentIntake.assignment")}</span>
             <select
               value={draftFilters.assignmentStatus}
               onChange={(event) =>
@@ -411,17 +419,18 @@ const TenantIntakesPage: React.FC = () => {
                 }))
               }
             >
-              <option value="">All</option>
-              <option value="UNASSIGNED">Unassigned</option>
-              <option value="ASSIGNED">Assigned</option>
+              <option value="">{translate("course:detail.filterAll")}</option>
+              <option value="UNASSIGNED">{translate("advising:studentIntake.unassigned")}</option>
+              <option value="ASSIGNED">{translate("common:status.ASSIGNED")}</option>
             </select>
           </label>
-          <button className={ui.primaryButton}>Apply filters</button>
+          <button className={ui.primaryButton}>{translate("operations:directory.applyFilters")}</button>
           {hasFilters ? <button
             type="button"
             className={ui.secondaryButton}
             onClick={clearFilters}
-          >{translate("common:actions.clearFilters")}</button> : null}
+          >
+            {translate("common:actions.clearFilters")}</button> : null}
           <button
             type="button"
             className={ui.iconButton}
@@ -433,33 +442,34 @@ const TenantIntakesPage: React.FC = () => {
             <RefreshCw size={17} aria-hidden="true" />
           </button>
         </form>
+        {invalidFilter ? <p className={styles.error} role="alert">{translate('operations:tenantIntakes.invalidId')}</p> : null}
 
         {intakes.isPending ? (
-          <p className={styles.status}>Loading intakes…</p>
+          <p className={styles.status}>{translate("advising:counsellor.loadingIntakes")}</p>
         ) : null}
         {intakes.isError ? (
           <p className={styles.error} role="alert">
             {advisingErrorMessage(
               intakes.error,
-              'Intakes could not be loaded.',
+              translate('advising:counsellor.intakesFailed'),
             )}
           </p>
         ) : null}
         {!intakes.isPending &&
         !intakes.isError &&
         intakes.data?.items.length === 0 ? (
-          <p className={styles.status}>No intakes match these filters.</p>
+          <p className={styles.status}>{translate("operations:tenantIntakes.empty")}</p>
         ) : null}
         <div className={ui.tableWrap}>
           <table className={ui.table}>
             <thead>
               <tr>
-                <th>Student</th>
-                <th>Intake ID</th>
-                <th>Lifecycle status</th>
-                <th>Assignment</th>
-                <th>Advisor</th>
-                <th>Actions</th>
+                <th>{translate("common:roles.STUDENT")}</th>
+                <th>{translate("operations:tenantIntakes.intakeId")}</th>
+                <th>{translate("operations:tenantIntakes.lifecycleStatus")}</th>
+                <th>{translate("advising:studentIntake.assignment")}</th>
+                <th>{translate("common:roles.ADVISOR")}</th>
+                <th>{translate("common:fields.actions")}</th>
               </tr>
             </thead>
             <tbody>
@@ -470,8 +480,8 @@ const TenantIntakesPage: React.FC = () => {
                       person={{...intake, id: intake.studentUserId}}
                     />
                   </td>
-                  <td data-label="Intake ID">#{intake.intakeId}</td>
-                  <td data-label="Lifecycle">
+                  <td data-label={translate("operations:tenantIntakes.intakeId")}>#{intake.intakeId}</td>
+                  <td data-label={translate("operations:tenantIntakes.lifecycle")}>
                     <span
                       className={ui.badge}
                       data-tone={intake.lifecycleStatus}
@@ -479,7 +489,7 @@ const TenantIntakesPage: React.FC = () => {
                       {readableValue(intake.lifecycleStatus)}
                     </span>
                   </td>
-                  <td data-label="Assignment">
+                  <td data-label={translate("advising:studentIntake.assignment")}>
                     <span
                       className={ui.badge}
                       data-tone={intake.assignmentStatus}
@@ -487,7 +497,7 @@ const TenantIntakesPage: React.FC = () => {
                       {readableValue(intake.assignmentStatus)}
                     </span>
                   </td>
-                  <td data-label="Advisor">
+                  <td data-label={translate("common:roles.ADVISOR")}>
                     {intake.advisorUserId ? (
                       <PersonCell
                         person={
@@ -508,16 +518,14 @@ const TenantIntakesPage: React.FC = () => {
                           to={TENANT_PATHS.student(intake.studentUserId)}
                           state={{returnTo: `${TENANT_PATHS.intakes}${searchParams.size ? `?${searchParams}` : ''}`}}
                         >
-                          View record
-                        </Link>
+                          {translate("operations:directory.viewRecord")}</Link>
                       ) : null}
                       <button
                         type="button"
                         className={ui.textButton}
                         onClick={() => manage(intake.intakeId)}
                       >
-                        Manage
-                      </button>
+                        {translate("common:admin.manage")}</button>
                     </div>
                   </td>
                 </tr>
@@ -526,17 +534,16 @@ const TenantIntakesPage: React.FC = () => {
           </table>
         </div>
         {intakes.data && intakes.data.total > PAGE_SIZE ? (
-          <nav className={styles.pagination} aria-label="Intake pages">
+          <nav className={styles.pagination} aria-label={translate("advising:counsellor.intakePages")}>
             <button
               type="button"
               className={styles.secondary}
               disabled={page === 0}
               onClick={() => setPage((current) => current - 1)}
             >
-              Previous
-            </button>
+              {translate("common:actions.previous")}</button>
             <span>
-              Page {page + 1} · {intakes.data.total} intakes
+              {translate('operations:tenantIntakes.pageSummary', {count: intakes.data.total, page: formatNumber(page + 1), number: formatNumber(intakes.data.total)})}
             </span>
             <button
               type="button"
@@ -544,18 +551,17 @@ const TenantIntakesPage: React.FC = () => {
               disabled={(page + 1) * PAGE_SIZE >= intakes.data.total}
               onClick={() => setPage((current) => current + 1)}
             >
-              Next
-            </button>
+              {translate("common:actions.next")}</button>
           </nav>
         ) : null}
       </section>
       {selectedIntakeId !== null ? (
         <TenantDrawer
-          title="Intake management"
+          title={translate("operations:tenantIntakes.management")}
           description={
             selected
-              ? formatPersonName(selected, `Intake #${selectedIntakeId}`)
-              : `Intake #${selectedIntakeId}`
+              ? formatPersonName(selected, translate('operations:tenantIntakes.number', {id: formatNumber(selectedIntakeId)}))
+              : translate('operations:tenantIntakes.number', {id: formatNumber(selectedIntakeId)})
           }
           busy={busy}
           onClose={() => {setSelectedIntakeId(null); setSearchParams(current => {current.delete('manage'); return current;}, {replace: true});}}
@@ -564,85 +570,86 @@ const TenantIntakesPage: React.FC = () => {
             <p className={styles.error} role="alert">
               {advisingErrorMessage(
                 mutationError,
-                'The operation failed. Your entries are preserved.',
+                translate('operations:tenantIntakes.operationFailed'),
               )}
             </p>
           ) : null}
           {detail.isPending ? (
-            <p className={styles.status}>Loading intake details…</p>
+            <p className={styles.status}>{translate("operations:tenantIntakes.loadingDetails")}</p>
           ) : null}
           {detail.isError ? (
             <p className={styles.error} role="alert">
               {advisingErrorMessage(
                 detail.error,
-                'Intake details could not be loaded.',
+                translate('operations:tenantIntakes.detailsFailed'),
               )}
             </p>
           ) : null}
           {intakeConflict ? (
             <div className={styles.dashboardNotice} role="alert">
-              <strong>This intake changed on the server.</strong>
+              <strong>{translate("operations:tenantIntakes.conflict")}</strong>
               <p>
-                Your current form values are preserved. Load the latest intake
-                only when you are ready to review the newer version.
-              </p>
+                {translate("operations:tenantIntakes.conflictHelp")}</p>
               <button
                 type="button"
                 className={styles.secondary}
                 onClick={() => void detail.refetch()}
               >
-                Load latest intake
-              </button>
+                {translate("advising:intake.loadLatest")}</button>
             </div>
           ) : null}
           {selected ? (
             <div className={ui.form}>
               <section>
-                <h3>Intake profile</h3>
+                <h3>{translate("operations:tenantIntakes.profile")}</h3>
                 {selected.lifecycleStatus === 'OPEN' &&
                 selected.assignmentStatus === 'UNASSIGNED' ? (
                   <form
                     className={styles.form}
+                    noValidate
                     onSubmit={(event) => {
                       event.preventDefault();
+                      const key = studentIntakeValidationKey(event.currentTarget);
+                      setEditValidation(key);
+                      if (key) return;
                       clearOperationErrors();
                       patchIntake.mutate();
                     }}
                   >
                     <StudentIntakeFormFields
                       value={editForm}
-                      onChange={setEditForm}
+                      onChange={value => {setEditValidation(undefined); setEditForm(value);}}
                       emailDisabled
                     />
+                    {editValidation ? <p className={styles.error} role="alert">{translate(editValidation)}</p> : null}
                     <p className={styles.muted}>
-                      Student email cannot be changed from an intake.
-                    </p>
+                      {translate("operations:tenantIntakes.emailHelp")}</p>
                     <button
                       className={styles.primary}
                       disabled={busy || !hasIntakeChanges}
                     >
                       {patchIntake.isPending
-                        ? 'Saving…'
-                        : 'Save intake changes'}
+                        ? translate("common:actions.saving")
+                        : translate("operations:tenantIntakes.save")}
                     </button>
                   </form>
                 ) : (
                   <dl className={styles.readonly}>
-                    <dt>Status</dt>
+                    <dt>{translate("common:fields.status")}</dt>
                     <dd>
-                      {selected.lifecycleStatus} / {selected.assignmentStatus}
+                      {readableValue(selected.lifecycleStatus)} / {readableValue(selected.assignmentStatus)}
                     </dd>
-                    <dt>Course request</dt>
+                    <dt>{translate("advising:studentIntake.courseRequest")}</dt>
                     <dd>{selected.courseRequest || '—'}</dd>
-                    <dt>Contact phone</dt>
+                    <dt>{translate("advising:intake.phone")}</dt>
                     <dd>{selected.contactPhone || '—'}</dd>
-                    <dt>Background</dt>
+                    <dt>{translate("advising:studentIntake.background")}</dt>
                     <dd>{selected.basicBackground || '—'}</dd>
                   </dl>
                 )}
               </section>
               <section>
-                <h3>{selected.assignmentStatus === 'ASSIGNED' ? 'Reassign advisor' : 'Assign advisor'}</h3>
+                <h3>{selected.assignmentStatus === 'ASSIGNED' ? translate("advising:intake.reassign") : translate("advising:intake.assign")}</h3>
                 <IntakeAssignmentEditor key={selected.intakeId} intake={selected} onUpdated={refresh} onPendingChange={setAssignmentPending}/>
               </section>
             </div>
