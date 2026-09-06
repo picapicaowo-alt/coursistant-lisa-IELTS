@@ -524,7 +524,7 @@
     "loadFailed": "暂时无法加载这门课程。",
     "totals": "课程内容统计",
     "assessments": "作业与测验",
-    "assessmentHelp": "管理课程作业、测验和反馈。",
+    "assessmentHelp": "管理课程作业和反馈。",
     "scheduleSections": "课表栏目",
     "members": "成员",
     "operations": "课次、考勤与报告",
@@ -720,7 +720,7 @@
     },
     "create": {
       "title": "在课程中创建内容",
-      "description": "请选择课程，再使用其中的资料、作业或测验工具。内容通过课程工作区保存，可用操作以你的权限为准。"
+      "description": "请选择课程，再使用其中的资料或作业工具。内容通过课程工作区保存，可用操作以你的权限为准。"
     }
   },
   "studySupport": {

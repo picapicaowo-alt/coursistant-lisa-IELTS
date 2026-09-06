@@ -524,7 +524,7 @@
     "loadFailed": "暫時無法載入這門課程。",
     "totals": "課程內容統計",
     "assessments": "作業與測驗",
-    "assessmentHelp": "管理課程作業、測驗和回饋。",
+    "assessmentHelp": "管理課程作業和回饋。",
     "scheduleSections": "課表欄目",
     "members": "成員",
     "operations": "課次、考勤與報告",
@@ -720,7 +720,7 @@
     },
     "create": {
       "title": "在課程中建立內容",
-      "description": "請選擇課程，再使用其中的資料、作業或測驗工具。內容透過課程工作區儲存，可用操作以你的權限為準。"
+      "description": "請選擇課程，再使用其中的資料或作業工具。內容透過課程工作區儲存，可用操作以你的權限為準。"
     }
   },
   "studySupport": {

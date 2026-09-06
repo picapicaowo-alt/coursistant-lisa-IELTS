@@ -524,7 +524,7 @@
     "loadFailed": "This course could not be loaded.",
     "totals": "Course content totals",
     "assessments": "Assignments & Quizzes",
-    "assessmentHelp": "Manage coursework, assessments and feedback.",
+    "assessmentHelp": "Manage coursework and feedback.",
     "scheduleSections": "Schedule sections",
     "members": "Members",
     "operations": "Classes, attendance & reports",
@@ -720,7 +720,7 @@
     },
     "create": {
       "title": "Create content in a course",
-      "description": "Choose a course, then use its content, assignment or quiz tools. Changes are saved through the course workspace, according to your permissions."
+      "description": "Choose a course, then use its content or assignment tools. Changes are saved through the course workspace, according to your permissions."
     }
   },
   "studySupport": {
