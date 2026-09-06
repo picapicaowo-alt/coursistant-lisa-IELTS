@@ -2,12 +2,12 @@
 > lms@0.0.0 test:i18n-tools
 > node --experimental-strip-types --test scripts/i18n-audit.node-check.ts
 
-✔ blocks literal text, secondary props and accessibility copy in active lazy routes (1700.458291ms)
-✔ accepts semantic keys and machine values without translating identifiers (1345.47625ms)
-✔ checks conditional copy, interpolated aria labels and indexed UI arrays (2074.658958ms)
-✔ keeps an exact original-paper exception but blocks new platform controls beside it (1702.039542ms)
-✔ does not count unreachable prototypes as active UI (1284.817959ms)
-✔ every exception has a rationale and an exact unique file/text identity (0.522792ms)
+✔ blocks literal text, secondary props and accessibility copy in active lazy routes (534.082417ms)
+✔ accepts semantic keys and machine values without translating identifiers (594.732583ms)
+✔ checks conditional copy, interpolated aria labels and indexed UI arrays (481.027208ms)
+✔ keeps an exact original-paper exception but blocks new platform controls beside it (495.07225ms)
+✔ does not count unreachable prototypes as active UI (642.892167ms)
+✔ every exception has a rationale and an exact unique file/text identity (2.098042ms)
 ℹ tests 6
 ℹ suites 0
 ℹ pass 6
@@ -15,4 +15,4 @@
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 8593.728
+ℹ duration_ms 2992.84175

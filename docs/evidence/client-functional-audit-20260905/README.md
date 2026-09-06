@@ -13,6 +13,7 @@
 - `candidate-90a8ec45-e2e.log`：整合最新登录标语前的候选，418 项通过。
 - `merged-main-e2e-first-run.log`：整合登录标语后的四并发运行，416 项通过、两项间歇超时。
 - `timeout-recheck.log`：相同代码／构建、未改测试和时限；三语 Reading 编辑及课程卡片各重复五次，20 项通过。
+- `before-99efa005-summary.json`、`before-99efa005-e2e.log`：整合最新可用时间弹窗及去重历史修复前，完整检查和 418 项浏览器回归通过的记录；最终结果另见 `summary.json` 与 `final-*.log`。
 - `current-production-release.json`：本轮初始读取的公开 Production 元数据，不能用来声明候选已部署。
 - `public-browser-acceptance.json`：线上登录页三语、刷新保留、忘记密码入口与返回的真实浏览器观察，未提交表单。
 
