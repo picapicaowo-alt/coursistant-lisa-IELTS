@@ -301,6 +301,10 @@
     "membershipUpdated": "Membership updated.",
     "membershipFailed": "The membership could not be changed.",
     "deleteSet": "Delete group set",
-    "deleteHelp": "Deletion is refused when assignments or other dependencies still use this group set."
+    "deleteHelp": "Deletion is refused when assignments or other dependencies still use this group set.",
+    "setMissing": "This group link has expired",
+    "setMissingHelp": "The group set may have been removed. Past activity is kept, and you can still view the current groups for this course.",
+    "setForbiddenHelp": "Your current account cannot open this group set. Return to the course group list to view available groups.",
+    "viewCurrent": "View current groups"
   }
 }

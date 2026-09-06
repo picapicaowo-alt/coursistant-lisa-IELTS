@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { FormEvent, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, Lock, Pencil, Plus, Shuffle, Trash2, UserMinus, UserPlus, Users, X } from 'lucide-react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { generatePath, Link, useNavigate, useParams } from 'react-router-dom';
 import type { CourseGroup, PatchGroupSetPayload } from '@/apis';
 import { unwrapData } from '@/apis';
 import { courseApiService } from '@/apis/services/course-api';
@@ -20,6 +20,8 @@ import {
 } from '@/utils/dateTimeRange';
 import { formatNumber } from '@/i18n/formatting';
 import { groupSetValidationKey, validGroupCapacity } from '@/pages/groups/formValidation';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {isHttpStatus, isNotFound} from '@/utils/apiError';
 import styles from './index.module.scss';
 
 interface GroupDraft {
@@ -67,13 +69,13 @@ const GroupSetDetailPage = () => {
     queryKey: ['course-group-set', courseId, groupSetId],
     queryFn: async () => unwrapData(await courseApiService.getGroupSet(courseId, groupSetId), 'getGroupSet'),
     enabled: valid,
-    retry: 1,
+    retry: (failureCount, error) => !isNotFound(error) && !isHttpStatus(error, 403) && failureCount < 1,
   });
   const ungroupedQuery = useQuery({
     queryKey: ['course-group-set-ungrouped', courseId, groupSetId],
     queryFn: async () =>
       unwrapData(await courseApiService.listUngroupedStudents(courseId, groupSetId), 'listUngroupedStudents'),
-    enabled: valid && access.canManageGroups,
+    enabled: valid && access.canManageGroups && groupSetQuery.isSuccess,
     retry: 1,
   });
   const groupSet = groupSetQuery.data;
@@ -331,19 +333,27 @@ const GroupSetDetailPage = () => {
   const myGroupId = groupSet?.myGroup?.groupId ?? null;
 
   if (!valid || groupSetQuery.isError) {
+    const missing = !valid || isNotFound(groupSetQuery.error);
+    const forbidden = isHttpStatus(groupSetQuery.error, 403);
+    const canReturnToGroups = Number.isInteger(courseId) && courseId > 0;
     return (
       <main className={styles.page}>
-          <section className={styles.card} role="alert">
-            <h1>{translate('courseTools:groups.setUnavailable')}</h1>
-            <p>{translate('courseTools:groups.setFailed')}</p>
-            {valid ? (
-              <button type="button" className={styles.primaryButton} onClick={() => void groupSetQuery.refetch()}>
-                {translate('common:actions.tryAgain')}
-              </button>
-            ) : null}
-          </section>
+        <section className={`${styles.card} ${styles.unavailable}`} role={missing || forbidden ? 'status' : 'alert'}>
+          <h1>{translate(missing ? 'courseTools:groups.setMissing' : 'courseTools:groups.setUnavailable')}</h1>
+          <p>{translate(missing ? 'courseTools:groups.setMissingHelp' : forbidden ? 'courseTools:groups.setForbiddenHelp' : 'courseTools:groups.setFailed')}</p>
+          <div className={styles.actionRow}>
+            <Link className={styles.secondaryButton} to={canReturnToGroups ? generatePath(APP_ROUTE_PATHS.courseCourseIdGroups, {courseId: String(courseId)}) : APP_ROUTE_PATHS.course}>
+              <ArrowLeft size={16} aria-hidden="true"/>{translate(canReturnToGroups ? 'courseTools:groups.viewCurrent' : 'dashboard:myCourses')}
+            </Link>
+            {valid && !missing && !forbidden ? <button type="button" className={styles.primaryButton} onClick={() => void groupSetQuery.refetch()}>{translate('common:actions.tryAgain')}</button> : null}
+          </div>
+        </section>
       </main>
     );
+  }
+
+  if (groupSetQuery.isPending) {
+    return <main className={styles.page}><section className={styles.card} role="status">{translate('courseTools:groups.loadingSet')}</section></main>;
   }
 
   return (

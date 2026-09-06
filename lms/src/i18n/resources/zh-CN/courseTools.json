@@ -301,6 +301,10 @@
     "membershipUpdated": "成员关系已更新。",
     "membershipFailed": "暂时无法更改成员关系。",
     "deleteSet": "删除分组集",
-    "deleteHelp": "如有作业或其他关联项目仍在使用此分组集，将无法删除。"
+    "deleteHelp": "如有作业或其他关联项目仍在使用此分组集，将无法删除。",
+    "setMissing": "此分组链接已失效",
+    "setMissingHelp": "分组可能已被移除，历史活动仍会保留。你可以查看课程当前的分组。",
+    "setForbiddenHelp": "当前账号无法查看此分组集。请返回课程分组列表，查看可访问的分组。",
+    "viewCurrent": "查看当前分组"
   }
 }

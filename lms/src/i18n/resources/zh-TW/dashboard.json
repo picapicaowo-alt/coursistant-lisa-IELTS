@@ -3,7 +3,7 @@
   "learner": "同學",
   "courseFilter": "課程篩選",
   "allCourses": "全部課程",
-  "noUpcomingWork": "暫無待辦事項",
+  "noUpcomingWork": "暫無即將截止的作業或測驗",
   "viewCourse": "檢視課程",
   "noActiveEnrolments": "暫無進行中的課程。可前往“我的課程”檢視已加入的課程。",
   "nothingPending": "暫無需要您處理的事項。",
@@ -81,5 +81,23 @@
     "upcomingClass": "即將上課",
     "scheduleConflict": "排課衝突"
   },
-  "assistantAttachment": "開啟對話以新增附件"
+  "assistantAttachment": "開啟對話以新增附件",
+  "teachingWork": {
+    "title": "教學待辦",
+    "help": "批改作業和測驗，發布已完成的成績。",
+    "viewAll": "開啟教學管理",
+    "loading": "正在載入教學待辦…",
+    "failed": "暫時無法載入教學待辦，請重試。",
+    "empty": "目前沒有待處理的作業或成績。",
+    "emptyHelp": "有新的提交需要批改，或有成績待發布時，會顯示在這裡。",
+    "moreWork": "部分待辦暫時無法在此顯示，請開啟教學管理查看。",
+    "assignment": "作業",
+    "quiz": "測驗",
+    "grade": "前往批改",
+    "release": "查看並發布成績",
+    "toGrade_one": "{{count, number}} 份提交待批改",
+    "toGrade_other": "{{count, number}} 份提交待批改",
+    "toRelease_one": "{{count, number}} 份成績待發布",
+    "toRelease_other": "{{count, number}} 份成績待發布"
+  }
 }
