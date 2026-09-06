@@ -67,14 +67,18 @@ test('release audit: failed schedule writes retry idempotently and block launch 
   await expect(page.getByRole('button', {name: 'Retry', exact: true})).toHaveCount(0);
   await page.getByRole('button', {name: 'Generate occurrences', exact: true}).click();
   await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
-  await expect(page.getByRole('button', {name: 'Validate readiness'})).toBeDisabled();
+  const headerReady = page.getByRole('main').locator('header').getByRole('button', {name: 'Validate readiness', exact: true});
+  const panelReady = page.getByRole('complementary', {name: 'Course readiness'}).getByRole('button', {name: 'Validate readiness', exact: true});
+  await expect(headerReady).toBeDisabled();
+  await expect(panelReady).toBeDisabled();
   await page.getByRole('tab', {name: 'Schedule', exact: true}).click();
   await page.getByRole('button', {name: 'View class dates'}).click();
   await expect(page.getByRole('button', {name: 'Generate dates'})).toBeDisabled();
   releaseRequest();
   await expect(page.getByRole('button', {name: 'Generate dates'})).toBeEnabled();
   await page.getByRole('tab', {name: 'Delivery', exact: true}).click();
-  await expect(page.getByRole('button', {name: 'Validate readiness'})).toBeEnabled();
+  await expect(headerReady).toBeEnabled();
+  await expect(panelReady).toBeEnabled();
   expect(keys).toHaveLength(2);
   expect(keys[0]).toBeTruthy();
   expect(keys[1]).toBe(keys[0]);
@@ -297,6 +301,8 @@ async function setupCourse(page: Page, denied = false) {
 }
 
 test('release audit: course routes preserve the same shell and fit their actual scroll container', async ({page}, info) => {
+  // This case navigates 28 pages and captures all seven supported widths.
+  test.slow();
   await setupCourse(page);
   for (const width of [320, 390, 768, 1024, 1440, 1920, 2560]) {
     await page.setViewportSize({width, height: 1000});

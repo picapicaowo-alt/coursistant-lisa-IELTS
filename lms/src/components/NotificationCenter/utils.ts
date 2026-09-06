@@ -19,6 +19,7 @@ export const resolveNotificationPath = (
   identity?: Pick<LoginResponse, 'role' | 'level'>,
 ): string | null => {
   if (notification.availability !== 'AVAILABLE') return null;
+  if (notification.notificationType?.startsWith('QUIZ_') || /^\/courses?\/\d+\/quizzes(?:\/|$)/.test(notification.deepLink ?? '')) return null;
 
   const registered = registeredDestination(notification.deepLink);
   if (identity?.level === 'PARENT') return APP_ROUTE_PATHS.parent;
@@ -53,7 +54,7 @@ export const resolveNotificationPath = (
     }
 
     const pluralSubject = deepLink.match(
-      /^\/courses\/(\d+)\/(assignments|quizzes|announcements|events|weeks|groups|group-sets)\/(\d+)(?:\/my-grade)?\/?$/,
+      /^\/courses\/(\d+)\/(assignments|announcements|events|weeks|groups|group-sets)\/(\d+)(?:\/my-grade)?\/?$/,
     );
     if (pluralSubject) {
       const [, courseId, rawKind, subjectId] = pluralSubject;
@@ -70,7 +71,7 @@ export const resolveNotificationPath = (
     if (singularGrades) return singularGrades[1];
 
     const singularSubject = deepLink.match(
-      /^(\/course\/\d+(?:\/(?:assignments|quizzes|announcements|events|weeks|group-sets)\/\d+)?)(?:\/my-grade)?\/?$/,
+      /^(\/course\/\d+(?:\/(?:assignments|announcements|events|weeks|group-sets)\/\d+)?)(?:\/my-grade)?\/?$/,
     );
     if (singularSubject) return singularSubject[1];
 

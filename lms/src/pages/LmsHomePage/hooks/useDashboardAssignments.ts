@@ -42,7 +42,7 @@ const fromStudentDeadline = (d: UpcomingDeadline): AssignmentRow => ({
 });
 
 const fromTeachingDeadline = (d: TeachingDeadline): AssignmentRow => {
-  const objectId = d.kind === 'Quiz' ? d.quizId : d.assignmentId;
+  const objectId = d.assignmentId;
   if (objectId === null) {
     throw new Error(`Malformed teaching deadline: ${d.kind} is missing its id`);
   }
@@ -56,9 +56,7 @@ const fromTeachingDeadline = (d: TeachingDeadline): AssignmentRow => {
     timezone: d.timezone,
     progress: {submitted: d.submittedCount, total: d.totalStudents},
     assignmentId: d.assignmentId,
-    destination: d.kind === 'Quiz'
-      ? `/course/${d.courseId}/quizzes/${objectId}`
-      : `/course/${d.courseId}/assignments/${objectId}`,
+    destination: `/course/${d.courseId}/assignments/${objectId}`,
   };
 };
 

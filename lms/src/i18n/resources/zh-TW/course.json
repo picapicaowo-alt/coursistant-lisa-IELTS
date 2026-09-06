@@ -354,7 +354,8 @@
     "itemCount_one": "{{count, number}} 項",
     "itemCount_other": "{{count, number}} 項",
     "assignmentFallback": "作業 {{id}}",
-    "due": "截止日期：{{date}}"
+    "due": "截止日期：{{date}}",
+    "visibilityNotice": "此處顯示已公布的作業成績，不計算課程總成績。"
   },
   "learning": {
     "loading": "正在載入課程…",
@@ -721,5 +722,10 @@
       "title": "在課程中建立內容",
       "description": "請選擇課程，再使用其中的資料、作業或測驗工具。內容透過課程工作區儲存，可用操作以你的權限為準。"
     }
+  },
+  "studySupport": {
+    "courseLoadFailed": "暫時無法核實課程清單，學習支援目前無法使用。",
+    "checkingCourses": "正在載入你的課程…",
+    "unavailable": "學習支援暫時無法使用"
   }
 }

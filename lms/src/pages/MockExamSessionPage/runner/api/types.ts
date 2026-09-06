@@ -6,6 +6,7 @@ export type ReadingSummary = {
 }
 
 export type ApiQuestion = {
+  sortOrder?: number
   kind: string
   title: string
   instruction: string

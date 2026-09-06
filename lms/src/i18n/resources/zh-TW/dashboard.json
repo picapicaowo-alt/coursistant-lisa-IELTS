@@ -81,5 +81,8 @@
     "upcomingClass": "即將上課",
     "scheduleConflict": "排課衝突"
   },
-  "assistantAttachment": "開啟對話以新增附件"
+  "assistantAttachment": "開啟對話以新增附件",
+  "teaching": {
+    "assignmentQueueFallback": "目前顯示作業提交紀錄，批改佇列暫時無法使用。"
+  }
 }

@@ -36,40 +36,50 @@ function isMockExamSection(value: string | undefined): value is MockExamSection 
   return value === 'listening' || value === 'reading' || value === 'writing'
 }
 
-async function loadSession(studentMockExamId: number, section: MockExamSection): Promise<LoadedSession> {
+async function loadSession(studentMockExamId: number, section: MockExamSection, signal: AbortSignal): Promise<LoadedSession> {
   const examResponse = await mockExamApiService.getStudentExam(studentMockExamId)
+  signal.throwIfAborted()
   const exam = unwrapData(examResponse, 'getStudentMockExam')
   if (isSectionSubmitted(exam, section)) return {section: 'submitted', exam, submittedSection: section, objectUrls: []}
   const sectionResponse = await mockExamApiService.getStudentSection(studentMockExamId, section)
+  signal.throwIfAborted()
   const sectionPayload = unwrapData(sectionResponse, `getStudentMockExam${section}`)
   const title = readExamTitle(exam, '')
 
   if (section === 'reading') {
-    const reading = mapReadingDetail(parseReadingDetail(sectionPayload, studentMockExamId))
+    const detail = parseReadingDetail(sectionPayload, studentMockExamId)
+    const reading = mapReadingDetail(detail)
     const objectUrls: string[] = []
-    await Promise.all(reading.passages.map(async (passage, passageIndex) => {
-      await Promise.all(passage.sections.map(async (questionSection, questionIndex) => {
-        if (questionSection.kind !== 'diagram') return
-        const blob = await mockExamApiService.getStudentReadingImage(
+    const images = await Promise.all(reading.passages.flatMap((passage, passageIndex) =>
+      passage.sections.flatMap((questionSection, questionIndex) => {
+        if (questionSection.kind !== 'diagram') return []
+        const source = detail.passages[passageIndex]
+        return [mockExamApiService.getStudentReadingImage(
           studentMockExamId,
-          passageIndex + 1,
-          questionIndex + 1,
-        )
-        const url = URL.createObjectURL(blob)
-        objectUrls.push(url)
-        questionSection.imageSrc = url
-      }))
-    }))
+          source.seq,
+          source.questions[questionIndex].sortOrder ?? questionIndex + 1,
+        ).then(blob => ({blob, questionSection}))]
+      }),
+    ))
+    // Allocate URLs only after every read succeeds and the route still owns the
+    // result. A failed or abandoned load has no mounted effect to clean them up.
+    signal.throwIfAborted()
+    for (const {blob, questionSection} of images) {
+      const url = URL.createObjectURL(blob)
+      objectUrls.push(url)
+      questionSection.imageSrc = url
+    }
     return {section, title, reading, objectUrls}
   }
 
   if (section === 'listening') {
     const detail = parseListeningDetail(sectionPayload, studentMockExamId)
     const paper = mapListeningDetail(detail)
-    const objectUrls = await Promise.all(detail.parts.map(async (part, index) => {
-      const blob = await mockExamApiService.getStudentListeningAudio(studentMockExamId, part.seq || index + 1)
-      return URL.createObjectURL(blob)
-    }))
+    const blobs = await Promise.all(detail.parts.map((part, index) =>
+      mockExamApiService.getStudentListeningAudio(studentMockExamId, part.seq || index + 1),
+    ))
+    signal.throwIfAborted()
+    const objectUrls = blobs.map(blob => URL.createObjectURL(blob))
     paper.parts.forEach((part, index) => {
       part.audioSrc = objectUrls[index]
     })
@@ -78,13 +88,16 @@ async function loadSession(studentMockExamId: number, section: MockExamSection):
 
   const writing = parseWritingDetail(sectionPayload, studentMockExamId)
   const objectUrls: string[] = []
-  await Promise.all(writing.tasks.map(async (task) => {
-    if (!task.hasImage) return
+  const images = await Promise.all(writing.tasks.filter(task => task.hasImage).map(async (task) => {
     const blob = await mockExamApiService.getStudentWritingImage(studentMockExamId, task.seq)
+    return {task, blob}
+  }))
+  signal.throwIfAborted()
+  for (const {task, blob} of images) {
     const url = URL.createObjectURL(blob)
     objectUrls.push(url)
     rememberWritingTaskImageUrl(writing.id, task.seq, url)
-  }))
+  }
   return {section, title, writing, objectUrls}
 }
 
@@ -104,7 +117,12 @@ const MockExamSessionPage = () => {
     enabled: Number.isFinite(studentMockExamId) && studentMockExamId > 0 && section !== null,
     retry: false,
     gcTime: 0,
-    queryFn: () => loadSession(studentMockExamId, section as MockExamSection),
+    // The runner owns unsent answers, its clock and media. Background query
+    // refreshes must not replace that active session or unmount it on failure.
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: false,
+    queryFn: ({signal}) => loadSession(studentMockExamId, section as MockExamSection, signal),
   })
 
   useEffect(() => () => {
@@ -147,7 +165,7 @@ const MockExamSessionPage = () => {
   }
 
   return (
-    <div className={styles.root}>
+    <div className={styles.root} key={`${studentMockExamId}:${section}`}>
       {session.data.section === 'reading' ? (
         <ExamPage
           reading={session.data.reading}

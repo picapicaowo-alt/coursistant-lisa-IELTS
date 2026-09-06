@@ -6,9 +6,8 @@ import {calendarOccurrences} from './calendarOccurrences';
 import {assignmentApiService} from '@/apis/services/assignment-api';
 import {courseApiService} from '@/apis/services/course-api';
 import {dashboardApiService} from '@/apis/services/dashboard-api';
-import {quizApiService} from '@/apis/services/quiz-api';
 
-export type CalendarItemKind = 'Session' | 'Assignment' | 'Quiz' | 'Event' | 'Personal';
+export type CalendarItemKind = 'Session' | 'Assignment' | 'Event' | 'Personal';
 
 export interface CalendarItem {
   id: string;
@@ -61,10 +60,9 @@ export const loadCalendarWindow = async (windowStart: string, windowEnd: string)
   const [courses, dated] = await Promise.all([loadAllActiveCourses(), courseOperationsApiService.getMyCalendar({from: windowStart, to: format(addDays(parseISO(windowEnd), 1), 'yyyy-MM-dd'), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone}).then(response => ({value: unwrapData(response, 'myCalendar'), failed: false})).catch(() => ({value: null, failed: true}))]);
   const occurrences = calendarOccurrences(dated.value, courses, windowStart, windowEnd);
   const courseResults = await Promise.all(courses.map(async course => {
-    const sourceKeys = ['calendar:errors.assignments', 'calendar:errors.quizzes', 'calendar:errors.events'] as const;
+    const sourceKeys = ['calendar:errors.assignments', 'calendar:errors.events'] as const;
     const results = await Promise.allSettled([
       assignmentApiService.getCourseAssignmentSummaries(course.id),
-      quizApiService.listQuizzes(course.id),
       courseApiService.listCourseEvents(course.id),
     ]);
     const failures: CalendarFailure[] = results.flatMap((result, index) => result.status === 'rejected'
@@ -95,31 +93,7 @@ export const loadCalendarWindow = async (windowStart: string, windowEnd: string)
     }
 
     if (results[1].status === 'fulfilled') {
-      unwrapData(results[1].value, `course ${course.id} quizzes`)
-        .filter(quiz => quiz.state === 'Published')
-        .forEach(quiz => {
-          const date = localDate(quiz.closesAtLocal);
-          if (date < windowStart || date > windowEnd) return;
-          items.push({
-            id: `quiz-${course.id}-${quiz.id}`,
-            sourceId: quiz.id,
-            courseId: course.id,
-            courseCode: course.courseCode,
-            courseTitle: course.title,
-            title: quiz.title,
-            kind: 'Quiz',
-            date,
-            startTime: localTime(quiz.closesAtLocal),
-            endTime: null,
-            timezone: quiz.timezone,
-            location: null,
-            path: `/course/${course.id}/quizzes/${quiz.id}`,
-          });
-        });
-    }
-
-    if (results[2].status === 'fulfilled') {
-      unwrapData(results[2].value, `course ${course.id} events`).forEach(event => {
+      unwrapData(results[1].value, `course ${course.id} events`).forEach(event => {
         if (event.date < windowStart || event.date > windowEnd) return;
         items.push({
           id: `event-${course.id}-${event.id}`,

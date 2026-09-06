@@ -1,0 +1,25 @@
+{
+  "environment": "app.xlearnedu.com deployed version; candidate changes were not deployed",
+  "observations": [
+    {
+      "role": "Advisor",
+      "pages": [
+        "Students",
+        "Action tasks",
+        "Scheduling"
+      ],
+      "result": "Lists and navigation rendered; resolved-task navigation is not counted as a new backend defect."
+    },
+    {
+      "role": "Instructor",
+      "pages": [
+        "Course content",
+        "Mock exams",
+        "Calendar"
+      ],
+      "result": "Course material list rendered. Writing review queue displayed an empty state. Calendar displayed the existing event in the timetable and sidebar."
+    }
+  ],
+  "logout": "Sign out clicked; browser tab inventory subsequently confirmed /login. The debugger detached after navigation, so there is no final login-form DOM snapshot.",
+  "candidateAcceptance": "See local fixture E2E logs; these are separate from live acceptance."
+}

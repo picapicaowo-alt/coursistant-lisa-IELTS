@@ -270,7 +270,10 @@
     "assignmentType": "{{type}} assignment",
     "submittedCount": "{{number}} submitted",
     "gradedCount": "{{number}} graded",
-    "releasedCount": "{{number}} released"
+    "releasedCount": "{{number}} released",
+    "stagingRefreshFailed": "Your files changed, but the current upload list could not be loaded. Retry before submitting.",
+    "submittedRefreshFailed": "Your assignment was submitted, but its status could not be refreshed. Retry to load the saved submission.",
+    "filesBusy": "Wait for the current submission to finish before changing files."
   },
   "grading": {
     "unknownLearner": "Unknown learner",

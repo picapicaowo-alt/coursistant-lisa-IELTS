@@ -1,0 +1,125 @@
+{
+  "environment": "Tokyo Production public API",
+  "scope": "This continuation only; counts are HTTP responses, not feature pass counts. Excludes the retired Quiz module.",
+  "responses": [
+    {
+      "at": "2026-09-05T09:51:47.687Z",
+      "role": "Advisor",
+      "method": "GET",
+      "path": "/v2/advisor/action-tasks?page=0&size=20",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T09:51:47.842Z",
+      "role": "Student",
+      "method": "GET",
+      "path": "/v2/me/notifications?page=1&size=20",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:18.491Z",
+      "role": "Counsellor",
+      "method": "GET",
+      "path": "/v2/counsellor/dashboard",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:18.633Z",
+      "role": "Counsellor",
+      "method": "GET",
+      "path": "/v2/counsellor/student-intakes?page=0&size=20",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:18.780Z",
+      "role": "Advisor",
+      "method": "GET",
+      "path": "/v2/advisor/students/26/study-plan/revisions?page=0&size=20",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:18.921Z",
+      "role": "Advisor",
+      "method": "GET",
+      "path": "/v2/advisor/students/26/course-options?page=0&size=20",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:19.063Z",
+      "role": "Advisor",
+      "method": "GET",
+      "path": "/v2/advisor/action-tasks/1",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:19.201Z",
+      "role": "Advisor",
+      "method": "GET",
+      "path": "/v2/advisor/conversations?page=0&size=20",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:19.349Z",
+      "role": "Advisor",
+      "method": "GET",
+      "path": "/v2/advisor/students/26/conversation/messages",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:19.489Z",
+      "role": "Advisor",
+      "method": "GET",
+      "path": "/v2/advisor/students/26/courses/1/student-reports/1",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:19.673Z",
+      "role": "Student",
+      "method": "GET",
+      "path": "/v2/student/advisor-conversation/messages",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:19.810Z",
+      "role": "Student",
+      "method": "GET",
+      "path": "/v2/me/schedule-requests?page=0&size=20",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:19.947Z",
+      "role": "Student",
+      "method": "GET",
+      "path": "/v2/me/attendance?courseId=1",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:20.086Z",
+      "role": "Student",
+      "method": "GET",
+      "path": "/v2/me/courses/1/hours",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:20.228Z",
+      "role": "Instructor",
+      "method": "GET",
+      "path": "/v2/me/teaching/activities/upcoming?days=14",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:20.366Z",
+      "role": "Instructor",
+      "method": "GET",
+      "path": "/v2/me/teaching/deadlines/upcoming?days=14",
+      "httpStatus": 200
+    },
+    {
+      "at": "2026-09-05T10:02:20.990Z",
+      "role": "Instructor",
+      "method": "GET",
+      "path": "/v2/courses/1/members?courseRole=Student&active=true&page=0&size=100",
+      "httpStatus": 200
+    }
+  ]
+}

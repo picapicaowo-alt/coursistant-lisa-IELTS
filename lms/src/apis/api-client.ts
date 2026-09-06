@@ -32,6 +32,8 @@ export interface RequestConfig extends Omit<AxiosRequestConfig, 'url' | 'method'
   retryCount?: number;
   /** Set internally once a request has been retried after a refresh. */
   isRetryAfterRefresh?: boolean;
+  /** Internal identity checkpoint; old responses must not update a new account. */
+  sessionIdentity?: string | null;
 }
 
 interface RefreshCandidate {
@@ -39,6 +41,17 @@ interface RefreshCandidate {
   skipAuth?: boolean;
   isRetryAfterRefresh?: boolean;
 }
+
+class ReplacedSessionError extends Error {}
+
+const currentSessionIdentity = (): string | null => {
+  try {
+    const user: unknown = JSON.parse(localStorage.getItem('user') ?? 'null');
+    return isRecord(user) ? JSON.stringify([user.userId ?? user.id, user.role, user.level]) : null;
+  } catch {
+    return null;
+  }
+};
 
 /** Anonymous auth calls must never revive or rotate an older user's session. */
 export const shouldAttemptTokenRefresh = (
@@ -60,7 +73,6 @@ export const shouldEndSessionAfterAuthFailure = (
 export class ApiClient {
   private readonly client: AxiosInstance;
   private config: ApiClientConfig;
-  private accessToken?: string;
   
   constructor(config: ApiClientConfig) {
     this.config = {
@@ -94,12 +106,11 @@ export class ApiClient {
   }
   
   public setAccessToken(token: string): void {
-    this.accessToken = token;
-    this.client.defaults.headers.common['Authorization'] = `Bearer ${this.accessToken}`;
+    localStorage.setItem('accToken', token);
   }
   
   public clearAccessToken(): void {
-    this.accessToken = undefined;
+    localStorage.removeItem('accToken');
     delete this.client.defaults.headers.common['Authorization'];
   }
   
@@ -121,15 +132,17 @@ export class ApiClient {
     if (requestConfig.skipAuth !== undefined && requestConfig.skipAuth) {
       delete config.headers.Authorization;
     } else {
-      if (this.accessToken === undefined) {
-        const token = localStorage.getItem('accToken');
-        if (token !== null) {
-          this.accessToken = token;
-          config.headers.Authorization = `Bearer ${this.accessToken}`;
-        }
-      } else {
-        config.headers.Authorization = `Bearer ${this.accessToken}`;
+      const identity = currentSessionIdentity();
+      if (requestConfig.sessionIdentity !== undefined && requestConfig.sessionIdentity !== identity) {
+        throw new axios.CanceledError('Session changed before request retry');
       }
+      requestConfig.sessionIdentity = identity;
+      // All API clients and tabs share the persisted session. A cached bearer
+      // survives another tab's logout or account switch and can act as the
+      // previous user, so resolve it again for every request (including retries).
+      const token = localStorage.getItem('accToken');
+      if (token) config.headers.Authorization = `Bearer ${token}`;
+      else delete config.headers.Authorization;
     }
     
     if (import.meta.env.DEV) {
@@ -146,6 +159,10 @@ export class ApiClient {
   }
   
   private handleResponse(response: AxiosResponse): AxiosResponse {
+    const request = response.config as InternalAxiosRequestConfig & RequestConfig;
+    if (!request.skipAuth && request.sessionIdentity !== currentSessionIdentity()) {
+      throw new axios.CanceledError('Session changed before response arrived');
+    }
     if (import.meta.env.DEV) {
       // Response bodies can contain access tokens and student data.
       console.debug(
@@ -198,6 +215,28 @@ export class ApiClient {
    */
   private async handleAuthError(error: AxiosError): Promise<never> {
     const original = error.config as (InternalAxiosRequestConfig & RequestConfig) | undefined;
+    const authenticationError = {
+      code: 401,
+      message: 'Authentication required',
+      details: isRecord(error.response?.data) ? error.response.data : undefined,
+    };
+    const currentToken = localStorage.getItem('accToken');
+    // A response from a previous account must never rotate the current cookie
+    // or replay an old write using the replacement account's credentials.
+    if (original && !original.skipAuth
+      && original.headers.Authorization !== (currentToken ? `Bearer ${currentToken}` : undefined)) {
+      // Another request may already have refreshed this same account while
+      // this 401 was in transit. Reuse its token without another rotation.
+      if (currentToken && original.sessionIdentity !== null
+        && original.sessionIdentity === currentSessionIdentity() && !original.isRetryAfterRefresh) {
+        original.isRetryAfterRefresh = true;
+        return await this.client.request(original) as never;
+      }
+      return Promise.reject(authenticationError);
+    }
+    if (original && !original.skipAuth && original.sessionIdentity !== currentSessionIdentity()) {
+      return Promise.reject(authenticationError);
+    }
 
     const canRetry = shouldAttemptTokenRefresh(this.config.refreshPath, original, {
       hasRefreshDelegate: Boolean(this.config.refreshDelegate),
@@ -206,23 +245,28 @@ export class ApiClient {
     if (canRetry && original) {
       try {
         await this.recoverSession();
-        const token = localStorage.getItem('accToken');
-        if (token) this.setAccessToken(token);
-        original.isRetryAfterRefresh = true;
-        original.headers.Authorization = `Bearer ${this.accessToken}`;
-        return await this.client.request(original) as never;
-      } catch {
-        if (shouldEndSessionAfterAuthFailure(this.config.preserveSessionOnAuthFailure)) {
+      } catch (refreshError) {
+        const latestToken = localStorage.getItem('accToken');
+        const stillOwnsSession = original.sessionIdentity === currentSessionIdentity()
+          && original.headers.Authorization === (latestToken ? `Bearer ${latestToken}` : undefined);
+        // A late rejection belongs to the account that started the refresh,
+        // just like a late success. Neither may clear a replacement session.
+        if (stillOwnsSession && !(refreshError instanceof ReplacedSessionError)
+          && shouldEndSessionAfterAuthFailure(this.config.preserveSessionOnAuthFailure)) {
           this.endSession();
         }
+        return Promise.reject(authenticationError);
       }
+      // A successful refresh does not make the business request infallible.
+      // Preserve its actual error (permissions, conflicts, service failure)
+      // instead of treating a rejected replay as a failed login session.
+      original.isRetryAfterRefresh = true;
+      return await this.client.request(original) as never;
     }
 
-    return Promise.reject({
-      code: 401,
-      message: 'Authentication required',
-      details: isRecord(error.response?.data) ? error.response.data : undefined,
-    });
+    if (original?.isRetryAfterRefresh && !original.skipAuth
+      && shouldEndSessionAfterAuthFailure(this.config.preserveSessionOnAuthFailure)) this.endSession();
+    return Promise.reject(authenticationError);
   }
 
   /** Rotates the LMS access token, including for clients that share this session. */
@@ -244,6 +288,8 @@ export class ApiClient {
     if (this.refreshInFlight) return this.refreshInFlight;
 
     this.refreshInFlight = (async () => {
+      const previousToken = localStorage.getItem('accToken');
+      const previousIdentity = currentSessionIdentity();
       // A bare axios call: the instance interceptor would recurse on failure.
       const response = await axios.post<ApiResponse<string>>(
         `${this.config.baseURL}${this.config.refreshPath}`,
@@ -257,8 +303,11 @@ export class ApiClient {
         throw new Error('Refresh response carried no access token');
       }
 
+      if (localStorage.getItem('accToken') !== previousToken || currentSessionIdentity() !== previousIdentity) {
+        throw new ReplacedSessionError('Session changed during token refresh');
+      }
+
       this.setAccessToken(token);
-      localStorage.setItem('accToken', token);
     })();
 
     return this.refreshInFlight.finally(() => {
@@ -268,7 +317,6 @@ export class ApiClient {
 
   private endSession(): void {
     this.clearAccessToken();
-    localStorage.removeItem('accToken');
     this.config.onSessionExpired?.();
   }
   

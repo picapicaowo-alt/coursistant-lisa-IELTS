@@ -354,7 +354,8 @@
     "itemCount_one": "{{count, number}} item",
     "itemCount_other": "{{count, number}} items",
     "assignmentFallback": "Assignment {{id}}",
-    "due": "Due {{date}}"
+    "due": "Due {{date}}",
+    "visibilityNotice": "Released assignment scores appear here. This page does not calculate a course total."
   },
   "learning": {
     "loading": "Loading course…",
@@ -721,5 +722,10 @@
       "title": "Create content in a course",
       "description": "Choose a course, then use its content, assignment or quiz tools. Changes are saved through the course workspace, according to your permissions."
     }
+  },
+  "studySupport": {
+    "courseLoadFailed": "Study Support is temporarily unavailable because your course list could not be verified.",
+    "checkingCourses": "Loading your courses…",
+    "unavailable": "Study Support unavailable"
   }
 }

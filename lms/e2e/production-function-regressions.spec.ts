@@ -153,35 +153,3 @@ test('course enrollment recovers missing launch versions through the delivery re
   await expect(dialog.getByRole('button', {name: 'Publish', exact: true})).toBeEnabled();
   expect(configReads).toBe(3);
 });
-
-test('student quiz history reads attempt metadata and opens the matching result and receipt', async ({page}) => {
-  await fixtureSession(page, 'STUDENT');
-  const reads: string[] = [];
-  const errors: string[] = [];
-  page.on('pageerror', error => errors.push(error.message));
-  await page.route('**/v2/**', route => {
-    const path = new URL(route.request().url()).pathname.replace(/^\/api/, '');
-    reads.push(path);
-    const result = {quizId: 1, countedAttemptId: 9, gradeStatus: 'Released', releasedAt: '2026-09-05T01:15:21Z', receiptId: 'qa-receipt', totalScore: 1, manualGradingPending: false};
-    let data: unknown = [];
-    if (path === '/v2/me/courses') data = {items: [{courseId: 42, role: 'Student'}], total: 1, page: 0, size: 100};
-    if (path.endsWith('/unread-count')) data = {unreadCount: 0};
-    if (path === '/v2/courses/42/quizzes/1') data = {id: 1, courseId: 42, title: 'QA objective quiz', state: 'Published', windowOpen: true, opensAtLocal: '2026-09-01T09:00:00', closesAtLocal: '2026-09-30T17:00:00', timezone: 'Asia/Shanghai', attemptsAllowed: 1, totalPoints: 1, resultVisibility: 'AfterRelease'};
-    if (path.endsWith('/attempts/current')) return route.fulfill({status: 404, json: {status: 404, code: 'QUIZ_ATTEMPT_NOT_FOUND'}});
-    if (path.endsWith('/my-attempts')) data = [{...result, totalScore: null}];
-    if (path.endsWith('/attempts')) data = [{id: 9, attemptNumber: 1, status: 'Submitted', startedAt: '2026-09-05T01:14:13.634', submittedAt: '2026-09-05T01:14:53Z', receiptId: 'qa-receipt'}];
-    if (path.endsWith('/my-result') || path.endsWith('/attempts/9/result')) data = result;
-    if (path.endsWith('/attempts/9/receipt')) data = {attemptId: 9, receiptId: 'qa-receipt', submittedAt: '2026-09-05T01:14:53Z'};
-    return route.fulfill({json: response(data)});
-  });
-  await page.goto('/course/42/quizzes/1');
-  await expect(page.getByRole('heading', {name: 'Quiz submitted'})).toBeVisible();
-  const history = page.getByRole('region', {name: 'Attempt history'});
-  await expect(history.getByText('Attempt 1', {exact: true})).toBeVisible();
-  await history.getByRole('button', {name: 'View result', exact: true}).click();
-  await expect(history.getByText('1 / 1', {exact: true})).toBeVisible();
-  await expect(history.getByText(/Receipt qa-receipt/)).toBeVisible();
-  expect(reads).toContain('/v2/courses/42/quizzes/1/attempts/9/receipt');
-  expect(reads.some(path => path.endsWith('/my-attempts'))).toBe(false);
-  expect(errors).toEqual([]);
-});

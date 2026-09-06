@@ -362,17 +362,12 @@ const AssignmentDetailPage = () => {
         if (!isNoFormalSubmissionError(error) || !assignment || !user)
           throw error;
 
-        // 8081 models “never submitted” as a 404. Preserve any staged files,
-        // then turn it into the empty state the student screen expects.
-        const stagingFiles = assignment.stagedFileCount
-          ? unwrapData(
-              await assignmentApiService.listStagingFiles(
-                courseId!,
-                assignmentId!,
-              ),
-              "listStagingFiles",
-            )
-          : [];
+        // The assignment's count predates uploads made in the open dialog.
+        // Always read the actual staging list when there is no formal submission.
+        const stagingFiles = unwrapData(
+          await assignmentApiService.listStagingFiles(courseId!, assignmentId!),
+          "listStagingFiles",
+        );
 
         return buildEmptySubmissionState(assignment, user.id, stagingFiles);
       }
@@ -983,17 +978,18 @@ const AssignmentDetailPage = () => {
       {confirmation.dialog}
       {isSubmitDialogOpen && submissionQuery.data && (
         <SubmitAssignmentDialog
+          key={`${courseId}:${assignment.id}`}
           assignment={assignment}
           courseId={courseId}
           submission={submissionQuery.data}
           onClose={() => setSubmitDialogOpen(false)}
           onStaged={async () => {
-            await submissionQuery.refetch();
+            await submissionQuery.refetch({throwOnError: true});
           }}
           onSubmitted={async () => {
             await Promise.all([
-              assignmentQuery.refetch(),
-              submissionQuery.refetch(),
+              assignmentQuery.refetch({throwOnError: true}),
+              submissionQuery.refetch({throwOnError: true}),
             ]);
             await queryClient.invalidateQueries({
               queryKey: [

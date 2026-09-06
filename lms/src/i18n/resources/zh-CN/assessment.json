@@ -270,7 +270,10 @@
     "assignmentType": "{{type}}作业",
     "submittedCount": "已提交 {{number}}",
     "gradedCount": "已评分 {{number}}",
-    "releasedCount": "已发布 {{number}}"
+    "releasedCount": "已发布 {{number}}",
+    "stagingRefreshFailed": "文件已变更，但暂时无法读取最新的上传列表。请重试后再提交。",
+    "submittedRefreshFailed": "作业已提交，但暂时无法刷新状态。请重试以查看已保存的提交记录。",
+    "filesBusy": "请等待当前提交完成后再更改文件。"
   },
   "grading": {
     "unknownLearner": "学员姓名未提供",

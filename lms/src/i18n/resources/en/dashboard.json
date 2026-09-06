@@ -81,5 +81,8 @@
     "upcomingClass": "Upcoming class",
     "scheduleConflict": "Schedule conflict"
   },
-  "assistantAttachment": "Open chat to add an attachment"
+  "assistantAttachment": "Open chat to add an attachment",
+  "teaching": {
+    "assignmentQueueFallback": "Showing assignment submissions. The grading queue is temporarily unavailable."
+  }
 }
