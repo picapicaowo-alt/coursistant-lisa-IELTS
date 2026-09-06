@@ -29,6 +29,20 @@
 
 此前个人事件删除等事项，应使用最新合同要求的版本参数复测；不复用旧的不完整请求作为当前故障依据。Quiz 已排除，不列为发布阻塞。
 
+## 复测入口
+
+以下路径直接来自当前前端 service 与消费合同，均相对于环境的 API base。路径占位符必须替换为该测试身份实际可访问的资源，不能跨身份复用结果。
+
+| 项目 | method / path / 关键参数 |
+| --- | --- |
+| B1 | `GET /v2/advisor/courses/{courseId}/delivery-config`；`GET /v2/courses/{courseId}/session-occurrences?from=YYYY-MM-DD&to=YYYY-MM-DD`。可选 `includeHistory`，不将 datetime 作为 date 参数。 |
+| B2 | `DELETE /v2/courses/{courseId}/weeks/{weekId}/materials/{materialId}`，沿用前端 `Idempotency-Key`；记录该文件的 DRAFT 状态及 uploadedBy，验证删除后列表回读。 |
+| C1 | `GET /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/{section}/authoring`；`PUT /v2/tenant/mock-exam-templates/{templateId}/versions/{versionId}/{section}`。section 为 reading / listening / writing，body 为完整 section 和 `expectedContentRevision`，不加 Idempotency-Key。 |
+| C2 图片 | `GET /v2/student/mock-exams/{studentMockExamId}/reading/passages/{passageSeq}/questions/{sortOrder}/image`。从真实 section payload 取序号，核验媒体内容与对应题组一致。 |
+| C3 | `PUT /v2/student/study-plan/tasks/{taskId}/submission-file?expectedVersion={version}`，multipart 字段 `file`；读取返回 `taskVersion`，用于 `POST /v2/student/study-plan/tasks/{taskId}/complete` 的版本字段。Advisor 用 `GET /v2/advisor/students/{studentUserId}/study-plan/tasks/{taskId}/submission-file/{preview或download}` 回读。 |
+| C4 | `GET /v2/parent/linked-students?page={page}&size={size}`，跨页核对学生身份；切换孩子后，后续请求必须使用所选 studentUserId。 |
+| N1 | `GET /v2/advisor/students/{studentUserId}/hub`；`GET /v2/advisor/schedule-requests?studentUserId={studentUserId}&page=0&size=20`；指定 QA 申请通过 `POST /v2/advisor/schedule-requests/{requestId}/decision` 审批后，回读队列与 Hub。 |
+
 ## 完成核验所需输入
 
 - 可用的测试环境与角色账号，至少覆盖 Student、Instructor、Advisor、Counsellor、Parent、Tenant Admin、System Admin 和 Instructor Advisor；只授予对应测试所需的现有权限。

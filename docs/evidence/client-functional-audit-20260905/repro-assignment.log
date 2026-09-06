@@ -1,0 +1,71 @@
+
+> lms@0.0.0 test:run
+> vitest run src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx
+
+(node:34531) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ RUN  v4.1.11 /private/tmp/coursistant-client-functional-audit-20260905/lms
+
+ ❯ src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx (4 tests | 3 failed) 97ms
+     × keeps a retry key for the same files and changes it when the selected files change 76ms
+     × prevents changing staged files while their submission is pending 7ms
+     × waits for a new upload and staging readback before allowing submission 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx > SubmitAssignmentDialog > keeps a retry key for the same files and changes it when the selected files change
+AssertionError: expected 'a2e902d3-a9f2-4583-8b55-56dde85b9075' not to be 'a2e902d3-a9f2-4583-8b55-56dde85b9075' // Object.is equality
+ ❯ src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx:70:84
+     68|     fireEvent.click(submit);
+     69|     await waitFor(() => expect(assignmentApiService.submitStagedFiles)…
+     70|     expect(vi.mocked(assignmentApiService.submitStagedFiles).mock.call…
+       |                                                                                    ^
+     71|     expect(vi.mocked(assignmentApiService.submitStagedFiles).mock.call…
+     72|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx > SubmitAssignmentDialog > prevents changing staged files while their submission is pending
+Error: expect(element).toBeDisabled()
+
+Received element is not disabled:
+  <button
+  aria-label="Delete Testing doc.pdf"
+  class="_deleteButton_27f8c2"
+  title="blockEditor.deleteFileTitle"
+  type="button"
+/>
+ ❯ src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx:79:74
+     77|     fireEvent.click(screen.getByRole('button', {name: 'assessment:subm…
+     78|     await waitFor(() => expect(assignmentApiService.submitStagedFiles)…
+     79|     expect(screen.getByRole('button', {name: 'Delete Testing doc.pdf'}…
+       |                                                                          ^
+     80|     expect(container.querySelector('input[type="file"]')).toBeNull();
+     81|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx > SubmitAssignmentDialog > waits for a new upload and staging readback before allowing submission
+Error: expect(element).toBeDisabled()
+
+Received element is not disabled:
+  <button
+  class="_submit_8fe41e"
+  type="button"
+/>
+ ❯ src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx:88:85
+     86|     fireEvent.change(container.querySelector('input[type="file"]')!, {…
+     87|     await waitFor(() => expect(assignmentApiService.uploadStagingFiles…
+     88|     expect(screen.getByRole('button', {name: 'assessment:submission.su…
+       |                                                                                     ^
+     89|     expect(assignmentApiService.submitStagedFiles).not.toHaveBeenCalle…
+     90|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 1 passed (4)
+   Start at  14:30:35
+   Duration  923ms (transform 323ms, setup 194ms, import 363ms, tests 97ms, environment 199ms)

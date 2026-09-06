@@ -1,0 +1,11 @@
+
+> lms@0.0.0 i18n:check
+> node --experimental-strip-types scripts/i18n-audit.ts --active --ui-only --strict --summary
+
+{
+  "scope": "entry-point dependency graph",
+  "sourceFiles": 464,
+  "candidateFiles": 0,
+  "candidates": 0,
+  "largestFiles": {}
+}

@@ -1,0 +1,43 @@
+
+> lms@0.0.0 test:e2e
+> playwright test e2e/client-functional-audit.spec.ts e2e/advisor-course-release-audit.spec.ts --workers=2
+
+[WebServer] (node:41617) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:41617) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+Running 27 tests using 2 workers
+
+(node:41619) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:41620) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › e2e/advisor-course-release-audit.spec.ts:40:1 › release audit: denied class dates remain a permission state, not an empty schedule (542ms)
+  ✓   2 [chromium] › e2e/advisor-course-release-audit.spec.ts:4:1 › release audit: class dates load on demand and failures stay in their own section (697ms)
+  ✓   4 [chromium] › e2e/advisor-course-release-audit.spec.ts:87:1 › release audit: create group course sends the selected instructor and course-local dates (623ms)
+  ✓   3 [chromium] › e2e/advisor-course-release-audit.spec.ts:51:1 › release audit: failed schedule writes retry idempotently and block launch across tabs (867ms)
+  ✓   6 [chromium] › e2e/advisor-course-release-audit.spec.ts:126:1 › release audit: configuration error recovery hydrates the required version and saves real input (334ms)
+  ✓   5 [chromium] › e2e/advisor-course-release-audit.spec.ts:108:1 › release audit: search, lifecycle and pagination use the owned-course query contract (549ms)
+  ✓   7 [chromium] › e2e/advisor-course-release-audit.spec.ts:148:1 › release audit: only the precise config-not-found response enables first configuration (446ms)
+  ✓   8 [chromium] › e2e/advisor-course-release-audit.spec.ts:165:1 › release audit: one-on-one, missing-version and published configurations cannot schedule here (627ms)
+  ✓   9 [chromium] › e2e/advisor-course-release-audit.spec.ts:183:1 › release audit: direct schedule load generates course-local term dates through the documented endpoint (393ms)
+  ✓  10 [chromium] › e2e/advisor-course-release-audit.spec.ts:198:1 › release audit: recurring edit and duplicate use complete templates and distinct idempotent operations (392ms)
+  ✓  11 [chromium] › e2e/advisor-course-release-audit.spec.ts:227:1 › release audit: version conflict preserves input and retries with the refreshed version (409ms)
+  ✓  12 [chromium] › e2e/advisor-course-release-audit.spec.ts:253:1 › release audit: returning to the list refreshes saved delivery data and summary counts (525ms)
+  ✓  13 [chromium] › e2e/advisor-course-release-audit.spec.ts:277:1 › release audit: changing course identity resets drafts even when versions coincide (444ms)
+  ✓  15 [chromium] › e2e/advisor-course-release-audit.spec.ts:330:1 › release audit: forbidden delivery must not enable scheduling writes (188ms)
+  ✓  16 [chromium] › e2e/advisor-course-release-audit.spec.ts:338:1 › release audit: catalog input respects the consumed API maximum of 64 (303ms)
+  ✓  17 [chromium] › e2e/advisor-course-release-audit.spec.ts:346:1 › release audit: maximum-length catalog codes stay within course cards (672ms)
+  ✓  18 [chromium] › e2e/advisor-course-release-audit.spec.ts:370:1 › new group courses prepare recurring sessions before delivery locks their templates (742ms)
+  ✓  19 [chromium] › e2e/advisor-course-release-audit.spec.ts:408:1 › ready courses can publish without repeating the draft readiness transition (824ms)
+  ✓  20 [chromium] › e2e/advisor-course-release-audit.spec.ts:433:1 › publish rejection exposes current readiness blockers across delivery views (588ms)
+  ✓  21 [chromium] › e2e/advisor-course-release-audit.spec.ts:454:1 › B1 course-not-found remains visible and only a successful empty response is an empty schedule (477ms)
+  ✓  22 [chromium] › e2e/client-functional-audit.spec.ts:6:1 › reading diagrams use the contracted passage sequence and question sort order (203ms)
+  ✓  23 [chromium] › e2e/client-functional-audit.spec.ts:30:1 › an active writing response survives stale-query focus and reconnect events (269ms)
+  ✓  24 [chromium] › e2e/client-functional-audit.spec.ts:58:1 › a partially failed media load allocates no orphaned blob URLs and can be retried (402ms)
+  ✓  14 [chromium] › e2e/advisor-course-release-audit.spec.ts:303:1 › release audit: course routes preserve the same shell and fit their actual scroll container (5.4s)
+  ✓  25 [chromium] › e2e/client-functional-audit.spec.ts:90:38 › first assignment upload, submission and read-only recovery work in en (2.1s)
+  ✓  26 [chromium] › e2e/client-functional-audit.spec.ts:90:38 › first assignment upload, submission and read-only recovery work in zh-CN (2.1s)
+  ✓  27 [chromium] › e2e/client-functional-audit.spec.ts:90:38 › first assignment upload, submission and read-only recovery work in zh-TW (2.2s)
+
+  27 passed (13.5s)

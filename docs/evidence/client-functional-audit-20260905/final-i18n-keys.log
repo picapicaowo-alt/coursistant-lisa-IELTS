@@ -1,0 +1,5 @@
+
+> lms@0.0.0 i18n:keys
+> node --experimental-strip-types scripts/i18n-keys.ts
+
+Static semantic translation references exist in all three locales.

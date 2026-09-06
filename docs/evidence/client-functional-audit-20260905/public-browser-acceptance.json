@@ -1,0 +1,26 @@
+{
+  "recordedAt": "2026-09-06T06:11:01.838164+00:00",
+  "environment": "Tokyo Production",
+  "url": "https://app.xlearnedu.com/login",
+  "method": "CUA in-app browser visible DOM and console inspection",
+  "protectedSession": false,
+  "formsSubmitted": false,
+  "observations": [
+    "English login heading, Email and Password inputs and Sign in control rendered",
+    "Simplified Chinese selected through the language control; login form and preview copy localized",
+    "Traditional Chinese selected and retained after browser reload",
+    "Forgot password link opened /forgotpassword with Traditional Chinese form",
+    "Back link returned to /login; Simplified Chinese selected again"
+  ],
+  "consoleErrorsObserved": [],
+  "observedTaglines": {
+    "zh-CN": "知明行异",
+    "zh-TW": "知明行異"
+  },
+  "endState": "Unauthenticated login page retained for later handoff",
+  "exclusions": [
+    "No login credentials supplied or entered",
+    "No password-reset request sent",
+    "No protected data or token-refresh acceptance"
+  ]
+}

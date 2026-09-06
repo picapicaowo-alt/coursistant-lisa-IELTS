@@ -1,0 +1,42 @@
+
+> lms@0.0.0 test:e2e
+> playwright test e2e/backend-fix-adaptation.spec.ts e2e/dashboard-course-layout.spec.ts --grep C1 reading replaces|student course cards keep --repeat-each=5 --workers=1
+
+[WebServer] (node:57698) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:57698) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+Running 20 tests using 1 worker
+
+(node:57700) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   1 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in en (541ms)
+  ✓   2 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-CN (488ms)
+  ✓   3 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-TW (554ms)
+  ✓   4 [chromium] › e2e/dashboard-course-layout.spec.ts:4:1 › student course cards keep two desktop slots regardless of enrolment count (3.5s)
+(node:57758) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   5 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in en (525ms)
+  ✓   6 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-CN (489ms)
+  ✓   7 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-TW (518ms)
+  ✓   8 [chromium] › e2e/dashboard-course-layout.spec.ts:4:1 › student course cards keep two desktop slots regardless of enrolment count (2.6s)
+(node:57774) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓   9 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in en (533ms)
+  ✓  10 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-CN (494ms)
+  ✓  11 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-TW (548ms)
+  ✓  12 [chromium] › e2e/dashboard-course-layout.spec.ts:4:1 › student course cards keep two desktop slots regardless of enrolment count (3.0s)
+(node:57807) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  13 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in en (491ms)
+  ✓  14 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-CN (376ms)
+  ✓  15 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-TW (402ms)
+  ✓  16 [chromium] › e2e/dashboard-course-layout.spec.ts:4:1 › student course cards keep two desktop slots regardless of enrolment count (2.4s)
+(node:57826) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓  17 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in en (494ms)
+  ✓  18 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-CN (471ms)
+  ✓  19 [chromium] › e2e/backend-fix-adaptation.spec.ts:26:71 › C1 reading replaces saved content and advances revision in zh-TW (474ms)
+  ✓  20 [chromium] › e2e/dashboard-course-layout.spec.ts:4:1 › student course cards keep two desktop slots regardless of enrolment count (3.2s)
+
+  20 passed (24.5s)
