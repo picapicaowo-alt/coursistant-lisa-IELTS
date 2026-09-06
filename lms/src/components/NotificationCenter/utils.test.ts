@@ -10,12 +10,12 @@ describe('resolveNotificationPath', () => {
     })).toBe('/course/7/assignments/12');
   });
 
-  it('opens the quiz destination instead of dropping the user at the course root', () => {
+  it('disables an excluded Quiz deep link', () => {
     expect(resolveNotificationPath({
       availability: 'AVAILABLE',
       courseId: 7,
       deepLink: '/courses/7/quizzes/3',
-    })).toBe('/course/7/quizzes/3');
+    })).toBeNull();
   });
 
   it('opens the exact assignment submission destination', () => {
@@ -26,19 +26,17 @@ describe('resolveNotificationPath', () => {
     })).toBe('/course/7/assignments/12/submissions/44');
   });
 
-  it('normalizes grade links onto the subject page that renders the grade', () => {
+  it('disables excluded Quiz result links', () => {
     expect(resolveNotificationPath({
       availability: 'AVAILABLE',
       courseId: 7,
       deepLink: '/courses/7/quizzes/3/my-grade',
-    })).toBe('/course/7/quizzes/3');
+    })).toBeNull();
   });
 
   it.each([
     'ASSIGNMENT_GRADE_RELEASED',
     'ASSIGNMENT_GRADE_CORRECTED',
-    'QUIZ_GRADE_RELEASED',
-    'QUIZ_GRADE_CORRECTED',
   ] as const)('opens the course grades page for %s', notificationType => {
     expect(resolveNotificationPath({
       availability: 'AVAILABLE',
@@ -46,6 +44,10 @@ describe('resolveNotificationPath', () => {
       deepLink: '/course/7/grades',
       notificationType,
     })).toBe('/course/7/grades');
+  });
+
+  it.each(['QUIZ_GRADE_RELEASED', 'QUIZ_GRADE_CORRECTED'] as const)('disables legacy %s notifications', notificationType => {
+    expect(resolveNotificationPath({availability: 'AVAILABLE', courseId: 7, deepLink: '/course/7/grades', notificationType})).toBeNull();
   });
 
   it.each([

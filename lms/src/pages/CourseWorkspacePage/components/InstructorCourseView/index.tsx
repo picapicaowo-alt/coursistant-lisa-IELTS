@@ -14,7 +14,6 @@ import { WeekWorkspace } from "./WeekWorkspace";
 import { CourseSettings } from "./CourseSettings";
 import { MaterialReader } from "../CourseDetailView/MaterialReader";
 import { AssignmentsCard } from "../CourseDetailView/AssignmentsCard";
-import { QuizzesCard } from "../CourseDetailView/QuizzesCard";
 import { AnnouncementsCard } from "../CourseDetailView/AnnouncementsCard";
 import { DiscussionPanel } from "../CourseDetailView/DiscussionPanel";
 import { ScheduleCard } from "../CourseDetailView/ScheduleCard";
@@ -26,7 +25,7 @@ import styles from "./index.module.scss";
 
 const TABS = [
   ["courses", "course:learning.content"],
-  ["assignments", "course:workspace.assessments"],
+  ["assignments", "course:detail.assignments"],
   ["discussion", "course:learning.tabs.discussion"],
   ["announcements", "course:detail.announcements"],
   ["schedule", "course:learning.tabs.schedule"],
@@ -169,14 +168,6 @@ export function InstructorCourseView({
                     ? "…"
                     : data.assignments.length,
               ],
-              [
-                "course:detail.quizzes",
-                data.quizzesFailed
-                  ? translate("course:learning.dataUnavailable")
-                  : data.quizzesLoading
-                    ? "…"
-                    : data.quizzes.length,
-              ],
             ] as const).map(([label, count]) => (
               <div key={label}>
                 <dt>{translate(label)}</dt>
@@ -214,24 +205,12 @@ export function InstructorCourseView({
         <div className={styles.sectionStack}>
           <div className={styles.sectionIntro}>
             <p>{translate("course:workspace.assessmentHelp")}</p>
-            <Link
-              className={styles.textButton}
-              to={path(routes.courseCourseIdGrades)}
-            >
-              {translate("course:grades.title")}<ArrowUpRight size={16} />
-            </Link>
           </div>
-          <div className={styles.pairedPanels}>
+          <div>
             <AssignmentsCard
               courseId={course.id}
               assignments={data.assignments}
               failed={data.assignmentsFailed}
-              canCreate={canCreateAssignments && writable}
-            />
-            <QuizzesCard
-              courseId={course.id}
-              quizzes={data.quizzes}
-              failed={data.quizzesFailed}
               canCreate={canCreateAssignments && writable}
             />
           </div>

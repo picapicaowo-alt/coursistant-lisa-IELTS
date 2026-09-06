@@ -43,6 +43,24 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
     setLoading(false);
   }, []);
 
+  useEffect(() => {
+    const synchronizeSession = (event: StorageEvent) => {
+      if (event.storageArea !== localStorage || (event.key !== 'user' && event.key !== null)) return;
+      // Another tab can log out or replace the account while this workspace
+      // remains open. Retire its user-relative reads and pending query results
+      // before rendering the new identity; its route state remounts below.
+      queryClient.clear();
+      const stored = localStorage.getItem('user');
+      try {
+        setUser(stored ? normalizeUser(JSON.parse(stored)) : null);
+      } catch {
+        setUser(null);
+      }
+    };
+    window.addEventListener('storage', synchronizeSession);
+    return () => window.removeEventListener('storage', synchronizeSession);
+  }, [queryClient]);
+
   const clearRocketChatCookies = () => {
     const cookies = document.cookie.split(';');
 

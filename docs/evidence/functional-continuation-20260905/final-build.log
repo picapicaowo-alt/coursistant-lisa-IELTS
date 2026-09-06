@@ -1,0 +1,382 @@
+
+> lms@0.0.0 build
+> vite build
+
+vite v7.3.6 building client environment for production...
+(node:77870) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+transforming...
+✓ 3060 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                                           1.46 kB │ gzip:   0.87 kB
+dist/assets/KaTeX_Size3-Regular-CTq5MqoE.woff             4.42 kB
+dist/assets/KaTeX_Size4-Regular-Dl5lxZxV.woff2            4.93 kB
+dist/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2            5.21 kB
+dist/assets/KaTeX_Size1-Regular-mCD8mA8B.woff2            5.47 kB
+dist/assets/KaTeX_Size4-Regular-BF-4gkZK.woff             5.98 kB
+dist/assets/KaTeX_Size2-Regular-oD1tc_U0.woff             6.19 kB
+dist/assets/KaTeX_Size1-Regular-C195tn64.woff             6.50 kB
+dist/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2      6.91 kB
+dist/assets/KaTeX_Caligraphic-Bold-Dq_IR9rO.woff2         6.91 kB
+dist/assets/KaTeX_Size3-Regular-DgpXs0kz.ttf              7.59 kB
+dist/assets/KaTeX_Caligraphic-Regular-CTRA-rTL.woff       7.66 kB
+dist/assets/KaTeX_Caligraphic-Bold-BEiXGLvX.woff          7.72 kB
+dist/assets/KaTeX_Script-Regular-D3wIWfF6.woff2           9.64 kB
+dist/assets/KaTeX_SansSerif-Regular-DDBCnlJ7.woff2       10.34 kB
+dist/assets/KaTeX_Size4-Regular-DWFBv043.ttf             10.36 kB
+dist/assets/KaTeX_Script-Regular-D5yQViql.woff           10.59 kB
+dist/assets/KaTeX_Fraktur-Regular-CTYiF6lA.woff2         11.32 kB
+dist/assets/KaTeX_Fraktur-Bold-CL6g_b3V.woff2            11.35 kB
+dist/assets/KaTeX_Size2-Regular-B7gKUWhC.ttf             11.51 kB
+dist/assets/KaTeX_SansSerif-Italic-C3H0VqGB.woff2        12.03 kB
+dist/assets/KaTeX_SansSerif-Bold-D1sUS0GD.woff2          12.22 kB
+dist/assets/KaTeX_Size1-Regular-Dbsnue_I.ttf             12.23 kB
+dist/assets/KaTeX_SansSerif-Regular-CS6fqUqJ.woff        12.32 kB
+dist/assets/KaTeX_Caligraphic-Regular-wX97UBjC.ttf       12.34 kB
+dist/assets/KaTeX_Caligraphic-Bold-ATXxdsX0.ttf          12.37 kB
+dist/assets/KaTeX_Fraktur-Regular-Dxdc4cR9.woff          13.21 kB
+dist/assets/KaTeX_Fraktur-Bold-BsDP51OF.woff             13.30 kB
+dist/assets/KaTeX_Typewriter-Regular-CO6r4hn1.woff2      13.57 kB
+dist/assets/KaTeX_SansSerif-Italic-DN2j7dab.woff         14.11 kB
+dist/assets/KaTeX_SansSerif-Bold-DbIhKOiC.woff           14.41 kB
+dist/assets/KaTeX_Typewriter-Regular-C0xS9mPB.woff       16.03 kB
+dist/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2         16.40 kB
+dist/assets/KaTeX_Math-Italic-t53AETM-.woff2             16.44 kB
+dist/assets/KaTeX_Script-Regular-C5JkGWo-.ttf            16.65 kB
+dist/assets/KaTeX_Main-BoldItalic-DxDJ3AOS.woff2         16.78 kB
+dist/assets/KaTeX_Main-Italic-NWA7e6Wa.woff2             16.99 kB
+dist/assets/KaTeX_Math-BoldItalic-iY-2wyZ7.woff          18.67 kB
+dist/assets/KaTeX_Math-Italic-DA0__PXp.woff              18.75 kB
+dist/assets/KaTeX_Main-BoldItalic-SpSLRI95.woff          19.41 kB
+dist/assets/KaTeX_SansSerif-Regular-BNo7hRIc.ttf         19.44 kB
+dist/assets/KaTeX_Fraktur-Regular-CB_wures.ttf           19.57 kB
+dist/assets/KaTeX_Fraktur-Bold-BdnERNNW.ttf              19.58 kB
+dist/assets/KaTeX_Main-Italic-BMLOBm91.woff              19.68 kB
+dist/assets/KaTeX_SansSerif-Italic-YYjJ1zSn.ttf          22.36 kB
+dist/assets/KaTeX_SansSerif-Bold-CFMepnvq.ttf            24.50 kB
+dist/assets/KaTeX_Main-Bold-Cx986IdX.woff2               25.32 kB
+dist/assets/KaTeX_Main-Regular-B22Nviop.woff2            26.27 kB
+dist/assets/KaTeX_Typewriter-Regular-D3Ib7_Hf.ttf        27.56 kB
+dist/assets/KaTeX_AMS-Regular-BQhdFMY1.woff2             28.08 kB
+dist/assets/KaTeX_Main-Bold-Jm3AIy58.woff                29.91 kB
+dist/assets/KaTeX_Main-Regular-Dr94JaBh.woff             30.77 kB
+dist/assets/KaTeX_Math-BoldItalic-B3XSjfu4.ttf           31.20 kB
+dist/assets/KaTeX_Math-Italic-flOr_0UB.ttf               31.31 kB
+dist/assets/KaTeX_Main-BoldItalic-DzxPMmG6.ttf           32.97 kB
+dist/assets/KaTeX_AMS-Regular-DMm9YOAa.woff              33.52 kB
+dist/assets/KaTeX_Main-Italic-3WenGoN9.ttf               33.58 kB
+dist/assets/KaTeX_Main-Bold-waoOVXN0.ttf                 51.34 kB
+dist/assets/KaTeX_Main-Regular-ypZvNtVU.ttf              53.58 kB
+dist/assets/KaTeX_AMS-Regular-DRggAlZN.ttf               63.63 kB
+dist/assets/pdf.worker.min-yatZIOMy.mjs               1,375.84 kB
+dist/assets/index-DIecttZ0.css                            0.16 kB │ gzip:   0.15 kB
+dist/assets/CourseCardGrid-ByDAbhsq.css                   0.41 kB │ gzip:   0.23 kB
+dist/assets/AdvisorCoursesPage-CBVE4BEq.css               0.41 kB │ gzip:   0.24 kB
+dist/assets/index-CryS6cBe.css                            0.42 kB │ gzip:   0.28 kB
+dist/assets/index-BI6X2BsO.css                            0.45 kB │ gzip:   0.27 kB
+dist/assets/ProgressRing-BmREQjEr.css                     0.51 kB │ gzip:   0.30 kB
+dist/assets/AdvisorSchedulePage-B1pAAQnj.css              0.54 kB │ gzip:   0.23 kB
+dist/assets/index-CIw6Fduy.css                            0.61 kB │ gzip:   0.30 kB
+dist/assets/index-Bxma_exZ.css                            0.64 kB │ gzip:   0.32 kB
+dist/assets/index-BD1QHcyY.css                            0.65 kB │ gzip:   0.29 kB
+dist/assets/queryKeys-Dm9liuna.css                        0.66 kB │ gzip:   0.34 kB
+dist/assets/index-DsFamdy5.css                            0.67 kB │ gzip:   0.38 kB
+dist/assets/index-ChBIH-4D.css                            0.87 kB │ gzip:   0.42 kB
+dist/assets/index-CejXGtG4.css                            0.88 kB │ gzip:   0.43 kB
+dist/assets/index-D22KUqgc.css                            0.97 kB │ gzip:   0.44 kB
+dist/assets/index-DXauJi-y.css                            1.00 kB │ gzip:   0.46 kB
+dist/assets/index-X3_3mYwa.css                            1.10 kB │ gzip:   0.43 kB
+dist/assets/index-C7A-eBrf.css                            1.17 kB │ gzip:   0.53 kB
+dist/assets/PdfMaterialPreview-Bpo_oGIM.css               1.23 kB │ gzip:   0.53 kB
+dist/assets/index-CKJDkVB6.css                            1.50 kB │ gzip:   0.64 kB
+dist/assets/index-_rjrD_P6.css                            1.61 kB │ gzip:   0.57 kB
+dist/assets/index-BBrdPR5P.css                            1.65 kB │ gzip:   0.76 kB
+dist/assets/index-O7IXv7Ke.css                            1.74 kB │ gzip:   0.63 kB
+dist/assets/index-7RKiLO85.css                            1.77 kB │ gzip:   0.69 kB
+dist/assets/index-BvCz1s6k.css                            1.79 kB │ gzip:   0.69 kB
+dist/assets/AdvisorTasksPage-ChdCwkkB.css                 1.84 kB │ gzip:   0.63 kB
+dist/assets/index-B-jwwXLf.css                            1.89 kB │ gzip:   0.70 kB
+dist/assets/CourseCreatePage-CHqzYUov.css                 1.96 kB │ gzip:   0.75 kB
+dist/assets/index-CfW-qBsF.css                            1.99 kB │ gzip:   0.79 kB
+dist/assets/index-Y5cbgzio.css                            2.29 kB │ gzip:   0.82 kB
+dist/assets/index-EnTSc1vg.css                            2.44 kB │ gzip:   0.89 kB
+dist/assets/index-DOmsNtGJ.css                            2.62 kB │ gzip:   0.87 kB
+dist/assets/index-CtxABaDY.css                            2.83 kB │ gzip:   0.97 kB
+dist/assets/index-_3Pa92L0.css                            3.04 kB │ gzip:   0.91 kB
+dist/assets/model-CCbhb09m.css                            3.10 kB │ gzip:   1.04 kB
+dist/assets/index-JPaFVyW9.css                            3.71 kB │ gzip:   1.16 kB
+dist/assets/index-CBkJycTq.css                            3.96 kB │ gzip:   1.29 kB
+dist/assets/index-CWY5Nv3v.css                            4.05 kB │ gzip:   1.14 kB
+dist/assets/index-BNqlQoGa.css                            4.14 kB │ gzip:   1.26 kB
+dist/assets/EnglishDateInput-Dba2HZUu.css                 4.38 kB │ gzip:   1.39 kB
+dist/assets/index-B6zuJrXh.css                            4.66 kB │ gzip:   1.45 kB
+dist/assets/ExamsPage-7DuXGaJf.css                        5.01 kB │ gzip:   1.46 kB
+dist/assets/index-x9zEFQGV.css                            5.38 kB │ gzip:   1.55 kB
+dist/assets/index-45dx2Ycr.css                            5.38 kB │ gzip:   1.57 kB
+dist/assets/index-Cob4jnXK.css                            5.60 kB │ gzip:   1.54 kB
+dist/assets/index-BlU0dDHd.css                            5.69 kB │ gzip:   1.57 kB
+dist/assets/SupportPage-D5MmIBZk.css                      6.24 kB │ gzip:   1.63 kB
+dist/assets/index-CUstGBwC.css                            6.31 kB │ gzip:   1.67 kB
+dist/assets/index-CBhUvrtG.css                            6.47 kB │ gzip:   1.74 kB
+dist/assets/index-bFxaBT3y.css                            6.69 kB │ gzip:   1.74 kB
+dist/assets/index-DEmyGGYW.css                            7.46 kB │ gzip:   1.90 kB
+dist/assets/index-DshwxSqQ.css                            7.57 kB │ gzip:   1.76 kB
+dist/assets/index-DwR_r31D.css                            7.80 kB │ gzip:   2.11 kB
+dist/assets/index-DFhbp1Bq.css                            8.54 kB │ gzip:   2.12 kB
+dist/assets/index-BOvcbRP6.css                            8.67 kB │ gzip:   2.10 kB
+dist/assets/StudentSubmissionHistory-CVJaZSYM.css         8.97 kB │ gzip:   2.10 kB
+dist/assets/index-Cyy0SB_c.css                            9.44 kB │ gzip:   2.12 kB
+dist/assets/index-Bkw9orWn.css                            9.48 kB │ gzip:   2.55 kB
+dist/assets/index-L6t8maP2.css                            9.73 kB │ gzip:   2.57 kB
+dist/assets/ChatContent-CN5u5-X_.css                      9.73 kB │ gzip:   2.30 kB
+dist/assets/index-zd0iXF4G.css                            9.95 kB │ gzip:   2.74 kB
+dist/assets/index-Cx9dySrs.css                           10.11 kB │ gzip:   2.43 kB
+dist/assets/index-CEcUSkBK.css                           10.49 kB │ gzip:   2.36 kB
+dist/assets/index-Dy3Pe1GB.css                           10.62 kB │ gzip:   2.41 kB
+dist/assets/index-WuKj1eW_.css                           10.68 kB │ gzip:   2.58 kB
+dist/assets/workspace-DkccyOie.css                       11.89 kB │ gzip:   3.08 kB
+dist/assets/CoursesPage-BGOLVy3L.css                     13.03 kB │ gzip:   2.59 kB
+dist/assets/StudyPlanPage-_pw-lTr7.css                   14.59 kB │ gzip:   2.92 kB
+dist/assets/Layout-CQJHi9hM.css                          15.57 kB │ gzip:   3.57 kB
+dist/assets/index-DMXQ1C6y.css                           16.36 kB │ gzip:   3.18 kB
+dist/assets/courseManagement-BE2pu7m9.css                19.22 kB │ gzip:   3.97 kB
+dist/assets/index-CLPzTkmL.css                           19.34 kB │ gzip:   3.88 kB
+dist/assets/index-BWETC8U9.css                           20.02 kB │ gzip:   4.16 kB
+dist/assets/index-MRJEu6U8.css                           21.34 kB │ gzip:   4.33 kB
+dist/assets/index-Cfp5mZ1-.css                           21.41 kB │ gzip:   4.14 kB
+dist/assets/advising-Cisn9Xh_.css                        21.97 kB │ gzip:   4.33 kB
+dist/assets/index-5IxAp9ol.css                           32.59 kB │ gzip:   6.04 kB
+dist/assets/index-BjP8n2Uw.css                           38.86 kB │ gzip:   7.31 kB
+dist/assets/index--UTbc3HN.css                           45.04 kB │ gzip:  11.64 kB
+dist/assets/index-fTOrNMYw.css                           54.93 kB │ gzip:  11.15 kB
+dist/assets/index-UfzDJWx_.css                           58.01 kB │ gzip:   9.52 kB
+dist/assets/index.module-BuXve7P4.js                      0.06 kB │ gzip:   0.07 kB
+dist/assets/queryKeys-Corhd2Da.js                         0.06 kB │ gzip:   0.08 kB
+dist/assets/passwordRules-DA1SasHz.js                     0.07 kB │ gzip:   0.09 kB
+dist/assets/addWeeks-DFpZ8pTq.js                          0.09 kB │ gzip:   0.11 kB
+dist/assets/index-ChFshZok.js                             0.09 kB │ gzip:   0.10 kB
+dist/assets/check-DlKgT5ql.js                             0.13 kB │ gzip:   0.15 kB
+dist/assets/course-BLKgpcsC.js                            0.13 kB │ gzip:   0.14 kB
+dist/assets/circle-DWN2p86j.js                            0.14 kB │ gzip:   0.14 kB
+dist/assets/chevron-down-DhWzVnM1.js                      0.14 kB │ gzip:   0.15 kB
+dist/assets/chevron-right-D1Ow5ys4.js                     0.14 kB │ gzip:   0.15 kB
+dist/assets/chevron-left-bQGWMt3c.js                      0.14 kB │ gzip:   0.15 kB
+dist/assets/isSameDay-B8hGLd5o.js                         0.14 kB │ gzip:   0.15 kB
+dist/assets/studyPlanView-CV1UrDkm.js                     0.15 kB │ gzip:   0.15 kB
+dist/assets/loader-circle-CcDRlaS-.js                     0.15 kB │ gzip:   0.16 kB
+dist/assets/plus-Bh13LYcp.js                              0.17 kB │ gzip:   0.16 kB
+dist/assets/x-DN3nC5nt.js                                 0.17 kB │ gzip:   0.16 kB
+dist/assets/arrow-left-kup7n3VP.js                        0.18 kB │ gzip:   0.17 kB
+dist/assets/arrow-down--xfH8lhe.js                        0.18 kB │ gzip:   0.17 kB
+dist/assets/arrow-right-DkG2E1Wf.js                       0.18 kB │ gzip:   0.17 kB
+dist/assets/arrow-up-right-D00kdsK7.js                    0.18 kB │ gzip:   0.17 kB
+dist/assets/search-DmLN2-bD.js                            0.18 kB │ gzip:   0.17 kB
+dist/assets/circle-check-DvmmYVJA.js                      0.19 kB │ gzip:   0.17 kB
+dist/assets/message-square-CAnRAi1u.js                    0.19 kB │ gzip:   0.18 kB
+dist/assets/clock-3-CZhkQ25y.js                           0.19 kB │ gzip:   0.18 kB
+dist/assets/courseOperations--JOazQOC.js                  0.20 kB │ gzip:   0.16 kB
+dist/assets/megaphone-B8tX-hIx.js                         0.20 kB │ gzip:   0.19 kB
+dist/assets/rotate-ccw-Dail7l4J.js                        0.21 kB │ gzip:   0.19 kB
+dist/assets/lock-DfxPblcr.js                              0.21 kB │ gzip:   0.19 kB
+dist/assets/ellipsis-CehfmnbQ.js                          0.23 kB │ gzip:   0.17 kB
+dist/assets/user-round-check-BRaNqbD1.js                  0.24 kB │ gzip:   0.21 kB
+dist/assets/upload-BqS14SEb.js                            0.24 kB │ gzip:   0.20 kB
+dist/assets/copy-D5-b1siH.js                              0.24 kB │ gzip:   0.21 kB
+dist/assets/download-BiGYRJeF.js                          0.24 kB │ gzip:   0.20 kB
+dist/assets/errors-DenbBYOy.js                            0.25 kB │ gzip:   0.18 kB
+dist/assets/activity-DAvvMbKg.js                          0.25 kB │ gzip:   0.21 kB
+dist/assets/headphones-C6wjcsjk.js                        0.25 kB │ gzip:   0.19 kB
+dist/assets/sendStableMessage-DYvzNV4h.js                 0.25 kB │ gzip:   0.21 kB
+dist/assets/personName-DLo6ru9g.js                        0.26 kB │ gzip:   0.18 kB
+dist/assets/index-CcbdpLGf.js                             0.26 kB │ gzip:   0.18 kB
+dist/assets/users-round-BXR3wEnW.js                       0.26 kB │ gzip:   0.22 kB
+dist/assets/settings-2-ia1iVn2_.js                        0.26 kB │ gzip:   0.20 kB
+dist/assets/circle-alert-DnAotPXn.js                      0.26 kB │ gzip:   0.19 kB
+dist/assets/eye-7vgiwbzU.js                               0.26 kB │ gzip:   0.21 kB
+dist/assets/map-pin-qV2dDYbR.js                           0.27 kB │ gzip:   0.23 kB
+dist/assets/message-square-text-DMSxpIOS.js               0.27 kB │ gzip:   0.21 kB
+dist/assets/file-check-2-BoXOvNup.js                      0.27 kB │ gzip:   0.21 kB
+dist/assets/calendar-CKlmnK_p.js                          0.27 kB │ gzip:   0.21 kB
+dist/assets/courseSessions-BjmM6MPS.js                    0.27 kB │ gzip:   0.17 kB
+dist/assets/pencil-g14urCIZ.js                            0.29 kB │ gzip:   0.23 kB
+dist/assets/pen-line-qTQ1iYWO.js                          0.29 kB │ gzip:   0.23 kB
+dist/assets/book-open-Dw-2h6cs.js                         0.29 kB │ gzip:   0.22 kB
+dist/assets/registeredDestination-CLq9Oj1l.js             0.29 kB │ gzip:   0.24 kB
+dist/assets/inbox-C-hkgFBR.js                             0.30 kB │ gzip:   0.24 kB
+dist/assets/bell-BEGxr6Wi.js                              0.30 kB │ gzip:   0.25 kB
+dist/assets/send-CK9e_G-S.js                              0.30 kB │ gzip:   0.24 kB
+dist/assets/clipboard-check-gJGy_44o.js                   0.31 kB │ gzip:   0.24 kB
+dist/assets/paperclip-BLeX4zKw.js                         0.31 kB │ gzip:   0.23 kB
+dist/assets/list-BPQAuCRO.js                              0.31 kB │ gzip:   0.19 kB
+dist/assets/users-DECeSZPX.js                             0.32 kB │ gzip:   0.23 kB
+dist/assets/user-plus-Cc2D7WMR.js                         0.32 kB │ gzip:   0.24 kB
+dist/assets/shield-check-CzFy-Cbd.js                      0.33 kB │ gzip:   0.26 kB
+dist/assets/refresh-cw-BCVInf5T.js                        0.33 kB │ gzip:   0.23 kB
+dist/assets/presentation-5akQHWfw.js                      0.33 kB │ gzip:   0.28 kB
+dist/assets/refresh-ccw-CLqSgLtg.js                       0.33 kB │ gzip:   0.23 kB
+dist/assets/NotFoundPage-BEbnlOvx.js                      0.34 kB │ gzip:   0.25 kB
+dist/assets/CourseCardGrid-CQD7xBVm.js                    0.34 kB │ gzip:   0.25 kB
+dist/assets/graduation-cap-P-yM707j.js                    0.34 kB │ gzip:   0.26 kB
+dist/assets/file-text-US6H617S.js                         0.35 kB │ gzip:   0.23 kB
+dist/assets/advisorWorkspace-BBVwlqDy.js                  0.35 kB │ gzip:   0.25 kB
+dist/assets/trash-2-BnxGqhMi.js                           0.37 kB │ gzip:   0.26 kB
+dist/assets/calendar-clock-Drgg8t-y.js                    0.39 kB │ gzip:   0.26 kB
+dist/assets/shuffle-Dp5_eG-b.js                           0.40 kB │ gzip:   0.25 kB
+dist/assets/index-ClCi8Ur3.js                             0.42 kB │ gzip:   0.28 kB
+dist/assets/clipboard-list-COfzJeRS.js                    0.42 kB │ gzip:   0.27 kB
+dist/assets/eye-off-BBQdq2QO.js                           0.44 kB │ gzip:   0.28 kB
+dist/assets/calendar-days-aUNGJ2sn.js                     0.51 kB │ gzip:   0.27 kB
+dist/assets/presentation-lgOuvVD8.js                      0.51 kB │ gzip:   0.37 kB
+dist/assets/sparkles-Cb8CNChV.js                          0.52 kB │ gzip:   0.31 kB
+dist/assets/file-utils-BjN9aBuq.js                        0.53 kB │ gzip:   0.34 kB
+dist/assets/DurationSelect-Cii4ihDx.js                    0.53 kB │ gzip:   0.33 kB
+dist/assets/index-3j7YmtLN.js                             0.54 kB │ gzip:   0.30 kB
+dist/assets/triangle-alert-7RqOA26s.js                    0.56 kB │ gzip:   0.33 kB
+dist/assets/useMutationState-sDbt0ZyD.js                  0.57 kB │ gzip:   0.35 kB
+dist/assets/profile-api-CW8MoX8N.js                       0.61 kB │ gzip:   0.33 kB
+dist/assets/index-DEyOgojW.js                             0.64 kB │ gzip:   0.40 kB
+dist/assets/readCollection-CTV1KsIu.js                    0.65 kB │ gzip:   0.39 kB
+dist/assets/notification-api-I1e-RddB.js                  0.67 kB │ gzip:   0.32 kB
+dist/assets/studyPlan-DDsuqRcq.js                         0.67 kB │ gzip:   0.45 kB
+dist/assets/formatting-Dalkm5TT.js                        0.69 kB │ gzip:   0.42 kB
+dist/assets/teachingAlert-T5EclKnI.js                     0.71 kB │ gzip:   0.44 kB
+dist/assets/index-BcnKaWvC.js                             0.73 kB │ gzip:   0.42 kB
+dist/assets/AdvisingPagination-Cv0tXIdj.js                0.73 kB │ gzip:   0.42 kB
+dist/assets/useIdempotencyCheckpoint-D6pD-j2f.js          0.74 kB │ gzip:   0.40 kB
+dist/assets/useProfileIdentity-DU-zFdBE.js                0.74 kB │ gzip:   0.43 kB
+dist/assets/differenceInCalendarDays-eLjBRayL.js          0.76 kB │ gzip:   0.43 kB
+dist/assets/tenant-advising-api-DTF6W6i8.js               0.79 kB │ gzip:   0.30 kB
+dist/assets/operationRecords-DOm8bCW-.js                  0.86 kB │ gzip:   0.44 kB
+dist/assets/queryKeys-Cp38TRo8.js                         0.87 kB │ gzip:   0.28 kB
+dist/assets/TenantDrawer-D_i4DxBy.js                      0.87 kB │ gzip:   0.51 kB
+dist/assets/index-CKYOsT0V.js                             0.91 kB │ gzip:   0.49 kB
+dist/assets/index-Dwt1-lOb.js                             0.92 kB │ gzip:   0.49 kB
+dist/assets/ProgressRing-D2_3kXWf.js                      0.92 kB │ gzip:   0.52 kB
+dist/assets/isSameMonth-BfwiOPZG.js                       0.94 kB │ gzip:   0.46 kB
+dist/assets/tenantNavigation-B7MjmxAX.js                  0.97 kB │ gzip:   0.55 kB
+dist/assets/advising-B8jUAv1I.js                          0.99 kB │ gzip:   0.45 kB
+dist/assets/downloadBlob-DWYs62Wg.js                      0.99 kB │ gzip:   0.55 kB
+dist/assets/index-DHu9j903.js                             1.00 kB │ gzip:   0.57 kB
+dist/assets/useActionTaskTransition-MCIs2mjw.js           1.01 kB │ gzip:   0.49 kB
+dist/assets/index-CgEeoSGc.js                             1.03 kB │ gzip:   0.52 kB
+dist/assets/index.module-CwBpcqrz.js                      1.04 kB │ gzip:   0.49 kB
+dist/assets/counsellor-api-Dw7uv2LN.js                    1.13 kB │ gzip:   0.48 kB
+dist/assets/useStudentProgress-DdTe19cx.js                1.14 kB │ gzip:   0.59 kB
+dist/assets/useInfiniteQuery-D_LajNDj.js                  1.16 kB │ gzip:   0.50 kB
+dist/assets/createLucideIcon-D5s6ZcLc.js                  1.16 kB │ gzip:   0.68 kB
+dist/assets/index-DgALqXPf.js                             1.21 kB │ gzip:   0.73 kB
+dist/assets/staffRuntime-CqZU3BiJ.js                      1.26 kB │ gzip:   0.53 kB
+dist/assets/index-Ddi97T1b.js                             1.29 kB │ gzip:   0.56 kB
+dist/assets/index-BOep8n4a.js                             1.31 kB │ gzip:   0.73 kB
+dist/assets/mockExamSummary-Bem5bkSL.js                   1.37 kB │ gzip:   0.67 kB
+dist/assets/index.module-C5M6Uii4.js                      1.39 kB │ gzip:   0.60 kB
+dist/assets/recordPresentation-DSFEqq5C.js                1.50 kB │ gzip:   0.81 kB
+dist/assets/index-C-l_0Y9l.js                             1.57 kB │ gzip:   0.83 kB
+dist/assets/index-BOt348R7.js                             1.63 kB │ gzip:   0.85 kB
+dist/assets/dateInput-Dr2kFDVu.js                         1.87 kB │ gzip:   0.83 kB
+dist/assets/advisingErrors-CWXbFp8q.js                    1.92 kB │ gzip:   0.82 kB
+dist/assets/useCourseAccess-KvHzZgc4.js                   1.94 kB │ gzip:   0.93 kB
+dist/assets/index-DQwAJRKX.js                             2.05 kB │ gzip:   0.94 kB
+dist/assets/index-B1Is2tYt.js                             2.08 kB │ gzip:   0.93 kB
+dist/assets/admin-api-D7gDIoH0.js                         2.11 kB │ gzip:   0.68 kB
+dist/assets/workspace.module-DwnG9dCz.js                  2.14 kB │ gzip:   0.87 kB
+dist/assets/dashboard-api-BncgYFKN.js                     2.18 kB │ gzip:   0.62 kB
+dist/assets/index-Die2xQx3.js                             2.20 kB │ gzip:   0.96 kB
+dist/assets/useMutation-CzcwcAwQ.js                       2.21 kB │ gzip:   0.91 kB
+dist/assets/advisorViewModels-0vjVv_9l.js                 2.43 kB │ gzip:   1.07 kB
+dist/assets/advising.module-hdqHtIlo.js                   2.47 kB │ gzip:   1.08 kB
+dist/assets/parseISO-3Li0EILj.js                          2.68 kB │ gzip:   1.22 kB
+dist/assets/IntakePage-Cz1NLTKg.js                        2.99 kB │ gzip:   1.23 kB
+dist/assets/index-CoPTZjsG.js                             3.05 kB │ gzip:   1.43 kB
+dist/assets/useQueries-D-28WOTb.js                        3.23 kB │ gzip:   1.45 kB
+dist/assets/notificationPresentation-B-WthZO0.js          3.46 kB │ gzip:   1.53 kB
+dist/assets/index-CEQpivcd.js                             3.49 kB │ gzip:   1.55 kB
+dist/assets/useTranslation-DapG9f0M.js                    3.55 kB │ gzip:   1.73 kB
+dist/assets/queryKeys-I_8K5w92.js                         3.84 kB │ gzip:   1.41 kB
+dist/assets/IntakeAssignmentEditor-8qq5Y76l.js            3.91 kB │ gzip:   1.66 kB
+dist/assets/index-CmstcU4R.js                             3.92 kB │ gzip:   1.59 kB
+dist/assets/index-Dd4-MJkR.js                             4.01 kB │ gzip:   1.75 kB
+dist/assets/parent-api-DEAlgWFT.js                        4.08 kB │ gzip:   1.04 kB
+dist/assets/model-BFJUM_9k.js                             4.16 kB │ gzip:   1.46 kB
+dist/assets/StudentSubmissionHistory-4NrwdL5u.js          4.21 kB │ gzip:   1.69 kB
+dist/assets/PdfMaterialPreview-Cy3Xdd59.js                4.22 kB │ gzip:   1.88 kB
+dist/assets/index-B58vRHdv.js                             4.31 kB │ gzip:   1.85 kB
+dist/assets/CourseCreatePage-BasTRKAW.js                  4.34 kB │ gzip:   1.58 kB
+dist/assets/index-BWMpbG6Z.js                             4.41 kB │ gzip:   1.89 kB
+dist/assets/runtimeData-DQD_kKOL.js                       4.46 kB │ gzip:   1.36 kB
+dist/assets/index-2fMPYBWk.js                             4.46 kB │ gzip:   1.95 kB
+dist/assets/index-BhQv52jn.js                             4.83 kB │ gzip:   2.12 kB
+dist/assets/index-DIE3MVBS.js                             5.08 kB │ gzip:   2.05 kB
+dist/assets/courseManagement-BZiiMlzJ.js                  5.28 kB │ gzip:   2.21 kB
+dist/assets/mock-exam-api-DTU3cPac.js                     5.29 kB │ gzip:   1.03 kB
+dist/assets/index-Bfo0dP2r.js                             5.41 kB │ gzip:   1.97 kB
+dist/assets/index-D_rVZ8Dy.js                             5.41 kB │ gzip:   1.99 kB
+dist/assets/index-CKHnhgPg.js                             5.42 kB │ gzip:   2.19 kB
+dist/assets/index-BC5dVEcj.js                             6.12 kB │ gzip:   2.42 kB
+dist/assets/datetime-Cru4j9uK.js                          6.33 kB │ gzip:   2.64 kB
+dist/assets/index-CaKPQLKf.js                             6.34 kB │ gzip:   2.52 kB
+dist/assets/ExamsPage-Dxx1smSr.js                         6.38 kB │ gzip:   2.61 kB
+dist/assets/assignment-api-BwGmBdYr.js                    6.48 kB │ gzip:   1.63 kB
+dist/assets/index-C_GjNBMR.js                             6.63 kB │ gzip:   2.52 kB
+dist/assets/index-DwyN86QJ.js                             6.70 kB │ gzip:   2.42 kB
+dist/assets/advisor-api-BfEnWhyc.js                       6.76 kB │ gzip:   1.34 kB
+dist/assets/index-CLgW5fun.js                             6.87 kB │ gzip:   2.43 kB
+dist/assets/OccurrenceRequests-CaDa6N7l.js                7.13 kB │ gzip:   2.89 kB
+dist/assets/index-CMnQBjqM.js                             7.15 kB │ gzip:   2.73 kB
+dist/assets/dayjs.min-CvuksRuc.js                         7.15 kB │ gzip:   3.09 kB
+dist/assets/index-C1f-kzL3.js                             8.14 kB │ gzip:   2.91 kB
+dist/assets/AdvisorSchedulePage-DKV3LUaK.js               8.30 kB │ gzip:   2.95 kB
+dist/assets/AdvisorTasksPage-liYnAZqS.js                  8.62 kB │ gzip:   2.81 kB
+dist/assets/index-D10Uz7Aw.js                             8.71 kB │ gzip:   3.03 kB
+dist/assets/course-operations-api-Ba3VGxkd.js             8.80 kB │ gzip:   1.74 kB
+dist/assets/course-api-Bgb63fCn.js                        8.83 kB │ gzip:   1.60 kB
+dist/assets/useQuery-BCzwAVfM.js                          8.95 kB │ gzip:   3.26 kB
+dist/assets/index-fnnnrOEk.js                             9.02 kB │ gzip:   3.17 kB
+dist/assets/index-BNiJbRPM.js                             9.21 kB │ gzip:   3.32 kB
+dist/assets/index-DpWYsof0.js                             9.42 kB │ gzip:   2.84 kB
+dist/assets/index-LR6fiwDY.js                             9.93 kB │ gzip:   3.43 kB
+dist/assets/index-BqGEuiGL.js                            10.70 kB │ gzip:   3.97 kB
+dist/assets/AdvisorCoursesPage-vxFyDGr_.js               10.70 kB │ gzip:   3.57 kB
+dist/assets/index-Dy1CgFYz.js                            10.85 kB │ gzip:   4.01 kB
+dist/assets/ProfilePage-B7gAFAjc.js                      11.10 kB │ gzip:   3.43 kB
+dist/assets/index-BDQhYRE1.js                            11.46 kB │ gzip:   4.25 kB
+dist/assets/EnglishDateInput-BGcYCCZE.js                 12.44 kB │ gzip:   4.38 kB
+dist/assets/index-CHEVuPm3.js                            12.85 kB │ gzip:   4.17 kB
+dist/assets/index-BixXDnIo.js                            14.16 kB │ gzip:   5.14 kB
+dist/assets/index-BdrQcEv4.js                            16.29 kB │ gzip:   6.14 kB
+dist/assets/index-DvaqC9BI.js                            16.72 kB │ gzip:   5.16 kB
+dist/assets/ChatContent-C0v3QEfs.js                      18.40 kB │ gzip:   6.89 kB
+dist/assets/format-BDcXb3H_.js                           18.97 kB │ gzip:   5.38 kB
+dist/assets/index-rSaJWvin.js                            19.15 kB │ gzip:   6.07 kB
+dist/assets/index-CFanFGnP.js                            19.58 kB │ gzip:   6.68 kB
+dist/assets/index-DbmyKz3V.js                            19.86 kB │ gzip:   5.63 kB
+dist/assets/ListeningSections-ebSOklzE.js                20.45 kB │ gzip:   3.58 kB
+dist/assets/SupportPage-LMzXDKpz.js                      21.78 kB │ gzip:   6.46 kB
+dist/assets/index-YjxsRLuq.js                            25.16 kB │ gzip:   8.51 kB
+dist/assets/Layout-DoEr9i1o.js                           25.27 kB │ gzip:   8.79 kB
+dist/assets/index-B_yQ8KaF.js                            25.54 kB │ gzip:   9.41 kB
+dist/assets/StudyPlanPage-BXf5HjDT.js                    25.68 kB │ gzip:   8.01 kB
+dist/assets/CoursesPage-CGuouAfr.js                      27.05 kB │ gzip:   7.64 kB
+dist/assets/index-BAiPJ6Sg.js                            27.12 kB │ gzip:   8.94 kB
+dist/assets/index-BYATNJ6e.js                            29.24 kB │ gzip:   8.13 kB
+dist/assets/index-D3zIBbmf.js                            30.36 kB │ gzip:   9.74 kB
+dist/assets/index-wz9GY9zz.js                            31.42 kB │ gzip:  10.03 kB
+dist/assets/index-CMUcPy0l.js                            34.79 kB │ gzip:   8.84 kB
+dist/assets/index-DKE1ASIF.js                            39.73 kB │ gzip:  11.47 kB
+dist/assets/index-BTI7yg5n.js                            40.42 kB │ gzip:  12.41 kB
+dist/assets/index-wZkPo577.js                            44.74 kB │ gzip:  12.55 kB
+dist/assets/index-BrPcztOE.js                            49.33 kB │ gzip:  14.24 kB
+dist/assets/index-CZSVc_Rs.js                            64.04 kB │ gzip:  15.94 kB
+dist/assets/index-oTUewUdn.js                            64.59 kB │ gzip:  17.88 kB
+dist/assets/index-Cm6Y9wLo.js                            90.19 kB │ gzip:  26.12 kB
+dist/assets/index-CTQ0KxYh.js                            98.17 kB │ gzip:  29.15 kB
+dist/assets/pdf-gh-BrLFn.js                             334.78 kB │ gzip:  98.38 kB
+dist/assets/index-CbemL9mD.js                           521.42 kB │ gzip: 173.89 kB
+dist/assets/index-ByJ5IXL0.js                           898.34 kB │ gzip: 275.03 kB
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+✓ built in 18.41s

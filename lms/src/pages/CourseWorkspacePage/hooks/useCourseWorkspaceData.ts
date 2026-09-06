@@ -1,9 +1,8 @@
 import {useParams} from 'react-router-dom';
 import {useQueries} from '@tanstack/react-query';
-import {AssignmentSummary, CourseAnnouncementSummary, CourseEvent, CourseGroupSet, CourseResponse, CourseSession, CourseWeek, QuizResponse, unwrapData} from '@/apis';
+import {AssignmentSummary, CourseAnnouncementSummary, CourseEvent, CourseGroupSet, CourseResponse, CourseSession, CourseWeek, unwrapData} from '@/apis';
 import {courseApiService} from '@/apis/services/course-api';
 import {assignmentApiService} from '@/apis/services/assignment-api';
-import {quizApiService} from '@/apis/services/quiz-api';
 
 /**
  * Everything the course workspace renders.
@@ -24,7 +23,6 @@ export interface CourseWorkspaceData {
   weeks: CourseWeek[];
   sessions: CourseSession[];
   assignments: AssignmentSummary[];
-  quizzes: QuizResponse[];
   events: CourseEvent[];
   groupSets: CourseGroupSet[];
   announcements: CourseAnnouncementSummary[];
@@ -34,8 +32,6 @@ export interface CourseWorkspaceData {
   sessionsFailed: boolean;
   assignmentsFailed: boolean;
   assignmentsLoading?: boolean;
-  quizzesLoading?: boolean;
-  quizzesFailed: boolean;
   eventsFailed: boolean;
   groupSetsFailed: boolean;
   announcementsFailed: boolean;
@@ -46,7 +42,6 @@ const FIVE_MINUTES = 5 * 60 * 1000;
 const EMPTY_WEEKS: CourseWeek[] = [];
 const EMPTY_SESSIONS: CourseSession[] = [];
 const EMPTY_ASSIGNMENTS: AssignmentSummary[] = [];
-const EMPTY_QUIZZES: QuizResponse[] = [];
 const EMPTY_EVENTS: CourseEvent[] = [];
 const EMPTY_GROUP_SETS: CourseGroupSet[] = [];
 const EMPTY_ANNOUNCEMENTS: CourseAnnouncementSummary[] = [];
@@ -72,7 +67,7 @@ export const useCourseWorkspaceData = (): CourseWorkspaceData => {
   const id = Number.isNaN(parsed) ? null : parsed;
   const enabled = id !== null;
 
-  const [course, weeks, sessions, assignments, quizzes, events, groupSets, announcements] = useQueries({
+  const [course, weeks, sessions, assignments, events, groupSets, announcements] = useQueries({
     queries: [
       {
         queryKey: ['course', id],
@@ -96,12 +91,6 @@ export const useCourseWorkspaceData = (): CourseWorkspaceData => {
         queryKey: ['course-assignments', id],
         queryFn: async () =>
           (await assignmentApiService.getCourseAssignmentSummaries(id!)).data ?? [],
-        enabled,
-        ...shared,
-      },
-      {
-        queryKey: ['course-quizzes', id],
-        queryFn: async () => (await quizApiService.listQuizzes(id!)).data ?? [],
         enabled,
         ...shared,
       },
@@ -136,7 +125,6 @@ export const useCourseWorkspaceData = (): CourseWorkspaceData => {
     weeks: weeks.data ?? EMPTY_WEEKS,
     sessions: sessions.data ?? EMPTY_SESSIONS,
     assignments: assignments.data ?? EMPTY_ASSIGNMENTS,
-    quizzes: quizzes.data ?? EMPTY_QUIZZES,
     events: events.data ?? EMPTY_EVENTS,
     groupSets: groupSets.data ?? EMPTY_GROUP_SETS,
     announcements: announcements.data ?? EMPTY_ANNOUNCEMENTS,
@@ -150,8 +138,6 @@ export const useCourseWorkspaceData = (): CourseWorkspaceData => {
     sessionsFailed: sessions.isError,
     assignmentsFailed: assignments.isError,
     assignmentsLoading: assignments.isPending,
-    quizzesLoading: quizzes.isPending,
-    quizzesFailed: quizzes.isError,
     eventsFailed: events.isError,
     groupSetsFailed: groupSets.isError,
     announcementsFailed: announcements.isError,
@@ -160,7 +146,6 @@ export const useCourseWorkspaceData = (): CourseWorkspaceData => {
       void weeks.refetch();
       void sessions.refetch();
       void assignments.refetch();
-      void quizzes.refetch();
       void events.refetch();
       void groupSets.refetch();
       void announcements.refetch();

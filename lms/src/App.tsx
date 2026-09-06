@@ -27,9 +27,6 @@ const CourseAnnouncementsPage = lazy(() => import('./pages/CourseAnnouncementsPa
 const CourseSchedulePage = lazy(() => import('./pages/CourseSchedulePage'));
 const CourseGroupsPage = lazy(() => import('./pages/CourseGroupsPage'));
 const GroupSetDetailPage = lazy(() => import('./pages/GroupSetDetailPage'));
-const QuizPage = lazy(() => import('./pages/QuizPage'));
-const QuizEditorPage = lazy(() => import('./pages/QuizEditorPage'));
-const QuizGradingPage = lazy(() => import('./pages/QuizGradingPage'));
 const CourseGradesPage = lazy(() => import('./pages/CourseGradesPage'));
 const CalendarPage = lazy(() => import('./pages/CalendarPage'));
 const Roster = lazy(() => import("./pages/RosterPage"));
@@ -134,10 +131,6 @@ const App = () => {
                 <Route path={APP_ROUTE_PATHS.courseCourseIdGroups} element={<CourseGroupsPage/>}/>
                 <Route path={APP_ROUTE_PATHS.courseCourseIdGroupSetsGroupSetId} element={<GroupSetDetailPage/>}/>
                 <Route path={APP_ROUTE_PATHS.courseCourseIdWeeksSubjectId} element={<NotificationSubjectPage kind="week"/>}/>
-                <Route path={APP_ROUTE_PATHS.courseCourseIdQuizzesNew} element={<QuizEditorPage/>}/>
-                <Route path={APP_ROUTE_PATHS.courseCourseIdQuizzesQuizId} element={<QuizPage/>}/>
-                <Route path={APP_ROUTE_PATHS.courseCourseIdQuizzesQuizIdEdit} element={<QuizEditorPage/>}/>
-                <Route path={APP_ROUTE_PATHS.courseCourseIdQuizzesQuizIdGrading} element={<QuizGradingPage/>}/>
                 <Route path={APP_ROUTE_PATHS.courseCourseIdGrades} element={<CourseGradesPage/>}/>
                 <Route path={APP_ROUTE_PATHS.courseAddContent} element={<RequireRoleAccess capability="courseCreation"><CourseCreatePage/></RequireRoleAccess>}/>
               </Route>

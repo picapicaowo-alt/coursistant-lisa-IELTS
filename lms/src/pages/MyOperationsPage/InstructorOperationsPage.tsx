@@ -278,23 +278,14 @@ function TeachingOverview() {
           <div>
             {queue.isError ? (
               <p className={s.notice}>
-                {translate("operations:teacher.queueFallback")}</p>
+                {translate('dashboard:teaching.assignmentQueueFallback')}
+              </p>
             ) : null}
             {groups.map((item) => (
               <Link
                 className={local.row}
-                key={`${item.kind}-${item.courseId}-${item.assignmentId ?? item.quizId}`}
-                to={
-                  item.assignmentId
-                    ? assignmentGradingPath(item.courseId, item.assignmentId)
-                    : generatePath(
-                        APP_ROUTE_PATHS.courseCourseIdQuizzesQuizIdGrading,
-                        {
-                          courseId: String(item.courseId),
-                          quizId: String(item.quizId),
-                        },
-                      )
-                }
+                key={`${item.kind}-${item.courseId}-${item.assignmentId}`}
+                to={assignmentGradingPath(item.courseId, item.assignmentId!)}
               >
                 <span>
                   <strong>{item.title}</strong>

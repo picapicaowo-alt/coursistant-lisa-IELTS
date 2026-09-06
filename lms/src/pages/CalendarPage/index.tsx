@@ -15,7 +15,7 @@ import styles from './index.module.scss';
 type CalendarView = 'month' | 'week' | 'day';
 type Category = 'all' | 'courses' | 'assignments' | 'personal';
 const CATEGORIES = [{id: 'all', labelKey: 'calendar:categories.all'}, {id: 'courses', labelKey: 'common:fields.courses'}, {id: 'assignments', labelKey: 'course:detail.assignments'}, {id: 'personal', labelKey: 'calendar:categories.personal'}] as const;
-const color = (item: CalendarItem) => item.kind === 'Personal' ? 'neutral' : item.kind === 'Assignment' || item.kind === 'Quiz' ? 'cyan' : item.kind === 'Event' ? 'pink' : 'brand';
+const color = (item: CalendarItem) => item.kind === 'Personal' ? 'neutral' : item.kind === 'Assignment' ? 'cyan' : item.kind === 'Event' ? 'pink' : 'brand';
 
 const CalendarPage = ({embedded = false, courseId}: {embedded?: boolean; courseId?: number}) => {
   const { t: translate } = useTranslation();
@@ -48,7 +48,7 @@ const CalendarPage = ({embedded = false, courseId}: {embedded?: boolean; courseI
     });
   }), [personal.data?.items, range.end, range.start]);
   const visibleItems = useMemo(() => [...(calendar.data?.items ?? []), ...personalItems].filter(item =>
-    (!courseId || item.courseId === courseId || item.kind === 'Personal') && (item.courseId == null || !hiddenCourseIds.has(item.courseId)) && (category === 'all' || category === 'personal' && item.kind === 'Personal' || category === 'assignments' && (item.kind === 'Assignment' || item.kind === 'Quiz') || category === 'courses' && (item.kind === 'Session' || item.kind === 'Event')),
+    (!courseId || item.courseId === courseId || item.kind === 'Personal') && (item.courseId == null || !hiddenCourseIds.has(item.courseId)) && (category === 'all' || category === 'personal' && item.kind === 'Personal' || category === 'assignments' && (item.kind === 'Assignment') || category === 'courses' && (item.kind === 'Session' || item.kind === 'Event')),
   ).sort((a, b) => `${a.date}${a.startTime ?? ''}`.localeCompare(`${b.date}${b.startTime ?? ''}`)), [calendar.data?.items, personalItems, hiddenCourseIds, category, courseId]);
   const byDate = useMemo(() => {const grouped = new Map<string, CalendarItem[]>(); visibleItems.forEach(item => grouped.set(item.date, [...grouped.get(item.date) ?? [], item])); return grouped;}, [visibleItems]);
   const toggleCourse = (id: number) => setHiddenCourseIds(current => {const next = new Set(current); if (next.has(id)) next.delete(id); else next.add(id); return next;});

@@ -81,5 +81,8 @@
     "upcomingClass": "即将上课",
     "scheduleConflict": "排课冲突"
   },
-  "assistantAttachment": "打开对话以添加附件"
+  "assistantAttachment": "打开对话以添加附件",
+  "teaching": {
+    "assignmentQueueFallback": "当前显示作业提交记录，批改队列暂时不可用。"
+  }
 }

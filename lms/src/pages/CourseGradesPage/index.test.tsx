@@ -24,7 +24,7 @@ vi.mock('@/apis/services/quiz-api', () => ({quizApiService: {
 import CourseGradesPage from './index';
 
 describe('CourseGradesPage', () => {
-  it('consolidates assignments and visibility-aware quiz results without a course total', async () => {
+  it('shows assignment grades without requesting the excluded Quiz module', async () => {
     mocks.getCourse.mockResolvedValue({data: {id: 37, courseCode: 'CSCI-570', title: 'Algorithms'}});
     mocks.listMyGrades.mockResolvedValue({data: [
       {assignmentId: 57, assignmentTitle: 'Homework 1', dueAtUtc: '2026-08-28T03:59:00', submissionStatus: 'Submitted', released: true, gradeDisplay: 'Released', pointsEarned: 10, pointsPossible: 10},
@@ -57,8 +57,10 @@ describe('CourseGradesPage', () => {
     expect(await screen.findByRole('heading', {name: 'Grades'})).toBeInTheDocument();
     expect(await screen.findByRole('link', {name: /Homework 1/})).toHaveAttribute('href', '/course/37/assignments/57');
     expect(screen.getByText('10 / 10')).toBeInTheDocument();
-    expect(screen.getAllByText('Not graded yet')).toHaveLength(2);
-    expect(screen.getByText('Auto-score: 1 / 1')).toBeInTheDocument();
+    expect(screen.getAllByText('Not graded yet')).toHaveLength(1);
+    expect(mocks.listQuizzes).not.toHaveBeenCalled();
+    expect(mocks.getMyResult).not.toHaveBeenCalled();
+    expect(screen.queryByRole('heading', {name: 'Quizzes'})).not.toBeInTheDocument();
     expect(screen.getByText(/does not calculate a course total/i)).toBeInTheDocument();
   });
 });

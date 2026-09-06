@@ -26,7 +26,7 @@ export const RequiredAuthProvider = ({children}: RequiredAuthProviderProps) => {
   }
   
   return (
-    <RequiredAuthContext.Provider value={{user}}>
+    <RequiredAuthContext.Provider key={`${user.userId}:${user.role}:${user.level}`} value={{user}}>
       {children}
     </RequiredAuthContext.Provider>
   );
