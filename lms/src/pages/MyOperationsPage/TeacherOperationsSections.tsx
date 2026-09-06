@@ -4,7 +4,7 @@ import {formatClockTime, formatDateValue, formatNumber, formatWeekday} from '@/i
 import {statusLabel} from '@/i18n/presentation';
 import {parseInputDate} from '@/i18n/dateInput';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
-import {CollapsibleSection} from '@/components/CollapsibleSection';
+import {TeachingDialog} from '@/components/TeachingWorkspace';
 import {dashboardApiService} from '@/apis/services/dashboard-api';
 import {assignmentGradingPath} from '@/configs/coursePaths';
 import {registeredDestination} from '@/utils/registeredDestination';
@@ -188,7 +188,7 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
   const [version, setVersion] = useState<number | null>(null);
   const [windows, setWindows] = useState<AvailabilityWindowRequest[]>([]);
   const [exceptions, setExceptions] = useState<AvailabilityExceptionRequest[]>([]);
-  const [editorReveal, setEditorReveal] = useState(0);
+  const [editorOpen, setEditorOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState<AvailabilityWindowRequest>(() => emptyWindow(timezone));
   const [saved, setSaved] = useState(false);
@@ -227,6 +227,7 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
     setSelectedIndex(null);
     setDraft(emptyWindow(timezone));
     setSaved(false);
+    setEditorOpen(false);
   };
 
   const mutation = useMutation({
@@ -254,17 +255,20 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
     : '';
 
   return <div className={styles.workspace}>
-    <WorkspaceSection title={translate("operations:availability.title")} headingId="availability-title" summary={translate("operations:availability.help")} meta={<span className={styles.versionBadge}>{translate('operations:availability.version', {number: version == null ? '—' : formatNumber(version)})}</span>}>
+    <WorkspaceSection title={translate("operations:availability.title")} headingId="availability-title" className={styles.availabilitySection} summary={translate("operations:availability.help")} meta={<div className={styles.availabilityHeaderActions}>
+      <span className={styles.versionBadge}>{translate('operations:availability.version', {number: version == null ? '—' : formatNumber(version)})}</span>
+      <button type="button" className={styles.primary} disabled={mutation.isPending} aria-haspopup="dialog" onClick={() => { setSelectedIndex(null); setDraft(emptyWindow(timezone)); setDateInputError(false); setEditorOpen(true); }}><Plus size={18} aria-hidden="true"/>{translate("operations:availability.addTitle")}</button>
+    </div>}>
 
       {windows.length === 0 ? <div className={styles.emptyPanel}><strong>{translate("operations:availability.empty")}</strong><span>{translate("operations:availability.emptyHelp")}</span></div> : <div className={styles.availabilityList}>{windows.map((item, index) => <article className={styles.availabilityRow} key={`${item.dayOfWeek}-${item.startTime}-${item.effectiveFrom ?? 'ongoing'}-${index}`}>
         <span className={styles.availabilityIcon}><CalendarClock size={19} aria-hidden="true"/></span>
         <span><strong>{formatWeekday(item.dayOfWeek ?? '', 'long')}</strong><small>{formatTime(item.startTime)}–{formatTime(item.endTime)}</small><small>{item.effectiveFrom || item.effectiveTo ? `${formatDate(item.effectiveFrom) ?? translate("operations:availability.now")}–${formatDate(item.effectiveTo) ?? translate("operations:availability.ongoing")}` : translate("operations:availability.ongoing")} · {item.timezone || timezone}</small></span>
-        <span className={styles.rowActions}><button type="button" onClick={() => { setEditorReveal(current => current + 1); setDateInputError(false); setSelectedIndex(index); setDraft({...item}); setSaved(false); }}><Pencil size={16} aria-hidden="true"/> {translate("common:actions.edit")}</button><button type="button" className={styles.textDanger} onClick={() => { setWindows(current => current.filter((_, itemIndex) => itemIndex !== index)); if (selectedIndex === index) { setSelectedIndex(null); setDraft(emptyWindow(timezone)); setDateInputError(false); } else if (selectedIndex != null && selectedIndex > index) { setSelectedIndex(selectedIndex - 1); } setSaved(false); }}><Trash2 size={16} aria-hidden="true"/> {translate("common:actions.remove")}</button></span>
+        <span className={styles.rowActions}><button type="button" onClick={() => { setEditorOpen(true); setDateInputError(false); setSelectedIndex(index); setDraft({...item}); setSaved(false); }}><Pencil size={16} aria-hidden="true"/> {translate("common:actions.edit")}</button><button type="button" className={styles.textDanger} onClick={() => { setWindows(current => current.filter((_, itemIndex) => itemIndex !== index)); if (selectedIndex === index) { setSelectedIndex(null); setDraft(emptyWindow(timezone)); setDateInputError(false); } else if (selectedIndex != null && selectedIndex > index) { setSelectedIndex(selectedIndex - 1); } setSaved(false); }}><Trash2 size={16} aria-hidden="true"/> {translate("common:actions.remove")}</button></span>
       </article>)}</div>}
       {exceptions.length > 0 ? <div className={styles.exceptionNotice}><strong>{translate('operations:availability.exceptions', {count: exceptions.length, number: formatNumber(exceptions.length)})}</strong><span>{translate("operations:availability.exceptionsHelp")}</span></div> : null}
     </WorkspaceSection>
 
-    <CollapsibleSection title={selectedIndex == null ? translate("operations:availability.addTitle") : translate("operations:availability.editTitle")} headingId="availability-editor-title" revealKey={editorReveal} summary={translate("operations:availability.editorHelp")}>
+    {editorOpen ? <TeachingDialog title={selectedIndex == null ? translate("operations:availability.addTitle") : translate("operations:availability.editTitle")} onClose={() => setEditorOpen(false)} description={translate("operations:availability.editorHelp")}>
 
       <form noValidate className={styles.form} onSubmit={event => { event.preventDefault(); commitDraft(event.currentTarget); }}>
         <label>{translate("course:scheduleModal.dayLabel")}<select value={draft.dayOfWeek} onChange={event => setDraft(current => ({...current, dayOfWeek: event.target.value}))}>{WEEKDAYS.map(day => <option key={day} value={day}>{formatWeekday(day, 'long')}</option>)}</select></label>
@@ -273,9 +277,13 @@ const AvailabilityEditor: React.FC<{timezone: string}> = ({timezone}) => {
         <label>{translate("operations:availability.effectiveFrom")}<EnglishDateInput name="effectiveFrom" aria-label={translate("operations:availability.effectiveFrom")} value={draft.effectiveFrom ?? ''} onChangeValue={effectiveFrom => setDraft(current => ({...current, effectiveFrom: effectiveFrom || undefined}))}/></label>
         <label>{translate("operations:availability.effectiveTo")}<EnglishDateInput name="effectiveTo" aria-label={translate("operations:availability.effectiveTo")} value={draft.effectiveTo ?? ''} onChangeValue={effectiveTo => setDraft(current => ({...current, effectiveTo: effectiveTo || undefined}))}/></label>
         {validationKey || dateInputError ? <p className={styles.formMessage} role="alert">{translate(validationKey ?? "operations:availability.invalidDate")}</p> : null}
-        <div className={styles.actions}><button className={styles.secondary} disabled={Boolean(validationKey)}>{selectedIndex == null ? <><Plus size={17} aria-hidden="true"/> {' '}{translate("operations:availability.add")}</> : translate("operations:availability.apply")}</button>{selectedIndex != null ? <button type="button" className={styles.secondary} onClick={() => { setSelectedIndex(null); setDraft(emptyWindow(timezone)); setDateInputError(false); }}>{translate("operations:availability.cancel")}</button> : null}</div>
+        <p className={styles.availabilityDraftHint}>{translate("operations:availability.draftHelp")}</p>
+        <div className={`${styles.actions} ${styles.availabilityDialogActions}`}>
+          <button type="button" className={styles.secondary} onClick={() => setEditorOpen(false)}>{translate("common:actions.cancel")}</button>
+          <button type="submit" className={styles.primary} disabled={Boolean(validationKey)}>{selectedIndex == null ? translate("operations:availability.add") : translate("operations:availability.apply")}</button>
+        </div>
       </form>
-    </CollapsibleSection>
+    </TeachingDialog> : null}
       <div className={styles.saveBar}>
         <span>{translate('operations:availability.ready', {count: windows.length, number: formatNumber(windows.length)})}</span>
         <button type="button" className={styles.primary} disabled={reloadRequired || mutation.isPending || version == null} onClick={() => mutation.mutate()}>{mutation.isPending ? translate("common:actions.saving") : translate("operations:availability.save")}</button>
