@@ -396,3 +396,27 @@ a.operationRow:focus-visible {
 
 .grid > .primaryRegion { @include workspace.region(8, 12); }
 .grid > .supportRegion { @include workspace.region(4, 6); }
+
+.availabilitySection > header {
+  flex-wrap: wrap;
+}
+
+.availabilityHeaderActions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: t.$space-3;
+  margin-left: auto;
+}
+
+.availabilityDraftHint {
+  grid-column: 1 / -1;
+  margin: t.$space-2 0 0;
+  color: t.$content-secondary;
+  font-size: t.$font-size-caption;
+}
+
+.availabilityDialogActions {
+  justify-content: flex-end;
+  margin-top: t.$space-3;
+}
