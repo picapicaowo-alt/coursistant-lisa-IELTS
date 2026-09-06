@@ -27,7 +27,8 @@ for (const locale of locales) for (const width of [390, 1440]) {
     await page.route('**/v2/me/teaching/grading-queue**', route => route.fulfill({json: reply(empty ? [] : [
       {...base, kind: 'AssignmentUngraded'},
       {...base, kind: 'AssignmentAwaitingRelease', pendingCount: 2},
-      {...base, title: 'Original quiz title', kind: 'QuizAwaitingRelease', pendingCount: 1, assignmentId: null, quizId: 81},
+      {...base, title: 'Release-only essay', kind: 'AssignmentAwaitingRelease', pendingCount: 1, assignmentId: 82},
+      {...base, title: 'Legacy quiz', kind: 'QuizAwaitingRelease', pendingCount: 1, assignmentId: null, quizId: 81},
     ])}));
     await page.goto('/');
     const selector = page.getByRole('combobox', {name: /^(Language|语言|語言)$/}).first();
@@ -36,9 +37,9 @@ for (const locale of locales) for (const width of [390, 1440]) {
       const work = page.getByRole('region', {name: t(selected, 'dashboard:teachingWork.title')});
       await expect(work.getByText('Original essay title', {exact: true})).toHaveCount(1);
       await expect(work.getByRole('link', {name: /Original essay title/})).toHaveAttribute('href', '/course/71/assignments/81/grading');
-      await expect(work.getByRole('link', {name: /Original quiz title/})).toHaveAttribute('href', '/course/71/quizzes/81/grading');
-      await expect(work.getByRole('link', {name: /Original quiz title/})).toContainText(t(selected, 'dashboard:teachingWork.release'));
-      await expect(work).not.toContainText(/SELF|STAFF|user=26|AssignmentAwaitingRelease|dashboard:/);
+      await expect(work.getByRole('link', {name: /Release-only essay/})).toHaveAttribute('href', '/course/71/assignments/82/grading');
+      await expect(work.getByRole('link', {name: /Release-only essay/})).toContainText(t(selected, 'dashboard:teachingWork.release'));
+      await expect(work).not.toContainText(/Legacy quiz|SELF|STAFF|user=26|AssignmentAwaitingRelease|dashboard:/);
       await expect(page.getByRole('region', {name: t(selected, 'dashboard:recentActivity')})).toHaveCount(0);
       await expect(page.getByRole('region', {name: t(selected, 'dashboard:courseFilter')})).toContainText(t(selected, 'dashboard:noUpcomingWork'));
     }

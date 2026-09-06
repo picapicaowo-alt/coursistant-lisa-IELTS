@@ -21,16 +21,16 @@ No new endpoint or response field is assumed by this frontend change.
 ## Teacher home information scope
 
 The home panel now shows **Teaching to-dos**, sourced only from the existing
-`/v2/me/teaching/grading-queue`. It includes pending assignment grading, manual
-quiz grading, and grades awaiting release. It no longer reads
+`/v2/me/teaching/grading-queue`. It includes pending assignment grading and grades awaiting release. Legacy LMS
+Quiz entries remain excluded by the current IELTS product scope; Mock Exam is
+a separate workflow and is unchanged. It no longer reads
 `/v2/me/teaching/activity/recent`: group membership logs and historical late
 submissions do not establish that a teacher needs to act now. Unresolved late
 submissions are represented by the authoritative grading queue when eligible;
 the frontend does not infer a late flag or pending status from old events.
 
-- Grading and release aggregates for the same course assignment or quiz share
-  one card and destination, with separate counts. Course and assessment-type
-  boundaries remain distinct. Each card explains the course, authored title,
+- Grading and release aggregates for the same course assignment share
+  one card and destination, with separate counts. Course boundaries remain distinct. Each card explains the course, authored title,
   work remaining and next action.
 - All platform copy uses the shared English, Simplified Chinese and Traditional
   Chinese resources. Authored course codes and assessment titles stay original.
@@ -39,8 +39,8 @@ the frontend does not infer a late flag or pending status from old events.
   no-work message; the existing teaching-management entry remains available.
 - The successful empty state is scoped to assignments and grades. Loading and
   failed reads cannot display an empty queue or zero pending count.
-- The separate course deadline panel says there are no upcoming assignment or
-  quiz deadlines, rather than no pending work. Past submissions can still need
+- The separate course deadline panel says there are no upcoming assignment
+  deadlines, rather than no pending work. Past submissions can still need
   grading, so those two areas must not contradict one another.
 - New activity types do not automatically gain a home placement. A future home
   item must have a verified current need, understandable context, a real action,
@@ -61,7 +61,7 @@ reads and management controls wait for successful group-set loading.
 ## Verification boundary
 
 The earlier live reproduction establishes the original stale-link issue.
-Current local regression covers grouped assignment/quiz work, separate course
+Current local regression covers grouped assignment work, separate course
 boundaries, empty/error/retry states, unknown kinds, exclusion of historical
 activity requests, actual locale switching and refresh persistence, and old-link
 recovery. Browser API fixtures are isolated and send no live mutations.

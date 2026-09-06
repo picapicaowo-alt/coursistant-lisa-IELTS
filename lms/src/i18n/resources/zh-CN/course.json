@@ -354,7 +354,8 @@
     "itemCount_one": "{{count, number}} 项",
     "itemCount_other": "{{count, number}} 项",
     "assignmentFallback": "作业 {{id}}",
-    "due": "截止日期：{{date}}"
+    "due": "截止日期：{{date}}",
+    "visibilityNotice": "此处显示已发布的作业成绩，不计算课程总成绩。"
   },
   "learning": {
     "loading": "正在加载课程…",
@@ -523,7 +524,7 @@
     "loadFailed": "暂时无法加载这门课程。",
     "totals": "课程内容统计",
     "assessments": "作业与测验",
-    "assessmentHelp": "管理课程作业、测验和反馈。",
+    "assessmentHelp": "管理课程作业和反馈。",
     "scheduleSections": "课表栏目",
     "members": "成员",
     "operations": "课次、考勤与报告",
@@ -719,7 +720,12 @@
     },
     "create": {
       "title": "在课程中创建内容",
-      "description": "请选择课程，再使用其中的资料、作业或测验工具。内容通过课程工作区保存，可用操作以你的权限为准。"
+      "description": "请选择课程，再使用其中的资料或作业工具。内容通过课程工作区保存，可用操作以你的权限为准。"
     }
+  },
+  "studySupport": {
+    "courseLoadFailed": "暂时无法核实课程列表，学习支持目前不可用。",
+    "checkingCourses": "正在加载你的课程…",
+    "unavailable": "学习支持暂不可用"
   }
 }

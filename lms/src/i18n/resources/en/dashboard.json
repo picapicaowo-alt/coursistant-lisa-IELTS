@@ -3,7 +3,7 @@
   "learner": "learner",
   "courseFilter": "Course filter",
   "allCourses": "All courses",
-  "noUpcomingWork": "No upcoming assignment or quiz deadlines",
+  "noUpcomingWork": "No upcoming assignment deadlines",
   "viewCourse": "View course",
   "noActiveEnrolments": "No active courses. Visit My Courses to view your enrolments.",
   "nothingPending": "Nothing needs your attention.",
@@ -82,9 +82,12 @@
     "scheduleConflict": "Schedule conflict"
   },
   "assistantAttachment": "Open chat to add an attachment",
+  "teaching": {
+    "assignmentQueueFallback": "Showing assignment submissions. The grading queue is temporarily unavailable."
+  },
   "teachingWork": {
     "title": "Teaching to-dos",
-    "help": "Grade assignments and quizzes, and release completed grades.",
+    "help": "Grade assignments and release completed grades.",
     "viewAll": "Open teaching management",
     "loading": "Loading teaching to-dos…",
     "failed": "Teaching to-dos could not be loaded. Please try again.",
@@ -92,7 +95,6 @@
     "emptyHelp": "New submissions to grade and grades ready to release will appear here.",
     "moreWork": "Some to-dos cannot be shown here. Open teaching management to review them.",
     "assignment": "Assignment",
-    "quiz": "Quiz",
     "toGrade_one": "{{count, number}} submission to grade",
     "toGrade_other": "{{count, number}} submissions to grade",
     "toRelease_one": "{{count, number}} grade to release",

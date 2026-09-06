@@ -1,5 +1,5 @@
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
-import {fireEvent, render, screen, waitFor} from '@testing-library/react';
+import {act, fireEvent, render, screen, waitFor} from '@testing-library/react';
 import '@testing-library/jest-dom';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AuthProvider, useAuth} from './AuthContext';
@@ -68,6 +68,25 @@ describe('AuthProvider logout', () => {
     expect(client.getQueryCache().getAll()).toHaveLength(0);
     expect(client.getMutationCache().getAll()).toHaveLength(0);
     expect(await screen.findByText('next@example.test')).toBeInTheDocument();
+  });
+
+  it('retires cached private data when another tab logs out or changes account', async () => {
+    const client = new QueryClient();
+    render(<QueryClientProvider client={client}><AuthProvider><AuthHarness/></AuthProvider></QueryClientProvider>);
+    expect(await screen.findByText(storedUser.email)).toBeInTheDocument();
+    client.setQueryData(['me', 'private'], {owner: storedUser.userId});
+    act(() => {
+      localStorage.removeItem('user');
+      window.dispatchEvent(new StorageEvent('storage', {key: 'user', storageArea: localStorage}));
+    });
+    expect(screen.getByText('Signed out')).toBeInTheDocument();
+    expect(client.getQueryCache().getAll()).toHaveLength(0);
+    act(() => {
+      localStorage.setItem('user', JSON.stringify({...storedUser, userId: 8, email: 'second@example.test'}));
+      window.dispatchEvent(new StorageEvent('storage', {key: 'user', storageArea: localStorage}));
+    });
+    expect(screen.getByText('second@example.test')).toBeInTheDocument();
+    expect(mocks.serverLogout).not.toHaveBeenCalled();
   });
 
   it('revokes the server session before clearing local authentication', async () => {

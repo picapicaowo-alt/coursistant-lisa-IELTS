@@ -40,7 +40,7 @@ describe('teacher home current work', () => {
     expect(dashboardApiService.getRecentActivity).not.toHaveBeenCalled();
   });
 
-  it('preserves quiz, course and assignment boundaries, and directs release-only work correctly', async () => {
+  it('preserves course boundaries, excludes legacy quizzes, and directs release-only work correctly', async () => {
     vi.mocked(dashboardApiService.getGradingQueue).mockResolvedValue(response([
       {...item, kind: 'AssignmentAwaitingRelease', pendingCount: 1},
       {...item, kind: 'QuizManualPending', title: 'Authored quiz', assignmentId: null, quizId: 81},
@@ -51,7 +51,7 @@ describe('teacher home current work', () => {
     expect(release).toHaveTextContent('1 grade to release');
     expect(release).toHaveTextContent('Review and release');
     expect(release).not.toHaveTextContent('to grade');
-    expect(screen.getByRole('link', {name: /Authored quiz/})).toHaveAttribute('href', '/course/31/quizzes/81/grading');
+    expect(screen.queryByRole('link', {name: /Authored quiz/})).not.toBeInTheDocument();
     expect(screen.getByRole('link', {name: /Another course essay/})).toHaveAttribute('href', '/course/32/assignments/81/grading');
   });
 
