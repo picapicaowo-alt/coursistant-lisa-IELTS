@@ -3,7 +3,7 @@
   "learner": "同学",
   "courseFilter": "课程筛选",
   "allCourses": "全部课程",
-  "noUpcomingWork": "暂无待办事项",
+  "noUpcomingWork": "暂无即将截止的作业",
   "viewCourse": "查看课程",
   "noActiveEnrolments": "暂无进行中的课程。可前往“我的课程”查看已加入的课程。",
   "nothingPending": "暂无需要您处理的事项。",
@@ -84,5 +84,22 @@
   "assistantAttachment": "打开对话以添加附件",
   "teaching": {
     "assignmentQueueFallback": "当前显示作业提交记录，批改队列暂时不可用。"
+  },
+  "teachingWork": {
+    "title": "教学待办",
+    "help": "批改作业，发布已完成的成绩。",
+    "viewAll": "打开教学管理",
+    "loading": "正在加载教学待办…",
+    "failed": "暂时无法加载教学待办，请重试。",
+    "empty": "当前没有待处理的作业或成绩。",
+    "emptyHelp": "有新的提交需要批改，或有成绩待发布时，会显示在这里。",
+    "moreWork": "部分待办暂时无法在此展示，请打开教学管理查看。",
+    "assignment": "作业",
+    "grade": "前往批改",
+    "release": "查看并发布成绩",
+    "toGrade_one": "{{count, number}} 份提交待批改",
+    "toGrade_other": "{{count, number}} 份提交待批改",
+    "toRelease_one": "{{count, number}} 份成绩待发布",
+    "toRelease_other": "{{count, number}} 份成绩待发布"
   }
 }

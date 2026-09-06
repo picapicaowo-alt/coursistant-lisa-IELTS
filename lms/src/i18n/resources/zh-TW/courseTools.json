@@ -301,6 +301,10 @@
     "membershipUpdated": "成員關係已更新。",
     "membershipFailed": "暫時無法更改成員關係。",
     "deleteSet": "刪除分組集",
-    "deleteHelp": "如有作業或其他關聯專案仍在使用此分組集，將無法刪除。"
+    "deleteHelp": "如有作業或其他關聯專案仍在使用此分組集，將無法刪除。",
+    "setMissing": "此分組連結已失效",
+    "setMissingHelp": "分組可能已被移除，歷史活動仍會保留。你可以查看課程目前的分組。",
+    "setForbiddenHelp": "目前帳號無法查看此分組集。請返回課程分組列表，查看可存取的分組。",
+    "viewCurrent": "查看目前分組"
   }
 }

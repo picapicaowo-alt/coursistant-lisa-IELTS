@@ -1,22 +1,23 @@
 .widget { display: flex; height: 100%; min-height: 0; flex-direction: column; color: t.$content-primary; }
-.header { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.75rem; padding-bottom: 0.7rem; border-bottom: 1px dashed t.$border-default; }
-.header p { margin-top: 0.2rem; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
-.header h2 { font-size: 1.2rem; font-weight: 700; }
-.header button { color: t.$action-primary; font-size: 0.78rem; cursor: pointer; }
-.status { display: grid; flex: 1; place-items: center; color: t.$content-secondary; font-size: 0.86rem; }
-.columns { display: grid; min-height: 0; flex: 1; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding-top: 0.8rem; overflow: auto; }
-.columns > section { min-width: 0; }
-.sectionTitle { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; margin-bottom: 0.5rem; }
-.sectionTitle h3 { font-size: 0.88rem; font-weight: 700; }
-.sectionTitle span { display: grid; min-width: 1.35rem; height: 1.35rem; place-items: center; border-radius: t.$radius-round; background: t.$surface-brand-subtle; color: t.$action-primary; font-size: t.$font-size-caption; font-weight: 700; }
-.list { display: grid; gap: 0.4rem; }
-.item { display: flex; align-items: center; justify-content: space-between; gap: 0.65rem; min-width: 0; padding: 0.58rem; border: 1px solid t.$border-default; border-radius: 0.55rem; color: t.$content-primary; text-decoration: none; }
+.header { display: flex; align-items: flex-start; justify-content: space-between; gap: t.$space-3; padding-bottom: t.$space-4; border-bottom: 1px dashed t.$border-default; }
+.header h2 { font-size: t.$font-size-body-lg; font-weight: t.$fw-semibold; }
+.header p { margin-top: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+.viewAll, .retry { flex-shrink: 0; display: inline-flex; align-items: center; min-height: 2.75rem; color: t.$action-primary; font-size: t.$font-size-caption; cursor: pointer; }
+.status, .empty { display: flex; flex: 1; flex-direction: column; align-items: flex-start; justify-content: center; gap: t.$space-2; padding-block: t.$space-5; }
+.status, .empty small, .notice { color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
+.empty p { font-size: t.$font-size-body; }
+.notice { margin-top: t.$space-4; }
+.list { display: grid; gap: t.$space-3; margin: 0; padding: t.$space-4 0 0; list-style: none; }
+.list:empty { display: none; }
+.item { display: flex; align-items: center; justify-content: space-between; gap: t.$space-4; min-width: 0; padding: t.$space-4; border: 1px solid t.$border-default; border-radius: t.$radius-control; color: t.$content-primary; text-decoration: none; }
 .item:hover { border-color: t.$border-interactive; background: t.$surface-brand-subtle; }
-.itemMain { display: grid; min-width: 0; gap: 0.12rem; }
-.itemMain strong { overflow: hidden; font-size: 0.78rem; text-overflow: ellipsis; white-space: nowrap; }
-.itemMain small { overflow: hidden; color: t.$content-secondary; font-size: t.$font-size-caption; text-overflow: ellipsis; white-space: nowrap; }
-.count { display: grid; flex: 0 0 auto; min-width: 1.75rem; height: 1.75rem; place-items: center; border-radius: 0.45rem; background: t.$action-primary; color: t.$content-on-color; font-size: t.$font-size-caption; font-weight: 700; }
-.empty, .inlineError { padding: 1rem 0.35rem; color: t.$content-secondary; font-size: 0.76rem; }
-.inlineError { color: t.$feedback-danger; }
-
-@media (max-width: 560px) { .columns { grid-template-columns: 1fr; } }
+.itemMain { display: grid; min-width: 0; gap: t.$space-1; overflow-wrap: anywhere; }
+.itemMain strong { font-size: t.$font-size-body; font-weight: t.$fw-semibold; }
+.itemMain small { color: t.$content-secondary; font-size: t.$font-size-caption; }
+.workCounts { display: flex; flex-wrap: wrap; gap: t.$space-2 t.$space-4; margin-top: t.$space-1; color: t.$content-secondary; font-size: t.$font-size-caption; }
+.action { flex-shrink: 0; color: t.$action-primary; font-size: t.$font-size-caption; }
+.item:focus-visible, .viewAll:focus-visible, .retry:focus-visible { outline: 2px solid t.$action-primary; outline-offset: 2px; }
+@media (max-width: 560px) {
+  .header { flex-wrap: wrap; gap: t.$space-1; }
+  .item { flex-direction: column; align-items: stretch; gap: t.$space-3; }
+}
