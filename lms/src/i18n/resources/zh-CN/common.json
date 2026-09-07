@@ -173,6 +173,7 @@
     "ACTIVE": "有效",
     "APPROVED": "已批准",
     "SCHEDULED": "已排期",
+    "RESCHEDULED": "已调课",
     "UPCOMING": "即将开始",
     "LATE": "迟到",
     "EXCUSED": "已准假",

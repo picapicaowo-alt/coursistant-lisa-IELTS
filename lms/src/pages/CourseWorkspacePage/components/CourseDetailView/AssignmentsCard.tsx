@@ -24,7 +24,7 @@ export const AssignmentsCard: React.FC<AssignmentsCardProps> = ({courseId, assig
   <section className={styles.card}>
     <div className={styles.cardHeader}>
       <h2 className={styles.cardTitle}>{translate("course:workspace.homework")}</h2>
-      {canCreate ? <Link to={generatePath(APP_ROUTE_PATHS.courseCourseIdAssignmentsNew, {courseId: String(courseId)})} className={styles.addButton}>{translate("course:schedule.addNew")}</Link> : null}
+      {canCreate ? <Link to={generatePath(APP_ROUTE_PATHS.courseCourseIdAssignmentsNew, {courseId: String(courseId)})} className={styles.addButton}>{translate("course:assignmentsList.addAssignmentTitle")}</Link> : null}
     </div>
 
     {categories.length ? <label className={styles.assignmentFilter}>{translate("course:workspace.learningType")}<select value={learningType} onChange={event => setLearningType(event.target.value)}><option value="">{translate("advising:actionTasks.allTypes")}</option>{categories.map(category => <option key={category} value={category}>{statusLabel(category)}</option>)}</select></label> : null}

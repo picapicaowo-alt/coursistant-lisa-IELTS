@@ -270,7 +270,10 @@
     "assignmentType": "{{type}}作業",
     "submittedCount": "已提交 {{number}}",
     "gradedCount": "已評分 {{number}}",
-    "releasedCount": "已發布 {{number}}"
+    "releasedCount": "已發布 {{number}}",
+    "stagingRefreshFailed": "檔案已變更，但暫時無法讀取最新的上傳清單。請重試後再提交。",
+    "submittedRefreshFailed": "作業已提交，但暫時無法重新整理狀態。請重試以查看已儲存的提交紀錄。",
+    "filesBusy": "請等待目前的提交完成後再變更檔案。"
   },
   "grading": {
     "unknownLearner": "學員姓名未提供",

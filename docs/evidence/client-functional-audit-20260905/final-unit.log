@@ -1,0 +1,16 @@
+
+> lms@0.0.0 test:run
+> vitest run
+
+(node:62776) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+ RUN  v4.1.11 /private/tmp/coursistant-client-functional-audit-20260905/lms
+
+(node:62885) ExperimentalWarning: localStorage is not available because --localstorage-file was not provided.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+ Test Files  176 passed (176)
+      Tests  880 passed (880)
+   Start at  23:23:42
+   Duration  54.64s (transform 16.06s, setup 83.63s, import 96.54s, tests 70.32s, environment 174.23s)

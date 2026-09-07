@@ -2,6 +2,7 @@ import { LocalizedError } from "@/i18n/errors";
 import { useTranslation } from "react-i18next";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FileSection } from "@/components/FileSection";
+import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import { assignmentApiService } from "@/apis/services/assignment-api";
 import { unwrapData } from "@/apis";
 import type { AssignmentDetail, SubmissionState } from "@/apis";
@@ -44,7 +45,32 @@ export const SubmitAssignmentDialog = ({
     "preview" | "download" | null
   >(null);
   const [submitError, setSubmitError] = useState<LocalizedError | null>(null);
-  const idempotencyKeyRef = useRef(crypto.randomUUID());
+  const idempotency = useIdempotencyCheckpoint();
+  const submittingRef = useRef(false);
+  const submittedRef = useRef(false);
+  const stagingCountRef = useRef(0);
+  const [stagingCount, setStagingCount] = useState(0);
+  const [stagingNeedsRefresh, setStagingNeedsRefresh] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const busy = isSubmitting || stagingCount > 0;
+
+  const refreshStaging = async () => {
+    try {
+      await onStaged();
+      setStagingNeedsRefresh(false);
+      setSubmitError(null);
+    } catch {
+      setStagingNeedsRefresh(true);
+      setSubmitError(new LocalizedError('assessment:submission.stagingRefreshFailed'));
+    }
+  };
+  const changeStaging = async <T,>(operation: () => Promise<T>): Promise<T> => {
+    if (submittingRef.current || submittedRef.current)
+      throw new LocalizedError('assessment:submission.filesBusy');
+    setStagingCount(++stagingCountRef.current);
+    try {return await operation();}
+    finally {setStagingCount(--stagingCountRef.current);}
+  };
 
   const stagedFiles = useMemo<FileView[]>(
     () =>
@@ -72,17 +98,17 @@ export const SubmitAssignmentDialog = ({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && !isSubmitting) onClose();
+      if (event.key === "Escape" && !busy) onClose();
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isSubmitting, onClose]);
+  }, [busy, onClose]);
 
   const uploadFile = async (
     file: File,
     signal: AbortSignal,
-  ): Promise<string> => {
+  ): Promise<string> => changeStaging(async () => {
     setSubmitError(null);
     const response = await assignmentApiService.uploadStagingFiles(
       courseId,
@@ -96,10 +122,11 @@ export const SubmitAssignmentDialog = ({
 
     if (!staged)
       throw new LocalizedError("assessment:submission.stagedFileMissing");
+    await refreshStaging();
     return String(staged.id);
-  };
+  });
 
-  const deleteFile = async (file: FileView) => {
+  const deleteFile = async (file: FileView) => changeStaging(async () => {
     const stagingFileId = Number(file.id);
     if (!Number.isInteger(stagingFileId) || stagingFileId <= 0) {
       throw new LocalizedError("assessment:submission.stagedFileInvalid");
@@ -111,12 +138,8 @@ export const SubmitAssignmentDialog = ({
       assignment.id,
       stagingFileId,
     );
-    void onStaged().catch(() => {
-      setSubmitError(
-        new LocalizedError("assessment:submission.deletedRefreshFailed"),
-      );
-    });
-  };
+    await refreshStaging();
+  });
 
   const downloadInstructorAttachment = async () => {
     if (!instructorAttachment) return;
@@ -171,26 +194,34 @@ export const SubmitAssignmentDialog = ({
   };
 
   const submit = async () => {
-    if (submission.stagingFiles.length === 0) {
+    if (submittingRef.current || stagingCountRef.current > 0 || stagingNeedsRefresh || !submission.acceptingSubmissions && !submittedRef.current) return;
+    if (!submittedRef.current && submission.stagingFiles.length === 0) {
       setSubmitError(new LocalizedError("assessment:submission.chooseFile"));
       return;
     }
 
+    submittingRef.current = true;
     setIsSubmitting(true);
     setSubmitError(null);
 
     try {
-      await assignmentApiService.submitStagedFiles(
-        courseId,
-        assignment.id,
-        { stagingFileIds: submission.stagingFiles.map((file) => file.id) },
-        idempotencyKeyRef.current,
-      );
+      if (!submittedRef.current) {
+        await idempotency.run('submit-assignment', [courseId, assignment.id, {
+          stagingFileIds: submission.stagingFiles.map(file => file.id).sort((a, b) => a - b),
+        }] as const, (key, args) => assignmentApiService.submitStagedFiles(...args, key));
+        // Once the server accepts a submission, retries only refresh its receipt.
+        // Never resubmit consumed staging files because a follow-up read failed.
+        submittedRef.current = true;
+        setSubmitted(true);
+      }
       await onSubmitted();
       onClose();
     } catch {
-      setSubmitError(new LocalizedError("assessment:submission.submitFailed"));
+      setSubmitError(new LocalizedError(submittedRef.current
+        ? 'assessment:submission.submittedRefreshFailed'
+        : 'assessment:submission.submitFailed'));
     } finally {
+      submittingRef.current = false;
       setIsSubmitting(false);
     }
   };
@@ -200,7 +231,7 @@ export const SubmitAssignmentDialog = ({
       className={styles.backdrop}
       role="presentation"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget && !isSubmitting) onClose();
+        if (event.target === event.currentTarget && !busy) onClose();
       }}
     >
       <section
@@ -266,8 +297,9 @@ export const SubmitAssignmentDialog = ({
           files={stagedFiles}
           accept={accept}
           uploadFunction={uploadFile}
-          onUploaded={() => void onStaged()}
+          onUploaded={() => {/* uploadFile already awaits the staging readback. */}}
           onDelete={deleteFile}
+          disabled={isSubmitting || submitted}
         />
 
         <p className={styles.fileHint}>
@@ -283,13 +315,16 @@ export const SubmitAssignmentDialog = ({
             {submitError.localizedMessage()}
           </p>
         )}
+        {stagingNeedsRefresh ? <button type="button" disabled={busy} onClick={() => void changeStaging(refreshStaging)}>
+          {translate('common:actions.retry')}
+        </button> : null}
 
         <div className={styles.actions}>
           <button
             type="button"
             className={styles.cancel}
             onClick={onClose}
-            disabled={isSubmitting}
+            disabled={busy}
           >
             {translate("common:actions.cancel")}
           </button>
@@ -297,11 +332,11 @@ export const SubmitAssignmentDialog = ({
             type="button"
             className={styles.submit}
             onClick={() => void submit()}
-            disabled={isSubmitting || !submission.acceptingSubmissions}
+            disabled={busy || stagingNeedsRefresh || !submission.acceptingSubmissions && !submitted}
           >
             {isSubmitting
               ? translate("common:actions.submitting")
-              : translate("assessment:submission.submitFiles")}
+              : translate(submitted ? 'common:actions.retry' : 'assessment:submission.submitFiles')}
           </button>
         </div>
       </section>

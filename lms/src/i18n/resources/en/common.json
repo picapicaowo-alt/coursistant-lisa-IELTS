@@ -173,6 +173,7 @@
     "ACTIVE": "Active",
     "APPROVED": "Approved",
     "SCHEDULED": "Scheduled",
+    "RESCHEDULED": "Rescheduled",
     "UPCOMING": "Upcoming",
     "LATE": "Late",
     "EXCUSED": "Excused",

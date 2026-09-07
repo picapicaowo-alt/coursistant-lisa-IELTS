@@ -68,6 +68,7 @@ function parseQuestion(value: unknown, index: number): ApiQuestion {
   const record = isRecord(value) ? value : {}
   const payload = isRecord(record.payload) ? record.payload : {}
   return {
+    sortOrder: asNumber(record.sortOrder, index + 1),
     kind: asString(record.kind),
     title: asString(record.title, `Questions ${index + 1}`),
     instruction: asString(record.instruction),

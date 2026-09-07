@@ -1,0 +1,71 @@
+
+> lms@0.0.0 test:e2e
+> playwright test e2e/client-functional-audit.spec.ts --workers=2
+
+[WebServer] (node:34773) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:34773) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+Running 2 tests using 2 workers
+
+(node:34776) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:34777) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium] › e2e/client-functional-audit.spec.ts:5:1 › reading diagrams use the contracted passage sequence and question sort order (5.3s)
+  ✘  1 [chromium] › e2e/client-functional-audit.spec.ts:29:1 › an active writing response survives stale-query focus and reconnect events (5.4s)
+
+
+  1) [chromium] › e2e/client-functional-audit.spec.ts:5:1 › reading diagrams use the contracted passage sequence and question sort order
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: getByRole('textbox')
+    Expected: visible
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" with timeout 5000ms
+      - waiting for getByRole('textbox')
+
+
+      22 |   });
+      23 |   await page.goto('/mock-exams/77/reading');
+    > 24 |   await expect(page.getByRole('textbox')).toBeVisible();
+         |                                           ^
+      25 |   await expect(page.getByRole('img', {name: 'Original diagram'})).toBeVisible();
+      26 |   expect(imagePaths).toEqual(['/api/v2/student/mock-exams/77/reading/passages/3/questions/7/image']);
+      27 | });
+        at /private/tmp/coursistant-client-functional-audit-20260905/lms/e2e/client-functional-audit.spec.ts:24:43
+
+    Error Context: test-results/client-functional-audit-re-3599c-nce-and-question-sort-order-chromium/error-context.md
+
+  2) [chromium] › e2e/client-functional-audit.spec.ts:29:1 › an active writing response survives stale-query focus and reconnect events
+
+    Error: expect(locator).toHaveValue(expected) failed
+
+    Locator: getByRole('textbox', { name: 'Your response' })
+    Expected: "This unsent answer must survive a background connection failure."
+    Timeout: 5000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveValue" with timeout 5000ms
+      - waiting for getByRole('textbox', { name: 'Your response' })
+
+
+      51 |   });
+      52 |   await page.clock.runFor(1000);
+    > 53 |   await expect(answer).toHaveValue('This unsent answer must survive a background connection failure.');
+         |                        ^
+      54 |   expect(reads).toHaveLength(2);
+      55 | });
+      56 |
+        at /private/tmp/coursistant-client-functional-audit-20260905/lms/e2e/client-functional-audit.spec.ts:53:24
+
+    Error Context: test-results/client-functional-audit-an-2276b--focus-and-reconnect-events-chromium/error-context.md
+
+  2 failed
+    [chromium] › e2e/client-functional-audit.spec.ts:5:1 › reading diagrams use the contracted passage sequence and question sort order
+    [chromium] › e2e/client-functional-audit.spec.ts:29:1 › an active writing response survives stale-query focus and reconnect events

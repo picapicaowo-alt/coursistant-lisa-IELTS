@@ -1,0 +1,118 @@
+{
+  "completedAt": "2026-09-06T06:30:32.598153+00:00",
+  "initialMain": "90a8ec45d09d9d4adcfd5740311b267968e4cfc3",
+  "integratedMain": "99efa0057e4657c5a7005e63bdaa62b1b5914762",
+  "validatedCommit": "e01e62705dd420cad5234b5ea924055fba6c870c",
+  "validatedLmsTree": "b41d0eb9ee9aa50af8f1faa6daca3febeb1704df",
+  "branch": "codex/client-functional-audit-20260905",
+  "node": "v26.7.0",
+  "newFrontendIssuesFixed": [
+    "F25",
+    "F26",
+    "F27",
+    "F28",
+    "F29",
+    "F30",
+    "F31"
+  ],
+  "inheritedFixes": [
+    "F22",
+    "F23",
+    "F24",
+    "Product-confirmed legacy Quiz exclusion"
+  ],
+  "checks": {
+    "lint:ci": "passed",
+    "typecheck": "passed",
+    "typecheck:production": "passed",
+    "typecheck:i18n": "passed",
+    "test:run": {
+      "filesPassed": 176,
+      "testsPassed": 880
+    },
+    "test:i18n-tools": {
+      "passed": 6
+    },
+    "i18n:keys": "passed in all three locales",
+    "i18n:check": {
+      "activeSourceFiles": 464,
+      "uiLiteralCandidates": 0
+    },
+    "build": "passed; existing large chunk warnings",
+    "test:e2e": {
+      "project": "chromium",
+      "passed": 436,
+      "failed": 0,
+      "skipped": 0,
+      "retries": 0,
+      "workers": 2,
+      "duration": "4.0m"
+    }
+  },
+  "priorRuns": {
+    "initialIntegration": {
+      "passed": 413,
+      "failed": 2,
+      "notes": "Ambiguous locator and long test duration; targeted test-only fixes documented."
+    },
+    "candidateBeforeLatestMain": {
+      "passed": 418
+    },
+    "integratedMainFourWorkers": {
+      "passed": 416,
+      "failed": 2,
+      "notes": "Intermittent click/load timeouts preserved."
+    },
+    "sameBuildTimeoutRecheck": {
+      "passed": 20,
+      "repeatEach": 5,
+      "workers": 1,
+      "notes": "No test code or timeout changes."
+    },
+    "beforeFinalMain": {
+      "main": "ee837ea8",
+      "validatedCommit": "8c0dc1cd",
+      "passed": 418,
+      "duration": "4.7m",
+      "record": "before-99efa005-summary.json"
+    }
+  },
+  "responsiveMatrix": {
+    "rolePageConfigurations": 9,
+    "locales": [
+      "en",
+      "zh-CN",
+      "zh-TW"
+    ],
+    "widths": [
+      320,
+      390,
+      768,
+      1024,
+      1440,
+      1920,
+      2560
+    ],
+    "exhaustive": false
+  },
+  "liveAcceptance": {
+    "protectedRolesTestedThisRound": [],
+    "publicBrowserRecord": "public-browser-acceptance.json",
+    "newConfirmedBackendFaults": 0,
+    "allRolesAccepted": false
+  },
+  "delivery": {
+    "frontendChecksPassed": true,
+    "readyForClientFullUse": false,
+    "pending": [
+      "Real authenticated role accounts and scoped QA records",
+      "Real writes, refresh and cross-role readback",
+      "Backend contract close-out on matching version",
+      "Candidate deployment acceptance"
+    ],
+    "candidateProductionReleased": false,
+    "automaticPreview": "PR-managed preview is separate from Production acceptance"
+  },
+  "pullRequest": "https://github.com/picapicaowo-alt/coursistant-lisa-IELTS/pull/61",
+  "inheritedFixesNowInMain": true
+}

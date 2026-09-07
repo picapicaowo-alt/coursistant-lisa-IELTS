@@ -1,0 +1,178 @@
+{
+  "baseSha": "4c774a624ebc5fb4387979f99adf230009768a00",
+  "unitFiles": 178,
+  "unitTests": 889,
+  "browserTests": 439,
+  "browserFailures": 0,
+  "browserSkipped": 0,
+  "browserRetries": 0,
+  "formerFailedCasesNowPassing": 11,
+  "protectedTests": "fixture",
+  "checks": [
+    {
+      "name": "targeted-unit",
+      "command": [
+        "npm",
+        "run",
+        "test:run",
+        "--",
+        "src/pages/AssignmentDetailPage/SubmitAssignmentDialog.test.tsx"
+      ],
+      "started": "2026-09-07T05:16:42.888163+00:00",
+      "seconds": 2.72,
+      "exitCode": 0
+    },
+    {
+      "name": "targeted-e2e",
+      "command": [
+        "env",
+        "CI=true",
+        "PLAYWRIGHT_PORT=4276",
+        "npm",
+        "run",
+        "test:e2e",
+        "--",
+        "e2e/client-functional-audit.spec.ts",
+        "--workers=2",
+        "--retries=0"
+      ],
+      "started": "2026-09-07T05:17:17.643816+00:00",
+      "seconds": 9.95,
+      "exitCode": 0
+    },
+    {
+      "name": "lint",
+      "command": [
+        "npm",
+        "run",
+        "lint:ci"
+      ],
+      "started": "2026-09-07T05:16:42.888164+00:00",
+      "seconds": 6.23,
+      "exitCode": 0
+    },
+    {
+      "name": "build",
+      "command": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "started": "2026-09-07T05:16:42.888162+00:00",
+      "seconds": 6.79,
+      "exitCode": 0
+    },
+    {
+      "name": "unit",
+      "command": [
+        "npm",
+        "run",
+        "test:run",
+        "--",
+        "--maxWorkers=2"
+      ],
+      "started": "2026-09-07T05:17:17.644538+00:00",
+      "seconds": 46.21,
+      "exitCode": 0
+    },
+    {
+      "name": "typecheck",
+      "command": [
+        "npm",
+        "run",
+        "typecheck"
+      ],
+      "started": "2026-09-07T05:17:17.646958+00:00",
+      "seconds": 23.15,
+      "exitCode": 0
+    },
+    {
+      "name": "typecheck-production",
+      "command": [
+        "npm",
+        "run",
+        "typecheck:production"
+      ],
+      "started": "2026-09-07T05:17:17.647532+00:00",
+      "seconds": 22.95,
+      "exitCode": 0
+    },
+    {
+      "name": "typecheck-i18n",
+      "command": [
+        "npm",
+        "run",
+        "typecheck:i18n"
+      ],
+      "started": "2026-09-07T05:17:17.655954+00:00",
+      "seconds": 2.75,
+      "exitCode": 0
+    },
+    {
+      "name": "i18n-keys",
+      "command": [
+        "npm",
+        "run",
+        "i18n:keys"
+      ],
+      "started": "2026-09-07T05:17:17.680618+00:00",
+      "seconds": 2.42,
+      "exitCode": 0
+    },
+    {
+      "name": "i18n-check",
+      "command": [
+        "npm",
+        "run",
+        "i18n:check"
+      ],
+      "started": "2026-09-07T05:17:17.659959+00:00",
+      "seconds": 2.92,
+      "exitCode": 0
+    },
+    {
+      "name": "i18n-tools",
+      "command": [
+        "npm",
+        "run",
+        "test:i18n-tools"
+      ],
+      "started": "2026-09-07T05:17:17.671008+00:00",
+      "seconds": 3.48,
+      "exitCode": 0
+    },
+    {
+      "name": "e2e",
+      "command": [
+        "env",
+        "CI=true",
+        "PLAYWRIGHT_PORT=4276",
+        "npm",
+        "run",
+        "test:e2e",
+        "--",
+        "--workers=2",
+        "--retries=0",
+        "--reporter=list"
+      ],
+      "started": "2026-09-07T05:18:25.988956+00:00",
+      "seconds": 304.23,
+      "exitCode": 0
+    }
+  ],
+  "logSha256": {
+    "build.log": "63b4252278b42695e1ed0273a4fa2e93aea64999d3120519c09a03831f92058b",
+    "e2e.log": "1a7ee5e5931fb53363bde434d5513c8489f5b7bfa19a3ac9d44773981b3be830",
+    "i18n-check.log": "71ece8758f881c21cb516fab5ff9365a036ac78fb32c8f5438c2678d3c256d37",
+    "i18n-keys.log": "0424c6f2ebfde97002b74373c2bb9157d66c8c07efd407656675e6e00f536e37",
+    "i18n-tools.log": "03eb0ca95ac6ccad70b0d48379614e71335b34f6dec8767cb7ebd4606b7fdd6b",
+    "lint.log": "4609a297cfeb1b9c5b2a8b45a776aa65756e4d5ca979bcb59b454e56299580d6",
+    "targeted-e2e.log": "b71c2513679336fd6cecb143c1c679887ff00b8d6752c82a48b82ce21ecd55e5",
+    "targeted-unit.log": "6e163575ae4a401dec68619f3187abe4d6be11c2d0272cdb9b94d89b935ea30e",
+    "typecheck-i18n.log": "90a02880dbbcfa2280a835652716b8d83f37097f89f3820e38d32e4a0fcb3f5b",
+    "typecheck-production.log": "badf8eb140167e4b7708962a1c4316b0392c6408f7c71414a8900e3c5fdb60ad",
+    "typecheck.log": "a161dfe4d9e9187b6a487b4121ca8b358716b858dcc4d178923e75681dfec742",
+    "unit.log": "8faa0d3d42c31b04449b4f0405fad860c24d3463abaa4772a8d72eed5339d800"
+  },
+  "logFormat": "Only trailing blank lines normalized; raw outputs retained in workspace output."
+}

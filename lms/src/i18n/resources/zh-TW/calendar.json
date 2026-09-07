@@ -34,6 +34,7 @@
   },
   "viewLabel": "日曆檢視",
   "views": {
+    "day": "日",
     "week": "週",
     "month": "月"
   },

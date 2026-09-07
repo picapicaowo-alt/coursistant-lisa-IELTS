@@ -1,0 +1,44 @@
+
+> lms@0.0.0 test:e2e
+> playwright test e2e/client-functional-audit.spec.ts --grep first assignment.*en$ --workers=1
+
+[WebServer] (node:41404) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+[WebServer] (Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] (node:41404) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+Running 1 test using 1 worker
+
+(node:41406) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium] › e2e/client-functional-audit.spec.ts:90:38 › first assignment upload, submission and read-only recovery work in en (5.6s)
+
+
+  1) [chromium] › e2e/client-functional-audit.spec.ts:90:38 › first assignment upload, submission and read-only recovery work in en
+
+    Error: expect(locator).toContainText(expected) failed
+
+    Locator: getByRole('dialog', { name: 'Submit Assignment' }).getByRole('alert')
+    Expected substring: "Your assignment was submitted, but its status could not be refreshed. Retry to load the saved submission."
+    Received string:    "Choose at least one file before submitting."
+    Timeout: 5000ms
+
+    Call log:
+      - Expect "toContainText" with timeout 5000ms
+      - waiting for getByRole('dialog', { name: 'Submit Assignment' }).getByRole('alert')
+        14 × locator resolved to <p role="alert" class="_error_ui6rw_78">Choose at least one file before submitting.</p>
+           - unexpected value "Choose at least one file before submitting."
+
+
+      127 |   await expect(submit).toBeEnabled();
+      128 |   await submit.click();
+    > 129 |   await expect(dialog.getByRole('alert')).toContainText(tx(locale, 'assessment:submission.submittedRefreshFailed'));
+          |                                           ^
+      130 |   expect(writes).toEqual([{stagingFileIds: [89]}]);
+      131 |   await page.setViewportSize({width: 390, height: 844});
+      132 |   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+        at /private/tmp/coursistant-client-functional-audit-20260905/lms/e2e/client-functional-audit.spec.ts:129:43
+
+    Error Context: test-results/client-functional-audit-fi-4abbe-ad-only-recovery-work-in-en-chromium/error-context.md
+
+  1 failed
+    [chromium] › e2e/client-functional-audit.spec.ts:90:38 › first assignment upload, submission and read-only recovery work in en

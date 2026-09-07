@@ -98,7 +98,6 @@ const LegacyCourseOperationsPage: React.FC = () => {
         <Link to={`/course/${id}/events`}>{translate("operations:courseEvents")}</Link>
         {systemAdmin || access.isInstructor ? <Link to={generatePath(APP_ROUTE_PATHS.rosterCourseId, {courseId: String(id)})}>{translate("operations:learnerRoster")}</Link> : null}
         <Link to={`/course/${id}/groups`}>{translate("operations:learningGroups")}</Link>
-        <Link to={`/course/${id}/grades`}>{translate("course:grades.label")}</Link>
         {staff ? <Link to={`/course/${id}/assignments/new`}>{translate("operations:createAssignment")}</Link> : null}
       </nav>
 

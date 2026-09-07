@@ -1,0 +1,9 @@
+{
+  "releaseId": "20260905T202857Z-90a8ec45-backend-adaptation",
+  "gitSha": "90a8ec45d09d9d4adcfd5740311b267968e4cfc3",
+  "environment": "tokyo-production",
+  "frontendOrigin": "https://app.xlearnedu.com",
+  "apiBase": "https://api-cn.xlearnedu.com/api",
+  "configSha256": "d9c536b8c398e495a165c8f9ef0efc98f117139ce14ec697d1fc3ab94d20396c",
+  "builtAt": "2026-09-05T20:29:28.365293+00:00"
+}
