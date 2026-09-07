@@ -1,94 +1,66 @@
-import React from 'react';
 import {useTranslation} from 'react-i18next';
-import {useQueries} from '@tanstack/react-query';
+import {useQuery} from '@tanstack/react-query';
 import {Link} from 'react-router-dom';
-import {GradingQueueItem, RecentActivityItem, unwrapData} from '@/apis';
+import {unwrapData} from '@/apis';
 import {dashboardApiService} from '@/apis/services/dashboard-api';
-import {parseZonedTimestamp} from '@/utils/datetime';
-import {formatDateTime} from '@/i18n/formatting';
+import {APP_ROUTE_PATHS} from '@/configs/routePaths';
+import {buildTeachingWork} from './teachingWork';
 import styles from './InstructorWorkComponent.module.scss';
 
-const queueLink = (item: GradingQueueItem) => `/course/${item.courseId}/assignments/${item.assignmentId}/grading`;
-
-const activityLink = (item: RecentActivityItem) => {
-  if (item.assignmentId) return `/course/${item.courseId}/assignments/${item.assignmentId}/grading`;
-  if (item.groupSetId) return `/course/${item.courseId}/group-sets/${item.groupSetId}`;
-  return `/course/${item.courseId}`;
-};
-
-const queueLabel = (kind: GradingQueueItem['kind']) => ({
-  AssignmentUngraded: 'Needs grading',
-  QuizManualPending: 'Manual grading',
-  AssignmentAwaitingRelease: 'Ready to release',
-  QuizAwaitingRelease: 'Ready to release',
-}[kind]);
-
-const InstructorWorkComponent: React.FC = () => {
-  const {t: translate} = useTranslation();
-  useTranslation();
-  const [queueQuery, activityQuery] = useQueries({
-    queries: [
-      {
-        queryKey: ['dashboard', 'teaching', 'grading-queue'],
-        queryFn: async () => unwrapData(await dashboardApiService.getGradingQueue(), 'getGradingQueue'),
-        staleTime: 60_000,
-        retry: 1,
-      },
-      {
-        queryKey: ['dashboard', 'teaching', 'recent-activity'],
-        queryFn: async () => unwrapData(await dashboardApiService.getRecentActivity(), 'getRecentActivity'),
-        staleTime: 60_000,
-        retry: 1,
-      },
-    ],
+const InstructorWorkComponent = () => {
+  const {t} = useTranslation();
+  const query = useQuery({
+    queryKey: ['dashboard', 'teaching', 'grading-queue'],
+    queryFn: async () => unwrapData(await dashboardApiService.getGradingQueue(), 'getGradingQueue'),
+    staleTime: 60_000,
+    retry: 1,
   });
-  const queue = (queueQuery.data ?? []) as GradingQueueItem[];
-  const activity = (activityQuery.data ?? []) as RecentActivityItem[];
-  const loading = queueQuery.isPending || activityQuery.isPending;
-  const failed = queueQuery.isError || activityQuery.isError;
+  const {items, hasUnsupportedItems} = buildTeachingWork(query.data ?? []);
 
   return (
     <section className={styles.widget} aria-labelledby="instructor-work-title">
       <header className={styles.header}>
-        <div><h2 id="instructor-work-title">{translate("dashboard:teachingActivity")}</h2><p>{translate("dashboard:teachingActivityHelp")}</p></div>
-        {failed ? <button type="button" onClick={() => { void queueQuery.refetch(); void activityQuery.refetch(); }}>{translate("common:actions.retry")}</button> : null}
+        <div>
+          <h2 id="instructor-work-title">{t('dashboard:teachingWork.title')}</h2>
+          <p>{t('dashboard:teachingWork.help')}</p>
+        </div>
+        <Link to={APP_ROUTE_PATHS.myOperations} className={styles.viewAll}>{t('dashboard:teachingWork.viewAll')}</Link>
       </header>
 
-      {loading ? <p className={styles.status}>{translate("dashboard:loadingActivity")}</p> : null}
-      {!loading ? (
-        <div className={styles.columns}>
-          <section aria-labelledby="grading-queue-title">
-            <div className={styles.sectionTitle}><h3 id="grading-queue-title">{translate("dashboard:gradingQueue")}</h3><span>{queue.length}</span></div>
-            {queueQuery.isError ? <p className={styles.inlineError}>{translate("dashboard:gradingFailed")}</p> : null}
-            {!queueQuery.isError && queue.length === 0 ? <p className={styles.empty}>{translate("dashboard:noGrading")}</p> : null}
-            <div className={styles.list}>
-              {queue.map(item => (
-                <Link key={`${item.kind}-${item.courseId}-${item.assignmentId}`} to={queueLink(item)} className={styles.item}>
-                  <span className={styles.itemMain}><strong>{item.title}</strong><small>{item.courseCode} · {queueLabel(item.kind)}</small></span>
-                  <span className={styles.count}>{item.pendingCount}</span>
-                </Link>
-              ))}
-            </div>
-          </section>
-
-          <section aria-labelledby="recent-activity-title">
-            <div className={styles.sectionTitle}><h3 id="recent-activity-title">{translate("dashboard:recentActivity")}</h3><span>{activity.length}</span></div>
-            {activityQuery.isError ? <p className={styles.inlineError}>{translate("dashboard:recentFailed")}</p> : null}
-            {!activityQuery.isError && activity.length === 0 ? <p className={styles.empty}>{translate("dashboard:noRecentActivity")}</p> : null}
-            <div className={styles.list}>
-              {activity.map((item, index) => {
-                const occurredAt = parseZonedTimestamp(item.occurredAt, item.timezone);
-                const hasTime = !Number.isNaN(occurredAt.getTime());
-                return (
-                <Link key={`${item.kind}-${item.occurredAt}-${index}`} to={activityLink(item)} className={styles.item}>
-                  <span className={styles.itemMain}><strong>{item.summary}</strong><small>{item.courseCode} · <time dateTime={hasTime ? occurredAt.toISOString() : undefined}>{hasTime ? formatDateTime(occurredAt, {month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZoneName: 'short'}) : item.occurredAt}</time></small></span>
-                  <span aria-hidden="true">›</span>
-                </Link>
-                );
-              })}
-            </div>
-          </section>
+      {query.isPending ? <p className={styles.status} role="status">{t('dashboard:teachingWork.loading')}</p> : null}
+      {query.isError ? (
+        <div className={styles.status} role="alert">
+          <p>{t('dashboard:teachingWork.failed')}</p>
+          <button type="button" className={styles.retry} onClick={() => void query.refetch()}>{t('common:actions.retry')}</button>
         </div>
+      ) : null}
+      {query.isSuccess && items.length === 0 && !hasUnsupportedItems ? (
+        <div className={styles.empty} role="status">
+          <p>{t('dashboard:teachingWork.empty')}</p>
+          <small>{t('dashboard:teachingWork.emptyHelp')}</small>
+        </div>
+      ) : null}
+      {query.isSuccess ? (
+        <>
+          {hasUnsupportedItems ? <p className={styles.notice} role="status">{t('dashboard:teachingWork.moreWork')}</p> : null}
+          <ul className={styles.list}>
+            {items.map(item => (
+              <li key={item.href}>
+                <Link to={item.href} className={styles.item}>
+                  <span className={styles.itemMain}>
+                    <small>{item.courseCode} · {t(`dashboard:teachingWork.${item.type}`)}</small>
+                    <strong>{item.title || t(`dashboard:teachingWork.${item.type}`)}</strong>
+                    <span className={styles.workCounts}>
+                      {item.gradingCount > 0 ? <span>{t('dashboard:teachingWork.toGrade', {count: item.gradingCount})}</span> : null}
+                      {item.releaseCount > 0 ? <span>{t('dashboard:teachingWork.toRelease', {count: item.releaseCount})}</span> : null}
+                    </span>
+                  </span>
+                  <span className={styles.action}>{t(item.gradingCount > 0 ? 'dashboard:teachingWork.grade' : 'dashboard:teachingWork.release')} <span aria-hidden="true">›</span></span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </>
       ) : null}
     </section>
   );
