@@ -119,9 +119,6 @@ export function InstructorCourseOperations({
         <Link to={path(routes.courseCourseIdGroups)}>
           {translate("operations:learningGroups")}
         </Link>
-        <Link to={path(routes.courseCourseIdGrades)}>
-          {translate("course:grades.label")}
-        </Link>
         <Link to={path(routes.courseCourseIdAssignmentsNew)}>
           {translate("operations:createAssignment")}
         </Link>

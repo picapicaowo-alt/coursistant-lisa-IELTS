@@ -1,5 +1,7 @@
 # IELTS 全站功能续查与发布准备记录
 
+后续状态：2026-09-06 已重新整合当前 main 并修复原工作区额外复查的 11 项失败；详见 [本次修复记录](site-availability-remediation-2026-09-06.md)。下文为 2026-09-05 的历史验收快照。
+
 日期：2026-09-05。当前结论：**前端候选的本地完整检查已通过；真实全角色验收尚未完成，不能声明可供全部客户正式使用。**
 
 ## 版本与范围
@@ -78,4 +80,4 @@
 4. 明确 AI、消息／邮件实际投递及需要真人参与的写操作范围；本轮没有向他人发送消息，没有改动 Parent–Student 关系。
 5. 候选合并／部署后，再完成真实登录、刷新、关键角色流程及退出。当前候选尚未发布到 Production。
 
-代码已提交 [Draft PR #61](https://github.com/picapicaowo-alt/coursistant-lisa-IELTS/pull/61)。后端交接见 [本轮后端核验清单](client-functional-backend-handoff-2026-09-05.md)。在这些证据补齐前，正式客户全量使用的结论保留为未通过，不能用本地自动化通过替代。
+代码已提交 [Draft PR #61](https://github.com/picapicaowo-alt/coursistant-lisa-IELTS/pull/61)。尚未执行的真实业务步骤保留在 [前端内部验收清单](client-functional-live-acceptance-checklist-2026-09-05.md)，不作为后端故障交接。在这些证据补齐前，正式客户全量使用的结论保留为未通过，不能用本地自动化通过替代。
