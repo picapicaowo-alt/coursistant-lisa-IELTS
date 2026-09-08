@@ -558,11 +558,25 @@
       "UPDATE_ALERT_RULES": "更新預警規則",
       "ASSIGN_ADVISOR": "分配學業顧問",
       "TRANSFER_COURSE_OWNER": "轉移課程負責人",
-      "MANAGED_USER_CREATED": "已建立機構使用者"
+      "MANAGED_USER_CREATED": "已建立機構使用者",
+      "MOCK_EXAM_TEMPLATE_CREATED": "建立模考試卷",
+      "MOCK_EXAM_TEMPLATE_SECTION": "更新模考科目",
+      "MOCK_EXAM_TEMPLATE_PUBLISHED": "發布模考試卷",
+      "CREATE_USER": "建立使用者",
+      "CREATE_PARENT": "建立家長",
+      "INTAKE_CREATED": "建立學生入學紀錄",
+      "ASSIGNED": "指派顧問",
+      "LINKED": "關聯家長與學生"
     },
     "resources": {
-      "GOVERNANCE": "機構管理"
-    }
+      "GOVERNANCE": "機構管理",
+      "MOCK_EXAM_TEMPLATE": "模考試卷",
+      "USER": "使用者",
+      "STUDENT_INTAKE": "學生入學紀錄",
+      "STUDENT_ADVISOR_ASSIGNMENT": "顧問指派",
+      "PARENT_STUDENT_LINK": "家長與學生關聯"
+    },
+    "templateTarget": "模考試卷 {{id}}"
   },
   "alertRules": {
     "editorHint": "先應用到草稿，再在規則頁面儲存更改。",

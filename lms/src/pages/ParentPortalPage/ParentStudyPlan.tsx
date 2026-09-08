@@ -22,18 +22,19 @@ export function ParentStudyPlan({value}: {value: unknown}) {
     {checkpoints.length ? <h3 className={styles.milestoneHeading}>{translate("learning:parent.milestones")}</h3> : null}
     {checkpoints.length ? <ol className={styles.checkpoints}>{checkpoints.map((checkpoint, index) => {
       const tasks = parentRecords(checkpoint.tasks);
-      const due = parentText(checkpoint, 'dueDate');
       const status = parentText(checkpoint, 'derivedStatus');
       const complete = status === 'REACHED_COMPLETED';
       const details = withoutFields(checkpoint, ['description', 'title', 'goal', 'dueDate', 'derivedStatus', 'tasks', 'position']);
       return <li key={index} data-status={status}>
         <span className={styles.timelineMarker}>{complete ? <Check size={15} aria-hidden="true"/> : <Circle size={13} aria-hidden="true"/>}</span>
         <div className={styles.rowHeading}><h3>{formatNumber(index + 1)}. {parentText(checkpoint, 'description') || parentText(checkpoint, 'title') || translate('learning:parent.checkpoint', {number: formatNumber(index + 1)})}</h3>{status ? <AdvisingBadge kind="status" value={status} label={parentLabel(status)}/> : null}</div>
-        {tasks.length ? <ul className={styles.planTasks}>{tasks.map((task, taskIndex) => <li key={taskIndex}>
+        {tasks.length ? <ul className={styles.planTasks}>{tasks.map((task, taskIndex) => {
+          const due = parentText(task, 'dueDate');
+          return <li key={taskIndex}>
           <div className={styles.taskHeading}><div><strong>{parentText(checkpoint, 'goal') || translate('learning:parent.task', {number: formatNumber(taskIndex + 1)})}</strong><span>{parentText(task, 'title') || parentText(task, 'description') || translate('learning:parent.task', {number: formatNumber(taskIndex + 1)})}</span></div>{due ? <span>{translate('assessment:attempt.deadline', {date: parentDate(due)})}</span> : null}</div>
           {parentText(task, 'status') ? <div className={styles.taskStatus}><AdvisingBadge kind="status" value={parentText(task, 'status')} label={parentLabel(parentText(task, 'status')!)}/></div> : null}
           <details className={styles.details}><summary>{translate("advising:actionTasks.details")}</summary><RecordSummaryList value={withoutFields(task, ['title', 'status'])}/></details>
-        </li>)}</ul> : <p className={styles.meta}>{translate("learning:parent.noTasks")}</p>}
+        </li>;})}</ul> : <p className={styles.meta}>{translate("learning:parent.noTasks")}</p>}
         {Object.keys(details).length ? <details className={styles.details}><summary>{translate("learning:parent.checkpointDetails")}</summary><RecordSummaryList value={details}/></details> : null}
       </li>;
     })}</ol> : <p className={styles.meta}>{translate("learning:parent.noCheckpoints")}</p>}

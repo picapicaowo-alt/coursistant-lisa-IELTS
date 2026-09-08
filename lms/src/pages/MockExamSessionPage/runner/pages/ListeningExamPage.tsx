@@ -1,3 +1,4 @@
+import {useExamDraft} from '../useExamDraft';
 import {getApiErrorMessage} from '@/utils/apiError'
 import {formatDateTime} from '@/i18n/formatting';
 import {useConfirmationDialog} from '@/components/TeachingWorkspace/useConfirmationDialog';
@@ -34,9 +35,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
   const questionIds = useMemo(() => allListeningQuestionNumbers(paper), [paper])
   const firstQuestion = questionIds[0] ?? 1
 
-  const [answers, setAnswers] = useState<Record<number, string>>({})
-  const [remainingSeconds, setRemainingSeconds] = useState(paper.totalMinutes * 60)
-  const [paused, setPaused] = useState(false)
+  const {answers, setAnswers, remainingSeconds, setRemainingSeconds, paused, setPaused, clearDraft, storageUnavailable, studentUserId} = useExamDraft(testId, 'listening', paper.totalMinutes * 60)
   const [currentPartId, setCurrentPartId] = useState(paper.parts[0]?.id ?? 1)
   const [currentQuestion, setCurrentQuestion] = useState(firstQuestion)
   const [clock, setClock] = useState(() => new Date())
@@ -160,7 +159,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
   const handleAnswerChange = useCallback((id: number, value: string) => {
     setAnswers((prev) => ({ ...prev, [id]: value }))
     setCurrentQuestion(id)
-  }, [])
+  }, [setAnswers])
 
   const handlePrev = useCallback(() => {
     const idx = questionIds.indexOf(currentQuestion)
@@ -190,7 +189,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
     setSubmissionError('')
     try {
       const payload = completeMockExamAnswers(questionIds, answers)
-      const attemptId = await ensureAttemptId(testId)
+      const attemptId = await ensureAttemptId(testId, studentUserId)
       const result = await submitListening(testId, {
         attemptId,
         answers: payload,
@@ -206,6 +205,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
           blank: item.blank,
         }
       }
+      clearDraft()
       setReviewByQuestion(byQuestion)
       setScoreSummary({
         correctCount: result.correctCount,
@@ -216,7 +216,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
     } finally {
       setSubmitting(false)
     }
-  }, [answers, questionIds, testId, scoreSummary, submitting])
+  }, [answers, clearDraft, questionIds, testId, scoreSummary, studentUserId, submitting])
 
   submitSectionRef.current = submitSection
 
@@ -224,8 +224,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
     if (paused || scoreSummary) return
     const id = window.setInterval(() => {
       setRemainingSeconds((prev) => {
-        if (prev <= 0) return 0
-        if (prev === 1) {
+        if (prev <= 1) {
           if (!timeUpTriggered.current) {
             timeUpTriggered.current = true
             window.setTimeout(() => {
@@ -238,7 +237,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
       })
     }, 1000)
     return () => window.clearInterval(id)
-  }, [paused, scoreSummary])
+  }, [paused, scoreSummary, setRemainingSeconds])
 
   const handleFinish = useCallback(() => {
     if (submitting || scoreSummary) return
@@ -267,6 +266,7 @@ export function ListeningExamPage({ paper, testId, testTitle, candidateLabel, on
   return (
     <div className="exam-shell listening-shell">
       {exitDialog}
+      {storageUnavailable && <p role="status">{translate('exams:runner.draftRecoveryUnavailable')}</p>}
       <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(scoreSummary)} error={submissionError ? getApiErrorMessage(submissionError, translate('exams:submission.failed')) : ''} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
       <ListeningTopBar
         testTitle={testTitle}

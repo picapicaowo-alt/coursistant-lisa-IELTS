@@ -1,9 +1,9 @@
 import {formatDateTime, formatNumber} from '@/i18n/formatting';
 import {statusLabel} from '@/i18n/presentation';
 import { useTranslation } from 'react-i18next';
-import {useRef, useEffect, useState} from 'react';
+import {useRef, useEffect} from 'react';
 import {generatePath, Link} from 'react-router-dom';
-import {ChevronRight, ChevronDown} from 'lucide-react';
+import {ChevronRight} from 'lucide-react';
 import type {AdvisorActionTaskResponse, AdvisorStudentSummaryResponse} from '@/apis';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import {WorkspaceSection} from '@/components/WorkspaceSection';
@@ -41,7 +41,6 @@ export function AdvisorDashboardOverview({name, dashboard, students, tasks, conv
 }) {
   const { t: translate } = useTranslation();
   const transition = useActionTaskTransition();
-  const [period, setPeriod] = useState<'week' | 'month' | 'caseload'>('week');
   const attention = students.filter(student => student.riskStatus === 'NEEDS_ATTENTION' || student.riskStatus === 'AT_RISK')
     .sort((a, b) => (PRIORITY_ORDER[a.highestPriority ?? ''] ?? 3) - (PRIORITY_ORDER[b.highestPriority ?? ''] ?? 3));
   const progress = dashboard.stats.filter(stat => ['onTrackCount', 'atRiskCount', 'needsAttentionCount'].includes(stat.key));
@@ -62,7 +61,7 @@ export function AdvisorDashboardOverview({name, dashboard, students, tasks, conv
             <Link className={styles.viewButton} data-primary={index === 0 || undefined} to={generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdStudyPlan, {studentUserId: String(student.studentUserId)})}>{translate("common:actions.view")}</Link>
           </div>)}
         </WorkspaceSection>
-        <WorkspaceSection title={translate("advising:overview.todayTasks")} meta={<ViewAll to={APP_ROUTE_PATHS.advisorTasks}/>} bodyClassName={styles.taskBody}>
+        <WorkspaceSection title={translate("advising:overview.openTasks")} meta={<ViewAll to={APP_ROUTE_PATHS.advisorTasks}/>} bodyClassName={styles.taskBody}>
           {transition.isError ? <p className={styles.error} role="alert">{advisingErrorMessage(transition.error, translate("advising:overview.taskFailed"))}</p> : null}
           {tasks.length === 0 ? <p className={styles.empty}>{loading ? translate("dashboard:loadingTasks") : translate("advising:overview.noTasks")}</p> : tasks.slice(0, 4).map(task => {
             const taskCategory = task.status === 'IN_PROGRESS'
@@ -80,19 +79,7 @@ export function AdvisorDashboardOverview({name, dashboard, students, tasks, conv
           })}
         </WorkspaceSection>
         <WorkspaceSection title={translate("advising:overview.progress")} meta={
-          <div className={styles.periodSelectWrapper}>
-            <select
-              className={styles.periodSelect}
-              value={period}
-              onChange={event => setPeriod(event.target.value as 'week' | 'month' | 'caseload')}
-              aria-label={translate("advising:overview.period")}
-            >
-              <option value="week">{translate("advising:overview.thisWeek")}</option>
-              <option value="month">{translate("advising:overview.thisMonth")}</option>
-              <option value="caseload">{translate("advising:overview.caseload")}</option>
-            </select>
-            <ChevronDown size={14} className={styles.periodChevron} aria-hidden="true"/>
-          </div>
+          <span>{translate("advising:overview.caseload")}</span>
         }>
           <div className={styles.progressBar} aria-label={translate("advising:overview.distribution")}>{progress.map(stat => <span key={stat.key} data-stat={stat.key} style={{flexGrow: stat.value}} title={translate("advising:overview.statValue", {label: stat.label, number: formatNumber(stat.value)})}/>)}{total === 0 ? <span/> : null}</div>
           <dl className={styles.stats}>{progress.map(stat => <div key={stat.key} data-stat={stat.key}><dt>{stat.label}</dt><dd>{loading || error ? '—' : formatNumber(stat.value)}</dd></div>)}</dl>

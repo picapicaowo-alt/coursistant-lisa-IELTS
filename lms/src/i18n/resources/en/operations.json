@@ -558,11 +558,25 @@
       "UPDATE_ALERT_RULES": "Update alert rules",
       "ASSIGN_ADVISOR": "Assign advisor",
       "TRANSFER_COURSE_OWNER": "Transfer course owner",
-      "MANAGED_USER_CREATED": "Managed user created"
+      "MANAGED_USER_CREATED": "Managed user created",
+      "MOCK_EXAM_TEMPLATE_CREATED": "Create mock exam template",
+      "MOCK_EXAM_TEMPLATE_SECTION": "Update mock exam section",
+      "MOCK_EXAM_TEMPLATE_PUBLISHED": "Publish mock exam template",
+      "CREATE_USER": "Create user",
+      "CREATE_PARENT": "Create parent",
+      "INTAKE_CREATED": "Create student intake",
+      "ASSIGNED": "Assign advisor",
+      "LINKED": "Link parent and student"
     },
     "resources": {
-      "GOVERNANCE": "Governance"
-    }
+      "GOVERNANCE": "Governance",
+      "MOCK_EXAM_TEMPLATE": "Mock exam template",
+      "USER": "User",
+      "STUDENT_INTAKE": "Student intake",
+      "STUDENT_ADVISOR_ASSIGNMENT": "Advisor assignment",
+      "PARENT_STUDENT_LINK": "Parent and student link"
+    },
+    "templateTarget": "Mock exam template {{id}}"
   },
   "alertRules": {
     "editorHint": "Apply to your draft, then save changes on the rules page.",

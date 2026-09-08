@@ -149,11 +149,13 @@ test('instructor results preserve pagination, errors and the selected identity a
   await expect(dialog.getByRole('button', {name: 'Create group course', exact: true})).toBeDisabled();
 });
 
-test('IELTS System Admin roster hides all TA configuration controls', async ({page}) => {
+test('IELTS System Admin explains roster scope without requesting the teaching read', async ({page}) => {
   await fixture(page, 'NOT_APPLICABLE', 'Instructor', 'SYSTEM_ADMIN');
-  await page.route('**/v2/courses/71/members?*', route => route.fulfill({json: reply({items: [{id: 1, courseId: 71, userId: 51, userName: 'Taylor Assistant', userEmail: 'taylor@example.test', courseRole: 'TA', active: true, canGrade: true}], total: 1, page: 0, size: 20})}));
+  const rosterRequests: string[] = [];
+  page.on('request', request => {if (request.url().includes('/v2/courses/71/members')) rosterRequests.push(request.url());});
   await page.goto('/roster/71');
-  await expect(page.getByText('Taylor Assistant', {exact: true})).toBeVisible();
+  await expect(page.getByText(/The course owner advisor and primary instructor/)).toBeVisible();
+  expect(rosterRequests).toEqual([]);
   await expect(page.getByRole('button', {name: /^(TA|Permissions|Make TA|Remove TA)$/})).toHaveCount(0);
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });

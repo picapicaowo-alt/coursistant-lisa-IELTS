@@ -13,6 +13,8 @@ import type {QuestionSection} from '@/pages/MockExamSessionPage/runner/data/type
 import i18n from './index';
 import {SUPPORTED_LOCALES} from './configuration';
 
+vi.mock('@/contexts/RequiredAuthContext', () => ({useRequiredAuth: () => ({user: {userId: 301}})}));
+
 const api = vi.hoisted(() => ({ensureAttemptId: vi.fn(), submitReading: vi.fn(), submitWriting: vi.fn()}));
 vi.mock('@/pages/MockExamSessionPage/runner/api/tests', () => ({ensureAttemptId: api.ensureAttemptId}));
 vi.mock('@/pages/MockExamSessionPage/runner/api/readings', () => ({submitReading: api.submitReading}));
@@ -21,7 +23,7 @@ const tfng: QuestionSection = {kind: 'tfng', title: 'Questions 1–1', instructi
 const readingInput = {id: 77, totalMinutes: 60, passages: [{seq: 1, title: 'Original IELTS passage', intro: 'Read carefully.', paragraphs: ['Libraries serve their communities.'], questions: [{kind: 'shortAnswer', questionStart: 9, questionEnd: 9, instruction: 'Write ONE WORD ONLY.', payload: {questions: [{id: 9, prompt: 'What serves communities?', answer: 'libraries'}]}}]}]};
 const writing = parseWritingDetail({totalMinutes: 60, tasks: [{seq: 3, taskKey: 'original-task-key', title: 'Writing Task 3', prompt: 'Discuss the role of public libraries.', minWords: 250, hasImage: true}]}, 77);
 const cycle = async (check: () => void) => {for (const locale of SUPPORTED_LOCALES) {await act(() => i18n.changeLanguage(locale)); check();}};
-beforeEach(async () => {vi.resetAllMocks(); await i18n.changeLanguage('en'); api.ensureAttemptId.mockResolvedValue(81); api.submitReading.mockRejectedValue(new Error('Opaque diagnostic')); api.submitWriting.mockRejectedValue(new Error('Opaque diagnostic'));});
+beforeEach(async () => {sessionStorage.clear(); vi.resetAllMocks(); await i18n.changeLanguage('en'); api.ensureAttemptId.mockResolvedValue(81); api.submitReading.mockRejectedValue(new Error('Opaque diagnostic')); api.submitWriting.mockRejectedValue(new Error('Opaque diagnostic'));});
 afterEach(async () => {cleanup(); vi.restoreAllMocks(); await i18n.changeLanguage('en');});
 
 it('preserves original IELTS statements, instructions, option text and answer codes in every locale', async () => {

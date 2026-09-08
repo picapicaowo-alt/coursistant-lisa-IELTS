@@ -25,8 +25,8 @@ const RosterPage: React.FC = () => {
   const isSystemAdmin = user.role === 'SYSTEM_ADMIN';
   // A membership read failure is not evidence of denial. Probe the roster and
   // let its 403/404 decide; a known TA, Student or inactive enrollment cannot read.
-  const canViewRoster = isSystemAdmin || (user.role === 'USER' &&
-    (access.isInstructor || access.isError || (access.isResolved && !access.membership)));
+  const canViewRoster = user.role === 'USER' &&
+    (access.isInstructor || access.isError || (access.isResolved && !access.membership));
   const canManageMembers = isSystemAdmin;
   const {
     courseId, members, total, page, pageCount, setPage, filters, setFilters,
@@ -35,7 +35,8 @@ const RosterPage: React.FC = () => {
   const [search, setSearch] = useState('');
 
   if (courseId === null) return <div className={styles.status}><p>{translate("course:roster.chooseHint")}</p><Link to={APP_ROUTE_PATHS.course}>{translate("course:roster.choose")}</Link></div>;
-  if (!isSystemAdmin && access.isLoading) return <p className={styles.status} role="status">{translate("course:roster.checking")}</p>;
+  if (isSystemAdmin) return <div className={styles.status}><p>{translate("common:admin.rosterScope")}</p><Link to={APP_ROUTE_PATHS.admin}>{translate("navigation:adminConsole")}</Link></div>;
+  if (access.isLoading) return <p className={styles.status} role="status">{translate("course:roster.checking")}</p>;
   if (!canViewRoster) return <Navigate to={access.membership ? `/course/${courseId}` : '/course'} replace/>;
   if (isForbidden) return <p className={styles.status} role="alert">{translate("course:roster.accessDenied")}</p>;
 

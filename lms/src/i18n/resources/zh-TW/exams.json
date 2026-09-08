@@ -52,7 +52,8 @@
     "writingAnswer": "你的作答",
     "writingResult": "{{task}}：{{words}} 詞（{{characters}} 個字元）",
     "taskImage": "{{task}} 的題目圖片",
-    "listeningRange": "聽錄音並回答第 {{range}} 題"
+    "listeningRange": "聽錄音並回答第 {{range}} 題",
+    "draftRecoveryUnavailable": "此瀏覽器無法儲存復原草稿。提交前請保持此頁面開啟。"
   },
   "label": "模擬考",
   "untitled": "模擬考 {{id}}",
@@ -590,5 +591,12 @@
     "saveFailed": "修改未能儲存，草稿仍保留，請重試。",
     "savedEditable": "此版本為草稿，可編輯已儲存的內容。",
     "publishedHelp": "已發布或封存內容僅供檢視，可複製版本後修改。"
+  },
+  "records": {
+    "questionType": "題型",
+    "questionContent": "題目內容",
+    "sequence": "順序",
+    "displayOrder": "顯示順序",
+    "taskReference": "任務識別碼"
   }
 }

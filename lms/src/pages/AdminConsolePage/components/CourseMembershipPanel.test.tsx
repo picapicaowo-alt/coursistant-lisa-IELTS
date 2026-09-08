@@ -40,6 +40,7 @@ const renderPanel = () => {
 
 describe("CourseMembershipPanel", () => {
   beforeEach(() => {
+    vi.clearAllMocks();
     mocks.browseCourses.mockResolvedValue(
       success({
         items: [
@@ -132,7 +133,8 @@ describe("CourseMembershipPanel", () => {
       }),
     ).toBeInTheDocument();
     expect(screen.getByText("Teacher: Professor Ada")).toBeInTheDocument();
-    expect(await screen.findByText("Taylor Assistant")).toBeInTheDocument();
+    expect(await screen.findByText(/The course owner advisor and primary instructor/)).toBeInTheDocument();
+    expect(mocks.listCourseMembers).not.toHaveBeenCalled();
     expect(
       screen.queryByRole("button", { name: "Return to student" }),
     ).not.toBeInTheDocument();
@@ -157,7 +159,8 @@ describe("CourseMembershipPanel", () => {
   it("does not expose TA assignment, role changes, or enrollment options", async () => {
     const user = userEvent.setup();
     renderPanel();
-    await screen.findByText("Jiarui Zhang");
+    await screen.findByText(/The course owner advisor and primary instructor/);
+    expect(mocks.listCourseMembers).not.toHaveBeenCalled();
     expect(screen.queryByRole("button", {name: /Set as TA|Return to student/})).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", {name: "Add course member"}));
     expect(screen.queryByRole("combobox", {name: "Course role"})).not.toBeInTheDocument();

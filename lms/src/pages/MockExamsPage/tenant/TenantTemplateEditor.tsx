@@ -18,7 +18,7 @@ import {
   readableValue,
   tenantDate,
 } from '@/components/TenantWorkspace/presentation';
-import {RecordSummaryList} from '@/components/RecordSummaryList';
+import {ExamRecordSummary} from '../ExamRecordSummary';
 import {ExamSectionMedia} from '../StaffMockExamWorkspaces';
 import {runtimeNumber} from '../staffRuntime';
 import {
@@ -571,7 +571,7 @@ function SavedSection({
         </p>
       ) : (
         <>
-          <RecordSummaryList value={content.data} />
+          <ExamRecordSummary value={content.data} />
           <ExamSectionMedia
             templateId={templateId}
             versionId={versionId}

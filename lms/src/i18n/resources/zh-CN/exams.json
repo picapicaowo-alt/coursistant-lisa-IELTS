@@ -52,7 +52,8 @@
     "writingAnswer": "你的作答",
     "writingResult": "{{task}}：{{words}} 词（{{characters}} 个字符）",
     "taskImage": "{{task}} 的题目图片",
-    "listeningRange": "听录音并回答第 {{range}} 题"
+    "listeningRange": "听录音并回答第 {{range}} 题",
+    "draftRecoveryUnavailable": "此浏览器无法保存恢复草稿。提交前请保持此页面打开。"
   },
   "label": "模拟考",
   "untitled": "模拟考 {{id}}",
@@ -590,5 +591,12 @@
     "saveFailed": "修改未能保存，草稿仍保留，请重试。",
     "savedEditable": "此版本为草稿，可编辑已保存的内容。",
     "publishedHelp": "已发布或归档内容仅供查看，可复制版本后修改。"
+  },
+  "records": {
+    "questionType": "题型",
+    "questionContent": "题目内容",
+    "sequence": "顺序",
+    "displayOrder": "显示顺序",
+    "taskReference": "任务标识"
   }
 }

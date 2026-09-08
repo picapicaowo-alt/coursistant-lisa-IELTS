@@ -17,7 +17,11 @@ export default function AdvisorOperationsPage() {
   const {hash, search} = useLocation();
   const dashboard = useQuery({queryKey: ['advisor', 'dashboard'], queryFn: async () => unwrapData(await advisorApiService.getDashboard(), 'advisorDashboard'), retry: false});
   const students = useQuery({queryKey: ['advisor', 'students-highlight'], queryFn: async () => {const pages = await Promise.all((['NEEDS_ATTENTION', 'AT_RISK'] as const).map(risk => advisorApiService.listStudents(0, ADVISOR_PAGE_SIZE, {risk}).then(response => unwrapData(response, 'listAdvisorStudents')))); return {items: [...new Map(pages.flatMap(page => page.items).map(student => [student.studentUserId, student])).values()]};}, retry: false});
-  const tasks = useQuery({queryKey: ['advisor', 'action-tasks', 'preview'], queryFn: async () => unwrapData(await advisorApiService.listActionTasks({page: 0, size: ADVISOR_PAGE_SIZE}), 'advisorActionTasks'), retry: false});
+  const tasks = useQuery({queryKey: ['advisor', 'action-tasks', 'preview'], queryFn: async () => {
+    // Fetch each active status so resolved history cannot crowd current work out of page one.
+    const pages = await Promise.all(['PENDING', 'IN_PROGRESS'].map(status => advisorApiService.listActionTasks({status, page: 0, size: ADVISOR_PAGE_SIZE}).then(response => unwrapData(response, 'advisorActionTasks'))));
+    return {items: [...new Map(pages.flatMap(page => page.items).filter(task => task.status === 'PENDING' || task.status === 'IN_PROGRESS').map(task => [task.taskId, task])).values()]};
+  }, retry: false});
   const conversations = useQuery({queryKey: ['advisor', 'conversations', 'preview'], queryFn: async () => unwrapData(await advisorApiService.listConversations(0, ADVISOR_PAGE_SIZE), 'advisorConversations'), retry: false});
   const schedule = useQuery({queryKey: ['advisor', 'schedule-requests', 'preview'], queryFn: async () => unwrapData(await courseOperationsApiService.listAdvisorScheduleRequests({page: 0, size: ADVISOR_PAGE_SIZE}), 'advisorScheduleRequests'), retry: false});
   // Preserve bookmarks from the former stacked dashboard without rendering hidden editors.

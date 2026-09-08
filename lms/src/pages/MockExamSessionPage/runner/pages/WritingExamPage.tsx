@@ -1,3 +1,4 @@
+import {useExamDraft} from '../useExamDraft';
 import { useTranslation } from 'react-i18next';
 import {formatDateTime, formatNumber} from '@/i18n/formatting';
 import {getApiErrorMessage} from '@/utils/apiError';
@@ -28,14 +29,8 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
   const tasks = writing.tasks
   const firstSeq = tasks[0]?.seq ?? 1
 
-  const [contents, setContents] = useState<Record<string, string>>(() => {
-    const init: Record<string, string> = {}
-    for (const t of tasks) init[t.taskKey] = ''
-    return init
-  })
+  const {answers: contents, setAnswers: setContents, remainingSeconds, setRemainingSeconds, paused, setPaused, clearDraft, storageUnavailable, studentUserId} = useExamDraft(testId, 'writing', writing.totalMinutes * 60)
   const [currentSeq, setCurrentSeq] = useState(firstSeq)
-  const [remainingSeconds, setRemainingSeconds] = useState(writing.totalMinutes * 60)
-  const [paused, setPaused] = useState(false)
   const [clock, setClock] = useState(() => new Date())
   const [submitting, setSubmitting] = useState(false)
   const [submissionOpen, setSubmissionOpen] = useState(false)
@@ -65,7 +60,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
       if (!currentTask || result) return
       setContents((prev) => ({ ...prev, [currentTask.taskKey]: value }))
     },
-    [currentTask, result],
+    [currentTask, result, setContents],
   )
 
   const submitSection = useCallback(async () => {
@@ -75,7 +70,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
     setSubmissionOpen(true)
     setSubmissionError('')
     try {
-      const attemptId = await ensureAttemptId(testId)
+      const attemptId = await ensureAttemptId(testId, studentUserId)
       const saved = await submitWriting(testId, {
         attemptId,
         tasks: tasks.map((t) => ({
@@ -83,13 +78,14 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
           content: contents[t.taskKey] ?? '',
         })),
       })
+      clearDraft()
       setResult(saved)
     } catch (err) {
       setSubmissionError(err)
     } finally {
       setSubmitting(false)
     }
-  }, [contents, result, submitting, tasks, testId])
+  }, [clearDraft, contents, result, studentUserId, submitting, tasks, testId])
 
   submitSectionRef.current = submitSection
 
@@ -97,8 +93,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
     if (paused || result) return
     const id = window.setInterval(() => {
       setRemainingSeconds((prev) => {
-        if (prev <= 0) return 0
-        if (prev === 1) {
+        if (prev <= 1) {
           if (!timeUpTriggered.current) {
             timeUpTriggered.current = true
             window.setTimeout(() => {
@@ -111,7 +106,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
       })
     }, 1000)
     return () => window.clearInterval(id)
-  }, [paused, result])
+  }, [paused, result, setRemainingSeconds])
 
   const handleFinish = useCallback(() => {
     if (submitting || result) return
@@ -134,6 +129,7 @@ export function WritingExamPage({ writing, testId, testTitle, candidateLabel, on
   return (
     <div className="exam-shell writing-shell">
       {exitDialog}
+      {storageUnavailable && <p role="status">{translate('exams:runner.draftRecoveryUnavailable')}</p>}
       <ExamSubmissionDialog open={submissionOpen} pending={submitting} submitted={Boolean(result)} error={submissionError ? getApiErrorMessage(submissionError, translate('exams:submission.failed')) : ''} onSubmit={() => void submitSection()} onClose={() => setSubmissionOpen(false)}/>
       <TopBar testTitle={testTitle} candidateId={candidateLabel} remainingSeconds={remainingSeconds} paused={paused} />
       <main className="writing-main">

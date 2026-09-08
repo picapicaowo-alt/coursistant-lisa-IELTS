@@ -50,6 +50,10 @@ const AuthHarness = () => {
 describe('AuthProvider logout', () => {
   beforeEach(() => {
     localStorage.clear();
+    sessionStorage.clear();
+    sessionStorage.setItem('coursistant:mock-exam:7:77:writing', 'private answer');
+    sessionStorage.setItem('coursistant:mock-exam:7:77:attempt', '81');
+    sessionStorage.setItem('unrelated-preference', 'keep-me');
     localStorage.setItem('user', JSON.stringify(storedUser));
     localStorage.setItem('accToken', storedUser.accessToken);
     localStorage.setItem('account', JSON.stringify({token: true}));
@@ -66,6 +70,9 @@ describe('AuthProvider logout', () => {
     render(<QueryClientProvider client={client}><AuthProvider><AuthHarness/></AuthProvider></QueryClientProvider>);
     fireEvent.click(await screen.findByRole('button', {name: 'Switch account'}));
     expect(client.getQueryCache().getAll()).toHaveLength(0);
+    expect(sessionStorage.getItem('coursistant:mock-exam:7:77:writing')).toBeNull();
+    expect(sessionStorage.getItem('coursistant:mock-exam:7:77:attempt')).toBeNull();
+    expect(sessionStorage.getItem('unrelated-preference')).toBe('keep-me');
     expect(client.getMutationCache().getAll()).toHaveLength(0);
     expect(await screen.findByText('next@example.test')).toBeInTheDocument();
   });
@@ -81,6 +88,9 @@ describe('AuthProvider logout', () => {
     });
     expect(screen.getByText('Signed out')).toBeInTheDocument();
     expect(client.getQueryCache().getAll()).toHaveLength(0);
+    expect(sessionStorage.getItem('coursistant:mock-exam:7:77:writing')).toBeNull();
+    expect(sessionStorage.getItem('coursistant:mock-exam:7:77:attempt')).toBeNull();
+    expect(sessionStorage.getItem('unrelated-preference')).toBe('keep-me');
     act(() => {
       localStorage.setItem('user', JSON.stringify({...storedUser, userId: 8, email: 'second@example.test'}));
       window.dispatchEvent(new StorageEvent('storage', {key: 'user', storageArea: localStorage}));
@@ -104,6 +114,7 @@ describe('AuthProvider logout', () => {
     await waitFor(() => expect(mocks.serverLogout).toHaveBeenCalledTimes(1));
     await waitFor(() => expect(mocks.clearAccessToken).toHaveBeenCalledTimes(1));
     expect(localStorage.getItem('user')).toBeNull();
+    expect(sessionStorage.getItem('coursistant:mock-exam:7:77:writing')).toBeNull();
     expect(localStorage.getItem('accToken')).toBeNull();
     expect(localStorage.getItem('account')).toBeNull();
     expect(localStorage.getItem('unrelated-preference')).toBe('keep-me');
@@ -123,6 +134,7 @@ describe('AuthProvider logout', () => {
 
     await waitFor(() => expect(mocks.clearAccessToken).toHaveBeenCalledTimes(1));
     expect(localStorage.getItem('user')).toBeNull();
+    expect(sessionStorage.getItem('coursistant:mock-exam:7:77:writing')).toBeNull();
     expect(localStorage.getItem('accToken')).toBeNull();
   });
 });

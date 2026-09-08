@@ -67,6 +67,9 @@ const AdvisorStudentLayout: React.FC = () => {
   }
 
   const skills = profile.data?.skills ?? [];
+  // The hub projection may omit this field; the already loaded profile is the
+  // authoritative student type. Do not infer aggregate course counts from links.
+  const studentType = intake.data?.studentType ?? profile.data?.studentType;
 
   return (
     <div className={`${styles.page} ${layout.workspace}`}>
@@ -84,7 +87,7 @@ const AdvisorStudentLayout: React.FC = () => {
           <small>{intake.data?.email}</small>
         </div>
         <dl className={layout.metadata}>
-          <div><dt>{translate("advising:actionTasks.studentType")}</dt><dd>{intake.data?.studentType ? statusLabel(intake.data.studentType) : translate("advising:studentWorkspace.notSupplied")}</dd></div>
+          <div><dt>{translate("advising:actionTasks.studentType")}</dt><dd>{studentType ? statusLabel(studentType) : translate("advising:studentWorkspace.notSupplied")}</dd></div>
           <div><dt>{translate("dashboard:activeCourses")}</dt><dd>{intake.data?.activeCourseCount == null ? '—' : formatNumber(intake.data.activeCourseCount)}</dd></div>
           <div><dt>{translate("advising:studentWorkspace.pendingRequests")}</dt><dd>{intake.data?.pendingRequestCount == null ? '—' : formatNumber(intake.data.pendingRequestCount)}</dd></div>
         </dl>

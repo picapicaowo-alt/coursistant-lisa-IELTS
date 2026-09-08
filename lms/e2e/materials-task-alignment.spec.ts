@@ -183,8 +183,9 @@ test('advisor status, priority and action columns remain aligned when actions di
 test('advisor dashboard task tags share columns and keyboard targets remain visible', async ({page}, info) => {
   await taskFixture(page);
   await page.goto('/advisor/operations');
-  const tasks = page.getByRole('region', {name: 'Tasks Due Today', exact: true});
-  await expect(tasks.locator('[data-kind="category"]')).toHaveCount(3);
+  const tasks = page.getByRole('region', {name: 'Open tasks', exact: true});
+  await expect(tasks.locator('[data-kind="category"]')).toHaveCount(2);
+  await expect(tasks).not.toContainText('Schedule change pending Advisor decision');
   for (const width of [1920, 1440, 390, 320]) {
     await noOverflow(page, width);
     const tags = await tasks.locator('[data-kind="category"]').all();
@@ -192,8 +193,8 @@ test('advisor dashboard task tags share columns and keyboard targets remain visi
       const boxes = await Promise.all(tags.map(tag => tag.boundingBox()));
       expect(Math.max(...boxes.map(box => box!.x)) - Math.min(...boxes.map(box => box!.x))).toBeLessThan(1);
     }
-    await tasks.getByRole('link', {name: /Schedule change/}).focus();
-    await expect(tasks.getByRole('link', {name: /Schedule change/})).toBeFocused();
+    await tasks.getByRole('link', {name: /Published course report/}).focus();
+    await expect(tasks.getByRole('link', {name: /Published course report/})).toBeFocused();
     await page.screenshot({path: info.outputPath(`dashboard-tasks-${width}.png`), fullPage: true});
   }
 });

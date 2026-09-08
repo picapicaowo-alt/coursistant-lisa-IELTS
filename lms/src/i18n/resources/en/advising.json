@@ -303,7 +303,7 @@
     "loadingStudents": "Loading students…",
     "noAttention": "No students currently need attention.",
     "noGoal": "Learning goal not set",
-    "todayTasks": "Tasks Due Today",
+    "openTasks": "Open tasks",
     "taskFailed": "The task could not be updated. Review its current state and try again.",
     "noTasks": "No action tasks to show.",
     "reviewTask": "Review action task",

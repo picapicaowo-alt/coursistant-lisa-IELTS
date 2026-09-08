@@ -22,7 +22,7 @@ import {
 import { unwrapData } from "@/apis";
 import { advisorApiService } from "@/apis/services/advisor-api";
 import { mockExamApiService } from "@/apis/services/mock-exam-api";
-import { RecordSummaryList } from "@/components/RecordSummaryList";
+import { ExamRecordSummary } from "./ExamRecordSummary";
 import { advisingErrorMessage } from "../advising/advisingErrors";
 import {
   recordLabel,
@@ -322,7 +322,7 @@ export function AdvisorWorkspace({ value }: { value: unknown }) {
                     fallback={translate('exams:staff.paperFailed')}
                   />
                 ) : (
-                  <RecordSummaryList value={selectedTemplate.data} />
+                  <ExamRecordSummary value={selectedTemplate.data} />
                 )}
               </div>
             ) : null}
