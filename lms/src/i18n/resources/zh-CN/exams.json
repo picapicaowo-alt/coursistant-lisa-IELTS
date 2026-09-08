@@ -52,7 +52,8 @@
     "writingAnswer": "你的作答",
     "writingResult": "{{task}}：{{words}} 词（{{characters}} 个字符）",
     "taskImage": "{{task}} 的题目图片",
-    "listeningRange": "听录音并回答第 {{range}} 题"
+    "listeningRange": "听录音并回答第 {{range}} 题",
+    "draftRecoveryUnavailable": "此浏览器无法保存恢复草稿。提交前请保持此页面打开。"
   },
   "label": "模拟考",
   "untitled": "模拟考 {{id}}",

@@ -71,7 +71,7 @@ for (const locale of locales) for (const width of [390, 1440]) {
     expect(writes).toEqual([]);
     await page.getByRole('button', {name: t(locale, 'operations:availability.save'), exact: true}).click();
     await expect.poll(() => writes.length).toBe(1);
-    expect(writes[0]).toMatchObject({expectedVersion: 3, windows: [{dayOfWeek: 'MONDAY', startTime: '09:00', endTime: '17:00'}], exceptions});
+    expect(writes[0]).toMatchObject({expectedVersion: 3, windows: [{dayOfWeek: 'MON', startTime: '09:00', endTime: '17:00'}], exceptions});
     await page.reload();
     await expect(trigger).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('lang', locale);
@@ -102,7 +102,7 @@ for (const locale of locales) for (const width of [390, 1440]) {
       await expect(page.getByText(t(language, 'operations:availability.exceptions', {count: 1, number: '1'}), {exact: true})).toBeVisible(); await fits(page);
     }
     expect(writes).toHaveLength(3); expect(writes.every(write => JSON.stringify(write) === JSON.stringify(writes[0]))).toBe(true);
-    expect(writes[0].body).toEqual({expectedVersion: 3, windows: [{...windows[0], dayOfWeek: 'FRIDAY', effectiveFrom: '2030-10-01'}, windows[1]], exceptions});
+    expect(writes[0].body).toEqual({expectedVersion: 3, windows: [{...windows[0], dayOfWeek: 'FRI', effectiveFrom: '2030-10-01'}, {...windows[1], dayOfWeek: 'WED'}], exceptions});
     await page.screenshot({path: info.outputPath('teacher-availability.png'), fullPage: true});
   });
 
@@ -132,7 +132,7 @@ for (const locale of locales) for (const width of [390, 1440]) {
     await page.getByRole('button', {name: t('zh-TW', 'operations:availability.reload'), exact: true}).click();
     await page.getByRole('button', {name: t('zh-TW', 'operations:availability.save'), exact: true}).click();
     await expect(page.getByText(t('zh-TW', 'operations:availability.saveFailed'), {exact: true})).toBeVisible();
-    expect(writes[1].body).toEqual({expectedVersion: 4, windows, exceptions}); expect(writes[1].key).not.toBe(writes[0].key);
+    expect(writes[1].body).toEqual({expectedVersion: 4, windows: windows.map(window => ({...window, dayOfWeek: window.dayOfWeek.slice(0, 3)})), exceptions}); expect(writes[1].key).not.toBe(writes[0].key);
     await page.screenshot({path: info.outputPath('teacher-availability-conflict.png'), fullPage: true});
   });
 

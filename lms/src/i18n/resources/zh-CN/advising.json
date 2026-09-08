@@ -303,7 +303,7 @@
     "loadingStudents": "正在加载学生…",
     "noAttention": "当前没有需要特别关注的学生。",
     "noGoal": "尚未设置学习目标",
-    "todayTasks": "今日到期任务",
+    "openTasks": "待办任务",
     "taskFailed": "暂时无法更新任务。请检查当前状态后重试。",
     "noTasks": "暂无待显示的行动任务。",
     "reviewTask": "查看行动任务",

@@ -31,7 +31,7 @@ import type {
   TransferCourseOwnerRequest,
   UpsertCourseStudentReportRequest,
 } from '@/apis';
-import {idempotent, V2ApiClient} from '@/apis';
+import {idempotent, V2ApiClient, WEEKDAYS} from '@/apis';
 
 export class CourseOperationsApiService {
   private apiClient = V2ApiClient;
@@ -291,12 +291,20 @@ export class CourseOperationsApiService {
     return this.apiClient.delete(`/v2/me/personal-events/${eventId}`, {...idempotent(key), params: {expectedVersion}});
   }
 
-  getMyTeachingAvailability(): Promise<ApiResponse<TeachingAvailabilityResponse>> {
-    return this.apiClient.get('/v2/me/teaching/availability');
+  async getMyTeachingAvailability(): Promise<ApiResponse<TeachingAvailabilityResponse>> {
+    const response = await this.apiClient.get<TeachingAvailabilityResponse>('/v2/me/teaching/availability');
+    if (!response.data) return response;
+    return {...response, data: {...response.data, windows: response.data.windows?.map(window => ({...window,
+      dayOfWeek: WEEKDAYS.find(day => day.slice(0, 3) === window.dayOfWeek) ?? window.dayOfWeek,
+    }))}};
   }
 
   replaceMyTeachingAvailability(request: ReplaceAvailabilityRequest, key: string = crypto.randomUUID()): Promise<ApiResponse<CourseOperationRead>> {
-    return this.apiClient.put('/v2/me/teaching/availability', request, idempotent(key));
+    // Availability uses MON..SUN in Prod, while the shared editor uses full
+    // weekday identifiers. Keep this wire-format difference at the API boundary.
+    return this.apiClient.put('/v2/me/teaching/availability', {...request, windows: request.windows?.map(window => ({...window,
+      dayOfWeek: WEEKDAYS.find(day => day === window.dayOfWeek)?.slice(0, 3) ?? window.dayOfWeek,
+    }))}, idempotent(key));
   }
 
   getAdvisorStudentAttendance(studentUserId: number): Promise<ApiResponse<CourseOperationRead>> {

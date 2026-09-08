@@ -170,7 +170,7 @@ test('instructor dashboard uses teaching data and availability edits preserve ev
   await expect(page.getByText('Record', {exact: true})).toHaveCount(0);
   await page.getByRole('button', {name: 'Save all availability'}).click();
   await expect.poll(() => savedAvailability).toBeDefined();
-  expect(savedAvailability).toMatchObject({expectedVersion: 4, windows, exceptions});
+  expect(savedAvailability).toMatchObject({expectedVersion: 4, windows: windows.map(window => ({...window, dayOfWeek: window.dayOfWeek.slice(0, 3)})), exceptions});
   await expect(page.getByText('Availability saved.')).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('instructor-availability.png'), fullPage: true});
 

@@ -182,7 +182,7 @@
     "REJECTED": "已拒絕",
     "OVERDUE": "已逾期",
     "ONGOING": "進行中",
-    "REACHED_COMPLETED": "已達成並完成",
+    "REACHED_COMPLETED": "已完成",
     "REACHED_INCOMPLETE": "已到期未完成",
     "APPROVED_ABSENCE": "已批准請假",
     "UNAPPROVED_ABSENCE": "未經批准缺勤",

@@ -1,18 +1,18 @@
+import {mockExamSessionKey} from '@/utils/mockExamSessionStorage';
 import {unwrapData} from '@/apis'
 import {LocalizedError} from '@/i18n/errors';
 import {mockExamApiService} from '@/apis/services/mock-exam-api'
 import {parseAttemptId} from './runtimeData'
 
-const attemptStorageKey = (studentMockExamId: number): string =>
-  `coursistant:mock-exam:${studentMockExamId}:attempt`
-
-export async function ensureAttemptId(studentMockExamId: number): Promise<number> {
-  const key = attemptStorageKey(studentMockExamId)
-  const stored = window.sessionStorage.getItem(key)
-  if (stored) {
-    const id = Number(stored)
-    if (Number.isFinite(id) && id > 0) return id
-  }
+export async function ensureAttemptId(studentMockExamId: number, studentUserId: number): Promise<number> {
+  const key = mockExamSessionKey(studentUserId, studentMockExamId, 'attempt');
+  try {
+    const stored = window.sessionStorage.getItem(key);
+    if (stored) {
+      const id = Number(stored);
+      if (Number.isFinite(id) && id > 0) return id;
+    }
+  } catch { /* The API can still create or recover the current attempt. */ }
 
   const payload = unwrapData(
     await mockExamApiService.createStudentAttempt(studentMockExamId),
@@ -22,6 +22,6 @@ export async function ensureAttemptId(studentMockExamId: number): Promise<number
   if (attemptId === null) {
     throw new LocalizedError('exams:session.missingAttempt')
   }
-  window.sessionStorage.setItem(key, String(attemptId))
+  try { window.sessionStorage.setItem(key, String(attemptId)); } catch { /* Do not discard a successful API response. */ }
   return attemptId
 }

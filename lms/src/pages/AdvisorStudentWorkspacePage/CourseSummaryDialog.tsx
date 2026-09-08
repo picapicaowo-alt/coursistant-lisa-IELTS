@@ -81,10 +81,7 @@ export function CourseSummaryDialog({
           <div>
             <dt>{translate("common:fields.status")}</dt>
             <dd>
-              {course.lifecycleStatus ||
-                course.launchState ||
-                course.status ||
-                translate("common:feedback.notProvided")}
+              {statusLabel(course.lifecycleStatus || course.launchState || course.status)}
             </dd>
           </div>
           <div>

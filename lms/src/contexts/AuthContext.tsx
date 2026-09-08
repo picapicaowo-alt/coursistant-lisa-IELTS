@@ -1,3 +1,4 @@
+import {clearMockExamSessionStorage} from '@/utils/mockExamSessionStorage';
 import {createContext, useContext, useState, useEffect, ReactNode} from 'react';
 import {V2ApiClient} from "@/apis";
 import type {LoginResponse} from "@/apis";
@@ -50,6 +51,12 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
       // remains open. Retire its user-relative reads and pending query results
       // before rendering the new identity; its route state remounts below.
       queryClient.clear();
+      // Profile updates for the same identity should not erase an active exam.
+      const identity = (raw: string | null): string => {
+        try { const value = JSON.parse(raw || 'null') as LoginResponse | null; return value ? `${value.userId}:${value.role}:${value.email}` : ''; }
+        catch { return ''; }
+      };
+      if (!event.oldValue || identity(event.oldValue) !== identity(event.newValue)) clearMockExamSessionStorage();
       const stored = localStorage.getItem('user');
       try {
         setUser(stored ? normalizeUser(JSON.parse(stored)) : null);
@@ -85,6 +92,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
   };
 
   const login = (userData: LoginResponse) => {
+    clearMockExamSessionStorage();
     // Queries such as ['me'] are intentionally user-relative. Never carry a
     // previous identity's data or pending mutations into a new session.
     queryClient.clear();
@@ -115,6 +123,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
   };
 
   const clearLocalSession = () => {
+    clearMockExamSessionStorage();
     queryClient.clear();
     V2ApiClient.clearAccessToken();
     localStorage.removeItem('accToken');

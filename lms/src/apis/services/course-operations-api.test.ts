@@ -6,6 +6,16 @@ const client = {get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn(), delet
 const service = new CourseOperationsApiService(client as unknown as typeof V2ApiClient);
 
 describe('CourseOperationsApiService', () => {
+  it('round-trips Prod availability weekday codes without changing dates or exceptions', async () => {
+    const window = {dayOfWeek: 'WED', startTime: '09:00', endTime: '17:00', effectiveFrom: '2026-09-08', timezone: 'America/Los_Angeles'};
+    const exceptions = [{exceptionDate: '2026-09-09', startTime: '10:00', endTime: '11:00'}];
+    client.get.mockResolvedValue({status: 200, data: {version: 3, windows: [window], exceptions}});
+    const read = await service.getMyTeachingAvailability();
+    expect(read.data?.windows?.[0].dayOfWeek).toBe('WEDNESDAY');
+    await service.replaceMyTeachingAvailability({expectedVersion: read.data?.version, windows: read.data?.windows, exceptions: read.data?.exceptions}, 'availability-key');
+    expect(client.put).toHaveBeenCalledWith('/v2/me/teaching/availability', {expectedVersion: 3, windows: [window], exceptions}, {headers: {'Idempotency-Key': 'availability-key'}});
+  });
+
   it('sends the current personal-event version in the delete query and blocks a missing version', async () => {
     client.delete.mockResolvedValue({status: 200, data: null});
     await service.deleteMyPersonalEvent(71, 'delete-retry-key', 4);

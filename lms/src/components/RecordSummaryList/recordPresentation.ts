@@ -133,6 +133,7 @@ export function displayScalar(value: unknown, key?: string): string | null {
   if (typeof value !== "string" || !value.trim()) return null;
   if (key === 'currentValue' || key === 'targetValue') return formatNumericText(value) ?? null;
   if (key === "role" || key === "courseRole") return roleLabel(value);
+  if (key === 'requestedBy' && (value === 'SELF' || value === 'PARENT')) return roleLabel(value === 'SELF' ? 'STUDENT' : value);
   if (key && ENUM_FIELDS.has(key)) return statusLabel(value);
   if (key === "dayOfWeek") return formatWeekday(value, "long");
   if (key && /(?:^date$|Date$|At(?:Local|Utc)?$)/.test(key))

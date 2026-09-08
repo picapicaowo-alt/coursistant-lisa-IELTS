@@ -182,7 +182,7 @@
     "REJECTED": "Rejected",
     "OVERDUE": "Overdue",
     "ONGOING": "Ongoing",
-    "REACHED_COMPLETED": "Reached completed",
+    "REACHED_COMPLETED": "Completed",
     "REACHED_INCOMPLETE": "Reached incomplete",
     "APPROVED_ABSENCE": "Approved absence",
     "UNAPPROVED_ABSENCE": "Unapproved absence",

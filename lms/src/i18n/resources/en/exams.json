@@ -52,7 +52,8 @@
     "writingAnswer": "Your response",
     "writingResult": "{{task}}: {{words}} words ({{characters}} characters)",
     "taskImage": "Image for {{task}}",
-    "listeningRange": "Listen and answer questions {{range}}"
+    "listeningRange": "Listen and answer questions {{range}}",
+    "draftRecoveryUnavailable": "This browser cannot save a recovery draft. Keep this page open until you submit."
   },
   "label": "Mock exam",
   "untitled": "Mock exam {{id}}",

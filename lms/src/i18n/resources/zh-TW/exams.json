@@ -52,7 +52,8 @@
     "writingAnswer": "你的作答",
     "writingResult": "{{task}}：{{words}} 詞（{{characters}} 個字元）",
     "taskImage": "{{task}} 的題目圖片",
-    "listeningRange": "聽錄音並回答第 {{range}} 題"
+    "listeningRange": "聽錄音並回答第 {{range}} 題",
+    "draftRecoveryUnavailable": "此瀏覽器無法儲存復原草稿。提交前請保持此頁面開啟。"
   },
   "label": "模擬考",
   "untitled": "模擬考 {{id}}",
