@@ -3,7 +3,7 @@ import {fireEvent, render, screen, waitFor} from '@testing-library/react';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 import {AuditPanel} from './AuditPanel';
 
-const mocks = vi.hoisted(() => ({listTenantAuditEvents: vi.fn()}));
+const mocks = vi.hoisted(() => ({listTenantAuditEvents: vi.fn(), getTenantUser: vi.fn()}));
 vi.mock('@/apis/services/admin-api', () => ({adminApiService: mocks}));
 
 const response = <T,>(data: T) => ({status: 200, code: 'SUCCESS', data, message: 'OK', timestamp: '2026-09-02T00:00:00Z'});
@@ -40,4 +40,18 @@ describe('Tenant Admin audit filters', () => {
     expect(await screen.findByRole('status')).toHaveTextContent('Filters cleared');
     await waitFor(() => expect(mocks.listTenantAuditEvents).toHaveBeenLastCalledWith({page: 0, size: 20}));
   });
+  it('shows the template resource instead of resolving its ID as an unrelated user', async () => {
+    mocks.listTenantAuditEvents.mockResolvedValue(response({items: [{
+      eventId: 'IDENTITY:39', actorUserId: 1, targetUserId: 2,
+      action: 'MOCK_EXAM_TEMPLATE_PUBLISHED', resourceType: 'MOCK_EXAM_TEMPLATE',
+      createdAt: '2026-09-07T00:00:00Z', after: {templateId: 2, versionId: 2},
+    }], total: 1}));
+    mocks.getTenantUser.mockResolvedValue(response({id: 1, firstName: 'Actual actor'}));
+    renderPanel();
+    expect(await screen.findByText('Mock exam template 2')).toBeInTheDocument();
+    expect(screen.getByText('Publish mock exam template')).toBeInTheDocument();
+    await waitFor(() => expect(mocks.getTenantUser).toHaveBeenCalledWith(1));
+    expect(mocks.getTenantUser).not.toHaveBeenCalledWith(2);
+  });
+
 });

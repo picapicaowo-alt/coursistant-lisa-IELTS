@@ -20,6 +20,7 @@ import { getApiErrorMessage } from "@/utils/apiError";
 import { EnglishDateTimeInput } from "@/components/EnglishDateInput";
 import styles from "@/components/TenantWorkspace/workspace.module.scss";
 import auditStyles from "./audit.module.scss";
+import {auditTemplateId, isTemplateAudit} from "./auditTarget";
 
 const PAGE_SIZE = TENANT_PAGE_SIZE;
 type AuditDraft = {
@@ -64,7 +65,7 @@ export const AuditPanel = () => {
   const people = useTenantPeople(
     (audit.data?.items ?? []).flatMap((event) => [
       event.actorUserId,
-      event.targetUserId,
+      isTemplateAudit(event) ? undefined : event.targetUserId,
     ]),
   );
   const apply = (event: FormEvent<HTMLFormElement>) => {
@@ -296,7 +297,11 @@ export const AuditPanel = () => {
                   <small>{tenantAuditValue(event.resourceType, 'resources')}</small>
                 </td>
                 <td data-label={translate("learning:plan.target")}>
-                  {event.targetUserId ? (
+                  {isTemplateAudit(event) ? (
+                    <span>{auditTemplateId(event) == null
+                      ? tenantAuditValue(event.resourceType, 'resources')
+                      : translate('operations:audit.templateTarget', {id: auditTemplateId(event)})}</span>
+                  ) : event.targetUserId ? (
                     <PersonCell
                       person={
                         people.get(event.targetUserId) ?? {

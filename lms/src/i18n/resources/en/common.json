@@ -616,7 +616,8 @@
     },
     "usersFailed": "Users could not be loaded.",
     "partialTaRetry": "The user was enrolled, but TA access was not assigned. Use “Set as TA” in the roster to try again.",
-    "invalidTenantId": "Enter a valid positive whole-number institution ID."
+    "invalidTenantId": "Enter a valid positive whole-number institution ID.",
+    "rosterScope": "The course owner advisor and primary instructor can view the roster in their course workspace. System administrators can enroll students here."
   },
   "records": {
     "submittedAt": "Submitted {{date}}",

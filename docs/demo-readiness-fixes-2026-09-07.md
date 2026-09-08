@@ -25,3 +25,9 @@ The API service converts full identifiers to MON…SUN on writes and expands sho
 Targeted browser coverage includes answer recovery for all three sections, failed-submit retention, successful-submit cleanup and paused-state recovery. Unit coverage checks elapsed time, identity/exam/section separation, malformed drafts, blocked storage, session cleanup, task deadlines and the availability API round trip. Existing availability retry/version-conflict browser expectations now use the verified short weekday wire values.
 
 Authenticated live tests separately verified course creation/launch, material and assignment submission, released grades, learning-task file completion and feedback, reports, a Parent→Instructor→Advisor schedule request, attendance/hour accounting, learning groups and Mock Exam grading. These live results do not mean the candidate frontend has been deployed: the Production frontend remains at the base revision until an approved release and post-release acceptance.
+
+## Remaining issue triage before Production release
+
+System Admin retains its contracted enrollment write; neither the console nor a direct roster URL calls the teaching-only members read. Template audit targets resolve the explicit template snapshot, without treating the server's misassigned targetUserId as a person. Known governance actions and mock-exam metadata use the three shared locales, preserving authored content. The student header falls back to the already loaded profile's studentType.
+
+UTC calendar generation, audit target data, hub aggregate counts and notification body localization require backend work. See `current-contract-issues-2026-09-08.md` for current requests, observations and frontend mitigations.

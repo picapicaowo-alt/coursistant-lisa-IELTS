@@ -591,5 +591,12 @@
     "saveFailed": "Changes could not be saved. Your draft is kept; try again.",
     "savedEditable": "Saved content can be edited while this version is a draft.",
     "publishedHelp": "Published or archived content is read-only. Copy the version to prepare changes."
+  },
+  "records": {
+    "questionType": "Question type",
+    "questionContent": "Question content",
+    "sequence": "Sequence",
+    "displayOrder": "Display order",
+    "taskReference": "Task reference"
   }
 }

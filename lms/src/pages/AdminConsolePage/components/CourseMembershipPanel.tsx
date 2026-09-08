@@ -1,21 +1,18 @@
 import { useTranslation } from "react-i18next";
-import React, { FormEvent, useMemo, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { CourseMember, CourseSummary, unwrapData } from "@/apis";
+import React, { FormEvent, useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { CourseSummary, unwrapData } from "@/apis";
 import { courseApiService } from "@/apis/services/course-api";
 import {LocalizedError} from '@/i18n/errors';
 import { TeachingDialog } from "@/components/TeachingWorkspace";
-import { PersonCell } from "@/components/PersonCell";
 import {
   SystemCourseFilters,
   type SystemCourseScope,
 } from "@/components/SystemCourseFilters";
-import { formatNumber } from "@/i18n/formatting";
 import i18n from "@/i18n";
 import styles from "../index.module.scss";
 
 const COURSE_PAGE_SIZE = 100;
-const MEMBER_PAGE_SIZE = 20;
 
 type Feedback = {
   tone: "success" | "error";
@@ -29,38 +26,6 @@ const instructorLabel = (course: CourseSummary): string => {
     instructor.name ||
     instructor.email ||
     i18n.t("common:admin.instructorNumber", { id: instructor.userId })
-  );
-};
-
-const memberRoleClass = (member: CourseMember): string => {
-  if (member.courseRole === "Instructor") return styles.roleInstructor;
-  if (member.courseRole === "TA") return styles.roleTa;
-  return styles.roleStudent;
-};
-
-const CourseMemberRow = ({member}: {member: CourseMember}) => {
-  const { t: translate } = useTranslation();
-  const displayName =
-    member.userName ||
-    member.userEmail ||
-    translate("common:admin.userNumber", { id: member.userId });
-
-  return (
-    <article className={styles.courseMemberRow}>
-      <div className={styles.memberIdentity}>
-        <PersonCell
-          person={{
-            id: member.userId,
-            firstName: displayName,
-            email: member.userEmail,
-          }}
-        />
-        <span className={`${styles.roleBadge} ${memberRoleClass(member)}`}>
-          {translate(`common:admin.courseRoles.${member.courseRole}`)}
-        </span>
-      </div>
-
-    </article>
   );
 };
 
@@ -81,13 +46,9 @@ export const CourseMembershipPanel: React.FC = () => {
 
 const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
   const { t: translate } = useTranslation();
-  const queryClient = useQueryClient();
   const [selectedCourseId, setSelectedCourseId] = useState<number | null>(null);
   const [enrollOpen, setEnrollOpen] = useState(false);
   const [identifier, setIdentifier] = useState("");
-  const [memberSearchInput, setMemberSearchInput] = useState("");
-  const [memberSearch, setMemberSearch] = useState("");
-  const [memberPage, setMemberPage] = useState(0);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
 
   const coursesQuery = useQuery({
@@ -109,43 +70,6 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
   const effectiveCourseId = selectedCourseId ?? courses[0]?.id ?? null;
   const selectedCourse =
     courses.find((course) => course.id === effectiveCourseId) ?? null;
-
-  const membersQuery = useQuery({
-    queryKey: [
-      "admin",
-      "course-members",
-      effectiveCourseId,
-      memberPage,
-      memberSearch,
-    ],
-    queryFn: async () =>
-      unwrapData(
-        await courseApiService.listCourseMembers(effectiveCourseId!, {
-          active: true,
-          q: memberSearch || undefined,
-          page: memberPage,
-          size: MEMBER_PAGE_SIZE,
-        }),
-        "listAdminCourseMembers",
-      ),
-    enabled: effectiveCourseId !== null,
-    retry: 1,
-  });
-
-  const members = useMemo(() => {
-    const rolePriority = { Instructor: 0, TA: 1, Student: 2 };
-    return [...(membersQuery.data?.items ?? [])].sort(
-      (left, right) =>
-        rolePriority[left.courseRole] - rolePriority[right.courseRole] ||
-        left.userId - right.userId,
-    );
-  }, [membersQuery.data?.items]);
-
-  const refreshMembers = async (courseId: number) => {
-    await queryClient.invalidateQueries({
-      queryKey: ["admin", "course-members", courseId],
-    });
-  };
 
   const enrolStudent = useMutation({
     mutationFn: async ({
@@ -173,13 +97,12 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
 
       return result;
     },
-    onSuccess: async (_result, variables) => {
+    onSuccess: () => {
       setIdentifier("");
       setFeedback({
         tone: "success",
         key: "common:admin.enrollSuccess",
       });
-      await refreshMembers(variables.courseId);
     },
     onError: (error) => {
       setFeedback({
@@ -202,9 +125,6 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
 
   const selectCourse = (courseId: number) => {
     setSelectedCourseId(courseId);
-    setMemberPage(0);
-    setMemberSearchInput("");
-    setMemberSearch("");
     setIdentifier("");
     setFeedback(null);
   };
@@ -237,11 +157,6 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
       <p className={styles.status}>{translate("common:admin.noCourses")}</p>
     );
   }
-
-  const memberPageCount = Math.max(
-    1,
-    Math.ceil((membersQuery.data?.total ?? 0) / MEMBER_PAGE_SIZE),
-  );
 
   return (
     <div className={styles.membersLayout}>
@@ -345,104 +260,11 @@ const ScopedCourseMembers = ({ scope }: { scope: SystemCourseScope }) => {
             </h2>
             <p>{translate("common:admin.memberHelp")}</p>
           </div>
-          <span>
-            {membersQuery.isSuccess
-              ? formatNumber(membersQuery.data.total)
-              : null}
-          </span>
         </div>
 
-        <form
-          className={styles.memberSearch}
-          onSubmit={(event) => {
-            event.preventDefault();
-            setMemberPage(0);
-            setMemberSearch(memberSearchInput.trim());
-          }}
-        >
-          <label className={styles.search}>
-            <span>{translate("common:admin.searchCourse")}</span>
-            <input
-              value={memberSearchInput}
-              onChange={(event) => setMemberSearchInput(event.target.value)}
-              placeholder={translate("common:admin.memberSearchPlaceholder")}
-            />
-          </label>
-          <button type="submit" className={styles.secondaryButton}>
-            {translate("common:actions.search")}
-          </button>
-        </form>
-
-        {membersQuery.isPending ? (
-          <p className={styles.status}>
-            {translate("common:admin.loadingMembers")}
-          </p>
-        ) : null}
-        {membersQuery.isError ? (
-          <div className={styles.status} role="alert">
-            <p>{translate("common:admin.membersFailed")}</p>
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              onClick={() => void membersQuery.refetch()}
-            >
-              {translate("common:actions.tryAgain")}
-            </button>
-          </div>
-        ) : null}
-        {!membersQuery.isPending && !membersQuery.isError && !members.length ? (
-          <p className={styles.status}>{translate("common:admin.noMembers")}</p>
-        ) : null}
-
-        {!membersQuery.isError && members.length ? (
-          <div className={styles.courseMemberList}>
-            {members.map((member) => (
-              <CourseMemberRow
-                key={member.id}
-                member={member}
-              />
-            ))}
-          </div>
-        ) : null}
-
-        {!enrollOpen && feedback ? (
-          <p
-            className={
-              feedback.tone === "error"
-                ? styles.inlineError
-                : styles.inlineSuccess
-            }
-            role={feedback.tone === "error" ? "alert" : "status"}
-          >
-            {translate(feedback.key)}
-          </p>
-        ) : null}
-        {memberPageCount > 1 ? (
-          <nav
-            className={styles.pagination}
-            aria-label={translate("common:admin.memberPages")}
-          >
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              disabled={memberPage === 0}
-              onClick={() => setMemberPage((page) => page - 1)}
-            >
-              {translate("common:actions.previous")}
-            </button>
-            <span>
-              {formatNumber(memberPage + 1)} / {formatNumber(memberPageCount)}
-            </span>
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              disabled={memberPage + 1 >= memberPageCount}
-              onClick={() => setMemberPage((page) => page + 1)}
-            >
-              {translate("common:actions.next")}
-            </button>
-          </nav>
-        ) : null}
+        {/* The consumed members read only authorizes the owner advisor and primary
+            instructor. System Admin enrollment does not grant roster access. */}
+        <p className={styles.status}>{translate("common:admin.rosterScope")}</p>
       </section>
     </div>
   );

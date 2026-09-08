@@ -616,7 +616,8 @@
     },
     "usersFailed": "暫時無法載入使用者清單。",
     "partialTaRetry": "使用者已加入課程，但助教權限未分配成功。請在成員名單中使用「設為助教」重試。",
-    "invalidTenantId": "請輸入有效的機構編號（正整數）。"
+    "invalidTenantId": "請輸入有效的機構編號（正整數）。",
+    "rosterScope": "課程負責顧問和主講教師可在各自的課程工作區查看名單。系統管理員可在此為學生選課。"
   },
   "records": {
     "submittedAt": "提交時間：{{date}}",

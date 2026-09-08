@@ -558,11 +558,25 @@
       "UPDATE_ALERT_RULES": "更新预警规则",
       "ASSIGN_ADVISOR": "分配学业顾问",
       "TRANSFER_COURSE_OWNER": "转移课程负责人",
-      "MANAGED_USER_CREATED": "已创建机构用户"
+      "MANAGED_USER_CREATED": "已创建机构用户",
+      "MOCK_EXAM_TEMPLATE_CREATED": "创建模考试卷",
+      "MOCK_EXAM_TEMPLATE_SECTION": "更新模考科目",
+      "MOCK_EXAM_TEMPLATE_PUBLISHED": "发布模考试卷",
+      "CREATE_USER": "创建用户",
+      "CREATE_PARENT": "创建家长",
+      "INTAKE_CREATED": "创建学生入学记录",
+      "ASSIGNED": "分配顾问",
+      "LINKED": "关联家长与学生"
     },
     "resources": {
-      "GOVERNANCE": "机构管理"
-    }
+      "GOVERNANCE": "机构管理",
+      "MOCK_EXAM_TEMPLATE": "模考试卷",
+      "USER": "用户",
+      "STUDENT_INTAKE": "学生入学记录",
+      "STUDENT_ADVISOR_ASSIGNMENT": "顾问分配",
+      "PARENT_STUDENT_LINK": "家长与学生关联"
+    },
+    "templateTarget": "模考试卷 {{id}}"
   },
   "alertRules": {
     "editorHint": "先应用到草稿，再在规则页面保存更改。",

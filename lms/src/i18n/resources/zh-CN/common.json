@@ -616,7 +616,8 @@
     },
     "usersFailed": "暂时无法加载用户列表。",
     "partialTaRetry": "用户已加入课程，但助教权限未分配成功。请在成员名单中使用“设为助教”重试。",
-    "invalidTenantId": "请输入有效的机构编号（正整数）。"
+    "invalidTenantId": "请输入有效的机构编号（正整数）。",
+    "rosterScope": "课程负责顾问和主讲教师可在各自的课程工作区查看名单。系统管理员可在此为学生选课。"
   },
   "records": {
     "submittedAt": "提交时间：{{date}}",
