@@ -11,7 +11,10 @@ const FIELD_KEYS: Record<string, string> = {
   taskKey: 'exams:records.taskReference',
 };
 
-const fieldLabel = (key: string) => FIELD_KEYS[key] ? i18n.t(FIELD_KEYS[key]) : recordFieldLabel(key);
+const fieldLabel = (key: string) => {
+  const examKey = FIELD_KEYS[key] ?? `exams:records.${key}`;
+  return i18n.exists(examKey) ? i18n.t(examKey) : recordFieldLabel(key);
+};
 const scalar = (value: unknown, key?: string): string | null => {
   if (key === 'kind' && typeof value === 'string') {
     const definition = questionDefinition('reading', value) ?? questionDefinition('listening', value);

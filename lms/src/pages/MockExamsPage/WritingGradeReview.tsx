@@ -5,7 +5,7 @@ import {useMutation, useQuery, useQueryClient} from '@tanstack/react-query';
 import {unwrapData} from '@/apis';
 import {getApiErrorCode} from '@/utils/apiError';
 import {mockExamApiService} from '@/apis/services/mock-exam-api';
-import {RecordSummaryList} from '@/components/RecordSummaryList';
+import {ExamRecordSummary} from './ExamRecordSummary';
 import {useIdempotencyCheckpoint} from '@/hooks/useIdempotencyCheckpoint';
 import {advisingErrorMessage} from '../advising/advisingErrors';
 import styles from './staff.module.scss';
@@ -40,7 +40,7 @@ export function WritingGradeReview({gradeId, onBusy}: {gradeId: number; onBusy?:
   });
   const alreadyGraded = !pendingGrade || submit.isSuccess || getApiErrorCode(submit.error) === 'MOCK_EXAM_WRITING_ALREADY_GRADED';
   return <>
-    {detail.isPending ? <p role="status" className={styles.status}>{translate("exams:staff.loadingScript")}</p> : detail.isError ? <div role="alert" className={styles.error}><p>{advisingErrorMessage(detail.error, translate('exams:staff.scriptFailed'))}</p><button type="button" className={styles.secondary} onClick={() => void detail.refetch()}>{translate("common:actions.retry")}</button></div> : <div className={styles.script}><RecordSummaryList value={detail.data} emptyMessage={translate("exams:staff.noScript")}/></div>}
+    {detail.isPending ? <p role="status" className={styles.status}>{translate("exams:staff.loadingScript")}</p> : detail.isError ? <div role="alert" className={styles.error}><p>{advisingErrorMessage(detail.error, translate('exams:staff.scriptFailed'))}</p><button type="button" className={styles.secondary} onClick={() => void detail.refetch()}>{translate("common:actions.retry")}</button></div> : <div className={styles.script}><ExamRecordSummary value={detail.data} emptyMessage={translate("exams:staff.noScript")}/></div>}
     <form noValidate className={styles.compactForm} onSubmit={event => {
       event.preventDefault();
       if (!hasDetail || submit.isPending || alreadyGraded) return;
