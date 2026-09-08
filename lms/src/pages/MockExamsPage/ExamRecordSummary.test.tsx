@@ -8,6 +8,7 @@ afterEach(async () => {await act(() => i18n.changeLanguage('en'));});
 
 it('localizes exam metadata across locales while preserving questions and answers', async () => {
   const value = {kind: 'tfng', taskKey: 'custom-writing', seq: 3, sortOrder: 7,
+    totalMinutes: 5, shortLabel: 'Original passage label', instruction: 'Choose TRUE, FALSE or NOT GIVEN.',
     payload: {statement: 'tfng', answer: 'TRUE'}};
   const original = JSON.stringify(value);
   render(<ExamRecordSummary value={value}/>);
@@ -15,6 +16,11 @@ it('localizes exam metadata across locales while preserving questions and answer
     await act(() => i18n.changeLanguage(locale));
     expect(screen.getByText(i18n.t('exams:records.questionType'))).toBeInTheDocument();
     expect(screen.getByText(i18n.t('exams:schema.tfng'))).toBeInTheDocument();
+    for (const key of ['totalMinutes', 'shortLabel', 'instruction', 'statement', 'answer']) {
+      expect(screen.getByText(i18n.t(`exams:records.${key}`))).toBeInTheDocument();
+    }
+    expect(screen.getByText('Original passage label')).toBeInTheDocument();
+    expect(screen.getByText('Choose TRUE, FALSE or NOT GIVEN.')).toBeInTheDocument();
     expect(screen.getByText('tfng')).toBeInTheDocument();
     expect(screen.getByText('TRUE')).toBeInTheDocument();
     expect(screen.getByText('custom-writing')).toBeInTheDocument();
