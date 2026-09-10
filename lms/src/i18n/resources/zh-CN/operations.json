@@ -576,7 +576,11 @@
       "STUDENT_ADVISOR_ASSIGNMENT": "顾问分配",
       "PARENT_STUDENT_LINK": "家长与学生关联"
     },
-    "templateTarget": "模考试卷 {{id}}"
+    "templateTarget": "模考试卷 {{id}}",
+    "resourceId": "资源 ID",
+    "resource": "资源",
+    "targetUser": "目标人员",
+    "invalidResource": "请输入正整数资源 ID，并同时填写资源类型。"
   },
   "alertRules": {
     "editorHint": "先应用到草稿，再在规则页面保存更改。",

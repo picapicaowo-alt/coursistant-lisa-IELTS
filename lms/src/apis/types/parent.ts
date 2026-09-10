@@ -81,8 +81,9 @@ export interface ParentNotification {
   studentUserId?: number;
   courseId?: number;
   courseCode?: string;
-  notificationType?: string;
-  message?: string;
+  notificationType: string;
+  message: string;
+  templateVars: Record<string, string>;
   subjectType?: string;
   subjectId?: number;
   deepLink?: string;

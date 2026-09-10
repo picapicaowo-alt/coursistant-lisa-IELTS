@@ -28,6 +28,7 @@ type AuditDraft = {
   targetUserId: string;
   action: string;
   resourceType: string;
+  resourceId: string;
   from: string;
   to: string;
 };
@@ -36,6 +37,7 @@ const emptyDraft: AuditDraft = {
   targetUserId: "",
   action: "",
   resourceType: "",
+  resourceId: "",
   from: "",
   to: "",
 };
@@ -78,6 +80,7 @@ export const AuditPanel = () => {
       const field = event.currentTarget.elements.namedItem(name);
       return field instanceof HTMLInputElement && field.value.trim() !== '' && !parseInputDateTime(field.value);
     });
+    if (draft.resourceId && (!draft.resourceType.trim() || !Number.isSafeInteger(Number(draft.resourceId)) || Number(draft.resourceId) <= 0)) {setValidation('operations:audit.invalidResource'); return;}
     if (invalidId || invalidInput?.type === 'number') {setValidation('operations:audit.invalidUserId'); return;}
     if (invalidInput || invalidDateDraft || [draft.from, draft.to].some(value => value && !Number.isFinite(Date.parse(value))) || (draft.from && draft.to && Date.parse(draft.to) < Date.parse(draft.from))) {setValidation('operations:audit.invalidDates'); return;}
     setValidation(null);
@@ -87,6 +90,7 @@ export const AuditPanel = () => {
       targetUserId: draft.targetUserId ? Number(draft.targetUserId) : undefined,
       action: draft.action.trim() || undefined,
       resourceType: draft.resourceType.trim() || undefined,
+      resourceId: draft.resourceId ? Number(draft.resourceId) : undefined,
       from: dateTimeParam(draft.from),
       to: dateTimeParam(draft.to),
       page: 0,
@@ -169,6 +173,10 @@ export const AuditPanel = () => {
                 }))
               }
             />
+          </label>
+          <label>
+            <span>{translate("operations:audit.resourceId")}</span>
+            <input type="number" min="1" value={draft.resourceId} onChange={event => setDraft(current => ({...current, resourceId: event.target.value}))}/>
           </label>
           <label className={auditStyles.dateTimeField}>
             <span>{translate("operations:from")}</span>
@@ -271,7 +279,8 @@ export const AuditPanel = () => {
               <th>{translate("operations:audit.timestamp")}</th>
               <th>{translate("common:roles.USER")}</th>
               <th>{translate("advising:counsellor.action")}</th>
-              <th>{translate("learning:plan.target")}</th>
+              <th>{translate("operations:audit.resource")}</th>
+              <th>{translate("operations:audit.targetUser")}</th>
               <th>{translate("common:fields.details")}</th>
             </tr>
           </thead>
@@ -294,9 +303,11 @@ export const AuditPanel = () => {
                 </td>
                 <td data-label={translate("advising:counsellor.action")}>
                   {tenantAuditValue(event.action)}
-                  <small>{tenantAuditValue(event.resourceType, 'resources')}</small>
                 </td>
-                <td data-label={translate("learning:plan.target")}>
+                <td data-label={translate("operations:audit.resource")}>
+                  {tenantAuditValue(event.resourceType, 'resources')}{event.resourceId != null ? ` #${event.resourceId}` : ''}
+                </td>
+                <td data-label={translate("operations:audit.targetUser")}>
                   {isTemplateAudit(event) ? (
                     <span>{auditTemplateId(event) == null
                       ? tenantAuditValue(event.resourceType, 'resources')

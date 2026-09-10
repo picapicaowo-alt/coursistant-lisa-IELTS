@@ -1,3 +1,4 @@
+import type {CalendarFeed, CalendarQuery} from '../types/calendar';
 import {LocalizedError} from '@/i18n/errors';
 import {readCollection, type CollectionPage} from './readCollection';
 import type {
@@ -256,7 +257,7 @@ export class CourseOperationsApiService {
 
   getMyAlerts(): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/alerts'); }
   getMyAttendance(params: {from?: string; to?: string; courseId?: number} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/attendance', {params}); }
-  getMyCalendar(params: {from?: string; to?: string; timezone?: string} = {}): Promise<ApiResponse<CourseOperationRead>> { return this.apiClient.get('/v2/me/calendar', {params}); }
+  getMyCalendar(params: CalendarQuery = {}): Promise<ApiResponse<CalendarFeed>> { return this.apiClient.get('/v2/me/calendar', {params}); }
   getMyProgress(): Promise<ApiResponse<StudentProgressResponse>> { return this.apiClient.get('/v2/me/progress'); }
   getMyScheduleRequests(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/schedule-requests', {params})); }
   getMyWorkQueue(): Promise<ApiResponse<CourseOperationRead>> { return readCollection<unknown>(params => this.apiClient.get<CollectionPage<unknown> | unknown[]>('/v2/me/work-queue', {params})); }

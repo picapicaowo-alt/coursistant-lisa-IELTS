@@ -89,6 +89,8 @@ export interface TenantAuditEventParams {
   targetUserId?: number;
   action?: string;
   resourceType?: string;
+  /** Must be supplied together with resourceType. */
+  resourceId?: number;
   from?: string;
   to?: string;
   page?: number;
@@ -102,7 +104,8 @@ export interface TenantAuditEvent {
   actorUserId?: number;
   action: string;
   resourceType: string;
-  targetUserId?: number;
+  resourceId: number;
+  targetUserId: number | null;
   before?: Record<string, unknown> | null;
   after?: Record<string, unknown> | null;
 }

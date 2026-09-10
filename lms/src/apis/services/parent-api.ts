@@ -1,3 +1,4 @@
+import type {CalendarFeed, CalendarQuery} from '../types/calendar';
 import dayjs from 'dayjs';
 import type {
   ApiResponse,
@@ -87,7 +88,7 @@ export class ParentApiService {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/assignments`);
   }
 
-  listStudentCalendar(studentUserId: number, params: {from?: string; to?: string; timezone?: string} = {}): Promise<ApiResponse<ParentAcademicRead>> {
+  listStudentCalendar(studentUserId: number, params: CalendarQuery = {}): Promise<ApiResponse<CalendarFeed>> {
     return this.apiClient.get(`/v2/parent/students/${studentUserId}/calendar`, {params: {from: dayjs().format('YYYY-MM-DD'), to: dayjs().add(14, 'day').format('YYYY-MM-DD'), timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, ...params}});
   }
 

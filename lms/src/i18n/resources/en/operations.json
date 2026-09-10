@@ -576,7 +576,11 @@
       "STUDENT_ADVISOR_ASSIGNMENT": "Advisor assignment",
       "PARENT_STUDENT_LINK": "Parent and student link"
     },
-    "templateTarget": "Mock exam template {{id}}"
+    "templateTarget": "Mock exam template {{id}}",
+    "resourceId": "Resource ID",
+    "resource": "Resource",
+    "targetUser": "Target user",
+    "invalidResource": "Enter a positive resource ID together with a resource type."
   },
   "alertRules": {
     "editorHint": "Apply to your draft, then save changes on the rules page.",

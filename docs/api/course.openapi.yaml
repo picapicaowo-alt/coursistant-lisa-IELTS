@@ -4289,6 +4289,7 @@ paths:
       - MeAttendance
   /v2/me/calendar:
     get:
+      description: "Envelope timezone is the display zone. startsAtUtc/endsAtUtc are absolute instants. Session item timezone is the source zone and must not reinterpret those instants. fromUtc is inclusive and toUtc exclusive."
       operationId: meCalendar
       parameters:
       - in: query

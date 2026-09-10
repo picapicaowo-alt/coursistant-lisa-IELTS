@@ -1,8 +1,8 @@
-import type {LoginResponse, NotificationItem, NotificationType} from '@/apis';
+import type {LoginResponse, NotificationItem} from '@/apis';
 import {registeredDestination} from '@/utils/registeredDestination';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 
-export {getNotificationTitle, formatNotificationTime} from '@/utils/notificationPresentation';
+export {getNotificationMessage, getNotificationTitle, formatNotificationTime} from '@/utils/notificationPresentation';
 
 /**
  * Resolves backend deep links against routes that exist in this frontend.
@@ -14,7 +14,7 @@ export {getNotificationTitle, formatNotificationTime} from '@/utils/notification
  */
 export const resolveNotificationPath = (
   notification: Pick<NotificationItem, 'availability' | 'courseId' | 'deepLink'> & {
-    notificationType?: NotificationType;
+    notificationType?: string;
   },
   identity?: Pick<LoginResponse, 'role' | 'level'>,
 ): string | null => {

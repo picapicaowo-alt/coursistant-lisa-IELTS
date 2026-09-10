@@ -4,7 +4,7 @@ import {unwrapData, type ManagedUser} from '@/apis';
 
 /** Resolve only visible actors through the tenant-safe directory, never the teaching profile API. */
 export function useTenantPeople(
-  ids: (number | undefined)[],
+  ids: (number | null | undefined)[],
 ): Map<number, ManagedUser> {
   const unique = [
     ...new Set(

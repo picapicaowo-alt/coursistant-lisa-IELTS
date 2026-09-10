@@ -12,6 +12,8 @@ export type CalendarItemKind = 'Session' | 'Assignment' | 'Event' | 'Personal';
 export interface CalendarItem {
   id: string;
   sourceId: number;
+  startsAtUtc?: string;
+  endsAtUtc?: string;
   courseId?: number;
   courseCode: string;
   courseTitle: string;

@@ -323,6 +323,7 @@ paths:
           description: NOT_FOUND
   /v2/parent/students/{studentUserId}/calendar:
     get:
+      description: "Envelope timezone is the display zone; UTC instants must not be reinterpreted using Session source timezone."
       operationId: parentListStudentCalendar
       tags: [Parent Academic Reads]
       parameters:
@@ -792,7 +793,12 @@ components:
         messageId: { type: integer, format: int64 }
     ParentNotification:
       type: object
+      required: [notificationType, message, templateVars]
       properties:
+        templateVars:
+          type: object
+          description: "Non-null structured notification variables; legacy notifications return {}."
+          additionalProperties: { type: string }
         notificationId: { type: integer }
         studentUserId: { type: integer }
         courseId: { type: integer, nullable: true, description: "Null for course-less Study Plan / Advisor Task events" }

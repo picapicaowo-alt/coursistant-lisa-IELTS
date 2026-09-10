@@ -55,3 +55,20 @@ describe('Tenant Admin audit filters', () => {
   });
 
 });
+
+it('requires a resource type before submitting a resource ID and never resolves it as a person', async () => {
+  mocks.listTenantAuditEvents.mockResolvedValue(response({items: [{eventId: 'mock-1', resourceType: 'MOCK_EXAM_TEMPLATE', resourceId: 880088, targetUserId: null, action: 'UPDATE', createdAt: '2026-09-09T12:00:00Z'}], page: 0, size: 20, total: 1}));
+  renderPanel();
+  expect(await screen.findByText(/#880088/)).toBeVisible();
+  expect(screen.getByRole('columnheader', {name: 'Resource'})).toBeVisible();
+  expect(screen.getByRole('columnheader', {name: 'Target user'})).toBeVisible();
+  const before = mocks.listTenantAuditEvents.mock.calls.length;
+  fireEvent.change(screen.getByLabelText('Resource ID'), {target: {value: '880088'}});
+  fireEvent.click(screen.getByRole('button', {name: 'Apply filters'}));
+  expect(await screen.findByRole('alert')).toHaveTextContent('Enter a positive resource ID together with a resource type.');
+  expect(mocks.listTenantAuditEvents).toHaveBeenCalledTimes(before);
+  fireEvent.change(screen.getByLabelText('Resource type'), {target: {value: 'MOCK_EXAM_TEMPLATE'}});
+  fireEvent.click(screen.getByRole('button', {name: 'Apply filters'}));
+  await waitFor(() => expect(mocks.listTenantAuditEvents).toHaveBeenLastCalledWith(expect.objectContaining({resourceType: 'MOCK_EXAM_TEMPLATE', resourceId: 880088})));
+  expect(mocks.getTenantUser).not.toHaveBeenCalled();
+});

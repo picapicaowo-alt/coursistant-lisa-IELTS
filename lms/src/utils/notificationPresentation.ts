@@ -1,6 +1,8 @@
 import i18n from '@/i18n';
 import type {NotificationType} from '@/apis';
 import {formatUtcTimestamp} from '@/utils/datetime';
+import {formatNumber, getFormattingLocale} from '@/i18n/formatting';
+import {statusLabel} from '@/i18n/presentation';
 
 const NOTIFICATION_TITLES = new Map<string, string>(Object.entries({
   ANNOUNCEMENT_POSTED: 'notification:types.ANNOUNCEMENT_POSTED',
@@ -38,6 +40,45 @@ const NOTIFICATION_TITLES = new Map<string, string>(Object.entries({
 // Parent read responses allow new notification types; keep unknown types readable.
 export const getNotificationTitle = (type?: string): string =>
   i18n.t(NOTIFICATION_TITLES.get(type ?? '') ?? 'notification:academicUpdate');
+
+const GROUP_TYPES = new Set(['GROUP_MEMBER_ADDED', 'GROUP_MEMBER_REMOVED', 'GROUP_MEMBER_MOVED']);
+const GROUP_AUDIENCES = new Set(['TARGET', 'EXISTING_MEMBER', 'OLD_GROUP_MEMBER', 'NEW_GROUP_MEMBER']);
+const STATUS_VARIABLES = new Set(['attendanceStatus', 'reportType', 'decision', 'requestType']);
+const DATE_VARIABLES = new Set(['submittedAt', 'dueAt', 'lateUntil', 'eventTime']);
+
+/** Never parse message prose. Missing historical variables and newer event types
+ * retain the server's English fallback rather than showing broken placeholders. */
+export function getNotificationMessage(notification: {
+  notificationType?: string;
+  templateVars?: Record<string, string>;
+  message?: string;
+}): string {
+  const fallback = notification.message || i18n.t('notification:academicUpdate');
+  const {notificationType: type, templateVars: vars} = notification;
+  if (!type || !NOTIFICATION_TITLES.has(type) || !vars || !Object.keys(vars).length) return fallback;
+  const audience = vars.audienceVariant;
+  if (GROUP_TYPES.has(type) && !GROUP_AUDIENCES.has(audience)) return fallback;
+  const templateName = GROUP_TYPES.has(type) ? `${type}_${audience}` : type;
+  const template = i18n.getResource(getFormattingLocale(), 'notification', `messages.${templateName}`);
+  if (typeof template !== 'string') return fallback;
+  const values: Record<string, string> = {};
+  for (const match of template.matchAll(/{{\s*(\w+)\s*}}/g)) {
+    const name = match[1];
+    const value = vars[name];
+    if (typeof value !== 'string' || !value.trim()) return fallback;
+    if (STATUS_VARIABLES.has(name)) values[name] = statusLabel(value);
+    // Only offset-bearing instants have enough information to format safely.
+    // Opaque time windows and zone-less values retain their contracted text.
+    else if (DATE_VARIABLES.has(name) && /(?:Z|[+-]\d{2}:?\d{2})$/i.test(value) && Number.isFinite(Date.parse(value))) values[name] = formatNotificationTime(value);
+    else if (name === 'versionNo' && Number.isFinite(Number(value))) values[name] = formatNumber(Number(value));
+    else values[name] = value;
+  }
+  try {
+    return i18n.t(`notification:messages.${templateName}`, {...values, interpolation: {escapeValue: false, skipOnVariables: true}});
+  } catch {
+    return fallback;
+  }
+}
 
 export const formatNotificationTime = (value: string): string => {
   return formatUtcTimestamp(value, {

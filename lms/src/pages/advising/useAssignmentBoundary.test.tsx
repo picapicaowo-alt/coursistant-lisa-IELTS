@@ -27,10 +27,10 @@ describe('Advisor assignment boundary', () => {
     expect(await screen.findByText('Assigned student queue')).toBeInTheDocument();
     await waitFor(() => expect(client.getQueryCache().findAll({predicate: query => query.meta?.advisingStudentId === 41})).toHaveLength(0));
   });
-  it('keeps legitimate first-use missing profiles inside the assigned student workspace', async () => {
+  it.each(['STUDENT_PROFILE_NOT_FOUND', 'STUDENT_INTAKE_NOT_FOUND', 'STUDY_PLAN_NOT_FOUND'])('keeps the missing aggregate %s visible in the student workspace', async code => {
     const client = setup();
     await act(async () => {
-      await client.fetchQuery({queryKey: ['advisor', 'profile', 41], meta: {advisingStudentId: 41}, queryFn: () => Promise.reject({code: 404, details: {code: 'STUDENT_PROFILE_NOT_FOUND'}})}).catch(() => undefined);
+      await client.fetchQuery({queryKey: ['advisor', 'profile', 41], meta: {advisingStudentId: 41}, queryFn: () => Promise.reject({code: 404, details: {code}})}).catch(() => undefined);
     });
     expect(screen.getByText('Student workspace')).toBeInTheDocument();
   });
