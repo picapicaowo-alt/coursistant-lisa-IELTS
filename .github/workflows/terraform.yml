@@ -1,0 +1,120 @@
+name: Terraform
+
+on:
+  pull_request:
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/terraform.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'infrastructure/**'
+      - '.github/workflows/terraform.yml'
+  workflow_dispatch:
+    inputs:
+      apply_pilot:
+        description: 'Apply the reviewed pilot plan'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  TF_IN_AUTOMATION: 'true'
+  TF_INPUT: 'false'
+  TF_WORKING_DIR: infrastructure/environments/pilot
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.16.0'
+      - uses: terraform-linters/setup-tflint@v5
+      - name: Terraform format
+        run: terraform fmt -check -recursive infrastructure
+      - name: Initialize bootstrap without backend
+        run: terraform -chdir=infrastructure/bootstrap init -backend=false
+      - name: Validate bootstrap
+        run: terraform -chdir=infrastructure/bootstrap validate
+      - name: Initialize pilot without backend
+        run: terraform -chdir="${TF_WORKING_DIR}" init -backend=false
+      - name: Validate pilot
+        run: terraform -chdir="${TF_WORKING_DIR}" validate
+      - name: Lint root modules
+        run: |
+          tflint --chdir=infrastructure/bootstrap --init
+          tflint --chdir=infrastructure/bootstrap
+          tflint --chdir="${TF_WORKING_DIR}" --init
+          tflint --chdir="${TF_WORKING_DIR}"
+          for module in infrastructure/modules/*; do tflint --chdir="$module"; done
+      - name: Install Checkov
+        run: pip install --disable-pip-version-check checkov==3.3.10
+      - name: Scan Terraform
+        run: checkov -d infrastructure --framework terraform --skip-path '.terraform' --compact
+
+  plan:
+    if: ${{ vars.AWS_TERRAFORM_PLAN_ROLE_ARN != '' && vars.TF_STATE_BUCKET != '' && vars.TF_STATE_KMS_KEY_ARN != '' }}
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.16.0'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_TERRAFORM_PLAN_ROLE_ARN }}
+          aws-region: ap-northeast-1
+      - name: Initialize remote state
+        run: >-
+          terraform -chdir="${TF_WORKING_DIR}" init
+          -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+          -backend-config="key=pilot/terraform.tfstate"
+          -backend-config="region=us-east-1"
+          -backend-config="encrypt=true"
+          -backend-config="use_lockfile=true"
+          -backend-config="kms_key_id=${{ vars.TF_STATE_KMS_KEY_ARN }}"
+      - name: Create plan
+        run: terraform -chdir="${TF_WORKING_DIR}" plan -lock-timeout=5m -out=pilot.tfplan
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pilot-terraform-plan
+          path: infrastructure/environments/pilot/pilot.tfplan
+          retention-days: 7
+
+  apply:
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.apply_pilot && vars.AWS_TERRAFORM_APPLY_ROLE_ARN != '' }}
+    needs: validate
+    runs-on: ubuntu-latest
+    environment: pilot
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.16.0'
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_TERRAFORM_APPLY_ROLE_ARN }}
+          aws-region: ap-northeast-1
+      - name: Initialize remote state
+        run: >-
+          terraform -chdir="${TF_WORKING_DIR}" init
+          -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+          -backend-config="key=pilot/terraform.tfstate"
+          -backend-config="region=us-east-1"
+          -backend-config="encrypt=true"
+          -backend-config="use_lockfile=true"
+          -backend-config="kms_key_id=${{ vars.TF_STATE_KMS_KEY_ARN }}"
+      - name: Apply reviewed main branch
+        run: terraform -chdir="${TF_WORKING_DIR}" apply -lock-timeout=5m -auto-approve

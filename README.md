@@ -15,3 +15,8 @@ Start here:
 3. [`lms/PROJECT_STANDARDS.md`](./lms/PROJECT_STANDARDS.md) — architecture
 4. [`docs/README.md`](./docs/README.md) — consumed OpenAPI and current A/B scope
 5. [`lms/src/README.md`](./lms/src/README.md) — live module map
+
+The explicitly authorized AWS Tokyo pilot infrastructure is isolated under
+[`infrastructure/`](./infrastructure/). Its Terraform workflow, ownership,
+security controls, and backend handoff are documented independently from the
+browser application.
