@@ -405,7 +405,9 @@
     "studentId": "學生編號：{{id}}",
     "completedTasks_one": "已完成 {{completed}} / {{number}} 項任務",
     "completedTasks_other": "已完成 {{completed}} / {{number}} 項任務",
-    "targetValue": "目標 {{value}}"
+    "targetValue": "目標 {{value}}",
+    "intakeMissing": "該學生尚未完成入學登記，學生中心暫不可用。",
+    "studyPlanUnavailable": "目前顧問無法存取該學生的學習計畫。"
   },
   "profile": {
     "loadCurrent": "請載入當前檔案後再儲存。",

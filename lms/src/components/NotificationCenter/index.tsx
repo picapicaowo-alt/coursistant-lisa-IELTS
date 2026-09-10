@@ -17,15 +17,15 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
-import type {LoginResponse, NotificationItem, NotificationType, UnreadNotificationCount} from '@/apis';
+import type {LoginResponse, NotificationItem, UnreadNotificationCount} from '@/apis';
 import {unwrapData} from '@/apis';
 import {notificationApiService} from '@/apis/services/notification-api';
-import {formatNotificationTime, getNotificationTitle, resolveNotificationPath} from './utils';
+import {formatNotificationTime, getNotificationMessage, getNotificationTitle, resolveNotificationPath} from './utils';
 import styles from './index.module.scss';
 
 const NOTIFICATION_PAGE_SIZE = 20;
 
-const ICONS: Partial<Record<NotificationType, LucideIcon>> = {
+const ICONS = new Map<string, LucideIcon>(Object.entries({
   ANNOUNCEMENT_POSTED: Megaphone,
   ASSIGNMENT_PUBLISHED: ClipboardList,
   ASSIGNMENT_SUBMISSION_RECEIVED: ClipboardList,
@@ -42,7 +42,7 @@ const ICONS: Partial<Record<NotificationType, LucideIcon>> = {
   GROUP_MEMBER_ADDED: UsersRound,
   GROUP_MEMBER_REMOVED: UsersRound,
   GROUP_MEMBER_MOVED: UsersRound,
-};
+}));
 
 const NotificationRow = ({
   notification,
@@ -54,8 +54,9 @@ const NotificationRow = ({
   onOpen: (notification: NotificationItem) => void;
 }) => {
   const {t: translate} = useTranslation();
-  const Icon = ICONS[notification.notificationType] ?? Bell;
+  const Icon = ICONS.get(notification.notificationType) ?? Bell;
   const target = resolveNotificationPath(notification, identity);
+  const message = getNotificationMessage(notification);
   const unread = !notification.readAt;
   const unavailable = notification.availability === 'NO_LONGER_AVAILABLE';
 
@@ -66,7 +67,7 @@ const NotificationRow = ({
         className={styles.notificationButton}
         onClick={() => onOpen(notification)}
         disabled={!target}
-        aria-label={translate(target ? 'notification:open' : 'notification:unavailable', {message: notification.message})}
+        aria-label={translate(target ? 'notification:open' : 'notification:unavailable', {message})}
       >
         <span className={styles.typeIcon} aria-hidden="true"><Icon size={18}/></span>
         <span className={styles.notificationCopy}>
@@ -74,7 +75,7 @@ const NotificationRow = ({
             <strong>{getNotificationTitle(notification.notificationType)}</strong>
             {unread ? <span className={styles.unreadDot} aria-label={translate("notification:unread")}/> : null}
           </span>
-          <span className={styles.message}>{notification.message}</span>
+          <span className={styles.message}>{message}</span>
           <span className={styles.metadata}>
             {notification.courseCode ? <span>{notification.courseCode}</span> : null}
             <time dateTime={notification.createdAt}>{formatNotificationTime(notification.createdAt)}</time>

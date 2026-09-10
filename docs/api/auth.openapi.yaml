@@ -593,6 +593,10 @@ paths:
         name: resourceType
         schema: { type: string }
       - in: query
+        name: resourceId
+        description: Must be supplied together with resourceType; otherwise BAD_REQUEST
+        schema: { type: integer, format: int64 }
+      - in: query
         name: from
         schema: { type: string, format: date-time }
       - in: query
@@ -606,7 +610,7 @@ paths:
         schema: { type: integer, format: int32, default: 20 }
       responses:
         "200":
-          description: Namespaced governance events
+          description: "Namespaced governance events. resourceId identifies the resource together with resourceType; targetUserId is a real person or null, never a resource identifier."
         "400":
           description: BAD_REQUEST
         "401":
@@ -833,6 +837,13 @@ paths:
       - Tenant Managed Users
 components:
   schemas:
+    TenantGovernanceAuditEvent:
+      type: object
+      required: [resourceType, resourceId, targetUserId]
+      properties:
+        resourceType: { type: string }
+        resourceId: { type: integer, format: int64, description: "Resource identity, always interpreted together with resourceType" }
+        targetUserId: { type: integer, format: int64, nullable: true, description: "Real person only; null for events without a personnel target" }
     AdminQuery:
       type: object
       properties:

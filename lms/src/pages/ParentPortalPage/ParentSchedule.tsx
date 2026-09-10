@@ -4,7 +4,7 @@ import {formatNumber} from '@/i18n/formatting';
 import {parseInputDate} from '@/i18n/dateInput';
 import {timeDurationMinutes} from '@/utils/dateTimeRange';
 import {formatPersonName} from '@/utils/personName';
-import {calendarLocalFields} from '@/utils/datetime';
+import {calendarDisplay} from '@/utils/calendarDisplay';
 import {useEffect, useRef, useState, type Dispatch, type SetStateAction} from 'react';
 import {CalendarClock, CalendarDays, Clock3, FilePenLine, MapPin} from 'lucide-react';
 import {SCHEDULE_REQUEST_TYPES, type ScheduleRequestType} from '@/apis';
@@ -20,14 +20,9 @@ export interface ParentScheduleDraft {
   courseId: string; occurrenceId: string; requestType: ScheduleRequestType; reason: string; date: string; start: string; end: string;
 }
 
-const classDuration = (start?: string, end?: string): string | undefined => {
-  const parse = (value?: string) => {
-    const match = value?.match(/^(\d{2}):(\d{2})/);
-    return match ? Number(match[1]) * 60 + Number(match[2]) : undefined;
-  };
-  const from = parse(start);
-  const to = parse(end);
-  return from != null && to != null && to > from ? i18n.t('assessment:attempt.duration', {count: to - from, number: formatNumber(to - from)}) : undefined;
+const classDuration = (start?: string, end?: string, durationMinutes?: number): string | undefined => {
+  const minutes = durationMinutes ?? timeDurationMinutes(start?.slice(0, 5) ?? '', end?.slice(0, 5) ?? '');
+  return minutes == null ? undefined : i18n.t('assessment:attempt.duration', {count: minutes, number: formatNumber(minutes)});
 };
 
 export function ParentSchedule({value, history, loading, loadError, draft, setDraft, pending, error, success, onSubmit}: {
@@ -38,6 +33,7 @@ export function ParentSchedule({value, history, loading, loadError, draft, setDr
   const {t: translate} = useTranslation();
   const [invalidOccurrence, setInvalidOccurrence] = useState<string>();
   const data = asRecord(value);
+  const calendar = asRecord(data?.calendar);
   const classes = parentRecords(data?.calendar).filter(row => !row.eventType || row.eventType === 'SESSION');
   const editor = useRef<HTMLHeadingElement>(null);
   const selected = classes.find(row => String(parentNumber(row, 'courseId')) === draft.courseId && String(parentNumber(row, 'occurrenceId') ?? parentNumber(row, 'sessionOccurrenceId')) === draft.occurrenceId);
@@ -51,13 +47,10 @@ export function ParentSchedule({value, history, loading, loadError, draft, setDr
         const courseId = parentNumber(row, 'courseId');
         const occurrenceId = parentNumber(row, 'occurrenceId') ?? parentNumber(row, 'sessionOccurrenceId');
         const active = selected === row;
-        const timezone = parentText(row, 'timezone') || Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const startUtc = parentText(row, 'startsAtUtc');
-        const endUtc = parentText(row, 'endsAtUtc');
-        const local = startUtc ? calendarLocalFields(startUtc, endUtc, timezone) : undefined;
-        const date = local?.date || parentText(row, 'occurrenceDate') || parentText(row, 'date');
-        const start = local?.startTime || parentText(row, 'startTime');
-        const end = local?.endTime || parentText(row, 'endTime');
+        const display = calendarDisplay(row, calendar?.timezone);
+        const date = display?.date;
+        const start = display?.startTime;
+        const end = display?.endTime;
         const instructor = formatPersonName({firstName: parentText(row, 'instructorFirstName'), middleName: parentText(row, 'instructorMiddleName'), lastName: parentText(row, 'instructorLastName')}, parentText(row, 'instructorName') || '');
         const location = parentText(row, 'location');
         return <article className={styles.classRow} data-selected={active || undefined} key={occurrenceId ?? index}>
@@ -67,7 +60,7 @@ export function ParentSchedule({value, history, loading, loadError, draft, setDr
           </header>
           <dl className={styles.classFacts}>
             <div><CalendarDays size={19} aria-hidden="true"/><span><dt>{translate("common:fields.date")}</dt><dd>{date ? parentDate(date) : translate("common:feedback.notProvided")}</dd></span></div>
-            <div><Clock3 size={19} aria-hidden="true"/><span><dt>{translate("common:dateTime.time")}</dt><dd>{[parentTime(start), parentTime(end)].filter(Boolean).join(' – ') || translate("common:feedback.notProvided")}</dd>{classDuration(start, end) ? <small>{classDuration(start, end)}</small> : null}<small>{timezone}</small></span></div>
+            <div><Clock3 size={19} aria-hidden="true"/><span><dt>{translate("common:dateTime.time")}</dt><dd>{[parentTime(start), parentTime(end)].filter(Boolean).join(' – ') || translate("common:feedback.notProvided")}</dd>{classDuration(start, end, display?.durationMinutes) ? <small>{classDuration(start, end, display?.durationMinutes)}</small> : null}<small>{display?.timezone}</small></span></div>
             {location ? <div><MapPin size={19} aria-hidden="true"/><span><dt>{translate("calendar:details.location")}</dt><dd>{location}</dd></span></div> : null}
           </dl>
           {courseId != null && occurrenceId != null ? <button type="button" className={active ? shared.primary : shared.secondary} aria-pressed={active} disabled={pending} onClick={() => setDraft(current => ({...current, courseId: String(courseId), occurrenceId: String(occurrenceId)}))}>{active ? translate("learning:schedule.selected") : translate("learning:schedule.requestChange")}</button> : <p className={styles.meta}>{translate("learning:schedule.unavailable")}</p>}
@@ -79,6 +72,7 @@ export function ParentSchedule({value, history, loading, loadError, draft, setDr
       {success && !draft.occurrenceId ? <p role="status" className={styles.success}>{translate("learning:schedule.parentSubmitted")}</p> : null}
       {selected && !loadError ? <form noValidate className={styles.scheduleForm} onSubmit={event => {event.preventDefault(); if (pending) return; if (draft.requestType === SCHEDULE_REQUEST_TYPES[1] && (!parseInputDate(draft.date) || timeDurationMinutes(draft.start, draft.end) === null)) {setInvalidOccurrence(draft.occurrenceId); return;} setInvalidOccurrence(undefined); onSubmit();}}>
         <h3 ref={editor} tabIndex={-1}>{parentText(selected, 'courseTitle') || parentText(selected, 'courseCode') || parentText(selected, 'title') || translate("learning:schedule.selectedClass")}</h3>
+        {parentText(selected, 'timezone') ? <p className={styles.meta}>{translate('calendar:editor.timezone')}: {parentText(selected, 'timezone')}</p> : null}
         <label>{translate("operations:requestType")}<select name="requestType" autoComplete="off" value={draft.requestType} disabled={pending} onChange={event => setDraft(current => ({...current, requestType: event.target.value as ScheduleRequestType}))}>{SCHEDULE_REQUEST_TYPES.map(type => <option key={type} value={type}>{parentLabel(type)}</option>)}</select></label>
         {draft.requestType === SCHEDULE_REQUEST_TYPES[1] ? <>
           <label>{translate("operations:proposedDate")}<EnglishDateInput aria-label={translate("operations:proposedDate")} name="proposedOccurrenceDate" required value={draft.date} disabled={pending} onChangeValue={date => setDraft(current => ({...current, date}))}/></label>

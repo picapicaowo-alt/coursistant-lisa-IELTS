@@ -405,7 +405,9 @@
     "studentId": "学生编号：{{id}}",
     "completedTasks_one": "已完成 {{completed}} / {{number}} 项任务",
     "completedTasks_other": "已完成 {{completed}} / {{number}} 项任务",
-    "targetValue": "目标 {{value}}"
+    "targetValue": "目标 {{value}}",
+    "intakeMissing": "该学生尚未完成入学登记，学生中心暂不可用。",
+    "studyPlanUnavailable": "当前顾问无法访问该学生的学习计划。"
   },
   "profile": {
     "loadCurrent": "请加载当前档案后再保存。",

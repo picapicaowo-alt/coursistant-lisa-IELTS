@@ -1,8 +1,8 @@
+import {calendarDisplay} from '@/utils/calendarDisplay';
 import type {MyCourse} from '@/apis';
 import {generatePath} from 'react-router-dom';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
 import type {CalendarItem} from './calendarData';
-import {calendarLocalFields} from '@/utils/datetime';
 
 /** Reuse the occurrence fields consumed by Learning operations. A recurring
  * template is not evidence that a class still takes place after rescheduling. */
@@ -31,32 +31,24 @@ export function calendarOccurrences(
     // supply the assignment and event details below the timetable.
     if (id == null) continue;
     const course = courses.find((course) => course.id === row.courseId);
-    const timezone = envelope?.timezone ?? row.timezone;
-    const local = typeof row.startsAtUtc === 'string' && typeof timezone === 'string'
-      ? calendarLocalFields(row.startsAtUtc, typeof row.endsAtUtc === 'string' ? row.endsAtUtc : undefined, timezone)
-      : undefined;
-    const date = local?.date ?? row.occurrenceDate ?? row.date;
-    const startTime = local?.startTime ?? row.startTime;
-    const endTime = local?.endTime ?? row.endTime;
+    const display = calendarDisplay(row, envelope?.timezone);
     if (
       typeof id !== 'number' ||
       !Number.isSafeInteger(id) ||
       id <= 0 ||
       !course ||
-      typeof date !== 'string' ||
-      !/^\d{4}-\d{2}-\d{2}$/.test(date) ||
-      typeof startTime !== 'string' ||
-      !/^\d{2}:\d{2}/.test(startTime) ||
-      typeof timezone !== 'string' ||
-      !timezone
+      !display
     ) {
       unavailableCount++;
       continue;
     }
+    const {date, startTime, endTime, timezone} = display;
     if (date < from || date > to) continue;
     items.push({
       id: `occurrence-${id}`,
-      sourceId: id,
+      sourceId: typeof row.sourceId === 'number' ? row.sourceId : id,
+      startsAtUtc: typeof row.startsAtUtc === 'string' ? row.startsAtUtc : undefined,
+      endsAtUtc: typeof row.endsAtUtc === 'string' ? row.endsAtUtc : undefined,
       courseId: course.id,
       courseCode: course.courseCode,
       courseTitle: course.title,

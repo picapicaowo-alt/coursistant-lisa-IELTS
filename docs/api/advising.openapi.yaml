@@ -1350,7 +1350,7 @@ paths:
         "401": { $ref: "#/components/responses/Unauthorized" }
         "403": { $ref: "#/components/responses/Forbidden" }
         "404":
-          description: STUDY_PLAN_NOT_FOUND
+          description: "STUDENT_INTAKE_NOT_FOUND when assigned intake is missing; STUDY_PLAN_NOT_FOUND when no study plan is accessible to the current Advisor."
   /v2/advisor/students/{studentUserId}/student-reports:
     get:
       operationId: advisorListStudentPublishedReports
@@ -2051,13 +2051,14 @@ components:
         timestamp: { type: string, format: date-time }
     AdvisorStudentHubResponse:
       type: object
+      required: [studentUserId, studentType, activeCourseCount]
       properties:
         studentUserId: { type: integer }
         firstName: { type: string }
         middleName: { type: string }
         lastName: { type: string }
         email: { type: string }
-        studentType: { type: string }
+        studentType: { type: string, enum: [VIP, STANDARD], description: "From Student Intake" }
         risk:
           type: object
           properties:
@@ -2069,7 +2070,7 @@ components:
         activeTasks:
           type: array
           items: { $ref: "#/components/schemas/AdvisorActionTaskResponse" }
-        activeCourseCount: { type: integer }
+        activeCourseCount: { type: integer, minimum: 0, description: "Distinct ACTIVE, incomplete, unarchived course links whose course is PUBLISHED; zero is a valid count." }
         publishedReportCount: { type: integer }
         pendingRequestCount: { type: integer, description: "Current Advisor PENDING_ADVISOR schedule requests only; excludes PENDING_INSTRUCTOR, processed requests and activeTasks." }
     AdvisorStudentHubApiResponse:

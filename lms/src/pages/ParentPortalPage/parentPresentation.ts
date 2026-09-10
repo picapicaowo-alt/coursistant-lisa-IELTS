@@ -1,3 +1,4 @@
+import type {ParentNotification} from '@/apis';
 import i18n from '@/i18n';
 import {formatDateValue, formatClockTime} from '@/i18n/formatting';
 import {statusLabel} from '@/i18n/presentation';
@@ -28,4 +29,24 @@ export const parentLabel = statusLabel;
 
 export function withoutFields(record: Record<string, unknown>, keys: string[]): Record<string, unknown> {
   return Object.fromEntries(Object.entries(record).filter(([key]) => !keys.includes(key)));
+}
+
+/** Normalize legacy notification reads without dropping rows with no template variables. */
+export function parentNotification(row: Record<string, unknown>): ParentNotification {
+  const vars = asRecord(row.templateVars);
+  return {
+    notificationId: parentNumber(row, 'notificationId'),
+    studentUserId: parentNumber(row, 'studentUserId'),
+    courseId: parentNumber(row, 'courseId'),
+    courseCode: parentText(row, 'courseCode'),
+    notificationType: parentText(row, 'notificationType') ?? '',
+    message: parentText(row, 'message') ?? '',
+    templateVars: Object.fromEntries(Object.entries(vars ?? {}).filter((entry): entry is [string, string] => typeof entry[1] === 'string')),
+    subjectType: parentText(row, 'subjectType'),
+    subjectId: parentNumber(row, 'subjectId'),
+    deepLink: parentText(row, 'deepLink'),
+    createdAt: parentText(row, 'createdAt'),
+    readAt: parentText(row, 'readAt'),
+    availability: parentText(row, 'availability'),
+  };
 }

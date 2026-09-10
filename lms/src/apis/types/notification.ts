@@ -56,8 +56,11 @@ export interface NotificationItem {
   recipientUserId: number;
   courseId?: number | null;
   courseCode?: string | null;
-  notificationType: NotificationType;
+  /** Open string so newer server types can use the message fallback. */
+  notificationType: string;
   message: string;
+  /** Structured interpolation values; legacy notifications return an empty object. */
+  templateVars: Record<string, string>;
   subjectType?: NotificationSubjectType | null;
   subjectId?: number | null;
   /** Frontend path supplied by the API, never an absolute URL. */

@@ -1,4 +1,3 @@
-import {ADVISING_ERROR_CODES} from '@/apis';
 import {isMissingResource} from '@/utils/apiError';
 import { useTranslation } from 'react-i18next';
 import {formatNumber, formatNumericText} from '@/i18n/formatting';
@@ -7,13 +6,13 @@ import React, {useId, useState} from 'react';
 import {generatePath, Link, NavLink, Outlet, useParams} from 'react-router-dom';
 import {useQuery} from '@tanstack/react-query';
 import {MessageSquare, Calendar, ChevronDown} from 'lucide-react';
-import {unwrapData} from '@/apis';
+import {ADVISING_ERROR_CODES, unwrapData} from '@/apis';
 import {UserAvatar} from '@/components/UserAvatar';
 import {ProgressRing} from '@/components/ProgressRing';
 import {TASK_STATUS, formatPlanDate} from '@/utils/studyPlan';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {APP_ROUTE_PATHS} from '@/configs/routePaths';
-import {isNotFound} from '@/utils/apiError';
+import {getApiErrorCode, isNotFound} from '@/utils/apiError';
 import {formatPersonName} from '@/utils/personName';
 import {advisingQueryKeys} from '../advising/queryKeys';
 import {useAssignmentBoundary} from '../advising/useAssignmentBoundary';
@@ -61,7 +60,11 @@ const AdvisorStudentLayout: React.FC = () => {
   if (intake.isError && isNotFound(intake.error)) {
     return (
       <div className={styles.page}>
-        <p className={styles.error} role="alert">{translate("advising:studentWorkspace.notAssigned")}</p>
+        <p className={styles.error} role="alert">{getApiErrorCode(intake.error) === ADVISING_ERROR_CODES.intakeNotFound
+          ? translate('advising:studentWorkspace.intakeMissing')
+          : getApiErrorCode(intake.error) === ADVISING_ERROR_CODES.studyPlanNotFound
+            ? translate('advising:studentWorkspace.studyPlanUnavailable')
+            : advisingErrorMessage(intake.error, translate('advising:studentWorkspace.intakeFailed'))}</p>
       </div>
     );
   }

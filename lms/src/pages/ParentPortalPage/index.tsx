@@ -1,3 +1,4 @@
+import {parentNotification} from './parentPresentation';
 import {formatNumber} from '@/i18n/formatting';
 import {useTranslation} from 'react-i18next';
 import {LocalizedError} from '@/i18n/errors';
@@ -7,7 +8,7 @@ import { AdvisingPagination } from "../advising/AdvisingPagination";
 import { useIdempotencyCheckpoint } from "@/hooks/useIdempotencyCheckpoint";
 import { sendStableMessage } from "@/utils/sendStableMessage";
 import {
-  getNotificationTitle,
+  getNotificationMessage, getNotificationTitle,
   formatNotificationTime,
 } from "@/utils/notificationPresentation";
 import {getParentSection, PARENT_SECTIONS, PARENT_LEARNING_TABS} from '@/configs/parentNavigation';
@@ -32,7 +33,6 @@ import {
   SCHEDULE_REQUEST_TYPES,
   unwrapData,
   type ParentConversationMessageResponse,
-  type ParentNotification,
   type ParentLinkedStudent,
 } from "@/apis";
 import { parentApiService } from "@/apis/services/parent-api";
@@ -146,7 +146,7 @@ const ParentStudentWorkspace: React.FC<{
       if (section === "learning") return null;
       if (section === "schedule") {
         const [calendar, requests] = await Promise.all([
-          parentApiService.listStudentCalendar(studentUserId),
+          parentApiService.listStudentCalendar(studentUserId, {timezone: Intl.DateTimeFormat().resolvedOptions().timeZone}),
           parentApiService.listScheduleRequests(studentUserId),
         ]);
         return {
@@ -338,7 +338,7 @@ const ParentStudentWorkspace: React.FC<{
     section === "notifications" && contentRecord
       ? contentRecord.notifications
       : undefined;
-  const notifications = recordItems(notificationData) as ParentNotification[];
+  const notifications = recordItems(notificationData).map(parentNotification);
   const notificationTotal = isRecord(notificationData)
     ? (numberField(notificationData, "total") ?? notifications.length)
     : notifications.length;
@@ -670,7 +670,7 @@ const ParentStudentWorkspace: React.FC<{
                               <span className={styles.unreadBadge}>{translate("dashboard:new")}</span>
                             )}
                           </div>
-                          <span>{item.message || translate("notification:academicUpdate")}</span>
+                          <span>{getNotificationMessage(item)}</span>
                           <small>
                             {[
                               item.courseCode,

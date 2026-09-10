@@ -52,15 +52,16 @@ export interface AdvisorConversationSummary {
   unreadCount?: number;
 }
 export interface AdvisorStudentHub {
-  studentUserId?: number;
+  studentUserId: number;
   firstName?: string;
   middleName?: string;
   lastName?: string;
   email?: string;
-  studentType?: string;
+  /** From Student Intake, never inferred from the learning profile. */
+  studentType: StudentType;
   risk?: {studentUserId?: number; status?: string; reasons?: string[]};
   activeTasks?: AdvisorActionTaskResponse[];
-  activeCourseCount?: number;
+  activeCourseCount: number;
   publishedReportCount?: number;
   /** Current Advisor PENDING_ADVISOR schedule requests; excludes activeTasks. */
   pendingRequestCount?: number;

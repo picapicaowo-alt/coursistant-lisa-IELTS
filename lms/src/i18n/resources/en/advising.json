@@ -405,7 +405,9 @@
     "studentId": "Student ID: {{id}}",
     "completedTasks_one": "{{completed}} of {{number}} task completed",
     "completedTasks_other": "{{completed}} of {{number}} tasks completed",
-    "targetValue": "Target {{value}}"
+    "targetValue": "Target {{value}}",
+    "intakeMissing": "This student has not completed intake. Student Hub is temporarily unavailable.",
+    "studyPlanUnavailable": "No study plan is accessible to the current advisor for this student."
   },
   "profile": {
     "loadCurrent": "Load the current profile before saving.",

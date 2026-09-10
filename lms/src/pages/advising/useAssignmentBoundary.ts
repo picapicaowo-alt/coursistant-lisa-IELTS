@@ -1,3 +1,4 @@
+import {ADVISING_ERROR_CODES} from '@/apis';
 import {useEffect} from 'react';
 import {useQueryClient} from '@tanstack/react-query';
 import {useNavigate} from 'react-router-dom';
@@ -12,7 +13,7 @@ export function useAssignmentBoundary(studentUserId: number) {
     const check = (meta: Record<string, unknown> | undefined, error: unknown) => {
       if (leaving || meta?.advisingStudentId !== studentUserId || !isNotFound(error)) return;
       // Missing aggregates are valid first-use states while the student remains assigned.
-      if (['STUDENT_PROFILE_NOT_FOUND', 'STUDY_PLAN_NOT_FOUND'].includes(getApiErrorCode(error) ?? '')) return;
+      if (new Set<string>([ADVISING_ERROR_CODES.intakeNotFound, ADVISING_ERROR_CODES.profileNotFound, ADVISING_ERROR_CODES.studyPlanNotFound]).has(getApiErrorCode(error) ?? '')) return;
       leaving = true;
       navigate('/advisor/students', {replace: true});
       void client.cancelQueries({predicate: query => query.meta?.advisingStudentId === studentUserId}).then(() => {

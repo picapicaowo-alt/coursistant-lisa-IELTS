@@ -360,8 +360,13 @@ components:
           example: 3
     NotificationResponse:
       type: object
+      required: [notificationType, message, templateVars]
       description: One in-app notification for the current user
       properties:
+        templateVars:
+          type: object
+          description: "Non-null structured interpolation variables; legacy notifications return {}. Fall back to message when the template or required variables are unavailable."
+          additionalProperties: { type: string }
         availability:
           type: string
           description: "Whether the subject is currently reachable for this viewer.\

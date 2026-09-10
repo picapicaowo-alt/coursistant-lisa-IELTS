@@ -576,7 +576,11 @@
       "STUDENT_ADVISOR_ASSIGNMENT": "顧問指派",
       "PARENT_STUDENT_LINK": "家長與學生關聯"
     },
-    "templateTarget": "模考試卷 {{id}}"
+    "templateTarget": "模考試卷 {{id}}",
+    "resourceId": "資源 ID",
+    "resource": "資源",
+    "targetUser": "目標人員",
+    "invalidResource": "請輸入正整數資源 ID，並同時填寫資源類型。"
   },
   "alertRules": {
     "editorHint": "先應用到草稿，再在規則頁面儲存更改。",
