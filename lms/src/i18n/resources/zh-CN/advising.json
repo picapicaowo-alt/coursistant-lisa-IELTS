@@ -36,7 +36,24 @@
       "REACHED_INCOMPLETE_CHECKPOINT": "检查点到期未完成",
       "OVERDUE_STUDY_PLAN_TASK": "学习计划任务逾期"
     },
-    "missingVersion": "请重新加载此任务，以获取当前版本。"
+    "missingVersion": "请重新加载此任务，以获取当前版本。",
+    "messageStudent": "联系学生",
+    "retryStudent": "重新加载学生姓名",
+    "studentUnavailable": "学生信息暂不可用。",
+    "recordId": "记录 #{{id}}",
+    "resources": {
+      "ADVISOR_TASK": "学生学习任务",
+      "STUDY_PLAN_CHECKPOINT": "学习计划检查点",
+      "ASSIGNMENT": "课程作业",
+      "SUBMISSION": "作业提交",
+      "SCHEDULE_REQUEST": "排课申请",
+      "COURSE_REPORT": "课程报告",
+      "COURSE_HOURS": "课程课时",
+      "STUDENT": "学生档案"
+    },
+    "sourceDueDate": "截止日期：{{date}}",
+    "sourceStatus": "学习任务状态：{{status}}",
+    "sourceUnavailable": "无法加载学习任务详情。"
   },
   "studentTasks": {
     "description": "顾问为你安排的个性化任务，帮助你实现学习目标。",
@@ -657,7 +674,17 @@
     "active": "当前对话",
     "back": "返回对话列表",
     "select": "选择对话",
-    "selectHelp": "选择学生，查看并回复消息。"
+    "selectHelp": "选择学生，查看并回复消息。",
+    "views": {
+      "conversations": "最近会话",
+      "students": "学生通讯录"
+    },
+    "searchStudents": "搜索学生",
+    "studentsHint": "选择你负责的学生，即可开始对话。",
+    "loadingStudents": "正在加载学生…",
+    "studentsFailed": "无法加载学生。",
+    "studentsEmpty": "没有找到符合搜索条件的学生。",
+    "studentPages": "学生通讯录分页"
   },
   "counsellor": {
     "dashboard": "招生概览",

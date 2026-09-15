@@ -53,6 +53,18 @@
 .detailsAction { grid-column: 1; }
 .recordAction { grid-column: 2; }
 .transitionAction { grid-column: 3; }
+.context { display: grid; gap: t.$space-2; min-width: 0; overflow-wrap: anywhere; }
+.studentLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: t.$space-3;
+  font-size: t.$font-size-caption;
+
+  a, button { min-height: t.$touch-target; display: inline-flex; align-items: center; }
+  a:first-child { font-weight: t.$fw-semibold; }
+  button { background: transparent; border: 0; text-decoration: underline; }
+}
 .taskBadges { display: flex; flex-wrap: wrap; align-items: center; gap: t.$space-3; margin-block: t.$space-3; }
 .detail h2 { font-size: t.$font-size-subhead; font-weight: t.$fw-semibold; }
 .detail h3 { font-size: t.$font-size-body; line-height: t.$line-height-body; font-weight: t.$fw-semibold; overflow-wrap: anywhere; }
