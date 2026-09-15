@@ -157,8 +157,8 @@ export default function AdvisorTasksPage() {
                       {task.createdAt ? ` · ${formatTaskDateTime(task.createdAt)}` : ''}
                     </p>
                   </div>
-                  <AdvisingBadge value={task.status} kind="status"/>
-                  <AdvisingBadge value={task.priority}/>
+                  <div className={taskStyles.statusCell}><AdvisingBadge value={task.status} kind="status"/></div>
+                  <div className={taskStyles.priorityCell}><AdvisingBadge value={task.priority}/></div>
                   <div className={taskStyles.taskActions}>
                     {task.taskId != null ? (
                       <button

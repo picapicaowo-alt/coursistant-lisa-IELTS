@@ -62,3 +62,9 @@ These are scoped dispositions, not a new all-role WCAG certification. Source che
 - Production build: passed; existing large-chunk advisory remains.
 - Full browser suite: 444 Chromium tests passed (2.0 minutes).
 - Live scope: Advisor read/navigation, task context, student contact selection, desktop/mobile and locale behavior. No message-send, attachment upload, reminder transition, grading write, or all-role acceptance claimed.
+
+## Label alignment follow-up
+
+Status and priority now have explicit grid cells. Desktop pills, first title lines and action buttons share a 44px first-line track, independent of extra student details or title wrapping. Compact layouts retain two equal label columns with the actions on the next row.
+
+Browser measurements at 1440, 1280, 1024, 768 and 390px confirmed identical per-column left edges across all four Tokyo reminders and no document overflow. Desktop status, priority and button centers matched exactly. Production build, targeted lint and three existing browser regression cases passed. The previously reported full-suite counts apply to the preceding commit; this CSS follow-up has its own fresh PR CI run.
