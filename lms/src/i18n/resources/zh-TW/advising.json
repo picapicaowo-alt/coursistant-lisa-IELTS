@@ -36,7 +36,24 @@
       "REACHED_INCOMPLETE_CHECKPOINT": "檢查點到期未完成",
       "OVERDUE_STUDY_PLAN_TASK": "學習計畫任務逾期"
     },
-    "missingVersion": "請重新載入此任務，以獲取當前版本。"
+    "missingVersion": "請重新載入此任務，以獲取當前版本。",
+    "messageStudent": "聯絡學生",
+    "retryStudent": "重新載入學生姓名",
+    "studentUnavailable": "學生資訊暫不可用。",
+    "recordId": "紀錄 #{{id}}",
+    "resources": {
+      "ADVISOR_TASK": "學生學習任務",
+      "STUDY_PLAN_CHECKPOINT": "學習計畫檢查點",
+      "ASSIGNMENT": "課程作業",
+      "SUBMISSION": "作業提交",
+      "SCHEDULE_REQUEST": "排課申請",
+      "COURSE_REPORT": "課程報告",
+      "COURSE_HOURS": "課程課時",
+      "STUDENT": "學生檔案"
+    },
+    "sourceDueDate": "截止日期：{{date}}",
+    "sourceStatus": "學習任務狀態：{{status}}",
+    "sourceUnavailable": "無法載入學習任務詳情。"
   },
   "studentTasks": {
     "description": "顧問為你安排的個人化任務，幫助你實現學習目標。",
@@ -657,7 +674,17 @@
     "active": "當前對話",
     "back": "返回對話列表",
     "select": "選擇對話",
-    "selectHelp": "選擇學生，檢視並回復訊息。"
+    "selectHelp": "選擇學生，檢視並回復訊息。",
+    "views": {
+      "conversations": "最近會話",
+      "students": "學生通訊錄"
+    },
+    "searchStudents": "搜尋學生",
+    "studentsHint": "選擇你負責的學生，即可開始對話。",
+    "loadingStudents": "正在載入學生…",
+    "studentsFailed": "無法載入學生。",
+    "studentsEmpty": "沒有找到符合搜尋條件的學生。",
+    "studentPages": "學生通訊錄分頁"
   },
   "counsellor": {
     "dashboard": "招生概覽",

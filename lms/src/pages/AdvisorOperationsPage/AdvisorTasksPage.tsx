@@ -16,6 +16,9 @@ import {formatDateTime, formatNumber} from '@/i18n/formatting';
 import {advisorApiService} from '@/apis/services/advisor-api';
 import {ADVISOR_PAGE_SIZE, ACTION_TASK_TYPES} from '@/apis/types/advisorWorkspace';
 import {actionTaskTargetPath} from './actionTaskTarget';
+import {ActionTaskContext} from './ActionTaskContext';
+import {actionTaskStudentId} from './taskIdentity';
+import {statusLabel} from '@/i18n/presentation';
 const formatTaskDateTime = (value?: string): string => {
   if (!value) return '';
   const parsed = new Date(value);
@@ -124,9 +127,7 @@ export default function AdvisorTasksPage() {
                 }}
               >
                 <option value="">{t("advising:actionTasks.allStudents")}</option>
-                <option value="ACTIVE">{t("common:status.ACTIVE")}</option>
-                <option value="INTAKE">{t("advising:actionTasks.intake")}</option>
-                <option value="TRANSITION">{t("advising:actionTasks.transition")}</option>
+                {(['VIP', 'STANDARD'] as const).map(value => <option key={value} value={value}>{statusLabel(value)}</option>)}
               </select>
             </label>
           </div>
@@ -150,13 +151,14 @@ export default function AdvisorTasksPage() {
               <article className={taskStyles.taskRow} key={task.taskId}>
                   <div className={taskStyles.taskMain}>
                     <h3>{task.description || t("advising:actionTasks.fallbackTitle", {id: task.taskId})}</h3>
+                    <ActionTaskContext task={task}/>
                     <p>
                       {task.category ? (ACTION_CATEGORY_LABELS[task.category] ? t(ACTION_CATEGORY_LABELS[task.category]) : task.category) : task.taskType && ACTION_TASK_TYPES.some(type => type === task.taskType) ? t(`advising:actionTasks.types.${task.taskType}`) : t('common:tasks.advisingTask')}
                       {task.createdAt ? ` · ${formatTaskDateTime(task.createdAt)}` : ''}
                     </p>
                   </div>
-                  <AdvisingBadge value={task.status} kind="status"/>
-                  <AdvisingBadge value={task.priority}/>
+                  <div className={taskStyles.statusCell}><AdvisingBadge value={task.status} kind="status"/></div>
+                  <div className={taskStyles.priorityCell}><AdvisingBadge value={task.priority}/></div>
                   <div className={taskStyles.taskActions}>
                     {task.taskId != null ? (
                       <button
@@ -169,7 +171,7 @@ export default function AdvisorTasksPage() {
                       >
                         {t("common:fields.details")}</button>
                     ) : null}
-                    {actionTaskTargetPath(task.target) ? (
+                    {actionTaskStudentId(task) && actionTaskTargetPath(task.target) ? (
                       <Link className={`${styles.secondaryLink} ${taskStyles.recordAction}`} to={actionTaskTargetPath(task.target)!}>
                         {t("advising:actionTasks.openRecord")}
                       </Link>
@@ -222,6 +224,7 @@ export default function AdvisorTasksPage() {
               {taskDetail.data ? (
                 <>
                   <h3>{taskDetail.data.description || t("navigation:actionTasks")}</h3>
+                  <ActionTaskContext task={taskDetail.data}/>
                   <div className={taskStyles.taskBadges}>
                     <AdvisingBadge value={taskDetail.data.status} kind="status"/>
                     <AdvisingBadge value={taskDetail.data.priority}/>

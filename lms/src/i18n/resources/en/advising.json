@@ -36,7 +36,24 @@
       "REACHED_INCOMPLETE_CHECKPOINT": "Incomplete checkpoint reached",
       "OVERDUE_STUDY_PLAN_TASK": "Overdue study plan task"
     },
-    "missingVersion": "Reload this task to get its current version."
+    "missingVersion": "Reload this task to get its current version.",
+    "messageStudent": "Message student",
+    "retryStudent": "Retry student name",
+    "studentUnavailable": "Student information is unavailable.",
+    "recordId": "Record #{{id}}",
+    "resources": {
+      "ADVISOR_TASK": "Student learning task",
+      "STUDY_PLAN_CHECKPOINT": "Study plan checkpoint",
+      "ASSIGNMENT": "Course assignment",
+      "SUBMISSION": "Assignment submission",
+      "SCHEDULE_REQUEST": "Schedule request",
+      "COURSE_REPORT": "Course report",
+      "COURSE_HOURS": "Course hours",
+      "STUDENT": "Student record"
+    },
+    "sourceDueDate": "Due {{date}}",
+    "sourceStatus": "Learning task: {{status}}",
+    "sourceUnavailable": "The learning task details could not be loaded."
   },
   "studentTasks": {
     "description": "Personalized tasks from your advisor to help you reach your learning goal.",
@@ -657,7 +674,17 @@
     "active": "Active conversation",
     "back": "Back to conversations",
     "select": "Select a conversation",
-    "selectHelp": "Choose a student to read messages and reply."
+    "selectHelp": "Choose a student to read messages and reply.",
+    "views": {
+      "conversations": "Conversations",
+      "students": "Student contacts"
+    },
+    "searchStudents": "Search students",
+    "studentsHint": "Choose any student assigned to you to start a conversation.",
+    "loadingStudents": "Loading students…",
+    "studentsFailed": "Students could not be loaded.",
+    "studentsEmpty": "No students match your search.",
+    "studentPages": "Student contact pages"
   },
   "counsellor": {
     "dashboard": "Intake dashboard",

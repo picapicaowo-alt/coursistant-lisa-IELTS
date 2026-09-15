@@ -252,9 +252,7 @@ const AdvisorStudentsPage: React.FC = () => {
                           <Link
                             className={listStyles.iconBtn}
                             aria-label={t('common:actions.messagePerson', {name})}
-                            to={`${generatePath(APP_ROUTE_PATHS.advisorStudentsStudentUserIdSupport, {
-                              studentUserId: String(student.studentUserId),
-                            })}#conversation`}
+                            to={`${APP_ROUTE_PATHS.advisorMessages}?${new URLSearchParams({studentUserId: String(student.studentUserId)})}`}
                           >
                             <MessageSquare size={14} aria-hidden="true" />
                           </Link>

@@ -27,19 +27,32 @@
 .columnHeadings > :last-child { grid-column: 4 / -1; }
 
 .taskRow {
+  align-items: start;
   padding-block: t.$space-5;
   border-top: 1px solid t.$border-default;
 }
 
 .taskMain {
   display: grid;
+  grid-column: 1;
   min-width: 0;
   gap: t.$space-2;
   overflow-wrap: anywhere;
 
-  h3 { margin: 0; font-size: t.$font-size-body; line-height: t.$line-height-body; font-weight: t.$fw-semibold; }
+  h3 { min-height: t.$touch-target; padding-block: (t.$touch-target - t.$line-height-body) * .5; margin: 0; font-size: t.$font-size-body; line-height: t.$line-height-body; font-weight: t.$fw-semibold; }
   p { margin: 0; color: t.$content-secondary; font-size: t.$font-size-caption; line-height: t.$line-height-caption; }
 }
+
+// A shared first-line height aligns pills with the title and buttons, even when
+// one task has more student/source detail than its neighbours.
+.statusCell,
+.priorityCell {
+  display: flex;
+  align-items: center;
+  min-height: t.$touch-target;
+}
+.statusCell { grid-column: 2; }
+.priorityCell { grid-column: 3; }
 
 .taskActions {
   display: grid;
@@ -53,16 +66,30 @@
 .detailsAction { grid-column: 1; }
 .recordAction { grid-column: 2; }
 .transitionAction { grid-column: 3; }
+.context { display: grid; gap: t.$space-2; min-width: 0; overflow-wrap: anywhere; }
+.studentLinks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: t.$space-3;
+  font-size: t.$font-size-caption;
+
+  a, button { min-height: t.$touch-target; display: inline-flex; align-items: center; }
+  a:first-child { font-weight: t.$fw-semibold; }
+  button { background: transparent; border: 0; text-decoration: underline; }
+}
 .taskBadges { display: flex; flex-wrap: wrap; align-items: center; gap: t.$space-3; margin-block: t.$space-3; }
 .detail h2 { font-size: t.$font-size-subhead; font-weight: t.$fw-semibold; }
 .detail h3 { font-size: t.$font-size-body; line-height: t.$line-height-body; font-weight: t.$fw-semibold; overflow-wrap: anywhere; }
 .detail p { margin-block: t.$space-2; color: t.$content-secondary; font-size: t.$font-size-caption; }
 
 @container (max-width: 62rem) {
-  .taskList { grid-template-columns: max-content minmax(0, 1fr); column-gap: t.$space-3; }
+  .taskList { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: t.$space-3; }
   .columnHeadings { display: none; }
   .taskRow { row-gap: t.$space-4; }
   .taskMain { grid-column: 1 / -1; }
+  .statusCell { grid-column: 1; }
+  .priorityCell { grid-column: 2; }
   .taskActions { display: flex; flex-wrap: wrap; grid-column: 1 / -1; gap: t.$space-3; }
 }
 
