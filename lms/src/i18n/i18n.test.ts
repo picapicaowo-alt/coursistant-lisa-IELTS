@@ -46,6 +46,8 @@ describe('locale resources', () => {
     }
     expect(leaves(resources['zh-CN'])['advising.actionTasks.intake']).toBe('入学档案');
     expect(leaves(resources['zh-TW'])['advising.actionTasks.intake']).toBe('入學檔案');
+    expect(leaves(resources['zh-CN'])['dashboard.advisorTasks']).toBe('学导任务');
+    expect(leaves(resources['zh-TW'])['dashboard.advisorTasks']).toBe('學導任務');
   });
 });
 

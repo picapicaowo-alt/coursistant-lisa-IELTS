@@ -296,7 +296,7 @@ test('student advising view presents profile, plan, and tasks with scannable hie
   await page.getByRole('region', {name: 'Learning Journey', exact: true}).getByRole('button', {name: /Complete the first diagnostic/}).click();
   await page.getByRole('button', {name: 'View Complete the week 1 diagnostic', exact: true}).click();
   await expect(page.getByRole('complementary').getByText('Not started', {exact: true})).toBeVisible();
-  await expect(page.getByRole('button', {name: 'Complete task', exact: true})).toBeVisible();
+  await expect(page.getByRole('button', {name: 'Submit', exact: true})).toBeVisible();
   await page.screenshot({path: testInfo.outputPath('student-advising-polished.png'), fullPage: true});
 });
 

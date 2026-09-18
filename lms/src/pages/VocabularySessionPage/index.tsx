@@ -58,7 +58,10 @@ const VocabularySessionPage = () => {
       {wordId, rating},
       crypto.randomUUID(),
     ),
-    onSuccess: setSession,
+    onSuccess: ratedSession => {
+      setSession(ratedSession);
+      advanceMutation.mutate('NEXT');
+    },
     onError: reconcileInactiveSession,
   });
   const advanceMutation = useMutation({
@@ -199,15 +202,13 @@ const VocabularySessionPage = () => {
 
       <div className={styles.progressBar} aria-label={translate("vocabulary:session.progress", {percent: formatPercent(progress / 100)})}><span style={{width: `${progress}%`}}/></div>
 
-      <p className={styles.modeGuidance}>
+      {session.mode !== 'TEST' || !session.rated ? <p className={styles.modeGuidance}>
         {session.mode === 'TEST'
-          ? session.rated
-            ? translate("vocabulary:session.ratingSavedHelp")
-            : session.revealed
-              ? translate("vocabulary:session.revealedHelp")
-              : translate("vocabulary:session.wordFirst")
+          ? session.revealed
+            ? translate("vocabulary:session.revealedHelp")
+            : translate("vocabulary:session.wordFirst")
           : translate("vocabulary:session.browseHelp")}
-      </p>
+      </p> : null}
 
       <section
         className={`${styles.studyCard} ${session.revealed ? styles.revealed : ''}`}
@@ -273,16 +274,18 @@ const VocabularySessionPage = () => {
               ))}
             </div>
           </div>
-        ) : (
+        ) : session.mode === 'REMEMBER' ? (
           <div className={styles.navigationControls}>
-            {session.mode === 'REMEMBER' ? (
-              <button type="button" onClick={() => advanceMutation.mutate('PREVIOUS')} disabled={!session.canGoPrevious || isBusy}> {translate("common:actions.previous")}</button>
-            ) : <span className={styles.lockedRating}><Check size={16}/> {' '}{translate("vocabulary:rating.saved")}</span>}
+            <button type="button" onClick={() => advanceMutation.mutate('PREVIOUS')} disabled={!session.canGoPrevious || isBusy}> {translate("common:actions.previous")}</button>
             <button type="button" className={styles.nextButton} onClick={() => advanceMutation.mutate('NEXT')} disabled={isBusy}>
               {session.position + 1 >= session.totalScheduled ? translate('common:navigationControls.finishSession') : translate('common:navigationControls.nextCard')}
             </button>
           </div>
-        )}
+        ) : advanceMutation.isError ? <div className={styles.navigationControls}>
+          <button type="button" className={styles.nextButton} onClick={() => advanceMutation.mutate('NEXT')} disabled={isBusy}>
+            {session.position + 1 >= session.totalScheduled ? translate('common:navigationControls.finishSession') : translate('common:navigationControls.nextCard')}
+          </button>
+        </div> : null}
       </footer>
     </main>
   );

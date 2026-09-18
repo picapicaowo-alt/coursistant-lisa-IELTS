@@ -52,7 +52,7 @@ test('student materials are expanded, aligned, and independently collapsible', a
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await expect(first.getByRole('listitem')).toHaveCount(0);
   await expect(second.getByRole('link', {name: /Open Reflection resource/})).toBeVisible();
-  await page.getByRole('link', {name: 'Open learning materials', exact: true}).click();
+  await toggle.click();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await first.getByRole('button', {name: 'Open Reading workshop.pdf', exact: true}).click();
   await expect(page).toHaveURL(/materialId=121/);
@@ -87,7 +87,7 @@ test('unit selection and material search combine, persist and recover from no re
   await unit.selectOption('82');
   await expect(page.locator('#week-81')).toHaveCount(0);
   await expect(page.locator('#week-82')).toBeVisible();
-  await expect(page.getByRole('link', {name: 'Open learning materials', exact: true})).toHaveAttribute('href', '#week-82');
+  await expect(page.getByRole('region', {name: 'Selected course content'})).toHaveCount(0);
   await unit.selectOption('');
   await search.fill('listening');
   await expect(page.locator('#week-81').getByRole('listitem')).toHaveCount(1);
@@ -97,8 +97,9 @@ test('unit selection and material search combine, persist and recover from no re
   await expect(search).toHaveValue('listening');
   await expect(page.getByRole('button', {name: 'Open Listening practice.mp3', exact: true})).toBeVisible();
   await search.fill('Reflection seminar');
-  await expect(page.locator('#week-82')).toBeVisible();
-  await expect(page.getByRole('link', {name: 'Open learning materials', exact: true})).toHaveAttribute('href', '#week-82');
+  const reflectionUnit = page.locator('#week-82');
+  await expect(reflectionUnit).toBeVisible();
+  await expect(reflectionUnit.getByRole('button', {name: /1 material/})).toBeVisible();
   await unit.selectOption('81');
   await expect(page.getByText('No materials match these filters. Try another name or learning unit.')).toBeVisible();
   await page.getByRole('button', {name: 'Clear filters', exact: true}).click();

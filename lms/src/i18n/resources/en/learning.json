@@ -239,7 +239,7 @@
     "note": "Submission note",
     "placeholder": "Share your work or reflection…",
     "start": "Start task",
-    "complete": "Complete task",
+    "complete": "Submit",
     "gone": "This task is no longer in the current checkpoint. Close this panel to choose another task."
   },
   "taskFile": {
