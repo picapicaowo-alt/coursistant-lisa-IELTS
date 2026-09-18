@@ -159,6 +159,12 @@ test('resumes a paused session from the library before opening its cards', async
 
 test('test mode requires reveal before rating and hides the LMS shell', async ({page}) => {
   await installSession(page);
+  let advanceRequests = 0;
+  const nextCard = {
+    ...hiddenCard,
+    position: 1,
+    currentCard: {wordId: '13000000-0000-4000-8000-000000000002', word: 'reduce', partOfSpeech: 'verb', answer: null},
+  };
   await page.route(`**/vocabulary-api/v1/vocabulary/units/${UNIT_ID}`, route => route.fulfill({json: unit}));
   await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}`, route => {
     if (route.request().method() === 'GET') return route.fulfill({json: hiddenCard});
@@ -166,6 +172,11 @@ test('test mode requires reveal before rating and hides the LMS shell', async ({
   });
   await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}/reveal`, route => route.fulfill({json: revealedCard}));
   await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}/ratings`, route => route.fulfill({json: ratedCard}));
+  await page.route(`**/vocabulary-api/v1/vocabulary/sessions/${SESSION_ID}/advance`, route => {
+    advanceRequests += 1;
+    expect(route.request().postDataJSON()).toEqual({direction: 'NEXT'});
+    return route.fulfill({json: nextCard});
+  });
   await page.goto(`/vocabulary/units/${UNIT_ID}/sessions/${SESSION_ID}`);
 
   await expect(page.getByRole('navigation')).toHaveCount(0);
@@ -176,8 +187,10 @@ test('test mode requires reveal before rating and hides the LMS shell', async ({
   await expect(page.getByText('分析', {exact: true})).toBeVisible();
   await expect(page.getByRole('button', {name: /Don't remember/})).toBeEnabled();
   await page.getByRole('button', {name: /Don't remember/}).click();
-  await expect(page.getByRole('button', {name: 'Next card'})).toBeVisible();
-  await expect(page.getByRole('button', {name: /Know well/})).toHaveCount(0);
+  await expect(page.getByRole('heading', {name: 'reduce'})).toBeVisible();
+  await expect(page.getByText('Rating saved', {exact: false})).toHaveCount(0);
+  expect(advanceRequests).toBe(1);
+  await expect(page.getByRole('button', {name: /Know well/})).toBeDisabled();
 });
 
 test('offers recovery when a card action discovers that the session is paused', async ({page}) => {

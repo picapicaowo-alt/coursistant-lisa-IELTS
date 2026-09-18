@@ -37,6 +37,24 @@ test('student course cards keep two desktop slots regardless of enrolment count'
   }
 });
 
+test('student course workspace keeps the course tabs directly below the course summary', async ({page}) => {
+  await fixture(page);
+  await page.setViewportSize({width: 1440, height: 1000});
+  await page.goto('/course/71');
+
+  const heading = page.getByRole('heading', {level: 1, name: course.title});
+  const tabs = page.getByRole('navigation', {name: 'Course sections'});
+  await expect(heading).toBeVisible();
+  await expect(tabs).toBeVisible();
+  await expect(page.getByRole('region', {name: 'Selected course content'})).toHaveCount(0);
+
+  const headingBox = await heading.boundingBox();
+  const tabsBox = await tabs.boundingBox();
+  expect(headingBox).not.toBeNull();
+  expect(tabsBox).not.toBeNull();
+  expect(tabsBox!.y - headingBox!.y).toBeLessThan(240);
+});
+
 test('advisor schedule preserves available sessions and retries a failed course read', async ({page}) => {
   await fixture(page, 'ADVISOR');
   let unavailable = true;

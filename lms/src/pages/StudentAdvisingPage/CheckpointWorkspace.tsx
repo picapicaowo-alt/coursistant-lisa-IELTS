@@ -97,22 +97,20 @@ export function CheckpointWorkspace({checkpoint, index, onBack, ...interaction}:
             </button>)}
           </div>
         </header>
-        <div className={styles.tableWrap}>
-          <table className={styles.table}>
-            <caption className={styles.srOnly}>{translate('learning:checkpoint.tasksFor', {checkpoint: checkpoint.description || translate('learning:checkpoint.current')})}</caption>
-            <thead><tr>
-              <th scope="col">{translate("learning:checkpoint.taskName")}</th>
-              <th scope="col" aria-sort={sort?.field === 'deadline' ? (sort.direction === 1 ? 'ascending' : 'descending') : 'none'}><button type="button" onClick={() => changeSort('deadline')}>{translate("learning:checkpoint.deadline")}<ArrowDown size={14} aria-hidden="true"/></button></th>
-              <th scope="col" aria-sort={sort?.field === 'status' ? (sort.direction === 1 ? 'ascending' : 'descending') : 'none'}><button type="button" onClick={() => changeSort('status')}>{translate("common:fields.status")}<ArrowDown size={14} aria-hidden="true"/></button></th>
-              <th scope="col"><span className={styles.srOnly}>{translate("common:fields.details")}</span></th>
-            </tr></thead>
-            <tbody>{visibleRows.map(row => <tr key={row.key} className={selected?.key === row.key ? styles.selected : undefined}>
-              <th scope="row"><strong>{row.task.title || translate("advising:studentTasks.task")}</strong>{row.task.description ? <span className={styles.taskDescription}>{row.task.description}</span> : null}</th>
-              <td><span className={styles.date}><img src="/icons/figma-study-plan/calendar.svg" alt=""/>{formatPlanDate(row.task.dueDate)}</span></td>
-              <td><span className={`${styles.status} ${styles[taskStatusTone(row.task.status)]}`}>{taskStatusLabel(row.task.status)}</span></td>
-              <td><button type="button" className={styles.view} aria-label={translate('learning:checkpoint.viewTask', {task: row.task.title || translate('advising:studentTasks.task')})} aria-expanded={selected?.key === row.key} aria-controls={selected?.key === row.key ? detailId : undefined} onClick={event => openDetail(row.key, event.currentTarget)}>{translate("common:actions.view")}</button></td>
-            </tr>)}</tbody>
-          </table>
+        <div className={styles.taskListWrap}>
+          <div className={styles.taskSortControls} aria-label={translate('learning:checkpoint.tasksFor', {checkpoint: checkpoint.description || translate('learning:checkpoint.current')})}>
+            <span>{translate("learning:checkpoint.taskName")}</span>
+            <button type="button" aria-pressed={sort?.field === 'deadline'} onClick={() => changeSort('deadline')}>{translate("learning:checkpoint.deadline")}<ArrowDown className={sort?.field === 'deadline' && sort.direction === -1 ? styles.sortDescending : undefined} size={14} aria-hidden="true"/></button>
+            <button type="button" aria-pressed={sort?.field === 'status'} onClick={() => changeSort('status')}>{translate("common:fields.status")}<ArrowDown className={sort?.field === 'status' && sort.direction === -1 ? styles.sortDescending : undefined} size={14} aria-hidden="true"/></button>
+          </div>
+          <div className={styles.taskCards}>{visibleRows.map(row => {
+            const taskTitle = row.task.title || translate("advising:studentTasks.task");
+            return <button type="button" key={row.key} className={`${styles.taskCard} ${selected?.key === row.key ? styles.selected : ''}`} aria-label={translate('learning:checkpoint.viewTask', {task: taskTitle})} aria-expanded={selected?.key === row.key} aria-controls={selected?.key === row.key ? detailId : undefined} onClick={event => openDetail(row.key, event.currentTarget)}>
+              <span className={styles.taskCopy}><strong>{taskTitle}</strong>{row.task.description ? <span className={styles.taskDescription}>{row.task.description}</span> : null}</span>
+              <span className={styles.date}><img src="/icons/figma-study-plan/calendar.svg" alt=""/>{formatPlanDate(row.task.dueDate)}</span>
+              <span className={`${styles.status} ${styles[taskStatusTone(row.task.status)]}`}>{taskStatusLabel(row.task.status)}</span>
+            </button>;
+          })}</div>
           {visibleRows.length === 0 ? <p className={styles.empty}>{rows.length ? translate("learning:checkpoint.noMatches") : translate("learning:checkpoint.noTasks")}</p> : null}
         </div>
         {rows.length > 0 ? <nav className={styles.pagination} aria-label={translate("learning:checkpoint.pages")}>

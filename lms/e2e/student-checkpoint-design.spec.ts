@@ -51,7 +51,7 @@ test('Figma task workspace preserves drafts, uses versioned mutations, and suppo
   await expect(panel.getByText('In progress', {exact: true})).toBeVisible();
   await expect(panel.getByRole('button', {name: 'Start task', exact: true})).toHaveCount(0);
   await page.screenshot({path: testInfo.outputPath('student-checkpoint-desktop.png'), fullPage: true});
-  await panel.getByRole('button', {name: 'Complete task', exact: true}).click();
+  await panel.getByRole('button', {name: 'Submit', exact: true}).click();
   await expect(panel.getByRole('heading', {name: 'Your submission'})).toBeVisible();
   expect(writes).toHaveLength(2);
   expect(writes[0].path).toContain('/start?expectedVersion=0');
@@ -68,19 +68,19 @@ test('Figma task workspace filters, sorts, paginates, and fits mobile details', 
   await page.getByRole('button', {name: 'Next task page'}).click();
   await expect(page.getByRole('button', {name: 'View Prepare the next draft', exact: true})).toBeVisible();
   await page.getByRole('button', {name: 'Completed 1', exact: true}).click();
-  await expect(page.getByRole('table').getByRole('button', {name: /^View /})).toHaveCount(1);
+  await expect(page.getByRole('button', {name: /^View /})).toHaveCount(1);
   await page.getByRole('button', {name: 'All tasks 6', exact: true}).click();
   await page.getByRole('button', {name: 'Deadline', exact: true}).click();
-  await expect(page.getByRole('row').nth(1)).toContainText('Prepare the next draft');
+  await expect(page.getByRole('button', {name: 'View Prepare the next draft', exact: true})).toBeVisible();
   await page.setViewportSize({width: 390, height: 844});
   await page.screenshot({path: testInfo.outputPath('student-checkpoint-mobile-list.png'), fullPage: true});
   await page.getByRole('button', {name: 'View Prepare the next draft', exact: true}).click();
   await expect(page.getByRole('heading', {level: 2, name: 'Prepare the next draft'})).toBeVisible();
-  await expect(page.getByRole('table')).not.toBeVisible();
+  await expect(page.getByRole('button', {name: 'View Prepare the next draft', exact: true})).not.toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.screenshot({path: testInfo.outputPath('student-checkpoint-mobile-detail.png'), fullPage: true});
   await page.getByRole('button', {name: 'Close task details'}).click();
-  await expect(page.getByRole('table')).toBeVisible();
+  await expect(page.getByRole('button', {name: 'View Prepare the next draft', exact: true})).toBeVisible();
 });
 
 test('stale task and checkpoint links recover without routing to a missing screen', async ({page}) => {
@@ -88,7 +88,7 @@ test('stale task and checkpoint links recover without routing to a missing scree
   await page.goto('/my-plan?checkpoint=91&task=999');
   await expect(page.getByRole('heading', {name: 'Task unavailable'})).toBeVisible();
   await page.getByRole('button', {name: 'Close task details'}).click();
-  await expect(page.getByRole('table')).toBeVisible();
+  await expect(page.getByRole('button', {name: 'View Build vocabulary range', exact: true})).toBeVisible();
   await page.goto('/my-plan?checkpoint=999');
   await expect(page.getByText('This checkpoint is no longer in your current study plan.')).toBeVisible();
   await page.getByRole('button', {name: 'Back to study plan'}).click();
