@@ -240,6 +240,7 @@
     "placeholder": "Share your work or reflection…",
     "start": "Start task",
     "complete": "Submit",
+    "resubmit": "Resubmit",
     "gone": "This task is no longer in the current checkpoint. Close this panel to choose another task."
   },
   "taskFile": {

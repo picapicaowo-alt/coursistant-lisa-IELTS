@@ -34,6 +34,24 @@ describe('task file version lifecycle', () => {
     await act(async () => {await expect(result.current.mutateAsync({action: 'complete', taskId: 24, version: 8})).rejects.toThrow();});
     expect(api.completeOwnAdvisorTask).not.toHaveBeenCalled();
   });
+  it('replaces the file on a completed task without completing it again', async () => {
+    const client = new QueryClient({defaultOptions: {queries: {retry: false}, mutations: {retry: false}}});
+    client.setQueryData(advisingQueryKeys.studentStudyPlan, {plan: {checkpoints: [{tasks: [{
+      id: 24, version: 7, status: 'COMPLETED', submissionFile: {...file, originalName: 'first.pdf'},
+    }]}]}});
+    vi.mocked(api.uploadOwnTaskSubmission).mockResolvedValue(envelope({...file, originalName: 'revised.pdf', taskVersion: 8}));
+    const wrapper = ({children}: PropsWithChildren) => <QueryClientProvider client={client}>{children}</QueryClientProvider>;
+    const {result} = renderHook(() => useTaskSubmission({}), {wrapper});
+    const revised = new File(['revised'], 'revised.pdf');
+
+    await act(async () => {await result.current.mutateAsync({action: 'upload', taskId: 24, version: 7, file: revised});});
+
+    expect(api.uploadOwnTaskSubmission).toHaveBeenCalledWith(24, 7, revised);
+    expect(api.completeOwnAdvisorTask).not.toHaveBeenCalled();
+    expect(client.getQueryData(advisingQueryKeys.studentStudyPlan)).toMatchObject({plan: {checkpoints: [{tasks: [{
+      id: 24, version: 8, status: 'COMPLETED', submissionFile: {originalName: 'revised.pdf'},
+    }]}]}});
+  });
   it('enforces the provided format and 100 MiB limit', () => {
     for (const extension of TASK_FILE_RULES.extensions) expect(() => validateTaskFile({name: `file.${extension.toUpperCase()}`, size: TASK_FILE_RULES.maxBytes})).not.toThrow();
     expect(() => validateTaskFile({name: 'file.pdf', size: TASK_FILE_RULES.maxBytes + 1})).toThrow();
