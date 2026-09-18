@@ -240,6 +240,7 @@
     "placeholder": "分享您的作業或學習感想…",
     "start": "開始任務",
     "complete": "提交",
+    "resubmit": "重新提交",
     "gone": "此任務已不在當前檢查點中，請關閉詳情後選擇其他任務。"
   },
   "taskFile": {
